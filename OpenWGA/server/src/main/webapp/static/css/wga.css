@@ -1,0 +1,277 @@
+/*******************************************************************************
+  *Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+  *
+  *This file is part of the OpenWGA server platform.
+  *
+  *OpenWGA is free software: you can redistribute it and/or modify
+  *it under the terms of the GNU General Public License as published by
+  *the Free Software Foundation, either version 3 of the License, or
+  *(at your option) any later version.
+  *
+  *In addition, a special exception is granted by the copyright holders
+  *of OpenWGA called "OpenWGA plugin exception". You should have received
+  *a copy of this exception along with OpenWGA in file COPYING.
+  *If not, see <http://www.openwga.com/gpl-plugin-exception>.
+  *
+  *OpenWGA is distributed in the hope that it will be useful,
+  *but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *GNU General Public License for more details.
+  *
+  *You should have received a copy of the GNU General Public License
+  *along with OpenWGA in file COPYING.
+  *If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+body,td,p,b,span,div,a,input,select,option{
+	font-family:Arial,Verdana,Helvetia;
+	font-size: 12px;
+}
+body{
+	background-color:white;
+	margin:10px;
+}
+body.noBorder{
+	background-color:white;
+	margin:0px;
+}
+td{
+	font-size: 12px;
+	font-weight:normal;	
+	color:#000000;
+}
+form{
+	display:inline;	
+}
+input{
+	font-family:Arial,Verdana,Helvetia;
+	font-size: 12px;
+	font-weight:normal;	
+	color:#000000;	
+	border:2px white inset;
+}
+textarea{
+	font-family:Arial,Verdana,Helvetia;
+	font-size: 12px;
+	font-weight:normal;	
+	color:#000000;	
+	border:2px white inset;
+}
+.button{
+	border:1px outset white;
+	font-family:Arial,Verdana,Helvetia;
+	font-size: 10px;
+	font-weight:normal;	
+	color:#000000;
+}
+.radio{
+	border:0px;
+}
+.checkbox{
+	border:0px;
+}
+select,option{
+	background-color:#ffffff;
+	color:#000000;
+	font-size:12px;
+	border-style:inset;
+	border-width:1px;
+	border-color:#ffc800;	
+}
+
+h1{
+	color:#000000;
+	font-size:20px;
+	font-weight:bold;
+}
+hr{	
+	height:2px;
+	color:white;
+	border:inset 1px white;
+}
+
+a {
+	color:black;	
+}
+a:hover {
+	color:red;
+}
+a.tab {
+	color:#000000;
+	font-size:11px;
+	text-decoration:none;
+}
+a.tab:hover {
+	color:red;
+	font-size:11px;
+	text-decoration:none;
+}
+
+li{
+	line-height:20px;
+}
+.orangeBorder{
+	border:1px orange solid;
+}
+.small{
+	font-size:11px;
+}
+.text{
+	background-color:#ffffff;
+	color:#000000;
+	font-size:12px;
+	border-style:solid;
+	border-width:1px;
+	border-color:#f5bd00;
+	height:20px;
+	padding-left:3px;
+	padding-right:3px;
+	padding-top:2px;
+	padding-bottom:0px;
+}
+
+.forms{ 
+	color: #000000;
+	font-size:11px;
+	background-color:#FEF0AA;
+	padding-left:5pt;
+	padding-right:5pt;
+	border:1px orange solid;
+	position:absolute; 
+	top:75px; 
+	left:5px; 
+	z-index:100; 
+	visibility:hidden; 
+}
+.staticforms{ 
+	color: #000000;
+	font-size:11px;	
+	padding-left:5pt;
+	padding-right:5pt;
+	border:3px white groove;	
+}
+.tabforms{ 
+	color: #000000;
+	font-size:11px;	
+	padding-left:5pt;
+	padding-right:5pt;
+	border:3px white groove;	
+}
+.formsHeadline{
+	background-color:#999999;
+	padding:4px;
+	padding-left:10px;
+	font-weight:bold;
+	font-size:12px;
+	color:#ffc800;
+	border-top:1px solid white;
+	border-bottom:2px solid black;
+}
+td.reiter{
+	border:white 2px inset;
+	border-bottom:0px; 	
+	padding-top:0pt;
+	padding-bottom:3pt;
+	padding-left:1pt;
+	padding-right:1pt;
+
+}
+
+a.reiter:link{
+	font-family:Arial,sans-serif;
+	font-size: 9pt;
+	font-weight:bold;
+	text-decoration:none;
+	color:#000000;
+}
+a.reiter:visited{
+	font-family:Arial,sans-serif;
+	font-size: 9pt;
+	font-weight:bold;
+	text-decoration:none;
+	color:#000000;
+}
+a.reiter:active{
+	font-family:Arial,sans-serif;
+	font-size: 9pt;
+	font-weight:bold;	
+	text-decoration:none;
+	color:#000000;
+}
+a.reiter:hover{
+	font-family:Arial,sans-serif;
+	font-size: 9pt;
+	font-weight:bold;
+	text-decoration:none;	
+	color:#FFFFFF;
+}
+a.reiterSelected{
+	font-family:Arial,sans-serif;
+	font-size: 9pt;
+	font-weight:bold;
+	text-decoration:none;	
+	color:#ffc800;
+}
+a.reiterSelected:hover{
+	font-family:Arial,sans-serif;
+	font-size: 9pt;
+	font-weight:bold;
+	text-decoration:none;	
+	color:#FFFFFF;
+}
+.orangeTop{
+	border-style:solid;
+	border-color:orange;
+	border-left:0px;
+	border-right:0px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-width: 0px;
+	border-right-width: 1px;
+}
+
+.warning{
+	padding:5px;
+	background-color:white;
+	border:solid 2px red;
+}
+
+.warning h1{
+	color:red;
+	font-weight:bold;
+	font-size:16px;
+}
+.warning p{
+	color:black;
+	font-size:12px;
+	font-weight:bold;
+}
+button.sorter{
+	cursor:pointer;
+	width:100%;	
+	text-align:left;
+	padding-left:5px;
+	border:outset 2px silver;
+	background-color:white;
+	font-size:10px;
+}
+
+table.listTable{
+	border:2px white groove;
+}
+table.listTable td{
+	padding-left:5px;
+	padding-right:5px;
+	padding-top:2px;
+	padding-bottom:2px;
+	border-bottom:2px white groove;
+}
+td.mainContentTable{
+	width:100%;
+	height:100%;
+	padding-top:2px;
+	padding-left:10px;
+	padding-right:10px;
+	padding-bottom:2px;
+	border-left:2px solid #DEDEDE;
+	border-right:2px solid black;
+}

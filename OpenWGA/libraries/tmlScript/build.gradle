@@ -1,0 +1,20 @@
+apply plugin: 'java'
+
+compileJava.options.encoding = 'ISO-8859-1'
+
+dependencies {
+    compile project(":libraries:wga");
+    compile fileTree(dir: '../../customLibs/rhino', include: ['*.jar'])
+    
+    compileClasspath 'javax.websocket:javax.websocket-api:1.1'
+    compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/java"]
+            excludes = ["**/*.java"]
+        }
+    }
+}

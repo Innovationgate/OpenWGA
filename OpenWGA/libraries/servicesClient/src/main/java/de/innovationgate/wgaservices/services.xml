@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<spheon-jsoap>
+	<service urn="urn:wgaservices" class="de.innovationgate.wgaservices.WGAServices"/>
+	<xsd uri="urn:wgaservices">
+		<soap type="RemoteSession">@de.fmui.spheon.jsoap.encoding.xsdBeanWrapper,RemoteSession,de.innovationgate.wgaservices.types.RemoteSession</soap>
+		<java type="de.innovationgate.wgaservices.types.RemoteSession">@de.fmui.spheon.jsoap.encoding.xsdBeanWrapper,RemoteSession,de.innovationgate.wgaservices.types.RemoteSession</java>
+
+		<soap type="BrowsingEntry">@de.fmui.spheon.jsoap.encoding.xsdBeanWrapper,BrowsingEntry,de.innovationgate.wgaservices.types.BrowsingEntry</soap>
+		<java type="de.innovationgate.wgaservices.types.BrowsingEntry">@de.fmui.spheon.jsoap.encoding.xsdBeanWrapper,BrowsingEntry,de.innovationgate.wgaservices.types.BrowsingEntry</java>
+
+		<soap type="ContentEntry">@de.fmui.spheon.jsoap.encoding.xsdBeanWrapper,ContentEntry,de.innovationgate.wgaservices.types.ContentEntry</soap>
+		<java type="de.innovationgate.wgaservices.types.ContentEntry">@de.fmui.spheon.jsoap.encoding.xsdBeanWrapper,ContentEntry,de.innovationgate.wgaservices.types.ContentEntry</java>
+
+		<soap type="Form">@de.fmui.spheon.jsoap.encoding.xsdBeanWrapper,Form,de.innovationgate.wgaservices.types.Form</soap>
+		<java type="de.innovationgate.wgaservices.types.Form">@de.fmui.spheon.jsoap.encoding.xsdBeanWrapper,Form,de.innovationgate.wgaservices.types.Form</java>
+
+		<soap type="FormField">@de.fmui.spheon.jsoap.encoding.xsdBeanWrapper,FormField,de.innovationgate.wgaservices.types.FormField</soap>
+		<java type="de.innovationgate.wgaservices.types.FormField">@de.fmui.spheon.jsoap.encoding.xsdBeanWrapper,FormField,de.innovationgate.wgaservices.types.FormField</java>
+		
+		<soap type="FormAttachment">@de.fmui.spheon.jsoap.encoding.xsdBeanWrapper,FormAttachment,de.innovationgate.wgaservices.types.FormAttachment</soap>
+		<java type="de.innovationgate.wgaservices.types.FormAttachment">@de.fmui.spheon.jsoap.encoding.xsdBeanWrapper,FormAttachment,de.innovationgate.wgaservices.types.FormAttachment</java>
+	</xsd>
+</spheon-jsoap>

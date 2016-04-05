@@ -1,0 +1,14 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<HTML>
+<HEAD>
+<META http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<META name="GENERATOR" content="IBM Software Development Platform">
+<TITLE>package.html</TITLE>
+</HEAD>
+<BODY>
+Basic functionality of the WGAPI including most of the database-independent functionality.
+When you work with the WGAPI you will rarely access any other classes than these from this package.
+<p>Main entry point for working with the WGAPI is the class {@link de.innovationgate.webgate.api.WGFactory WGFactory} which is a singleton that is aquired by it's static getInstance() method.</p>
+<p>The WGFactory can open Databases by it's method openDatabase. The returned objects are of type {@link de.innovationgate.webgate.api.WGDatabase WGDatabase}. From there you can retrieve the data of WGA databases as descendants of {@link de.innovationgate.webgate.api.WGDocument WGDocument}.</p>
+</BODY>
+</HTML>

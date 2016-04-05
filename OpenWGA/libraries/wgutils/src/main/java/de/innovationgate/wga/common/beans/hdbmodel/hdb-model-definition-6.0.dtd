@@ -1,0 +1,64 @@
+<!-- DTD hdb-model ... -->
+<!-- (C) ... Mon Jul 22 13:33:09 2013 -->
+<!ELEMENT hdb-model (custom|storage)* >
+<!-- custom=1 | storage=2 -->
+	<!-- versioning : ... -->
+	<!ATTLIST hdb-model versioning (true|false) #IMPLIED>
+	<!-- version : ... -->
+	<!ATTLIST hdb-model version CDATA #IMPLIED >
+	<!-- scripts : ... -->
+	<!ATTLIST hdb-model scripts CDATA #IMPLIED >
+	<!-- definition : ... -->
+	<!ATTLIST hdb-model definition CDATA #IMPLIED >
+<!ELEMENT singleton-content (item|custom)* >
+<!-- item=2 | custom=2 -->
+	<!-- cid : ... -->
+	<!ATTLIST singleton-content cid CDATA #REQUIRED>
+<!ELEMENT filter ((custom|param|where)*,order?)>
+<!-- order=6 | custom=1 | param=1 | where=6 -->
+	<!-- name : ... -->
+	<!ATTLIST filter name CDATA #REQUIRED>
+<!ELEMENT content (singleton-content|filter|relation|custom|item|storage)* >
+<!-- singleton-content=1 | filter=6 | relation=8 | custom=1 | item=3 | storage=8 -->
+	<!-- contentclass : ... -->
+	<!ATTLIST content contentclass CDATA #REQUIRED>
+<!ELEMENT item (custom)* >
+<!-- custom=2 -->
+	<!-- name : ... -->
+	<!ATTLIST item name CDATA #REQUIRED>
+	<!-- default : ... -->
+	<!ATTLIST item default CDATA #IMPLIED >
+<!ELEMENT custom (#PCDATA) >
+<!-- #PCDATA=1 -->
+	<!-- name : ... -->
+	<!ATTLIST custom name CDATA #REQUIRED>
+<!ELEMENT where (#PCDATA) >
+<!-- #PCDATA=1 -->
+<!ELEMENT order (#PCDATA) >
+<!-- #PCDATA=1 -->
+<!ELEMENT relation ((custom|param|where)*,order?) >
+<!-- order=1 | custom=1 | param=2 | where=3 -->
+	<!-- group : ... -->
+	<!ATTLIST relation group (true|false) #IMPLIED >
+	<!-- baseclass : ... -->
+	<!ATTLIST relation baseclass CDATA #IMPLIED >
+	<!-- targetclass : ... -->
+	<!ATTLIST relation targetclass CDATA #IMPLIED>
+	<!-- filter : ... -->
+	<!ATTLIST relation filter CDATA #IMPLIED >
+	<!-- name : ... -->
+	<!ATTLIST relation name CDATA #REQUIRED>
+	<!-- optional : ... -->
+	<!ATTLIST relation optional (true|false) #IMPLIED >
+<!ELEMENT storage (singleton-content|content|custom|storage)* >
+<!-- singleton-content=1 | content=11 | custom=1 | storage=2 -->
+	<!-- sid : ... -->
+	<!ATTLIST storage sid CDATA #REQUIRED>
+	<!-- readers : ... -->
+	<!ATTLIST storage readers CDATA #IMPLIED >
+	<!-- editors : ... -->
+	<!ATTLIST storage editors CDATA #IMPLIED >
+<!ELEMENT param (#PCDATA) >
+<!-- #PCDATA=1 -->
+	<!-- name : ... -->
+	<!ATTLIST param name CDATA #REQUIRED>

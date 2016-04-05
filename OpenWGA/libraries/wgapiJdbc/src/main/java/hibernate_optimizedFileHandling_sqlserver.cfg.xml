@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+
+<session-factory>
+	<!-- SQL dialect -->
+	<property name="dialect">
+		 org.hibernate.dialect.SQLServerDialect
+	</property>	
+	<mapping resource="de/innovationgate/webgate/api/jdbc/Mapping.optimizedFileHandling.hbm.xml"/>
+</session-factory>
+
+</hibernate-configuration>

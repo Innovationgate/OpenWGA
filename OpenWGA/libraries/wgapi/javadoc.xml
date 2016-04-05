@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="javadoc" name="WGAPI-Javadoc">
+
+	<!-- Definitions -->
+		<path id="basepath">
+			<pathelement location="WebContent/WEB-INF/lib/wgutils.jar"/>
+			<pathelement location="WebContent/WEB-INF/lib/xstream-1.2.2.jar"/>
+			<pathelement location="WebContent/WEB-INF/lib/dom4j-1.6.1.jar"/>
+			<pathelement location="WebContent/WEB-INF/lib/commons-vfs-1.0.jar"/>
+			<pathelement location="WebContent/WEB-INF/lib/commons-lang-2.1.jar"/>
+			<pathelement location="../WGA/lib/ant/extensions/wgaant.jar" />
+		</path>
+		<taskdef name="buildInformation" classname="de.innovationgate.ant.BuildInformationTask" classpathref="basepath" loaderref="basepath.loader"/>
+		<taskdef name="buildSignature" classname="de.innovationgate.ant.BuildSignatureTask" classpathref="basepath" loaderref="basepath.loader"/>
+		<taskdef name="fattrib" classname="de.innovationgate.ant.FAttribTask" classpath="../WGA/lib/ant/extensions/wgaant.jar"/>
+		<taskdef name="buildWGAPlugin" classname="de.innovationgate.ant.BuildWGAPlugin" classpath="../WGA/lib/ant/wgaant.jar" classpathref="basepath"/>
+	<taskdef name="collectlibs" classname="de.innovationgate.ant.CollectLibsTask" classpath="../WGA/lib/ant/wgaant.jar" classpathref="basepath"/>
+	
+	
+	<target name="javadoc">
+		<mkdir dir="${wga.deploydir}/Development Kit/apidoc/WGAPI"/>
+		<delete>
+			<fileset dir="${wga.deploydir}/Development Kit/apidoc/WGAPI" includes="*.*"/>
+		</delete>
+		
+		<collectlibs divider=";" dir="../WGAPublisher/WebContent/WEB-INF/lib" targetdir="../WGAPublisher/WebContent/WEB-INF/lib" property="classpath-WGA"/>
+	    <!-- <collectlibs divider=";" dir="${javadoc.noteslibs}" targetdir="${javadoc.noteslibs}" property="classpath-Notes"/>-->
+		<collectlibs divider=";" dir="${j2ee.1_4.lib}" targetdir="${j2ee.1_4.lib}" property="classpath-J2EE"/>
+		<buildInformation webinf="../WGAPublisher/WebContent/WEB-INF"/>
+		
+		<echo message="Classpath from WGA: ${classpath-WGA}"/>
+		<echo message="Classpath from J2EE: ${classpath-J2EE}"/>
+		<javadoc access="public" author="true" encoding="ISO-8859-1"
+			classpath="${classpath-WGA};${classpath-J2EE};../WGAPublisher/WebContent/WEB-INF/classes"
+			destdir="${wga.deploydir}/Development Kit/apidoc/WGAPI"
+			doctitle="WGAPI ${majorVersion}.${minorVersion} Javadoc Documentation" nodeprecated="false"
+			windowtitle="WGAPI ${majorVersion}.${minorVersion}"
+			nodeprecatedlist="false" noindex="false" nonavbar="false"
+			notree="false"
+			excludepackagenames="de.innovationgate.utils.modules,de.innovationgate.monitoring,de.innovationgate.webgate.api.modules.*,de.innovationgate.webgate.api.query.rss,de.innovationgate.webgate.api.rss2,de.innovationgate.wga.model"
+			source="1.6" sourcepath="." splitindex="true" use="true"
+			version="true">
+				<sourcepath>
+			      <pathelement path="."/>
+			      <pathelement path="../WGUtils"/>
+			    </sourcepath>
+			
+				<group title="WGAPI Core Classes" packages="de.innovationgate.webgate.api.utils,de.innovationgate.webgate.api.auth,de.innovationgate.webgate.api.workflow,de.innovationgate.webgate.api,de.innovationgate.webgate.api.templates,de.innovationgate.webgate.api.locking,de.innovationgate.webgate.api.fake,de.innovationgate.webgate.api.mail,de.innovationgate.webgate.api.servers,de.innovationgate.webgate.api.schemadef,de.innovationgate.webgate.api.simple"/>
+				<group title="WGAPI Utility Classes" packages="de.innovationgate.utils*"/>
+				<group title="OpenWGA Platform Shared Classes" packages="de.innovationgate.wga.common*,de.innovationgate.wga.config*,de.innovationgate.wga.modules*"/>
+			
+		</javadoc>
+		
+		<!-- packagenames="de.innovationgate.utils.*,de.innovationgate.wga.common*,de.innovationgate.webgate.api.utils,de.innovationgate.webgate.api.auth,de.innovationgate.webgate.api.workflow,de.innovationgate.webgate.api,de.innovationgate.webgate.api.templates,de.innovationgate.webgate.api.locking" -->
+		
+	</target>
+</project>

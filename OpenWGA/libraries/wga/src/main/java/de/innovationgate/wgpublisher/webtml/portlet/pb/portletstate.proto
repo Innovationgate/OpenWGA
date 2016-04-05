@@ -1,0 +1,28 @@
+package webtml.portlet;
+
+option java_package = "de.innovationgate.wgpublisher.webtml.portlet.pb";
+option java_outer_classname = "TMLPortletStatePBData";
+
+message Data {
+	optional string processId = 1;
+	optional string complianceVersion = 2;
+	optional string portletKey = 3;
+	optional string portletName = 4;
+	optional string parentPortletKey = 5;
+	optional string profileName = 6;
+	optional string sessionId = 7;
+	optional string design = 8;
+
+	message ScopeState {
+		optional string ref = 1;
+		optional string json = 2;
+	}
+	
+	message ScopeObjectRegistry {
+		optional string scope = 1;
+		repeated ScopeState = 2;
+	}
+	
+	optional ScopeObjectRegistry registry = 9;
+	
+} 

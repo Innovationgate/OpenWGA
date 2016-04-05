@@ -1,0 +1,9 @@
+apply plugin: 'java'
+apply plugin: 'war'
+
+compileJava.options.encoding = 'ISO-8859-1'
+
+dependencies {
+    compile project(":libraries:wga");
+    compile project(":libraries:tmlScript");
+}

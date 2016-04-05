@@ -1,0 +1,6 @@
+/COPYING
+/ddl/
+/de/
+/hibernate.properties
+/hibernate_optimizedFileHandling_mysql.cfg.xml
+/hibernate_optimizedFileHandling_sqlserver.cfg.xml

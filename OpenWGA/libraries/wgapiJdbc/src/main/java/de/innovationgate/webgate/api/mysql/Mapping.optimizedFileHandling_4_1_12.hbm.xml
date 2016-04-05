@@ -1,0 +1,492 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping auto-import="true">
+
+	<class name="de.innovationgate.webgate.api.jdbc.Language" table="LANGUAGES">
+
+		<id name="name" column="name" unsaved-value="any" type="string" length="10">
+			<generator class="assigned" />
+		</id>
+
+		<property name="created" not-null="true" type="timestamp" />
+		<property name="lastmodified" not-null="true" type="timestamp" />
+		<property name="title" not-null="false" type="string"/>
+		<property name="description" not-null="false" type="string" />
+		
+		<list name="contentcreators" table="LANGUAGES_CONTENTCREATORS" cascade="all" lazy="true">
+			<key column="language" />
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+		
+		<!-- <map name="contents" inverse="true" lazy="true">
+			<key column="language" />
+			<index column="cuid" type="string"/>
+			<one-to-many class="de.innovationgate.webgate.api.jdbc.Content" />
+		</map>-->
+
+	</class>
+
+	<class name="de.innovationgate.webgate.api.jdbc.FileContainer" table="FILECONTAINERS">
+
+		<id name="name" column="name" unsaved-value="any" type="string" length="50">
+			<generator class="assigned" />
+		</id>
+
+		<property name="created" not-null="true" type="timestamp" />
+		<property name="lastmodified" not-null="true" type="timestamp" />
+		<property name="description" not-null="false" type="string" />
+
+		<list name="categories" table="FILECONTAINERS_CATEGORIES" cascade="all" lazy="true">
+			<key column="containername" />	
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+
+		<map name="files" inverse="true" lazy="true" cascade="all-delete-orphan">
+			<key column="containername"/>
+			<index column="name" type="string" />
+			<one-to-many class="de.innovationgate.webgate.api.jdbc.ContainerFileMeta" />
+		</map>
+
+	</class>
+
+	<class name="de.innovationgate.webgate.api.jdbc.CSSJSModule" table="CSSJSMODULES">
+
+		<id name="name" column="name" unsaved-value="any" type="string" length="50">
+			<generator class="assigned" />
+		</id>
+
+		<property name="created" not-null="true" type="timestamp" />
+		<property name="lastmodified" not-null="true" type="timestamp" />
+		<property name="code" not-null="false" type="text">
+			<column name="code"/>
+		</property>
+		<property name="codetype" not-null="false" type="string" />
+		<property name="description" not-null="false" type="string" />
+
+	</class>
+
+	<class name="de.innovationgate.webgate.api.jdbc.TMLModule" table="TMLMODULES">
+
+		<composite-id name="modulekey" class="de.innovationgate.webgate.api.jdbc.TMLModuleKey" unsaved-value="any">
+			<key-property name="name" type="string" length="50"/>
+			<key-property name="mediakey" type="string" length="10"/>
+		</composite-id>
+
+		<property name="created" not-null="true" type="timestamp" />
+		<property name="lastmodified" not-null="true" type="timestamp" />
+		<property name="description" not-null="false" type="string" />
+		<property name="code" not-null="false" type="text">
+			<column name="code"/>
+		</property>
+		<property name="directaccess" not-null="true" type="java.lang.Boolean" />
+		<property name="cacheable" not-null="true" type="java.lang.Boolean" />
+		<property name="editor" not-null="false" type="string"/>
+		<property name="editordata" not-null="false" type="string"/>
+		<property name="version" not-null="false" type="java.lang.Integer"/>
+		<property name="status" not-null="false" type="string"/>
+				
+		<list name="categories" table="TMLMODULES_CATEGORIES" cascade="all" lazy="true">
+			<key>
+				<column name="modulename" />
+				<column name="modulemediakey" />
+			</key>
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+
+	</class>
+
+	<class name="de.innovationgate.webgate.api.jdbc.ContentType" table="CONTENTTYPES">
+
+		<id name="name" column="name" unsaved-value="any" type="string" length="50">
+			<generator class="assigned" />
+		</id>
+
+		<property name="created" not-null="true" type="timestamp" />
+		<property name="lastmodified" not-null="true" type="timestamp" />
+		<property name="description" not-null="false" type="string" />		
+		<property name="workflow" not-null="false" type="string" />
+		<property name="outerlayout" not-null="false" type="string" />
+		<property name="innerlayout" not-null="false" type="string" />
+		<property name="positioning" not-null="false" type="string" />
+		<property name="eventcreatecontent" not-null="false" type="text"/>
+		<property name="eventsavecontent" not-null="false" type="text"/>
+		<property name="eventworkflowmail" not-null="false" type="text"/>
+		<property name="preferredparent" not-null="false" type="text"/>
+
+		<list name="contentcreators" table="CONTENTTYPES_CONTENTCREATORS" cascade="all" lazy="true">
+			<key column="contenttypename" />
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+		<list name="contenteditors" table="CONTENTTYPES_CONTENTEDITORS" cascade="all" lazy="true">
+			<key column="contenttypename" />
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+		
+		<list name="allowedpositions" table="CONTENTTYPES_ALLOWEDPOSITIONS" cascade="all" lazy="true">
+			<key column="contenttypename" />
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+		<list name="namealiases" table="CONTENTTYPES_NAMEALIASES" cascade="all" lazy="true">
+			<key column="contenttypename" />
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+		<list name="descriptionaliases" table="CONTENTTYPES_DESCRIPTIONALIASES" cascade="all" lazy="true">
+			<key column="contenttypename" />
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+	</class>
+
+	<class name="de.innovationgate.webgate.api.jdbc.Area" table="WEBAREAS">
+
+		<id name="name" column="name" unsaved-value="any" type="string" length="50">
+			<generator class="assigned" />
+		</id>
+
+		<property name="created" not-null="true" type="timestamp" />
+		<property name="lastmodified" not-null="true" type="timestamp" />
+		<property name="description" not-null="false" type="string" />		
+
+		<list name="editors" table="AREAS_EDITORS" cascade="all" lazy="true">
+			<key column="area" />
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+
+		<list name="rootentrycreators" table="AREAS_ROOTCREATORS" cascade="all" lazy="true">
+			<key column="area" />
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+
+		<list name="childentrycreators" table="AREAS_CHILDCREATORS" cascade="all" lazy="true">
+			<key column="area" />
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+
+		<map name="rootentries" inverse="true" lazy="true" where="parententry IS NULL">
+			<key column="area" />
+			<index column="structkey" type="string"/>
+			<one-to-many class="de.innovationgate.webgate.api.jdbc.StructEntry" />
+		</map>
+
+	</class>
+
+	<class name="de.innovationgate.webgate.api.jdbc.StructEntry" table="STRUCTENTRIES">
+
+		<id name="key" column="structkey" unsaved-value="any" type="string" length="32">
+			<generator class="assigned" />
+		</id>
+
+		<property name="created" not-null="true" type="timestamp" />
+		<property name="lastmodified" not-null="true" type="timestamp" />
+		<property name="position" column="structposition" not-null="true" type="java.lang.Integer" />
+		<property name="title" not-null="false" type="string" />
+		<property name="originalkey" not-null="false" type="string"/>
+		<property name="outerlayout" not-null="false" type="string" />
+		<property name="innerlayout" not-null="false" type="string" />
+		
+		<list name="contentcreators" table="STRUCTENTRIES_CONTENTCREATORS" cascade="all" lazy="true">
+			<key column="structentry" />
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+
+		<list name="childentrycreators" table="STRUCTENTRIES_CHILDCREATORS" cascade="all" lazy="true">
+			<key column="structentry" />
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+
+		<map name="childentries" inverse="true" lazy="true">
+			<key column="parententry" />
+			<index column="structkey" type="string" />
+			<one-to-many class="de.innovationgate.webgate.api.jdbc.StructEntry" />
+		</map>
+		
+		<set name="content" inverse="true" lazy="true">
+			<key column="structentry" />
+			<one-to-many class="de.innovationgate.webgate.api.jdbc.Content"/>
+		</set>
+
+		<many-to-one name="parententry" class="de.innovationgate.webgate.api.jdbc.StructEntry"/>
+		<many-to-one name="contenttype" class="de.innovationgate.webgate.api.jdbc.ContentType" column="contenttype"/>
+		<many-to-one name="area" class="de.innovationgate.webgate.api.jdbc.Area" column="area"/>
+
+	</class>
+
+	<class name="de.innovationgate.webgate.api.jdbc.Content" table="CONTENT">
+	
+		<id name="cuid" unsaved-value="null" type="string" length="32">
+			<generator class="uuid.hex" />
+		</id>
+
+		<property name="created" not-null="true" type="timestamp" />
+		<property name="lastmodified" not-null="true" type="timestamp" />
+		<property name="title" not-null="true" type="string" />
+		<property name="status" not-null="true" type="string" />
+		<property name="uniquename" not-null="false" type="string" />
+		<property name="version" not-null="true" type="java.lang.Integer"/>
+		<list name="ishiddenfrom" table="CONTENT_ISHIDDENFROM" cascade="all" lazy="false" fetch="join">
+			<key column="cuid"/>
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+		<list name="readers" table="CONTENT_READERS" cascade="all" lazy="false" fetch="join">
+			<key column="cuid"/>
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+		<property name="visible" not-null="true" type="java.lang.Boolean" />
+		<property name="validfrom" not-null="false" type="timestamp" />
+		<property name="validto" not-null="false" type="timestamp" />
+		<property name="baseimage" not-null="false" type="string" />
+		<property name="mouseoverimage" not-null="false" type="string" />
+		<property name="selectedimage" not-null="false" type="string" />
+		<property name="usenavimages" not-null="true" type="java.lang.Boolean" />
+		<property name="virtuallink" not-null="false" type="string" />
+		<property name="virtuallinktype" not-null="false" type="string" />
+		<property name="linktarget" not-null="false" type="string" />
+		<property name="lastclient" not-null="false" type="string" />
+		<property name="htmlhead" not-null="false" type="text">
+			<column name="htmlhead"/>
+		</property>
+		<list name="keywords" table="CONTENT_KEYWORDS" cascade="all" lazy="false" fetch="join">
+			<key column="cuid"/>
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+		<property name="refresh" not-null="false" type="java.lang.Boolean" />
+		<property name="refreshurl" not-null="false" type="string" />
+		<property name="refreshtime" not-null="false" type="java.lang.Integer" />
+		<list name="trackingkeys" table="CONTENT_TRACKINGKEYS" cascade="all" lazy="true">
+			<key column="cuid"/>
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+		<property name="author" not-null="false" type="string" />
+		<property name="email" not-null="false" type="string" />
+		<property name="searchscore" not-null="false" type="java.lang.Integer" />
+		<list name="wfhistory" table="CONTENT_WFHISTORY" cascade="all" lazy="true">
+			<key column="cuid"/>
+			<index column="idx"/>
+			<element column="name" type="string" />
+		</list>
+		<property name="description" not-null="false" type="text">
+			<column name="description"/>
+		</property>
+		<property name="releaseready" not-null="false" type="java.lang.Boolean" />
+
+		<map name="items" inverse="true" cascade="all-delete-orphan" lazy="false" fetch="join">
+			<key column="cuid"/>
+			<index column="name" type="string" />
+			<one-to-many class="de.innovationgate.webgate.api.jdbc.ContentItem" />
+		</map>
+
+		<map name="files" inverse="true" lazy="true" cascade="all-delete-orphan">
+			<key column="cuid"/>
+			<index column="name" type="string" />
+			<one-to-many class="de.innovationgate.webgate.api.jdbc.ContentFileMeta" />
+		</map>
+
+		<many-to-one name="structentry" class="de.innovationgate.webgate.api.jdbc.StructEntry"/>
+		<many-to-one name="language" class="de.innovationgate.webgate.api.jdbc.Language"/>
+		
+	</class>
+
+	<class name="de.innovationgate.webgate.api.jdbc.ContentItem" table="CONTENT_ITEMS">
+
+		<composite-id unsaved-value="any">
+			<key-many-to-one name="parentcontent" class="de.innovationgate.webgate.api.jdbc.Content" column="cuid"/>
+			<key-property name="name" length="100" type="string"/>
+		</composite-id>
+		
+		<property name="type" column="itemtype" type="integer" not-null="true"/>
+		
+		<property name="text" type="text" column="textvalue"/>
+		<property name="number" type="double" column="numbervalue"/>
+		<property name="date" type="timestamp" column="datevalue"/>
+
+		<many-to-one name="parentcontent" class="de.innovationgate.webgate.api.jdbc.Content"/>
+		
+
+	</class>
+	
+	<class name="de.innovationgate.webgate.api.jdbc.ContentFileMeta" table="CONTENT_FILES_META">
+		
+		<id name="fuid" unsaved-value="null" type="string" length="32">
+			<generator class="uuid.hex" />
+		</id>
+
+		<natural-id mutable="true">
+			<many-to-one name="parentcontent" class="de.innovationgate.webgate.api.jdbc.Content" column="cuid"/>
+			<property name="name" length="100" type="string"/>
+		</natural-id>
+
+		<list name="parts" inverse="true" lazy="extra" cascade="all-delete-orphan">
+			<key column="fuid"/>
+			<index column="partnr"/>
+			<one-to-many class="de.innovationgate.webgate.api.jdbc.ContentFilePart" />
+		</list>
+		
+		<property name="size" type="long"/>				
+		
+		<property name="created" type="timestamp"/>
+		<property name="lastmodified" type="timestamp"/>
+		<property name="checksum" type="string" length="32"/>
+								
+	</class>
+	
+	<class name="de.innovationgate.webgate.api.jdbc.ContentFilePart" table="CONTENT_FILES_DATA">
+
+		<composite-id unsaved-value="any">
+			<key-many-to-one name="meta" class="de.innovationgate.webgate.api.jdbc.ContentFileMeta" column="fuid"/>
+			<key-property name="partnr" type="integer"/>
+		</composite-id>					
+		
+		<property name="data" type="blob" not-null="false"/>
+
+	</class>
+	
+
+	<class name="de.innovationgate.webgate.api.jdbc.ContainerFileMeta" table="FILECONTAINERS_FILES_META">
+	
+		<id name="fuid" unsaved-value="null" type="string" length="32">
+			<generator class="uuid.hex" />
+		</id>	
+		
+		<natural-id mutable="true">		
+			<many-to-one name="parentcontainer" class="de.innovationgate.webgate.api.jdbc.FileContainer" column="containername"/>
+			<property name="name" length="100" type="string"/>
+		</natural-id>
+
+		<list name="parts" inverse="true" lazy="extra" cascade="all-delete-orphan">
+			<key column="fuid"/>
+			<index column="partnr"/>
+			<one-to-many class="de.innovationgate.webgate.api.jdbc.ContainerFilePart" />
+		</list>
+		
+		<property name="size" type="long"/>		
+		
+		<property name="created" type="timestamp"/>
+		<property name="lastmodified" type="timestamp"/>
+		<property name="checksum" type="string" length="32"/>					
+
+	</class>
+
+	<class name="de.innovationgate.webgate.api.jdbc.ContainerFilePart" table="FILECONTAINERS_FILES_DATA">
+
+		<composite-id unsaved-value="any">
+			<key-many-to-one name="meta" class="de.innovationgate.webgate.api.jdbc.ContainerFileMeta" column="fuid"/>
+			<key-property name="partnr" type="integer"/>
+		</composite-id>					
+		
+		<property name="data" type="blob" not-null="false"/>
+
+	</class>
+	
+	
+	
+	<class name="de.innovationgate.webgate.api.jdbc.LogEntry" table="HISTORYLOG">
+	
+		<id name="id" type="string" unsaved-value="null" length="32">
+			<generator class="uuid.hex" />
+		</id>
+		
+		<property name="logtime" type="de.innovationgate.webgate.api.mysql.JavaDateAsLongType" column="logtime_ms"/>
+		<property name="type" column="entrytype" type="integer"/>
+		<property name="target" type="string"/>
+		<property name="loguser" type="string"/>
+	
+	</class>
+	
+	<class name="de.innovationgate.webgate.api.jdbc.ACLEntry" table="ACL">
+	
+		<id name="name" type="string" column="name" length="200" unsaved-value="any">
+			<generator class="assigned" />
+		</id>
+		
+		<property name="type" column="entrytype" type="integer"/>
+		<property name="level" column="entrylevel" type="integer"/>
+		<property name="flags" type="string"/>
+	
+	
+	</class>
+	
+	<class name="de.innovationgate.webgate.api.jdbc.UserProfile" table="USERPROFILES">
+	
+		<id name="name" type="string" column="name" unsaved-value="any" length="90">
+			<generator class="assigned" />
+		</id>
+		
+		<property name="created" not-null="true" type="timestamp" />
+		<property name="lastmodified" not-null="true" type="timestamp" />
+		
+		<property name="type" column="profiletype" type="java.lang.Integer"/>
+		<property name="lastaccess" type="timestamp"/>
+		<property name="lastsessionid" type="string"/>
+		<property name="lastsessiondate" type="timestamp"/>
+		<property name="lastsessionhits" type="java.lang.Integer"/>
+		<property name="prevsessionid" type="string"/>
+		<property name="prevsessiondate" type="timestamp"/>
+		<property name="prevsessionhits" type="java.lang.Integer"/>
+		<property name="hits" type="java.lang.Integer"/>
+		<property name="sessions" type="java.lang.Integer"/>
+		<property name="client" type="string"/>
+		<property name="login" type="string"/>
+		<property name="password" column="profilepassword" type="string"/>
+		
+		
+		<list name="languages" table="USERPROFILES_LANGUAGES" cascade="all" lazy="true">
+			<key column="name"/>
+			<index column="idx"/>
+			<element column="language" type="string" />
+		</list>
+
+		<list name="trackingkeys" table="USERPROFILES_TRACKINGKEYS" cascade="all" lazy="true">
+			<key column="name"/>
+			<index column="idx"/>
+			<element column="trackingkey" type="string" />
+		</list>		
+
+		<list name="portletkeys" table="USERPROFILES_PORTLETKEYS" cascade="all" lazy="true">
+			<key column="name"/>
+			<index column="idx"/>
+			<element column="portletkey" type="string" />
+		</list>	
+		
+		<map name="items" inverse="true" lazy="true" cascade="all-delete-orphan">
+			<key column="profilename"/>
+			<index column="name" type="string" />
+			<one-to-many class="de.innovationgate.webgate.api.jdbc.UserProfileItem" />
+		</map>
+		
+	</class>
+	
+	<class name="de.innovationgate.webgate.api.jdbc.UserProfileItem" table="USERPROFILES_ITEMS">
+
+		<composite-id unsaved-value="any">
+			<key-many-to-one name="parentprofile" class="de.innovationgate.webgate.api.jdbc.UserProfile" column="profilename"/>
+			<key-property name="name" length="100" type="string"/>
+		</composite-id>
+		
+		<property name="type" column="itemtype" type="integer"/>
+		
+		<property name="text" type="text" column="stringvalue"/>
+		<property name="number" type="double" column="numbervalue"/>
+		<property name="date" type="timestamp" column="datevalue"/>
+		
+	</class>
+
+</hibernate-mapping>
