@@ -28,10 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -48,8 +45,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -62,7 +57,6 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.search.highlight.Fragmenter;
@@ -88,7 +82,6 @@ import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.SearchDetails;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGArea;
-import de.innovationgate.webgate.api.WGBackendException;
 import de.innovationgate.webgate.api.WGCSSJSModule;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGContentEventListener;
@@ -127,18 +120,17 @@ import de.innovationgate.wga.common.beans.LuceneConfiguration;
 import de.innovationgate.wga.common.beans.LuceneIndexItemRule;
 import de.innovationgate.wga.common.beans.csconfig.v1.MediaKey;
 import de.innovationgate.wga.common.beans.csconfig.v1.PluginID;
-import de.innovationgate.wga.common.beans.csconfig.v1.Version;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.TMLScript;
+import de.innovationgate.wga.server.api.TMLScript.ObjectType;
 import de.innovationgate.wga.server.api.UnavailableResourceException;
 import de.innovationgate.wga.server.api.WGA;
-import de.innovationgate.wga.server.api.TMLScript.ObjectType;
 import de.innovationgate.wga.server.api.tml.Context;
 import de.innovationgate.wga.server.api.tml.TMLPage;
 import de.innovationgate.wgpublisher.DBLoginInfo;
+import de.innovationgate.wgpublisher.PersonalisationManager;
 import de.innovationgate.wgpublisher.RenderServletRequest;
 import de.innovationgate.wgpublisher.RenderServletResponse;
-import de.innovationgate.wgpublisher.PersonalisationManager;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGADomain;
 import de.innovationgate.wgpublisher.WGAServerException;
@@ -179,6 +171,7 @@ import de.innovationgate.wgpublisher.webtml.actions.TMLActionException;
 import de.innovationgate.wgpublisher.webtml.actions.TMLActionLink;
 import de.innovationgate.wgpublisher.webtml.env.IndependentDesignContext;
 import de.innovationgate.wgpublisher.webtml.env.IndependentTMLScriptEnvironment;
+import de.innovationgate.wgpublisher.webtml.env.IsolatedTMLContextEnvironment;
 import de.innovationgate.wgpublisher.webtml.env.WebTMLContextEnvironment;
 import de.innovationgate.wgpublisher.webtml.env.WebTMLDesignContext;
 import de.innovationgate.wgpublisher.webtml.form.TMLForm;
@@ -696,11 +689,11 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	}
 	
 	@CodeCompletion
-	public TMLContext(WGDocument doc, WGACore core, TMLUserProfile userProfile, TMLForm form) throws WGAPIException {
+	public TMLContext(WGDocument doc, WGACore core, TMLUserProfile userProfile, TMLForm form) {
 		this(doc, core, userProfile, form, null, null, null, null);
 	}
 	
-	public TMLContext(WGDocument doc, WGACore core, TMLUserProfile userProfile, TMLForm form, HttpServletRequest req, HttpServletResponse rsp, HttpSession session) throws WGAPIException {
+	public TMLContext(WGDocument doc, WGACore core, TMLUserProfile userProfile, TMLForm form, HttpServletRequest req, HttpServletResponse rsp, HttpSession session) {
 	    this(doc, core, userProfile, form, req, rsp, session, null);
 	}
 
@@ -2557,7 +2550,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      */
 	@Override
     public String contenturl(String mediaKey, String layoutKey, boolean ignoreVirtualLink) throws WGException {
-	    return getURLBuilder().buildContentURL(this, mediaKey, layoutKey, ignoreVirtualLink);
+	    return getURLBuilder().buildContentURL(toUnlockedVersion(), mediaKey, layoutKey, ignoreVirtualLink);
 	}
     
     public String contentdataurl(String mediaKey, String layoutKey) throws ServletException, IOException, WGException {        
@@ -2576,6 +2569,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
             return null;
         }
         
+        TMLContext unlockedCx = toUnlockedVersion();
+        
         
         // retrieve standard contenturl
         String url = contenturl(mediaKey, layoutKey, ignoreVirtualLink);
@@ -2586,15 +2581,6 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
             url = url + "?" + queryString;
         }
         
-        // determine contentType (mimeType)
-        if (mediaKey == null) {
-            if (tag == null) {
-                mediaKey = tag.getTMLModuleMediaKey();
-            }
-            else {
-                
-            }
-        }
         MediaKey key = getwgacore().getMediaKey(mediaKey);        
         String contentType = key.getMimeType();
         
@@ -2603,8 +2589,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         RenderServletRequestWrapper req = new RenderServletRequestWrapper(this.getrequest(), url);        
         RenderServletResponseWrapper res = new RenderServletResponseWrapper(this.getresponse());
         **/
-        RenderServletRequest req = new RenderServletRequest(this.getrequest(), url);        
-        RenderServletResponse res = new RenderServletResponse(this.getresponse());
+        RenderServletRequest req = new RenderServletRequest(unlockedCx.getrequest(), url);        
+        RenderServletResponse res = new RenderServletResponse(unlockedCx.getresponse());
         
         
         // call include
@@ -2631,7 +2617,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      */
     @CodeCompletion
 	public String layouturl(String dbKey, String mediaKey, String layoutKey) throws WGException {
-	    return getURLBuilder().buildLayoutURL(this, resolveDBKey(dbKey), mediaKey, layoutKey);
+	    return getURLBuilder().buildLayoutURL(toUnlockedVersion(), resolveDBKey(dbKey), mediaKey, layoutKey);
 	}
 	
 	/* (non-Javadoc)
@@ -4065,10 +4051,10 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         WGAURLBuilder builder = getURLBuilder();
         
         if (getDesignContext().getVersionCompliance().isAtLeast(7,2) && builder instanceof WGASpecificFileURLBuilder) {
-            return ((WGASpecificFileURLBuilder) builder).buildContentFileURL(this, dbKey, containerName, fileName);
+            return ((WGASpecificFileURLBuilder) builder).buildContentFileURL(toUnlockedVersion(), dbKey, containerName, fileName);
         }
         else {
-            return builder.buildFileURL(this, dbKey, containerName, fileName);
+            return builder.buildFileURL(toUnlockedVersion(), dbKey, containerName, fileName);
         }
     }
     
@@ -5315,8 +5301,25 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         
     }
     
-    public TMLContext toIsolatedVersion() throws WGAPIException {
-        return new TMLContext(getcontent(), getwgacore(), null, null);
+    public TMLContext toIsolatedVersion() {
+        if (!(_environment instanceof IsolatedTMLContextEnvironment)) {
+            TMLContext isolatedContext =  new TMLContext(getcontent(), getwgacore(), getprofile(), gettmlform(), getrequest(), getresponse(), gethttpsession());
+            isolatedContext.isolate();
+            return isolatedContext;
+        }
+        else {
+            return this;
+        }
+    }
+    
+    private TMLContext toUnlockedVersion() {
+        if (_environment instanceof IsolatedTMLContextEnvironment) {
+            TMLContextEnvironment unlockedEnv = ((IsolatedTMLContextEnvironment) _environment).getParentEnvironment();
+            return new TMLContext(getcontent(), getwgacore(), getprofile(), unlockedEnv.getForm(), unlockedEnv.getRequest(), unlockedEnv.getResponse(), unlockedEnv.getSession());
+        }
+        else {
+            return this;
+        }
     }
     
     protected boolean isEnhancedItemExpressions() {
@@ -5326,6 +5329,12 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     public void setLocalVar(String name, Object value) throws WGException {
         getDesignContext().setLocalVar(name.toLowerCase(), value);
     }
-
+    
+    private void isolate() {
+        if (!(_environment instanceof IsolatedTMLContextEnvironment)) {
+            _environment = new IsolatedTMLContextEnvironment(this, getEnvironment().getCore(), getprofile(), getEnvironment().getForm(), getEnvironment().getRequest(), getEnvironment().getResponse(), getEnvironment().getSession());
+        }
+    }
+    
 	
 } 

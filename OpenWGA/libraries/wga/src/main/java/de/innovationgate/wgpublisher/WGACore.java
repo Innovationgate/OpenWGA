@@ -3252,20 +3252,30 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
 	    	}
     	}
 	    
-        // Build URL array from jars list
-        URL[] loaderURLs = new URL[jarsList.size()];
-        for (int idx = 0; idx < jarsList.size(); idx++) {
-            loaderURLs[idx] = jarsList.get(idx);
+	    try {
+    	    // add all jars from /WEB-INF/isolated
+    	    Iterator resourcePaths = _context.getResourcePaths("/WEB-INF/isolated").iterator();
+    	    while (resourcePaths.hasNext()) {
+    	        jarsList.add(_context.getResource((String) resourcePaths.next()));
+    	    }
+    
+            // Build URL array from jars list
+            URL[] loaderURLs = new URL[jarsList.size()];
+            for (int idx = 0; idx < jarsList.size(); idx++) {
+                loaderURLs[idx] = jarsList.get(idx);
+            }
+            
+            baseLibraryLoader = new IsolatedJARLoader(loaderURLs, getClass().getClassLoader());
+            getLog().info("Creating WGA java library loader");
+            libraryClassLoadingChain = new DynamicClassLoadingChain(baseLibraryLoader);
+            WGFactory.setImplementationLoader(libraryClassLoadingChain);
+            updateLibraryLoader();
+            _libraryXStream = new XStream(new Dom4JDriver());
+            _libraryXStream.setClassLoader(libraryClassLoadingChain);
         }
-        
-        baseLibraryLoader = new IsolatedJARLoader(loaderURLs, getClass().getClassLoader());
-        getLog().info("Creating WGA java library loader");
-        libraryClassLoadingChain = new DynamicClassLoadingChain(baseLibraryLoader);
-        WGFactory.setImplementationLoader(libraryClassLoadingChain);
-        updateLibraryLoader();
-        _libraryXStream = new XStream(new Dom4JDriver());
-        _libraryXStream.setClassLoader(libraryClassLoadingChain);
-        
+        catch (MalformedURLException e1) {
+            log.fatal("Unable to create library loader! TMLScript will not work!", e1);
+        }
     }
 
     private void addLibraryFile(List<URL> jarsList, File libFile) {

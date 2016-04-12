@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 compileJava.options.encoding = 'ISO-8859-1'
 
@@ -17,6 +18,14 @@ sourceSets {
         resources {
             srcDirs = ["src/main/java"]
             excludes = ["**/*.java"]
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
         }
     }
 }

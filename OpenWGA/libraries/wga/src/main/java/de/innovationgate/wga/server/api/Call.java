@@ -531,9 +531,11 @@ public class Call {
         if (getJavaResponse().isCommitted()) {
             throw new WGAServerException("The current environment cannot influence HTTP response headers");
         }
-        if (_wga.isTMLContextAvailable() && _wga.tmlcontext().iswebenvironment()) {
-            throw new WGAServerException("The current environment cannot influence HTTP response headers");
-        }
+//        The environment can currently not determine for sure if this is possible, as the JSP env just prevents this possibility
+//        in a transparent way.        
+//        if (_wga.isTMLContextAvailable() && _wga.tmlcontext().iswebenvironment()) {
+//            throw new WGAServerException("The current environment cannot influence HTTP response headers");
+//        }
     }
 
     /**

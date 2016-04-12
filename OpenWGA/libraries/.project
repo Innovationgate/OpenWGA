@@ -111,5 +111,14 @@
 				<arguments>1.0-projectRelativePath-matches-false-false-wga</arguments>
 			</matcher>
 		</filter>
+		<filter>
+			<id>1460374433651</id>
+			<name></name>
+			<type>26</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-projectRelativePath-matches-false-false-wgaBuildTools</arguments>
+			</matcher>
+		</filter>
 	</filteredResources>
 </projectDescription>

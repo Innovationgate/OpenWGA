@@ -107,13 +107,10 @@ public class ScriptTask extends Task {
         }
         
 		TMLContext context;
-        try {
-            context = new TMLContext(dummyContent, wga.getCore(), null, null);
-            context.getEnvironment().setLog(jobContext.getLog());
-        }
-        catch (WGAPIException e) {
-            throw new TaskException("Unable to create context." + db.getDbReference(), e);
-        }
+        
+        context = new TMLContext(dummyContent, wga.getCore(), null, null);
+        context.getEnvironment().setLog(jobContext.getLog());
+        
 		Map<String,Object> objects = new HashMap<String,Object>();
 		objects.put("jobContext", jobContext);
 		objects.put(RhinoExpressionEngine.PARAM_SCRIPTNAME, "TMLScript-Task running module " + _database + "/" + _module + " for scheduler job '" +  jobContext.getCurrentJob().getName() + "'");

@@ -1,9 +1,44 @@
 apply plugin: 'java'
 apply plugin: 'war'
+apply plugin: 'maven-publish'
 
 compileJava.options.encoding = 'ISO-8859-1'
+ant.basedir=project.rootDir
+
+configurations {
+    buildSignatureConfig
+}
 
 dependencies {
     compile project(":libraries:wga");
     compile project(":libraries:tmlScript");
+    
+    buildSignatureConfig project(":libraries:wgutils");
+    buildSignatureConfig project(":libraries:wga");
+    buildSignatureConfig project(":libraries:wgaBuildTools");
 }
+
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            pom.version =  project.version
+//            pom.artifactId = 'server'
+//        }
+//    }
+//}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.web
+        }
+    }
+}
+
+//task buildSignature << {
+//    ant.taskdef(name:"buildSignature", classname:"de.innovationgate.ant.BuildSignatureTask", classpath: configurations.buildSignatureConfig.asPath)
+//    ant.buildSignature(target:"src/main/webapp/WEB-INF/wgabuild.properties", webinf:"src/main/webapp/WEB-INF")
+//}
+//compileJava.doFirst {
+//    tasks.buildSignature.execute()
+//}

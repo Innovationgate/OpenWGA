@@ -1,0 +1,8 @@
+apply plugin: 'java'
+
+compileJava.options.encoding = 'ISO-8859-1'
+
+dependencies {
+    compile project(":libraries:wga")
+	compile 'ant:ant:1.7.0'
+}
