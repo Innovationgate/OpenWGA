@@ -1,2 +1,4 @@
-GRADLE_FILTERS=1.0-projectRelativePath-matches-false-false-libraries,1.0-projectRelativePath-matches-false-false-server,1.0-projectRelativePath-matches-false-false-build,1.0-projectRelativePath-matches-false-false-.gradle
+GRADLE_BUILD_COMMANDS=org.eclipse.jdt.core.javabuilder
+GRADLE_FILTERS=1.0-projectRelativePath-matches-false-false-libraries,1.0-projectRelativePath-matches-false-false-server,1.0-projectRelativePath-matches-false-false-build,1.0-projectRelativePath-matches-false-false-.gradle,1.0-projectRelativePath-matches-false-false-libraries/servicesClient,1.0-projectRelativePath-matches-false-false-libraries/tmlScript,1.0-projectRelativePath-matches-false-false-libraries/wga,1.0-projectRelativePath-matches-false-false-libraries/wgaBuildTools,1.0-projectRelativePath-matches-false-false-libraries/wgapi,1.0-projectRelativePath-matches-false-false-libraries/wgapiJdbc,1.0-projectRelativePath-matches-false-false-libraries/wgutils
+GRADLE_NATURES=org.eclipse.jdt.core.javanature
 eclipse.preferences.version=1

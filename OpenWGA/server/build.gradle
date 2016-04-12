@@ -5,27 +5,23 @@ apply plugin: 'maven-publish'
 compileJava.options.encoding = 'ISO-8859-1'
 ant.basedir=project.rootDir
 
-configurations {
-    buildSignatureConfig
-}
-
 dependencies {
-    compile project(":libraries:wga");
-    compile project(":libraries:tmlScript");
+    compile project(":wga");
+    compile project(":tmlScript");
     
-    buildSignatureConfig project(":libraries:wgutils");
-    buildSignatureConfig project(":libraries:wga");
-    buildSignatureConfig project(":libraries:wgaBuildTools");
+    compileClasspath project(":wgaBuildTools");
 }
 
-//uploadArchives {
-//    repositories {
-//        mavenDeployer {
-//            pom.version =  project.version
-//            pom.artifactId = 'server'
-//        }
-//    }
-//}
+
+task writeVersion << {
+    ant.taskdef(name:"writeVersion", classname:"de.innovationgate.ant.WriteVersionTask", classpath: configurations.compileClasspath.asPath)
+    ant.writeVersion(target:"server/build/tmp/wgabuild.properties", version: rootProject.version)
+    println "Wrote OpenWGA Version: ${rootProject.version}"
+}
+
+compileJava.doLast {
+    tasks.writeVersion.execute()
+}
 
 publishing {
     publications {
@@ -35,10 +31,10 @@ publishing {
     }
 }
 
-//task buildSignature << {
-//    ant.taskdef(name:"buildSignature", classname:"de.innovationgate.ant.BuildSignatureTask", classpath: configurations.buildSignatureConfig.asPath)
-//    ant.buildSignature(target:"src/main/webapp/WEB-INF/wgabuild.properties", webinf:"src/main/webapp/WEB-INF")
-//}
-//compileJava.doFirst {
-//    tasks.buildSignature.execute()
-//}
+war {
+    war.archiveName = "openwga-ce.war"
+    from('build/tmp') {
+        include 'wgabuild.properties' into('WEB-INF')
+    }
+}
+

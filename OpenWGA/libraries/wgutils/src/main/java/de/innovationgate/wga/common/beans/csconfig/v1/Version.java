@@ -163,12 +163,17 @@ public class Version implements Comparable<Version>, Serializable {
     public Version(String verString) {
         
         if (verString.indexOf("Build") != -1) {
-            List items = WGUtils.deserializeCollection(verString, "Build", true);
+            List<String> items = WGUtils.deserializeCollection(verString, "Build", true);
+            verString = (String) items.get(0);
+            setBuildVersion(Integer.parseInt((String) items.get(1)));
+        }
+        if (verString.indexOf(".b") !=  -1) {
+            List<String> items = WGUtils.deserializeCollection(verString, ".b", true);
             verString = (String) items.get(0);
             setBuildVersion(Integer.parseInt((String) items.get(1)));
         }
         
-        List items = WGUtils.deserializeCollection(verString, ".");
+        List<String> items = WGUtils.deserializeCollection(verString, ".");
         if (items.size() < 3) {
             throw new IllegalArgumentException("Version string '" + verString + "' is not valid");
         }
@@ -256,6 +261,15 @@ public class Version implements Comparable<Version>, Serializable {
         
         return verString;
         
+    }
+    
+    public String toProjectVersion() {
+        String verString = getMainVersionString();
+        if (getBuildVersion() != 0) {
+            verString += ".b" + getBuildVersion();
+        }
+        
+        return verString;
     }
 
     /**

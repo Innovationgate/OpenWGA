@@ -106,7 +106,9 @@ public class Cookie {
     protected javax.servlet.http.Cookie toJavaCookie() {
         
         javax.servlet.http.Cookie c = new javax.servlet.http.Cookie(_name, _value);
-        c.setDomain(_domain);
+        if (_domain != null) {
+            c.setDomain(_domain);
+        }
         c.setPath(_path);
         c.setMaxAge(_maxAge);
         c.setSecure(_secure);

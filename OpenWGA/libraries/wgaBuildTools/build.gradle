@@ -1,8 +1,26 @@
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
 compileJava.options.encoding = 'ISO-8859-1'
 
 dependencies {
-    compile project(":libraries:wga")
-	compile 'ant:ant:1.7.0'
+    compile project(":wga")
+	compileClasspath 'ant:ant:1.7.0'
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/java"]
+            excludes = ["**/*.java"]
+        }
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
 }

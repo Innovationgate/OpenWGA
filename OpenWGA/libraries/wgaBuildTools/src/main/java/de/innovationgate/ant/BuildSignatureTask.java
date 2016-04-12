@@ -19,6 +19,7 @@ import java.util.Properties;
 
 import org.apache.tools.ant.BuildException;
 
+import de.innovationgate.utils.WGUtils;
 import de.innovationgate.wga.common.beans.csconfig.v1.Version;
 
 /**
@@ -68,6 +69,7 @@ public class BuildSignatureTask extends BuildInformationTask {
             // Find necessary ant properties
             String baseDir = getProject().getProperty("basedir");
             File buildPropertiesFile = new File(baseDir, target);
+            buildPropertiesFile.getParentFile().mkdirs();
             String target = getTarget();
             if (target == null) {
                 throw new BuildException("You must specify an attribute target!");
@@ -91,8 +93,8 @@ public class BuildSignatureTask extends BuildInformationTask {
     
             // Create signature consisting of builder name and date/time of build
             String userName = getProject().getProperty("wga.builduser");
-            if (userName == null) {
-                System.getProperty("user.name");
+            if (WGUtils.isEmpty(userName)) {
+                userName= System.getProperty("user.name");
             }
             
             String timeStamp = TIMESTAMP.format(new Date());
@@ -114,9 +116,14 @@ public class BuildSignatureTask extends BuildInformationTask {
             props.setProperty("maintenanceVersion", String.valueOf(bi.getMaintenanceVersion()));
             props.setProperty("patchVersion", String.valueOf(bi.getPatchVersion()));
             props.setProperty("build", String.valueOf(bi.getBuild()));
-            props.setProperty("tag", createVcsTag(new Version(bi.getMajorVersion(), bi.getMinorVersion(), bi.getMaintenanceVersion(), bi.getPatchVersion(), bi.getBuild())));
+            
+            
+            Version version = new Version(bi.getMajorVersion(), bi.getMinorVersion(), bi.getMaintenanceVersion(), bi.getPatchVersion(), bi.getBuild());
+            props.setProperty("tag", createVcsTag(version));
+            props.setProperty("projectVersion", version.toProjectVersion());
     
             getProject().setProperty("releaseName", bi.getReleaseString());
+            getProject().setProperty("projectVersion", version.toProjectVersion());
     
             // Write properties file
             if (buildPropertiesFile.exists()) {

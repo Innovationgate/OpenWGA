@@ -4,7 +4,7 @@ apply plugin: 'maven-publish'
 compileJava.options.encoding = 'ISO-8859-1'
 
 dependencies {
-    compile project(":libraries:wgapi");
+    compile project(":wgapi");
     compile 'org.apache.commons:commons-dbcp2:2.1.1'
     compile fileTree(dir: '../../customLibs/groq', include: ['*.jar'])
     compile 'org.hibernate:hibernate-core:4.1.2.Final'

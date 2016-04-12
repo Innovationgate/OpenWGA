@@ -1,6 +1,6 @@
 {
   "1.0": {
-    "project_path": ":libraries:wga",
+    "project_path": ":wga",
     "project_dir": "/home/oliver/EclipseWorkspaces/WGA_HEAD.git/OpenWGA/OpenWGA/libraries/wga",
     "connection_project_dir": "/home/oliver/EclipseWorkspaces/WGA_HEAD.git/OpenWGA/OpenWGA",
     "connection_gradle_user_home": null,

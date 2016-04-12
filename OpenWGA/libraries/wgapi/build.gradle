@@ -4,7 +4,7 @@ apply plugin: 'maven-publish'
 compileJava.options.encoding = 'ISO-8859-1'
 
 dependencies {
-    compile project(":libraries:wgutils");
+    compile project(":wgutils");
     compile 'net.sf.ehcache:ehcache-core:2.5.2'
     compile 'com.google.guava:guava:18.0'
     compile 'org.jdom:jdom:1.1.3'

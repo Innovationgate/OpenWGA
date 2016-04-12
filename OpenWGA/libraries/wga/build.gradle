@@ -4,10 +4,10 @@ apply plugin: 'maven-publish'
 compileJava.options.encoding = 'ISO-8859-1'
 
 dependencies {
-    compile project(":libraries:wgapi");
-    compile project(":libraries:wgapiJdbc");
-    compile project(":libraries:wgutils");
-    compile project(":libraries:servicesClient");
+    compile project(":wgapi");
+    compile project(":wgapiJdbc");
+    compile project(":wgutils");
+    compile project(":servicesClient");
     compile fileTree(dir: '../../customLibs/datedFileAppender', include: ['*.jar'])
     compile 'xerces:xercesImpl:2.11.0'
     compile 'org.apache.lucene:lucene-core:3.5.0'
@@ -19,6 +19,7 @@ dependencies {
     compile 'org.glassfish:javax.json:1.0.4'
     compile 'nekohtml:nekohtml:1.9.6.2'
     compile 'org.mockito:mockito-core:1.10.19'
+    compile 'javax.jcr:jcr:1.0'
     
     compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
     compileClasspath 'javax.websocket:javax.websocket-api:1.1'

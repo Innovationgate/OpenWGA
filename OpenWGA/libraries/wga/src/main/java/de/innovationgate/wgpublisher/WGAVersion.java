@@ -24,18 +24,55 @@
  ******************************************************************************/
 package de.innovationgate.wgpublisher;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 import de.innovationgate.wga.common.beans.csconfig.v1.Version;
 
 /**
- * Contains all version constants for WGA.
+ * Contains all version constants for WGA, read from wgabuild.properties.
  */
 public abstract class WGAVersion {
+    
+    public static final Properties BUILD_PROPERTIES = new Properties();
+    static {
+        InputStream propsIn = null;
+        try {
+            if (WGACore.INSTANCE.getServletContext() != null) {
+                propsIn = WGACore.INSTANCE.getServletContext().getResourceAsStream("/WEB-INF/wgabuild.properties");
+                BUILD_PROPERTIES.load(propsIn);
+            }
+            
+            // Defaults for other environments without running WGACore, just for the sake of preventing crashes
+            else {
+                BUILD_PROPERTIES.setProperty("build", "639");
+                BUILD_PROPERTIES.setProperty("majorVersion", "7");
+                BUILD_PROPERTIES.setProperty("minorVersion", "2");
+                BUILD_PROPERTIES.setProperty("maintenanceVersion", "0");
+                BUILD_PROPERTIES.setProperty("patchVersion", "0");
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (propsIn != null) {
+                try {
+                    propsIn.close();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
-    public static final int WGAPUBLISHER_BUILD_VERSION = 639;
-    public static final int WGAPUBLISHER_MAJOR_VERSION = 7;
-    public static final int WGAPUBLISHER_MINOR_VERSION = 2;
-    public static final int WGAPUBLISHER_MAINTENANCE_VERSION = 0;
-    public static final int WGAPUBLISHER_PATCH_VERSION = 0;
+    public static final int WGAPUBLISHER_BUILD_VERSION = Integer.parseInt(BUILD_PROPERTIES.getProperty("build"));
+    public static final int WGAPUBLISHER_MAJOR_VERSION = Integer.parseInt(BUILD_PROPERTIES.getProperty("majorVersion"));;
+    public static final int WGAPUBLISHER_MINOR_VERSION = Integer.parseInt(BUILD_PROPERTIES.getProperty("minorVersion"));
+    public static final int WGAPUBLISHER_MAINTENANCE_VERSION = Integer.parseInt(BUILD_PROPERTIES.getProperty("maintenanceVersion"));;
+    public static final int WGAPUBLISHER_PATCH_VERSION = Integer.parseInt(BUILD_PROPERTIES.getProperty("patchVersion"));;
     
     public static final String WGAPUBLISHER_PRODUCT_NAME = WGABrand.getProduct();
     public static final String WGAPUBLISHER_PLATFORM_NAME = WGABrand.getPlatform();

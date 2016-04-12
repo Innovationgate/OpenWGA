@@ -17,6 +17,8 @@ import java.util.List;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
+import de.innovationgate.wgpublisher.WGAVersion;
+
 /**
  * @author ow
  * 
@@ -84,46 +86,40 @@ public class BuildInformationTask extends Task {
         File libDir = new File(webinfDir, "lib");
 
         try {
-            List loaderURLs = new ArrayList();
-            //loaderURLs.add(j2eeLib.toURL());
-            loaderURLs.add(classesDir.toURL());
-
-            String[] fileNames = libDir.list();
-            if (fileNames != null) {
-                for (int idx = 0; idx < fileNames.length; idx++) {
-                    if (fileNames[idx].endsWith(".jar")) {
-                        File jar = new File(libDir, fileNames[idx]);
-                        loaderURLs.add(jar.toURL());
-                    }
-                }
-            }
-            
-            if (getDebug().equals("true")) {
-                Iterator urlsIt = loaderURLs.iterator();
-                while (urlsIt.hasNext()) {
-                    log(urlsIt.next().toString());
-                }
-            }
-            
-            URL[] urls = new URL[loaderURLs.size()];
-            loaderURLs.toArray(urls);
-   
-            URLClassLoader loader = new URLClassLoader(urls);
-            
-            Class wgaVersionClass = null;
-            try {
-                wgaVersionClass = loader.loadClass("de.innovationgate.wgpublisher.WGAVersion");
-            }
-            catch (ClassNotFoundException e) {
-                wgaVersionClass = loader.loadClass("de.innovationgate.wgpublisher.WGACore");
-            }
+//            List loaderURLs = new ArrayList();
+//            //loaderURLs.add(j2eeLib.toURL());
+//            loaderURLs.add(classesDir.toURL());
+//
+//            String[] fileNames = libDir.list();
+//            if (fileNames != null) {
+//                for (int idx = 0; idx < fileNames.length; idx++) {
+//                    if (fileNames[idx].endsWith(".jar")) {
+//                        File jar = new File(libDir, fileNames[idx]);
+//                        loaderURLs.add(jar.toURL());
+//                    }
+//                }
+//            }
+//            
+//            if (getDebug().equals("true")) {
+//                Iterator urlsIt = loaderURLs.iterator();
+//                while (urlsIt.hasNext()) {
+//                    log(urlsIt.next().toString());
+//                }
+//            }
+//            
+//            URL[] urls = new URL[loaderURLs.size()];
+//            loaderURLs.toArray(urls);
+//   
+//            URLClassLoader loader = new URLClassLoader(urls, getClass().getClassLoader());
             
             
-            info.setMajorVersion(wgaVersionClass.getField("WGAPUBLISHER_MAJOR_VERSION").getInt(null));
-            info.setMinorVersion(wgaVersionClass.getField("WGAPUBLISHER_MINOR_VERSION").getInt(null));
-            info.setMaintenanceVersion(wgaVersionClass.getField("WGAPUBLISHER_MAINTENANCE_VERSION").getInt(null));
-            info.setPatchVersion(wgaVersionClass.getField("WGAPUBLISHER_PATCH_VERSION").getInt(null));
-            info.setBuild(wgaVersionClass.getField("WGAPUBLISHER_BUILD_VERSION").getInt(null));
+            
+            
+            info.setMajorVersion(WGAVersion.WGAPUBLISHER_MAJOR_VERSION);
+            info.setMinorVersion(WGAVersion.WGAPUBLISHER_MINOR_VERSION);
+            info.setMaintenanceVersion(WGAVersion.WGAPUBLISHER_MAINTENANCE_VERSION);
+            info.setPatchVersion(WGAVersion.WGAPUBLISHER_PATCH_VERSION);
+            info.setBuild(WGAVersion.WGAPUBLISHER_BUILD_VERSION);
             return info;
         }
         catch (Exception e) {

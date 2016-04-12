@@ -1,10 +1,24 @@
 rootProject.name = 'OpenWGAServer'
 
-include ":libraries:wgapi"
-include ":libraries:wgutils"
-include ":libraries:wgapiJdbc"
-include ":libraries:servicesClient"
-include ":libraries:wga"
-include ":libraries:tmlScript"
-include ":libraries:wgaBuildTools"
+include ":wgapi"
+project(":wgapi").projectDir = file("libraries/wgapi")
+
+include ":wgutils"
+project(":wgutils").projectDir = file("libraries/wgutils")
+
+include ":wgapiJdbc"
+project(":wgapiJdbc").projectDir = file("libraries/wgapiJdbc")
+
+include ":servicesClient"
+project(":servicesClient").projectDir = file("libraries/servicesClient") 
+
+include ":wgaBuildTools"
+project(":wgaBuildTools").projectDir = file("libraries/wgaBuildTools")
+
+include ":wga"
+project(":wga").projectDir = file ("libraries/wga")
+
+include ":tmlScript"
+project(":tmlScript").projectDir = file ("libraries/tmlScript")
+
 include ":server"
