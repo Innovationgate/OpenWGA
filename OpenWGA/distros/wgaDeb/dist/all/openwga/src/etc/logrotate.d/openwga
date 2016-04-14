@@ -1,0 +1,11 @@
+/var/lib/openwga/tomcat/logs/catalina.out {
+    compress
+    dateext
+    maxage 365
+    rotate 99
+    size=+4096k
+    notifempty
+    missingok
+    create 644 openwga openwga
+    copytruncate
+}

@@ -1,0 +1,5 @@
+@PACKAGE@ (@VERSION@) @COMPONENT@; urgency=@URGENCY@
+
+  * For the list of changes please refer to <http://tracker.openwga.com>
+
+ -- Innovation Gate GmbH <support@innovationgate.com>  @DATE@

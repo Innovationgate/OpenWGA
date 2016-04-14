@@ -1,0 +1,1 @@
+OpenWGA plugin files in this folder will be automatically installed.

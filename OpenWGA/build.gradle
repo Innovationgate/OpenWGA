@@ -1,7 +1,7 @@
 allprojects {
     apply plugin: 'java'
     group='de.innovationgate.openwga'
-    version=openwga_version
+    version="${openwga_version_major}.${openwga_version_minor}.${openwga_version_maintenance}.${openwga_version_patch}.b${openwga_version_build}"
     sourceCompatibility = 1.7
     repositories {
         mavenCentral()

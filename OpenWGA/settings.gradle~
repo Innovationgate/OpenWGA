@@ -16,12 +16,9 @@ include ":wgaBuildTools"
 project(":wgaBuildTools").projectDir = file("libraries/wgaBuildTools")
 
 include ":wga"
-project(":wga").projectDir = file("libraries/wga")
+project(":wga").projectDir = file ("libraries/wga")
 
 include ":tmlScript"
-project(":tmlScript").projectDir = file("libraries/tmlScript")
-
-include ":wgaDeb"
-project(":wgaDeb").projectDir = file("distros/wgaDeb")
+project(":tmlScript").projectDir = file ("libraries/tmlScript")
 
 include ":server"

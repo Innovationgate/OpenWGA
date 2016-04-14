@@ -1,0 +1,138 @@
+#!/bin/bash
+
+
+### BEGIN INIT INFO
+# Provides:          openwga
+# Required-Start:    $local_fs $remote_fs $network
+# Should-Start:      mysql apache2	 
+# Required-Stop:     $local_fs $remote_fs $network 
+# Should-Stop:       
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: OpenWGA Server
+# Description:       OpenWGA Server
+### END INIT INFO
+
+# read config
+. /etc/openwga/server.conf
+
+# include lsb functions
+. /lib/lsb/init-functions
+
+
+# locale config
+LC_CONFIG="export LANG=$OPENWGA_LOCALE;export LC_ALL=$OPENWGA_LOCALE";
+
+###
+# checks if tomcat is running
+#
+isRunning() {
+	if [ -e $CATALINA_PID ] ; then
+		check=$(ps --no-headers -p $(cat $CATALINA_PID) | wc -l)
+		test "$check" = "1"
+	else
+		false
+	fi
+}
+
+###
+# waits STARTUP_TIMEOUT (default 30 sec.) for tomcat startup
+#
+waitForStartup() {
+	timeout=0;
+	while [ $timeout -le $STARTUP_TIMEOUT ]
+	do
+	    if isRunning  ; then
+		break;
+	    else
+		timeout=$((timeout+1));
+	    	sleep 1;	
+            fi			
+	done
+}
+
+###
+# waits SHUTDOWN_TIMEOUT (default 90 sec.) for tomcat shutdown
+#
+waitForShutdown() {
+	timeout=0;
+	while [ $timeout -le $SHUTDOWN_TIMEOUT ]
+	do
+	    if isRunning  ; then
+		timeout=$((timeout+1));
+	    	sleep 1;	
+	    else
+		break;
+            fi			
+	done
+}
+
+case $1 in
+ "start")
+	echo -n "Starting OpenWGA"
+
+	if [ ! -e $JRE_HOME ] ; then
+		log_failure_msg;
+        echo "JRE_HOME '$JRE_HOME' does not exist."	
+	    exit -1;    		
+	fi
+
+	if [ -e $CATALINA_PID ] ; then
+		if isRunning ; then
+				log_failure_msg;
+       			echo "'$CATALINA_PID' already exists and corresponding process '$(cat $CATALINA_PID)' is alive"	
+	   			exit -1;	   		
+	   		else
+	   			rm -f $CATALINA_PID
+		fi		    		
+    fi
+	
+	su $USER -s /bin/bash -c "$LC_CONFIG;$CATALINA_HOME/bin/startup.sh" > $CATALINA_HOME/logs/start.log 2>&1;
+	
+	waitForStartup;
+	
+	# check if tomcat is started
+	if isRunning ; then
+                log_success_msg;
+        else
+                log_failure_msg;
+        fi
+ 	;;
+ "stop")
+	if [ -e $CATALINA_PID ] ; then
+		echo -n "Stopping OpenWGA";
+		su $USER -s /bin/bash -c "kill -15 $(cat $CATALINA_PID)";
+        
+		waitForShutdown;
+
+        	# check if tomcat is stopped
+	        if isRunning ; then
+	                log_failure_msg;
+	        else
+        		if [ -e $CATALINA_PID ] ; then
+        			rm $CATALINA_PID
+        		fi
+                	log_success_msg;
+        	fi
+	fi
+        ;;
+ "restart")
+	$0 stop;
+	sleep 2;
+	$0 start;
+	;;
+ "force-reload")
+	$0 stop;
+	sleep 2;
+	$0 start;
+	;;
+ "status")
+	if isRunning ; then
+		echo "OpenWGA is running with pid '$(cat $CATALINA_PID)'";
+	else	
+		echo "OpenWGA is not started";
+	fi
+	;;
+ *)
+	echo "USAGE: $0 {start|stop|status|restart|force-reload}";; 
+esac

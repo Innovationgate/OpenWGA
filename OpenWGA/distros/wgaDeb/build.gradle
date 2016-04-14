@@ -1,0 +1,78 @@
+import java.text.SimpleDateFormat;
+import org.apache.tools.ant.filters.*
+
+plugins {
+  id 'nebula.ospackage' version '3.4.0'
+}
+
+ext.debianQualifier = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())
+ext.changelogDate = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z").format(new Date ())
+
+ospackage {
+    packageName = "openwga${openwga_version_major}.${openwga_version_minor}-ce"
+    version = "${project.version}-${debianQualifier}"
+    packageGroup = 'web'
+    release = '1'
+    arch = 'all'
+    os = LINUX
+    maintainer = 'Innovation Gate GmbH'
+    packageDescription = "OpenWGA - Open Source Java CMS Platform\
+ The OpenWGA Community Edition is a fully-featured CMS web platform for the needs of small and medium businesses, available under fair open source terms and without any fee.\
+ Visit http://www.openwga.com for more details."
+    license = "GPL 2.0 with OpenWGA plugin exception"
+    
+    requires('adduser')
+    requires('oracle-java7-jdk|openjdk-7-jdk|java7-sdk')
+    conflicts('openwga')
+    replaces('openwga')
+    provides('openwga')
+
+    configurationFile('debianScripts/conffiles')
+    postInstall file('debianScripts/postinst')
+    preUninstall file('debianScripts/prerm')
+    postUninstall file('debianScripts/postrm')
+
+    
+    from('dist/all/openwga/src/etc') {
+        into '/etc'
+        exclude 'init.d/openwga'
+    }
+    from('dist/all/openwga/src/etc') {
+        into '/etc'
+        include 'init.d/openwga'
+        fileMode 0755
+    }
+    from('dist/all/openwga/src/usr') {
+        into '/usr'
+        filter(ReplaceTokens, tokens:
+            [
+                'PACKAGE': ospackage.packageName,
+                'VERSION': new String("${project.version}-${debianQualifier}"),
+                'URGENCY': (openwga_version_patch == 0 ? 'medium' : 'critical'),
+                'DATE': changelogDate,
+                'COMPONENT': 'main'
+
+            ]
+        )
+    }
+    from('dist/all/openwga/src/var') {
+        into '/var'
+        exclude 'lib/openwga/tomcat/bin/*.sh'
+    }
+    from('dist/all/openwga/src/var') {
+        into '/var'
+        include 'lib/openwga/tomcat/bin/*.sh'
+        fileMode 0755
+    }
+    from(project(':server').tasks.war.archivePath) {
+        into '/var/lib/openwga/tomcat/webapps'
+        rename { String fileName ->
+            'ROOT.war'
+        }
+    }
+
+}
+
+buildDeb {   
+}
+build.dependsOn buildDeb
