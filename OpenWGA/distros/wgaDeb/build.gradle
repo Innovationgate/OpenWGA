@@ -5,6 +5,18 @@ plugins {
   id 'nebula.ospackage' version '3.4.0'
 }
 
+configurations {
+    tomcatAdditionalJars
+}
+
+dependencies {
+    tomcatAdditionalJars 'com.sun.mail:javax.mail:1.4.7'
+    tomcatAdditionalJars 'javax.activation:activation:1.1.1'
+    tomcatAdditionalJars 'org.apache.geronimo.specs:geronimo-activation_1.1_spec:1.1'
+    tomcatAdditionalJars 'org.apache.geronimo.specs:geronimo-jta_1.1_spec:1.1.1'
+    tomcatAdditionalJars 'org.glassfish.main.transaction:javax.transaction:3.1.2.2'
+}
+
 ext.debianQualifier = new SimpleDateFormat("yyyyMMddHHmmss").format(new Date())
 ext.changelogDate = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z").format(new Date ())
 
@@ -63,6 +75,9 @@ ospackage {
         into '/var'
         include 'lib/openwga/tomcat/bin/*.sh'
         fileMode 0755
+    }
+    from (configurations.tomcatAdditionalJars) {
+        into '/var/lib/openwga/lib'
     }
     from(project(':server').tasks.war.archivePath) {
         into '/var/lib/openwga/tomcat/webapps'

@@ -51,12 +51,12 @@ case "$1" in
 	fi	
     
     TOMCAT_CONF="/var/lib/openwga/tomcat/conf"
-    if [ ! -e $TOMCAT_CONF ] ; then
+    if [ ! -h $TOMCAT_CONF ] ; then
     	ln -s /etc/openwga/tomcat/conf $TOMCAT_CONF
     fi
 
 	OPENWGA_CONF="/var/lib/openwga/wgaconfig.xml"
-	if [ ! -e $OPENWGA_CONF ] ; then
+	if [ ! -h $OPENWGA_CONF ] ; then
     	ln -s /etc/openwga/wgaconfig.xml $OPENWGA_CONF
     fi
 

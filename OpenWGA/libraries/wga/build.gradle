@@ -24,6 +24,10 @@ dependencies {
     compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
     compileClasspath 'javax.websocket:javax.websocket-api:1.1'
     compileClasspath 'javax.servlet.jsp:jsp-api:2.2'
+    compileClasspath 'javax.mail:javax.mail-api:1.4.7'
+    compileClasspath 'javax.transaction:transaction-api:1.1'
+    compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
+
 }
 
 sourceSets {
