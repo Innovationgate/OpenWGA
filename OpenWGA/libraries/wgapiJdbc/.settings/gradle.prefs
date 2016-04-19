@@ -1,0 +1,12 @@
+{
+  "1.0": {
+    "project_path": ":wgapiJdbc",
+    "project_dir": "/home/oliver/EclipseWorkspaces/WGA_HEAD.git/OpenWGA/OpenWGA/libraries/wgapiJdbc",
+    "connection_project_dir": "/home/oliver/EclipseWorkspaces/WGA_HEAD.git/OpenWGA/OpenWGA",
+    "connection_gradle_user_home": null,
+    "connection_gradle_distribution": "GRADLE_DISTRIBUTION(WRAPPER)",
+    "connection_java_home": null,
+    "connection_jvm_arguments": "",
+    "connection_arguments": ""
+  }
+}
