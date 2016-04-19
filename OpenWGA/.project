@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>OpenWGA</name>
-	<comment>Project OpenWGA created by Buildship.</comment>
+	<name>OpenWGAServer</name>
+	<comment>Project OpenWGAServer created by Buildship.</comment>
 	<projects>
 	</projects>
 	<buildSpec>
@@ -20,114 +20,4 @@
 		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<filteredResources>
-		<filter>
-			<id>1459769969227</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-libraries</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1459769969312</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-server</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1459769969322</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-build</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1459769969335</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-.gradle</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1460476519325</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-libraries/servicesClient</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1460476519334</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-libraries/tmlScript</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1460476519346</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-libraries/wga</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1460476519356</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-libraries/wgaBuildTools</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1460476519363</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-libraries/wgapi</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1460476519369</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-libraries/wgapiJdbc</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1460476519374</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-libraries/wgutils</arguments>
-			</matcher>
-		</filter>
-		<filter>
-			<id>1460638541096</id>
-			<name></name>
-			<type>26</type>
-			<matcher>
-				<id>org.eclipse.ui.ide.multiFilter</id>
-				<arguments>1.0-projectRelativePath-matches-false-false-distros/wgaDeb</arguments>
-			</matcher>
-		</filter>
-	</filteredResources>
 </projectDescription>
