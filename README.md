@@ -6,7 +6,7 @@ Building
 
 Run
 
-  ./gradlew clean build
+`./gradlew clean build`
   
 Distributions are:
 
@@ -18,3 +18,9 @@ Developing in Eclipse
 ---------------------
 
 Make sure you have Eclipse Mars and at least Buildship 1.0.14 installed.
+
+
+Versioning
+----------
+
+Specify OpenWGA version in file "gradle.properties" in main project folder.
