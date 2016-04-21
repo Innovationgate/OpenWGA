@@ -6,10 +6,13 @@ plugins {
 }
 
 configurations {
+    server
     tomcatAdditionalJars
 }
 
 dependencies {
+    server project(":server")
+    
     tomcatAdditionalJars 'com.sun.mail:javax.mail:1.4.7'
     tomcatAdditionalJars 'javax.activation:activation:1.1.1'
     tomcatAdditionalJars 'org.apache.geronimo.specs:geronimo-activation_1.1_spec:1.1'
@@ -91,3 +94,18 @@ ospackage {
 buildDeb {   
 }
 build.dependsOn buildDeb
+buildDeb.dependsOn configurations.server
+
+task updateDebBetaRepositories(dependsOn: buildDeb) << {
+    def buildProps = new Properties()
+    buildProps.load(file(build_properties_file).newInputStream())
+
+    def debFile = buildDeb.archivePath
+    println "Publishing debian package: ${debFile}"
+    for (distro in linuxDistros) {
+        ant.exec(command:"/usr/bin/reprepro -C non-free -Vb ${buildProps['deploy.apt.ce.beta-repository.local']} includedeb ${distro} ${debFile}")
+    }
+}
+updateDebBetaRepositories.onlyIf{
+    project.hasProperty('build_properties_file')
+}
