@@ -1,0 +1,10 @@
+<html>
+	<head>
+		<title>Ye olde custom error page</title>
+	</head>
+	<body>
+		Error code: <tml:script expression="wgaerror.errorCode"/><br>
+		Error message: <tml:script expression="wgaerror.mainMessage"/><br>
+		Detail message: <tml:script expression="wgaerror.detailMessageHTML"/><br>
+	</body>
+</html>

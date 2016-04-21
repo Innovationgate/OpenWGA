@@ -1,0 +1,57 @@
+<tml:if condition="Sprache='DE' ">
+<tml:then>
+<tml:if condition="Titel = 'Webgate Anywhere'">
+<tml:then>
+<div class="teaser">
+<table bgcolor="5f655f" border="0">
+<tr>
+<td>
+<a href="WSCI-5EBB47.DE.0/~FILE/WebGate+Anywhere+Whitepaper.pdf" target="_new">
+<tml:image name="Teaser" src="WGAWhitepaper.gif"> border="0"</tml:image>
+</a></td>
+</tr>
+</table>
+</div>
+</tml:then>
+<tml:else>
+<table border="0"cellspacing="0" cellpadding="0">
+<tr>
+<td style="border-color:#000000;border-width:1;border-style:solid">
+<EMBED src="<tml:url type="file" doc="WGAFlash" file="SingleIntro.swf"/>" quality=high bgcolor=#A5A69C  WIDTH=170  height="90" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"></EMBED></td>
+</tr>
+<tr>
+<td align="center">
+<a href="JavaScript:loadFlashDemo()">Guided Tour (Flash)</a></td>
+</tr>
+</table>
+</tml:else>
+</tml:if>
+</tml:then>
+<tml:else>
+<div class="teaser">
+<table bgcolor="5f655f" border="0">
+<tr>
+<td>
+<a href="WSCI-5EBB47.EN.0/~FILE/WebGate+Anywhere+Whitepaper+English.pdf" target="_new">
+<tml:image name="Teaser" src="WGAWhitepaper.gif"> border="0"</tml:image>
+</a></td>
+</tr>
+</table>
+</div>
+<tml:if condition="Titel != 'WebGate Anywhere'">
+<tml:then>
+<table border="0"cellspacing="0" cellpadding="0">
+<tr>
+<td style="border-color:#000000;border-width:1;border-style:solid">
+<EMBED src="<tml:url type="file" doc="WGAFlash" file="SingleIntro.swf"/>" quality=high bgcolor=#A5A69C  WIDTH=170  height="70" TYPE="application/x-shockwave-flash" PLUGINSPAGE="http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockwaveFlash"></EMBED></td>
+</tr>
+<tr>
+<td align="center">
+<a href="JavaScript:loadFlashDemo()">Guided Tour (Flash)</a></td>
+</tr>
+</table>
+</tml:then>
+</tml:if>
+
+</tml:else>
+</tml:if>

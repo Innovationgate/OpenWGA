@@ -1,0 +1,4 @@
+<tml:include ref="vote-collection">
+<tml:option name="index">1</tml:option>
+<tml:option name="archive">no</tml:option>
+</tml:include>

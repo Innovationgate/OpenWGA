@@ -1,0 +1,26 @@
+function Controller() {
+}
+
+Controller.prototype.getActionCounter = function($cx) {
+
+	var counter = $cx.getSessionVar("counter");
+	if (counter != null) {
+		return counter;
+	}
+	else {
+		return 0;
+	}
+
+}.nonIsolated()
+
+Controller.prototype.incCounter = function($cx) {
+
+	var counter = $cx.getSessionVar("counter");
+	if (counter != null) {
+		$cx.setSessionVar("counter", counter+1);
+	}
+	else {
+		$cx.setSessionVar("counter", 1);
+	}
+
+}.nonIsolated()

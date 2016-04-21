@@ -1,0 +1,18 @@
+function Controller() {
+}
+
+Controller.prototype.prepare = function($cx, $cookie_testId, $cookie_clickStep) {
+	try{
+		var cat = $cookie_testId;
+		var clickStep = parseInt($cookie_clickStep);
+		$cx.assertEquals("ClickStep " + clickStep + ", Option: copyright (string)", cat, $cx.option("copyright"), "Innovation Gate AG");
+		$cx.assertEquals("ClickStep " + clickStep + ", Option: canonicalURL (JS object)", cat, String($cx.option("canonicalURL")), "[object Object]");
+		$cx.assertEquals("ClickStep " + clickStep + ", Option: canonicalURL.port (Number on JS object)", cat, $cx.option("canonicalURL").port, 80);
+		$cx.assertEqualLists("ClickStep " + clickStep + ", Option: global_site_keywords (array)", cat, $cx.option("global_site_keywords"), ["my","default","keywords"], false);
+		$cx.assertEquals("ClickStep " + clickStep + ", Option: bootstrap (boolean)", cat, $cx.option("bootstrap"), true);
+		$cx.assertEquals("ClickStep " + clickStep + ", Option: some_number (number)", cat, $cx.option("some_number"), 2);
+	}
+	catch(e){
+		logException(e);
+	}
+}.nonIsolated();

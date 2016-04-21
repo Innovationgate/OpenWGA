@@ -1,0 +1,28 @@
+<table border="0" width="100%">
+<tml:navigator type="siblings" context="name:Home">
+<tr>
+<td colspan="4" bgcolor="#848A84"><tml:link>target="IG" class="Nav"</tml:link></td>
+</tr>
+<tml:navigator type="children">
+<tr>
+<td bgcolor=#848A84><tml:image name="blank" src="blank.gif"> width="20" </tml:image></td>
+<td colspan="3" bgcolor="#848A84"><tml:link>target="IG" class="Nav"</tml:link></td>
+</tr>
+<tml:navigator type="children">
+<tr>
+<td bgcolor=#848A84><tml:image name="blank" src="blank.gif"> width="20" </tml:image></td>
+<td bgcolor=#848A84><tml:image name="blank" src="blank.gif"> width="20" </tml:image></td>
+<td colspan="2" bgcolor="#848A84"><tml:link>target="IG" class="Nav"</tml:link></td>
+</tr>
+<tml:navigator type="children">
+<tr>
+<td bgcolor=#848A84><tml:image name="blank" src="blank.gif"> width="20" </tml:image></td>
+<td bgcolor=#848A84><tml:image name="blank" src="blank.gif"> width="20" </tml:image></td>
+<td bgcolor=#848A84><tml:image name="blank" src="blank.gif"> width="20" </tml:image></td>
+<td bgcolor="#848A84"><tml:link>target="IG" class="Nav"</tml:link></td>
+</tr>
+</tml:navigator>
+</tml:navigator>
+</tml:navigator>
+</tml:navigator>
+</table>

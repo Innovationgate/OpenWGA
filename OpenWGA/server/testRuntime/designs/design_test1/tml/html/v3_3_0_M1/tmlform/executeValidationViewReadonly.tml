@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+  <tml:htmlhead/>    
+  <tml:script>
+  	  if (!isdefined("mode")) {		
+		  setsessionvar("mode", this.request.getParameter("formmode"));
+	  }
+	  if (!isdefined("persist")) {
+	  	  setsessionvar("persist", this.request.getParameter("persist"));
+	  }
+  </tml:script>
+    
+  <tml:action id="validate">
+  	var category = "TMLForm:executeValidationViewReadonly";
+  	
+  	// validate form
+  	tmlform.validate();
+  	
+  	// form is always filled invalid by default
+  	assertequals("Action='validate' - toBeValidated-Field is 'Marie Curie'", category, tmlform.toBeValidated, "Marie Curie");
+  	assertequals("Action='validate' - Correct message for 'toBeValidated' set on tmlform.", category, tmlform.getmessage("toBeValidated"), "toBeValidated should be 'Albert Einstein'");
+	asserttrue("Action='validate' - start is not before end", category, "!tmlform.parsedvalue('start').before(tmlform.parsedvalue('end'))");
+  	asserttrue("Action='validate' - TML-Validate Tag executed. Correct message set on tmlform.", category, "tmlform.getmessages().contains('StartDate must be before EndDate.')");	  
+  </tml:action>
+  
+  <tml:action id="store">
+	  	var category = "TMLForm:executeValidationViewReadonly";  
+	  	try {
+		    if (this.tmlparam1.equals("content")) {
+	  			this.tmlform.storeincontent();
+	  		} else if (this.tmlparam1.equals("profile")) {
+	  			this.tmlform.storeinprofile();
+	  		} else if (this.tmlparam1.equals("portlet")) {
+	  			this.tmlform.storeinportlet();
+	  		}
+		} catch (Exception) {
+			// catch nullpointer during store because source="none"
+		}
+  	
+	  	// form is always filled invalid by default
+	  	assertequals("Action=store('" + this.tmlparam1 + "') - toBeValidated-Field is 'Marie Curie'", category, tmlform.toBeValidated, "Marie Curie");
+	  	assertequals("Action=store('" + this.tmlparam1 + "') - Correct message for 'toBeValidated' set on tmlform.", category, tmlform.getmessage("toBeValidated"), "toBeValidated should be 'Albert Einstein'");
+		asserttrue("Action=store('" + this.tmlparam1 + "') - start is not before end", category, "!tmlform.parsedvalue('start').before(tmlform.parsedvalue('end'))");
+	  	asserttrue("Action=store('" + this.tmlparam1 + "') - TML-Validate Tag executed. Correct message set on tmlform.", category, "tmlform.getmessages().contains('StartDate must be before EndDate.')");	  		
+  </tml:action>
+</head>
+<body>
+<HR/>
+<PRE>
+This test checks the following if form is in view or readonly-mode:
+ - execution of validation during all storeIn... methods
+ - correct setting of validationmessages
+ - explizit execution of validation in action
+</PRE>
+
+
+	<tml:form id="executeValidationViewReadonly" source="none" 
+	          mode="{this.mode}"
+	          persist="{this.persist}">
+	          
+	        <tml:input type="text" name="toBeValidated" 
+	        		   validation="$E_VALUE.equals('Albert Einstein')"
+	        		   message="toBeValidated should be 'Albert Einstein'"
+	        		   default="Marie Curie"/>
+	        
+	        
+	        <tml:input type="date" 
+	        		   name="start" format="dd.MM.yyyy"
+	        		   default="26.11.2005"/>
+	        <tml:input type="date" 
+		               name="end" format="dd.MM.yyyy"
+		               default="01.03.2005"/>
+	        <tml:validate condition="tmlform.parsedvalue('start').before(tmlform.parsedvalue('end'))"  output="false">StartDate must be before EndDate.</tml:validate>
+	        <tml:button clickaction="store" id="storeinportlet" param1="portlet">storeinportlet</tml:button><BR/>	        		   
+	        <tml:button clickaction="store" id="storeincontent" param1="content">storeincontent</tml:button><BR/>	        		   
+	        <tml:button clickaction="store" id="storeinprofile" param1="profile">storeinprofile</tml:button><BR/>	        		   	               
+	        <tml:button clickaction="validate" id="validate">validate</tml:button>		
+	</tml:form>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<html>
+<body>
+
+<PRE>
+Tests the enforcements of visibility fields across all query types that are used
+against WGA Content Stores and that need to enforce those fields.
+</PRE>
+<hr>
+
+
+<p>
+<h2>HQL</h2>
+<tml:include ref="::QVEInner">
+	<tml:option name="database">test1</tml:option>
+	<tml:option name="type">hql</tml:option>
+	<tml:option name="query">content.structentry.contenttype='standard'</tml:option>
+</tml:include>
+</p>
+
+<p>
+<h2>Lucene</h2>
+<tml:include ref="::QVEInner">
+	<tml:option name="database">test1</tml:option>
+	<tml:option name="type">lucene</tml:option>
+	<tml:option name="query">WGA</tml:option>
+</tml:include>
+</p>
+
+<p>
+<h2>Expression Query</h2>
+<tml:include context="name:queryvisibilityenforcement" ref="::QVEInner">
+	<tml:option name="database">test1</tml:option>
+	<tml:option name="type">xp:tmlscript</tml:option>
+	<tml:option name="query">meta("contenttype") == 'standard'</tml:option>
+</tml:include>
+</p>
+
+<p>
+<h2>Domino Formula</h2>
+<tml:include ref="::QVEInner">
+	<tml:option name="database">ig</tml:option>
+	<tml:option name="type">formula</tml:option>
+	<tml:option name="query">@Contains(Titel; "testdocument")</tml:option>
+</tml:include>
+</p>
+
+<p>
+<h2>Domino Fulltext</h2>
+<tml:include ref="::QVEInner">
+	<tml:option name="database">ig</tml:option>
+	<tml:option name="type">fulltext</tml:option>
+	<tml:option name="query">WGA</tml:option>
+</tml:include>
+</p>
+
+<tml:warnings/>
+</body>
+</html>

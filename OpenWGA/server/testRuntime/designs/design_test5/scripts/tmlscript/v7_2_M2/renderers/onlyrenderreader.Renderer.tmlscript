@@ -1,0 +1,11 @@
+this.render = function($cx) {
+
+	var data = WGA.design().resolve("testfiles").fileContainer.getFileText("onlyrenderreader.txt");
+	try {
+		WGA.TMLPage.write(data);
+	}
+	finally {
+		data.close();
+	}
+		
+}

@@ -1,0 +1,8 @@
+<html><body>
+
+<hr/>
+<tml:item name="body" scriptlets="true" encode="none"/>
+
+<tml:warnings/>
+
+</body></html>

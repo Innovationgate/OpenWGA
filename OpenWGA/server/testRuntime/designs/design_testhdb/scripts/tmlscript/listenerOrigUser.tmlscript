@@ -1,0 +1,12 @@
+function postCreateContent(event) {
+	try {
+		var con = context(this).context("db:test1");
+		assertEquals("HDB Listener: We normally are master user now", cat, con.meta('db', "USERNAME"),  db().MASTER_USERNAME);
+		executeAssertions(con, "HDB Listener: ");
+		assertEquals("HDB Listener: Original_username from a different DB is null", cat, context("db:test2").meta('db', "ORIGINAL_USERNAME"), null);
+	}
+	catch (e) {
+		assertTrue("Exception in HDB listener", "TMLScript:OriginalUser", "false");
+		logException(e);
+	}
+}

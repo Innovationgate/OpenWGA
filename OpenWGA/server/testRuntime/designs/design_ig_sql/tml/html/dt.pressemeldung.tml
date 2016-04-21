@@ -1,0 +1,25 @@
+<input type="button" class="buttonsmall" value="<tml:if condition="Sprache ='DE' "><tml:then>PDF online erstellen</tml:then><tml:else>create PDF online</tml:else></tml:if>" onclick="PDFNews('<tml:url context="name:PDFName"/>','<tml:url medium="pdf"/>')">
+
+<br><br>
+<tml:evaluate var="bild">@AttachmentNames</tml:evaluate> 
+<table border="0" width="100%">
+<tr><td class="Headline">
+<tml:item name="_Headline"/>
+</td></tr>
+<tr><td>
+<div align=right>
+<tml:item name="_Ort"/>, <tml:item name="_Date"/>
+</div>
+<br>
+<tml:if condition="@attachments !=0">
+<tml:then>
+<table align=right border=0>
+<tr><td>
+<img width=250 src="<tml:url type="file" file="{item:bild}"/>"></td>
+</tr>
+</table>
+</tml:then>
+</tml:if>
+<tml:item name="body" editor="rtf"/>
+</td></tr>
+</table>  

@@ -1,0 +1,4 @@
+this.render = function($cx) {
+	$cx.setVar("rendererContext", $cx.path);
+	WGA.TMLPage.render(WGA.design().resolve("::outerlayoutrenderer2_tml"), $cx.context("name:home")); 
+}

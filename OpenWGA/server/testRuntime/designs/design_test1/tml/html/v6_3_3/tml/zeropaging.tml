@@ -1,0 +1,43 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests pagesize="0", meant to disable paging, on databases (#00003482)
+	</PRE>
+	
+	<hr>
+	
+	<tml:navigator var="dominocs" type="siblings" context="db:ig/name:home" pagesize="0">
+		<tml:link/>
+	</tml:navigator>
+
+	<tml:navigator var="sqlcs" type="siblings" context="name:home" pagesize="0">
+		<tml:link/>
+	</tml:navigator>
+	
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			assertEquals("Pagesize 0 disables paging on domino CS", cat, itemList("dominocs").size(), 12);
+			assertEquals("Pagesize 0 disables paging on SQL CS", cat, itemList("sqlcs").size(), 3);
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

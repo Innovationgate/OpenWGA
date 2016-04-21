@@ -1,0 +1,18 @@
+<tml:script>
+var mail = this.createmail("mail.innovationgate.de", "", "");
+if( mail != null ) {
+mail.setSubject ( "DataURLTest" );
+mail.setBody( "Anhänge:" );
+
+mail.setTo( "tb@innovationgate.de" );
+mail.setFrom( "dataurl@intern" );
+
+mail.setMimeType("text/html");
+mail.addAttachmentURL(this.filedataurl("tv","lola.jpg"), "lola.jpg");
+mail.addAttachmentURL(this.contentdataurl("pdf","simplepdf"), "simple.pdf");
+mail.send();
+}
+else{
+errorMSG = "Error: Can't create mail object.";
+}
+</tml:script>

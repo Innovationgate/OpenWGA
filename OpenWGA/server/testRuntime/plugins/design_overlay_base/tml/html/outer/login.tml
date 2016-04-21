@@ -1,0 +1,43 @@
+<tml:action id="login">
+	if(login(tmlform.username, tmlform.password, meta("db", "domain")))
+		tmlform.storeInProfile();		
+	else _login_error=true;
+</tml:action>
+
+<tml:action id="logout">
+	logout(meta("db", "domain"));
+	profile.removeItem("remember_me");
+	profile.save();
+	redirectTo(contenturl(null, null));
+</tml:action>
+
+<tml:case istrue="_login_error">
+	<div style="font-weight:bold">login error</div>
+</tml:case>
+
+<tml:if condition="meta('db', 'username')=='anonymous'">
+	<tml:then>
+		<tml:form id="login-form" source="profile" onsubmit="return login()" cssstyle="display:inline">
+			Username:<br>
+			<tml:input name="username" cssstyle="width:95%"/><br>
+			Password:<br>
+			<tml:input name="password" type="password" cssstyle="width:95%"/><br>
+			<tml:input type="checkbox" name="remember_me" options="Rember me|autologin"/>
+			<button type="submit">login</button>
+			<script>
+				function login(){
+					WGA.callAction("<tml:action ref="login"/>");
+					return true;
+				}
+			</script>
+		</tml:form>
+	</tml:then>
+	<tml:else>
+		You are logged in as<br>
+		<b><tml:script>
+			var user = meta("db", "username");
+			return user.length>25? user.substr(0,22) + "...":user
+		</tml:script></b><br>
+		<tml:button clickaction="logout">logout</tml:button>
+	</tml:else>
+</tml:if>

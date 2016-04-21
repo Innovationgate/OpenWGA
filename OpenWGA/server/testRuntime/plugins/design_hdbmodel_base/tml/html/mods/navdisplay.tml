@@ -1,0 +1,13 @@
+<tml:script>
+	var navmodel = HDBModel.getModelForContent(content());
+	portlet.setVar("navmodel", navmodel);
+</tml:script>
+
+<tml:select>
+	<tml:case condition="HDBModel.isStorage(content())">
+		<a id="<tml:script expression="UNIQUENAME"/>" href="<tml:url action="$refresh" ajax="false" portletmode="browse" portletcontext="this"/>">View <tml:item name="navmodel" xpath="@storageId"/></a>
+	</tml:case>
+	<tml:caseelse>
+		<a id="<tml:script expression="UNIQUENAME"/>" href="<tml:url action="$refresh" ajax="false" portletmode="browse" portletcontext="this"/>"><tml:script expression="javaObject(CONTENTCLASS).toUpperCase()"/>: <tml:meta name="title"/></a>
+	</tml:caseelse>
+</tml:select>

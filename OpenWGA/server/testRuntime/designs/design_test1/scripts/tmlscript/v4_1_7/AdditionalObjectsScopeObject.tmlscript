@@ -1,0 +1,12 @@
+this.isJobContextVisible = function() {
+
+	try {
+		var wgacore1 = jobContext.wgaCore;
+		var db1 = db("test1");
+		return (wgacore1 != null && db1 != null);
+	}
+	catch(e) {
+		return false;
+	}
+
+}

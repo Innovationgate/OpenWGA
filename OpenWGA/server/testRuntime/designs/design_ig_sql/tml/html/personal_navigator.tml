@@ -1,0 +1,64 @@
+<table border="0"  width="100%" cellspacing="1" cellpadding="0" height="40">
+<tr>
+<td colspan="6" align="center" bgcolor="black"><div class="SmallFontWeiss">
+<tml:if condition="Sprache='EN' ">
+<tml:then>
+your personal menu
+</tml:then>
+<tml:else>
+Ihr persönliches Menü
+</tml:else>
+</tml:if></div></td></tr>
+<tr>
+<td width="17%" align="center" bgcolor="black">
+<a href="http://www2.innovationgate.de/WebGatePublisher/igforum/html/default/home">
+<tml:if condition="Sprache='EN' ">
+<tml:then>
+German forum
+</tml:then>
+<tml:else>
+Forum
+</tml:else>
+</tml:if></a></td>
+<td width="17%" align="center" bgcolor="black" class="NoActivLink">
+<tml:if condition="Sprache='EN' ">
+<tml:then>
+partner area
+</tml:then>
+<tml:else>
+<a href="http://www.innovationgate.de/C1256B0C004BA105/ContentByKey/DSTS-4RTG32-DE-p">Partner Bereich</a>
+</tml:else>
+</tml:if></td>
+<td width="17%" align="center" bgcolor="black" class="NoActivLink">
+&nbsp;
+<tml:if condition="Sprache='EN' ">
+<tml:then>
+contract data
+</tml:then>
+<tml:else>
+Vertragsdaten
+</tml:else>
+</tml:if></td>
+<td width="17%" align="center" bgcolor="black" class="NoActivLink">
+&nbsp;Support</td>
+<td width="17%" align="center" bgcolor="black" class="NoActivLink">
+<tml:if condition="Sprache='EN' ">
+<tml:then>
+project monitoring
+</tml:then>
+<tml:else>
+Projektverfolgung
+</tml:else>
+</tml:if></td>
+<td width="17%" align="center" bgcolor="black">
+<tml:if condition="Sprache='EN' ">
+<tml:then>
+	<a href="<tml:url context="name:downloads-en"/>">Downloads</a>
+</tml:then>
+<tml:else>
+	<a href="<tml:url context="name:downloads"/>">Downloads</a>
+</tml:else>
+</tml:if>
+</td>
+</tr>
+</table>

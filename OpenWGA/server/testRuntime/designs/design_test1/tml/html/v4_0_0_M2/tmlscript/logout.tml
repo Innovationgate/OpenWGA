@@ -1,0 +1,26 @@
+<html>
+<body>
+<HR/>
+<PRE>
+Login/ logout via tmlscript F000040C2
+</PRE>
+<BR/>
+
+<tml:script>
+// check login from previous request
+var loginsDB = this.db("logins");
+var accessLevel = loginsDB.getSessionContext().getAccessLevel();
+assertEquals("logged in as manager", "tmlscript:login", accessLevel, loginsDB.ACCESSLEVEL_MANAGER);
+
+// logout
+var result = this.logout("default");
+assertEquals("logout method returned 'logout was successful'", "tmlscript:logout", result, true);
+</tml:script>
+
+
+<tml:script>
+	// check warnings
+	asserttrue("No tml:warnings detected", "tmlscript:logout", this.tag.getWarnings().isEmpty());
+</tml:script>
+</body>
+</html>

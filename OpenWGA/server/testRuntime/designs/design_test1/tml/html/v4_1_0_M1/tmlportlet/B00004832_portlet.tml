@@ -1,0 +1,23 @@
+<tml:action id="contextCheck">
+	try {
+		assertEquals("Contextpath within action is ok", "TMLPortlet", getpath() , "db:test2/docid:owee-5aegzr.de.4");
+	}
+	catch (e) {
+		logException(e);
+		assertTrue("Exception running test", "TMLPortlet", "false");
+	}
+</tml:action>
+
+
+<tml:script>
+	try {
+		assertEquals("Contextpath within portlet is ok", "pers", getpath() , "db:test2/docid:owee-5aegzr.de.4");
+	}
+	catch (e) {
+		logException(e);
+		assertTrue("Exception running test", "TMLPortlet", "false");
+	}
+</tml:script>
+
+
+<tml:button clickaction="contextCheck" ajax="true" id="refresh">refresh</tml:button>

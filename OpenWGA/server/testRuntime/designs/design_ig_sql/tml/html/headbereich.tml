@@ -1,0 +1,22 @@
+<title><tml:metadata type="database" name="titleprefix"/> | <tml:metadata name="title"/></title>
+<!--
+Innovation Gate GmbH | J2EE basierendes Enterprise Content Management System - CMS
+-->
+<link rel="SHORTCUT ICON" href="<tml:url type="file" doc="Favicon" file="favicon.ico"/>">
+<META NAME="subtitle" CONTENT="Innovation Gate GmbH | J2EE basierendes Enterprise Content Management System - CMS">
+<META NAME="keywords" CONTENT="Innovation Gate, Content Management System, Enterprise, J2EE, Redaktionssysteme, Redaktionssystem, Web Content Management, CMS, Software, Integration, Publishing, Vergleich, WCMS, XML, SOAP, Java, Webservice, MS-Word Client, Personalisierung, Shop">
+<META NAME="description" CONTENT="Innovation Gate GmbH - J2EE basierendes Enterprise Content Management System - CMS">
+<META NAME="abstract" CONTENT="Innovation Gate GmbH - J2EE basierendes Enterprise Content Management System - CMS">
+<META NAME="page-topic" CONTENT="Innovation Gate GmbH - J2EE basierendes Enterprise Content Management System - CMS">
+<META NAME="content-language" content="<tml:evaluate>@Lowercase(Sprache)</tml:evaluate>">
+<META NAME="publisher" content="Innovation Gate GmbH, Enterprise Content Management System">
+<META NAME="public" content="yes">
+<META NAME="copyright" CONTENT="Innovation Gate GmbH, Enterprise Content Management System">
+<META NAME="organization" CONTENT="Innovation Gate GmbH, Enterprise Content Management System">
+<META NAME="revisit-after" CONTENT="10 days">
+<META NAME="robots" CONTENT="index, follow">
+<meta http-equiv="content-type" content="text/html;charset=iso-8859-1">
+<tml:htmlhead/>
+<script language="JavaScript">
+window.defaultStatus = "Innovation Gate GmbH | J2EE based Enterprise Content Management System.";
+</Script>

@@ -1,0 +1,26 @@
+function PageScopeObject() {
+}
+
+PageScopeObject.prototype.doPageScopeEvent = function($event, $websocket) {
+	WGA.log.info("Page Scope Object received pageScopeEvent. Param: " + $event.params.data);
+	$websocket.firePortletEvent("eventFromPageScopeObject", {param: $event.params.data});
+}.listenToAppEvents("pageScopeEvent");
+
+
+PageScopeObject.prototype.doPageScopeEvent2 = function($event, $websocket) {
+	WGA.log.info("Page Scope Object received pageScopeEvent2. Param: " + $event.params.data);
+	$websocket.sendMessage({"theData": $event.params.data});
+}.listenToAppEvents("pageScopeEvent2");
+
+PageScopeObject.prototype.isWGAIsolated = function() {
+	return WGA.isIsolated();
+	
+}
+
+PageScopeObject.prototype.isCxIsolated = function($cx) {
+	return  !$cx.isWebEnvironment() && $cx.request == null && $cx.response == null && $cx.httpsession == null;
+}
+
+PageScopeObject.prototype.callMe = function(someParam) {
+	return {answer: "Hi client, this is the Page global. You sent: " + someParam};
+}

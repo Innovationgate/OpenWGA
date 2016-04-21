@@ -1,0 +1,35 @@
+<div class="rtf">
+<table width="100%" border="1" cellpadding="2" cellspacing="2">
+	<tr>
+		<td width="100">RTF:</td>
+		<td><div class="rtf"><tml:item name="rtf" editor="rtf"><tml:option name="showoptions">all</tml:option></tml:item></div></td>
+	</tr>
+	<tr>
+		<td width="100">Textblock:</td>
+		<td><tml:item name="textblock" editor="textblock"/></td>
+	</tr>
+	<tr>
+		<td width="100">Text:</td>
+		<td><tml:item name="text" editor="text"/></td>
+	</tr>
+	<tr>
+		<td width="100">Textarea:</td>
+		<td><tml:item name="textarea" editor="textarea" encode="html"/></td>
+	</tr>
+	<tr>
+		<td width="100">Number:</td>
+		<td><tml:item name="number" editor="number"/></td>
+	</tr>
+	<tr>
+		<td width="100">Date:</td>
+		<td><tml:item name="date" editor="date"/></td>
+	</tr>
+	<tr>
+		<td width="100">Custom:</td>
+		<td><tml:item name="custom" editor="custom">
+			Name: <tml:input name="name"type="text"/>
+			Age: <tml:input name="age" type="number"/>
+		</tml:item></td>
+	</tr>
+</table>
+</div>

@@ -1,0 +1,23 @@
+<pre>
+	Manual test for F000042AA (Attach files directly on mail object)
+</pre>
+
+<tml:script>
+	var mail = this.createmail("mail.innovationgate.de", "", "");
+	if( mail != null ) {
+		mail.setSubject ( "test(F000042AA)" );
+		mail.setBody( "attachments:" );
+		
+		mail.setTo( "tb@innovationgate.de" );
+		mail.setFrom( "mail@intern" );
+		
+		mail.setMimeType("text/html");
+		mail.addAttachment(gettag().openDesignDB().getFileContainer("tv"), "lola.jpg");
+		mail.addAttachment(gettag().openDesignDB().getFileContainer("tv"), "lola.jpg", "lola_alternative.jpg");
+		mail.addAttachment(new Packages.java.io.FileInputStream("/home/tbinias/mail.txt"), "localfile.txt");
+		mail.send();
+	}
+	else{
+		errorMSG = "Error: Can't create mail object.";
+	}
+</tml:script>

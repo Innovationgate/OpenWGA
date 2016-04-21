@@ -1,0 +1,10 @@
+<table border=0 cellpadding=0 cellspacing=5>
+<tr>
+<tml:navigator type="path">
+<tml:level from="2" to="*">
+<td valign="top"><tml:image name="Navigation" src="more.gif">width="10" height="12"</tml:image></td>
+<td valign="top"><tml:link> class="Nav"</tml:link></td>
+</tml:level>
+</tml:navigator>
+</tr>
+</table>

@@ -1,0 +1,47 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing correct decoding of HTML form fields sent URL-encoded regarding "+" signs (#00002940)
+	</PRE>
+	
+	<hr>
+	
+	<form id="theform">
+	
+		<input name="theinput" value="The Text">
+		<input type="submit" id="click1">
+	
+	</form>
+	
+	<tml:urlparam var="theParam" name="theinput"/>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+
+			if (clickStep == 1) {
+				assertEquals("Sent form field was correctly decoded: request.getParameter()", cat, request.getParameter("theinput"), "The Text");
+				assertEquals("Sent form field was correctly decoded: tml:urlparam", cat, theParam, "The Text");
+			}
+		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

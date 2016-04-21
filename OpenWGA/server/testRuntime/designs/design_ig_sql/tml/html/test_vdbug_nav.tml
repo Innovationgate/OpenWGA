@@ -1,0 +1,20 @@
+<html>
+<body>
+
+Ohne Layout-Switch:</br/>
+<ul>
+<tml:navigator type="siblings" context="db:ig/area:home">
+<li><tml:link>target="IG"</tml:link>
+</tml:navigator>
+</ul>
+
+
+Mit Layout-Switch:<br/>
+<ul>
+<tml:navigator type="siblings" context="db:ig/area:home">
+<li><tml:link layout="test_scriptlets">target="IG"</tml:link>
+</tml:navigator>
+</ul>
+
+</body>
+</html>

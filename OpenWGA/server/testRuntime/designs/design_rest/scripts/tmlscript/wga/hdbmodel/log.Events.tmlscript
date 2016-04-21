@@ -1,0 +1,19 @@
+function Events() {
+}
+
+Events.prototype.onCreate = function($cx, $event) {
+	WGA.log.info("Running onCreate for contentclass log in TMLScript Object V2");
+	if ($event.customParam) {
+		var content = $cx.content();
+		content.setItemValue("ref", $event.customParam.ref);
+		content.setItemValue("message", $event.customParam.message);
+		HDBModel.assignContentID(content, $event.customParam.ref);
+		if ($event.customParam.files) {
+			for (var fileName in Iterator(WGA.getLookupKeys($event.customParam.files))) {
+				var stream = $event.customParam.files.get(fileName);
+				content.attachFile(stream, fileName);
+				stream.close();
+			}
+		}
+	}
+}

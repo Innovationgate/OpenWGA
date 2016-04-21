@@ -1,0 +1,6 @@
+<tml:form id="theform">
+
+<tml:input name="field" validation="$E_VALUE != 'weihnachtsmann'" message="Der Weihnachtsmann ist unerwünscht"/>
+
+<tml:button id="action" clickaction="v4_0_2:actionFromDifferentMainContext">Action</tml:button>
+</tml:form>

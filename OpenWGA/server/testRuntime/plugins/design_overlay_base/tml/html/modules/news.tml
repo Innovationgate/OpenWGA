@@ -1,0 +1,39 @@
+
+<div class="collection">
+	<div class="createpage">
+		<tml:createpage message="create news item" context="name:news" contenttype="news"/>
+	</div>
+		
+	<tml:collection>
+		<tml:query type="hql">
+			content.structentry.contenttype.name='news'
+			order by content.items['date'].date DESC
+		</tml:query>
+
+		<tml:foreach pagesize="3" id="news" filllastpage="false">
+			<div class="news rtf">
+				<h1><a href="<tml:url/>"><tml:script expression="headline||TITLE" encode="rtf"/></a></h1>
+				<div align="right"><tml:item name="date" format="longDate"/></div>
+				<h2>
+					<tml:item name="intro" encode="rtf"/>
+				</h2>
+			</div>
+		</tml:foreach>
+	</tml:collection>
+	
+</div>
+
+<tml:case condition="taginfo('news', 'pages')>1">
+	<div class="pagecontrol">
+		<tml:foreach type="loop" count="{taginfo('news', 'pages')}" currentvalue="_i">
+			<tml:if condition="_i == taginfo('news', 'currentpage')">
+				<tml:then><b><tml:item name="_i"/></b></tml:then>
+				<tml:else>
+					<button onclick="location.href='<tml:url type="selectpage" page="{_i}" sourcetag="news"/>'">
+						<tml:item name="_i"/>
+					</button>
+				</tml:else>
+			</tml:if>
+		</tml:foreach>
+	</div>
+</tml:case>

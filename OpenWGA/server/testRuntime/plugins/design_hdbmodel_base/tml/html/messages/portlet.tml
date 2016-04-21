@@ -1,0 +1,18 @@
+<tml:eventscript onevent="hdbupdate" ajax="false">
+portlet.setVar("msgtitle", "Uh, oh, something happened!");
+portlet.setVar("theevent", portletEvent);
+</tml:eventscript>
+
+<tml:if isdefined="theevent">
+	<tml:then>
+		<h3><tml:item name="msgtitle"/></h3>
+		Type: <div id="msg_type"><tml:script expression="theEvent.getParameter('type')"/></div>
+		Key: <div id="msg_key"><tml:script expression="theEvent.getParameter('key')"/></div>
+		Content Class:<div id="msg_contentclass"><tml:script expression="theEvent.getParameter('contentclass')"/></div>
+	</tml:then>
+	<tml:else>
+		All clear, captain.
+	</tml:else>
+
+
+</tml:if>

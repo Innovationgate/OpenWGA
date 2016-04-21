@@ -1,0 +1,9 @@
+this.query = function() {
+	return WGA.dataSource("customjdbc").query("hql", "select * from users");
+}
+
+this.enhance = function(ref) {
+	ref.addItem("firstName", firstName);
+	ref.addItem("lastName", lastName);
+	ref.addItem("id", id);
+} 

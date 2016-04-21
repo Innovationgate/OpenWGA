@@ -1,0 +1,116 @@
+<tml:action id="clickxaction">
+/*WGA.Call.setResponseHeader("X-WGA-Test", "true");
+
+WGA.Call.addCookie("thatCookie", "yumyum");
+assertTrue("Call.addCookie() already available before sending: getCookieNames()", cat, "WGA.Call.getCookieNames().contains('thatCookie')");
+assertEquals("Call.addCookie() already available before sending: getCookie()", cat, WGA.Call.getCookie('thatCookie').getValue(), "yumyum");
+assertEquals("Call.addCookie() already available before sending: Not from client", cat, WGA.Call.getCookie('thatCookie').isFromClient(), false);
+*/</tml:action>
+
+<tml:action id="click2action">
+/*WGA.Call.removeCookie(WGA.Call.getCookie("thatCookie"));
+assertTrue("Cookie no longer available before sending: getCookieNames()", cat, "!WGA.Call.getCookieNames().contains('thatCookie')");
+assertEquals("Cookie no longer available before sending: getCookie()", cat, WGA.Call.getCookie('thatCookie'), null);
+*/</tml:action>
+
+<tml:action id="click6action" master="true">
+_isAvailable = WGA.Call.isAvailable();
+_client =  WGA.Call.getClient();
+</tml:action>
+
+
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing the Server API Object "Call"
+	</PRE>
+	
+	<hr>
+	
+	<a id="click1" href="<tml:url/>">Click 1 - Just reloading page to test referrer</a>
+	<tml:button id="click2" clickaction="click2action">Click 2 - Just reloading page to test cookie removing</tml:button>
+
+	<tml:portlet name="theportlet" ref="::call_portlet"/>	
+	
+	<a id="click5" href="<tml:url u_theparam="thevalue" u_otherparam="othervalue"/>">Click 5 - Add an URL param</a>
+	<tml:button id="click6" clickaction="click6action">Click 6 - Testing non-Call environment behaviour</tml:button>
+	<tml:button id="click7" clickaction="$refresh">Click 7 - Write to output</tml:button>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+	
+			if (clickStep == 0) {
+				assertTrue("Call object available", cat, "WGA.Call != null");
+				assertEquals("Call.getClient()", cat, WGA.Call.getClient(), request.getRemoteAddr());
+				assertEqualLists("Call.getCookieNames()", cat, WGA.Call.getCookieNames(), request.getCookies().map(function(e) e.name));
+				assertEquals("Call.getRequestHeader()", cat, WGA.Call.getRequestHeader("User-Agent"), request.getHeader("User-Agent"));
+				assertEqualLists("Call.getRequestHeaderNames()", cat, WGA.Call.getRequestHeaderNames(), WGA.Utils.extractEntryList(request.getHeaderNames()));
+				assertEquals("Call.getJavaRequest()", cat, WGA.Call.getJavaRequest(), request);
+				assertEquals("Call.getJavaResponse()", cat, WGA.Call.getJavaResponse(), response);
+				assertEquals("Call.getMainContext()", cat, WGA.Call.getMainContext(), context("main"));
+				assertEquals("Call.getMediaKey()", cat, WGA.Call.getMediaKey(), meta("request", "mainmedium"));
+				assertEquals("Call.getRequestMethod()", cat, WGA.Call.getRequestMethod(), "GET");
+				assertEquals("Call.getOriginalURL()", cat, WGA.Call.getOriginalURL(), Packages.de.innovationgate.wgpublisher.WGPDispatcher.getCompleteRequestURL(request.getAttribute(Packages.de.innovationgate.wgpublisher.filter.WGAFilter.REQATTRIB_ORIGINAL_URL), request.getQueryString()));
+				assertEquals("Call.getOuterLayout()", cat, WGA.Call.getOuterLayout(), request.getAttribute(Packages.de.innovationgate.wgpublisher.WGACore.ATTRIB_OUTER_DESIGN));
+				assertEquals("Call.getPort()", cat, WGA.Call.getPort(), 8080);
+				assertEquals("Call.getQueryString()", cat, WGA.Call.getQueryString(), null);
+				assertEquals("Call.getURL()", cat, WGA.Call.getURL(), meta("request", "url"));
+				assertEquals("Call.getUserAgent()", cat, WGA.Call.getUserAgent(), request.getHeader("User-Agent"));
+				assertEquals("Call.getVirtualHostName()", cat, WGA.Call.getVirtualHostName(), "*");
+				assertEquals("Call.isAjax() - No ajax", cat, WGA.Call.isAjax(), false);
+				assertEquals("Call.isAvailable()", cat, WGA.Call.isAvailable(), true);
+				setsessionvar("firstURL", WGA.Call.getURL());
+				
+			}
+			else if (clickStep == 1) {
+				assertEquals("Call.getReferrer()", cat, WGA.Call.getReferrer(), firstURL);
+				/*assertTrue("Cookie available after sending: getCookieNames()", cat, "WGA.Call.getCookieNames().contains('thatCookie')");
+				assertEquals("Cookie available after sending: getCookie()", cat, WGA.Call.getCookie('thatCookie').getValue(), "yumyum");
+				assertEquals("Cookie available after sending: From client", cat, WGA.Call.getCookie('thatCookie').isFromClient(), true);*/
+			}
+			else if (clickStep == 2) {
+				/*assertTrue("Cookie no longer available after sending: getCookieNames()", cat, "!WGA.Call.getCookieNames().contains('thatCookie')");
+				assertEquals("Cookie no longer available after sending: getCookie()", cat, WGA.Call.getCookie('thatCookie'), null);*/
+			}
+			else if (clickStep == 3) {
+				assertEqualLists("Call.getFormFieldNames()", cat, WGA.Call.getFormFieldNames(), ["theinput"]);
+				assertEquals("Call.getFormField()", cat, WGA.Call.getFormField("theinput"), "thevalue");
+				assertEquals("Call.isAjax() non AJAX", cat, WGA.Call.isAjax(), false);
+			}
+			else if (clickStep == 5) {
+				assertEqualLists("Call.getQueryString()", cat, WGA.Utils.deserializeCollection(WGA.Call.getQueryString(), "&"), ["theparam=thevalue","otherparam=othervalue"]);
+				assertEqualLists("Call.getParamNames()", cat, WGA.Call.getParamNames(), ["theparam", "otherparam"]);
+				assertEquals("Call.getParam()", cat, WGA.Call.getParam("theparam"), "thevalue");
+				assertEqualLists("Call.getParamValues()", cat, WGA.Call.getParamValues("theparam"), ["thevalue"]);
+			}
+			else if (clickStep == 6) {
+				assertEquals("Call.isAvailable() returns false when no call available", cat, _isAvailable, false);
+				assertEquals("Call.getClient() returns null when no call available", cat, isDefined("_client") && _client == null, true);
+			}
+			else if (clickStep == 7) {
+				// This is tested by HTMLUnit client
+				WGA.Call.getWriter().write('<div id="testoutput">Test-Output</div>');
+			}			
+		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

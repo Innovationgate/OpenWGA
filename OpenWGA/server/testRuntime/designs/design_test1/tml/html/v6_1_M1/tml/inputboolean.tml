@@ -1,0 +1,57 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests the rendering of boolean WebTML input fields (because of #00002155);
+	</PRE>
+	
+	<hr>
+	
+	<tml:form id="theform">
+	
+		<tml:range var="multiOptions" trim="true" output="true">
+			<tml:input name="multioptions" type="boolean" options="Yes|true,No|false"/>		
+		</tml:range>
+		
+		<br>
+		
+		<tml:range var="singleOption" trim="true" output="true">
+			<tml:input name="singleoption" type="boolean" options="Yes|true"/>		
+		</tml:range>
+		
+		<br>
+		
+		<tml:range var="noOption" trim="true" output="true">
+			<tml:input name="nooption" type="boolean"/>		
+		</tml:range>
+		
+	</tml:form>
+	
+	
+	<tml:script>
+		var cat = "WebTML:Input:Boolean";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertEquals("Input type boolean, multiple options", cat, multiOptions.trim(), '<input type="radio" name="multioptions"  value="true" >Yes<br/><input type="radio" name="multioptions"  value="false"  checked="true">No');
+			assertEquals("Input type boolean, single option", cat, singleOption.trim(), '<input type="checkbox" name="singleoption"  value="true" >Yes');
+			assertEquals("Input type boolean, no option", cat, noOption.trim(), '<input type="checkbox" name="nooption"  value="true" >');	
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

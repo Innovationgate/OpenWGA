@@ -1,0 +1,31 @@
+<p align="right">
+<anchor>
+Home
+<go href="home"/>
+</anchor>
+</p>
+<p>
+<small>
+	<tml:item name="_Ort"/>,
+	<tml:evaluate>
+	@Text(@Day(_Date)) + "." + @Text(@Month(_Date)) + "." + @Text(@Year(_Date))
+	</tml:evaluate>
+	<br/>
+<tml:evaluate var="TextBody">
+	   @Abstract( [Abbrev]; 900; ""; "_Shortstory" )
+</tml:evaluate>
+<tml:item name="TextBody" encode="html"/>
+<br/>
+<tml:case context="siblings[-1]" iscontextvalid="true">
+&lt;&lt;<a href="<tml:url/>"><tml:metadata name="Title" encode="html"/></a>
+</tml:case>
+<tml:case context="siblings[+1]" iscontextvalid="true">
+&gt;&gt;<a href="<tml:url/>"><tml:metadata name="Title" encode="html"/></a>
+</tml:case>
+</small>
+</p>
+<p align="right">
+<do type="option" name="prev" label="Zurueck">
+<prev/>
+</do>
+</p>

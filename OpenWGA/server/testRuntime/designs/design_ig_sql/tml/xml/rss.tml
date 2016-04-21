@@ -1,0 +1,24 @@
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>InnovationGate News</title>
+    <link>http://www.innovationgate.de</link> 
+    <description>Neuigkeiten von der Innovation Gate GmbH zu WebGate und WebGate Anywhere</description>
+    <copyright>Copyright: (C) 2003 Innovation Gate GmbH</copyright>
+    <tml:collection>
+      <tml:query type="formula">_news="J"</tml:query>
+      <tml:foreach pagesize="10" sortorder="descending" sortexpression="_Date">
+        <item>
+          <title><tml:meta name="title" encode="xml"/></title>
+          <link>http://www2.innovationgate.de<tml:url medium="html"/></link>
+          <description><tml:item name="_shortstory" encode="xml"/></description>
+          <guid isPermaLink="false"><tml:meta name="key"/></guid>
+          <pubDate><tml:meta name="created" format="EEE, d MMM yyyy HH:mm:ss Z"/></pubDate> 
+        </item>
+        <tml:script>
+          if (this.lastBuildDate == "" || this.CREATED > this.lastBuildDate) this.setvar("lastBuildDate", this.CREATED);
+        </tml:script>
+      </tml:foreach>
+    </tml:collection>
+    <lastBuildDate><tml:item name="lastBuildDate" format="EEE, d MMM yyyy HH:mm:ss Z"/></lastBuildDate>
+  </channel>
+</rss>

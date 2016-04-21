@@ -1,0 +1,15 @@
+function Controller() {
+}
+
+Controller.prototype.sendSocketEvents = function() {
+	WGA.log.info("Sending pageScopeEvent");
+	WGA.app().createEvent("pageScopeEvent").params({data: "This is sendSocketEvents"}).fire();
+	WGA.Core.eventManager.waitForEvents();
+}
+
+
+Controller.prototype.sendCustomMessage = function() {
+	WGA.log.info("Sending pageScopeEvent2");
+	WGA.app().createEvent("pageScopeEvent2").params({data: "This is sendCustomMessage"}).fire();
+	WGA.Core.eventManager.waitForEvents();
+}

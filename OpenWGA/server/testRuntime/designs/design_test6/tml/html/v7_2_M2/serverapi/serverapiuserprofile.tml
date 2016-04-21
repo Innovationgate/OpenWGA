@@ -1,0 +1,60 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing the availability of the user profile via WGA Server API (#00004576)
+	</PRE>
+	
+	<hr>
+	
+	<tml:button id="click1" clickaction="$mc.storeValues">Store values on the profile</tml:button>
+	<tml:button id="click2" clickaction="$refresh">Store values on the profile</tml:button>
+	<tml:button id="click3" clickaction="$mc.sendEvent">Send app event to update profile on a non-request environment</tml:button>
+	<tml:button id="click4" clickaction="$mc.waitForEvents">Wait for events</tml:button>
+	<tml:button id="click5" clickaction="$refresh">Refresh to change session</tml:button>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		WGA.app().userProfile().profile.dropCache();
+		
+		try {
+			if (clickStep == 0) {
+				assertNotEquals("We see the User Profile", cat, WGA.app().userProfile(), null);
+				assertEquals("It is the same as the user profile via TMLContext", cat, WGA.app().userProfile().profile, profile.profile); 
+			}
+			else if (clickStep == 1) {
+				assertEquals("Controller method sees profile", cat, WGA.app().userProfile().aField, "aValue");
+			}
+			else if (clickStep == 2) {
+				assertEquals("Profile field was autosaved", cat, WGA.app().userProfile().aField, "aValue");
+			}
+			else if (clickStep == 4) {
+				assertEquals("Profile field was saved in app event environment", cat, WGA.app().userProfile().testUserProfile1, "This is testUserProfile1");
+				setSessionVar("firstSession", true);
+				assertEquals("First session is marked", cat, firstSession, true);
+			}
+			else if (clickStep == 5) {
+				assertNotEquals("Click step 5 runs in second session", cat, firstSession, true);
+				assertEquals("Profile field testUserProfile1 was persisted", cat, WGA.app().userProfile().testUserProfile1, "This is testUserProfile1");
+				assertEquals("Profile field aField was persisted", cat, WGA.app().userProfile().aField, "aValue");
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<html>
+<body>
+<PRE>
+Tests the behaviour of various item access methods when an item does not exist
+</PRE>
+
+<tml:form id="emptyformTest1" source="none">
+
+	<tml:input name="emptyselect" options="a,b,c"/>
+
+</tml:form>
+
+<tml:script>
+var cat = "NoItemValue";
+try {
+	// Test on database with default behaviour
+
+	var emptyList = createList();
+	var emptyItem = null;
+		
+	var con = context("db:ig/name:home", false);
+	var dominoValueDNE = con.content().getItemValue("doesnotexist");
+	var dominoValueListDNE = con.content().getItemValueList("doesnotexist");
+	var dominoTextDNE = con.content().getItemText("doesnotexist");
+	var dominoItemDNE = con.item("doesnotexist");
+	var dominoItemListDNE = con.itemList("doesnotexist");
+	
+	con = context("db:test1/name:home", false);
+	var sqlValueDNE = con.content().getItemValue("doesnotexist");
+	var sqlValueListDNE = con.content().getItemValueList("doesnotexist");
+	var sqlTextDNE = con.content().getItemText("doesnotexist");
+	var sqlItemDNE = con.item("doesnotexist");
+	var sqlItemListDNE = con.itemList("doesnotexist");
+	
+	var profileItemDNE = profile.item("doesnotexist");
+	var profileItemListDNE = profile.itemList("doesnotexist");
+	var portletItemDNE = portlet.item("doesnotexist");
+	var portletItemListDNE = portlet.itemList("doesnotexist");
+	
+	var formFieldDNE = tmlform.field("doesnotexist");
+	var formFieldListDNE = tmlform.fieldList("doesnotexist");
+	var formEmptyField = tmlform.field("emptyselect");
+	var formEmptyFieldList = tmlform.fieldList("emptyselect");
+		
+	assertEquals("Default: Domino getItemValue", cat, dominoValueDNE, null);
+	assertEquals("Default: Domino getItemValueList", cat, dominoValueListDNE, emptyList);
+	assertEquals("Default: Domino getItemText", cat, dominoTextDNE, null);
+	assertEquals("Default: Domino item", cat, dominoItemDNE, null);
+	assertEquals("Default: Domino itemlist", cat, dominoItemListDNE, emptyList);
+	assertEquals("Default: SQL getItemValue", cat, sqlValueDNE, null);
+	assertEquals("Default: SQL getItemValueList", cat, sqlValueListDNE, emptyList);
+	assertEquals("Default: SQL getItemText", cat, sqlTextDNE, null);
+	assertEquals("Default: SQL item", cat, sqlItemDNE, null);
+	assertEquals("Default: SQL itemlist", cat, sqlItemListDNE, emptyList);
+	assertEquals("Default: Profile item", cat, profileItemDNE, null);
+	assertEquals("Default: Profile itemList", cat, profileItemListDNE, emptyList);
+	assertEquals("Default: Portlet item", cat, portletItemDNE, null);
+	assertEquals("Default: Portlet itemList", cat, portletItemListDNE, emptyList);
+	assertEquals("Default: Form field", cat, formFieldDNE, null);
+	assertEquals("Default: Form fieldList", cat, formFieldListDNE, emptyList);
+	assertEquals("Default: Form empty field", cat, formEmptyField, null);
+	assertEquals("Default: Form empty fieldList", cat, formEmptyFieldList, emptyList);
+	
+	assertTrue("No warnings", cat, tag.getWarnings().size() == 0);
+}
+catch (e) {
+	logException(e);
+	assertTrue("Exception executing test :" + e.message, cat, false);
+}
+</tml:script>
+
+<tml:form id="emptyformTest2" source="none" context="db:designslave">
+
+	<tml:input name="emptyselect" options="a,b,c"/>
+
+</tml:form>
+
+
+<tml:script context="db:designslave">
+var cat = "NoItemValue";
+try {
+	// Test on database with backward compatibility behaviour: DB-Option "NoItemValue":="emptystring"
+
+	var emptyList = createList();
+	var emptyItem = "";
+	var listWithEmptyString = createList();
+	listWithEmptyString.add("");
+		
+	var con = context("db:crm/root", false);
+	var dominoValueDNE = con.content().getItemValue("doesnotexist");
+	var dominoValueListDNE = con.content().getItemValueList("doesnotexist");
+	var dominoTextDNE = con.content().getItemText("doesnotexist");
+	var dominoItemDNE = con.item("doesnotexist");
+	var dominoItemListDNE = con.itemList("doesnotexist");
+	
+	con = context("db:designslave/name:home", false);
+	var sqlValueDNE = con.content().getItemValue("doesnotexist");
+	var sqlValueListDNE = con.content().getItemValueList("doesnotexist");
+	var sqlTextDNE = con.content().getItemText("doesnotexist");
+	var sqlItemDNE = con.item("doesnotexist");
+	var sqlItemListDNE = con.itemList("doesnotexist");
+	
+	//runtime.debug();
+	con = context("db:inittest", false);
+	var profileItemDNE = con.profile.item("doesnotexist");
+	var profileItemListDNE = con.profile.itemList("doesnotexist");
+	
+	/* This cannot work since the portlet uses the profile of the main context, which is not in compatible mode
+	var portletItemDNE = con.portlet.item("doesnotexist");
+	var portletItemListDNE = con.portlet.itemList("doesnotexist");*/
+	
+	var formFieldDNE = tmlform.field("doesnotexist");
+	var formFieldListDNE = tmlform.fieldList("doesnotexist");
+	var formEmptyField = tmlform.field("emptyselect");
+	var formEmptyFieldList = tmlform.fieldList("emptyselect");
+		
+	assertEquals("Compatible: Domino getItemValue", cat, dominoValueDNE, emptyItem);
+	assertEquals("Compatible: Domino getItemValueList", cat, dominoValueListDNE, listWithEmptyString);
+	assertEquals("Compatible: Domino getItemText", cat, dominoTextDNE, emptyItem);
+	assertEquals("Compatible: Domino item", cat, dominoItemDNE, emptyItem);
+	assertEquals("Compatible: Domino itemlist", cat, dominoItemListDNE, listWithEmptyString);
+	assertEquals("Compatible: SQL getItemValue", cat, sqlValueDNE, emptyList);
+	assertEquals("Compatible: SQL getItemValueList", cat, sqlValueListDNE, emptyList);
+	assertEquals("Compatible: SQL getItemText", cat, sqlTextDNE, null);
+	assertEquals("Compatible: SQL item", cat, sqlItemDNE, emptyItem);
+	assertEquals("Compatible: SQL itemlist", cat, sqlItemListDNE, emptyList);
+	assertEquals("Compatible: Profile item", cat, profileItemDNE, emptyItem);
+	assertEquals("Compatible: Profile itemList", cat, profileItemListDNE, emptyList);
+		/* This cannot work since the portlet uses the profile of the main context, which is not in compatible mode
+	assertEquals("Compatible: Portlet item", cat, portletItemDNE, emptyItem);
+	assertEquals("Compatible: Portlet itemList", cat, portletItemListDNE, emptyList);
+	*/
+	assertEquals("Compatible: Form field", cat, formFieldDNE, null);
+	assertEquals("Compatible: Form fieldList", cat, formFieldListDNE, null);
+	assertEquals("Compatible: Form empty field", cat, formEmptyField, emptyItem);
+	// B00004716
+	assertEquals("Compatible: Form empty fieldList", cat, formEmptyFieldList, emptyList);
+	
+	assertTrue("No warnings", cat, tag.getWarnings().size() == 0);
+}
+catch (e) {
+	logException(e);
+	assertTrue("Exception executing test :" + e.message, cat, false);
+}
+</tml:script>
+
+<tml:warnings/>
+
+</body>
+</html>

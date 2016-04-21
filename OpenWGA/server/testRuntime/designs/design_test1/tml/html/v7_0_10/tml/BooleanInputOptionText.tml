@@ -1,0 +1,43 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests output of input type boolean with option titles in view mode (#00004395)
+	</PRE>
+	
+	<tml:form id="theform" mode="view">
+		<tml:script>
+			tmlform.setField("theboolean", true);
+		</tml:script>
+	
+		<tml:range var="booleanOut" trim="true" output="true">
+			<tml:input name="theboolean" type="boolean" options="Yes|true,No|false" defaultexpression="true"/>
+		</tml:range>
+	</tml:form>
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			assertEquals("tml:input puts out option title in view mode", cat, booleanOut, "Yes");
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

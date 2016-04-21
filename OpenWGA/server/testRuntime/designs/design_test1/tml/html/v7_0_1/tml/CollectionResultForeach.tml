@@ -1,0 +1,96 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing usage of a CollectionResult object as input for a tml:foreach type="itemvalue"
+	</PRE>
+	
+	<hr>
+	
+	<!-- Iterating with Collection result as item -->
+	<tml:script>
+		theNav = WGA.nav(context("name:home")).children();
+		theNavList = WGA.createList();
+	</tml:script>
+	
+	<tml:foreach id="navForeach" item="theNav">
+		<tml:script>
+			theNavList.add(KEY);
+		</tml:script>
+	</tml:foreach>
+	
+	<!-- Iterating with List of Contextes result as item -->
+	<tml:script>
+		theContextes = WGA.createList();
+		for (cx in Iterator(WGA.nav(context("name:home")).children())) {
+			theContextes.add(cx);
+		}
+		theContextList = WGA.createList();		
+	</tml:script>
+	<tml:foreach id="contextesForeach" item="theContextes">
+		<tml:script>
+			theContextList.add(KEY);
+		</tml:script>
+	</tml:foreach>
+	
+	<!-- Iterating with List of WGContents result as item -->
+	<tml:script>
+		theContents = WGA.createList();
+		for (cx in Iterator(WGA.nav(context("name:home")).children())) {
+			theContents.add(cx.content());
+		}
+		theContentList = WGA.createList();		
+	</tml:script>
+	<tml:foreach id="contentsForeach" item="theContents">
+		<tml:script>
+			theContentList.add(KEY);
+		</tml:script>
+	</tml:foreach>
+	
+	<-- Ensure that iterating over non-content objects is still doable -->
+	<tml:script>
+		theObjects = WGA.createList();
+		theObjects.add("a");
+		theObjects.add("b");
+		theObjects.add("c");
+		theObjectsList = WGA.createList();
+	</tml:script>
+	
+	<tml:foreach id="objectsForeach" item="theObjects" currentvalue="_value">
+		<tml:script>
+			theObjectsList.add(_value);
+		</tml:script>
+	</tml:foreach> 
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			var correctList = ["jjar-5xeqc8.de.3", "jjar-5xeqgv.de.4" , "jjar-5xeqkq.de.2", "jjar-5xeqjv.de.1" , "jjar-5xeqld.de.1"];
+			assertEqualLists("Using CollectionResult for tml:foreach item", cat, theNavList, correctList, false);
+			assertEquals("Using CollectionResult for tml:foreach item: Correct size", cat, taginfo("navForeach", "count"), 5);
+			assertEqualLists("Using List of Contextes for tml:foreach item", cat, theContextList, correctList, false);
+			assertEquals("Using List of Contextes for tml:foreach item: Correct size", cat, taginfo("contextesForeach", "count"), 5);
+			assertEqualLists("Using List of WGContents for tml:foreach item", cat, theContentList, correctList, false);
+			assertEquals("Using List of WGContents for tml:foreach item: Correct size", cat, taginfo("contentsForeach", "count"), 5);
+			assertEqualLists("Using List of objects for tml:foreach item", cat, theObjectsList, ["a" , "b" , "c"], false);
+			assertEquals("Using List of objects for tml:foreach item: Correct size", cat, taginfo("objectsForeach", "count"), 3);
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

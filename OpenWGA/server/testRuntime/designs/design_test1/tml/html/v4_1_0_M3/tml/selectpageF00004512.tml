@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+	<tml:script>
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+			callAction("$refresh");
+		}
+	</tml:script>	
+  <tml:htmlhead/> 
+</head>
+<body>
+<PRE>
+Test for FEATURE: F00004512 - selectpage on tml:url for tml:foreach
+</PRE>
+
+
+
+<tml:range var="result" output="true" trim="true">
+<tml:foreach type="loop" count="25" currentvalue="c" pagesize="5" id="foreachID">
+	<tml:item name="c"/>
+</tml:foreach>
+</tml:range>
+
+<hr>
+
+<a href="<tml:url type="selectpage" page="3" sourcetag="foreachID"/>" id="click1">Page 3</a>
+<br>
+<a href="<tml:url type="selectpage" page="6" sourcetag="foreachID"/>" id="click2">Page 6</a>
+<br>
+<a href="<tml:url type="selectpage" page="5" sourcetag="foreachID"/>" id="click3">Page 5</a>
+<br>
+<a href="<tml:url type="selectpage" page="1" sourcetag="foreachID"/>" id="click4">Page 1</a>
+<br>
+<a href="<tml:url type="selectpage" page="0" sourcetag="foreachID"/>" id="click5">Page 0</a>
+
+
+<tml:script>
+var wgutils = Packages.de.innovationgate.utils.WGUtils;
+
+var checkresult = wgutils.strReplace(result, "\n", "", true, false);
+checkresult = wgutils.strReplace(checkresult, " ", "", true, false);
+checkresult = wgutils.strReplace(checkresult, "\t", "", true, false);
+
+if (seq == 1) {
+	// page 1
+	assertEquals("Check result for page 1", "tml", checkresult, "12345");
+}
+if (seq == 2) {
+	// page 3
+	assertEquals("Check result for page 3", "tml", checkresult, "1112131415");
+}
+if (seq == 3) {
+	// page 6 --> fallback to page 5
+	assertEquals("Check result for page 6 - fallback to page 5", "tml", checkresult, "2122232425");
+}
+if (seq == 4) {
+	// page 5
+	assertEquals("Check result for page 5", "tml", checkresult, "2122232425");
+}
+if (seq == 5) {
+	// page 1
+	assertEquals("Check result for page 1", "tml", checkresult, "12345");
+}
+if (seq == 6) {
+	// page 0 -- fallback to page 1
+	assertEquals("Check result for page 0 - fallback to page 1", "tml", checkresult, "12345");
+}
+</tml:script>
+
+<hr>
+<tml:script>return seq</tml:script>
+
+
+<tml:warnings/>
+
+</body>
+</html>

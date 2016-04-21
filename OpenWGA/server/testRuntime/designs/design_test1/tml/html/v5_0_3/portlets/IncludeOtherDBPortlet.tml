@@ -1,0 +1,44 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests if portlets with designs from other DBs can be included  (#00000346	Registering portlets with external design dbs ineffective)
+	</PRE>
+	
+	<hr>
+	
+	<tml:portlet name="p1" designdb="test3" ref="v5_0_3:portlets:IncludeOtherDBPortlet_theportlet"/>
+	
+	<tml:script>
+		portlet.registerPortletForName("p2", "test3", "v5_0_3:portlets:IncludeOtherDBPortlet_theportlet", true);
+	</tml:script>
+	
+	<tml:portlet name="p2"/>
+	
+	
+	<tml:script>
+		var cat = "TMLPortlet";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertEquals("Include portlet from other db - registered direct via tml:portlet", cat, p1TheOtherPortletIncluded, "Ohyes!");
+			assertEquals("Include portlet from other db - registered via TMLScript", cat, p2TheOtherPortletIncluded, "Ohyes!");		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

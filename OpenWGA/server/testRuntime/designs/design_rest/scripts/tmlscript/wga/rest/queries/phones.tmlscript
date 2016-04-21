@@ -1,0 +1,3 @@
+this.query = function() {
+	return HDBModel.getDocument("phones").getChildContentIterator(11);
+}

@@ -1,0 +1,13 @@
+<br><b>
+<tml:item name="_EventDateStart" format ="dd.MM.yyyy"/> - <tml:item name="_EventDateEnde" format ="dd.MM.yyyy"/><br>
+<tml:item name="_Event"/></b><br>
+<tml:item name="_EventOrt"/><br><tml:item name="_EventHalle"/><br><br>
+<tml:if condition ="_EventLogo !=\"\"">
+<tml:then>
+<div align=center>
+<img src="<tml:url type="file" file="{item:_EventLogo}"/>">
+</div>
+<br>
+</tml:then>
+</tml:if>
+<tml:item name="body"/>

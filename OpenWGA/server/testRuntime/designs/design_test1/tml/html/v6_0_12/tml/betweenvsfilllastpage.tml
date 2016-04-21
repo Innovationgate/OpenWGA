@@ -1,0 +1,45 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	#00002715: tml:between and condition islastloop not working in tml:foreach with filllastpage=false
+	</PRE>
+	
+	<tml:script>
+		values = WGA.createList();
+		values.add("a");
+		values.add("b");
+		values.add("c");
+	</tml:script>
+	
+	<tml:range var="result" trim="true" output="true">
+		<tml:foreach item="values" pagesize="2" page="1" filllastpage="false" currentvalue="val"><tml:item name="val"/><tml:between>,</tml:between></tml:foreach>
+	</tml:range>
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "WebTML";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertEquals("Foreach with filllastpage=false correctly uses tml:between", cat, result, "a,b");		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

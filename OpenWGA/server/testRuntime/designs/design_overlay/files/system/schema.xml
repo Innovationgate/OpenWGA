@@ -1,0 +1,36 @@
+<WGSchemaDefinition createDefaultLanguage="false" version="5.2">
+   <documentDefinitions class="java.util.ArrayList">
+      <WGSchemaDocumentDefinition class="de.innovationgate.webgate.api.schemadef.WGContentTypeDefinition" name="ct3" autoCreate="true">
+         <metadata class="java.util.ArrayList">
+            <WGMetaFieldDefinition name="INNERLAYOUT">
+               <values class="java.util.ArrayList">
+                  <object class="java.lang.String">inner_standard</object>
+               </values>
+            </WGMetaFieldDefinition>
+            <WGMetaFieldDefinition name="OUTERLAYOUT">
+               <values class="java.util.ArrayList">
+                  <object class="java.lang.String">outer_standard</object>
+               </values>
+            </WGMetaFieldDefinition>
+         </metadata>
+         <contentItemDefinitions class="java.util.ArrayList"/>
+         <contentMetaDefinitions class="java.util.ArrayList"/>
+      </WGSchemaDocumentDefinition>
+      <WGSchemaDocumentDefinition class="de.innovationgate.webgate.api.schemadef.WGContentTypeDefinition" name="ct2" autoCreate="true">
+         <metadata class="java.util.ArrayList">
+            <WGMetaFieldDefinition name="INNERLAYOUT">
+               <values class="java.util.ArrayList">
+                  <object class="java.lang.String">inner_ct2</object>
+               </values>
+            </WGMetaFieldDefinition>
+            <WGMetaFieldDefinition name="OUTERLAYOUT">
+               <values class="java.util.ArrayList">
+                  <object class="java.lang.String">outer_ct2</object>
+               </values>
+            </WGMetaFieldDefinition>
+         </metadata>
+         <contentItemDefinitions class="java.util.ArrayList"/>
+         <contentMetaDefinitions class="java.util.ArrayList"/>
+      </WGSchemaDocumentDefinition>
+   </documentDefinitions>
+</WGSchemaDefinition>

@@ -1,0 +1,41 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Will test the registration of portlets that use TMLs from external DBs
+	</PRE>
+	
+	<hr>
+	
+	<tml:portlet ajax="true" designdb="test3" ref="v4_1_0_M1:tmlportlet:externalportlet" name="externalportlet"/>
+
+	<a name="refresh" href="<tml:url action="$refresh"/>">Refresh</a>
+	
+	<tml:script>
+		var cat = "portlet";
+		
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertEquals("External portlet included, Sequence " + seq,  cat, externalportlet, "included");		
+			
+			if (seq == 2) {
+				assertEquals("External portlet reloaded by ajax", cat, ajaxreload, "true");
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests a fix for XSS on AJAX form action requests (#00003204)
+	</PRE>
+	
+	<hr>
+	<tml:portlet name="theportlet" ref="::formactionxss_portlet" ajax="true"/>
+	
+	<tml:form id="theForm2">
+		<tml:input name="theField1" default="DefaultValue">id="theField1"</tml:input>
+		<tml:button id="click3" clickaction="$refresh">Refresh</tml:button>
+	</tml:form>
+	
+	<tml:warnings/>
+	
+	<tml:script>
+		var cat = "WebTML";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			if (seq == 2) {
+				assertEquals("Form field was not modified by injected code", cat, tmlform.theField1, "DefaultValue");
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+</tml:script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<script>
+function fireTheEvent() {
+	WGA.event.fireEvent("theEvent", "<tml:script expression="portlet.portletkey"/>");
+}
+</script>
+
+<a id="click1" href="javascript:fireTheEvent()">Fire client event</a>
+
+<a id="click2" href="<tml:url ajax="true" type="action">portlet.fireEvent(createEvent("theEvent"))</tml:url>">Fire server event</a>
+
+<a id="click3" href="javascript:fireTheEvent()">Fire client event</a>
+

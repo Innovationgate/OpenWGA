@@ -1,0 +1,88 @@
+<tml:action id="add_section">
+	var content = this.content();
+	var list=this.itemList("_sections");
+	var nextindex= isEmpty("_nextindex") ? 0 : this._nextindex;
+	
+	list.add(this.tmlparam1, "S" + nextindex);	
+	
+	content.setItemValue("_sections", list);
+	content.setItemValue("_nextindex", nextindex+1);
+	content.save()
+</tml:action>
+
+<tml:action id="delete_section">
+	var content = this.content();
+	var list=this.itemList("_sections");
+	var index=this.tmlparam1-1;
+	list.remove(index);
+	if (list.isEmpty())
+		content.setItemValue("_sections", "");
+	else
+		content.setItemValue("_sections", list);
+	content.save()
+</tml:action>
+
+<style>
+	.section{
+		border-left:solid lightblue 1px;
+		margin-bottom:15px;
+	}
+	.section .headline{
+		border-bottom:solid lightblue 1px;
+		border-left:solid lightblue 10px;
+		padding-left:5px;
+		font-size:16pt;
+	}
+	.section .body{
+		padding:5px;
+	}
+	.section p{
+		margin-top:0px;
+		margin-bottom:3px;
+	}
+	
+</style>
+
+<br>
+
+<div class="section">
+	<div class="headline">
+		<tml:item name="_headline" editor="textblock" label="Headline"/>
+	</div>
+	<div class="body">
+		<tml:item name="body" editor="rtf" label="Body"/>
+	</div>
+</div>
+
+<tml:case iseditmode="true">
+	<div align="right">
+		<tml:button clickaction="add_section" param1="0">+ (add section)</tml:button>
+	</div>
+</tml:case>
+
+<tml:foreach type="loop" count="{this.itemList('_sections').size()}" currentvalue="_index">
+	<tml:eval var="_section">return this.itemList("_sections").get(this._index-1)</tml:eval>
+	<tml:case condition="this._section!=''">
+		<div class="section">
+			<div class="headline">
+				<tml:item name="{this._section + '_headline'}" editor="textblock" label="Headline"/>
+			</div>
+			<div class="body">
+				<tml:item name="{this._section + '_body'}" editor="rtf" label="Body"/>
+			</div>
+		</div>
+		
+		<tml:case iseditmode="true">
+			<div style="border-style:none" align="right">
+				<tml:button clickaction="delete_section" param1="{this._index}">-</tml:button>
+				<tml:button clickaction="add_section" param1="{this._index}">+</tml:button>
+			</div>
+		</tml:case>		
+	</tml:case>
+</tml:foreach>
+
+<tml:include ref="demohelper">
+	<tml:option name="usage-de">
+		Dieser Contenttyp demonstriert Mechanismen, mit denen dynamisch Abschnitte zum Dokument hinzugefügt werden können.
+	</tml:option>
+</tml:include>

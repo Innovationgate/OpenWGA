@@ -1,0 +1,14 @@
+<body>
+<html>
+<tml:range var="contextisvalid">false</tml:range>
+<tml:case context="db:test3/docid:doesnotexist" iscontextvalid="true">
+<tml:range var="contextisvalid">true</tml:range>
+</tml:case>
+
+
+<tml:script>
+assertEquals("iscontextvalid returns false when last part of path expression fails", "tml", contextisvalid, "false");
+</tml:script>
+
+</html>
+</body>

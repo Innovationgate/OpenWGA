@@ -10,6 +10,18 @@ dependencies {
     compile project(":tmlScript");
     
     compileClasspath project(":wgaBuildTools");
+    
+    testCompile 'javax.servlet:javax.servlet-api:3.0.1'
+    testCompile 'javax.websocket:javax.websocket-api:1.1'
+    testCompile 'javax.servlet.jsp:jsp-api:2.2'
+    testCompile 'javax.mail:javax.mail-api:1.4.7'
+    testCompile 'org.glassfish.jersey.core:jersey-client:2.19'
+    testCompile 'net.sourceforge.htmlunit:htmlunit:2.19'
+    testCompile 'org.apache.ant:ant:1.9.7'
+    testCompile 'org.glassfish.jersey.media:jersey-media-multipart:2.19'
+    testCompile 'org.glassfish.jersey.media:jersey-media-json-processing:2.19'
+    testCompile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.19'
+    
 }
 
 

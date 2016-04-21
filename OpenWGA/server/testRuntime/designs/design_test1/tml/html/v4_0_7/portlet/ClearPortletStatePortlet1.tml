@@ -1,0 +1,6 @@
+Hello, this is the portlet 1 in mode <tml:script expression="portlet.mode"/>.
+
+<tml:script>
+portlet.setmode("edit");
+portlet.setSessionVar("sessionvar", "portlet1");
+</tml:script>

@@ -1,0 +1,29 @@
+	<tml:form id="theform">
+		<tml:input name="theinput" default="thevalue"/>
+		<tml:button id="click3" ajax="false" clickaction="$refresh">Click 3 - Test retrieval of form fields</tml:button>
+		<tml:button id="click4" clickaction="$refresh">Click 4 - Test retrieval of form fields and AJAX environment</tml:button>
+	</tml:form>
+
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			if (clickStep == 4) {
+				assertEqualLists("Call.getFormFieldNames()", cat, WGA.Call.getFormFieldNames(), ["theinput"]);
+				assertEquals("Call.getFormField()", cat, WGA.Call.getFormField("theinput"), "thevalue");
+				assertEquals("Call.isAjax()", cat, WGA.Call.isAjax(), true);			
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>

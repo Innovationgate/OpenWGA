@@ -1,0 +1,128 @@
+<Script Language="JavaScript">
+<!--
+function search() {
+	var TheQuery=document.GoogleSearch._query.value;
+var myURL= document.location.href;
+var TheURL= myURL.split("?");
+	document.location.href=TheURL[0]+'?QUERY=' + TheQuery;	
+}
+//-->
+</Script>
+<tml:urlparameter name="QUERY" var="GoogleQuery"/>
+<div align="center">
+<form name="GoogleSearch"method="post" action="javascript:search()">
+<table border="0" cellpadding="0" cellspacing="0" width="170pt">
+<tr>
+<td><input  type="text" size="10pt" name="_query"></td>
+<td><input type="submit" value="go"></td>
+</tr>
+</table></form></div>
+<tml:element classname="de.innovationgate.wgpublisher.webtml.elements.HttpPost" var="GoogleResult">
+<tml:option name="action">http://api.google.com/search/beta2</tml:option>
+<tml:option name="Content-type">text/xml</tml:option>
+<tml:body>
+
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
+xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:xsd="http://www.w3.org/1999/XMLSchema">
+  <SOAP-ENV:Body>
+    <ns1:doGoogleSearch xmlns:ns1="urn:GoogleSearch" 
+         SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+      <key xsi:type="xsd:string">Y9DVT/RQFHJshFsHk01hNXXofuiK2gPh</key>
+      <q xsi:type="xsd:string"><tml:if condition="GoogleQuery = '' ">WebGate<tml:else><tml:item name="GoogleQuery"/></tml:else></tml:if></q>
+      <start xsi:type="xsd:int">0</start>
+      <maxResults xsi:type="xsd:int">10</maxResults>
+      <filter xsi:type="xsd:boolean">true</filter>
+      <restrict xsi:type="xsd:string"></restrict>
+      <safeSearch xsi:type="xsd:boolean">false</safeSearch>
+      <lr xsi:type="xsd:string">lang_de</lr>
+      <ie xsi:type="xsd:string">latin1</ie>
+      <oe xsi:type="xsd:string">latin1</oe>
+    </ns1:doGoogleSearch>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+</tml:body>
+</tml:element>
+
+<tml:element name="XSLT">
+<tml:option name="xml"><tml:item name="GoogleResult"/></tml:option>
+<tml:body>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+   <xsl:output method="html" version="1.0" encoding="iso-8859-1" indent="no" />
+
+   <xsl:template match="/">
+      <div align="center">
+         <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            <tr>
+               <td align="center">Es wurden 
+               <b>
+                  <xsl:value-of select="//estimatedTotalResultsCount" />
+               </b>
+
+               Seiten mit dem Suchbegiff 
+               <b>
+                  <xsl:value-of select="//searchQuery" />
+               </b>
+
+               gefunden. 
+               <br />
+
+               Sie sehen die Treffer 
+               <xsl:value-of select="//startIndex" />
+
+               bis 
+               <xsl:value-of select="//endIndex" />
+               </td>
+            </tr>
+
+            <tr>
+               <td>
+                  <table border="0" width="60%">
+                     <xsl:for-each select="//item">
+                        <xsl:if test="contains (title/text(),'')">
+                           <xsl:variable name="rtitle" select="translate(title, '&lt;', ' ')" />
+
+                           <tr>
+                              <td colspan="2">
+                                 <b>
+                                    <a href="{URL}" target="new">
+                                       <xsl:value-of select="translate(title, '&lt;b&gt;', ' ')" />
+                                    </a>
+                                 </b>
+                              </td>
+                           </tr>
+
+                           <tr>
+                              <td colspan="2">
+                                 <xsl:value-of select="translate(snippet, '&lt;b&gt;', ' ')" />
+                              </td>
+                           </tr>
+
+                           <tr>
+                              <td>
+                                 <a href="{URL}" target="new">
+                                    <xsl:value-of select="URL" />
+                                 </a>
+                              </td>
+
+                              <td>
+                                 <xsl:value-of select="cachedSize" />
+                              </td>
+                           </tr>
+
+                           <tr>
+                              <td height="15" colspan="2">
+                              </td>
+                           </tr>
+                        </xsl:if>
+                     </xsl:for-each>
+                  </table>
+               </td>
+            </tr>
+         </table>
+      </div>
+   </xsl:template>
+</xsl:stylesheet>
+
+
+</tml:body>
+</tml:element>

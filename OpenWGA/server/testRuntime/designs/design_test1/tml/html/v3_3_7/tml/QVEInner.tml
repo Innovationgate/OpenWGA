@@ -1,0 +1,85 @@
+<!--  Test with onlypublished="true" -->
+<tml:script>
+setvar(option("type") + "OnlyPublishedVisible", false);
+setvar(option("type") + "OnlyPublishedIshiddenfrom", false);
+setvar(option("type") + "OnlyPublishedValid", false);
+</tml:script>
+<h3>onlypublished="true"</h3>
+<ul>
+<tml:collection>
+	<tml:query id="{'q' + option('type') + 'OnlyPublished'}" db="{option:database}" type="{option:type}" onlypublished="true"><tml:option name="query"/></tml:query>
+	<tml:foreach onlypublished="false">
+		<li><tml:link/></li>
+		<tml:script>
+		if (UNIQUENAME=="testdocumentvisible") {
+			setvar(option("type") + "OnlyPublishedVisible", true);
+		}
+		if (UNIQUENAME=="testdocumentishiddenfrom") {
+			setvar(option("type") + "OnlyPublishedIshiddenfrom", true);
+		}
+		if (UNIQUENAME=="testdocumentvalid") {
+			setvar(option("type") + "OnlyPublishedValid", true);
+		}
+		</tml:script>
+	</tml:foreach>
+</tml:collection>
+</ul>
+
+<p>
+Fullquery: <tml:taginfo sourcetag="{'q' + option('type') + 'OnlyPublished'}" name="fullquery"/>
+</p>
+
+<tml:script>
+var cat = "QueryVisibilityEnforcement";
+try {
+	assertEquals(option("type") + ": onlypublished='true' enforced metafield visible", cat, item(option("type") + "OnlyPublishedVisible"), false);
+	assertEquals(option("type") + ": onlypublished='true' enforced metafield ishiddenfrom", cat, item(option("type") + "OnlyPublishedIshiddenfrom"), false);
+	assertEquals(option("type") + ": onlypublished='true' enforced metafield validfrom/to", cat, item(option("type") + "OnlyPublishedValid"), false);
+}
+catch (e) {
+	assertTrue("Exception running test: " + e.message, cat, "false");
+}
+</tml:script>
+
+<!--  Test with onlypublished="true" -->
+<tml:script>
+setvar(option("type") + "AllVisible", false);
+setvar(option("type") + "AllIshiddenfrom", false);
+setvar(option("type") + "AllValid", false);
+</tml:script>
+<h3>onlypublished="false"</h3>
+<ul>
+<tml:collection>
+	<tml:query id="{'q' + option('type') + 'All'}" db="{option:database}" type="{option:type}" onlypublished="false"><tml:option name="query"/></tml:query>
+	<tml:foreach onlypublished="false">
+		<li><tml:link/></li>
+		<tml:script>
+		if (UNIQUENAME=="testdocumentvisible") {
+			setvar(option("type") + "AllVisible", true);
+		}
+		if (UNIQUENAME=="testdocumentishiddenfrom") {
+			setvar(option("type") + "AllIshiddenfrom", true);
+		}
+		if (UNIQUENAME=="testdocumentvalid") {
+			setvar(option("type") + "AllValid", true);
+		}
+		</tml:script>
+	</tml:foreach>
+</tml:collection>
+</ul>
+
+<p>
+Fullquery: <tml:taginfo sourcetag="{'q' + option('type') + 'All'}" name="fullquery"/>
+</p>
+
+<tml:script>
+var cat = "QueryVisibilityEnforcement";
+try {
+	assertEquals(option("type") + ": onlypublished='false' ignored metafield visible", cat, item(option("type") + "AllVisible"), true);
+	assertEquals(option("type") + ": onlypublished='false' ignored metafield ishiddenfrom", cat, item(option("type") + "AllIshiddenfrom"), true);
+	assertEquals(option("type") + ": onlypublished='false' ignored metafield validfrom/to", cat, item(option("type") + "AllValid"), true);
+}
+catch (e) {
+	assertTrue("Exception running test: " + e.message, cat, "false");
+}
+</tml:script>

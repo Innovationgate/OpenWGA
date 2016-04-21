@@ -1,0 +1,6 @@
+this.query = function() {
+	var params = {gps: request.getParameter("gps") == "true" ? 1 : 0};
+	var qr = WGA.app().query("hql", "content.contentclass='phone' and content.items['connectivity_gps'].boolean=:gps order by content.lastmodified desc", null, params);
+	console.log(qr.fullQuery);
+	return qr;
+}

@@ -1,0 +1,18 @@
+<de.innovationgate.wga.common.beans.csconfig.v2.CSConfig>
+  <shortcuts/>
+  <anonymousAccessLevel>10</anonymousAccessLevel>
+  <defaultAccessLevel>10</defaultAccessLevel>
+  <versionCompliance>wga5.0</versionCompliance>
+  <publisherOptions>
+    <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+      <name>DesignEncoding</name>
+      <value>UTF-8</value>
+    </de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+  </publisherOptions>
+  <encoderMappings/>
+  <elementMappings/>
+  <remoteActions/>
+  <mediaKeys/>
+  <roles/>
+  <jobDefinitions/>
+</de.innovationgate.wga.common.beans.csconfig.v2.CSConfig>

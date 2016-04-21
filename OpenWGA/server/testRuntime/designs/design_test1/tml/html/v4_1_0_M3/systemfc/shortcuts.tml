@@ -1,0 +1,37 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests the shortcut definition functionality in csconfig.xml (F000048A2) 
+	</PRE>
+	
+	<hr>
+	
+	<tml:script context="name:home">
+		var cat = "SystemFileContainer:Shortcuts";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertEquals("Item Mapping Shortcut", cat, thekey, KEY);
+			assertEquals("Meta Mapping Shortcut", cat, THETITLE, TITLE);
+			assertEquals("Plugin Shortcut", cat, fileurl("@afw", "icons", "page.png"), "/WGAPublisher/plugin-wga-app-framework/file/icons/page.png");
+			assertEquals("TMLScript Global Shortcut", cat, TheUtil, Packages.de.innovationgate.utils.WGUtils);
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

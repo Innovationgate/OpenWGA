@@ -1,0 +1,67 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests &lt;tml:navigator&gt; attribute "exclude"
+	</PRE>
+	
+	<tml:script>
+		navkeys = WGA.createList();
+	</tml:script>
+	
+	<ul>
+		<tml:navigator id="nav" context="name:home" type="siblings">
+			<li><tml:link/>
+			<tml:script>
+				navkeys.add(KEY);
+			</tml:script>
+		</tml:navigator>
+	</ul>
+	
+	<tml:script>
+		navexcludekeys = WGA.createList();
+	</tml:script>
+	
+	<ul>
+		<tml:navigator id="navexclude" context="name:home" type="siblings" exclude="this">
+			<li><tml:link/>
+			<tml:script>
+				navexcludekeys.add(KEY);
+			</tml:script>
+		</tml:navigator>
+	</ul>
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "WebTML:Navigator";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertEquals("Without exclude: Navigator count returns 3 documents", cat, taginfo("navexclude", "count"), 2);
+			assertEquals("Without exclude: 3 Iterations were done", cat, taginfo("navexclude", "iteration"), 2);
+			assertTrue("Without exclude: Document 'home' is included", cat, "navkeys.contains(context('name:home').KEY)");
+		
+		
+			assertEquals("With exclude: Navigator count returns 2 documents", cat, taginfo("navexclude", "count"), 2);
+			assertEquals("With exclude: 2 Iterations were done", cat, taginfo("navexclude", "iteration"), 2);
+			assertTrue("With exclude: Document 'home' is excluded", cat, "!navexcludekeys.contains(context('name:home').KEY)");
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

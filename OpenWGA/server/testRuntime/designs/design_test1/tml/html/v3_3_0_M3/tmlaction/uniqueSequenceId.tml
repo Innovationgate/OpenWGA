@@ -1,0 +1,55 @@
+<html>
+<head>
+	<tml:htmlhead/>
+</head>
+<body>
+
+<HR/>
+<PRE>
+This test checks the bugfix (B00003382) as follows:
+- an customaction is defined
+- the actionlink is rendered two times (within the same session, but in different browser windows)
+- each browserwindow must be able to execute the action
+</PRE>
+<BR/>
+
+<tml:action id="actionX">
+	this.actionCounter = this.actionCounter + 1;
+</tml:action>
+
+<tml:script>
+	if (!isdefined("actionCounter")) {
+		this.setsessionvar("actionCounter",  0);
+	}
+	if (!isdefined("sequence")) {
+		this.setsessionvar("sequence",  0);
+	}
+	sequence = sequence + 1;
+	return sequence;
+</tml:script>
+
+<tml:script>
+	var category = "tmlaction:uniqueSequenceId";
+	if (this.sequence == 1) {
+		// first page call from window 1 - no action executed
+		assertequals("no action executed on first page rendering of window 1", category, actionCounter, 0);
+	}
+	if (this.sequence == 2) {
+		// second page call from window 2
+ 		assertequals("no action executed on second page rendering of window 2", category, actionCounter, 0);
+	}
+	if (this.sequence == 3) {
+		// first window called action
+ 		assertequals("action called from window 1", category, actionCounter, 1);
+	}
+	if (this.sequence == 4) {
+		// second window called action
+ 		assertequals("action called from window 2", category, actionCounter, 2);	
+	}		
+</tml:script>
+
+<tml:button id="actionX" clickaction="actionX">action X</tml:button></br>
+<HR/>
+<tml:warnings/>
+</body>
+</html>

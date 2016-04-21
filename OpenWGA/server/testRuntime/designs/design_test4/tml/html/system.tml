@@ -1,0 +1,32 @@
+<div class="login">
+	<tml:include ref="login"/>
+</div>
+
+<div class="rubrictitle">Search</div>
+<div class="rubric">
+	<tml:include ref="search-form"/>
+</div>
+
+<div class="rubrictitle">Links</div>
+<div class="rubric">
+	<a target="_blank" href="http://forum.innovationgate.de">Forum</a><br>
+	<a target="_blank" href="http://dev.innovationgate.de">Developer Center</a><br>
+	<a target="_blank" href="http://www.innovationgate.de">Innovation Gate</a><br>
+	<a target="_blank" href="http://www.innovationgate.de/WebGateAnywhere">WebGate Anywhere</a><br>
+</div>
+
+<tml:case condition="this.profile!=null">
+	<div class="rubrictitle">User Statistics:</div>
+	<div class="rubric">
+		<tml:include ref="pers_infos"/>
+	</div>
+</tml:case>
+
+<div class="rubrictitle">Systems Architecture</div>
+<div class="rubric">
+	This site runs on a Java Applicartion server. The HTML pages are dynamicaly rendered by <a href="http://www.innovationgate.de/webgateanywhere">WebGate Anywhere</a>, a J2EE based Content Management Solution developed by <a href="http://www.innovationgate.de">Innovation Gate</a>.
+</div>
+
+<div class="copyright">
+	&copy; 2004, Innovation Gate
+</div>

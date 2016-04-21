@@ -1,0 +1,78 @@
+	<!-- Check if outer variables are not available here, but page variables -->
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			assertEquals("Outer WebTML Variable is not available in include", cat, _outerVar, null);
+			assertEquals("Outer WebTML Variable is not available in include: Definition check", cat, isdefined("_outerVar"), false);
+			assertEquals("WebTML Page Variable is available on included module", cat, _pageVar, option("pagevarvalue"));
+			
+			if (option("invocation") == 2) {
+				assertEquals("Inner WebTML Variable is not yet set (from previous invocation)", cat, _innerVar, null);
+				assertEquals("Inner WebTML Variable is not yet set (from previous invocation): Definition check", cat, isdefined("_innerVar"), false); 
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<!-- Set inner var, overload outervars, overwrite page var -->
+	<tml:script>
+		_outerVar = "y";
+		_outerVar2 = "m";
+		_innerVar = "f";
+		_pageVar = "p";
+
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			assertEquals("Inner WebTML Variable is available in include", cat, _innerVar, "f");
+			assertEquals("Inner WebTML Variable is available in include: Definition check", cat, isDefined("_innerVar"), true);
+			assertEquals("Overloaded outer WebTML Variable in include", cat, _outerVar, "y");
+			assertEquals("Overloaded outer WebTML Variable in include", cat, _outerVar2, "m");
+			assertEquals("Overwritten WebTML page variable in include", cat, _pageVar, "p"); 
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<!-- remove overloaded outervar2, check if is again null -->
+	<tml:script>
+		removeVar("_outerVar2");
+		
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			assertEquals("Removed inner WebTML Variable is gone", cat, _outerVar2, null);
+			assertEquals("Removed inner WebTML Variable is gone: Definition check", cat, isdefined("_outerVar2"), false);
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>

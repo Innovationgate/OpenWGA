@@ -1,0 +1,35 @@
+<tml:eventscript onevent="theEvent" ajax="true">
+	if (!isDefined("eventScriptRan")) {
+		setSessionVar("eventScriptRan", 1);
+	}
+	else {
+		eventScriptRan++;
+	}
+</tml:eventscript>
+
+<tml:script>
+	function findCookie(name) {
+		for each (c in request.getCookies()) {
+			if (c.name==name) return c.value;
+		}
+		return null;
+	}
+	var clickStep = parseInt(findCookie("clickStep"));
+	var cat = findCookie("testId");
+	
+	try {
+		if (clickStep == 1) {
+			assertEquals("Event script ran on client-triggered portlet event, no prior server events", cat, eventScriptRan, 1);
+		}
+		else if (clickStep == 2) {
+			assertEquals("Event script ran on server-triggered portlet event", cat, eventScriptRan, 2);
+		}
+		else if (clickStep == 3) {
+			assertEquals("Event script ran on client-triggered portlet event, prior events were thrown", cat, eventScriptRan, 3);
+		}
+	}
+	catch (e) {
+		logException(e);
+		assertTrue("Exception running tests", cat, "false");
+	}
+</tml:script>

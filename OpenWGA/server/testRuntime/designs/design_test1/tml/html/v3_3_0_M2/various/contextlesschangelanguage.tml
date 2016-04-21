@@ -1,0 +1,31 @@
+<html>
+<body>
+<PRE>
+Testing fix of bug B000031CE: Change of preferred language in contextless request
+</PRE>
+<HR/>
+Preferred language: <tml:meta type="session" name="language"/><br/>
+<a name="toEn" href="<tml:url context="this<en>"/>">Change language to en</a><br/>
+<a name="toDe" href="<tml:url context="this<de>"/>">Change language to de</a>
+
+<tml:script>
+
+if (isdefined("seq")) {
+	seq++;
+}
+else {
+	setSessionVar("seq", 1);
+}
+
+if (seq==2) {
+	assertEquals("Changed preferred language to 'en' in contextless request", "Various:contextlessChangeLanguage", meta("session", "language"), "en");
+}
+else if (seq==3) {
+	assertEquals("Changed preferred language to 'de' in contextless request", "Various:contextlessChangeLanguage", meta("session", "language"), "de");
+}
+
+</tml:script>
+
+<tml:warnings/>
+</body>
+</html>

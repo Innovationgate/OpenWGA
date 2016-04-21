@@ -1,0 +1,33 @@
+<div class="rtf">
+	<tml:if condition="STATUS==content().STATUS_DRAFT">
+		<tml:then>
+			<tml:item name="teaser" editor="rtf" label="Optional teaser for this site. If no teaser is defined, the teaser of the parent document will be used.">
+				<tml:option name="head">
+					<link type='text/css' rel='stylesheet' href='<tml:url type="css" name="rtf"/>'>
+				</tml:option>
+				<tml:option name="showoptions">editHTML</tml:option>
+				<tml:option name="tableStyleList">"gray with space|IG"</tml:option>
+				<tml:option name="trStyleList">"dark gray|table-header"</tml:option>
+			</tml:item>
+		</tml:then>
+		<tml:else>
+			<tml:script>
+				// find teaser
+				var doc = content();
+				_teaser = teaser;
+				while(doc && (_teaser==null || _teaser.replace(/<br.*>/g, '')=='')){
+					doc = doc.getParentContent();
+					if(doc)
+						_teaser = doc.getItemValue("teaser");
+				}
+			</tml:script>
+			<tml:if isfilled="_teaser">
+				<tml:then>
+					<tml:item name="_teaser" encode="rtf"/>
+				</tml:then>
+			</tml:if>
+		</tml:else>
+	</tml:if>
+	
+</div>
+

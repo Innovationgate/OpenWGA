@@ -1,0 +1,2 @@
+jobContext.log.info("Running overlay referencing job!");
+db().setAttribute("OverlayReferencingJob", WGA.callAction("v6_0_4:overlayaction"));

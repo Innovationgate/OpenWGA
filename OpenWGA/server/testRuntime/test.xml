@@ -1,0 +1,448 @@
+
+<project name="WGAUnitTest">
+
+	<!-- Definitions -->
+	<taskdef name="prepareenvironment" classname="de.innovationgate.wga.test.PrepareEnvironmentTask" />
+	<taskdef name="fattrib" classname="de.innovationgate.ant.FAttribTask"  />
+	<taskdef name="wgaunit" classname="de.innovationgate.wga.test.WGAUnitTask" />
+
+	<!-- Main targets -->
+	<target name="executeAllTests" description="Executes all WGA unit tests. Server must be started before doing this">
+
+		<prepareenvironment />
+
+		<!-- Must be up here so database 'designslave'  is not used yet, therefore not connected -->
+		<!-- WGA5 - will currently fail bc. 'designslave' is not lazy connected due to issue on design updates -->
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.general.LazyConnectedDB" />
+
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tml.General1" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlform.KeepOnValidate" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlform.IfNoError" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlform.DefaultValue" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlform.DisplayOfHiddenField" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlform.DynamicFields" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlform.TMLScriptAccess" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlform.ModeOnInputTag" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlform.HtmlInput" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlform.ExecuteValidation" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlform.ExecuteValidationViewReadonly" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlform.ClearIfError" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlform.HashedPassword" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.designsync.DesignSync" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.labels.Labels" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlitem.Aliases" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.auth.CSAuth" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlscript.General1" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlscript.ImplicitThisVar" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlscript.SortList" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.tmlscript.Scriptlets" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M1.ajax.RecoverEnvironment" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.tmlaction.Debounce" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.tmlaction.DebounceDefault" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.auth.BruteForceBlocking" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.auth.DisabledCSUser" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.various.CustomDominoNav" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.various.ContextlessChangeLanguage" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.nav.Sitemap" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.nav.Siblings" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.nav.Children" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.nav.Parents" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.nav.Path" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.nav.Languages" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.nav.Areas" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.tmlscript.VariablePrecedence" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M2.tmlform.ScriptletsInValidationMessages" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tmlaction.SecureActionLink" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tmlform.InputEncoding" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tmlform.ListToOptions" />
+
+		<!-- There is no difference in design sync and design sharing any more, so no need for separate tests 
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.designsharing.DesignSharing" /> -->
+
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.auth.CaseInsensitiveLogin" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.context.PathContextExpressions" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tmlaction.ActionFromModule" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tmlaction.UniqueSequenceId" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tmlaction.Remoting" />
+		<!-- WGA5 - personalisation user classes has been removed -->
+		<!-- <wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.pers.UserClasses" /> -->
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tml.ItemXPath" />
+		<!-- WGA5.1 - preferred language was removed -->
+		<!-- <wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tmlscript.PrefLang" /> -->
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.wgapi.BasicOperations" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tmlaction.RemoteImport" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tml.LocalRef" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tmlaction.ActionParams" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tml.Format" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tmlaction.CreateObject" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.queries.PagingEven" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.queries.PagingOdd" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.queries.PagingLow" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.wgapi.ContentEvents" dbkey="test1" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.wgapi.ContentEvents" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_0_M3.tml.FileURLs" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_1.queries.ResultWithHiddenDoc" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_1.tmlaction.ActionCalling" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_3.tmlcache.TMLCache" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_4.tml.SpecialCharacterFiles" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_4.tml.QualifyRTFURLs" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_4.tmlscript.DateOnly" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M1.tml.OptionExpression" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M1.tml.OptionScope" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M1.wgapi.XStreamSerialization" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M1.wgapi.LowerCaseMeta" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.lucene.Highlighting" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.systemfc.InitWGACS" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.tmlscript.AjaxActionCalling" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_5.tmlform.TMLFormFieldlistNullReturnValue" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_5.tml.IsContextValidPath" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_5.tmlscript.LookupTable" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_5.tml.MultiCustomJDBCQueries" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_5.tml.DesignDB" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_6.wgapi.QueryCache" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_7.customjdbc.B000040DA" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_7.tml.ForEachSort" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_7.tml.DesignVariants" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_7.general.TestJSPCompilation" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_7.tml.QueryRole" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_7.tml.QueryVisibilityEnforcement" />
+		<!-- This test may not be used in WGA4+ since it tests the old NonExistentItem behaviour in WGA3
+		<wgaunit test="de.innovationgate.wga.test.v3_3_8.general.NonExistentItem" />-->
+		<wgaunit test="de.innovationgate.wga.test.v3_3_8.pers.MasterActionProfile" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_8.tml.B00004216" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_11.tml.URLDB" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M1.tmlscript.PortletEvents" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.systemfc.CSConfig" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.general.NonExistentItem" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.general.CoreEventListener" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.tmlportlet.PortletName" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.tmlportlet.ServerSidePortletEvent" dbkey="test1" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.tmlportlet.ServerSidePortletEvent" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.tmlscript.TMLScriptLoginLogout" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.wgapi.SetItemToNaN" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.tml.ElementOptions" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.server.Encoding" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.tmlcache.TMLCache" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M2.tml.XSLTFOPElements" />
+		<wgaunit test="de.innovationgate.wga.test.v3_3_9.customjdbc.General" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M3.tml.CancelTagOnContextFailure" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0_M3.tmlscript.ObjectFormatter" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0.wgapi.BasicOperations" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_0.wgapi.BasicHDBFunctions" dbkey="testhdb" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_1.remoting.AdminRemoting" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_1.tml.StoreInContentTarget" />
+
+		<!-- does not apply any more to WGA5 since WGUserDetails is no more separately retrievable from dbcore
+		<wgaunit test="de.innovationgate.wga.test.v4_0_2.wgapi.MasterUserDetails"/> -->
+
+		<wgaunit test="de.innovationgate.wga.test.v4_0_2.tmlscript.B00004602" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_2.tmlaction.ActionFromDifferentMainContext" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_2.tml.LocalOptions" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_2.design.HideSystemContainer" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_3.plugins.ExternalDefaultPlugins" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_3.tml.ResponseMetaCharacterEncoding" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_3.tmlscript.B000045F6" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_3.tml.LoginLogoutURL" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_3.wgapi.RemoveRoleWithUsers" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_3.designsync.AlternateTMLFileSuffix" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_3.wgapi.B0000471E" dbkey="test1_v5"/>
+		<wgaunit test="de.innovationgate.wga.test.v4_0_3.plugins.InstallPlugin" />
+
+		<wgaunit test="de.innovationgate.wga.test.v4_0_3.tml.DummyContentURL" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_4.tml.HasChildren" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_4.wgapi.Replicator" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_7.tml.PrefLanguageOrder" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_7.queries.PagingHQL" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_7.queries.PagingCached" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_7.queries.WaitForLuceneIndex" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_7.queries.PagingLucene" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_7.portlet.ClearPortletState" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_8.actions.ActionIsolation" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_8.server.OptionPriority" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_8.plugins.PluginConfig" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_8.tmlform.NewFileMethods" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_8.tml.DBContextChange" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_11.wgapi.IncorrectUniqueNameCheckB00004D4E" dbkey="test1" />
+		<wgaunit test="de.innovationgate.wga.test.v4_0_11.wgapi.IncorrectUniqueNameCheckB00004D4E" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.tmlportlet.ExternalDBPortlet" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.tmlportlet.B00004832" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.tml.F00004936" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.tmlform.EncodedOptions" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.url.TitlePathURL" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.tmlscript.TMLScriptFalse" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.tmlscript.MasterActionLimitations" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.wgapi.F00004312" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.wgapi.F000047C6" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.wgapi.MutableObject" />
+
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.wgapi.OptimizedFileHandlingF00004BCA_Step1" dbkey="opt_file_handling" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.wgapi.OptimizedFileHandlingF00004BCA_Step2" dbkey="opt_file_handling" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M2.wgapi.AdditionalFileFunctionalitiesF00004A4E" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M2.wgapi.AdditionalFileFunctionalitiesOptFileHandlingF00004A4E" dbkey="opt_file_handling" />
+
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.wgapi.OptimizedFileHandlingF00004BCA_Step1" dbkey="opt_file_handling_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M1.wgapi.OptimizedFileHandlingF00004BCA_Step2" dbkey="opt_file_handling_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M2.wgapi.AdditionalFileFunctionalitiesF00004A4E" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M2.wgapi.AdditionalFileFunctionalitiesOptFileHandlingF00004A4E" dbkey="opt_file_handling_v5" />
+
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M2.tmlscript.TMLScriptGlobals" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M2.tml.RoleContextExpression" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M2.tml.AbsoluteURL" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M2.tml.IncludeShortSyntax" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M2.general.EncodingIssueOnGETRequestsF00004BC2" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M3.lucene.HighlightingMetasF000044FE" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M3.tmlscript.Scriptlets" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M3.tml.IsFirstLastLoopF00004A8E" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M3.webdav.BasicFunctionality" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M3.tml.PortletModeF00004292" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M3.systemfc.Shortcuts" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M3.tml.SelectPageF00004512" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M3.wgapi.AttachAndRetrieve" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M3.tml.TextualDateF00003816" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M4.tml.SelectSwitch" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M4.tml.InputChangeAction" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M4.tml.JSActions" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M4.tml.SelectOptionsForNumberDate" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M4.workflow.ApproverAccess" dbkey="inittest" domain="hsql" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M4.wgapi.ACLEnhancements" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_0_M4.rss.RSSConnector" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_3.wgapi.EnhanceHDBFunctionsF00004E96" dbkey="testhdb" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_3.tmlaction.MasterAndAsync" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_4.workflow.BasicOperations" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_5.wgapi.StructEditorsBackendCache" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_5.tmlscript.NonOverwritableActionParams" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_7.tml.CustomSQLContextChange" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_7.tmlscript.AdditionalObjectsScope" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_7.tmlscript.ItemAndMetaShortform" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_7.tml.CustomPluginContextChange" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_7.wgapi.BackendChanges" />
+		<wgaunit test="de.innovationgate.wga.test.v4_1_13.tmlscript.B00005E12" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_M1.wgapi.CS_ACL_Query" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_M2.wgapi.Relations" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_M2.wgapi.CoAuthorsAndOwner" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_M2.wgapi.UniqueNames" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_M3.tmlscript.MasterFunctions" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_M3.tml.OriginalUser" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_M3.wgapi.ExtensionDataCRUD" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_M3.portlets.Unregister" dbkey="test1" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_M3.portlets.Unregister" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_2.portlets.PortletItemCaseInsensitive" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_2.portlets.PortletItemCaseInsensitive" dbkey="test1" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_2.tml.CachedQueries" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_2.wgapi.SQLCSQueryTypes" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_3.portlets.IncludeOtherDBPortlet" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_7.tml.ScriptletDetermination" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_9.pers.BugfixHash00000723" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_11.tml.PortletContextNone" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_12.server.HttpLogin" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_12.server.ReadProtection" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v5_0_12.tml.InputContext" />
+
+		<!-- Not to be fixed in 5.0, rather "upstairs" -->
+		<!-- <wgaunit test="de.innovationgate.wga.test.v5_0_17.portlets.EarlyPortletEvents"/> -->
+
+		<wgaunit test="de.innovationgate.wga.test.v5_0_17.tml.ActionFormPosting" />
+		<wgaunit test="de.innovationgate.wga.test.v5_1_0.wgapi.TransactionalContentStoreReplication" />
+		<wgaunit test="de.innovationgate.wga.test.v5_1_0.urls.ContentURLs" />
+		<wgaunit test="de.innovationgate.wga.test.v5_2_0.schemadef.SchemaEnforcement" />
+		<wgaunit test="de.innovationgate.wga.test.v5_2_0.webtml.LinkAction" />
+		<wgaunit test="de.innovationgate.wga.test.v5_2_1.webtml.LangContextLoss" />
+		<wgaunit test="de.innovationgate.wga.test.v5_3.webtml.DynamicAttributes" />
+		<wgaunit test="de.innovationgate.wga.test.v5_3.webtml.LinkMedium" />
+		<wgaunit test="de.innovationgate.wga.test.v5_3.webtml.WebTMLScope" />
+		<wgaunit test="de.innovationgate.wga.test.v5_3.webtml.URLParams" />
+		<wgaunit test="de.innovationgate.wga.test.v5_3.tmlscript.WGAGlobal" />
+		<wgaunit test="de.innovationgate.wga.test.v5_3.tmlscript.WGAGlobalCompatibility" />
+		<wgaunit test="de.innovationgate.wga.test.v5_3.tmlscript.BugfixHash00000757" />
+		<wgaunit test="de.innovationgate.wga.test.v5_3.webtml.QueryParameters" />
+		<wgaunit test="de.innovationgate.wga.test.v5_4.wgapi.PageReaderFields" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v5_4_3.tml.AJAXPortletContextLanguage" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v5_5.tml.Overlays" dbkey="overlaytest" />
+		<wgaunit test="de.innovationgate.wga.test.v5_5.hdbmodel.BasicInitialisation" />
+		<wgaunit test="de.innovationgate.wga.test.v5_5.hdbmodel.CreateHdbmodelContent1" />
+		<wgaunit test="de.innovationgate.wga.test.v5_5.hdbmodel.CreateHdbmodelContent2" />
+		<wgaunit test="de.innovationgate.wga.test.v5_5.hdbmodel.DeleteHdbmodelContent1" />
+		<wgaunit test="de.innovationgate.wga.test.v5_5.hdbmodel.DeleteHdbmodelContent2" />
+		<wgaunit test="de.innovationgate.wga.test.v5_5.hdbmodel.FillHdbmodel" />
+		<wgaunit test="de.innovationgate.wga.test.v5_5_3.tml.OverlayMediumChange" dbkey="overlaytest" />
+		<wgaunit test="de.innovationgate.wga.test.v5_5_3.tml.OverlayPageAction" dbkey="overlaytest" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.wgapi.SaveIsolation" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.portlets.IncludePortletmode" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.portlets.IncludePortletmode" dbkey="test4" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.tmlform.FileUpload" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.tmlform.FileUpload" dbkey="test4" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.tml.ActionURLParameters" dbkey="test4" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.wgapi.RemoveAddSave" dbkey="test1" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.wgapi.RemoveAddSave" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.tml.ForeachFilter" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.wgapi.PagePublished" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.tmlform.CreateUpdate" dbkey="test4" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.wgapi.PendingRelease" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.wgapi.PageNameCache" dbkey="test4-nolucene" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.tml.ConnectScriptOtherDesign" dbkey="test4" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.wgapi.ManualTransaction" dbkey="test1" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_M1.wgapi.ManualTransaction" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_1.tml.CallModuleActionFromPlugin" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_1.tmlform.FormPCFile" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_1.tml.AjaxAndUrlParams" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_1.tml.AjaxAndUrlParams" dbkey="test4" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_1.tml.FormDefaultAction" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_2.wgapi.SaveEventVsFileData" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_2.tml.MaxResults" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_2.pers.UserProfileSave" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_4.jobs.OverlayReferencing" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_7.tml.ContextlessRequestURL" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_7.url.OldTitlePathURLs00002274" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_7.wgapi.PendingReleaseNoAdmin" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_8.tml.PortletContextFallback" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_9.wgapi.EditReadUpdateSave" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_9.wgapi.CreateCloneDeleteAtts" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.tml.VoidAttributes" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.tml.SmallAdditions" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.wgapi.PartialNavResults" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.tml.NavExclude" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.tml.ImageSize" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.design.OverlaySchema" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.design.Overlay61" dbkey="overlaytest" />
+		<fattrib file="designs/design_overlay" readonly="false" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.design.Overlay61Upgrade" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.tml.MasterMainContext" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.tml.HDBModelContextFunctions" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.tml.IncludeShortcutCR" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.server.DirectAccess" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.tml.InputBoolean" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.tml.QueryDynamicParam" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.tml.PreferredOptionReceivers" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.tml.ForeachSort" />
+		<wgaunit test="de.innovationgate.wga.test.v6_1_M1.tml.NewFunctions" dbkey="test4" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_9.wgapi.ReplacePrimaryFile" dbkey="test1_v5" />
+		<wgaunit test="de.innovationgate.wga.test.v6_0_12.tml.BetweenVsFilllastpage"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_0_14.workflow.AutoApprove"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_0_18.tml.FormActionXSS"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_0_20.tml.TMLFormInvalidChars"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.ActionsAndPortletStates" dbkey="test5" browser="FIREFOX_17" />
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.ActionsAndPortletStates" dbkey="test5" browser="CHROME" />
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.ActionsAndPortletStates" dbkey="test5" browser="INTERNET_EXPLORER_8" />
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.ActionsAndPortletStates" dbkey="test5" browser="FIREFOX_10" />
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.TMLDefaultEncoding" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.FailedActionFallback" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tmlscript.RunTask" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.IncludeMediumChange"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.pers.PersOptIn" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.FormSourceContent" dbkey="test4"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.FormSourceProfile" dbkey="test4"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.FormSourcePortlet" dbkey="test4"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.FormSourcePortletSessionVars" dbkey="test4"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.FormSourceContent" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.FormSourceProfile" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.FormSourcePortlet" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_M1.tml.FormSourcePortletSessionVars" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_1.tml.VarParamProblems"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_2.wgapi.UserAccessFilter"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_2.tml.UrlEncodedFormField"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_2_5.tml.ClientEventScript" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M1.rest.BasicOperations"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M1.tmlscript.NativeObjectMap"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M1.tmlscript.NativeArrayList"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M1.wgapi.PageRestrictions"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.scriptlets.OverlayScriptlets" dbkey="overlaytest"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.server.ServerApiPart4"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.tml.StaleCacheLatency" />
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.tml.StaleCacheUpdate" />
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.derivates.DerivatesPreparation" />
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.derivates.Derivates" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.derivates.DerivatesFallbackBehaviour"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.derivates.DerivatesCleanup" />
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.tml.Image" />
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.server.VLinksPreparation" dbkey="test1_v5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.server.VLinksWebTML" dbkey="test1_v5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.server.VLinksRequest" dbkey="test1_v5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.server.VLinksCleanup" dbkey="test1_v5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.tml.DataSourcePortlet" dbkey="test1_v5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.design.OverlayInit" dbkey="test1_v5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_M2.tml.RecoverURLParams" dbkey="test1_v5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_2.tml.Exclude"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_2.tmlscript.URLBuilder" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_2.server.XSS" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_3.rest.RestDataSources"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_3_3.tml.ZeroPaging"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_M1.wgapi.ManualTransaction" dbkey="test1"/>		
+		<wgaunit test="de.innovationgate.wga.test.v7_0_M1.wgapi.ManualTransaction" dbkey="test1_v5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_M1.tmlscript.HostObjectEquality" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_M2.tml.Nav"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_M2.tml.NavTags"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_M2.tml.RelationOrder" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_M2.wgapi.AttachDocs"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_M2.serverapi.TMLScriptProblems" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v6_0_23.tml.LevelContextExpression"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_M3.wgapi.ReadProtection" dbkey="test1_v5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_1.tml.CollectionResultForeach"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_3.tmlscript.GlobalsOnMaster"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_3.tml.KeepParamsAction"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_3.tmlscript.DeserializeLibBeans"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_4.tml.MultiplePortletEvents" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_4.rest.QueryToHdbmodelApi"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_7.wgapi.CreateCustomDominoDoc"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_10.tml.BooleanInputOptionText"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_10.tml.TMLScriptWGAContextDelegates"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_10.tml.EventBounce" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_12.rest.CustomApiNoReturn"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_0_12.rest.BinaryPutPost"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_1_M1.tml.DynamicHtmlAttributes"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_1_M1.wgapi.BinaryExtensionData"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_1_M1.wgapi.FileRevision"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_1_M2.tml.NavOrder" dbkey="test1_v5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_1_M2.tml.ForeachExpression" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_1_M2.tml.URLBuilder"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_1_M2.tml.CallActionConvenience"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_1_M2.tml.IterateCascadedLists" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M1.serverapi.Call" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.controllers.BasicFunctionality" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.renderers.Basic" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.renderers.OuterLayoutRenderer"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.tmlscript.ObjectsV2" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.ConditionAtts" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.RangeWrap" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.AppEvents" dbkey="test6"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.ErrorIncidentPage"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.DefaultActionDebouncing" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.domino.CustomizedViewColumnNames" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.processcontextproliferation.Test" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.ActionRedirects" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.ItemExpressions" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.tmlscript.MoreFunctionModifiers" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.tmlform.StoreFileInEvent" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.tmlscript.RestServiceV2"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.LabelLanguage" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.IterateJSIterators" dbkey="test5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.wgapi.ContentEventErrors"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.SpecificFileURLs" dbkey="test6"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.server.ClientRestrictions"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.wgapi.TestPageRightsFilter" dbkey="test1_v5"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.WebSockets" dbkey="test6"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.ManagedGlobals" dbkey="test6"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.LocalVars" dbkey="test6"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.PortletConfig" dbkey="test6"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.serverapi.ServerAPIUserProfile" dbkey="test6"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.ListReduction" dbkey="test6"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.DynamicAttributes" dbkey="test6"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.websockets.IndependentWebSockets"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.OptionSerialisation" dbkey="test6"/>
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.VarPriority" dbkey="test6"/>
+	</target>
+
+	<!-- Developer targets -->
+
+	<target name="runCustomTest" description="Prompts for a test to run">
+		<input message="test to run" addproperty="test.class" defaultvalue="" />
+		<prepareenvironment />
+		<wgaunit test="${test.class}" />
+
+	</target>
+
+	<target name="currentTest" description="Running single test">
+		<!--<prepareenvironment />-->
+		<wgaunit test="de.innovationgate.wga.test.v7_2_M2.webtml.VarPriority" dbkey="test6"/>
+	</target>
+
+</project>

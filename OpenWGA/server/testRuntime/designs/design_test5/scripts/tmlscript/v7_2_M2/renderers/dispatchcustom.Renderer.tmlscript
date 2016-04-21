@@ -1,0 +1,7 @@
+this.render = function($cx) {
+	WGA.TMLPage.render({
+		design: WGA.design().resolve("::dispatchcustomtarget"),
+		context: $cx.context("docid:8a8181dc050f238901050f2539ac0002")
+	}); 	
+}
+ 

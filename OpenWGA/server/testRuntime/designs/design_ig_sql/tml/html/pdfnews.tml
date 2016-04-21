@@ -1,0 +1,36 @@
+<div align="center">
+<table border="0" cellspacing="0" cellspacing="0" width="98%" height="268">
+<tr>
+<td class="BGRahmen" align="center"><b>IG News in PDF</b><br></td>
+</tr>
+<tr>
+<td class="RahmenUntenoffen"><tml:img name="blank" src="blank.gif">width="1" height="10"</tml:img></td>
+</tr>
+<tr>
+<td class="RahmenUntenObenoffen">
+<tml:if condition="Sprache='DE'">
+<tml:then>
+Um Ihnen zu demonstrieren, das wir die Pressemeldung dynamisch in ein PDF Dokument konvertieren, bitten wir Sie ihren Namen einzugeben.<br>Die Pressemeldung wird dann persönlich für Sie erstellt.
+</tml:then>
+<tml:else>
+In order to prove that the news article will be transfered to a pdf document totally dynamic we kindly ask you to enter your name.<br>The news article will then be created personally for you.
+</tml:else>
+</tml:if></td>
+</tr>
+<tr>
+<td class="RahmenUntenObenoffen"><tml:img name="blank" src="blank.gif">width="1" height="10"</tml:img></td>
+</tr>
+<tr>
+<td align="center" class="RahmenObenOffen">
+<form action="JavaScript:PDFName()" name="PDFForm">
+<input type="hidden" name="ziel" value="<tml:urlparameter name="URL"/>">
+<input type ="text" name="name" class="field"><br><br>
+<input type ="submit" class="button" value ="<tml:if condition="Sprache='DE'"><tml:then>senden</tml:then><tml:else>send</tml:else></tml:if>"></form></td>
+</tr>
+</table>
+</div>
+<Script Language="JavaScript">
+<!--
+document.PDFForm.name.focus();
+//-->
+</Script>

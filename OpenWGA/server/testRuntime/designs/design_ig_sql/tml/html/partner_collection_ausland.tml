@@ -1,0 +1,37 @@
+<table>
+<tml:collection id="Partner">
+<tml:query type="formula">
+_Partnerflag="Partner" & _Laenderkennung !="D-"
+</tml:query>
+<tml:foreach type="content" sortorder="descanding" sortexpression="_Laenderkennung">
+<tml:groupchange id ="Land" expression="_Laenderkennung">
+</table>
+<table border="0" cellspacing="0" width="100%">
+<tr>
+<td>
+<h2 align="center">IG Technology Partner - 
+<tml:evaluate>
+@ReplaceSubstring(_Laenderkennung; "IR-":"CH-":"GB-";"Irland":"Schweiz":"Groﬂbritanien")
+</tml:evaluate>
+</h2></td>
+</tr>
+</tml:groupchange>
+<tr>
+<td class="BGRahmen_rechtsoffen">
+<b><tml:link/></b>
+</td>
+<td class="BGRahmen_linksoffen">
+<tml:if condition ="_url !=''">
+<div align="right"><a target="partner" href="<tml:item name="_url"/>">
+<tml:img name="Navigation" src="NavTrans1.gif"> border="0" alt="zur Partnerwebseite"</tml:img></a>
+</div>
+</tml:if>
+</td>
+</tr>
+<td colspan="2">
+<b><tml:item name= "_Partnername"/></b><br><tml:item name=" _Laenderkennung"/><tml:item name="_Stadt"/><br>
+</td>
+</tr>
+</tml:foreach>
+</tml:collection>
+</table>

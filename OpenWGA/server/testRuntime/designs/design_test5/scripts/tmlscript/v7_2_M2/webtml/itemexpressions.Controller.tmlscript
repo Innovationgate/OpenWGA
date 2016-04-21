@@ -1,0 +1,29 @@
+function Controller() {
+}
+
+Controller.prototype.someComplexObject = function() {
+
+	return {
+		javaClass: Packages.de.innovationgate.utils.WGUtils,
+		javaObject: WGA.urlBuilder(),
+		aString: " The String ",
+		anEmptyString: "",
+		anotherString: "Yet another String",
+		aNumber: 1,
+		aZero: 0,
+		aNull: null,
+		aFive: 5,
+		aFivePointTwo: 5.2,
+		aBool: true,
+		aFalseBool: false,
+		aList1: ["a","b"],
+		aList2: ["c","d"],
+		anObject1: {elemA: "a", elemB:"b"},
+		anObject2: {elemC: "c", elemD: "d"},
+		giveMeAnA: "a",
+		giveMeAnF: "f",
+		aDate: WGA.parseDate("23.01.1954", "dd.MM.yyyy")
+	}
+
+
+}

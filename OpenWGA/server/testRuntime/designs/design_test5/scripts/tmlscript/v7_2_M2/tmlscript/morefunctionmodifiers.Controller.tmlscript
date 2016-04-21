@@ -1,0 +1,16 @@
+function Controller()  {
+}
+
+Controller.prototype.nonIsolatedMethod = function($cx) {
+	$cx.setVar("isolationState", WGA.isIsolated());
+	$cx.setVar("statement", "Thank god I'm not isolated");
+}.nonIsolated();
+
+
+Controller.prototype.syncedMethod = function($cx) {
+	return {
+		$vars: {
+			syncedMethodIsLocked: java.lang.Thread.holdsLock(this)
+		}
+	}
+}.synced();

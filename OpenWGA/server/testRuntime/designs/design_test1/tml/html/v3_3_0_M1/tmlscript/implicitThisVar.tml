@@ -1,0 +1,43 @@
+<html>
+<body>
+
+<HR>
+<PRE>
+Verifying a fix for a bug (B0000320E) that appeared in some interim versions of 3.3 M1.
+TMLScript scripts compiled with context would keep that context as parent scope, even after this was no more current.
+When WebTML variables got stored via this context (by omitting the "this"-object) they were not available later.
+</PRE>
+
+
+<tml:query id="user" alllanguages="true" type="hql">
+	content.structentry.contenttype.name='standard'	
+</tml:query>
+
+<p>Result1: <tml:meta context="query:user" name="title"/></p>
+<tml:if context="query:user" iscontextvalid="true">
+	<tml:then>
+		<tml:script>
+			_currentuserkey=STRUCTKEY;
+			this._currentuserroles=itemlist("roles");
+		</tml:script>		
+	</tml:then>
+</tml:if>
+
+Current user key1: <tml:item name="_currentuserkey"/><br/>
+<tml:option name="currentuserkey" mode="set"><tml:item name="_currentuserkey"/></tml:option>
+<tml:option name="currentuserroles" mode="set"><tml:item name="_currentuserroles" divider=","/></tml:option>
+<p>Current user key: <tml:script>return this.option("currentuserkey")</tml:script></p>
+<tml:script>
+if (isDefined("seq")) {
+	seq++;
+}
+else {
+	setSessionVar("seq", 1);
+}
+
+assertEquals("Implicit this-object stores vars correctly, load " + seq, "tmlscript", this.option("currentuserkey"), this.context("query:user").STRUCTKEY);
+</tml:script>
+<a name="refresh" href="<tml:url action="$refresh"/>">Refresh</a>
+<tml:warnings/>
+</body>
+</html>

@@ -1,0 +1,18 @@
+/* --- Layout for the voted beam --- */
+td.voted {
+border-style:outset;
+border-width:1px;
+border-color:orange;
+background-color:#FFC300;
+}
+/* --- Layout for the unvoted beam --- */
+td.unvoted {
+background-color:#9CA29C;
+border-style:inset;
+border-width:1px;
+}
+/* --- Layout for the text ---  */
+td.text {
+font-size:8pt;
+color:#000000;
+}

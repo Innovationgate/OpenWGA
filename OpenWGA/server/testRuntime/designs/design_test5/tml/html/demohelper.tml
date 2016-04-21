@@ -1,0 +1,18 @@
+<tml:case condition="this.STATUS=='w'">
+
+	<br><hr size="1"><font color="red"><b>	
+	<tml:case condition="this.LANGUAGE=='de'">
+		<h3><tml:option name="usage-de"/></h3>
+		Bitte klicken Sie auf ein Edit-Icon, um ein Feld zu bearbeiten.<br>
+		Klicken Sie auf das grüne Häkchen, um das Feld zu speichern.<br>
+		<br>
+		Die Felder haben unterschiedliche Feldtypen. Bearbeiten Sie das Feld "Body", so erscheint eine zusätzliche Toolbar am oberen Bildschirmrand.<br>
+		<br>
+		Um das Dokument zu veröffentlichen müssen Sie den Publish-Button links im Zusatzfenster unten klicken
+	</tml:case>
+	<tml:case condition="this.LANGUAGE=='en'">
+		To edit a field just click on one of the edit icons.<br>
+		Please remember to click the Publish-button in the lower left corner.
+	</tml:case>
+	</b></font>
+</tml:case>

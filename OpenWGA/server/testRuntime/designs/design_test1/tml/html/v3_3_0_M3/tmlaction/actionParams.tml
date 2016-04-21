@@ -1,0 +1,53 @@
+<html>
+<head><tml:htmlhead/></head>
+<tml:script>
+
+if (isdefined("seq")) {
+	seq++;
+}
+else {
+	setSessionVar("seq", 0);
+}
+
+
+if (seq>=1) {
+	var cat = "TMLAction:actionParams";
+	
+	if (tmlparam1 == null) {
+		assertTrue("No tmlparam1 present on test sequence  " + seq, cat, "false");
+		return;
+	}
+	
+	assertEquals(tmlparam1 + ": Param2", cat, tmlparam2, seq.toString() + "2");
+	assertEquals(tmlparam1 + ": Param3", cat, tmlparam3, seq.toString() + "3");
+	assertEquals(tmlparam1 + ": Param4", cat, tmlparam4, seq.toString() + "4");
+	assertEquals(tmlparam1 + ": Param5", cat, tmlparam5, seq.toString() + "5");
+}
+
+</tml:script>
+<tml:action id="empty">
+</tml:action>
+
+<body>
+<p>
+<a name="url1"href="<tml:url type="action" param1="Inline action URL" param2="12" param3="13" param4="14" param5="15"></tml:url>">Inline action URL</a><br/>
+</p>
+
+<p>
+<a name="url2" href="<tml:url action="empty" param1="Referenced action URL" param2="22" param3="23" param4="24" param5="25"/>">Referenced action URL</a><br/>
+</p>
+
+<p>
+<a name="url3" href="javascript:callAction('<tml:action param1="Inline action definition, called by JavaScript" param2="32" param3="33" param4="34" param5="35"> </tml:action>')">Inline action definition, called by JavaScript</a><br/>
+</p>
+
+<p>
+<a name="url4" href="javascript:callAction('<tml:action ref="empty" param1="Action reference, called by JavaScript" param2="42" param3="43" param4="44" param5="45"/>')">Action reference, called by JavaScript</a><br/>
+</p>
+
+<p>
+<tml:button id="button1" clickaction="empty" param1="Action button" param2="52" param3="53" param4="54" param5="55">Action button</tml:button>
+</p>
+<tml:warnings/>
+</body>
+</html>

@@ -1,0 +1,10 @@
+this.onCreate = function(e) {
+	content().setTitle(name);
+}
+
+this.onSave = function(e) {
+	HDBModel.assignContentID(content(), name);
+}
+
+this.preDelete = function(e) {
+}

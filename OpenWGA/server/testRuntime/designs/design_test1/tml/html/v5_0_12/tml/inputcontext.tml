@@ -1,0 +1,21 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests if a changed context on a tml:input influences it's ability to get the right field value from the tml:form context
+	</PRE>
+	
+	<tml:form context="name:home" source="content" id="theform">
+	
+		<tml:portlet name="inputs" ref="::inputcontext_portlet" ajax="true"/>
+			
+	</tml:form>
+	
+	
+	<hr>
+	
+	<tml:warnings/>
+</body>
+</html>

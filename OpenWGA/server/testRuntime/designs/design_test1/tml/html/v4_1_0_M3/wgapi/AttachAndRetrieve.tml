@@ -1,0 +1,64 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests if files that got attached are directly retrievable in the same session
+	</PRE>
+	
+	<hr>
+	
+	<tml:action id="attachAndRetrieve" master="true">
+	
+		var cat = "WGAPI:AttachAndRetrieve";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			
+			var home = context("name:remoteImportBase", false).content();
+			con = home.createChildPage(db().getContentType("artikel"), "attach");
+			
+			var file = wgacore.getConfigFile();			
+			con.attachFile(file);
+			con.save();
+			
+			assertTrue("File is retrievable in getFileNames()", cat, "con.getFileNames().contains('wgaconfig.xml')");
+			assertEquals("File size is correct: " + file.length(), cat, con.getFileSize("wgaconfig.xml"), file.length());
+			
+			var inStream = new java.io.InputStreamReader(con.getFileData("wgaconfig.xml"), "UTF-8");
+			var out = new java.io.StringWriter();
+			Packages.de.innovationgate.utils.WGUtils.inToOut(inStream, out, 2048);
+			inStream.close();
+			out.close();
+			
+			var compareReader = new java.io.InputStreamReader(new java.io.FileInputStream(wgacore.getConfigFile()), "UTF-8");
+			var compare = Packages.de.innovationgate.utils.WGUtils.readString(compareReader);
+			compareReader.close();
+			
+			assertEquals("File content is retrievable", cat, out.toString(), compare);
+			
+		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	
+		
+		
+	7
+	</tml:action>
+	
+	<tml:button id="attachAndRetrieve" clickaction="attachAndRetrieve">Attach and retrieve</tml:button>
+	
+	<tml:warnings/>
+</body>
+</html>

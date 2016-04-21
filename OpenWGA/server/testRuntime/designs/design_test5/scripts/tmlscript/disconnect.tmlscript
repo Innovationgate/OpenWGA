@@ -1,0 +1,2 @@
+WGA.design().unregisterGlobal("ServerScopeObject");
+WGA.design().unregisterGlobal("AppScopeObject");

@@ -1,0 +1,44 @@
+<tml:action id="thataction">
+	setVar("actionRan", true);
+</tml:action>
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests fix of bug #00003789
+	</PRE>
+	
+	<hr>
+	<tml:range var="theurl"><tml:url action="thataction" keepparams="true"/></tml:range>
+	
+	<a href="<tml:item name="theurl"/>" id="click1">Click 1</a>
+	<a href="<tml:item name="theurl"/>" id="click2">Click 2</a>
+	<a href="<tml:item name="theurl"/>" id="click3">Click 3</a>
+	
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			if (clickStep > 0) {
+				assertTrue("Action ran on click " +  clickStep, cat, "actionRan");
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

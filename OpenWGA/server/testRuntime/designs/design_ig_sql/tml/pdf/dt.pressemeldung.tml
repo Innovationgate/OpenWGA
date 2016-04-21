@@ -1,0 +1,55 @@
+<tml:evaluate var="bild">@AttachmentNames</tml:evaluate>
+<!--  Headline -->
+<fo:block
+font-size="18pt"
+font-family="sans-serif" 
+text-align="center"
+padding-top="5pt"
+padding-bottom="20pt"
+span="all"
+>
+<tml:if condition="_Headline=''">
+<tml:then>
+<tml:item name="Titel" encode="XML"/>
+</tml:then>
+<tml:else>
+<tml:item name="_Headline" encode="XML"/>
+</tml:else>
+</tml:if>
+</fo:block>
+<!--  Shortstory -->
+<fo:block
+font-size="10pt" 
+font-weight="bold"
+span="all"
+>
+<tml:element name='plaintext'>
+<tml:body>
+<tml:item name='_ShortStory'/>
+</tml:body>
+</tml:element>
+
+</fo:block>
+
+<!--  Body -->
+<fo:block
+font-size="10pt" 
+font-family="sans-serif" 
+space-after.optimum="15pt"
+background-color="white"
+color="black"
+text-align="justify"
+padding-top="20pt"
+>
+<!--  Grafik -->
+<tml:if condition="@attachments !=0">
+<tml:then>
+<fo:external-graphic
+src="http://<tml:item name="SerPath" context="currentdocument"/><tml:url type="file" file="{item:bild}"/>"
+ width="200px" alignment-adjust="left"/>
+</tml:then>
+</tml:if>
+
+<tml:include ref="rtf2pdf"/>
+
+</fo:block>

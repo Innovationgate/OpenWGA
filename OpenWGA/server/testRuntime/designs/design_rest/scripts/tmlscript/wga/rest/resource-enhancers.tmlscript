@@ -1,0 +1,19 @@
+this.special = function(res, doc) {
+
+	var addFeatures = content().getItemValue("additionalfeatures");
+	if (addFeatures != null && /NFC/.test(addFeatures)) {
+		res.addItem("hasNFC", true);
+	}
+	else {
+		res.addItem("hasNFC", false);
+	}
+	
+	if (addFeatures != null && /Flash/.test(addFeatures)) {
+		res.addItem("hasFlash", true);
+	}
+	else {
+		res.addItem("hasFlash", false);
+	}
+	
+	
+}

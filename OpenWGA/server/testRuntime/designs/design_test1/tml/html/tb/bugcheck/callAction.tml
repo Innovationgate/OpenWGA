@@ -1,0 +1,23 @@
+<html>
+<head>
+  <tml:htmlhead/>
+</head>
+
+<tml:action id="inc">
+	if (!isdefined("count")) {
+		setsessionvar("count", 0);
+	}
+	count = count + 1;
+</tml:action>
+
+<body>
+Count: <tml:script> return count </tml:script><br/>
+
+<tml:button clickaction="inc">Inc</tml:button>
+
+<br/>
+
+<a href="javascript:callAction('<tml:action>if (!isdefined("count")) {setsessionvar("count", 0);}count = count + 1;</tml:action>')"> inc </a>
+
+</body>
+</html>

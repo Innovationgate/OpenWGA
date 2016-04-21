@@ -1,0 +1,53 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests the correct semantics for local WebTML options (as corrected in B00004516)
+	</PRE>
+	
+	<tml:range id="thatcertainrange">
+		<tml:option name="option1">value1</tml:option>
+		<tml:option name="option3">value1</tml:option>
+			
+		<tml:script>
+			<tml:option name="option2">value2</tml:option>
+			<tml:option name="option3">value3</tml:option>
+			
+			var cat = "TML:LocalOptions";
+			try {
+				var lo = tag.getLocalOptions();
+				assertTrue("Option1 is not available, bc. it was defined outside", cat, !lo.containsKey("option1"));
+				assertTrue("Option1 is available, bc. it was defined inside", cat, lo.containsKey("option2"));		
+				assertTrue("Option3 is available, bc. it was re-defined inside", cat, lo.containsKey("option3"));
+				assertEquals("Option3 contains redefined value", cat, lo.get("option3"), "value3");
+			}
+			catch (e) {
+				logException(e);
+				assertTrue("Exception running tests", cat, "false");
+			}
+		</tml:script>
+			
+
+	
+	
+	</tml:range>
+	
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "category";
+		try {
+			// Execute assertions		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

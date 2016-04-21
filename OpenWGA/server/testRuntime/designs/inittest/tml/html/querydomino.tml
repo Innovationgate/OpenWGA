@@ -1,0 +1,13 @@
+<html>
+<body>
+<tml:collection>
+	<tml:query db="nab" type="formula">
+		@text(@documentuniqueid)="<tml:urlparameter name="wgkey"/>"
+	</tml:query>
+	<tml:foreach>
+		<li><tml:item name="firstname"/></li>
+	</tml:foreach>
+</tml:collection>
+<tml:warnings/>
+</body>
+</html>

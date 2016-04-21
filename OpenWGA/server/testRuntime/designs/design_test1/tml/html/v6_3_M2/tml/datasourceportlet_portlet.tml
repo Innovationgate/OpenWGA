@@ -1,0 +1,4 @@
+<tml:script>
+	portletRan = "Yes";
+	portletCx = meta("db", "dbkey");
+</tml:script>

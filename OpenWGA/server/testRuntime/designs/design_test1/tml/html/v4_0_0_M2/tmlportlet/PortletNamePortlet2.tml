@@ -1,0 +1,4 @@
+<tml:script>
+portlet2Ran = true;
+portlet.setitem("pitem2", true);
+</tml:script>

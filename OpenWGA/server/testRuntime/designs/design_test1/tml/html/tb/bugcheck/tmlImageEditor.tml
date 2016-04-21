@@ -1,0 +1,3 @@
+<tml:item name="_img2"/>
+
+<tml:image item="_img2">width="100"</tml:image>

@@ -1,0 +1,8 @@
+function ThatDerivedObject() {
+}
+
+ThatDerivedObject.prototype = Object.create($$.ThatObject.prototype);
+
+ThatDerivedObject.prototype.doAnotherBit = function() {
+	return "Did something very different";
+}

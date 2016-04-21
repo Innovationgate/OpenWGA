@@ -1,0 +1,28 @@
+<de.innovationgate.wga.common.beans.csconfig.v1.CSConfig>
+  <anonymousAccessLevel>0</anonymousAccessLevel>
+  <defaultAccessLevel>0</defaultAccessLevel>
+  <versionCompliance>wga4</versionCompliance>
+  <publisherOptions>
+    <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+      <name>DesignEncoding</name>
+      <value>ISO-8859-1</value>
+    </de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+  </publisherOptions>
+  <encoderMappings/>
+  <elementMappings/>
+  <remoteActions>
+    <de.innovationgate.wga.common.beans.csconfig.v1.RemoteAction>
+      <moduleName>remotetest:assertequals</moduleName>
+      <callers/>
+      <callerLevel>10</callerLevel>
+    </de.innovationgate.wga.common.beans.csconfig.v1.RemoteAction>
+    <de.innovationgate.wga.common.beans.csconfig.v1.RemoteAction>
+      <moduleName>remotetest:asserttrue</moduleName>
+      <callers/>
+      <callerLevel>10</callerLevel>
+    </de.innovationgate.wga.common.beans.csconfig.v1.RemoteAction>
+  </remoteActions>
+  <mediaKeys/>
+  <roles/>
+  <jobDefinitions/>
+</de.innovationgate.wga.common.beans.csconfig.v1.CSConfig>

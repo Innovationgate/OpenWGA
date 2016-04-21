@@ -1,0 +1,47 @@
+<tml:script>return createDate()</tml:script>
+
+<tml:action id="triggerEvent">
+var ev = createEvent("theEvent");
+ev.addParameter("param", "wga");
+portlet.fireEvent(ev);
+</tml:action>
+
+<tml:eventscript onevent="init">
+log.info("Initialisation of p1");
+portlet.setitem("inited", createDate(false));
+portlet.save();
+setvar("inited" + portlet.name, true);
+portlet.setvar("scopedvar", true);
+portlet.setsessionvar("scopedsessionvar", true);
+</tml:eventscript>
+
+<a name="triggerEventAnchor" href="<tml:url action="triggerEvent"/>">Trigger Event</a>
+
+<tml:range pvar="scopedtmlvar">true</tml:range>
+
+<tml:case isdefined="scopedvar">
+	<tml:range psessionvar="scopedsessiontmlvar">true</tml:range>	
+</tml:case>
+
+<tml:script>
+
+		var cat = "ServerSidePortletEvent";
+		try {
+			if (seq == 1) {
+				assertEquals("Portlet p1 set scoped var", cat, this.item("scopedvar"), true);
+			}
+			else if (seq == 2) {
+				assertEquals("Portlet p1 set scoped session var", cat, this.item("scopedsessionvar"), true);
+				assertEquals("Portlet p1 set scoped tml var", cat, this.item("scopedtmlvar"), "true");
+				assertEquals("Portlet p1 set scoped session tml var", cat, this.item("scopedsessiontmlvar"), "true");
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+
+
+</tml:script>
+
+<tml:warnings/>

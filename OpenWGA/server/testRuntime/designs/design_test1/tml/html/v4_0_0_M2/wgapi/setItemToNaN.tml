@@ -1,0 +1,31 @@
+<html>
+<body>
+<HR/>
+<PRE>
+Test for B000040FA - set NaN as item value
+</PRE>
+<BR/>
+
+<tml:script>
+try {
+	this.content().setItemValue("itemA", Number.NaN);
+} catch (e) {
+	assertEquals("WGIllegalArgumentException thrown on setItemValue(NaN)", "wgapi:setItemToNaN", e.javaException.getClass().getName(), "de.innovationgate.webgate.api.WGIllegalArgumentException");	
+}
+
+try {
+	this.content().setItemValue("itemB", 123);
+	asserttrue("No WGIllegalArgumentException thrown on setItemValue(123)", "wgapi:setItemToNaN", true);	
+} catch (e) {
+	asserttrue("No WGIllegalArgumentException thrown on setItemValue(123)", "wgapi:setItemToNaN", false);	
+}
+
+</tml:script>
+
+
+<tml:script>
+	// check warnings
+	asserttrue("No tml:warnings detected", "tmlscript:checklogout", this.tag.getWarnings().isEmpty());
+</tml:script>
+</body>
+</html>

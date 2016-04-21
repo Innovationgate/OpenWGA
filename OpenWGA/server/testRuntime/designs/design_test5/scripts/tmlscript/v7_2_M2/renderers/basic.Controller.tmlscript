@@ -1,0 +1,51 @@
+function Controller() {
+	this.someOtherField = 3;
+	this.util = new $$.ControllerUtil();
+}
+
+Controller.prototype.prepare = function($cx) {
+	WGA.log.info("Running basic.prepare");
+	this.aField = 2;
+	WGA.log.info("aField is " + this.aField);
+	return {
+		$vars: {
+			prepareRan: "yes",	
+			prepareContext: $cx.path,
+			prepareDesignContext: WGA.design().resourceName
+		}
+	};
+}
+
+Controller.prototype.getUtilSomething = function() {
+	return this.util.getSomething();
+}
+
+
+Controller.prototype.doIt = function($cx, namedParam, unnamedParam) {
+	return {
+		$vars: {
+			controllerMethod: namedParam + "-" + unnamedParam
+		}
+	}
+}
+
+Controller.prototype.fetchIt = function($cx) {
+	return "fetchedValue:" + $cx.path;
+}
+
+
+Controller.prototype.fetchItWithParams = function(theParam) {
+	return "fetchedValue:" + theParam;
+}
+
+Controller.prototype.isWGAIsolated = function() {
+	return WGA.isIsolated();
+}
+
+Controller.prototype.isCxIsolated = function($cx) {
+	return  !$cx.isWebEnvironment() && $cx.request == null && $cx.response == null && $cx.httpsession == null;
+}
+
+Controller.prototype.getContentURL = function($cx) {
+	return $cx.context("name:home").contenturl();
+}

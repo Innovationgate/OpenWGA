@@ -1,0 +1,66 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests writing access to native objects via map interface  (#00003113)
+	</PRE>
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			
+			var obj = {
+				existing: "value" 
+			};
+			
+			var testClass = Packages.de.innovationgate.wga.test.v6_3_M1.tmlscript.NativeObjectMap;
+			
+			assertEquals("Existing value on NativeObject - Value", cat, obj.existing, "value");
+			assertEquals("Existing value on NativeObject - Value", cat, testClass.mapSize(obj), 1);
+			
+			testClass.doPut(obj);
+			assertEquals("Put on NativeObject - Value", cat, obj.that, "is the value");
+			assertEquals("Put on NativeObject - Size", cat, testClass.mapSize(obj), 2);
+			
+			testClass.doPutAll(obj);
+			assertEquals("PutAll on NativeObject - Numeric Value", cat, obj.a, 1);
+			assertEquals("PutAll on NativeObject - String Value", cat, obj.b, "String");
+			assertEquals("PutAll on NativeObject - Boolean Value", cat, obj.c, true);
+			assertEquals("PutAll on NativeObject - Date Value", cat, obj.d, WGA.parseDate("01.01.2012", "dd.MM.yyyy"));
+			assertEquals("PutAll on NativeObject - Size", cat, testClass.mapSize(obj), 6);
+			
+			testClass.doRemove(obj);
+			assertEquals("Remove on NativeObject - Value", cat, obj.c, undefined);
+			assertEquals("Remove on NativeObject - Size", cat, testClass.mapSize(obj), 5);
+			
+			testClass.doClear(obj);
+			assertEquals("Clear on NativeObject - Any Value", cat, obj.existing, undefined);
+			assertEquals("Clear on NativeObject - Any Value", cat, obj.that, undefined);
+			assertEquals("Clear on NativeObject - Any Value", cat, obj.a, undefined);
+			assertEquals("Clear on NativeObject - Any Value", cat, obj.b, undefined);
+			assertEquals("Clear on NativeObject - Any Value", cat, obj.c, undefined);
+			assertEquals("Clear on NativeObject - Any Value", cat, obj.d, undefined);
+			assertEquals("Clear on NativeObject - Size", cat, testClass.mapSize(obj), 0);
+			
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<HR>
+This is the listener-portlet:
+<script type="text/javascript">
+
+	function handleEvent(event) {
+		callAction("<tml:action>
+			asserttrue("eventHandled", true);
+		</tml:action>", "<tml:script>return getportlet().getportletkey()</tml:script>");
+	}
+
+	function handleAjaxEvent(event) {
+		callAction("<tml:action>
+			asserttrue("ajaxEventHandled", true);
+		</tml:action>", "<tml:script>return getportlet().getportletkey()</tml:script>");
+	}
+
+
+	WGA.event.register("<tml:script>return getportlet().getportletkey()</tml:script>", "normalEvent", handleEvent);
+	WGA.event.register("<tml:script>return getportlet().getportletkey()</tml:script>", "ajaxEvent", handleAjaxEvent);
+</script>

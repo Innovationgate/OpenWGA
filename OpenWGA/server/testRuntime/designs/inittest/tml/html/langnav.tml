@@ -1,0 +1,5 @@
+<div align="right">
+	<tml:navigator type="languages">
+		<a class="selected"  href="<tml:url context="[this<{LANGUAGE}>]"/>"><tml:meta name="languageTitle"/></a>
+	</tml:navigator>
+</div>

@@ -1,0 +1,1 @@
+WGA.design().registerDbGlobal("HDBModelBeans", Packages.de.innovationgate.wga.common.beans.hdbmodel);

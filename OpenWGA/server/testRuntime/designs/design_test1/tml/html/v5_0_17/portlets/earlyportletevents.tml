@@ -1,0 +1,18 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests an issue (#00001171) where portlet events are triggered for portlets that weren't rendered at the moment the event was fired
+	</PRE>
+	
+	<hr>
+	
+	<tml:portlet name="portletA" ajax="true" ref="::portletA"/>
+	
+	<a id="click1" href="<tml:url type="layout" layout="::earlyportletevents2"/>">Goto Page 2</a>
+	
+	<tml:warnings/>
+</body>
+</html>

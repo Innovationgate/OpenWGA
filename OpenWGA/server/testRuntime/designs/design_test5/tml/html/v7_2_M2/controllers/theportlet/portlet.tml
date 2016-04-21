@@ -1,0 +1,80 @@
+
+<tml:button context="docid:jjar-5xeqb5" id="click1" clickaction="$pc.doNumberOne">Click 1</tml:button>
+<tml:button id="click2" clickaction="$refresh" ajax="false">Click 2</tml:button>
+<tml:button id="click3" clickaction="$refresh" ajax="false">Click 3</tml:button>
+<tml:button id="click4" clickaction="$pc.setLocalState" ajax="true">Click 4</tml:button>
+<tml:button id="click5" clickaction="$refresh" ajax="true">Click 5</tml:button>
+
+<tml:item name="$pc.getSomething" var="someMethod"/>
+<tml:item name="$pc.getUtilSomething" var="someMethodFromUtil"/>
+<tml:item name="$pc.getUtil2Something" var="someMethodFromUtil2"/>
+<tml:item name="$pc.getSomethingWithParams" a-someParam="'someValue'" var="someMethod2"/>
+<tml:item name="$pc.state.theProp" var="someProp"/>
+<tml:item name="$pc.getScopeIds1" var="scopeIds1"/>
+<tml:item name="$pc.getScopeIds2" var="scopeIds2"/>
+
+<tml:portlet name="inner" ref="::innerportlet:portlet"/>
+
+<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		WGA.log.info("Click step " + clickStep  + " AJAX: " + WGA.Call.ajax);
+		
+		try {
+			if (clickStep == 0) {
+				setSessionVar("theIds1", ServerScopeObject.getId() + "/" + AppScopeObject.getId());
+				setSessionVar("theIds2", ServerScopeObject.getId() + "/" + AppScopeObject.getAppId());
+			
+				assertTrue("Controller was created", cat, "javaObject(portlet).getState().fetchController(WGA) != null && javaObject(portlet).getState().fetchController(WGA).getObject() != null");
+				assertEquals("Options from controller were enforced", cat, option("optionFromController"), "optionA");
+				assertEquals("Controller init was called with injected context parameter", cat, item("$pc.state.theContext"), this);
+				assertEquals("Controller method callable as item", cat, someMethod, "something");
+				assertEquals("Method on internally created util object callable as item", cat, someMethodFromUtil, "better than nothing");
+				assertEquals("Method on internally created util2 object callable as item", cat, someMethodFromUtil2, "better than nothing");
+				assertEquals("Controller method callable as item, plus params", cat, someMethod2, "something plus:someValue");
+				assertEquals("Controller property callable as item", cat, someProp, "TheProperty");
+				assertEquals("Controller: WGA is isolated", cat, item("$pc.isWGAIsolated"), true);
+				assertEquals("Controller: Injected context is isolated", cat, item("$pc.isCxIsolated"), true);
+				assertEquals("Injecting managed globals IDs 1", cat, scopeIds1, theIds1);
+				assertEquals("Injecting managed globals: IDs 2", cat, scopeIds2, theIds2);
+				
+				setSessionVar("portletprocessId", portlet.state.processId);
+				setSessionVar("controllerHash", java.lang.System.identityHashCode(portlet.state.fetchController(WGA).object));
+			}
+			else if (clickStep == 1) {
+				assertEquals("Process Id is still the same", cat, portlet.state.processId, portletprocessId);
+				assertEquals("Controller controls portlet mode", cat, portlet.mode, "edit");
+				assertEquals("Controller controls portlet context", cat, this.path, context("docid:jjar-5xeqb5").path);
+				assertEquals("Controller controls custom state changes", cat, item("$pc.state.somethingDifferent"), "yes");
+				assertEquals("Called method/Added option from controller was enforced", cat, option("anotherOptionFromController"), "optionB");
+				assertEquals("Injecting managed globals Stay the same on persistent scopes 1", cat, scopeIds1, theIds1);
+				assertEquals("Injecting managed globals: Stay the same on persistent scopes 2", cat, scopeIds2, theIds2);
+				
+			}
+			else if (clickStep == 2) {
+				assertEquals("This is no AJAX request", cat, WGA.Call.ajax, false);
+				assertEquals("Controller mode is still the same after Non-AJAX", cat, portlet.mode, "edit");
+				assertEquals("Controller custom state change is still the same after Non-AJAX", cat, item("$pc.state.somethingDifferent"), "yes");
+			}
+			else if (clickStep == 3) {
+				assertEquals("AppScopeObject can access WGA.app() although isolated", cat, AppScopeObject.getAppKey(), "test5");
+				assertEquals("SessionScopeObject can access WGA.app() although isolated", cat, SessionScopeObject.getAppKey(), "test5");
+				assertEquals("Portlet Controller can access WGA.app() although isolated", cat, item("$pc.getAppKey"), "test5");
+			}
+			else if (clickStep == 5) {
+				assertEquals("Local controller state stays on server", cat, item("$pc.theLocalState"), "Yes!");
+			}
+		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+</tml:script>

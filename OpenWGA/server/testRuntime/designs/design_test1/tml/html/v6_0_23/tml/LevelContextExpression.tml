@@ -1,0 +1,39 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests general functionality of context expression "level"
+	</PRE>
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "WebTML:ContextExpressions";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			var startContext = context("docid:jjar-5xeqc8");
+			assertEquals("Start context is correct", cat, startContext.STRUCTKEY, "jjar-5xeqc8");
+			
+			var levelContext = startContext.context("level:1");
+			assertEquals("Level expression moved up to level 1", cat, levelContext.STRUCTKEY, "owee-5aegzr");
+			
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

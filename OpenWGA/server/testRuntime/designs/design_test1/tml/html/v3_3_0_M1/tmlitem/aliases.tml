@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+  <tml:htmlhead/>  
+</head>
+<body>
+
+
+<HR/>
+<PRE>
+This test checks the aliases-attribute on tml:item:
+- item display alias if present
+- item display value if alias not found or aliases not present
+</PRE>
+<BR/>
+<HR/>
+<table border="1">
+	<tr>
+		<td>Item without aliases</td>
+		<td>
+			<tml:range var="result1" output="true">
+				<tml:item name="aSelectBox"/>
+			</tml:range>
+		</td>
+	</tr>
+	<tr>
+		<td>Item with correct aliases</td>
+		<td>
+			<tml:range var="result2" output="true">
+				<tml:item name="aSelectBox" aliases="Deutsch | 1, Englisch | 2, Spanisch | 3"/>
+			</tml:range>
+		</td>
+	</tr>
+	<tr>
+		<td>Item with incorrect aliases</td>
+		<td>
+			<tml:range var="result3" output="true">
+				<tml:item name="aSelectBox" aliases="Deutsch | 5, Englisch | 6, Spanisch | 7"/>
+			</tml:range>				
+		</td>
+	</tr>
+	<tr>
+		<td>Item with aliasesitem</td>
+		<td>
+			<tml:range var="result4" output="true">
+				<tml:script>
+				theAliases = createList();
+				theAliases.add("Deutsch | 1");
+				theAliases.add("Englisch | 2");
+				theAliases.add("Spanisch | 3");
+				</tml:script>
+				<tml:item name="aSelectBox" aliasesitem="theAliases"/>
+			</tml:range>
+		</td>
+	</tr>
+</table>
+</body>
+</html>
+
+<tml:script>	
+	var category = "TMLItem:aliases";
+
+	//expected results
+	var expected1 = "1";
+	var expected2 = "Deutsch";
+	var expected3 = "1";
+	
+	assertequals("Item display value if aliases not present", category, javaObject(this.result1).trim(), expected1);
+	assertequals("Item display alias if alias for value present", category, javaObject(this.result2).trim(), expected2);
+	assertequals("Item display value if alias for value not present", category, javaObject(this.result3).trim(), expected3);
+	assertequals("Item display alias if aliases were given by aliasesitem", category, javaObject(this.result2).trim(), expected2);
+</tml:script>

@@ -1,0 +1,95 @@
+<html>
+
+<head><tml:htmlhead/></head>
+<body>
+
+
+<tml:action id="deregisterAll">
+try {
+	log.info("Unregistering all portlets");
+	portlet.unregisterChildPortlets();
+}
+catch (e) {
+	logException(e);
+}
+</tml:action>
+
+<tml:script>
+	if (isdefined("seq")) {
+		seq++;
+	}
+	else {
+		setSessionVar("seq", 1);
+	}
+	log.info("Sequence " + seq + ": " + meta("request", "url"));
+</tml:script>
+
+<table cellpadding="5" border="1">
+
+<tr>
+	<td>
+		<tml:portlet name="p1" ref="::ssportlet1"/>
+	</td>
+	<td>
+		<tml:portlet name="p2" ref="::ssportlet2"/>	
+	</td>
+</tr>
+
+<a name="reload" href="<tml:url action="$refresh"/>">Reload</a>
+
+<tml:script>
+
+		var cat = "ServerSidePortletEvent:" + db().getDbReference();
+		try {
+
+		
+			if (seq == 1) {
+				// Test if the init event ran
+				log.info("Test if the init event ran");
+				assertTrue("Portlet p1 inited", cat, "initedp1");
+				assertTrue("Portlet p2 inited", cat, "initedp2");
+				
+				setSessionVar("p1InitedAt", portlet.getPortletForName("p1").inited);
+				setSessionVar("p2InitedAt", portlet.getPortletForName("p2").inited);
+			}
+			else if (seq == 2) {
+				// Test if portlet was not reinited
+				log.info("Test if portlet was not reinited");
+				assertEquals("Portlet p1 remained registered and init task didn't run again", cat, portlet.getPortletForName("p1").inited, p1InitedAt);
+				assertEquals("Portlet p2 remained registered and init task didn't run again", cat, portlet.getPortletForName("p2").inited, p2InitedAt);
+			}
+			else if (seq == 3) {
+				// Test if portlet event was executed
+				log.info("Test if portlet event was executed");
+				assertEquals("Portlet p2 received and processed event 'theEvent'", cat, portlet.getPortletForName("p2").item("eventParameter"), "wga");
+				assertEquals("Portlet p2 received and processed event 'theEvent' (Test Variable)", cat, portlet.getPortletForName("p2").getVar("theEventRan"), true); 
+			}	
+			else if (seq == 4) {
+				// Test if portlet event is not again executed on reload
+				assertEquals("Event 'theEvent' was only executed once", cat, portlet.getPortletForName("p2").eventCall, 1);
+				assertEquals("Event 'theEvent' was only executed once (Test Variable)", cat, portlet.getPortletForName("p2").getVar("theEventRan"), null);
+			}
+			else if (seq == 5) {
+				// Portlets where resetted and must be inited again
+				log.info("Portlets were resetted and must be inited again");
+				assertTrue("Portlet p1 inited after reset", cat, "initedp1");
+				assertTrue("Portlet p2 inited after reset", cat, "initedp2");
+			}
+			
+				
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+
+
+</tml:script>
+
+<tml:warnings/>
+</table>
+
+<a name="reset" href="<tml:url action="deregisterAll"/>">Reset</a>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+<tml:form id="portletstore" source="portlet">
+Name: <tml:input name="meinName"/><br/>
+Typ: <tml:input name="meinTyp" type="select" changeaction="$store" options="Toll,Mäßig,Mies"/><br/>
+<tml:button clickaction="$store">Speichern</tml:button>
+</tml:form>
+
+Aktueller Typ: <tml:item type="portlet" name="meinTyp"/><br/>
+Aktueller Name: <tml:item type="portlet" name="meinName"/>
+
+<tml:img doc="staumelder" file="karte.gif"/>
+
+<tml:button clickaction="$refresh" ajax="true">Refresh</tml:button>
+
+<tml:portlet name="ancestor" ref="::unregister_very_inner"/>

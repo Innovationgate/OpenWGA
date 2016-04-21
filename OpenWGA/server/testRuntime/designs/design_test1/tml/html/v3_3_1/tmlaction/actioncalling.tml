@@ -1,0 +1,54 @@
+<html>
+<body>
+<tml:action id="webtmlAction">
+callAction("setAVar", "webtmlAction", "done");
+</tml:action>
+
+<tml:action id="webtmlObject">
+return createObject("v3_3_1:object1");
+</tml:action>
+
+<PRE>
+These tests show the way, that WGA calls actions from various sources. It is evaluated, if WGA uses the right databases
+to search for these actions.
+</PRE>
+
+<tml:range context="db:test2/name:home">
+
+<tml:script>
+var cat = "ActionCalling";
+
+try {
+assertEquals("Correct database context for action calling tests", cat, meta("db", "dbkey") , "test2");
+
+callAction("setAVar", "scriptAction", "done");
+assertEquals("Call action directly from script module: Must use design db", cat, scriptAction, "done");  
+
+callAction("webtmlAction");
+assertEquals("Call action from webtml defined action: Must use design db", cat, webtmlAction, "done");
+
+callAction("test3/v3_3_1:actioncalling1");
+assertEquals("Call action from module action: Must use database of module action", cat, moduleAction, "done");
+
+var obj1 = createObject("v3_3_1:object1");
+assertEquals("Create object directly from script module: Must use design db", cat, obj1.getName(), "theObject");
+
+var obj2 = callAction("webtmlObject");
+assertEquals("Create object from webtml defined action: Must use design db", cat, obj2.getName(), "theObject");
+
+var obj3 = createObject("test3/v3_3_1:object2");
+assertEquals("Create object from another object: Must use database of parent object", cat, obj3.getObject3().getName(), "theObject3");
+
+}
+catch (e) {
+	assertEquals("Exception running test: " + e.message, cat, true, false);
+}
+
+assertEquals("No warnings", cat, tag.getWarnings().size(), 0);
+
+</tml:script>
+
+</tml:range>
+
+</body>
+</html>

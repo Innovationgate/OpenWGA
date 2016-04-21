@@ -1,0 +1,18 @@
+<html>
+<body>
+<hr>
+<pre>
+Testing correct results on the count of a languages navigator.
+</pre>
+<hr>
+<h2>Languages-Navigator</h2>
+<tml:navigator id="nav" type="languages" context="db:ig<de>/name:home">
+<tml:foreach type="level">-</tml:foreach><tml:link/><br/>
+</tml:navigator>
+
+<tml:script>
+assertEquals("Correct count of elements in languages navigator", "Navigation", taginfo('nav', 'count'), 1);
+</tml:script>
+<tml:warnings/>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+  <tml:htmlhead/> 
+</head>
+<body>
+<PRE>
+This test checks:
+ - if events are fired by portlets
+ 
+************************ NOTE **********************************
+This test cannot be done by HTMLUnit "clicks" 
+bc. HTMLUnit does not execute the necessary javascript functions
+****************************************************************
+</PRE>
+<tml:script>
+if (isEmptyValue(this.profile.item("portletEventsPortletKey"))) {
+	key=this.portlet.registerPortlet("v4_0_0_M1:tmlscript:portletEventsPortlet", "Titel XY");
+	this.profile.setitem("portletEventsPortletKey", key);
+	this.profile.save();
+}
+if (isEmptyValue(this.profile.item("portletEventsListenerPortletKey"))) {
+	key=this.portlet.registerPortlet("v4_0_0_M1:tmlscript:portletEventsListenerPortlet", "Titel XY");
+	this.profile.setitem("portletEventsListenerPortletKey", key);
+	this.profile.save();
+}
+// preregister asserts
+if (!assertisregisteredorexecuted("eventHandled")) {
+	registerasserttrue("eventHandled", "Event thrown and successfully handled.", "tmlscript");
+}
+if (!assertisregisteredorexecuted("ajaxEventHandled")) {
+	registerasserttrue("ajaxEventHandled", "Ajax event thrown and successfully handled.", "tmlscript");
+}
+</tml:script>
+
+<tml:include type="portlet" key="{this.profile.item('portletEventsPortletKey')}" ajax="true"/>
+<tml:include type="portlet" key="{this.profile.item('portletEventsListenerPortletKey')}" ajax="true"/>
+
+</body>
+</html>

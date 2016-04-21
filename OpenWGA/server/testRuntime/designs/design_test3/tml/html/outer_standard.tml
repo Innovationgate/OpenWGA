@@ -1,0 +1,57 @@
+<html>
+<head>
+	<tml:include ref="html-head"/>
+	<script language="JavaScript">
+	function openHelp()
+	{
+		var help=window.open("<tml:url layout="helplayout" context="docid:helphome"/>", "Help", "top=5,left=5,height=700,width=500,locationbar=no,menubar=no,resizeable=no,status=no,scrollbars=yes");
+		if(help.closed == true) map;
+		else help.focus()
+	}
+	self.name="wga3demo";
+	</script>
+	
+	
+</head>
+
+<body style="background-image:url(<tml:url type="file" doc="background" file="OnlineDemo_BG.jpg"/>);background-repeat:no-repeat">
+
+	<xml>
+		<key><tml:meta name="key"/></key>
+	</xml>
+
+	<table border="0" cellspacing="0" cellpadding="0" width="100%">
+		<tr>
+			<td colspan="3" valign="bottom" class="header">
+			<tml:include ref="header"/>
+			</td>
+		</tr>
+		
+		<tr>
+			<td width="20%" valign="top" class="navigation">
+				<tml:include ref="rootnav"/>
+			</td>
+			<td width="60%" valign="top" class="content">
+				<tml:include ref="pathnav"/>
+				
+				<tml:if hasurlparameter="query">
+					<tml:then>
+						<tml:include ref="searchresult"/>
+					</tml:then>
+					<tml:else>
+						<tml:include ref="langnav"/>
+						<tml:innerlayout/>
+					</tml:else>
+				</tml:if>
+			</td>
+			<td width="20%" valign="top" class="navigation">
+				<tml:include ref="system"/>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3" class="footer"><tml:include ref="footer"/></td>
+		</tr>
+	</table>
+
+</body>
+</html>

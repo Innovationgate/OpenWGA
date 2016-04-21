@@ -1,0 +1,9 @@
+this.imageURL = function(ref) {
+
+	var fileName = content().getPrimaryFileName();
+	if (fileName != null) {
+		var url = WGA.urlBuilder(fileurl(fileName)).build(true);
+		ref.addItem("imageurl", url);
+	}
+
+} 

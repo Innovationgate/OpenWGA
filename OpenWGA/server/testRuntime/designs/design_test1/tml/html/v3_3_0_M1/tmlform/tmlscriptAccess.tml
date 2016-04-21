@@ -1,0 +1,128 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+  <tml:htmlhead/> 
+  
+  <tml:action id="checkTMLScriptAccess">
+  	// check access to tmlform during action
+
+	var category = "TMLForm:tmlscriptAccess";  	
+  	this.asserttrue("TMLForm-Object is accessable", category, "this.tmlform != null");
+  	
+	//test for access tmlform fields
+	this.assertequals("Access to aTextField in action is ok", category, this.tmlform.aTextField, "text from content");
+	this.assertequals("Access to aTextArea in action is ok", category, this.tmlform.aTextArea, "textarea from content");				
+	this.assertequals("Access to aDateField in action is ok", category, this.tmlform.parsedvalue('aDateField'), this.parsedate('01.02.2004', 'dd.MM.yyyy'));
+	this.asserttrue("Access to aNumberField in action is ok", category, "this.tmlform.aNumberField===88");
+	this.assertequals("Access to aSelectBox in action is ok", category, this.tmlform.aSelectBox, "1");
+	this.assertequals("Access to aMultiSelectBox in action is ok", category, this.tmlform.aMultiSelectBox, "C#");
+	this.assertequals("Access to aCheckBox in action is ok", category, this.tmlform.aCheckBox, "2");
+	this.assertequals("Access to aRadioButton in action is ok", category, this.tmlform.aRadioButton, "2");
+	this.asserttrue("Access to aBoolean in action is ok", category, "this.tmlform.aBoolean === false");
+	this.assertequals("Access to aHidden in action is ok", category, this.tmlform.aHidden, "hidden value from content");  	
+  	
+	this.redirectTo(this.meta("request", "absolutewgaurl") + "/static/html/blank.htm");
+  </tml:action>
+</head>
+<body>
+
+
+<HR/>
+<PRE>
+This test checks the:
+ - access tmlform via tmlscript in all modes (persist and none persist) outside and inside an tml:action
+</PRE>
+<BR/>
+<HR/>
+
+<tml:form id="aForm" source="content" 
+          mode="{this.request.getParameter('formmode')}"
+		  persist="{this.request.getParameter('persist')}">
+<table border="1">
+	<tr>
+		<td>A TextField</td>
+		<td><tml:input type="text" name="aTextField"/></td>
+	</tr>
+	<tr>
+		<td>A TextArea</td>
+		<td><tml:input type="textarea" name="aTextArea"/></td>
+	</tr>	
+	<tr>
+		<td>A DateField</td>
+		<td><tml:input type="date" name="aDateField" id="aDate" format="dd.MM.yyyy"/></td>
+	</tr>
+	<tr>
+		<td>A NumberField</td>
+		<td><tml:input type="number" name="aNumberField"/></td>
+	</tr>	
+	<tr>
+		<td>A SelectBox</td>
+		<td><tml:input type="select" name="aSelectBox" 
+			       options="Deutsch | 1, Englisch | 2, Spanisch | 3"/></td>
+	</tr>
+	<tr>
+		<td>A MultiSelectBox</td>
+		<td><tml:input type="select" name="aMultiSelectBox" 
+			       options="Java | java, Perl | perl, C++ | c++, C# | C#, VisualBasic | vb"
+			       multiple="true">size="5"</tml:input></td>
+	</tr>	
+	<tr>
+		<td>A CheckBox</td>
+		<td><tml:input type="checkbox" name="aCheckBox" 
+			       options="Email | 1,  Post | 2"/></td>
+	</tr>
+	<tr>
+		<td>A RadionButton</td>
+		<td><tml:input type="radio" name="aRadioButton" 
+			       options="Yes | 1,  No | 0, Maybe | 2"/></td>
+	</tr>
+	<tr>
+		<td>A Boolean</td>
+		<td><tml:input type="boolean" name="aBoolean" options="yes|true,no|false"/></td>
+	</tr>
+	<tr>
+		<td>A Hidden</td>
+		<td><tml:input type="hidden" name="aHidden" default="secret hidden value"/></td>
+	</tr>	
+	<tr>
+		<td>Action</td>
+		<td><tml:button clickaction="checkTMLScriptAccess" id="checkTMLScriptAccess">check tmlscript-access</tml:button></td>
+	</tr>						
+</table>
+</tml:form>
+
+<HR/>
+</body>
+</html>
+
+<tml:script>	
+	var category = "TMLForm:tmlscriptAccess";
+
+	// check if formmode is set correctly
+	assertequals("Formmode is set correctly", category, this.request.getParameter("formmode"), tmlform.getMode());	
+	
+
+	// check if form-persist is set correctly
+	if (this.request.getParameter('persist').equals("true")) {
+		asserttrue("Form-Persist is set correctly", category, "tmlform.ispersistent()");
+	} else if (this.request.getParameter('persist').equals("false")) {
+		asserttrue("Form-Persist is set correctly", category, "!tmlform.ispersistent()");
+	}
+
+	//test for access tmlform fields
+	this.assertequals("Access to aTextField is ok", category, this.tmlform.aTextField, "text from content");
+	this.assertequals("Access to aTextArea is ok", category, this.tmlform.aTextArea, "textarea from content");				
+	this.assertequals("Access to aDateField is ok", category, this.tmlform.parsedvalue('aDateField'), this.parsedate('01.02.2004', 'dd.MM.yyyy'));
+	this.asserttrue("Access to aNumberField is ok", category, "this.tmlform.aNumberField === 88");
+	this.assertequals("Access to aSelectBox is ok", category, this.tmlform.aSelectBox, "1");
+	this.assertequals("Access to aMultiSelectBox is ok", category, this.tmlform.aMultiSelectBox, "C#");
+	this.assertequals("Access to aCheckBox is ok", category, this.tmlform.aCheckBox, "2");
+	this.assertequals("Access to aRadioButton is ok", category, this.tmlform.aRadioButton, "2");
+	this.asserttrue("Access to aBoolean is ok", category, "this.tmlform.aBoolean === false");
+	this.assertequals("Access to aHidden is ok", category, this.tmlform.aHidden, "hidden value from content");		
+</tml:script>
+
+<tml:script>
+	// check warnings
+	asserttrue("No tml:warnings detected", "Global:CheckTMLWarnings", this.tag.getWarnings().isEmpty());
+</tml:script>

@@ -1,0 +1,282 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests effectivity of the "max" attribute on tml:query in various query forms (because of #00001748)
+	</PRE>
+
+	<h2>HQL</h2>
+	<ul>
+	<tml:collection id="hqlAll">
+		<tml:query type="hql" db="test1_v5">content.status='p'</tml:query>
+		<tml:foreach var="hqlAll" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<ul>
+	<tml:collection id="hqlLimited">
+		<tml:query type="hql" db="test1_v5" max="5">content.status='p'</tml:query>
+		<tml:foreach var="hqlLimited" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+
+	<h2>HQL (all langs)</h2>
+	<ul>
+	<tml:collection id="hqlAlllangsAll">
+		<tml:query type="hql" db="test1_v5" alllanguages="true">content.status='p'</tml:query>
+		<tml:foreach var="hqlAlllangsAll" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<ul>
+	<tml:collection id="hqlAlllangsLimited">
+		<tml:query type="hql" db="test1_v5" max="5" alllanguages="true">content.status='p'</tml:query>
+		<tml:foreach var="hqlAlllangsLimited" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+
+	
+
+	<h2>Lucene</h2>
+	<ul>
+	<tml:collection id="luceneAll">
+		<tml:query type="lucene" db="test1_v5">STATUS:p</tml:query>
+		<tml:foreach var="luceneAll" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<ul>
+	<tml:collection id="luceneLimited">
+		<tml:query type="lucene" db="test1_v5" max="5">STATUS:p</tml:query>
+		<tml:foreach var="luceneLimited" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<h2>SQL</h2>
+	<ul>
+	<tml:collection id="sqlAll">
+		<tml:query type="sql" db="test1_v5">select title from content where status='p'</tml:query>
+		<tml:foreach var="sqlAll" output="true"><li><tml:item name="column1"/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<ul>
+	<tml:collection id="sqlLimited">
+		<tml:query type="sql" db="test1_v5" max="5">select title from content where status='p'</tml:query>
+		<tml:foreach var="sqlLimited" output="true"><li><tml:item name="column1"/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<h2>SQL (Custom)</h2>
+	<ul>
+	<tml:collection id="sqlCustomAll">
+		<tml:query type="sql" db="customjdbc">select * from users</tml:query>
+		<tml:foreach var="sqlCustomAll" output="true"><li><tml:item name="column1"/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<ul>
+	<tml:collection id="sqlCustomLimited">
+		<tml:query type="sql" db="customjdbc" max="1">select * from users</tml:query>
+		<tml:foreach var="sqlCustomLimited" output="true"><li><tml:item name="column1"/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<h2>SQL (Enhanced)</h2>
+	<ul>
+	<tml:collection id="sqlEnhancedAll">
+		<tml:query type="sql" db="enhancedjdbc">select * from users</tml:query>
+		<tml:foreach var="sqlEnhancedAll" output="true"><li><tml:item name="column1"/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<ul>
+	<tml:collection id="sqlEnhancedLimited">
+		<tml:query type="sql" db="enhancedjdbc" max="1">select * from users</tml:query>
+		<tml:foreach var="sqlEnhancedLimited" output="true"><li><tml:item name="column1"/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<h2>Table</h2>
+	<ul>
+	<tml:collection id="tableAll">
+		<tml:query type="table:users" db="enhancedjdbc"/>
+		<tml:foreach var="tableAll" output="true"><li><tml:item name="column1"/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<ul>
+	<tml:collection id="tableLimited">
+		<tml:query type="table:users" db="enhancedjdbc" max="1"/>
+		<tml:foreach var="tableLimited" output="true"><li><tml:item name="column1"/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<h2>Formula</h2>
+	<ul>
+	<tml:collection id="formulaAll">
+		<tml:query type="formula" db="ig">WGStatus="p"</tml:query>
+		<tml:foreach var="formulaAll" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<ul>
+	<tml:collection id="formulaLimited">
+		<tml:query type="formula" db="ig" max="5">WGStatus="p"</tml:query>
+		<tml:foreach var="formulaLimited" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<h2>Fulltext</h2>
+	<ul>
+	<tml:collection id="fulltextAll">
+		<tml:query type="fulltext" db="ig">Webgate</tml:query>
+		<tml:foreach var="fulltextAll" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<ul>
+	<tml:collection id="fulltextLimited">
+		<tml:query type="fulltext" db="ig" max="5">Webgate</tml:query>
+		<tml:foreach var="fulltextLimited" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<h2>Formula (Custom)</h2>
+	<ul>
+	<tml:collection id="formulaCustomAll">
+		<tml:query type="formula" db="crm">DokumentArt="Ansprechpartner"</tml:query>
+		<tml:foreach var="formulaCustomAll" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<ul>
+	<tml:collection id="formulaCustomLimited">
+		<tml:query type="formula" db="crm" max="5">DokumentArt="Ansprechpartner"</tml:query>
+		<tml:foreach var="formulaCustomLimited" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<h2>Fulltext (Custom)</h2>
+	<ul>
+	<tml:collection id="fulltextCustomAll">
+		<tml:query type="fulltext" db="crm">Ansprechpartner</tml:query>
+		<tml:foreach var="fulltextCustomAll" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<ul>
+	<tml:collection id="fulltextCustomLimited">
+		<tml:query type="fulltext" db="crm" max="5">Ansprechpartner</tml:query>
+		<tml:foreach var="fulltextCustomLimited" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<h2>View (Custom)</h2>
+	<ul>
+	<tml:collection id="viewAll">
+		<tml:query type="view" db="crm">Ansprechpartner</tml:query>
+		<tml:foreach var="viewAll" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<ul>
+	<tml:collection id="viewLimited">
+		<tml:query type="view" db="crm" max="5">Ansprechpartner</tml:query>
+		<tml:foreach var="viewLimited" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+
+	<h2>HDBModel</h2>
+	<ul>
+	<tml:collection id="hdbmodelTargetsAll">
+		<tml:query context="db:testhdbmodel/name:projects/children[0]" type="hdbmodel:relationtargets:customer" db="testhdbmodel"/>
+		<tml:foreach var="hdbmodelTargetsAll" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<ul>
+	<tml:collection id="hdbmodelTargetsLimited">
+		<tml:query context="db:testhdbmodel/name:projects/children[0]" type="hdbmodel:relationtargets:customer" db="testhdbmodel" max="5"/>
+		<tml:foreach var="hdbmodelTargetsLimited" output="true"><li><tml:link/></tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "WebTML:Queries";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertEquals("HQL Limited (taginfo)", cat, 	taginfo("hqlLimited", "count"), 5);
+			assertEquals("HQL Limited (foreach count)", cat, itemList("hqlLimited").size(), 5);
+			assertLarger("HQL All Documents > Limited", cat, itemList('hqlAll').size(), itemList('hqlLimited').size());
+
+			assertEquals("HQL All Languages Limited (taginfo)", cat, 	taginfo("hqlAlllangsLimited", "count"), 5);
+			assertEquals("HQL All Languages Limited (fore ach count)", cat, itemList("hqlAlllangsLimited").size(), 5);
+			assertLarger("HQL All Languages All Documents > Limited", cat, itemList('hqlAlllangsAll').size(), itemList('hqlAlllangsLimited').size());
+			
+			assertEquals("Lucene Limited (taginfo)", cat, 	taginfo("luceneLimited", "count"), 5);
+			assertEquals("Lucene Limited (foreach count)", cat, itemList("luceneLimited").size(), 5);
+			assertLarger("Lucene All Documents > Limited", cat, itemList('luceneAll').size(), itemList('luceneLimited').size());
+
+			assertEquals("SQL Limited (taginfo)", cat, 	taginfo("sqlLimited", "count"), 5);
+			assertEquals("SQL Limited (foreach count)", cat, itemList("sqlLimited").size(), 5);
+			assertLarger("SQL All Documents > Limited", cat, itemList('sqlAll').size(), itemList('sqlLimited').size());
+
+			assertEquals("SQL Custom Limited (taginfo)", cat, 	taginfo("sqlCustomLimited", "count"), 1);
+			assertEquals("SQL Custom Limited (foreach count)", cat, itemList("sqlCustomLimited").size(), 1);
+			assertLarger("SQL Custom All Documents > Limited", cat, itemList('sqlCustomAll').size(), itemList('sqlCustomLimited').size());
+
+			assertEquals("SQL Enhanced Limited (taginfo)", cat, 	taginfo("sqlEnhancedLimited", "count"), 1);
+			assertEquals("SQL Enhanced Limited (foreach count)", cat, itemList("sqlEnhancedLimited").size(), 1);
+			assertLarger("SQL Enhanced All Documents > Limited", cat, itemList('sqlEnhancedAll').size(), itemList('sqlEnhancedLimited').size());
+
+			assertEquals("Table Limited (taginfo)", cat, 	taginfo("tableLimited", "count"), 1);
+			assertEquals("Table Limited (foreach count)", cat, itemList("tableLimited").size(), 1);
+			assertLarger("Table All Documents > Limited", cat, itemList('tableAll').size(), itemList('tableLimited').size());
+
+			assertEquals("Formula Limited (taginfo)", cat, 	taginfo("formulaLimited", "count"), 5);
+			assertEquals("Formula Limited (foreach count)", cat, itemList("formulaLimited").size(), 5);
+			assertLarger("Formula All Documents > Limited", cat, itemList('formulaAll').size(), itemList('formulaLimited').size());
+			
+			assertEquals("Fulltext Limited (taginfo)", cat, 	taginfo("fulltextLimited", "count"), 5);
+			assertEquals("Fulltext Limited (foreach count)", cat, itemList("fulltextLimited").size(), 5);
+			assertLarger("Fulltext All Documents > Limited", cat, itemList('fulltextAll').size(), itemList('fulltextLimited').size());
+			
+			assertEquals("Formula Custom Limited (taginfo)", cat, 	taginfo("formulaCustomLimited", "count"), 5);
+			assertEquals("Formula Custom Limited (foreach count)", cat, itemList("formulaCustomLimited").size(), 5);
+			assertLarger("Formula Custom All Documents > Limited", cat, itemList('formulaCustomAll').size(), itemList('formulaCustomLimited').size());
+			
+			assertEquals("Fulltext Custom Limited (taginfo)", cat, 	taginfo("fulltextCustomLimited", "count"), 5);
+			assertEquals("Fulltext Custom Limited (foreach count)", cat, itemList("fulltextCustomLimited").size(), 5);
+			assertLarger("Fulltext Custom All Documents > Limited", cat, itemList('fulltextCustomAll').size(), itemList('fulltextCustomLimited').size());
+			
+			assertEquals("View Limited (taginfo)", cat, 	taginfo("viewLimited", "count"), 5);
+			assertEquals("View Limited (foreach count)", cat, itemList("viewLimited").size(), 5);
+			assertLarger("View All Documents > Limited", cat, itemList('viewAll').size(), itemList('viewLimited').size());
+			
+			assertEquals("HDBModel Targets Limited (taginfo)", cat, taginfo("hdbmodelTargetsLimited", "count"), 5);
+			assertEquals("HDBModel Targets Limited (foreach count)", cat, itemList("hdbmodelTargetsLimited").size(), 5);
+			assertLarger("HDBModel Targets All Documents > Limited", cat, itemList('hdbmodelTargetsAll').size(), itemList('hdbmodelTargetsLimited').size());
+			
+		}
+		catch (e) {
+			logException(e);
+			assertLarger("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

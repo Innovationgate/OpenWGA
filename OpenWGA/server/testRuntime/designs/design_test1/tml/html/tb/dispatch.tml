@@ -1,0 +1,17 @@
+<%@ page import="de.innovationgate.wgpublisher.RenderServletRequest" %>
+<%@ page import="de.innovationgate.wgpublisher.RenderServletResponse" %>
+<%
+
+//RenderServletRequest req = new RenderServletRequest(request, "/test1/html/default/owee-5aegzr.de.4?test=1&t=5&t=6");
+RenderServletResponse res = new RenderServletResponse(response);
+RenderServletRequest req = new RenderServletRequest(request, "/test1/pdf/simplepdf");
+request.getRequestDispatcher("/test1/pdf/simplepdf").include(req, res);
+//request.getRequestDispatcher("/test1/zip/zipdataURL").include(req, res);
+%>
+<H1>Hallo Welt!</h1>
+
+<%
+        java.io.FileOutputStream fout = new java.io.FileOutputStream("d:/jsp.pdf");
+        fout.write(res.getBinaryData());
+        fout.close();
+%>

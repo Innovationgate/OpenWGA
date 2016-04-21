@@ -1,0 +1,16 @@
+<html>
+<body>
+
+<tml:option name="date" expression="parseDate('21.02.1999', 'dd.MM.yyyy')"/>
+<tml:option name="text">atext</tml:option>
+<tml:option name="date" var="datevar" format="dd.MM.yyyy"/>
+
+<tml:script>
+assertEquals("Storing normal text values", "tml:optionExpression", option("text") , "atext");
+assertEquals("Store nonstring value in option", "tml:optionExpression", javaObject(option("date")).getClass(), java.lang.Class.forName("java.util.Date"));
+assertEquals("Retrieving nonstring value with tml:option", "tml:optionExpression", datevar, parseDate('21.02.1999', 'dd.MM.yyyy'));
+</tml:script>
+
+<tml:warnings/>
+</body>
+</html>

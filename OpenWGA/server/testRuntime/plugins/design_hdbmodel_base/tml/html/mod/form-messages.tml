@@ -1,0 +1,10 @@
+<tml:case condition="tmlform.hasMessages()">
+<div id="formmessages">
+<h2>Incoming message, captain....</h2>
+
+<ul>
+<tml:formmessages/>
+</ul>
+
+</div>
+</tml:case>

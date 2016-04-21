@@ -1,0 +1,23 @@
+<tml:action id="theaction">
+
+	function findCookie(name) {
+		for each (c in request.getCookies()) {
+			if (c.name==name) return c.value;
+		}
+		return null;
+	}
+	var clickStep = parseInt(findCookie("clickStep"));
+	var cat = findCookie("testId");
+	assertEquals("Accessing HDBMdel from a page action", cat, HDBModel.EVENT_POST_DELETE, "postDelete");
+	
+	try {
+		WGA.Master.runFunction(function(cat) {
+			assertEquals("Accessing HDBModel from a master function inside a page action", cat, HDBModel.EVENT_POST_DELETE, "postDelete");		
+		}, cat);
+	}
+	catch (e) {
+		logException(e);
+		assertTrue("Exception running tests", cat, "false");
+	}
+
+</tml:action>

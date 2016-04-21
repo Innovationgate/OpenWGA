@@ -1,0 +1,17 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Test fix of #00003134
+	</PRE>
+	
+	<tml:portlet name="theportlet" ref="::clienteventscript_portlet" ajax="true"/>
+	<tml:portlet name="theportlet2" ref="::clienteventscript_portlet2" ajax="true"/>
+	
+	<hr>
+	
+	<tml:warnings/>
+</body>
+</html>

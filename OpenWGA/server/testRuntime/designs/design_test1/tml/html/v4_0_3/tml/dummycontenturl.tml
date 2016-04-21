@@ -1,0 +1,33 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests usage of layout urls, in the background of B000047F6.
+	</PRE>
+	
+	<hr>
+	
+	<tml:url var="curl"/>
+	
+	<tml:script>
+		var cat = "TML";
+		
+		try {
+		
+			var semicolon = curl.indexOf(";jsessionid=");
+			if (semicolon != -1) {
+				curl = curl.substring(0, semicolon);
+			}
+			assertEquals("Content url on dummy content", cat, curl, meta("request", "wgaurl") + "/" + db().getDbReference() + "/html/v4_0_3:tml:dummycontenturl.de.html"); 
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

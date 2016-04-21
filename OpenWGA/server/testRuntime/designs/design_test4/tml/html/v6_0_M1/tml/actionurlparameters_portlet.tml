@@ -1,0 +1,42 @@
+<button id="click3" onclick="WGA.ajax.action({action:'<tml:action ref="theaction" ajax="true"/>', params: { param1: 'button3+clöck' }})">Click3</button>
+	
+	
+<tml:form id="portletactionform">
+	<tml:input name="theinput" default="input"/>
+	<button id="click4" onclick="WGA.ajax.action({action:'<tml:action ref="theformaction" ajax="true"/>', params: { param1: 'button4+clöck' }})">Click4</button>	
+</tml:form>
+
+<tml:script>
+		var cat = "WebTML:Actions";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			if (seq == 2) {
+				assertEquals("Normal Action triggered by JavaScript could read URL parameter", cat, param1, "button1+clöck");
+			}	
+			else if (seq == 3) {
+				assertTrue("Normal form Action sent by with form", cat, "formAvailable");
+				assertEquals("Normal form Action triggered by JavaScript could read URL parameter", cat, param1, "button2+clöck");
+			}
+			else if (seq == 4) {
+				assertEquals("AJAX Action was triggered by AJAX", cat, meta("request", "ajax"), true);
+				assertEquals("AJAX Action triggered by JavaScript could read URL parameter", cat, param1, "button3+clöck");
+			}	
+			else if (seq == 5) {
+				assertEquals("AJAX form Action was triggered by AJAX", cat, meta("request", "ajax"), true);
+				assertTrue("AJAX form Action sent by with form", cat, "formAvailable");
+				assertEquals("AJAX form Action triggered by JavaScript could read URL parameter", cat, param1, "button4+clöck");
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+</tml:script>

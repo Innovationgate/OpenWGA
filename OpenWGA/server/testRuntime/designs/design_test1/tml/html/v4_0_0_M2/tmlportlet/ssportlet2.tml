@@ -1,0 +1,45 @@
+<tml:script>return createDate()</tml:script>
+
+<tml:eventscript onevent="init">
+log.info("Initialisation of p2");
+portlet.setitem("inited", createDate(false));
+portlet.save();
+setvar("inited" + portlet.name, true);
+</tml:eventscript>
+
+<tml:eventscript onevent="theEvent" ajax="false">
+log.info("Event done for portlet " + portlet.name + " with parameter " + portletEvent.getParameter("param"));
+portlet.setitem("eventParameter", portletEvent.getParameter("param"));
+portlet.setVar("theEventRan", true);
+
+if (portlet.hasitem("eventCall")) {
+	portlet.setitem("eventCall", portlet.item("eventCall")++);
+}
+else {
+	portlet.setitem("eventCall", 1);	
+}
+
+portlet.save();
+</tml:eventscript>
+
+<tml:script>
+
+		var cat = "ServerSidePortletEvent";
+		try {
+			if (seq == 1) {
+				assertTrue("p1 scoped var not available in p2", cat, 'item("scopedvar") != true');
+			}
+			else if (seq == 2) {
+				assertTrue("p1 scoped session var not available in p2", cat, 'item("scopedsessionvar") != true');
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+
+
+</tml:script>
+
+
+<tml:warnings/>

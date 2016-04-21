@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WGStraightWorkflowDefinitionBean><name>EventTest</name><admin-reviewers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="java:java.lang.String">ow</admin-reviewers><levels xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="WGStraightWorkflowLevelBean"><name>level1</name><position>0</position><reviewers xsi:type="java:java.lang.String">ow</reviewers><reviewer-count>0</reviewer-count></levels></WGStraightWorkflowDefinitionBean>

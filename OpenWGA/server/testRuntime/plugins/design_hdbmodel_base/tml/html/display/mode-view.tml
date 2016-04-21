@@ -1,0 +1,7 @@
+<tml:siblings context="area:hdb-content" pagesize="10">
+
+	<div class="navdisplay">
+		<tml:include ref="mods:navdisplay"/>
+	</div>
+
+</tml:siblings>

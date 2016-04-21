@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+  <tml:htmlhead/> 
+</head>
+<body>
+<PRE>
+This test checks:
+ - ajax action calling and protlet events without refreshing the calling portlet
+</PRE>
+
+<tml:script>
+	// preregister asserts
+	if (!isDefined("registered")) {
+		registerasserttrue("eventHandled", "Event thrown and successfully handled.", "tmlscript:ajaxActionCalling");
+		setSessionVar("registered", true);
+	}
+</tml:script>
+
+<table border="1">
+<TR>
+<td>
+<tml:include type="portlet" name="portletA" ref="::ajaxActionCallingPortletA" ajax="true"/>
+</td>
+<td>
+<tml:include type="portlet" name="portletB" ref="::ajaxActionCallingPortletB" ajax="true"/>
+</td>
+</TR>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Fix of issue #00004565: Content Type Event can no longer access files on passed on TMLForm
+	</PRE>
+	
+	<hr>
+	
+	
+	<tml:form source="none" id="noteForm" context="db:testhdbmodel" contentclass="note">
+	
+		Note: <tml:input type="text" name="note"/>
+		
+		File: <tml:input type="file" name="file" html_id="theFileInput"/>
+		
+		<tml:button id="click1" clickaction="$mc.uploadFile">Upload file</tml:button>
+		<tml:button id="click2" clickaction="$mc.store">Store form</tml:button>
+	
+	</tml:form>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			// Execute assertions		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

@@ -3213,7 +3213,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
 		        
 		        if (token.endsWith("/*")) {
 		            File libDir = getWGAFile(token.substring(0, token.length() - 2));
-		            if (libDir.exists() && libDir.isDirectory()) {
+		            if (libDir != null && libDir.exists() && libDir.isDirectory()) {
 		                for (File libFile : libDir.listFiles()) {
 		                    if (libFile.getName().endsWith(".jar")) {
 		                        addLibraryFile(jarsList, libFile);

@@ -1,0 +1,83 @@
+<html>
+<head>
+  <tml:htmlhead/>
+</head>
+
+<tml:action async="true" master="true" id="action1">
+		var doc = this.context("docid:owee-5aegzr").getdocument(); 
+		var start = java.lang.System.currentTimeMillis();
+		doc.lock();
+		// do some work
+		Packages.java.lang.Thread.sleep(70000);
+		doc.save();
+</tml:action>
+
+<tml:action async="true" master="true" id="action2">
+		var doc = this.context("docid:owee-5aegzr").getdocument(); 
+		this.log.info("try to obtain lock for 'owee-5aegzr'");
+		doc.lock();
+		this.log.info("doc lock obtained");
+		this.log.info("working on doc");
+		Packages.java.lang.Thread.sleep(10000);
+		this.log.info("working on doc done");
+		// try to save
+		this.log.info("try to save doc");
+		doc.save();
+		this.log.info("doc saved");
+</tml:action>
+
+<tml:action async="true" master="true" id="action3">
+		// lock db
+		this.log.info("begin db lock");
+		this.db().lock();
+		this.log.info("db lock obtained");
+		
+		this.log.info("begin work on db lock");
+		// do some work
+		Packages.java.lang.Thread.sleep(10000);
+		this.log.info("db work done");
+</tml:action>
+
+<tml:action async="true" master="true" id="action4">
+		var doc = this.context("docid:owee-5aegzr").getdocument();
+		this.log.info("log doc");
+		doc.lock();
+		this.log.info("log db");
+		this.db().lock();
+		this.log.info("begin work on doc");
+		// do some work
+		Packages.java.lang.Thread.sleep(5000);
+		this.log.info("saving doc");
+		doc.save();
+		this.log.info("begin work on db");
+		Packages.java.lang.Thread.sleep(5000);
+		this.log.info("work done");
+</tml:action>
+
+<tml:action async="true" master="true" id="action5">
+		this.log.info("log db");
+		this.db().lock();
+		var doc = this.context("docid:owee-5aegzr").getdocument();
+		this.log.info("log doc");
+		doc.lock();
+		this.log.info("unlock db");
+		this.db().unLock();
+		this.log.info("begin work on doc");
+		// do some work
+		Packages.java.lang.Thread.sleep(5000);
+		this.log.info("saving doc");
+		doc.save();
+</tml:action>
+
+
+
+<body>
+<tml:button clickaction="action1" id="action1">lock doc, wait 70s and save</tml:button>
+<tml:button clickaction="action2" id="action2">lock doc, wait 10s and save</tml:button>
+<tml:button clickaction="action3" id="action3">lock db and wait 10s</tml:button>
+<tml:button clickaction="action4" id="action4">lock doc and db, wait 5s, save doc, wait 5s</tml:button>
+<tml:button clickaction="action5" id="action5">lock db, lock doc, unlock db, wait 5s, save doc</tml:button>
+<hr/>
+<tml:warnings/>
+</body>
+</html>

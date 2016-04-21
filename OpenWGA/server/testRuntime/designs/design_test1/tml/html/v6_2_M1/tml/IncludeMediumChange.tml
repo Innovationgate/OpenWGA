@@ -1,0 +1,40 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests the change of medium on an include - for the sake of issue #00002560
+	</PRE>
+	
+	<hr>
+	
+	<tml:include ref="::includemediumchange_changemedium" medium="httplogin"/>
+	
+	<tml:include ref="::includemediumchange_keepmediumroot"/> 
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			assertEquals("Change medium on include", cat, changemedium, "httplogin");
+			assertEquals("Keep main medium on include", cat, keepmediumroot, "html");
+			assertEquals("Keep non-main medium on include", cat, keepmedium, "httplogin");
+			assertEquals("Change medium again on include", cat, changemediumagain, "html");		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

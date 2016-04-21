@@ -1,0 +1,34 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Checks a bugfix for an error on Design.resolve() (#00002872)
+	</PRE>
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			var fc = WGA.design().resolve("overlay:files").getFileContainer();
+			assertEquals("WGA.design().resolve() resolved overlay resource correctly", cat, fc, db().getFileContainer("overlay:files"));
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

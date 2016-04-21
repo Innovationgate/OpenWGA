@@ -1,0 +1,6 @@
+<tml:script>
+
+designchange2 = "done!";
+assertEquals("Context-DB remains " + option("originaldb"), "tml:designdb", db().getDbReference(), option("originaldb"));
+
+</tml:script>

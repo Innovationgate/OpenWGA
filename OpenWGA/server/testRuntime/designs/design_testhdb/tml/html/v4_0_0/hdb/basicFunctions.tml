@@ -1,0 +1,87 @@
+<html>
+<PRE>
+checks basic hdb functions
+
+the following structure is created in the hdb init-script:
+
+StorageA
+	StorageB
+		StorageC
+	StorageD
+StorageE
+	StorageF
+
+</PRE>
+<hr>
+
+<tml:script>
+	// create doc in storageC
+	var storageC = hdb().getStorage("storageA.storageB.storageC");
+	asserttrue("storageC retrieved", "hdb", storageC != null);
+	// create expected listener execution list
+	var shouldExecute = createlist();
+	shouldExecute.add("listenerC.preCreateContent");
+	shouldExecute.add("listenerB.preCreateContent");
+	shouldExecute.add("listenerA.preCreateContent");
+	shouldExecute.add("listenerC.postCreateContent");
+	shouldExecute.add("listenerB.postCreateContent");
+	shouldExecute.add("listenerA.postCreateContent");
+	
+	var contentC = hdb().createContent(storageC, "contentC", shouldExecute);
+	asserttrue("contentC created", "hdb", contentC != null);
+	assertequals("contentC is published", "hdb", contentC.status, "p"); 
+	
+	shouldExecute = createlist();
+	shouldExecute.add("listenerC.preUpdateContent");
+	shouldExecute.add("listenerB.preUpdateContent");
+	shouldExecute.add("listenerA.preUpdateContent");
+	shouldExecute.add("listenerC.postUpdateContent");
+	shouldExecute.add("listenerB.postUpdateContent");
+	shouldExecute.add("listenerA.postUpdateContent");	
+	hdb().updateContent(contentC, shouldExecute);
+	
+	var storageB = hdb().getStorage("storageA.storageB");
+	asserttrue("storageB retrieved", "hdb", storageB != null);
+	shouldExecute = createlist();
+	shouldExecute.add("listenerB.preCreateContent");
+	shouldExecute.add("listenerA.preCreateContent");
+	shouldExecute.add("listenerB.postCreateContent");
+	shouldExecute.add("listenerA.postCreateContent");		
+	var contentB = hdb().createContent(storageB, "contentB", shouldExecute);
+	asserttrue("contentB created", "hdb", contentB != null);
+	assertequals("contentB is published", "hdb", contentB.status, "p");
+	
+	
+	var storageE = hdb().getStorage("storageE");
+	asserttrue("storageE retrieved", "hdb", storageE != null);
+	shouldExecute = createlist();
+	shouldExecute.add("listenerE.preCreateContent");
+	shouldExecute.add("listenerE.postCreateContent");
+	var contentE = hdb().createContent(storageE, "contentE", shouldExecute);
+	asserttrue("contentE created", "hdb", contentE != null);
+	assertequals("contentE is published", "hdb", contentE.status, "p");
+	
+	shouldExecute = createlist();
+	shouldExecute.add("listenerE.preDeleteContent");
+	shouldExecute.add("listenerE.postDeleteContent");
+	hdb().deleteContent(contentE, shouldExecute);
+	
+	shouldExecute = createlist();
+	shouldExecute.add("listenerB.preDeleteContent");
+	shouldExecute.add("listenerB.postDeleteContent");
+	shouldExecute.add("listenerA.postDeleteContent");
+	shouldExecute.add("listenerA.preDeleteContent");
+	hdb().deleteContent(contentB, shouldExecute);
+	
+	shouldExecute = createlist();
+	shouldExecute.add("listenerC.preDeleteContent");
+	shouldExecute.add("listenerC.postDeleteContent");
+	shouldExecute.add("listenerB.preDeleteContent");
+	shouldExecute.add("listenerB.postDeleteContent");
+	shouldExecute.add("listenerA.postDeleteContent");
+	shouldExecute.add("listenerA.preDeleteContent");
+	hdb().deleteContent(contentC, shouldExecute);
+</tml:script>
+
+
+</html>

@@ -1,0 +1,8 @@
+<tml:collection >	
+			<tml:query type="formula" db="names">
+				form="Person"
+			</tml:query>		
+		<tml:foreach pagesize="10">
+				Username=<tml:item name="firstname"/> <tml:item name="lastname"/><br><br>
+		</tml:foreach>	
+</tml:collection>

@@ -1,0 +1,75 @@
+<html>
+<body>
+<pre>
+Correct result paging in hql.
+</pre>
+<hr/>
+<ul>
+	<tml:collection>
+		<tml:query id="query" db="test2" type="hql">1=1 order by content.title asc</tml:query>
+		<tml:foreach pagesize="5" id="search" filllastpage="false">
+			<li><tml:link/> - <tml:meta name="created" format="dd.MM.yyyy HH:mm:ss"/> (<tml:script expression="'doc' + taginfo('search', 'iteration')"/>=<tml:meta name="structkey" output="true" var="{'doc' + taginfo('search', 'iteration')}"/>)</li>
+		</tml:foreach>
+	</tml:collection>
+	</ul>
+	
+	<tml:case haspreviouspage="search"><a name="back" href="<tml:url type="previouspage" sourcetag="search"/>">Rückwärts</a></tml:case>  ---- <tml:case hasnextpage="search"><a name="forward" href="<tml:url type="nextpage" sourcetag="search"/>">Vorwärts</a></tml:case>
+	
+	<p>Seite <tml:taginfo sourcetag="search" name="currentpage"/> von <tml:taginfo sourcetag="search" name="pages"/> Seiten (<tml:taginfo sourcetag="search" name="count"/> Ergebnisse, angezeigt Ergebnis <tml:taginfo sourcetag="search" name="startindex"/> bis <tml:taginfo sourcetag="search" name="endindex"/>)<br/></p>
+	<p>Fullquery: <tml:taginfo sourcetag="query" name="fullquery"/></p>
+	
+	<tml:warnings/>
+
+<tml:script>
+var cat = "Queries:pagingHQL";
+
+// Number of pages for the query on this page
+var queryPages = 4;
+
+// Number of results for the query on this page
+var queryResults = 17;
+
+var beginningPages = createList();
+beginningPages.add("ff8080811a76b7b2011a76bfd0890106");
+beginningPages.add("jjar-5xeqkq");
+beginningPages.add("jjar-5xesg8");
+beginningPages.add("jjar-5xeqc8");
+
+
+// Sequence number
+if (isdefined("seq")) {
+	seq++;
+}
+else {
+	setSessionVar("seq", 1);
+}
+
+// Current values for page and count
+var page = taginfo("search", "currentpage");
+var count = taginfo("search", "count");
+
+// This is the page that should be shown
+var shouldPage = (seq <= queryPages ? seq : queryPages);
+
+// Test correct page and count info
+assertEquals("Correct page", cat, page, shouldPage);
+assertEquals("Correct pages info", cat, taginfo("search", "pages"), queryPages);
+assertEquals("Correct count info", cat, count, queryResults);
+
+// Determine correct start and end index
+var shouldStartIndex = 1 + ((page - 1) * 5);
+var shouldEndIndex = shouldStartIndex + 4;
+if (shouldEndIndex > count) {
+	shouldEndIndex = count;
+}
+
+assertEquals("Correct paging on page "  + page + ": Startindex", cat, taginfo("search", "startindex"), shouldStartIndex);
+assertEquals("Correct paging on page "  + page + ": Endindex", cat, taginfo("search", "endindex"), shouldEndIndex);
+
+assertEquals("Correct beginning document " + beginningPages.get(page-1) + " on page " + page, cat, beginningPages.get(page-1), doc1);
+assertEquals("Previous page link available on page "  + page, cat, taginfo("search", "haspreviouspage"), page > 1);
+assertEquals("Next page link available on page "  + page, cat, taginfo("search", "hasnextpage"), page < queryPages); 
+</tml:script>
+
+</body>
+</html>

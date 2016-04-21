@@ -1,0 +1,11 @@
+if (!this.tmlform.hasfield("field")) {
+	log.warn("No field 'field'");
+	return "No field of name 'field'";
+}
+else if (!this.tmlform.filenames.contains("users.xml")) {
+	log.warn("No file 'users.xml'");
+	return "No file 'users.xml'";
+}
+else {
+	return "ok";
+}

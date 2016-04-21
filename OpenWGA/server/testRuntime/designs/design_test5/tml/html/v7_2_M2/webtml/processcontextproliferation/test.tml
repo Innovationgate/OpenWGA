@@ -1,0 +1,25 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests if certain operations with portlets leads to proliferation of process contextes on the server
+	</PRE>
+	
+	<hr>
+	
+	<button id="click1" onclick="location.reload()">Reload 1</button>
+	<button id="click2" onclick="location.reload()">Reload 2</button>
+	<button id="click3" onclick="location.reload()">Reload 3</button>
+	
+	<tml:script>
+		// Force retrieval of PC
+		portlet.getmode()
+	</tml:script>
+	
+	<tml:portlet name="root" ref="::root:portlet"/>
+	
+	<tml:warnings/>
+</body>
+</html>

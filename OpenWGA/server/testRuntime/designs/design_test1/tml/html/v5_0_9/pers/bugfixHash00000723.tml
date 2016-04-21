@@ -1,0 +1,35 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing bugfix of #00000723 (cannot open domain personalisation other than of "default")
+	</PRE>
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "Personalisation";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			domainPersDB = wgacore.openPersonalisationDB("hsql");			
+			assertTrue("Can retrieve and open personalisation db of domain 'hsql'", cat, "domainPersDB != null && domainPersDB.isSessionOpen()"); 	
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

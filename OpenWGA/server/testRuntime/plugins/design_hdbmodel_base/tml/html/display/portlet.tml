@@ -1,0 +1,35 @@
+<tml:script>
+//runtime.debug();
+if (portlet.context != null) {
+	var model = HDBModel.getModelForContent(content());
+	portlet.setVar("model", model);
+	
+	createModels = createList();
+	if (model instanceof HDBModelBeans.Storage) {
+		var cons = model.getChildContents().iterator();
+		while (cons.hasNext()) {
+			var con = cons.next();
+			createModels.add(con);
+		}
+	}
+}
+</tml:script>
+
+Portletmode: <div id="portletmode"><tml:script expression="portlet.mode"/></div>
+Portlet Context: <div id="portletcontext"><tml:meta name="key"/></div>
+
+<div id="pathnav">
+<a id="pathnav-root" href="<tml:url action="$refresh" portletcontext="none" portletmode="view" ajax="false"/>">ROOT</a> &gt;
+
+<tml:case condition="portlet.context != null">
+	<tml:path divider=" &gt; ">
+		<tml:[mods:navdisplay]/>
+	</tml:path>
+</tml:case>
+</div>
+
+<div id="content">
+<tml:include ref="{'::mode-' + portlet.mode}"/>
+</div>
+
+<tml:warnings autohide="true"/>

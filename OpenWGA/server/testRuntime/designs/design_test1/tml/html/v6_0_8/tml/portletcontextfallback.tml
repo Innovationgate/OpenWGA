@@ -1,0 +1,54 @@
+<tml:action id="testDone">
+WGA.Core.getTestCore().testDone();
+</tml:action>
+
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Test case description
+	</PRE>
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+	
+		try {
+			log.info("Main Page 1 Seq " + clickStep);
+		
+			if (clickStep == 0) {
+				registerAssertEquals("first-p1", "First call: Portlet 1 was loaded in initial mode and with dummy context", cat)	
+				registerAssertEquals("second-p1", "Second call: Portlet 1 was loaded in mode 'doc' and with created doc in context", cat);
+				registerAssertEquals("third-p1", "Third call: Portlet 1 fell back to initial mode with dummy context", cat);
+				registerAssertEquals("first-p2", "First call: Portlet 2 was loaded in initial mode and with dummy context", cat)	
+				registerAssertEquals("second-p2", "Second call: Portlet 2 was loaded in mode 'doc' and with created doc in context", cat);
+				registerAssertEquals("third-p2", "Third call: Portlet 2 fell back to initial mode with dummy context", cat);
+			}
+			
+		}
+		catch (e) {
+			assertTrue("Exception registering assertions", cat, "false");
+		} 
+		
+	</tml:script>
+	
+	
+	<tml:portlet name="portlet1" ajax="true" ref="::portletcontextfallback_portlet1" portletmode="silly"/>
+	
+	<tml:portlet name="portlet2" ajax="true" ref="::portletcontextfallback_portlet2"/>
+	
+	<tml:button clickaction="testDone" id="click4">Test done</tml:button>
+	
+	<tml:warnings/>
+</body>
+</html>

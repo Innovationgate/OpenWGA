@@ -1,0 +1,4 @@
+<h2>Bill</h2>
+
+No.: <tml:input name="nr"/><br>
+Amount: <tml:input name="amount"/>

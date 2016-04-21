@@ -1,0 +1,54 @@
+<tml:element name="fop">
+	<tml:option name="output">pdf</tml:option>
+	<tml:body>
+		<?xml version="1.0" encoding="UTF-8"?>
+		<%--<tml:include ref="entity"/>--%>
+		<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
+
+  <fo:layout-master-set>
+    <!-- layout information -->
+    <fo:simple-page-master master-name="simple"
+                  page-height="29.7cm" 
+                  page-width="21cm"
+                  margin-top="1cm" 
+                  margin-bottom="2cm" 
+                  margin-left="2.5cm" 
+                  margin-right="2.5cm">
+      <fo:region-body margin-top="3cm" margin-bottom="1.5cm"/>
+      <fo:region-before extent="3cm"/>
+      <fo:region-after extent="1.5cm"/>
+    </fo:simple-page-master>
+  </fo:layout-master-set>
+  <!-- end: defines page layout -->
+  <fo:page-sequence master-reference="simple">
+    <fo:flow flow-name="xsl-region-body">
+      <!-- this defines a title -->
+      <fo:block font-size="18pt" 
+            font-family="sans-serif" 
+            line-height="24pt"
+            space-after.optimum="15pt"
+            background-color="blue"
+            color="white"
+            text-align="center"
+            padding-top="3pt">
+        Extensible Markup Language (XML) 1.0
+      </fo:block>
+      <!-- this defines normal text -->
+      <fo:block font-size="12pt" 
+                font-family="sans-serif" 
+                line-height="15pt"
+                space-after.optimum="3pt"
+                text-align="justify">
+        The Extensible Markup Language (XML) is a subset of SGML that is completely described in this document. Its goal is to
+        enable generic SGML to be served, received, and processed on the Web in the way that is now possible with HTML. XML
+        has been designed for ease of implementation and for interoperability with both SGML and HTML.
+      </fo:block>
+      <fo:block>
+      	 <%--<fo:external-graphic src="<tml:script>return filedataurl("tv","lola.jpg");</tml:script>"/>--%>
+      </fo:block>
+      
+    </fo:flow> <!-- closes the flow element-->
+  </fo:page-sequence> <!-- closes the page-sequence -->
+</fo:root>
+	</tml:body>
+</tml:element>

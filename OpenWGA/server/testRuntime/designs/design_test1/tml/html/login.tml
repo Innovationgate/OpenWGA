@@ -1,0 +1,38 @@
+<tml:case hasurlparameter="loginerror">
+	<div style="color:red">login error. Try again.</div>
+</tml:case>
+
+<tml:if condition="!this.isLoggedin">
+	<tml:then>
+		<form style="display:inline" name="login" method="post" action="<tml:meta type="request" name="wgaurl"/>/login">
+			<table width="100%">
+				<tr>
+					<td>User:</td>
+					<td width="100%"><input  class="textinput" type="text" name="username" value="author"/></td>
+				</tr>
+				<tr>
+					<td>Pwd:</td>
+					<td><input class="textinput" type="password" name="password" value="author"/></td>
+				</tr>
+				<tr>
+					<td></td><td><input class="button" type="submit" value="login"/></td>
+				</tr>
+			</table>
+			
+			<input type="hidden" name="domain" value="default"/>
+			<input type="hidden" name="redirect" value="<tml:url/>">
+		</form>
+	</tml:then>
+	<tml:else>
+		You are logged in as<br>
+		<b><tml:meta type="database" name="username"/></b><br>
+		Access level: <tml:meta type="database" name="useraccess"/><br>
+		
+		<input class="button" type="button" value="logout"  onClick="location.href='<tml:url type="logout"/>'"/>
+		<br>
+		<a href="<tml:meta type="request" name="wgaurl"/>/start.jsp?dbKey=<tml:metadata type="database" name="dbkey"/>&domain=default&contentKey=<tml:metadata name="key"/>">
+			Open the WebGate Anywhere Browser Interface ...
+		</a>
+	</tml:else>
+</tml:if>
+

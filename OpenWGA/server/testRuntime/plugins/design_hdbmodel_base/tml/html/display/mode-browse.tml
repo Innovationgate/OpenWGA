@@ -1,0 +1,29 @@
+<div>CONTENTCLASS: <tml:meta name="contentclass"/></div>
+
+<tml:select>
+	<tml:case condition="HDBModel.isStorage(content())">
+	
+		<div id="buttons">
+			<tml:foreach type="itemvalue" item="createmodels" currentvalue="createmodel">
+				<tml:script var="contentclass" expression="createmodel.getContentClass()"/>
+				<tml:button id="[create-{contentclass}]" clickaction="newcontent" param1="{contentclass}" ajax="false">Create <tml:item name="contentclass"/></tml:button>
+			</tml:foreach>
+		</div>
+	
+		<tml:children pagesize="10">
+			<div class="navdisplay">
+				<tml:include ref="mods:navdisplay"/>
+			</div>
+		</tml:children>
+		
+	</tml:case>
+	<tml:caseelse>
+		<tml:include ref="mod:docview"/>
+		
+		<tml:children pagesize="10">
+			<div class="navdisplay">
+				<tml:include ref="mods:navdisplay"/>
+			</div>
+		</tml:children>
+	</tml:caseelse>
+</tml:select>

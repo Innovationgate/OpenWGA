@@ -1,0 +1,38 @@
+<html>
+<body>
+	<PRE>
+	Testing for servlet context attributes that the core event listener deposited.
+	Can test all events, except preShutdown and postShutdown.
+	</PRE>
+	
+	<hr>
+	
+	<tml:script>
+	
+	var cat = "ContentEventListener";
+	var servletContext = wgacore.getServletContext();
+	var flag;
+
+	flag = servletContext.getAttribute("CoreEventListener:startupPreConnect");
+	assertEquals("Event startupPreConnect was executed", cat, flag, true);
+
+	flag = servletContext.getAttribute("CoreEventListener:startupPostConnect");
+	assertEquals("Event startupPostConnect was executed", cat, flag, true);
+	
+	flag = servletContext.getAttribute("CoreEventListener:contentStoreConnected");
+	assertEquals("Event contentStoreConnected was executed", cat, flag, true);
+	
+	wgacore.removeContentDB("designslave");
+    wgacore.updateContentDBs();
+	
+	flag = servletContext.getAttribute("CoreEventListener:contentStoreDisconnected");
+	assertEquals("Event contentStoreDisconnected was executed", cat, flag, "designslave");
+	
+	flag = servletContext.getAttribute("CoreEventListener:javaAssertionsEnabled");
+	assertEquals("Java Assertions are enabled", cat, flag, true);
+	
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

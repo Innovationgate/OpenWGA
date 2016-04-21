@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+  <tml:htmlhead/> 
+</head>
+<body>
+<HR/>
+<PRE>
+This test checks:
+ - hidden field is not displayed in viewmode set on the form
+ - implizit correct setting of formmode is tested
+</PRE>
+
+
+	<tml:form id="displayHidden" source="content" 
+	          mode="{this.request.getParameter('formmode')}"
+	          persist="{this.request.getParameter('persist')}">
+		
+		<tml:range var="hiddenOutput">
+			<tml:input type="hidden" name="aHidden" />
+		</tml:range>
+
+	</tml:form>
+</body>
+</html>
+
+<tml:script>
+	var category = "TMLForm:displayHidden";
+	var mode = this.request.getParameter("formmode");
+	
+	// check if formmode is set correctly
+	assertequals("Formmode is set correctly", category, mode, tmlform.getMode());
+	
+	// check if field is display or not
+	if (mode.equals("edit") || mode.equals("readonly")) {
+		asserttrue("In edit and readonly mode, hidden field should be rendered", category, "!javaObject(hiddenOutput).trim().equals('')");
+	} else if (mode.equals("view")) {
+		assertequals("In viewmode hidden field should not be rendered", category, javaObject(hiddenOutput).trim(), "");
+	}	
+</tml:script>
+
+<tml:script>
+	// check warnings
+	asserttrue("No tml:warnings detected", "Global:CheckTMLWarnings", this.tag.getWarnings().isEmpty());
+</tml:script>

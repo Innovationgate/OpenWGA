@@ -1,0 +1,57 @@
+<html>
+<body>
+	<PRE>
+	Test availability of data from csconfig.xml
+	</PRE>
+	
+	<hr>
+	
+	<tml:range var="encodeLite"><tml:range encode="lite">{b}bold{/b}</tml:range></tml:range>
+	
+	<tml:element name="unittest" var="elementUnittest"/>
+	
+	<tml:script>
+	
+	try {
+		var cat = "SystemFileContainer:csconfig";
+		
+		// Publisher option
+		var poption = db().getAttribute("htmlunittests");
+		assertEquals("Publisher option from csconfig.xml", cat, poption, "true");
+		
+		// Encoder
+		assertEquals("Encoder definition from csconfig.xml", cat, encodeLite, "<b>bold</b>");
+		
+		// Element
+		assertEquals("WebTML Element definition from csconfig.xml", cat, elementUnittest, "htmlunittest");
+		
+		// Media key
+		var mediaKey = wgacore.getMediaKey("unittest");
+		if (mediaKey != null) {
+			assertEquals("Media key definition from csconfig.xml", cat, mediaKey.getMimeType(), "application/unittest");
+		}
+		else {
+			assertTrue("Media key definition from csconfig.xml not imported!", cat, false);
+		}
+		
+		// Task definition
+		wgacore.getScheduler().run(db().getDbReference() + ".thejob", "WGA Unittests", null, null);
+		java.lang.Thread.sleep(3000);
+		assertEquals("Job definition from csconfig.xml", cat, db().getAttribute("thejob"), "ran");
+		
+		// Connection script
+		var connectscript = db().getAttribute("connectscript");
+		assertEquals("Connect script ran", cat, connectscript, true);
+		
+		
+	}
+	catch (e) {
+		logException(e);
+		assertTrue("Exception running tests", cat, false);
+	}
+	
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

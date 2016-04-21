@@ -1,0 +1,244 @@
+<form name="WebForm" action="http://www.innovationgate.de/C1256B28003459E5/pushToDB?OpenAgent"
+method="post" enctype="application/x-www-form-urlencoded" onSubmit="return Validate()">
+<input type="hidden" name="Sprache" value="<tml:item name="Sprache"/>">
+<input type="hidden" name="WGRepID" value="C1256C29:0038F07D">
+<input type="hidden" name="WGDocID" value="<tml:evaluate>@Text(@DocumentUniqueID) </tml:evaluate>">
+<input type="hidden" name="RedirectURL" value="http://www2.innovationgate.de<tml:url context="docid:GBES-5DPE4X.DE.0"/>">
+<input type="hidden" name="RootingKey" value="Webgate5">
+
+<script language="Javascript">
+<!--
+// This function gets data from the client's cookie
+function getCookieData(name)
+{
+ var nameLen = name.length
+ var cLen = document.cookie.length
+ var i = 0
+ var cEnd
+ while (i < cLen)
+ {
+  var j = i + nameLen
+  var k = j + 1
+  if (document.cookie.substring(i,j) == name)
+  {
+   cEnd = document.cookie.indexOf(";",j)
+   if (cEnd == -1)
+   {
+    cEnd = document.cookie.length
+   }
+  return unescape(document.cookie.substring(k,cEnd))
+  }
+  i++
+ }
+return ""
+}
+// This function writes the client's cookie data to the form
+function writeCookieData()
+{
+var Name = getCookieData('Name');
+var PreName = getCookieData('PreName');
+var Company = getCookieData('Company');
+var Function = getCookieData('Function');
+var StreetNR = getCookieData('StreetNR');
+var POBox = getCookieData('POBox');
+var City = getCookieData('City');
+var CompanyPhone = getCookieData('CompanyPhone');
+var Fax = getCookieData('Fax');
+var Email = getCookieData('Email');
+
+document.WebForm.Name.value = (Name==";") ? "" : Name;
+document.WebForm.PreName.value = (PreName==";") ? "" : PreName;
+document.WebForm.Company.value = (Company==";") ? "" : Company;
+document.WebForm.Function.value = (Function==";") ? "" : Function;
+document.WebForm.StreetNR.value = (StreetNR==";") ? "" : StreetNR;
+document.WebForm.POBox.value = (POBox==";") ? "" : POBox;
+document.WebForm.City.value = (City==";") ? "" : City;
+document.WebForm.CompanyPhone.value = (CompanyPhone==";") ? "" : CompanyPhone;
+document.WebForm.Fax.value = (Fax==";") ? "" : Fax;
+document.WebForm.Email.value = (Email==";") ? "" : Email;
+}
+
+// This function adds a cookie to the client's browser
+function setCookie()
+{
+var exp = new Date();
+var oneYearFromNow = exp.getTime() + (365 * 24 * 60 * 60 * 1000);
+exp.setTime(oneYearFromNow);
+document.cookie = "Name=" + escape(document.WebForm.Name.value) + ";" +
+"path=/" + ";" + "expires=" + exp.toGMTString();
+document.cookie = "PreName=" + escape(document.WebForm.PreName.value) + ";" +
+"path=/" + ";" + "expires=" + exp.toGMTString();
+document.cookie = "Company=" + escape(document.WebForm.Company.value) + ";" +
+"path=/" + ";" + "expires=" + exp.toGMTString();
+document.cookie = "Function=" + escape(document.WebForm.Function.value) + ";" +
+"path=/" + ";" + "expires=" + exp.toGMTString();
+document.cookie = "StreetNR=" + escape(document.WebForm.StreetNR.value) + ";" +
+"path=/" + ";" + "expires=" + exp.toGMTString();
+document.cookie = "POBox=" + escape(document.WebForm.POBox.value) + ";" +
+"path=/" + ";" + "expires=" + exp.toGMTString();
+document.cookie = "City=" + escape(document.WebForm.City.value) + ";" +
+"path=/" + ";" + "expires=" + exp.toGMTString();
+document.cookie = "CompanyPhone=" + escape(document.WebForm.CompanyPhone.value)
++ ";" + "path=/" + ";" + "expires=" + exp.toGMTString();
+document.cookie = "Fax=" + escape(document.WebForm.Fax.value) + ";" + "path=/"
++ ";" + "expires=" + exp.toGMTString();
+document.cookie = "Email=" + escape(document.WebForm.Email.value) + ";" +
+"path=/" + ";" + "expires=" + exp.toGMTString();
+}
+//-->
+</Script>
+
+
+<script language="Javascript">
+<!--
+function Validate()
+{
+setCookie();
+if(document.WebForm.Name.value == "")
+{
+alert("Geben Sie bitte Ihren Namen ein!");
+document.WebForm.Name.focus();
+return false;
+}
+
+if(document.WebForm.PreName.value == "")
+{
+alert("Geben Sie bitte Ihren Vornamen ein!");
+document.WebForm.PreName.focus();
+return false;
+}
+
+if(document.WebForm.StreetNR.value == "")
+{
+alert("Geben Sie bitte Strasse und Hausnummer ein!");
+document.WebForm.StreetNR.focus();
+return false;
+}
+
+if(document.WebForm.POBox.value == "")
+{
+alert("Geben Sie bitte die PLZ ein!");
+document.WebForm.POBox.focus();
+return false;
+}
+
+if(document.WebForm.City.value == "")
+{
+alert("Geben Sie bitte den Ort ein!");
+document.WebForm.City.focus();
+return false;
+}
+
+if(document.WebForm.Email.value == "" ||
+document.WebForm.Email.value.indexOf('@') == -1 ||
+document.WebForm.Email.value.length < 6)
+{
+alert("Tragen Sie bitte ihre E-mail-adresse ein!");
+document.WebForm.Email.focus();
+return false;
+}
+return true;
+}
+function Absenden()
+{
+ if (Validate() == true)
+ {
+ document.WebForm.submit();
+ }
+}
+// -->
+</script>
+<div align="center">
+<b>WebGate</b> live sehen. Kein Problem. Geben Sie uns nur die <b>nötigen</b> Infos...<p>&nbsp;<br>
+<table border="0" cellspacing="0" cellpadding="0" width="500">
+<tr><td colspan="4" class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="10"></td></tr>
+<tr>
+<td rowspan="11" class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="14"></td>
+<td width="50%" valign=top class="bgdunkel"><font color=black>Anrede:</font></td><td class="bgdunkel"><select
+name="Anrede" size="1" class="select"><option selected value="Herr">Herr <option
+value="Frau">Frau</select></td>
+<td rowspan="11" class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="14"></td>
+</tr>
+<tr><td class="bgdunkel">Name: *</td><td class="bgdunkel"><input name="Name" type="text" class="field" size="30"></td></tr>
+<tr><td class="bgdunkel">Vorname: *</td><td class="bgdunkel"><input name="PreName" type="text" class="field" size="30"></td></tr>
+<tr><td class="bgdunkel">Firma:</td><td class="bgdunkel"><input name="Company" type="text" class="field" size="30"></td></tr>
+<tr><td class="bgdunkel">Funktion:</td><td class="bgdunkel"><input name="Function" type="text" class="field" size="30"></td></tr>
+<tr><td class="bgdunkel">Straße, Haus-Nr.: *</td><td class="bgdunkel"><input name="StreetNR" type="text" class="field"
+size="30"></td></tr>
+<tr><td class="bgdunkel">PLZ: *</td><td class="bgdunkel"><input name="POBox" type="text" class="field"></td></tr>
+<tr><td class="bgdunkel">Ort: *</td><td class="bgdunkel"><input name="City" type="text" class="field" size="30"></td></tr>
+<tr><td class="bgdunkel">Telefon geschäftlich:</td><td class="bgdunkel"><input name="CompanyPhone" type="text" class="field"
+size="30"></td></tr>
+<tr><td class="bgdunkel">Fax geschäftlich:</td><td class="bgdunkel"><input name="Fax" type="text" class="field"></td></tr>
+<tr>
+<td class="bgdunkel"><font color=black>E-mail: *</font></td><td class="bgdunkel"><input name="Email" type="text" class="field" size="30"></td>
+</tr>
+<tr><td colspan="4" class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="10"></td></tr>
+<tr><td colspan="4"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="25"></td></tr>
+</table>
+
+<table border="0" cellspacing="0" cellpadding="0" width="500">
+<tr>
+<td  valign=top colspan="5">Wir planen ein... *</td>
+</tr>
+<tr><td colspan="5" ><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="5"></td></tr>
+<tr><td colspan="5" class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="10"></td></tr>
+<tr>
+<td class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="14"></td>
+<td class="bgdunkel"><input type=checkbox name="INet" value="Internet">Internet</td>
+<td class="bgdunkel"><input type=checkbox name="INet" value="Intranet">Intranet</td>
+<td class="bgdunkel"><input type=checkbox name="INet" value="Extranet">Extranet</td>
+<td class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="14"></td>
+</tr>
+<tr><td colspan="5" class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="10"></td></tr>
+<tr><td colspan="5"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="25"></td></tr>
+</table>
+
+<table border="0" cellspacing="0" cellpadding="0" width="500">
+<tr>
+<td colspan="8">Wann möchten Sie starten (in Monaten):</td>
+</tr>
+<tr><td colspan="8" ><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="5"></td></tr>
+<tr><td colspan="8" class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="10"></td></tr>
+<tr>
+<td class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="14"></td>
+<td class="bgdunkel"><input type=radio name="EntscheidungInMonaten" value="< 1">< 1</td>
+<td class="bgdunkel"><input type=radio name="EntscheidungInMonaten" value="1 - 3">1 - 3</td>
+<td class="bgdunkel"><input type=radio name="EntscheidungInMonaten" value="4 - 6">4 - 6</td>
+<td class="bgdunkel"><input type=radio name="EntscheidungInMonaten" value="7 - 9">7 - 9</td>
+<td class="bgdunkel"><input type=radio name="EntscheidungInMonaten" value="9 - 12">9 - 12</td>
+<td class="bgdunkel"><input type=radio name="EntscheidungInMonaten" value="> 12">> 12</td>
+<td class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="14"></td>
+</tr>
+<tr><td colspan="8" class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="10"></td></tr>
+<tr><td colspan="8"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="25"></td></tr>
+</table>
+
+<table border="0" cellspacing="0" cellpadding="0" width="500">
+<tr>
+<td colspan="3">Möchten Sie per Email über Neuigkeiten von Innovation Gate informiert werden?</td>
+</tr>
+<tr><td colspan="3" ><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="5"></td></tr>
+<tr><td colspan="3" class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="10"></td></tr>
+<tr>
+<td class="bgdunkel" width="14"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="14"></td>
+<td class="bgdunkel" align="left" width="100%"><input type=checkbox name="Maillist" checked value="J">Ja</td>
+<td class="bgdunkel" width="14"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="14"></td>
+</tr>
+<tr><td colspan="3" class="bgdunkel"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="10"></td></tr>
+<tr><td colspan="3"><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="1" height="25"></td></tr>
+</table>
+
+<table border="0" cellspacing="0" cellpadding="0" width="500">
+<tr>
+<td ><img border=0 src="<tml:url type="file" doc="blank" file="blank.gif"/>"></td>
+<td align="right">
+<input type=button value="Absenden" onClick="Absenden()" class="button">
+ <input type=button value="Zurück" onClick="history.back();" class="button">
+</td>
+</tr>
+</table>
+</div>
+<script language="javascript">
+writeCookieData();
+</script>

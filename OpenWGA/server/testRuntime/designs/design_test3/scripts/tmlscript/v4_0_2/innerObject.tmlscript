@@ -1,0 +1,4 @@
+
+this.theMethod = function() {
+	return "innerObject method called";
+}

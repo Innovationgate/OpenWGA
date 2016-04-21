@@ -1,0 +1,65 @@
+<br>
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<tr>
+<td class="headline">
+<tml:item name="Titel"/></td>
+</tr>
+</table><br>
+
+<p>
+<tml:metadata type="content" name="attachments" var="Att"/>
+
+<div align=center>
+<tml:if hasurlparameter="FEKOLLPage">
+<tml:then>
+<tml:foreach type="itemvalue" item="Att" sortorder="ascending" pagesize="1" id="FEKOLL"><tml:taginfo sourcetag="FEKOLL" name="currentvalue" var="MyName"/>
+<a href="<tml:url/>"><img border=0 src="<tml:url type="file" file="{item:MyName}"/>"></a>
+</tml:foreach>
+
+<br><br>
+<table border=0 width=100%><tr>
+<tml:if haspreviouspage="FEKOLL">
+<tml:then>
+          <td align=left><a class="textlink" href="<tml:url type="previousPage" sourcetag="FEKOLL"/>"><b><<<</b></a></td>
+</tml:then>
+</tml:if>
+ 
+<tml:if hasnextpage="FEKOLL">
+<tml:then>
+        <td align=right><a class="textlink" href="<tml:url type="nextPage" sourcetag="FEKOLL"/>"><b>>>></b></a></td>
+</tml:then>
+</tml:if>
+</tr></table>
+
+</tml:then>
+<tml:else>
+
+<tml:foreach type="itemvalue" item="Att" currentvalue="ATTName" sortorder="ascending" id="FE">
+<a href="<tml:url/>?FEKOLLPage=<tml:taginfo sourcetag="FE" name="iteration"/>"><img border=0 width="100" height="100" src="<tml:url type="file" file="{item:ATTName}"/>"></a> 
+</tml:foreach>
+<br>Insgesamt <tml:taginfo sourcetag="FE" name="count"/> Bilder in dieser Gallery vorhanden
+
+</tml:else>
+</tml:if>
+</div>
+
+</p>
+<br><br>
+<tml:if condition="wgstatus='p'">
+    <table width="100%" border="0">
+    <tr>
+        <td>
+        <tml:case context="siblings[-1]" iscontextvalid="true">
+            &lt;&lt; <tml:link>style="color: black"</tml:link> &lt;&lt;
+        </tml:case>
+        </td>
+
+        <td align="right">
+        <tml:case context="siblings[+1]" iscontextvalid="true">
+            &gt;&gt; <tml:link>style="color: black"</tml:link> &gt;&gt;
+        </tml:case>
+        </td>
+    </tr>
+    </table>
+
+</tml:if>

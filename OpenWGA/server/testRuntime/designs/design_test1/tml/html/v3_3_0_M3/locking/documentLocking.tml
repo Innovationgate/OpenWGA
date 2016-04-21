@@ -1,0 +1,308 @@
+<html>
+<head>
+  <tml:htmlhead/>
+</head>
+
+<tml:action  master="true" async="true" id="a_action_1">
+	var category = "locking:documentLocking(a_action_1)";
+	try {	
+		var docA = this.context("docid:owee-5aegzr").getdocument();
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		docA.lock();
+		assertequals("document A locked successfully", category, true, true);
+		var lockEndTime = java.lang.System.currentTimeMillis();
+		duration = (lockEndTime - lockStartTime);		
+		asserttrue("document A locked within 1s", category, "duration < 1000");	
+	
+		// do some work
+		Packages.java.lang.Thread.sleep(10000);
+	
+		var saveResult = docA.save();
+		assertequals("document A saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+	}	
+</tml:action>
+
+<tml:action async="true" master="true" id="b_action_1">
+	var category = "locking:documentLocking(b_action_1)";
+	try {	
+		var docA = this.context("docid:owee-5aegzr").getdocument();
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		docA.lock();
+		assertequals("document A locked successfully", category, true, true);
+		var lockEndTime = java.lang.System.currentTimeMillis();
+		duration = (lockEndTime - lockStartTime);		
+		asserttrue("b have to wait for a", category, "duration  > 7000");		
+	
+		// do some work
+		Packages.java.lang.Thread.sleep(10000);
+	
+		var saveResult = docA.save();
+		assertequals("document A saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+	}	
+</tml:action>
+
+<tml:action async="true" master="true" id="a_action_2">
+	var category = "locking:documentLocking(a_action_2)";
+	try {	
+		var docA = this.context("docid:owee-5aegzr").getdocument();
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		docA.lock();
+		assertequals("document A locked successfully", category, true, true);
+		var lockEndTime = java.lang.System.currentTimeMillis();
+		duration = (lockEndTime - lockStartTime);	
+		
+		asserttrue("document A locked within 1s", category, "duration < 1000");	
+	
+		// do some work
+		Packages.java.lang.Thread.sleep(70000);
+	
+		var saveResult = docA.save();
+		assertequals("document A saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+	}	
+</tml:action>
+
+<tml:action async="true" master="true" id="b_action_2">
+	var category = "locking:documentLocking(b_action_2)";
+	try {	
+		var docA = this.context("docid:owee-5aegzr").getdocument();
+		docA.lock();
+		asserttrue("timeout-exception thrown", category, "false");
+	} catch (e) {
+		assertequals("timeout-exception thrown", category, e.javaException.getClass().getName(), "de.innovationgate.webgate.api.locking.LockWaitTimeoutException");
+	}	
+</tml:action>
+
+<tml:action async="true" master="true" id="b_action_3">
+	var category = "locking:documentLocking(b_action_3)";
+	try {	
+		var docB = this.context("docid:jjar-5xeqld").getdocument();
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		docB.lock();
+		assertequals("document B locked successfully", category, true, true);
+		var lockEndTime = java.lang.System.currentTimeMillis();
+		duration = (lockEndTime - lockStartTime);
+		asserttrue("document B locked within 1s", category, "duration < 1000");	
+	
+		// do some work
+		Packages.java.lang.Thread.sleep(10000);
+	
+		var saveResult = docB.save();
+		assertequals("document B saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+	}	
+</tml:action>
+
+<tml:action async="true" master="true" id="b_action_4">
+	var category = "locking:documentLocking(b_action_4)";
+	try {	
+		var docA = this.context("docid:owee-5aegzr").getdocument();
+		docA.save()
+		asserttrue("exception thrown - blocked save operation if document is locked", category, "false");
+	} catch (e) {
+		assertequals("exception thrown - blocked save operation if document is locked", category, e.javaException.getClass().getName(), "de.innovationgate.webgate.api.locking.ResourceIsLockedException");
+	}	
+</tml:action>
+
+<tml:action async="true" master="true" id="b_action_5">
+	var category = "locking:documentLocking(b_action_5)";
+	try {	
+		var docB = this.context("docid:jjar-5xeqld").getdocument();
+		var saveResult = docB.save()
+		assertequals("docB saved successfully", category, saveResult, true);
+	} catch (exception) {
+		asserttrue("no exception thrown", category, "false");
+	}	
+</tml:action>
+
+<tml:action async="true" master="true" id="a_action_3">
+	var category = "locking:documentLocking(a_action_3)";
+	try {	
+		var docA = this.context("docid:owee-5aegzr").getdocument();
+	
+		// do some work
+		Packages.java.lang.Thread.sleep(10000);
+	
+		var saveResult = docA.save();
+	} catch (e) {
+		assertequals("exception thrown - doc a is locked", category, e.javaException.getClass().getName(), "de.innovationgate.webgate.api.locking.ResourceIsLockedException");
+	}	
+</tml:action>
+
+<tml:action async="true" master="true" id="b_action_6">
+	var category = "locking:documentLocking(b_action_6)";
+	try {	
+		var docA = this.context("docid:owee-5aegzr").getdocument();
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		docA.lock();
+		assertequals("document A locked successfully", category, true, true);
+		var lockEndTime = java.lang.System.currentTimeMillis();
+		duration = (lockEndTime - lockStartTime);
+		
+		asserttrue("document A locked within 1s", category, "duration < 1000");	
+	
+		// do some work
+		Packages.java.lang.Thread.sleep(20000);
+	
+		var saveResult = docA.save();
+		assertequals("document A saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+	}	
+</tml:action>
+
+
+<body>
+	<tml:button clickaction="a_action_1" id="a_action_1">a_action_1</tml:button>
+	<tml:button clickaction="a_action_2" id="a_action_2">a_action_2</tml:button><br/>	
+	<tml:button clickaction="a_action_3" id="a_action_3">a_action_3</tml:button>
+	<hr/>
+	<tml:button clickaction="b_action_1" id="b_action_1">b_action_1</tml:button>
+	<tml:button clickaction="b_action_2" id="b_action_2">b_action_2</tml:button><br/>	
+	<tml:button clickaction="b_action_3" id="b_action_3">b_action_3</tml:button>
+	<tml:button clickaction="b_action_4" id="b_action_4">b_action_4</tml:button><br/>	
+	<tml:button clickaction="b_action_5" id="b_action_5">b_action_5</tml:button>
+	<tml:button clickaction="b_action_6" id="b_action_6">b_action_6</tml:button>	
+	
+	<hr/>
+	<table border="1">
+	 <th>test</th><th>thread a</th><th>thread b</th><th>actions to call</th><th>wait until next test is started</th>
+	 <tr>
+	  <td>1</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>none</td>			
+	  <td>a_action_1</td>
+  	  <td>20s</td>
+	 </tr>
+	 <tr>
+	  <td>2</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>lock doc 'A'</td></tr>
+	  		<tr><td>have to wait for A</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+			<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_1, wait 1s, b_action_1</td>
+  	  <td>30s</td>
+	 </tr>
+	 <tr>
+	  <td>3</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock doc 'A'</td></tr>
+	  		<tr><td>do work 70s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>lock doc 'A'</td></tr>
+	  		<tr><td>get Timeout waiting for lock</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_2, wait 1s, b_action_2</td>
+  	  <td>80s</td>
+	 </tr>	 
+	 <tr>
+	  <td>4</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>lock doc 'B'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'B'</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_1, wait 1s, b_action_3</td>
+	  <td>20s</td>
+	 </tr>	 	
+	 <tr>
+	  <td>5</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  		<tr><td>get Exception - save denied</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_1, wait 2s, b_action_4</td>
+	  <td>20s</td>
+	 </tr>	  	 
+	 <tr>
+	  <td>6</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>get doc 'B'</td></tr>
+	  		<tr><td>save doc 'B'</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_1, wait 1s, b_action_5</td>
+	  <td>20s</td>
+	 </tr>	  	 
+	 <tr>
+	  <td>7</td>
+	  <td>
+	  	<table>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  		<tr><td>get Exception - save denied</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>lock doc 'A'</td></tr>
+	  		<tr><td>do work 20s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_3, wait 1s, b_action_6</td>
+  	  <td>30s</td>
+	 </tr>		 
+	</table>	
+	
+</body>
+
+
+</html>

@@ -1,0 +1,5 @@
+<div class="title"><tml:meta name="title"/></div>
+
+<p><tml:item name="body" editor="rtf"/></p>
+
+<tml:include ref="News_Artikel"/>

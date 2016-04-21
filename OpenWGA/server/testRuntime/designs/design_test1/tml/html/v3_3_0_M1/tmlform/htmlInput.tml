@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+  <tml:htmlhead/> 
+  <tml:script>
+  	  if (!isdefined("mode")) {		
+		  setsessionvar("mode", this.request.getParameter("formmode"));
+	  }
+	  if (!isdefined("persist")) {
+	  	  setsessionvar("persist", this.request.getParameter("persist"));
+ 	  }
+	  if (!isdefined("htmlinput")) {
+	  	  setsessionvar("htmlinput", this.request.getParameter("htmlinput"));
+	  }
+  </tml:script>
+  
+  
+  <tml:action id="checkHtmlInput">
+		var category = "TMLForm:htmlinput";  
+  		if (this.htmlinput.equals("true")) {
+  		    if (this.mode.equals("edit")) {
+	  			asserttrue("HTML input is present in tmlform", category, "this.tmlform.hasfield('aHtmlInput')");  		
+  				assertequals("HTML input has correct value", category, this.tmlform.aHtmlInput, "posted htmlinput value");
+			} else {
+				// form is accessable
+				asserttrue("TMLForm object is accessable in viewmode", category, "this.tmlform != null");
+				// html input was ignored during post
+	  			asserttrue("HTML input is not present in tmlform", category, "!this.tmlform.hasfield('aHtmlInput')");
+			}
+  		}
+  		else {	
+  			asserttrue("HTML input is not present in tmlform", category, "!this.tmlform.hasfield('aHtmlInput')");  		
+  		}
+  </tml:action>
+</head>
+<body>
+<HR/>
+<PRE>
+This test checks:
+ - htmlinput are ignored from tmlform if htmlinput is false - tmlwarning notice about the disabled htmlinput-flag
+ - htmlinput are accepted is form attribute htmlinput is true
+ - htmlinput have correct values
+ - tmlform is submitted in all formmodes
+ - tmlform is accessable in action in all formmodes
+</PRE>
+
+
+	<tml:form id="htmlinput" source="none" 
+			  mode="{this.mode}" 
+			  persist="{this.persist}" 
+			  htmlinput="{this.htmlinput}">	          
+			<input type="text" name="aHtmlInput"/><BR/>
+	        <tml:button clickaction="checkHtmlInput" id="checkHtmlInput">check htmlInput</tml:button>		
+	</tml:form>
+</body>
+</html>

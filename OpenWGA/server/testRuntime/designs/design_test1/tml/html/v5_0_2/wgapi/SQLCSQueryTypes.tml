@@ -1,0 +1,41 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing availability of the db query types for WGA Content Stores für JDBC (bc. of bug #00000330)
+	</PRE>
+	
+	<hr>
+	
+	<tml:query var="hqlTitle" return="title" type="hql">content.structentry.contenttype.name='standard'</tml:query>
+	<tml:query var="fullhqlTitle" return="title" type="fullhql">select content from Content as content where content.structentry.contenttype.name='standard'</tml:query>
+	<tml:query var="sqlTitle" return="title" type="sql">select {content.*} from {content} where content.status='p'</tml:query>
+		
+	<tml:script>
+		var cat = "WGAPI:Queries:SQL";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertEquals("No warnings occured", cat, tag.getWarnings().size(), 0);
+			assertTrue("HQL query executed", cat, "hqlTitle != null");
+			assertTrue("FullHQL query executed", cat, "fullhqlTitle != null");
+			assertTrue("SQL query executed", cat, "sqlTitle != null");		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

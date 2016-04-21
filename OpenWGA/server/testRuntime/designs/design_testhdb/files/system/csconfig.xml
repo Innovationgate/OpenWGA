@@ -1,0 +1,25 @@
+<de.innovationgate.wga.common.beans.csconfig.v1.CSConfig>
+  <anonymousAccessLevel>-1</anonymousAccessLevel>
+  <defaultAccessLevel>-1</defaultAccessLevel>
+  <versionCompliance>wga4</versionCompliance>
+  <publisherOptions>
+    <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+      <name>DesignEncoding</name>
+      <value>ISO-8859-1</value>
+    </de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+    <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+      <name>DirectAccessDefault</name>
+      <value>true</value>
+    </de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+    <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+      <name>MultiLanguageContent</name>
+      <value>false</value>
+    </de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+  </publisherOptions>
+  <encoderMappings/>
+  <elementMappings/>
+  <remoteActions/>
+  <mediaKeys/>
+  <roles/>
+  <jobDefinitions/>
+</de.innovationgate.wga.common.beans.csconfig.v1.CSConfig>

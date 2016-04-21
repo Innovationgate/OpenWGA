@@ -1,0 +1,18 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+  <tml:htmlhead/> 
+</head>
+<body>
+<PRE>
+Test for FEATURE: F00004292 - portletmode after action calling
+
+- call default action "$refresh" and check if mode is correct
+- call custom action and check if mode is correct
+</PRE>
+
+
+<tml:portlet name="portletmodeTest" ref="::portletmodeF00004292_portlet"/>
+
+</body>
+</html>

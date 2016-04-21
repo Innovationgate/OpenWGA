@@ -1,0 +1,50 @@
+<tml:script>
+		// Force retrieval of PC
+		portlet.getmode()
+</tml:script>
+
+
+<tml:portlet name="child1" ref="::child1:portlet"/>
+
+<tml:portlet name="child2" ref="::child2:portlet"/>
+
+<tml:portlet name="child3" ref="::child3:portlet"/>
+
+<tml:button id="click7" clickaction="$refresh">Refresh after reloads to test PC count</tml:button>
+
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		function getProcessContextRegistration() {
+			return javaObject(this).getEnvironment().getProcessContextRegistration();
+		}
+		
+		
+		try {
+		
+			var reg = getProcessContextRegistration();
+			log.info("Click step " + clickStep);
+			log.info(reg.dump());
+						
+			if (clickStep == 0) {
+				assertEquals("Number of PCs on first request", cat, reg.size(), 4);
+			}
+			if (clickStep == 7) {
+				assertEquals("Number of PCs after 3 reloads and 3 refreshs", cat, reg.size(), 4);	
+			}
+			
+				
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>

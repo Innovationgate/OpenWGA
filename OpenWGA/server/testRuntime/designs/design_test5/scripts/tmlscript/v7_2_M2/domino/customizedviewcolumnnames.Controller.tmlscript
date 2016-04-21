@@ -1,0 +1,17 @@
+function Controller() {
+}
+
+Controller.prototype.ansprechpartner = function() {
+
+	return WGA.dataSource("crm").query(
+		"view",
+		"Ansprechpartner",
+		{
+			options: {
+				columnsOnly: true,
+				column1: "DieFirma",
+				column4: "Strasse"
+			}
+		});
+
+}

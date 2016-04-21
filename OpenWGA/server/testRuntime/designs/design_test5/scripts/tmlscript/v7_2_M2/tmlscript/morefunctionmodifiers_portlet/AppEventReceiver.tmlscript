@@ -1,0 +1,11 @@
+function AppEventReceiver($sessionId) {
+	WGA.log.info("Creating AppEventReceiver " + java.lang.System.identityHashCode(this) + " for session " + $sessionId);
+}
+
+AppEventReceiver.prototype.receiveAppEvent1 = function($event) {
+	this.appEvent1 = $event;
+}.listenToAppEvents("appEvent1");
+
+AppEventReceiver.prototype.receiveAppEvent2 = function($event) {
+	this.appEvent2 = $event;
+}.listenToAppEvents("appEvent2");

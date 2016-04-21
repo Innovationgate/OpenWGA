@@ -1,0 +1,30 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<tml:action id="formProcess">
+log.info(multipartData);
+	asserttrue("multipartData present", "tml:F00004936", multipartData.size() > 0);
+</tml:action>
+
+<body>
+	<PRE>
+	Test case for F00004936: 
+	
+	- renders a standard html form
+	- post multipart data to wga
+	- check if multipart data is available as tmlvar "multipartData"
+	</PRE>
+	
+	<hr>
+
+	<form name="customForm" id="customForm" enctype="multipart/form-data" method="post" 
+	      accept-charset="<tml:script> return request.getCharacterEncoding()</tml:script>"
+	      action="<tml:url action="formProcess"/>">
+		<input type="text" name="aTextField" value="aTextValue"><br>
+		<input type="submit" value="send">
+	</form>	
+	
+	<tml:warnings/>
+</body>
+</html>

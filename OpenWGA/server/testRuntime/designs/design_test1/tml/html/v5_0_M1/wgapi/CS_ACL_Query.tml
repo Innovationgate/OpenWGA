@@ -1,0 +1,72 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<tml:script>
+		
+		var cat = "ACL_CS_Query";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			login('ow', 'Heidi', 'default');
+			
+			var _db = db('logins');
+			var authModule = _db.getAuthenticationModule();
+			var queryable = authModule.isQueryable('queryUsersAndGroups');
+			var results = authModule.query('o','queryUsersAndGroups');
+			
+			assertEquals("Queryable", cat, queryable, true);
+			
+			if(results.size() > 0){
+				for(var i=0; i<results.size();i++){
+	
+					if(results.get(i).isUser()){
+						var currentArea = _db.getArea('logins');
+						var childNodes = currentArea.getChildNodes();
+						for(var j=0;j<childNodes.size();j++){
+							var allContent = childNodes.get(j).getAllContent();
+							for(var k=0;k<allContent.size();k++){
+								var username = allContent.get(k).getItemValue('username');	
+								if(username.equals(results.get(i).getFullQualifiedName())){
+									assertEquals("Query" ,cat ,results.get(i).getFullQualifiedName(), username);
+								}
+							}		
+						}
+					}
+					
+					if(results.get(i).isGroup()){
+						var currentArea = _db.getArea('groups');
+						var childNodes = currentArea.getChildNodes();
+						for(var j=0;j<childNodes.size();j++){
+							var allContent = childNodes.get(j).getAllContent();
+							for(var k=0;k<allContent.size();k++){
+								var groupname = allContent.get(k).getItemValue('groupname');	
+								if(groupname.equals(results.get(i).getFullQualifiedName())){
+									assertEquals("Query" ,cat ,results.get(i).getFullQualifiedName(), groupname);
+								}
+							}		
+						}
+					}
+						
+				}
+			}
+			else assertTrue("Query returns no result", cat, "false");
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+		
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

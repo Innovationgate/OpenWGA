@@ -1,0 +1,20 @@
+<html>
+<body>
+<PRE>
+Tests for setting the preferredLanguage via TMLScript, which was broken in 3.3 b195
+</PRE>
+<hr/>
+<tml:action id="prefLang">
+this.preferredLanguage = tmlparam1;
+assertEquals("Setting preferred language to " + tmlparam1 + " via TMLScript", "TMLScript:preferredLanguage", meta("session", "language"), tmlparam1);
+</tml:action>
+
+<p>Current preferred language: <tml:meta type="session" name="language"/></p>
+
+<tml:navigator type="languages" alllanguages="true" context="docid:jjar-5xeqc8.de.0">
+<a name="lang_<tml:meta name="language"/>" href="<tml:url action="prefLang" param1="{LANGUAGE}"/>">Set Lang to <tml:meta name="language"/></a><br/>
+</tml:navigator>
+<tml:warnings/>
+
+</body>
+</html>

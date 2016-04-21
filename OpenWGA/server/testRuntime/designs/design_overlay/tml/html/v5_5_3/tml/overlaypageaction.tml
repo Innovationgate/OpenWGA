@@ -1,0 +1,5 @@
+<tml:action id="readlabel">
+setsessionvar("thelabel", label("alabel"));
+</tml:action>
+
+<a id="click1" href="<tml:url action="readlabel"/>">Action</a>

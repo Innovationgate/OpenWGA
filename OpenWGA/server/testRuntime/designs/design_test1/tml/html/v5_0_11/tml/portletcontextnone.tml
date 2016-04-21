@@ -1,0 +1,16 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests the portlet context, on occasion of bugfix #00000838.
+	</PRE>
+	
+	<hr>
+	
+	<tml:portlet ref="::portletcontextnone_portlet" name="pcnportlet" ajax="true"/>
+	
+	<tml:warnings/>
+</body>
+</html>

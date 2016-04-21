@@ -1,0 +1,10 @@
+<html>
+	<head><tml:htmlhead/></head>
+	<body>
+		<h2>Login Test Database</h2>
+	
+	
+		<a href="<tml:url type="tml" layout="logins"/>">Edit users</a><br>
+		<a href="<tml:url type="tml" layout="groups"/>">Edit groups</a><br>
+	</body>
+</html>

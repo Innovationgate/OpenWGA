@@ -1,0 +1,51 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests if attachFile() on wgdocument throws expected exception if a file is attached twice
+	</PRE>
+	
+	Sequence: <tml:item name="sequence"/> <br>
+	
+	<tml:button id="click1" clickaction="$refresh">Refresh</tml:button>
+
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			if (clickStep == 0) {
+				try {			
+					context("name:B0000471E").content().attachFile(getwgacore().getConfigFile());
+					assertTrue("No exception thrown on attach of none existing file", "WGAPI - B0000471E", true);
+				} catch (e) {
+					assertTrue("No exception thrown on attach of none existing file", "WGAPI - B0000471E", false);
+					logException(e);
+				}
+			} else if (clickStep == 1) {
+				try {
+					context("name:B0000471E").content().attachFile(getwgacore().getConfigFile());
+					context("name:B0000471E").content().attachFile(getwgacore().getConfigFile());
+					assertTrue("Exception thrown on attach of existing file", "WGAPI - B0000471E", false);
+				} catch (e) {
+					assertTrue("Exception thrown on attach of existing file", "WGAPI - B0000471E", true);
+				}
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+
+	<tml:warnings/>
+</body>
+</html>

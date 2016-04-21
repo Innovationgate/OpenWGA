@@ -1,0 +1,55 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests running custom tasks as job
+	</PRE>
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+		
+			db().removeAttribute("TestTaskRan");
+			db().removeAttribute("TestTaskConfigRan");
+			db().removeAttribute("ScriptTestTaskRan");
+			
+			var jobName = WGA.jobs().runTask(Packages.de.innovationgate.testclasses.TestTask, {db:"test5"});
+			WGA.jobs().waitWhileRunning(jobName, 10000);
+			if (WGA.jobs().isRunning(jobName)) {
+				assertTrue("Job for test task did not finish in time", cat, "false");
+			}
+			
+			jobName = WGA.jobs().runScriptModule(WGA.design().resolve("testtask"), {db:"test5"});
+			WGA.jobs().waitWhileRunning(jobName, 10000);
+			if (WGA.jobs().isRunning(jobName)) {
+				assertTrue("Job for script test task did not finish in time", cat, "false");
+			}
+
+			java.lang.Thread.sleep(10000); // Needed for attribute modifications to leave CPU cache
+			
+			assertTrue("TestTask ran", cat, "db().getAttribute('TestTaskRan')");
+			assertTrue("TestTaskConfig ran", cat, "db().getAttribute('TestTaskConfigRan')");
+			assertTrue("ScriptTestTask ran", cat, "db().getAttribute('ScriptTestTaskRan')");
+			
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

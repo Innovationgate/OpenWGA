@@ -1,0 +1,78 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests preferred option receivers (#00001769)
+	</PRE>
+	
+	<hr>
+	
+	<tml:range id="unpreferred">
+	
+		<tml:range id="unpreferredDirectAncestor">
+		
+			<tml:option name="unpreferredOption">unpreferredValue</tml:option>
+		
+		</tml:range>
+	
+	</tml:range>
+	
+	<tml:include id="preferredInclude" ref="::preferredoptionreceivers_include">
+	
+		<tml:range id="preferredIncludeDirectAncestor">
+		
+			<tml:option name="preferredIncludeOption">preferredIncludeValue</tml:option>
+		
+		</tml:range>
+	
+	</tml:include>
+	
+	<tml:range var="preferredElementOutput" output="true" trim="true">
+		<tml:element id="preferredElement" name="optiontest">
+			
+			<tml:range id="preferredElementDirectAncestor">
+		
+				<tml:option name="preferredElementOption">preferredElementValue</tml:option>
+			
+			</tml:range>		
+			
+		</tml:element>
+	</tml:range>
+	
+	
+	<tml:script>
+		var cat = "WebTML:Options";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertEquals("Unpreferred: Direct ancestor got option", cat, tag.getTagStatusById("unpreferredDirectAncestor").getOption("unpreferredOption"), "unpreferredValue");
+			assertEquals("Unpreferred: Unpreferred indirect ancestor did not get option", cat, tag.getTagStatusById("unpreferred").getOption("unpreferredOption"), null); 		
+			
+			assertEquals("Preferred include: Direct ancestor got option", cat, tag.getTagStatusById("preferredIncludeDirectAncestor").getOption("preferredIncludeOption"), "preferredIncludeValue");
+			assertEquals("Preferred include: Include indirect ancestor did also get option", cat, tag.getTagStatusById("preferredInclude").getOption("preferredIncludeOption"), "preferredIncludeValue");
+			assertEquals("Preferred include: Option was available in included module", cat, preferredIncludeOptionFromIncludedModule, "preferredIncludeValue");
+			assertEquals("Preferred include: Include did not get option from within included module", cat, tag.getTagStatusById("preferredIncludeDirectAncestor").getOption("insideIncludeOption"), null);
+
+			assertEquals("Preferred element: Direct ancestor got option", cat, tag.getTagStatusById("preferredElementDirectAncestor").getOption("preferredElementOption"), "preferredElementValue");
+			assertEquals("Preferred element: Element indirect ancestor did also get option", cat, tag.getTagStatusById("preferredElement").getOption("preferredElementOption"), "preferredElementValue");
+			assertEquals("Preferred include: Option was available in element implementation", cat, preferredElementOutput, "Option:preferredElementValue");
+			
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

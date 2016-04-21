@@ -1,0 +1,42 @@
+<html>
+<head>
+  <tml:htmlhead/>
+</head>
+<body>
+
+<tml:action id="save">
+	// validate
+	if (this.tmlform.field('datum') != null) {
+		// check date
+		var validDatebisExp = /^\d{4,4}.\d{2,2}.\d{2,2}$/;
+		if (!validDatebisExp.test(format (this.tmlform.field('datum'),"yyyy-MM-dd"))) {
+			this.errorMessage = "Bitte tragen Sie im Feld [Besucherdatum bis] das Datum im Format YYYY-MM-DD z.B. (2005-07-01) ein.";
+		}
+	} else {
+		this.errorMessage = "Datum nicht gesetzt.";
+	}	
+	tmlform.storeInContent(context("docid:8a8181b80d3f0c68010d3f2eef9f0007").getcontent());
+</tml:action>
+
+<tml:form id="datum">
+	<tml:input name="datum" type="date" id="dateInput2" format="yyyy-MM-dd"/>	
+	<tml:button clickaction="save">save</tml:button>
+</tml:form>
+
+<HR>
+Message:#
+<tml:script>
+ return this.errorMessage;
+</tml:script>
+#
+
+Datum:#
+<tml:script>
+ return format (this.tmlform.field('datum'),"yyyy-MM-dd");
+</tml:script>
+#
+
+<tml:warnings/>
+
+</body>
+</html>

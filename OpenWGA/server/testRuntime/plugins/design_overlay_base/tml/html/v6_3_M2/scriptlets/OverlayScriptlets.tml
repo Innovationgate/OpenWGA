@@ -1,0 +1,47 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing correct behaviour of scriptlets in overlays (#00002873)
+	</PRE>
+	
+	
+	<tml:range var="urlResolved" trim="true">
+		<tml:range encode="rtf">
+				A file link: {@!thaturl@}
+		</tml:range>
+	</tml:range>
+	
+	<tml:range var="actionResolved" trim="true">
+		<tml:range encode="rtf">
+				An action result: {@!thataction@}
+		</tml:range>
+	</tml:range>
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			assertEquals("Custom scriptlet uses overlay addressation for filelink", cat, urlResolved, "A file link: " + meta("request", "wgaurl") + "/overlaytest/file/overlay/images/header-background.jpg");
+			assertEquals("Custom scriptlet uses overlay addressation for calling action", cat, actionResolved, "An action result: The action!");
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

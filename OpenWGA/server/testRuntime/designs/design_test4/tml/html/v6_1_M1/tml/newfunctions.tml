@@ -1,0 +1,196 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Test case description
+	</PRE>
+	
+	<hr>
+	
+	<tml:query id="regularquery" type="hql">content.author = 'ow'</tml:query>
+	
+	<tml:script>
+		var cat = "TMLScript:WGA";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			var startDate = WGA.parseDate("31.12.2012", "dd.MM.yyyy");
+			var endDate = WGA.parseDate("31.01.2013", "dd.MM.yyyy");
+			var modDate = WGA.modifyDate(startDate, "M", 1);
+			assertEquals("WGA.modifyDate() added one month", cat, modDate, endDate);
+			
+			dataBase= WGA.database();
+			assertTrue("WGA.database() returned database object", cat, "dataBase != null");
+			assertEquals("WGA.database() returned object of database 'test4'", cat, dataBase.dbKey, "test4");
+			
+			dataBase_dbkey= WGA.database("test4");
+			assertTrue("WGA.database(dbkey) returned database object", cat, "dataBase_dbkey != null");
+			assertEquals("WGA.database(dbkey) returned object of database 'test4'", cat, dataBase_dbkey.dbKey, "test4");
+			
+			var ct= content();
+			dataBase_context= WGA.database(context(ct));
+			assertTrue("WGA.database(context) returned database object", cat, "dataBase_context != null");
+			assertEquals("WGA.database(context) returned object of database 'test4'", cat, dataBase_context.dbKey, "test4");
+			
+			dataBase_WGAPIdb= WGA.database(WGA.db("test4"));
+			assertTrue("WGA.database(WGAPI-Object WGDatabase) returned database object", cat, "dataBase_WGAPIdb != null");
+			assertEquals("WGA.database(WGAPI-Object WGDatabase) returned object of database 'test4'", cat, dataBase_WGAPIdb.dbKey, "test4");
+			
+			qObject= WGA.database().query("hql", "content.author = 'ow'");
+			assertTrue("WGA.database().query(queryType, query) returned query result object", cat, "qObject != null");
+			assertEquals("WGA.database().query(queryType, query).firstResultContent.getStructKey() returned struct key of first result", cat, qObject.firstResultContent.getStructKey(), "owee-5aegzr");
+			
+			qObjNum= qObject.set.results();
+			var m= new java.util.HashMap();
+			assertEquals("WGA.database().query(queryType, query).set.results() returned number of results", cat, qObjNum, taginfo("regularquery", "count"));
+			assertEquals("WGA.database().query(queryType, query).fullQuery returned full query", cat, qObject.fullQuery, 
+						"select new de.innovationgate.webgate.api.WGContentQueryResult(content.structentry.key, content.language.name, content.version, parent.key, area.name) from Content as content left outer join content.structentry.parententry as parent left outer join content.structentry.area as area where content.visible=1 and (content.validfrom is null OR content.validfrom <= current_timestamp()) and (content.validto is null OR content.validto >= current_timestamp()) and :wgaparamRole not in elements(content.ishiddenfrom) and content.status = 'p' and content.language.name = :wgaparamLanguage and (content.author = 'ow') ");
+			assertEquals("WGA.database().query(queryType, query).servedFromCache returned query served from WGAPI query cache as false", cat, qObject.servedFromCache, false);
+			assertEquals("WGA.database().query(queryType, query).outputParams returned all output parameters of query", cat, qObject.outputParams, m);
+			
+			qObject2= WGA.database().query("hql", "content.author = 'ow'", {max: 1});
+			qObjNum2= qObject2.set.results();
+			assertEquals("WGA.database().query(queryType, query, [attributes]).set.results() returned number of results having attribute 'max'", cat, qObjNum2, 1);
+
+			// The result count of this query is dependent on some earlier tests, which created docs for this author. May be different count when called without previous tests			
+			qObject3= WGA.database().query("hql", "content.author = :name", {} , {name: "ow"});
+			assertEquals("WGA.database().query(queryType, query, [queryParams]).firstResultContent.getStructKey() returned struct key of first result", cat, qObject3.firstResultContent.getStructKey(), "owee-5aegzr");
+			assertEquals("WGA.database().query(queryType, query, [queryParams]) correct size", cat, qObject3.size, 4);
+			
+			var page = qObject3.getPage(1, 10);
+			assertEquals("CollectionPage of WGA.database().query(queryType, query, [queryParams]).firstResultContent.getStructKey() returns start index", cat, page.startIndex, 1);
+			assertEquals("CollectionPage of WGA.database().query(queryType, query, [queryParams]).firstResultContent.getStructKey() returns end index", cat, page.endIndex, 4);
+			
+			app= WGA.app();
+			assertTrue("WGA.app() returned app object", cat, "app != null");
+			assertEquals("WGA.app() returned object of database 'test4'", cat, app.dbKey, "test4");
+			
+			app_dbkey= WGA.app("test4");
+			assertTrue("WGA.app(dbkey) returned app object", cat, "app_dbkey != null");
+			assertEquals("WGA.app(dbkey) returned object of database 'test4'", cat, app_dbkey.dbKey, "test4");
+			
+			app_context= WGA.app(context(ct));
+			assertTrue("WGA.app(context) returned app object", cat, "app_context != null");
+			assertEquals("WGA.app(context) returned object of database 'test4'", cat, app_context.dbKey, "test4");
+			
+			app_WGAPIdb= WGA.app(WGA.db("test4"));
+			assertTrue("WGA.app(WGAPI-Object WGDatabase) returned app object", cat, "app_WGAPIdb != null");
+			assertEquals("WGA.app(WGAPI-Object WGDatabase) returned object of database 'test4'", cat, app_WGAPIdb.dbKey, "test4");
+			
+			domain= WGA.domain("default");
+			assertTrue("WGA.domain(name) returned domain object", cat, "domain != null");
+			
+			reqURL= WGA.requestURL;
+			str= String(reqURL);
+			subindex= str.lastIndexOf(";jsessionid");
+			if (subindex != -1) {
+				str= str.substring(0, subindex);
+			}
+			assertTrue("WGA.requestURL returned request URL string", cat, "reqURL != null");
+			assertEquals("WGA.requestURL returned request URL of current WebTML request", cat, str, '<tml:metadata type="request" name="absolutewgaurl"/>' + '/test4/html/v6_1_m1:tml:newfunctions.de.html');
+			
+			sessbef= db().sessionContext.created;
+			WGA.reopenSessions();
+			sessafter= db().sessionContext.created;
+			assertNotEquals("WGA.reopenSessions() returned session having different dates of creation", cat, sessbef, sessafter);
+			
+			reqInfo= WGA.accessLogging();
+			table= WGA.createLookupTable();
+			assertTrue("WGA.accessLogging() returned request information object", cat, "reqInfo != null");
+			assertEquals("WGA.accessLogging().loggingEnabled returned true", cat, reqInfo.loggingEnabled, true);
+			assertEquals("WGA.accessLogging().attributes returned empty lookup table", cat, reqInfo.attributes, table);
+			
+			lucObject= WGA.lucene();
+			assertTrue("WGA.lucene() returned lucene object", cat, "lucObject != null");
+			
+			fieldIndex= lucObject.getFieldIndexType("Test1");
+			assertNotEquals("WGA.lucene().getFieldIndexType(name) returned index rule", cat, fieldIndex, null);
+			assertEquals("WGA.lucene().getFieldIndexType(name).boost returned index boost", cat, fieldIndex.boost, 5);
+			assertEquals("WGA.lucene().getFieldIndexType(name).contentType returned content type", cat, fieldIndex.contentType, "htmlxml");
+			assertEquals("WGA.lucene().getFieldIndexType(name).defaultRule returned index type different from default rule", cat, fieldIndex.defaultRule, false);
+			assertEquals("WGA.lucene().getFieldIndexType(name).indexType returned field index type", cat, fieldIndex.indexType, "keyword");
+			assertEquals("WGA.lucene().getFieldIndexType(name).pattern returned field name matching pattern", cat, fieldIndex.pattern, "Te*");
+			assertEquals("WGA.lucene().getFieldIndexType(name).sortable returned property sortable as true", cat, fieldIndex.sortable, true);
+			assertEquals("WGA.lucene().getFieldIndexType(name).wildcardPattern returned pattern rule containing a wildcard", cat, fieldIndex.wildcardPattern, true);
+			
+			fileIndex= lucObject.getFileIndexType("Test2.tst");
+			assertNotEquals("WGA.lucene().getFileIndexType(name) returned index rule", cat, fileIndex , null);
+			assertEquals("WGA.lucene().getFileIndexType(name).boost returned index boost", cat, fileIndex.boost , 3);
+			assertEquals("WGA.lucene().getFileIndexType(name).defaultRule returned index type different from default rule", cat, fileIndex.defaultRule , false);
+			assertEquals("WGA.lucene().getFileIndexType(name).includedInAllContent returned searchability in field-unspecific searches", cat, fileIndex.includedInAllContent , true);
+			assertEquals("WGA.lucene().getFileIndexType(name).pattern returned field name matching pattern", cat, fileIndex.pattern , "*.tst");
+			assertEquals("WGA.lucene().getFileIndexType(name).wildcardPattern returned pattern rule containing a wildcard", cat, fileIndex.wildcardPattern , true);
+			
+			//default rule
+			fieldIndexDef= lucObject.getFieldIndexType("randomname");
+			assertEquals("WGA.lucene().getFieldIndexType(name).boost returned index boost", cat, fieldIndexDef.boost, 1);
+			assertEquals("WGA.lucene().getFieldIndexType(name).contentType returned content type", cat, fieldIndexDef.contentType, "plaintext");
+			assertEquals("WGA.lucene().getFieldIndexType(name).defaultRule returned default rule as index type", cat, fieldIndexDef.defaultRule, true);
+			assertEquals("WGA.lucene().getFieldIndexType(name).indexType returned field index type", cat, fieldIndexDef.indexType, "fulltext");
+			assertEquals("WGA.lucene().getFieldIndexType(name).pattern returned field name matching pattern", cat, fieldIndexDef.pattern, "*");
+			assertEquals("WGA.lucene().getFieldIndexType(name).sortable returned property sortable as false", cat, fieldIndexDef.sortable, false);
+			assertEquals("WGA.lucene().getFieldIndexType(name).wildcardPattern returned pattern rule containing a wildcard", cat, fieldIndexDef.wildcardPattern, true);
+			
+			//default rule
+			fileIndexDef= lucObject.getFileIndexType("randomname2");
+			assertEquals("WGA.lucene().getFileIndexType(name).boost returned index boost", cat, fileIndexDef.boost , 1);
+			assertEquals("WGA.lucene().getFileIndexType(name).defaultRule returned default rule as index type", cat, fileIndexDef.defaultRule , true);
+			assertEquals("WGA.lucene().getFileIndexType(name).includedInAllContent returned false for searchability in field-unspecific searches", cat, fileIndexDef.includedInAllContent , false);
+			assertEquals("WGA.lucene().getFileIndexType(name).pattern returned field name matching pattern", cat, fileIndexDef.pattern , "*");
+			assertEquals("WGA.lucene().getFileIndexType(name).wildcardPattern returned pattern rule containing a wildcard", cat, fileIndexDef.wildcardPattern , true);
+			
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:script context="db:enhancedjdbc">
+		var cat = "TMLScript:WGA";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		try {
+			
+			dataSource= WGA.dataSource();
+			assertTrue("WGA.dataSource() returned datasource object", cat, "dataSource != null");
+			assertEquals("WGA.dataSource() returned object of database 'enhancedjdbc'", cat, dataSource.dbKey, "enhancedjdbc");
+			
+			dataSource_dbkey= WGA.dataSource("enhancedjdbc");
+			assertTrue("WGA.dataSource(dbkey) returned datasource object", cat, "dataSource_dbkey != null");
+			assertEquals("WGA.dataSource(dbkey) returned object of database 'enhancedjdbc'", cat, dataSource_dbkey.dbKey, "enhancedjdbc");
+			
+			var ct= content();
+			dataSource_context= WGA.dataSource(context(ct));
+			assertTrue("WGA.dataSource(context) returned datasource object", cat, "dataSource_context != null");
+			assertEquals("WGA.dataSource(context) returned object of database 'enhancedjdbc'", cat, dataSource_context.dbKey, "enhancedjdbc");
+			
+			dataSource_WGAPIdb= WGA.dataSource(WGA.db("enhancedjdbc"));
+			assertTrue("WGA.dataSource(WGAPI-Object WGDatabase) returned datasource object", cat, "dataSource_WGAPIdb != null");
+			assertEquals("WGA.dataSource(WGAPI-Object WGDatabase) returned object of database 'enhancedjdbc'", cat, dataSource_WGAPIdb.dbKey, "enhancedjdbc");
+			
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+		
+	<tml:warnings/>
+</body>
+</html>

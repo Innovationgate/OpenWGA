@@ -1,0 +1,46 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests WebTML forms coping with illegal HTML/XML characters in form fields (#00003398) 
+	</PRE>
+	
+	<hr>
+	
+	<tml:script var="theValue" expression="tmlform ? tmlform.theField : null"/>
+	
+	<tml:form id="theForm">
+	
+		<tml:input name="theField"/>
+		
+		<tml:button id="click1" clickaction="$refresh">Click</tml:button>
+	
+	</tml:form>
+	
+	<tml:script>
+		var cat = "WebTML:Form";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			if (seq == 2) {
+				assertEquals("Form field was filtered for illegal HTML/XML characters", cat, theValue, "The Value");
+			}		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

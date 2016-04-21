@@ -1,0 +1,546 @@
+<html>
+<head>
+  <tml:htmlhead/>
+</head>
+
+<tml:action  master="true" async="true" id="a_action_1">
+	var category = "locking:areaLocking(a_action_1)";
+	try {
+		var areaA = this.db().getArea("home");	
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		areaA.lock();
+		assertequals("area A locked successfully", category, true, true);
+		var lockEndTime = java.lang.System.currentTimeMillis();
+		duration = (lockEndTime - lockStartTime);
+		asserttrue("area A locked within 1s", category, "duration < 1000");	
+	
+		var docA = this.context("docid:jjar-5xeqc8").getdocument()			
+		// do some work
+		Packages.java.lang.Thread.sleep(10000);	
+		var saveResult = docA.save();
+		assertequals("document A saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+		e.javaException.printStackTrace();
+	}	
+</tml:action>
+
+
+<tml:action  master="true" async="true" id="b_action_1">
+	var category = "locking:areaLocking(b_action_1)";
+	try {
+		var areaA = this.db().getArea("home");	
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		areaA.lock();
+		assertequals("area A locked successfully", category, true, true);
+		var lockEndTime = java.lang.System.currentTimeMillis();
+		duration = (lockEndTime - lockStartTime);
+		asserttrue("B have to wait for area-lock of A", category, "duration > 7000");	
+	
+		var docA = this.context("docid:jjar-5xeqc8").getdocument()			
+		// do some work
+		Packages.java.lang.Thread.sleep(10000);	
+		var saveResult = docA.save();
+		assertequals("document A saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+		e.javaException.printStackTrace();
+	}	
+</tml:action>
+
+<tml:action  master="true" async="true" id="b_action_2">
+	var category = "locking:areaLocking(b_action_2)";
+	try {	
+		var seA = this.context("docid:jjar-5xeqc8").getdocument().getStructEntry();				
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		seA.lock();
+		assertequals("structentry A locked successfully", category, true, true);
+		var lockEndTime = java.lang.System.currentTimeMillis();
+		duration = (lockEndTime - lockStartTime);		
+		asserttrue("B have to wait for area-lock of A", category, "duration > 7000");	
+	
+		var docA = this.context("docid:jjar-5xeqc8").getdocument()			
+		// do some work
+		Packages.java.lang.Thread.sleep(10000);	
+		var saveResult = docA.save();
+		assertequals("document A saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+	}	
+</tml:action>
+
+<tml:action  master="true" async="true" id="b_action_3">
+	var category = "locking:areaLocking(b_action_3)";
+	try {	
+		var docA = this.context("docid:jjar-5xeqc8").getdocument();				
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		docA.lock();
+		assertequals("document A locked successfully", category, true, true);
+		var lockEndTime = java.lang.System.currentTimeMillis();
+		duration = (lockEndTime - lockStartTime);		
+		asserttrue("B have to wait for area-lock of A", category, "duration > 7000");	
+		// do some work
+		Packages.java.lang.Thread.sleep(10000);	
+		var saveResult = docA.save();
+		assertequals("document A saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+	}	
+</tml:action>
+
+<tml:action  master="true" async="true" id="b_action_4">
+	var category = "locking:areaLocking(b_action_4)";
+	try {
+		var areaB = this.db().getArea("online-help");	
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		areaB.lock();
+		assertequals("area B locked successfully", category, true, true);
+		var lockEndTime = java.lang.System.currentTimeMillis();
+		duration = (lockEndTime - lockStartTime);
+		asserttrue("area B locked within 1s", category, "duration < 1000");	
+	
+		var docB = this.context("docid:jjar-5xesg8").getdocument();			
+		// do some work
+		Packages.java.lang.Thread.sleep(10000);	
+		var saveResult = docB.save();
+		assertequals("document B saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+		e.javaException.printStackTrace();
+	}	
+</tml:action>
+
+<tml:action  master="true" async="true" id="b_action_5">
+	var category = "locking:areaLocking(b_action_5)";
+	try {
+		var seB = this.context("docid:jjar-5xesg8").getdocument().getStructEntry();	
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		seB.lock();
+		assertequals("structentry B locked successfully", category, true, true);
+		var lockEndTime = java.lang.System.currentTimeMillis();
+		duration = (lockEndTime - lockStartTime);
+		asserttrue("structentry B locked within 1s", category, "duration < 1000");	
+	
+		var docB = this.context("docid:jjar-5xesg8").getdocument();			
+		// do some work
+		Packages.java.lang.Thread.sleep(10000);	
+		var saveResult = docB.save();
+		assertequals("document B saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+		e.javaException.printStackTrace();
+	}	
+</tml:action>
+
+<tml:action  master="true" async="true" id="b_action_6">
+	var category = "locking:areaLocking(b_action_6)";
+	try {
+		var docB = this.context("docid:jjar-5xesg8").getdocument();	
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		docB.lock();
+		assertequals("document B locked successfully", category, true, true);
+		var lockEndTime = java.lang.System.currentTimeMillis();
+		duration = (lockEndTime - lockStartTime);
+		asserttrue("document B locked within 1s", category, "duration < 1000");	
+	
+		// do some work
+		Packages.java.lang.Thread.sleep(10000);	
+		var saveResult = docB.save();
+		assertequals("document B saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+		e.javaException.printStackTrace();
+	}	
+</tml:action>
+
+<tml:action  master="true" async="true" id="b_action_7">
+	var category = "locking:areaLocking(b_action_7)";
+	try {	
+		var docA = this.context("docid:jjar-5xeqc8").getdocument();			
+		docA.save();
+		asserttrue("exception thrown - b could not save doc A", category, "false");
+	} catch (e) {
+		assertequals("exception thrown - b could not save doc A", category, e.javaException.getClass().getName(), "de.innovationgate.webgate.api.locking.ResourceIsLockedException");
+	}			
+	try {	
+		var seA = this.context("docid:jjar-5xeqc8").getdocument().getStructEntry();			
+		seA.save();
+		asserttrue("exception thrown - b could not save structentry A", category, "false");
+	} catch (e) {
+		assertequals("exception thrown - b could not save structentry A", category, e.javaException.getClass().getName(), "de.innovationgate.webgate.api.locking.ResourceIsLockedException");
+	}			
+	try {	
+		var areaA = this.db().getArea("home");			
+		areaA.save();
+		asserttrue("exception thrown - b could not save area A", category, "false");
+	} catch (e) {
+		assertequals("exception thrown - b could not save area A", category, e.javaException.getClass().getName(), "de.innovationgate.webgate.api.locking.ResourceIsLockedException");
+	}		
+</tml:action>
+
+<tml:action  master="true" async="true" id="b_action_8">
+	var category = "locking:areaLocking(b_action_8)";
+	try {	
+		var docB = this.context("docid:jjar-5xesg8").getdocument();			
+		var saveResult = docB.save();
+		assertequals("document B saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+		e.javaException.printStackTrace();
+	}		
+	try {	
+		var seB = this.context("docid:jjar-5xesg8").getdocument().getStructEntry();			
+		var saveResult = seB.save();
+		assertequals("structEntry B saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+		e.javaException.printStackTrace();
+	}		
+	try {	
+		var areaB = this.db().getArea("online-help");
+		var saveResult = areaB.save();
+		assertequals("area B saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+		e.javaException.printStackTrace();
+	}					
+</tml:action>
+
+<tml:action  master="true" async="true" id="a_action_2">
+	var category = "locking:areaLocking(a_action_2)";
+	try {
+		var areaA = this.db().getArea("home");	
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		areaA.lock();
+		assertequals("area A locked successfully", category, true, true);
+		var lockEndTime = java.lang.System.currentTimeMillis();
+		duration = (lockEndTime - lockStartTime);
+		asserttrue("area A locked within 1s", category, "duration < 1000");	
+	
+		var docA = this.context("docid:jjar-5xeqc8").getdocument();			
+		// do some work
+		Packages.java.lang.Thread.sleep(70000);	
+		var saveResult = docA.save();
+		assertequals("document A saved successfully", category, saveResult, true);
+	} catch (e) {
+		asserttrue("no exception thrown", category, "false");
+		e.javaException.printStackTrace();
+	}	
+</tml:action>
+
+<tml:action  master="true" async="true" id="b_action_9">
+	var category = "locking:areaLocking(b_action_9)";
+	try {
+		var docA = this.context("docid:jjar-5xeqc8").getdocument();	
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		docA.lock();
+		asserttrue("timeout exception thrown", category, "false");
+	} catch (e) {
+		assertequals("timeout exception thrown", category, e.javaException.getClass().getName(), "de.innovationgate.webgate.api.locking.LockWaitTimeoutException");
+	}	
+</tml:action>
+
+<tml:action  master="true" async="true" id="b_action_10">
+	var category = "locking:areaLocking(b_action_10)";
+	try {
+		var seA = this.context("docid:jjar-5xeqc8").getdocument().getStructEntry();	
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		seA.lock();
+		asserttrue("timeout exception thrown", category, "false");
+	} catch (e) {
+		assertequals("timeout exception thrown", category, e.javaException.getClass().getName(), "de.innovationgate.webgate.api.locking.LockWaitTimeoutException");
+	}	
+</tml:action>
+
+
+<tml:action  master="true" async="true" id="b_action_11">
+	var category = "locking:areaLocking(b_action_11)";
+	try {
+		var areaA = this.db().getArea("home");	
+		var lockStartTime = java.lang.System.currentTimeMillis();
+		areaA.lock();
+		asserttrue("timeout exception thrown", category, "false");
+	} catch (e) {
+		assertequals("timeout exception thrown", category, e.javaException.getClass().getName(), "de.innovationgate.webgate.api.locking.LockWaitTimeoutException");
+	}	
+</tml:action>
+
+<body>
+	<tml:button clickaction="a_action_1" id="a_action_1">a_action_1</tml:button>
+	<tml:button clickaction="a_action_2" id="a_action_2">a_action_2</tml:button><br/>	
+	<hr/>
+	<tml:button clickaction="b_action_1" id="b_action_1">b_action_1</tml:button>
+	<tml:button clickaction="b_action_2" id="b_action_2">b_action_2</tml:button><br/>	
+	<tml:button clickaction="b_action_3" id="b_action_3">b_action_3</tml:button>
+	<tml:button clickaction="b_action_4" id="b_action_4">b_action_4</tml:button><br/>	
+	<tml:button clickaction="b_action_5" id="b_action_5">b_action_5</tml:button>
+	<tml:button clickaction="b_action_6" id="b_action_6">b_action_6</tml:button><br/>	
+	<tml:button clickaction="b_action_7" id="b_action_7">b_action_7</tml:button>	
+	<tml:button clickaction="b_action_8" id="b_action_8">b_action_8</tml:button><br/>		
+	<tml:button clickaction="b_action_9" id="b_action_9">b_action_9</tml:button>	
+	<tml:button clickaction="b_action_10" id="b_action_10">b_action_10</tml:button><br/>		
+	<tml:button clickaction="b_action_11" id="b_action_11">b_action_11</tml:button>		
+	<hr/>
+<pre>
+Document hierarchy:
+Area A (home)
+	-> SE A (jjar-5xeqc8)
+		-> Doc A (jjar-5xeqc8)
+Area B (online-help)	
+	-> SE B (jjar-5xesg8)
+		-> Doc B (jjar-5xesg8)
+</pre>
+	<table border="1">
+	 <th>test</th><th>thread a</th><th>thread b</th><th>actions to call</th><th>wait until next test is started</th>
+	 <tr>
+	  <td>1</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>none</td>			
+	  <td>a_action_1</td>
+  	  <td>20s</td>
+	 </tr>	 
+	 <tr>
+	  <td>2</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>have to wait for A</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+			<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_1, wait 1s, b_action_1</td>
+  	  <td>30s</td>
+	 </tr>
+	 <tr>
+	  <td>3</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>lock SE 'A'</td></tr>
+	  		<tr><td>have to wait for A</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>	  		
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>	  		
+	  	</table>
+	  </td>			
+	  <td>a_action_1, wait 1s, b_action_2</td>
+  	  <td>30s</td>
+	 </tr>	 
+	 <tr>
+	  <td>4</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>lock doc 'A'</td></tr>
+	  		<tr><td>have to wait for A</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>  		
+	  	</table>
+	  </td>			
+	  <td>a_action_1, wait 1s, b_action_3</td>
+	  <td>30s</td>
+	 </tr>	 	
+	 <tr>
+	  <td>5</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>lock area 'B'</td></tr>
+	  		<tr><td>get doc 'B'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'B'</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_1, wait 1s, b_action_4</td>
+	  <td>20s</td>
+	 </tr>	
+	 <tr>
+	  <td>6</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>lock SE 'B'</td></tr>
+	  		<tr><td>get doc 'B'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'B'</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_1, wait 1s, b_action_5</td>
+	  <td>20s</td>
+	 </tr>		 
+	 <tr>
+	  <td>7</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>lock doc 'B'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'B'</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_1, wait 1s, b_action_6</td>
+	  <td>20s</td>
+	 </tr>		 
+	 <tr>
+	  <td>8</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  		<tr><td>get exception</td></tr>	  		
+	  		<tr><td>get SE 'A'</td></tr>
+	  		<tr><td>save SE 'A'</td></tr>
+	  		<tr><td>get exception</td></tr>	  		
+	  		<tr><td>get area 'A'</td></tr>
+	  		<tr><td>save area 'A'</td></tr>
+	  		<tr><td>get exception</td></tr>	  		
+	  	</table>
+	  </td>			
+	  <td>a_action_1, wait 1s, b_action_7</td>
+	  <td>20s</td>
+	 </tr>		 
+	 <tr>
+	  <td>9</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 10s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>get doc 'B'</td></tr>
+	  		<tr><td>save doc 'B'</td></tr>
+	  		<tr><td>get SE 'B'</td></tr>
+	  		<tr><td>save SE 'B'</td></tr>
+	  		<tr><td>get area 'B'</td></tr>
+	  		<tr><td>save area 'B'</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_1, wait 1s, b_action_8</td>
+	  <td>20s</td>
+	 </tr>	 
+	 <tr>
+	  <td>10</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 70s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>lock doc 'A'</td></tr>
+	  		<tr><td>get timeout exception</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_2, wait 1s, b_action_9</td>
+	  <td>80s</td>
+	 </tr>
+	 <tr>
+	  <td>11</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 70s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>lock SE 'A'</td></tr>
+	  		<tr><td>get timeout exception</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_2, wait 1s, b_action_10</td>
+	  <td>80s</td>
+	 </tr>	 
+	 <tr>
+	  <td>12</td>
+	  <td>
+	  	<table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>get doc 'A'</td></tr>
+	  		<tr><td>do work 70s</td></tr>
+	  		<tr><td>save doc 'A'</td></tr>
+	  	</table>
+	  </td>
+	  <td>
+	  	 <table>
+	  		<tr><td>lock area 'A'</td></tr>
+	  		<tr><td>get timeout exception</td></tr>
+	  	</table>
+	  </td>			
+	  <td>a_action_2, wait 1s, b_action_11</td>
+	  <td>80s</td>
+	 </tr>		 	   	 
+	</table>		
+</body>
+
+
+</html>

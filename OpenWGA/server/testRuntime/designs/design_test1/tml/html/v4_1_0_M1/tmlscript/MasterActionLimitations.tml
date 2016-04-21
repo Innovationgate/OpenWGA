@@ -1,0 +1,78 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing the removal of master action limitations (F00004096)
+	</PRE>
+	
+	<tml:action id="regularAction">
+		setvar("regularActionRan", true);
+	</tml:action>
+	
+	<tml:action id="myMasterAction" master="true">
+		try {
+			var cat = "TMLScript:MasterAction";
+			assertEquals("Master action can access session var", cat, asessionvar, true);
+			callAction("regularAction");
+			assertEquals("Master action can call regular action", cat, regularActionRan, true);
+			addWarning("MyWarning");
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Error running unittest", cat, "false");
+		}  
+	
+	</tml:action>
+	
+	<tml:action id="modifyingMasterAction" master="true">
+		var con = context("name:home").content();
+		theDate = createDate()
+		con.setItemValue("mySetDate", theDate);
+		con.save();
+		setvar("theSetDate", theDate);
+	</tml:action>
+	
+	<hr>
+	
+	<tml:button id="modifyingMasterAction" clickaction="modifyingMasterAction">Modify</tml:button>
+	
+	<tml:script>
+		var cat = "TMLScript:MasterAction";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+
+
+		try {
+			
+			switch (seq) {
+				case 1:		
+					setSessionVar("asessionvar", true);
+					callAction("myMasterAction");
+					assertTrue("Master action can send warning back to calling page", cat, "tag.getWarnings().size() == 1 && tag.getWarnings().get(0).getMessage() == 'MyWarning'");
+					break;
+				
+				case 2:
+					// We must compare formatted dates bc. of differing millisecond precision between Java and the Database
+					assertEquals("Data modified in master action can be read on following page", cat, format(theSetDate, "dd.MM.yyyy HH:mm:ss"), format(context("name:home").mySetDate, "dd.MM.yyyy HH:mm:ss"));
+				}	
+					
+			
+					
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

@@ -1,0 +1,60 @@
+this.preCreate = function(e) {
+	if (e.customParam == null) {
+		e.customParam = WGA.createList();
+	}
+	e.customParam.add("preCreate");
+}
+
+this.onCreate = function(e) {
+	if (e.customParam == null) {
+		e.customParam = WGA.createList();
+	}
+	e.customParam.add("onCreate");
+}
+
+
+this.onSave = function(e) {
+
+	HDBModel.assignContentID(content(), name);
+	content().setTitle(name);
+
+	if (e.customParam == null) {
+		e.customParam = WGA.createList();
+	}
+	e.customParam.add("onSave");
+}
+
+this.postCreate = function(e) {
+	if (e.customParam == null) {
+		e.customParam = WGA.createList();
+	}
+	e.customParam.add("postCreate");
+}
+
+this.preUpdate = function(e) {
+	if (e.customParam == null) {
+		e.customParam = WGA.createList();
+	}
+	e.customParam.add("preUpdate");
+}
+
+this.postUpdate = function(e) {
+	if (e.customParam == null) {
+		e.customParam = WGA.createList();
+	}
+	e.customParam.add("postUpdate");
+}
+
+this.preDelete = function(e) {
+	if (e.customParam == null) {
+		e.customParam = WGA.createList();
+	}
+	e.customParam.add("preDelete");
+}
+
+this.postDelete = function(e) {
+	if (e.customParam == null) {
+		e.customParam = WGA.createList();
+	}
+	e.customParam.add("postDelete");
+}

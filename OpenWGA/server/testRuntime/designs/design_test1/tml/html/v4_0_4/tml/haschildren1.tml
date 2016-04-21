@@ -1,0 +1,53 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests hasChildren() behaviour, especially with relevant languages functionality
+	</PRE>
+	
+	<hr>
+	
+	<a name="homeEnglish" href="<tml:url layout="v4_0_4:tml:haschildren1" context="name:haschildrentest<en>"/>">Home English</a>
+	
+	<tml:script var="children">return haschildren()</tml:script>
+	
+	<tml:script>
+		var cat = "tml";
+		
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			
+			switch (seq) {
+			
+				case 1:
+					assertEquals("Current language is german", cat, LANGUAGE, "de");
+					assertEquals("Preferred language is german", cat, preferredLanguage, "de");
+					assertTrue("Has children recognizes german child bc. of main language", cat, "children");
+					break;
+					
+				case 2:
+					assertEquals("Current language is english", cat, LANGUAGE, "en");
+					assertEquals("Preferred language is english", cat, preferredLanguage, "en");
+					assertTrue("Has children recognizes german child bc. of browser language and dynamic language behaviour", cat, "children");
+					break;
+			
+			}
+					
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

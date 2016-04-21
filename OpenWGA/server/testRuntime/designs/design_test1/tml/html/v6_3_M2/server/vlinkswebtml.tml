@@ -1,0 +1,68 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests virtual links (bc. of feature #00003207)
+	</PRE>
+	
+	<tml:url var="ContentVLink1" context="name:ContentVLink1"/>
+	
+	<tml:url var="NameVLink1" context="name:NameVLink1"/>
+	
+	<tml:url var="AttachmentVLink1" context="name:AttachmentVLink1"/>
+	
+	<tml:url var="FCAttachmentVLink1" context="name:FCAttachmentVLink1"/>
+	
+	<tml:url var="LocalAttachmentVLink1" context="name:LocalAttachmentVLink1"/>
+	
+	<tml:url var="PrimaryAttachmentVLink1" context="name:PrimaryAttachmentVLink1"/>
+	
+	<tml:url var="LocalPrimaryAttachmentVLink1" context="name:LocalPrimaryAttachmentVLink1"/>
+	
+	<tml:url var="ExternalVLink1" context="name:ExternalVLink1"/>
+	
+	<tml:url var="ExternalVLink1Param" u_urlparam="urlvalue" context="name:ExternalVLink1"/>
+	
+	<tml:meta var="VLinkTargetContent" name="key" context="name:ContentVLink1/vlinktarget"/>
+	
+	<tml:meta var="VLinkTargetName" name="key" context="name:NameVLink1/vlinktarget"/>
+	
+	ExternalVLink1
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			assertEquals("Virtual Link in WebTML: ContentVLink1", cat, contentVLink1, meta("request", "wgaurl") + "/" + meta("db", "dbkey") + "/html/default/jjar-5xeqgv.de.html");
+			assertEquals("Virtual Link in WebTML: NameVLink1", cat, nameVLink1, meta("request", "wgaurl") + "/" + meta("db", "dbkey") + "/html/default/home.de.html");
+			assertEquals("Virtual Link in WebTML: AttachmentVLink1", cat, attachmentVLink1, meta("request", "wgaurl") + "/" + meta("db", "dbkey") + "/file/jjar-5xeqgv.de.0/browser.jpg");
+			assertEquals("Virtual Link in WebTML: FileContainerAttachmentVLink1", cat, fcAttachmentVLink1, meta("request", "wgaurl") + "/" + meta("db", "dbkey") + "/file/boerse/dax.gif");
+			assertEquals("Virtual Link in WebTML: LocalAttachmentVLink1", cat, localAttachmentVLink1, meta("request", "wgaurl") + "/" + meta("db", "dbkey") + "/file/" + context("name:LocalAttachmentVLink1").KEY + "/dax.gif");
+			assertEquals("Virtual Link in WebTML: PrimaryAttachmentVLink1", cat, primaryAttachmentVLink1, meta("request", "wgaurl") + "/" + meta("db", "dbkey") + "/file/" + context("name:LocalAttachmentVLink1").KEY + "/dax.gif");
+			assertEquals("Virtual Link in WebTML: LocalPrimaryAttachmentVLink1", cat, localPrimaryAttachmentVLink1, meta("request", "wgaurl") + "/" + meta("db", "dbkey") + "/file/" + context("name:LocalPrimaryAttachmentVLink1").KEY + "/dax.gif");
+			assertEquals("Virtual Link in WebTML: ExternalVLink1", cat, externalVLink1, meta("request", "absolutewgaurl") + "/test1/html/default/home.de.html");
+			assertEquals("Virtual Link in WebTML: ExternalVLink1 plus URL param", cat, externalVLink1Param, meta("request", "absolutewgaurl") + "/test1/html/default/home.de.html?urlparam=urlvalue");
+			assertEquals("Context expression vlinktarget on content vlink", cat, vlinkTargetContent, context("docid:jjar-5xeqgv").KEY);
+			assertEquals("Context expression vlinktarget on name vlink", cat, vlinkTargetName, context("name:home").KEY);
+					
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

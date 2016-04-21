@@ -1,0 +1,6 @@
+<tml:element name="zip">
+	<tml:option name="target">ziplogin</tml:option>
+	<tml:option name="files">
+		http://localhost:8080<tml:url type="file" doc="staumelder" file="karte.gif"/>;jsessionid=<tml:meta type="session" name="id"/>|karte.gif
+	</tml:option>
+</tml:element>

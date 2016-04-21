@@ -1,0 +1,67 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing WebTML default encodings and where they should apply (by opportunity of issue #00002678)
+	</PRE>
+	
+	<hr>
+
+	<tml:script>
+		avar = 'This is a "text" with <br> various \'things\' to encode';
+		avar_item = "item:" + avar;
+		avar_input = "input:" + avar;
+	</tml:script>
+	
+	<a id="click1" href="<tml:url u_aparam="{'urlparam:' + avar}"/>">Add the URL parameter</a>
+	
+	<tml:range var="theitem" trim="true">
+		<tml:item name="avar_item"/>
+	</tml:range>
+	
+	<tml:form id="someform" mode="view">
+		<tml:range var="theinput" trim="true">
+			<tml:input name="avar_input"/>
+		</tml:range>
+	</tml:form>
+	
+	<tml:range var="theurlparam" trim="true">
+		<tml:urlparam name="aparam"/>
+	</tml:range>
+	
+	<tml:range var="thelabel" trim="true">
+		<tml:label key="encodingtest" param1="\"text\"" param2="<br>" param3="'things'"/>
+	</tml:range>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			
+			
+			if (clickStep == 1) {
+				assertEquals("tml:item is default-encoded", cat, theitem, "item:This is a &#34;text&#34; with &#60;br&#62; various &#39;things&#39; to encode");
+				assertEquals("tml:input type=view is default-encoded", cat, theinput, "input:This is a &#34;text&#34; with &#60;br&#62; various &#39;things&#39; to encode");
+				assertEquals("tml:urlparam is default-encoded", cat, theurlparam, "urlparam:This is a &#34;text&#34; with &#60;br&#62; various &#39;things&#39; to encode");
+				assertEquals("tml:label params are default-encoded", cat, thelabel, "label:This is a &#34;text&#34; with &#60;br&#62; various &#39;things&#39; to encode");
+			}	
+			
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

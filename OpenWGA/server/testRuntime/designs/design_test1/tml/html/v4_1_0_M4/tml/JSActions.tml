@@ -1,0 +1,53 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests the execution of WebTML Actions from Browser-JavaScript
+	</PRE>
+	
+	<hr>
+	
+	<tml:action id="theAction">
+		setSessionVar(tmlparam1, true);
+		
+		if (tmlparam1 == "button4") {
+			setSessionVar("textfield", tmlform.textinput);
+		}
+	</tml:action>
+	
+	
+	<button id="button1" name="button1" onclick="callAction('<tml:action ref="theAction" param1="button1"/>')">Button 1</button>
+	
+	<tml:portlet name="JSActionsPortlet" ref="::JSActionsPortlet" ajax="true"/>
+	
+	<tml:action id="test">
+		var cat = "TML:JavaScriptActions";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertTrue("Calling simple action from JavaScript", cat, "button1");
+			assertTrue("Calling AJAX action from JavaScript. Portletkey explicitly given.", cat, "button2");
+			assertTrue("Calling AJAX action from JavaScript. Portletkey implicitly given by actionlink.", cat, "button3");
+			assertTrue("Calling Form AJAX action from JavaScript. Portletkey implicitly given by actionlink. ", cat, "button4");
+			assertEquals("Calling Form AJAX action from JavaScript. Form submitted.", cat, textfield, "textvalue");
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:action>
+	
+	<tml:button clickaction="test" id="test">Test</tml:button>
+	
+	<tml:warnings/>
+</body>
+</html>

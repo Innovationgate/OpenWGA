@@ -1,0 +1,89 @@
+<tml:action id="reconnectPlugin">
+	
+	WGA.Master.runFunction(
+		function() {
+			WGA.Core.removeContentDB("plugin-testplugin");
+			WGA.Core.updatePlugins();
+		}
+	);
+	
+	testPageKey = WGA.Master.runFunction(
+		context("plugin:de.innovationgate.testplugin"),
+		function() {
+			pdb = plugindb("de.innovationgate.testplugin");
+			theCt = pdb.getContentType("rubric");
+			
+			var testPage = pdb.getArea("focusonwga").createRootPage(theCt, "SchemaEnforcementTest");
+			testPage.publish();
+			
+			return testPage.getContentKey();
+		}
+	);
+		
+
+
+</tml:action>
+
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+		Tests the enforcement of a schema definition done on "testplugin", seq==2 to test fix of bug #00001696 
+	</PRE>
+	
+	<tml:button id="click1" clickaction="reconnectPlugin">Reconnect plugin</tml:button>
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "SchemaEnforcement";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+		
+			pdb = plugindb("de.innovationgate.testplugin");
+			theCt = pdb.getContentType("rubric");
+			if (seq == 1) {
+				assertTrue("Contenttype created by schema", cat, 'pdb.getContentType("rubric") != null');
+				assertTrue("Area created by schema", cat, 'pdb.getArea("focusonwga") != null');
+				assertTrue("Language created by schema", cat, 'pdb.getLanguage("de").isDummy() == false');
+				assertEquals("Content type data is returned from definition", cat, theCt.getOuterLayoutName(), "outer_blog");
+				assertTrue("Content type signals data coming from definition", cat, 'theCt.isMetaDeterminedInSchema(theCT.META_OUTER_LAYOUT)');
+				
+				// Ensure backend cache fields can also be read from schema (#00002621)
+				var focusOnWga = pdb.getArea("focusonwga");
+				WGA.Master.runFunction(function(a) {
+					a.database.openSession();
+					a.core.setMetaData("EDITORS", ["John", "Ringo", "Paul", "George"]);
+					a.save();
+				}, focusOnWga);
+				
+				focusOnWga.dropCore();
+				focusOnWga.getCore();
+				assertEqualLists("Effective editors on content read from schema", cat, focusOnWga.getEffectiveEditors(), ["ow","tb","pf","ws"]); 
+			}
+			else if (seq == 2) {
+				testPage = pdb.getContentByKey(String(testPageKey));
+				assertTrue("Test page reachable", cat, "testPage != null");
+				assertEquals("Item from schema create event was set", cat, testPage.getItemValue("createevent"), "ranfromschema"); 
+			}
+			
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

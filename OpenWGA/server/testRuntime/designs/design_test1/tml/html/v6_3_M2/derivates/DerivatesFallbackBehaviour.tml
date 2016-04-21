@@ -1,0 +1,43 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests fallback behaviour for derivate queries (#00003222)
+	</PRE>
+	
+	<tml:form id="theForm">
+	
+		<tml:input type="file" name="theFile">id="theFile"</tml:input>
+		
+		<tml:button id="theButton" clickaction="$refresh">Upload</tml:button>
+		
+		<a id="theUrl" href="<tml:url type="tmlform" file="2-house.jpg"/>">The House</a>
+	
+	</tml:form>
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			// Execute assertions		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

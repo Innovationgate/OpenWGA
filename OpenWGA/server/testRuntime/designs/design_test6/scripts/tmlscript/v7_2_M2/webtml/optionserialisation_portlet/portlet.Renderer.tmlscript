@@ -1,0 +1,17 @@
+function Renderer() {
+}
+
+Renderer.prototype.render = function($cx, $option_body) {
+	try{
+		var options = JSON.parse($option_body)
+		for(let [key, value] in options){
+			console.log("Setting option", key, value);
+			$cx.setOption(key, value);
+		}
+	}
+	catch(e){
+		console.log(e);
+	}
+
+	WGA.TMLPage.renderDefault();
+}

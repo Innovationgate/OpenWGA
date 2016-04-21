@@ -1,0 +1,18 @@
+<html>
+<body>
+<pre>
+Tests the availability of a profile in a master action
+</pre>
+<hr>
+
+<tml:action id="doit" master="true">
+var cat = "MasterActionProfile";
+assertTrue("Profile available", cat, "this.profile != null");
+assertTrue("Profile database open", cat, "this.profile.getProfile().getDatabase().isSessionOpen()");
+assertTrue("Profile of other app is not served", cat, "context('db:test2').profile == null");
+</tml:action>
+
+<a name="action" href="<tml:url action="doit"/>">Do it</a>
+
+</body>
+</html>

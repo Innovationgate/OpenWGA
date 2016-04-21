@@ -1,0 +1,29 @@
+<html>
+<body>
+<pre>
+Tests the generation of title path URLs and their correct addressation/parsing.
+</pre>
+
+<div id="currentContext"><tml:meta name="key"/></div>
+
+<tml:sitemap>
+<tml:case condition="CONTENTTYPE == 'artikel' || CONTENTTYPE == 'home' || CONTENTTYPE == 'standard'">
+	<a href="<tml:url/>" id="<tml:meta name="key"/>"><tml:meta name="title"/></a><br>
+</tml:case>
+</tml:sitemap>
+
+<!-- A navigator whose titles contains some umlauts -->
+
+<tml:children context="name:sorttestroot">
+	<a href="<tml:url/>" id="<tml:meta name="key"/>"><tml:meta name="title"/></a><br>
+</tml:children>
+
+<!-- An additional page with some non ASCII characters in title -->
+<tml:range context="docid:8a8181b80dc614e7010dc6481122000a.de.1"> 
+	<a href="<tml:url/>" id="<tml:meta name="key"/>"><tml:meta name="title"/></a><br>
+</tml:range>
+
+<tml:warnings/>
+
+</body>
+</html>

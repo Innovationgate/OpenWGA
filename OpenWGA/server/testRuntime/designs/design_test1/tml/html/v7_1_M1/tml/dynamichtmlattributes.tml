@@ -1,0 +1,56 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests dynamic HTML attributes at WebTML tags (#00002232)
+	</PRE>
+
+	<tml:button id="thebutton" html_label="The Button" clickaction="$refresh">Refresh</tml:button><br>
+	
+	<tml:form id="theform" html_autocomplete="off">
+	
+		<tml:input id="thetextinput" type="text" html_label="The text input" name="thetextinput"/><br>
+		<tml:input id="theselectinput" type="select" html_label="The select input" name="theselectinput" options="a,b,c"/><br>
+		<tml:input id="theradioinput" type="radio" html_label="[The radio input {$O_VALUE}]" name="theradioinput" options="1,2,3"/><br>
+		<tml:input id="thecheckboxinput" type="checkbox" html_label="The checkbox input" name="thecheckboxinput" options="x,y,z"/><br>
+		<tml:input id="thehashedpasswordinput" type="hashedpassword" html_label="The hashed password input" name="thehashedpasswordinput"/><br>
+		<tml:input id="thetextareainput" type="textarea" html_rows="5" name="thetextareainput"/><br>
+		<tml:input id="thefileinput" type="file" html_label="The file input" name="thefileinput"/><br>
+		<tml:input id="thebooleaninput" type="boolean" html_label="The boolean input" name="thebooleaninput"/><br>
+		<tml:input id="thedateinput" type="date" html_label="The date input" name="thedateinput"/><br>
+	
+		
+	</tml:form>
+	
+	<tml:image id="theimage" html_id="theimage" html_label="The image" doc="images" file="2-house.jpg"/><br>
+	
+	<tml:link id="thelink" html_id="thelink" context="name:home" html_label="The link"/><br>
+	
+	
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			// Execute assertions		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

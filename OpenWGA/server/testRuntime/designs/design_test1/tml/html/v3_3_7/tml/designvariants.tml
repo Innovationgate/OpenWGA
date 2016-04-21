@@ -1,0 +1,59 @@
+<html>
+<body>
+<PRE>
+Testing the design variants functionality.
+</PRE>
+<hr>
+
+<tml:include ref="::designvariants_include"/>
+<tml:script>
+category = "DesignVariants";
+try {
+	assertEquals("TML-Include: Using base version in provider db", category, include_base, "true");
+}
+catch (e) {
+	assertTrue("Exception executing test: " + e.message, cat, false);
+}
+</tml:script>
+
+<tml:include designdb="designslave" ref="::designvariants_include"/>
+<tml:script>
+try {
+	assertEquals("TML-Include: Using variant in consumer db", category, include_designslave, "true");
+}
+catch (e) {
+	assertTrue("Exception executing test: " + e.message, cat, false);
+}
+</tml:script>
+
+
+<tml:script>
+try {
+	// Test for script modules
+	var mod_base = db().getCSSJSModule("designvariants");
+	assertEquals("Script-Module: Using base version in provider db", category, mod_base.getCode(), "<data>base</data>"); 
+
+	var mod_designslave = db("designslave").getCSSJSModule("designvariants");
+	assertEquals("Script-Module: Using variant in consumer db", category, mod_designslave.getCode(), "<data>designslave</data>");
+	
+	// Test for file containers
+	var ct_base = db().getFileContainer("designvariants");
+	var base_text = Packages.de.innovationgate.utils.WGUtils.readString(ct_base.getFileText("text.txt"));
+	assertEquals("File container: Using base version in provider db", category, base_text, "base");
+	
+	var ct_designslave = db("designslave").getFileContainer("designvariants");
+	var designslave_text = Packages.de.innovationgate.utils.WGUtils.readString(ct_designslave.getFileText("text.txt"));
+	assertEquals("File container: Using variant in consumerr db", category, designslave_text, "designslave");
+
+	
+}
+catch (e) {
+	assertTrue("Exception executing test: " + e.message, cat, false);
+}
+
+</tml:script>
+
+<tml:warnings/>
+
+</body>
+</html>

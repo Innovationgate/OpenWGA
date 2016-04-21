@@ -1,0 +1,77 @@
+<html>
+<head>
+	<tml:htmlhead/>
+	<tml:script>
+		if (!isdefined("persistent")) {
+			this.setsessionvar("persistent", this.request.getParameter("persistent"));
+		}
+	</tml:script>
+</head>
+<body>
+
+<HR/>
+<PRE>
+This test checks:
+- the resolve of scriptlets in validationmessages
+  with peristent and none persistent form
+</PRE>
+<BR/>
+
+<tml:action id="validate">
+var category = "TMLForm:scriptletsInValidationMessages";
+
+if (this.persistent == "true") {
+	asserttrue("Form is persistent.", category, tmlform.ispersistent());
+} else {
+	asserttrue("Form is not persistent.", category, !tmlform.ispersistent());
+}
+
+if (tmlform.validate()) {
+	assertequals("No form errors. Field1 is 'Albert Einstein'", category, tmlform.field1, "Albert Einstein");
+	assertequals("No form errors. Field2 is 'Marie Curie'", category, tmlform.field2, "Marie Curie");	
+	assertequals("No form errors. Field3 is 'Nobody'", category, tmlform.field3, "Nobody");		
+} else {
+	// form has errors
+	// scriptlets has been resolved correctly
+	if (tmlform.field1 != "Albert Einstein") {
+		assertequals("Scriptlet of Field1 has been resolved.", category, tmlform.getmessage("field1"), "field1 should be 'Albert Einstein' but was 'wrong value in field1'");
+	}
+	if (tmlform.field2 != "Marie Curie") {
+		assertequals("Scriptlet of Field2 has been resolved.", category, tmlform.getmessage("field2"), "field2 should be 'Marie Curie' but was 'wrong value in field2'");
+	}	
+}
+
+this.setsessionvar("validated", true);
+</tml:action>
+
+
+<tml:form id="scriptlets" source="none" persist="{this.persistent}">
+
+<tml:input name="field1" validation="$e_value == 'Albert Einstein'" 
+	       message="field1 should be 'Albert Einstein' but was '{@=tmlform.field1@}'"/>
+<tml:input name="field2" validation="$e_value == 'Marie Curie'" 
+	       message="field2 should be 'Marie Curie' but was '{@=$e_value@}'"/>
+<tml:input name="field3"/>
+
+<tml:range var="msg_field3">
+	<tml:validate condition="tmlform.field3 == 'Nobody'">
+	field3 should be 'Nobody' but was '{@=tmlform.field3@}'
+	</tml:validate>
+</tml:range>
+
+<tml:script>
+	var category = "TMLForm:scriptletsInValidationMessages";
+	if ( tmlform.field3 != "Nobody" && isdefined("validated") ) {
+		assertequals("Scriptlet of Field3 has been resolved.", category, javaObject(msg_field3).trim(), "field3 should be 'Nobody' but was 'wrong value in field3'");
+	}	
+</tml:script>
+
+<tml:button id="validate" clickaction="validate">Validate</tml:button>
+
+<HR/>
+<tml:formmessages divider="<br>"/>
+
+</tml:form>
+
+</body>
+</html>

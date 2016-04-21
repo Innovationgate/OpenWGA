@@ -1,0 +1,70 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests usage of dynamic parameters on tml:query
+	</PRE>
+	
+	
+	<h2> Dynamic </h2>
+	<tml:collection id="dynamicCol">
+		
+		<tml:query type="hql" p_author="ow">
+			content.author=:author
+		</tml:query>
+		
+		<ul>
+		<tml:foreach>
+			<li><tml:link/>
+		</tml:foreach>
+		</ul>
+		
+	</tml:collection>
+	
+	<h2> Dynamic </h2>
+	<tml:collection id="staticCol">
+
+		<tml:param name="author">ow</tml:param>
+		
+		<tml:query type="hql">
+			content.author=:author
+		</tml:query>
+		
+		<ul>
+		<tml:foreach>
+			<li><tml:link/>
+		</tml:foreach>
+		</ul>
+		
+	</tml:collection>
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "WebTML:Query";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			
+			assertTrue("Collection with dynamic parameter returned any results", cat, "taginfo('dynamicCol', 'count') > 0");
+			assertEquals("Collection with dynamic parameter returned as many results as equal collection with static parameter", cat, taginfo('dynamicCol', 'count'),taginfo('staticCol', 'count'));
+				
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

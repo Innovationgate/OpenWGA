@@ -1,0 +1,10 @@
+<tml:navigator type="path" exclude="main">
+	<tml:case condition="LEVEL>1">
+		=>
+		<tml:link/>
+	</tml:case>
+</tml:navigator>
+<tml:case condition="LEVEL>1">
+	=>
+	<tml:meta name="title"/>
+</tml:case>

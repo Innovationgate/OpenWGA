@@ -1,0 +1,87 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests WGA5 TMLScript master functions
+	</PRE>
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "TMLScript:MasterFunctions";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+		
+			// Simple master function with a param
+			var theParam = {
+				value1: "x",
+				value2: 2334
+			}
+			
+			var table = createLookupTable();
+			table.put("a", 1);
+
+			retValue =runMasterFunction(
+				function(e, con,tab) {
+					try {
+						var cat = "TMLScript:MasterFunctions";
+						assertTrue("Master function is in master session", cat, db().getSessionContext().isMasterSession());
+						mfParam = e;
+						conParam = con;
+						tabParam = tab;
+						assertTrue("Parameter object 1 is available in master function", cat, "mfParam != null && mfParam != undefined");
+						assertEquals("Parameter object 1 is accessible in master function", cat, e.value1, "x");
+						assertTrue("Parameter object 2 is available in master function", cat, "conParam != null && conParam != undefined");
+						assertEquals("Parameter object 2 is accessible in master function", cat, con.getUniqueName(), "home");
+						assertTrue("Parameter object 3 is available in master function", cat, "tabParam != null && tabParam != undefined");
+						assertEquals("Parameter object 3 is accessible in master function", cat, tabParam.get("a"), 1);
+						return con;
+					}
+					catch (e) {
+						logException(e);
+						assertTrue("Exception in master function", cat, "false");
+					}
+				}, 
+				theParam,
+				context("name:home").content(),
+				table
+			);
+			assertTrue("Master function returns java value", cat, "retValue != null && retValue != undefined");
+			assertEquals("Master function java returnvalue is accessible", cat, retValue.getUniqueName(), "home");
+			
+			// Master function with passed over context
+			retValue2 = runMasterFunction(context("name:home"), function() {
+				var cat = "TMLScript:MasterFunctions";
+				assertEquals("Master function uses given parameter context", cat, UNIQUENAME, "home");
+				return { prop:"Value"};
+			});
+			assertTrue("Master function returns script value", cat, "retValue2 != null && retValue2 != undefined");
+			assertEquals("Master function script returnvalue is accessible", cat, retValue2.prop, "Value");
+			
+			
+			// Object using master method
+			var mfObj = createObject("::masterFunctionObject");
+			var field = mfObj.outerFunction();
+			assertEquals("Master method has access to object private field", cat, field, "Private field");
+
+			
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

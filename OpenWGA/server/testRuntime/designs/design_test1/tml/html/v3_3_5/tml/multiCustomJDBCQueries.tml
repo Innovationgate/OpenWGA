@@ -1,0 +1,43 @@
+
+<html>
+<head>
+  <tml:htmlhead/> 
+</head>
+
+<body>
+<pre>
+	Test for bugfix: B000037C6
+</pre>
+<tml:collection>	
+			<tml:query type="sql" db="customjdbc">
+				SELECT * FROM users WHERE id = '1';
+			</tml:query>
+			
+			<tml:foreach pagesize="1">
+				<tml:range var="result1" output="true"><tml:item name="lastname"/></tml:range>
+			</tml:foreach>
+			<tml:script>
+				// check result
+				assertequals("Result1 is correct.", "Bugfix:B000037C6", result1, "Binias");
+			</tml:script>	
+</tml:collection>
+
+
+
+<tml:collection >	
+			<tml:query type="sql" db="customjdbc">
+				SELECT * FROM users WHERE id = '2';
+			</tml:query>		
+		<tml:foreach pagesize="1">
+			<tml:range var="result2" output="true"><tml:item name="lastname"/></tml:range>
+		</tml:foreach>	
+		<tml:script>
+			// check result
+			assertequals("Result2 is correct.", "Bugfix:B000037C6", result2, "Weise");
+		</tml:script>
+</tml:collection>
+
+<tml:warnings/>
+
+</body>
+</html>

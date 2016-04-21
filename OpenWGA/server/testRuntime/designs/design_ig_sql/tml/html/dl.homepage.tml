@@ -1,0 +1,116 @@
+<html>
+<head>
+<tml:include type="tml" ref="HeadBereich" medium="html"/>
+<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="Standard"/>"/>
+<script Language="Javascript" type="text/Javascript" src="<tml:url type="js" name="StandardScript"/>"></script>
+<script Language="Javascript" type="text/Javascript" src="<tml:url type="js" name="EdvonCheck"/>"></script>
+<script language="JavaScript">window.name="IG"</Script>
+<Script Language="JavaScript">
+<!--
+function loadFlashDemo(){
+var url = 'rfef-5fles8.<tml:item name="Sprache"/>.0/~file/start.htm';
+//window.open(url , 'WGA' , 'height='+(self.screen.availHeight-50)+',width='+(self.screen.availWidth-50)+',top=0,left=0,location=0,menubar=0,scrollbars=0,status=0,toolbar=0');
+window.open(url , 'WGA');
+}
+//-->
+</script>
+<!-- get the servername, -port and the projectname to build the path-->
+<tml:range var="SName"><%= request.getServerName() %></tml:range>
+<tml:range var="SPort"><%= request.getServerPort() %></tml:range>
+<tml:range var="Projekt"><%= request.getContextPath() %></tml:range>
+</head>
+<body bgcolor="#A0A29F" leftmargin="0" topmargin="0">
+<table border="0" cellspacing="0" cellpadding="0" width="100%" height="100%">
+<tr><td valign="top">
+
+
+
+<tml:comment>----------------  1. Kopf Tabelle (Anzeige Username)  --------------------</tml:comment>
+<table bgcolor="#FFFFFF" border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr valign="top">
+     <td align="left" background="<tml:url type="file" doc="BG" file="TopBGLiO.gif"/>">
+&nbsp;
+<font color="#484332"><!-- Username --></font>
+        </td>
+     <td align="right" background="<tml:url type="file" doc="BG" file="TopBGLiO.gif"/>"><img src="<tml:url type="file" doc="BG" file="TopBGoben_neu.gif"/>" width="593" height="25px"></td>
+  </tr>
+</table>
+<tml:comment>----------  2. Kopf Tabelle (Login, Sprache, Ed von Check usw.)  ------------</tml:comment>
+<tml:include ref="HeaderTable"/>
+<tml:comment>----------------------  3. Kopf Tabelle  ------------------------------</tml:comment>
+<table bgcolor="#000000" border="0" cellpadding="0" cellspacing="0" width="100%">
+ <tr>
+    <td align="right" background="<tml:url type="file" doc="BG" file="TopBGLiU.gif"/>"  height="17" colspan="2"><img src="<tml:url type="file" doc="BG" file="TopBGunten.jpg"/>" width="593" height="17"></td>
+ </tr>
+</table></td>
+</tr><tr>
+<td valign="top" height="100%">
+<tml:comment>----------------- Beginn der Content Tabelle mit Menue ------------------------</tml:comment>
+<table border="0" height="100%" cellpadding="0" cellspacing="0" width="1000">
+<tr>
+<td bgcolor="#5F655F" valign="top" width="180">
+<tml:include type="tml" ref="Hauptnavigation"/>
+</td>
+<td bgcolor="#000000" width="2" align="left" valign="top"><img height="100%"  width="2px" src="<tml:url type="file" doc="BlackDot" file="Blackdot.gif"/>"></td>
+<td>
+<img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width="10" height="500">
+</td>
+<td valign="top" width="808">
+<img src="<tml:url type="file" doc="blank" file="blank.gif"/>" height="4"><br>
+<tml:comment>---------------------- Content Tabelle   ------------------------------</tml:comment>
+<table width=100% border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td valign=top>
+<table border="0" width=100% cellspacing="0" cellpadding="0">
+<tr>
+<td valign="top" colspan="2" align="right"> 
+<img src="<tml:url type="file" doc="blank" file="blank.gif"/>" height="4" width="620">
+</td>
+<tr>
+<td class="inhalt" width="620" height=100% valign="top">
+<tml:include type="innerlayout"/>
+</td>
+<td><img src="<tml:url type="file" doc="blank" file="blank.gif"/>" width=10"></td>
+</tr>
+</table></td>
+<td valign="top">
+<tml:image name="RechterRand" src="RechterRand.gif">border="0" width="21" height="291"</tml:image>
+</td>
+<td valign=top   width="100%">
+<tml:comment>---------------------TopNews und Events------------------------</tml:comment>
+<tml:include type="tml" ref="Top_3"/>
+<br><br>
+<tml:comment><tml:include type="tml" ref="TopEvent"/><br></tml:comment>
+<tml:if condition ="Sprache='DE'">
+<tml:then>
+<TABLE border="0" cellspacing="0" cellpadding="0">
+<TR>
+<TD class="SmallFont" bgcolor="#848A84" align="center" class="smallFont">
+<b>Aktuelle Umfrage</b></TD>
+</TR>
+<TR>
+<TD class="SmallFont">
+<tml:image name="blank" src="blank.gif">height="10"  width="10" border="0"</tml:image></TD>
+</TR>
+<TR>
+<TD class="smallFont">
+<tml:include ref="vote-collection"><tml:option name="index">0</tml:option></tml:include></TD>
+</TR>
+<TR>
+<td align="right"><br><a href="<tml:url context="name:AktuelleUmfrage"/>">zur Abstimmung</a></td>
+</TR>
+</table>
+</tml:then>
+</tml:if>
+</td>
+</tr>
+</table>
+
+<tml:comment>---------------------- Fuss Tabelle ------------------------------</tml:comment>
+<tml:include type="tml" ref="Footer"/>
+</td>
+</tr>
+</table>
+</td></tr></table>
+<tml:warnings/>
+</body></HTML>

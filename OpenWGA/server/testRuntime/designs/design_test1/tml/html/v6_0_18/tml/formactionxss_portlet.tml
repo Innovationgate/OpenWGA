@@ -1,0 +1,30 @@
+<tml:action id="theAction">
+</tml:action>
+
+<tml:form id="theForm1">
+
+	<script>
+		function doSubmit1() {
+			var actionLink = "<tml:action ref="theAction" ajax="true"/>";
+			WGA.ajax.action({ 
+				action: actionLink + "', inject: (parent.document.getElementById('theField1').value = 'modifiedValue') , anyproperty:'",
+				portletKey: '<tml:script expression="portlet.portletkey"/>',
+				graydiv:false
+			});
+		}
+		
+		function doSubmit2() {
+			var actionLink = "<tml:action ref="theAction" ajax="true"/>";
+			WGA.ajax.action({ 
+				action: actionLink + '", inject: (parent.document.getElementById("theField1").value = "modifiedValue") , anyproperty:"',
+				portletKey: '<tml:script expression="portlet.portletkey"/>',
+				graydiv:false
+			});
+		}
+	</script>
+	
+	<button id="click1" onclick="doSubmit1(); return false;">Submit</button>
+	<button id="click2" onclick="doSubmit2(); return false;">Submit</button>
+
+</tml:form>
+	

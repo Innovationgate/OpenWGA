@@ -1,0 +1,43 @@
+<tml:eventscript onevent="eventFromPageScopeObject" action="$pc.doPageScopeEvent" ajax="true"/>
+
+<tml:button clickaction="$refresh" id="click2">Refresh</tml:button>
+
+<tml:button clickaction="$refresh" id="click4">Refresh</tml:button>
+
+Event param: <tml:item var="theEventParam" name="$pc.state.eventParam" output="true"/>
+
+Event param: <tml:item var="theEventParam2" name="$pc.state.eventParam2" output="true"/>
+
+<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		log.info("Click Step " + clickStep + ",  state: " + item("$pc.state.eventParam") + ", ajax:" + WGA.Call.ajax);
+		try {
+			if (clickStep == 2) {
+				log.info("Now testing portlet controller state: " + item("$pc.state.eventParam"));
+				assertEquals("Portlet received portlet event via web socket communication", cat, theEventParam, "Yes, we received the Portlet Event: eventFromPageScopeObject");
+			}
+			if (clickStep == 4) {
+				log.info("Now testing portlet controller state 2: " + item("$pc.state.eventParam2"));
+				assertEquals("JS listener received web socket message", cat, theEventParam2, "Yes, we received the message: This is sendCustomMessage");
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+</tml:script>
+
+
+<script>
+	WGA.websocket.messageListeners = [function(data) {
+		console.log("Received websocket message: " + JSON.stringify(data));
+		WGA.ajax.action({action:"<tml:action ref="$mc.doPageScopeEvent2"/>", params: data});
+	}];
+</script>

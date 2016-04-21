@@ -1,0 +1,40 @@
+<br>
+
+<div class="headline">
+	<tml:item
+	name="_Headline"
+	editor="textblock"
+	label="{this.LANGUAGE=='de' ? 'Überschrift des Artikels' : 'Headline of article'}"
+	/>
+</div>
+
+<br>
+
+<div class="date">
+	<tml:item
+	name="_date"
+	editor="date"
+	format="dd. MMMMMMMM yyyy"
+	label="{this.LANGUAGE=='de' ? 'Erscheinungsdatum' : 'date of first presentation'}"
+	/>
+</div>
+
+<br>
+
+<div class="abstract">
+	<tml:item
+	name="_ShortStory"
+	editor="textblock"
+	label="{this.LANGUAGE=='de' ? 'Kurze info über den Artikel' : 'short intro to article'}"
+	/>
+</div>
+
+<p>
+	<tml:item name="Body" editor="rtf" />
+</p>
+
+<tml:include ref="demohelper">
+	<tml:option name="usage-de">
+		Dieser Contenttyp demonstriert die Erfassung einer Pressemeldung. Pressemeldungen erscheinen automatisch auf der Startseite.
+	</tml:option>
+</tml:include>

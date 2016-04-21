@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+  <tml:htmlhead/> 
+</head>
+<body>
+<PRE>
+Test for FEATURE: F00004A8E - isFirst/LastLoop for condition tags
+</PRE>
+
+<tml:range var="simple1" output="true" trim="true">
+<tml:foreach type="loop" count="5" currentvalue="c">
+	<tml:case isfirstloop="true">
+		<tml:item name="c"/>
+	</tml:case>
+	<tml:case islastloop="true">
+		<tml:item name="c"/>
+	</tml:case>
+</tml:foreach>
+</tml:range>
+
+<hr>
+
+<tml:range var="simple2" output="true" trim="true">
+<tml:foreach type="loop" count="5" currentvalue="c">
+	<tml:case isfirstloop="false">
+		<tml:item name="c"/>
+	</tml:case>
+	<tml:case islastloop="false">
+		<tml:item name="c"/>
+	</tml:case>
+</tml:foreach>
+</tml:range>
+
+<hr>
+
+<tml:range var="complex" output="true" trim="true">
+<tml:foreach id="outer" type="loop" count="5" currentvalue="co">
+	<tml:case isfirstloop="true">
+		o<tml:item name="co"/>
+	</tml:case>	
+	<tml:foreach id="inner" type="loop" count="2" currentvalue="ci">
+		<tml:case isfirstloop="outer">
+			o<tml:item name="co"/>
+		</tml:case>
+		<tml:case islastloop="outer">
+			o<tml:item name="co"/>
+		</tml:case>
+		<tml:case isfirstloop="true">
+			i<tml:item name="ci"/>
+		</tml:case>
+		<tml:case islastloop="true">
+			i<tml:item name="ci"/>
+		</tml:case>
+	</tml:foreach>
+	<tml:case islastloop="true">
+		o<tml:item name="co"/>
+	</tml:case>
+</tml:foreach>
+</tml:range>
+
+<tml:script>
+var wgutils = Packages.de.innovationgate.utils.WGUtils;
+
+var simple1Result = wgutils.strReplace(simple1, "\n", "", true, false);
+simple1Result = wgutils.strReplace(simple1Result, " ", "", true, false);
+simple1Result = wgutils.strReplace(simple1Result, "\t", "", true, false);
+
+var simple2Result = wgutils.strReplace(simple2, "\n", "", true, false);
+simple2Result = wgutils.strReplace(simple2Result, " ", "", true, false);
+simple2Result = wgutils.strReplace(simple2Result, "\t", "", true, false);
+
+var complexResult = wgutils.strReplace(complex, "\n", "", true, false);
+complexResult = wgutils.strReplace(complexResult, " ", "", true, false);
+complexResult = wgutils.strReplace(complexResult, "\t", "", true, false);
+
+assertEquals("Check simple result 1", "tml", simple1Result, "15");
+assertEquals("Check simple result 2", "tml", simple2Result, "12233445");
+assertEquals("Check complex result", "tml", complexResult, "o1o1i1o1i2i1i2i1i2i1i2o5i1o5i2o5");
+</tml:script>
+
+
+<tml:warnings/>
+
+</body>
+</html>

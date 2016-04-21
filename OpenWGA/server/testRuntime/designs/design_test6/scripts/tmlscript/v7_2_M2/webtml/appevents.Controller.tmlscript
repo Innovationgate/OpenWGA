@@ -1,0 +1,61 @@
+function Controller(PageScopeObject) {
+}
+
+Controller.prototype.sendAppEvent = function() {
+	WGA.app().createEvent("thatEvent").param("data", "Here is event thatEvent").fire();
+}
+
+Controller.prototype.sendEndlessEvent = function(AppScopeObject) {
+
+	AppScopeObject.endlessEventCount = 0;
+
+	WGA.app().createEvent("endlessEvent").fire();
+}
+
+Controller.prototype.sendTransactionCommitEvent = function(AppScopeObject) {
+
+	AppScopeObject.transactionData = null;
+
+	var trans = WGA.app().db().startTransaction();
+	WGA.app().createEvent("transactionEvent").params({data: "Transaction commit"}).fire();
+	trans.commit();
+	
+}
+
+Controller.prototype.sendTransactionRollbackEvent = function(AppScopeObject) {
+
+	AppScopeObject.transactionData = null;
+
+	var trans = WGA.app().db().startTransaction();
+	WGA.app().createEvent("transactionEvent").params({data: "Transaction rollback"}).fire();
+	trans.rollback();
+	
+}
+
+
+Controller.prototype.sendMultipeEventPathTypes = function(ServerScopeObject) {
+
+	ServerScopeObject.serverEventTypes = [];
+
+	WGA.app().createEvent("serverEvent/subEvent").params({data: "Concatenated string"}).fire();
+	WGA.app().createEvent(["serverEvent", "subEvent"]).params({data: "String array"}).fire();
+	WGA.app().createEvent(["q=serverEvent", "q=subEvent"]).params({data: "String array with keys"}).fire();
+	WGA.app().createEvent([{q:"serverEvent"}, {q:"subEvent"}]).params({data: "Object array"}).fire();
+
+}
+
+Controller.prototype.sendSubEvents = function(ServerScopeObject) {
+	ServerScopeObject.wildcardSubEventTypes = [];
+	ServerScopeObject.specificNameSubEventTypes = [];
+	ServerScopeObject.specificSubEventPath = {};
+	
+	WGA.app().createEvent([{q:"subEvents"}, {q:"anySubEvent"}]).params({data: "Subevent to wildcard"}).fire();
+	WGA.app().createEvent([{q:"subEvents"}, {theData:"theValue"}]).params({data: "Subevent with specific name"}).fire();
+	
+	
+}
+
+Controller.prototype.sendSessionOnlyEvent = function(AppScopeObject) {
+	AppScopeObject.sessionOnlyEventCount=0;
+	WGA.app().createEvent("onlySessionScopeEvent").fireOnSession();
+}

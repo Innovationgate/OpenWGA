@@ -1,0 +1,40 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing attribute expression on tml:foreach (#00003825)
+	</PRE>
+	
+	<hr>
+	<tml:foreach id="theforeach" expression="WGA.nav(context('name:home')).children()">
+		<tml:range appendvar="resultlist"><tml:meta name="key"/></tml:range>
+	</tml:foreach>
+	
+	
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			var correctList = ["jjar-5xeqc8.de.5" , "jjar-5xeqgv.de.3" , "jjar-5xeqkq.de.2" , "jjar-5xeqjv.de.2" , "8a8181b50dc006c7010dc01b3efc0004.de.1" ,  "jjar-5xeqld.de.2"];
+			assertEqualLists("Using attribute expression on tml:foreach", cat, itemList("resultlist"), correctList, false);
+			assertEquals("Using attribute expression on tml:foreach: Correct size", cat, taginfo("theforeach", "count"), 6);	
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

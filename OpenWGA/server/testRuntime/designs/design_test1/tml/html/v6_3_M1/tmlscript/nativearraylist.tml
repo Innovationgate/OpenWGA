@@ -1,0 +1,71 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests writing access to native arrays via list interface  (#00003156)
+	</PRE>
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			
+			var arr = ["a", "b", "c"];
+			
+			var testClass = Packages.de.innovationgate.wga.test.v6_3_M1.tmlscript.NativeArrayList;
+			
+			testClass.doAdd(arr);
+			assertEquals("Add on native array - Elements", cat, WGA.createList(arr), WGA.createList(["a", "a1", "b", "c", "d"]));
+			assertEquals("Add on native array - Size", cat, testClass.getSize(arr), 5);
+			
+			testClass.doRemove(arr);
+			assertEquals("Remove on native array - Elements", cat, WGA.createList(arr), WGA.createList(["a", "a1", "d"]));
+			assertEquals("Remove on native array - Size", cat, testClass.getSize(arr), 3);
+
+			testClass.doAddAll(arr);
+			assertEquals("Add all on native array - Elements", cat, WGA.createList(arr), WGA.createList(["a", "a1", "b", "c", "d", "e", "f"]));
+			assertEquals("Add all on native array - Size", cat, testClass.getSize(arr), 7);
+			
+			var sublist = testClass.doSubList(arr);
+			assertEquals("Sublist on native array - Elements", cat, WGA.createList(sublist), WGA.createList(["b", "c", "d"]));
+			assertEquals("Sublist on native array - Size", cat, testClass.getSize(sublist), 3);
+			
+			testClass.doRemoveAll(arr);
+			assertEquals("Remove all on native array - Elements", cat, WGA.createList(arr), WGA.createList(["a", "a1", "b", "d", "e"]));
+			assertEquals("Remove all on native array - Size", cat, testClass.getSize(arr), 5);
+			
+			testClass.doRetainAll(arr);
+			assertEquals("Retain all on native array - Elements", cat, WGA.createList(arr), WGA.createList(["a1", "b", "d"]));
+			assertEquals("Retain all on native array - Size", cat, testClass.getSize(arr), 3);
+			
+			testClass.doListIterator(arr);
+			assertEquals("List iterator on native array - Elements", cat, WGA.createList(arr), WGA.createList(["b", "c", "e"]));
+			assertEquals("List iterator on native array - Size", cat, testClass.getSize(arr), 3);
+			
+			testClass.doClear(arr); 
+			assertEquals("Clear on native array - Elements", cat, WGA.createList(arr), WGA.createList());
+			assertEquals("Clear on native array - Size", cat, testClass.getSize(arr), 0);
+			
+			
+		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<html>
+<body>
+
+<tml:script>
+// Various TMLScript functionality
+assertEquals("TMLScript-Function javaObject()", "tmlscript", javaObject("   TrimMe    ").trim(), "TrimMe");
+</tml:script>
+
+<tml:script>
+var xml = '<config><dbkey>crm</dbkey><viewname>firmen</viewname><cols><col title="ID">FirmenID</col><col title="Firmenname">companyName</col><col title="PLZ">companyMainZip</col><col title="Ort">companyCity</col><col title="Telefon">companyPhone</col><col title="Erstellt am" type="expression">@created</col></cols></config>';
+assertEquals("TMLScript-Function xpath()", "tmlscript", xpath(xml, "/config/dbkey/text()"), "crm");
+</tml:script>
+
+<tml:script>
+var xml = "<xml><elem>Hallo User!</elem></xml>";
+var doc = parseXML(xml);
+assertEquals("TMLScript-Function parseXML", "tmlscript", doc.selectSingleNode("/xml/elem").getStringValue(), "Hallo User!");
+</tml:script>
+
+<tml:script>
+// Test cases without "this"
+var listString = "Alpha,Beta,Gamma";
+var listArray = listString.split(',');
+var list1 = createList(listArray);
+assertEquals("TMLScript-Function createList(JS-Array)", "tmlscript", list1.size(), 3);
+
+var arr = java.lang.reflect.Array.newInstance(java.lang.String, 3);
+arr[0] = "a";
+arr[1] = "b";
+arr[2] = "c";
+var list3 = createList(arr);
+assertEquals("TMLScript-Function createList(Java-Array)", "tmlscript", list3.size(), 3);
+
+var list4 = createList();
+assertEquals("TMLScript-Function createList()", "tmlscript", list4.size(), 0);
+
+var list5 = createList("a;b;c;d;e", ";");
+assertEquals("TMLScript-Function createList(string, delimiter)", "tmlscript", list5.size(), 5);
+</tml:script>
+
+<tml:script>
+// Test cases with "this"
+var listString = "Alpha,Beta,Gamma";
+var listArray = listString.split(',');
+var list1 = this.createList(listArray);
+assertEquals("TMLScript-Function this.createList(JS-Array)", "tmlscript", list1.size(), 3);
+
+var arr = java.lang.reflect.Array.newInstance(java.lang.String, 3);
+arr[0] = "a";
+arr[1] = "b";
+arr[2] = "c";
+var list3 = this.createList(arr);
+assertEquals("TMLScript-Function this.createList(Java-Array)", "tmlscript", list3.size(), 3);
+
+var list4 = this.createList();
+assertEquals("TMLScript-Function this.createList()", "tmlscript", list4.size(), 0);
+
+var list5 = createList("a;b;c;d;e", ";");
+assertEquals("TMLScript-Function createList(string, delimiter)", "tmlscript", list5.size(), 5);
+
+var list6 = CREATEList();
+assertEquals("Case insensitive createList()", "tmlscript", list6.size(), 0);
+</tml:script>
+
+<tml:script>
+var bag = Packages.org.apache.commons.collections.TreeBag();
+bag.add("http://www.yahoo.com");
+assertEquals("Instantiating a java class per 'Packages.'-Syntax", "tmlscript", bag.iterator().next(), "http://www.yahoo.com");
+
+</tml:script>
+
+<tml:script>
+assertEquals("No warnings generated", "tmlscript", tag.getWarnings().size(), 0);
+</tml:script>
+<tml:warnings/>
+</body>
+</html>

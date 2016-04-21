@@ -1,0 +1,5 @@
+
+// Creating object from a different design
+
+var pluginObject = WGA.design("plugin-unittests").createObject("pluginobject");
+db().setAttribute("pluginObject", pluginObject);

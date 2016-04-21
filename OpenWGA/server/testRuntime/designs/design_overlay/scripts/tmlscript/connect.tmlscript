@@ -1,0 +1,1 @@
+WGA.design().registerDbGlobal("OverlayGlobal", WGA.design().createObject("objects:overlayglobal"));

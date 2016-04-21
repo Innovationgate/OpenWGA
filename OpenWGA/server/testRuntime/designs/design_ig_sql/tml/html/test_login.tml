@@ -1,0 +1,7 @@
+<html>
+<body>
+
+User: <tml:meta type="database" name="username"/><br/>
+<tml:warnings/>
+</body>
+</html>

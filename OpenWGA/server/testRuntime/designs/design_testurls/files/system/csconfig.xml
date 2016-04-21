@@ -1,0 +1,19 @@
+<de.innovationgate.wga.common.beans.csconfig.v3.CSConfig>
+  <staticClasspath>false</staticClasspath>
+  <shortcuts/>
+  <anonymousAccessLevel>10</anonymousAccessLevel>
+  <defaultAccessLevel>90</defaultAccessLevel>
+  <versionCompliance>wga5.0</versionCompliance>
+  <publisherOptions>
+    <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+      <name>DesignEncoding</name>
+      <value>ISO-8859-1</value>
+    </de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+  </publisherOptions>
+  <encoderMappings/>
+  <elementMappings/>
+  <remoteActions/>
+  <mediaKeys/>
+  <roles/>
+  <jobDefinitions/>
+</de.innovationgate.wga.common.beans.csconfig.v3.CSConfig>

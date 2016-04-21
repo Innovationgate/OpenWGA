@@ -1,0 +1,344 @@
+<tml:comment>----------------Anzahl der einzelnen Stimmen zählen und den Feldern A1-An zuweisen -------------------</tml:comment>
+<tml:evaluate var="A1">0</tml:evaluate>
+<tml:evaluate var="A2">0</tml:evaluate>
+<tml:evaluate var="A3">0</tml:evaluate>
+<tml:evaluate var="A4">0</tml:evaluate>
+<tml:evaluate var="A5">0</tml:evaluate>
+<tml:evaluate var="A6">0</tml:evaluate>
+
+<tml:collection  id="voting">
+<tml:query type="formula" db="vote" id ="wgquery">
+Abstimmung="J2EE_Engine"
+</tml:query>
+<tml:foreach type="content" sourcetag="voting"  id="dumpnotes">
+<tml:select>
+<tml:case condition="stimme=\"Keinen\"">
+<tml:evaluate var="A1" context="CurrentDocument">
+A1+1
+</tml:evaluate>
+</tml:case>
+<tml:case condition="stimme=\"IBM Websphere\"">
+<tml:evaluate var="A2" context="CurrentDocument">
+A2+1
+</tml:evaluate>
+</tml:case>
+<tml:case condition="stimme=\"BEA Weblogic\"">
+<tml:evaluate var="A3" context="CurrentDocument">
+A3+1
+</tml:evaluate>
+</tml:case>
+<tml:case condition="stimme=\"Tomcat\"">
+<tml:evaluate var="A4" context="CurrentDocument">
+A4+1
+</tml:evaluate>
+</tml:case>
+<tml:case condition="stimme=\"JRun\"">
+<tml:evaluate var="A5" context="CurrentDocument">
+A5+1
+</tml:evaluate>
+</tml:case>
+<tml:case condition="stimme=\"andere\"">
+<tml:evaluate var="A6" context="CurrentDocument">
+A6+1
+</tml:evaluate>
+</tml:case>
+</tml:select>
+</tml:foreach>
+</tml:collection>
+<tml:metadata type="taginfo" sourcetag="dumpnotes" name="count" var="countvote" output="false"/>
+<tml:evaluate var="ATotal">
+tmp_total := @TextToNumber(@Trim(@Text(countvote)));
+@If(tmp_total = 0; 1; tmp_total);
+</tml:evaluate>
+<tml:evaluate var="A1_Prozent">
+@TextToNumber(@Text(100/ATotal*A1; "F,2"))
+</tml:evaluate>
+<tml:evaluate var="A1_Prozent_Absolut">
+@Round(A1_Prozent)
+</tml:evaluate>
+<tml:evaluate var="A1_Prozent_100">
+100-A1_Prozent_Absolut
+</tml:evaluate>
+
+<tml:evaluate var="A2_Prozent">
+@TextToNumber(@Text(100/ATotal*A2; "F,2"))
+</tml:evaluate>
+<tml:evaluate var="A2_Prozent_Absolut">
+@Round(A2_Prozent)
+</tml:evaluate>
+<tml:evaluate var="A2_Prozent_100">
+100-A2_Prozent_Absolut
+</tml:evaluate>
+
+<tml:evaluate var="A3_Prozent">
+@TextToNumber(@Text(100/ATotal*A3; "F,2"))
+</tml:evaluate>
+<tml:evaluate var="A3_Prozent_Absolut">
+@Round(A3_Prozent)
+</tml:evaluate>
+<tml:evaluate var="A3_Prozent_100">
+100-A3_Prozent_Absolut
+</tml:evaluate>
+
+<tml:evaluate var="A4_Prozent">
+@TextToNumber(@Text(100/ATotal*A4; "F,2"))
+</tml:evaluate>
+<tml:evaluate var="A4_Prozent_Absolut">
+@Round(A4_Prozent)
+</tml:evaluate>
+<tml:evaluate var="A4_Prozent_100">
+100-A4_Prozent_Absolut
+</tml:evaluate>
+
+<tml:evaluate var="A5_Prozent">
+@TextToNumber(@Text(100/ATotal*A5; "F,2"))
+</tml:evaluate>
+<tml:evaluate var="A5_Prozent_Absolut">
+@Round(A5_Prozent)
+</tml:evaluate>
+<tml:evaluate var="A5_Prozent_100">
+100-A5_Prozent_Absolut
+</tml:evaluate>
+
+<tml:evaluate var="A6_Prozent">
+@TextToNumber(@Text(100/ATotal*A6; "F,2"))
+</tml:evaluate>
+<tml:evaluate var="A6_Prozent_Absolut">
+@Round(A6_Prozent)
+</tml:evaluate>
+<tml:evaluate var="A6_Prozent_100">
+100-A6_Prozent_Absolut
+</tml:evaluate>
+<tml:eval language="tmlscript" var="VoteCookie">
+if (this.cookies.length > 0) {
+for (i=0;i < this.cookies.length; i++) {
+if (this.cookies[i].name == "Voting_ID") {
+return this.cookies[i].value;
+}
+}
+}
+</tml:eval>
+
+<div align="center">
+<TABLE border=0 cellspacing=0 cellpadding=0 width="500">
+<TR>
+<TR>
+<TD id="SmallFont" Colspan=2><tml:image name="blank" src="blank.gif"> height="10" width="10" border="0"</tml:image></TD>
+</TR>
+<TD id="SmallFont" Colspan=2 id="smallFont"><b>
+<tml:if condition="Sprache='DE'">
+<tml:then>Welchen J2EE Application Server setzen Sie neben Lotus Domino für Ihre Webanwendungen ein?</tml:then>
+<tml:else>How important do you consider Websites that present content according to your personal profile?</tml:else>
+</tml:if>
+</b></TD>
+</TR>
+<TR>
+<TD id="SmallFont" Colspan=2><tml:image name="blank" src="blank.gif">height="10" width="10" border="0"</tml:image></TD>
+</TR>
+<TR>
+<TD id="SmallFont">
+<tml:comment>----------------Wenn der User nochnicht abgestimmt hat  -------------------</tml:comment>
+
+<tml:if condition="VoteCookie != 'J2EE_Engine' ">
+<tml:then>
+<form name="WebForm" action="http://www.innovationgate.de/C1256B28003459E5/pushToDB?OpenAgent" method="post" enctype="application/x-www-form-urlencoded" onSubmit="return Validate()">
+
+<script language="Javascript">
+<!--
+// This function gets data from the client's cookie
+function getCookieData(name)
+{
+ var nameLen = name.length
+ var cLen = document.cookie.length
+ var i = 0
+ var cEnd
+ while (i < cLen)
+ {
+  var j = i + nameLen
+  var k = j + 1
+  if (document.cookie.substring(i,j) == name)
+  {
+   cEnd = document.cookie.indexOf(";",j)
+   if (cEnd == -1)
+   {
+    cEnd = document.cookie.length
+   }
+  return unescape(document.cookie.substring(k,cEnd))
+  }
+  i++
+ }
+return ""
+}
+// This function adds a cookie to the client's browser
+function setCookie()
+{
+var exp = new Date();
+var oneYearFromNow = exp.getTime() + (365 * 24 * 60 * 60 * 1000);
+exp.setTime(oneYearFromNow);
+document.cookie = "Voting_ID=" + escape(document.WebForm.Voting_ID.value) + ";" + "path=/" + ";" + "expires=" + exp.toGMTString();
+}
+function Validate()
+{
+var empty = false;
+for(i=0; i<document.WebForm.Stimme.length; i++)
+if(document.WebForm.Stimme[i].checked == true)
+empty = true;
+if(empty == false)
+{
+alert("Bitte waehlen Sie eine Antwort aus!");
+document.WebForm.Stimme[0].focus();
+return false;
+}
+return true;
+}
+function Absenden()
+{
+        if (Validate() == true)
+        {
+setCookie();
+        document.WebForm.submit();
+        }
+}
+// -->
+</script>
+<input type="hidden" name="RootingKey" value="Abstimmungen">
+<input type="hidden" name="Abstimmung" value="J2EE_Engine">
+<input type="hidden" name="Voting_ID" type=text value="J2EE_Engine">
+<input type="hidden" name="WGRepID" value="C1256C29:0038F07D">
+<input type="hidden" name="WGDocID" value="<tml:evaluate>@Text(@DocumentUniqueID)</tml:evaluate>">
+<input type="hidden" name="Sprache" value="<tml:item name="Sprache"/>">
+<input type="hidden" name="RedirectURL" value="http://www2.innovationgate.de<tml:url context="docid:gbes-5exg5e.de.0"/>">
+<table border="0" cellspacing="0" cellpadding="0" width="500">
+<tr><td><tml:image name="blank" src="blank.gif"> width="1" height="10"</tml:image></td></tr>
+<tr><TD id="SmallFont">
+<input type=radio name="Stimme" value="Keinen">Keinen<br>
+<input type=radio name="Stimme" value="IBM Websphere">IBM Websphere<br>
+<input type=radio name="Stimme" value="BEA Weblogic">BEA Weblogic<br>
+<input type=radio name="Stimme" value="Tomcat">Tomcat<br>
+<input type=radio name="Stimme" value="JRun">JRun<br>
+<input type=radio name="Stimme" value="andere">andere<br>
+</td></tr>
+<tr><td ><tml:image name="blank" src="blank.gif"> width="1" height="10"</tml:image></td></tr>
+<tr><TD id="SmallFont" align="center"><br><br>
+<tml:if condition="Sprache='DE'">
+<tml:then>
+<input type=button value="Stimme abgeben" onClick="Absenden()" class="button">
+</tml:then>
+</tml:if>
+<tml:if condition="Sprache='EN'">
+<tml:then>
+<input type=button value="Vote" onClick="Absenden()" class="button">
+</tml:then>
+</tml:if>
+</td></tr>
+</table>
+</form>
+</tml:then>
+<tml:else>
+<tml:comment>----------------Wenn der Besucher schon abgestimmt hat -------------------</tml:comment>
+<TABLE border="0" cellspacing="0" cellpadding="0" width="500">
+<TR>
+<TD id="SmallFont" Colspan=3>&nbsp;</TD>
+</TR>
+<TR>
+<TD id="SmallFont" valign=top id="smallFont">Keinen</TD>
+<TD id="SmallFont"><tml:image name="blank" src="blank.gif"> height="1" width="5" border="0"</tml:image></TD>
+<TD id="SmallFont"><tml:image name="Minigifs" src="mitte1.gif"> width="<tml:item name="A1_Prozent_Absolut"/>" align="absMiddle" border="0" height="12"</tml:image>
+<tml:image name="blank" src="blank.gif"> height="12" width="<tml:item name="A1_Prozent_100"/>" align="absMiddle" border="0"</tml:image>
+<tml:image name="blank" src="blank.gif"> height="15"  width="5" align="absMiddle" border="0"</tml:image>
+<tml:item name="A1_Prozent"/>&nbsp;%&nbsp;&nbsp;(<tml:item name="A1"/>)</TD>
+</TR>
+<TR>
+<TD id="SmallFont" Colspan=3>&nbsp;</TD>
+</TR>
+<TR>
+<TD id="SmallFont" valign=top>IBM Websphere</TD>
+<TD id="SmallFont"><tml:image name="blank" src="blank.gif"> height="1" width="5" border="0"</tml:image></TD>
+<TD id="SmallFont"><tml:image name="Minigifs" src="mitte1.gif"> width=<tml:item name="A2_Prozent_Absolut"/> align="absMiddle" border="0" height="12"</tml:image>
+<tml:image name="blank" src="blank.gif"> height="12" width="<tml:item name="A2_Prozent_100"/>" align="absMiddle" border="0"</tml:image>
+<tml:image name="blank" src="blank.gif"> height="15"  width="5" align="absMiddle" border="0"</tml:image>
+<tml:item name="A2_Prozent"/>&nbsp;%&nbsp;&nbsp;(<tml:item name="A2"/>)</TD>
+</TR>
+<TR>
+<TD id="SmallFont" Colspan=3>&nbsp;</TD>
+</TR>
+<TR>
+<TD id="SmallFont" valign=top>BEA Weblogic</TD>
+<TD id="SmallFont"><tml:image name="blank" src="blank.gif"> height="1" width="5" border="0"</tml:image></TD>
+<TD id="SmallFont"><tml:image name="Minigifs" src="mitte1.gif"> width=<tml:item name="A3_Prozent_Absolut"/> align="absMiddle" border="0" height="12"</tml:image>
+<tml:image name="blank" src="blank.gif"> height="12" width="<tml:item name="A3_Prozent_100"/>" align="absMiddle" border="0"</tml:image>
+<tml:image name="blank" src="blank.gif"> height="15"  width="5" align="absMiddle" border="0"</tml:image>
+<tml:item name="A3_Prozent"/>&nbsp;%&nbsp;&nbsp;(<tml:item name="A3"/>)</TD>
+</TR>
+<TR>
+<TD id="SmallFont" Colspan=3>&nbsp;</TD>
+</TR>
+<TR>
+<TD id="SmallFont" valign=top>Tomcat</TD>
+<TD id="SmallFont"><tml:image name="blank" src="blank.gif"> height="1" width="5" border="0"</tml:image></TD>
+<TD id="SmallFont"><tml:image name="Minigifs" src="mitte1.gif"> width=<tml:item name="A4_Prozent_Absolut"/> align="absMiddle" border="0" height="12"</tml:image>
+<tml:image name="blank" src="blank.gif"> height="12" width="<tml:item name="A4_Prozent_100"/>" align="absMiddle" border="0"</tml:image>
+<tml:image name="blank" src="blank.gif"> height="15"  width="5" align="absMiddle" border="0"</tml:image>
+<tml:item name="A4_Prozent"/>&nbsp;%&nbsp;&nbsp;(<tml:item name="A4"/>)</TD>
+</TR>
+<TR>
+<TD id="SmallFont" Colspan=3>&nbsp;</TD>
+</TR>
+<TR>
+<TD id="SmallFont" valign=top>JRun</TD>
+<TD id="SmallFont"><tml:image name="blank" src="blank.gif"> height="1" width="5" border="0"</tml:image></TD>
+<TD id="SmallFont"><tml:image name="Minigifs" src="mitte1.gif"> width=<tml:item name="A5_Prozent_Absolut"/> align="absMiddle" border="0" height="12"</tml:image>
+<tml:image name="blank" src="blank.gif"> height="12" width="<tml:item name="A5_Prozent_100"/>" align="absMiddle" border="0"</tml:image>
+<tml:image name="blank" src="blank.gif"> height="15"  width="5" align="absMiddle" border="0"</tml:image>
+<tml:item name="A5_Prozent"/>&nbsp;%&nbsp;&nbsp;(<tml:item name="A5"/>)</TD>
+</TR>
+<TR>
+<TD id="SmallFont" Colspan=3>&nbsp;</TD>
+</TR>
+<TR>
+<TD id="SmallFont" valign=top>andere</TD>
+<TD id="SmallFont"><tml:image name="blank" src="blank.gif"> height="1" width="5" border="0"</tml:image></TD>
+<TD id="SmallFont"><tml:image name="Minigifs" src="mitte1.gif"> width=<tml:item name="A6_Prozent_Absolut"/> align="absMiddle" border="0" height="12"</tml:image>
+<tml:image name="blank" src="blank.gif"> height="12" width="<tml:item name="A6_Prozent_100"/>" align="absMiddle" border="0"</tml:image>
+<tml:image name="blank" src="blank.gif"> height="15"  width="5" align="absMiddle" border="0"</tml:image>
+<tml:item name="A6_Prozent"/>&nbsp;%&nbsp;&nbsp;(<tml:item name="A6"/>)</TD>
+</TR>
+<TR>
+<TD id="SmallFont" Colspan=3>&nbsp;</TD>
+</TR>
+<TR>
+<TD id="SmallFont" Colspan=3>&nbsp;</TD>
+</TR>
+<TR>
+<TD id="SmallFont" Colspan=3><b>
+<tml:if condition="Sprache='DE'"><tml:then>Anzahl Stimmen:</tml:then></tml:if>
+<tml:if condition="Sprache='EN'"><tml:then>number of votes:</tml:then></tml:if>
+<tml:item name="countvote"/></b></TD>
+</TR>
+<tml:if condition="@Contains(HTTP_Cookie; \"Voting_ID=Personalisierung\")">
+<tml:then>
+<TR>
+<TD id="SmallFont" Colspan=3><b>
+<tml:if condition="Sprache='DE'"><tml:then>Vielen Dank für Ihre Stimme!</tml:then></tml:if>
+<tml:if condition="Sprache='EN'"><tml:then>Thank you for your vote!</tml:then></tml:if>
+</b></TD>
+</TR>
+</tml:then>
+</tml:if>
+</TABLE>
+
+</tml:else>
+</tml:if>
+
+
+</TD>
+</TR>
+<tml:if condition="Sprache='DE'">
+<tml:then>
+<TR>
+<TD id="SmallFont" Colspan=2><tml:image name="blank" src="blank.gif"> height="10" width="10" align="absMiddle" border="0"</tml:image></TD>
+</TR>
+</tml:then>
+</tml:if>
+</TABLE>
+</div>

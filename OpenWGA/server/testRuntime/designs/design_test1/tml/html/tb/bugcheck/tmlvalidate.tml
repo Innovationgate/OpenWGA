@@ -1,0 +1,53 @@
+<html>
+<head>
+  <tml:htmlhead/>
+</head>
+<body>
+<HR>
+<PRE>
+Test
+</PRE>
+<BR>
+
+<tml:action id="store">
+tmlform.storeInContent();
+</tml:action>
+
+<tml:action id="clearmessages">
+tmlform.clearmessages();
+</tml:action>
+
+
+
+<tml:script>
+
+// Maintain call sequence
+if (isDefined("seq")) {
+	seq++;
+}
+else {
+	setSessionVar("seq", 1);
+}
+</tml:script>
+
+<tml:form source="none" id="form">
+
+Field 1: <tml:input name="field1" message="feld muss =10 sein nicht {@=$E_VALUE@}" 
+					validation="$P_VALUE==10" type="number"/><br/>
+Field 2: <tml:input name="field2" type="number"/><br/>
+
+<tml:validate condition="tmlform.field1 > tmlform.field2" output="false">
+	Feld1 ({@=tmlform.field1@}) muss größer als Feld2 ({@=tmlform.field2@}) sein.
+</tml:validate>
+<tml:button clickaction="store" id="store">store</tml:button><BR/>
+<tml:button clickaction="$refresh" id="refresh">refresh</tml:button><BR/>
+<tml:button clickaction="clearmessages" id="clearmessages">clearmessages</tml:button>
+
+<br/>
+<HR/>
+<tml:formmessages/>
+
+</tml:form>
+
+</body>
+</html>

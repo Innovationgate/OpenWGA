@@ -1,0 +1,47 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests More modifiers for JS Functions (#00004564)
+	Also tests throwing portlet/app events via action result object (#00004594)
+	</PRE>
+	
+	<tml:button clickaction="$mc.nonIsolatedMethod" id="click1">Non Isolated Method</tml:button>
+	<tml:button clickaction="$mc.syncedMethod" id="click2">Non Isolated Method</tml:button>
+	
+	<tml:portlet name="theportlet" ref="::morefunctionmodifiers_portlet:portlet"/>
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			if (clickStep == 1) {
+				assertEquals("nonIsolated() uses non-isolated WGA", cat, isolationState, false);
+				assertEquals("nonIsolated() uses original TML context", cat, statement, "Thank god I'm not isolated");
+			}
+			else if (clickStep == 2) {
+				assertEquals("synced() method holds object monitor", cat, syncedMethodIsLocked, true);
+			}
+			
+				
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

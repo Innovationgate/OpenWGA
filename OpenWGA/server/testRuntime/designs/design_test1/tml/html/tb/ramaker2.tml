@@ -1,0 +1,23 @@
+<tml:collection >	
+			<tml:query id="q1" type="sql" db="servlet">
+				SELECT * FROM `addresses` WHERE `id` = '1';
+			</tml:query>
+			
+			<tml:foreach pagesize="1">
+				Username=<tml:item name="firstname"/> <tml:item name="lastname"/><br><br>
+			</tml:foreach>
+</tml:collection>
+
+
+
+<tml:collection >	
+			<tml:query type="sql" db="servlet">
+				SELECT * FROM `addresses` WHERE `id` = '2';
+			</tml:query>		
+		<tml:foreach pagesize="1">
+				Username=<tml:item name="firstname"/> <tml:item name="lastname"/><br><br>
+		</tml:foreach>	
+</tml:collection>
+
+
+<tml:warnings/>

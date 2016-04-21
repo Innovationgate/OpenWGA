@@ -1,0 +1,18 @@
+<html>
+<body>
+<hr>
+<pre>
+Testing correct results on the count of an areas navigator.
+</pre>
+<hr>
+<h2>Area-Navigator</h2>
+<tml:navigator id="nav" type="areas" context="db:ig<de>/docid:GBES-5DPAFQ.de.0">
+<tml:foreach type="level">-</tml:foreach><tml:link/><br/>
+</tml:navigator>
+
+<tml:script>
+assertEquals("Correct count of elements in areas navigator", "Navigation", taginfo('nav', 'count'), 8);
+</tml:script>
+<tml:warnings/>
+</body>
+</html>

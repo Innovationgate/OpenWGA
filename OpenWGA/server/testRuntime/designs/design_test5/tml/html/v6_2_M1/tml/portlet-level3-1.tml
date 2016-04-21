@@ -1,0 +1,73 @@
+<tml:action id="actionOnJSEvent">
+	eventActionRan = true;
+	actionEventP1 = request.getParameter("p1");
+	actionEventP2 = parseInt(request.getParameter("p2"));
+	actionEventP3 = WGA.parseDate(request.getParameter("p3"), "iso8601");
+	actionEventP4 = (request.getParameter("p4") == "true")
+</tml:action>
+
+
+
+<script>
+
+WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "thatEvent", function(e) {
+WGA.ajax.action({
+		action:"<tml:action ref="actionOnJSEvent"/>",
+			params: {
+				p1: e.params.p1,
+				p2: e.params.p2,
+				p3: e.params.p3,
+				p4: e.params.p4, 
+			}
+		}); 
+});
+
+</script>
+
+<a id="click6" href="<tml:url action="updateAction" ajax="true"/>">Reload Level 3</a>
+
+<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return "0";
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+		
+			if (clickStep == 0) {
+				portlet.setMode("edit");
+				portlet.setSessionVar("name", portlet.name);
+				portlet.setcontext(context("name:home"));
+			}
+
+			if (clickStep == 6) {
+				assertEquals("Reload Level 3 - Action ran", cat, actionRan, true);
+				assertEqualLists("Reload Level 3 - Sent portlet states from client match expected states", cat, sentStates, ["level1-1", "level2-1", "level3-1"]);
+			}
+			
+			if (clickStep == 7) {
+				assertEquals("Throw JS event - Event action ran", cat, eventActionRan, true);
+				assertEquals("Throw JS event - Read string event parameter in action", cat, actionEventP1, "value1");
+				assertEquals("Throw JS event - Read number event parameter in action", cat, actionEventP2, 5.0);
+				assertEquals("Throw JS event - Read date event parameter in action", cat, actionEventP3, WGA.parseDate("1999.12.31 23:59:59", "yyyy.MM.dd HH:mm:ss"));
+				assertEquals("Throw JS event - Read boolean event parameter in action", cat, actionEventP4, true);
+			}
+			
+			
+			assertEquals("ClickStep " + clickStep + " - Portlet still owns mode", cat, portlet.mode, "edit");
+			assertEquals("ClickStep " + clickStep + " - Portlet still owns session variable", cat, portlet.getsessionvar("name"), "level3-1");
+			assertEquals("ClickStep " + clickStep + " - Portlet still owns context", cat, portlet.context.path, context("name:home", false).path);
+			
+
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+Level 3 - 1 - Mode <tml:script expression="portlet.mode"/>

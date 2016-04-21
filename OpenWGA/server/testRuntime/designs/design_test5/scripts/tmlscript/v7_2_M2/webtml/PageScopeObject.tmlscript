@@ -1,0 +1,7 @@
+function PageScopeObject() {
+}
+
+PageScopeObject.prototype.doPageScopeEvent = function($event, $websocket) {
+	WGA.log.info("Page Scope Object received event. Param: " + $event.params.data);
+	$websocket.firePortletEvent("eventFromPageScopeObject", {param: $event.params.data});
+}.listenToAppEvents("pageScopeEvent");

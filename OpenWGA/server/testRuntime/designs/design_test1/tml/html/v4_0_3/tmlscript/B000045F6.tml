@@ -1,0 +1,41 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<tml:action id="append">
+	tmlform.appendtofield("aCustomField", "x"); 	
+</tml:action>
+
+<tml:script>
+	if (!isdefined("sequence")) {
+		setSessionVar("sequence", 0);
+	} else {
+		setSessionVar("sequence", sequence + 1);
+	}	
+</tml:script>
+
+<body>
+	<PRE>
+	Tests if appendtofield is possible for custom form fields 'B000045F6'
+	</PRE>
+	
+	Sequence: <tml:item name="sequence"/> <br>
+	
+	<tml:form id="aForm">
+		Value of aCustomField: <tml:script>return tmlform.fieldlist("aCustomField")</tml:script><br>		
+		<tml:button clickaction="append" id="append">append</tml:button>
+	</tml:form>
+	
+	<tml:script>
+		var expectedValue = createlist();
+		for (var i=0; i < sequence; i++) {
+			expectedValue.add("x");
+		}
+		var compareValueFormField = tmlform.fieldlist("aCustomField");
+		
+		assertEquals("Form field 'aCustomField' has expected value (multiple of 'x')", "TMLScript", compareValueFormField, expectedValue);
+	</tml:script>
+
+	<tml:warnings/>
+</body>
+</html>

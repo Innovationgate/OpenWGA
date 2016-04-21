@@ -1,0 +1,8 @@
+<tml:script>
+setvar("externalportlet", "included");
+if (request.getAttribute(WGACore.ATTRIB_AJAXINFO) != null) {
+	setSessionVar("ajaxreload", "true");
+}
+</tml:script>
+
+<a name="ajaxrefresh" href="<tml:url ajax="true" action="$refresh"/>">Refresh</a>

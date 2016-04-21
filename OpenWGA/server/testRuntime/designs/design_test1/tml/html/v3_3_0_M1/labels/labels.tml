@@ -1,0 +1,103 @@
+ <html>
+<body>
+
+<HR>
+<PRE>
+Testing functionality around WebTML-labels:
+- Retrieving a label that is available under the preferred language
+- ...that is available only under a language configured in browser settings
+- ...that is available only in databases default language
+- ...that is not available. Filename and key must be returned in that case
+- Retrieving via WebTML-Tag tml:label
+- Retrieving via TMLScript-function this.label
+- Retrieving via attribute expression "{label:...}"
+- Retrieving via preprocessor tag {%label:...%}
+- Retrieving with parameters
+- Retrieving from outside WebTML (Since 4.1.2)
+</PRE>
+
+<tml:action master="true" id="nonWebTMLLabel">
+return label("label4");
+</tml:action>
+
+<tml:range labelfile="general">
+
+<p>
+Label aus preferred language (fr):
+<tml:label output="true" var="label1" key="label1"/>
+</p>
+<p>
+Label aus browser language, genau (de_DE):
+<tml:label output="true" var="label2" key="label2"/>
+</p>
+<p>
+Label aus browser language, parent (de):
+<tml:label output="true" var="label3" key="label3"/>
+</p>
+<p>
+Label aus database default language (en):
+<tml:label output="true" var="label4" key="label4"/>
+</p>
+<p>
+Nicht existierendes label:
+<tml:label output="true" var="label5" key="label5"/>
+</p>
+<p>
+Label-Abruf per TMLScript:
+<tml:script output="true" var="label_tmlscript">return label(null, null, "label1");</tml:script>
+</p>
+<p>
+Label-Abruf per Attribut-Ausdruck:
+<tml:range output="true" var="{label:label1}">TheLabel</tml:range>
+</p>
+<p>
+Label-Abruf per Präprozessor:
+<tml:range output="true" var="label_preprocessor">{%label:label1%}</tml:range>
+</p>
+<p>
+Label Abruf mit (allen) parametern:
+<tml:label output="true" var="label_params1" key="label_params" param1="A" param2="B" param3="C" param4="D" param5="E"/>
+</p>
+<p>
+Label Abruf mit (zwei) parametern:
+<tml:label output="true" var="label_params2" key="label_params" param4="D" param5="E"/>
+</p>
+<p>
+Label Abruf von anderer Property-Datei:
+<tml:label output="true" var="nongeneral_label"  file="nongeneral" key="label1"/>
+</p>
+<p>
+Label Abruf von anderem Container und Property-Datei:
+<tml:label output="true" var="otherlabels_label"  container="otherlabels" file="nongeneral" key="label1"/>
+</p>
+<p>
+Label Abruf von einer Sprache "es" die nicht als Sprachdefinition vorhanden ist (#00000096)
+<tml:label output="true" var="label6" key="label6"/>
+</p>
+
+<tml:script>
+// Assertions:
+assertEquals("Verifying preferred language as fr", "labels", this.meta('session', 'language'), "fr");
+assertEquals("Label from preferred language", "labels", label1, "LABEL1_fr");
+assertEquals("Label from browser language, exact", "labels", label2, "LABEL2_de_DE");
+assertEquals("Label from browser language, parent", "labels", label3, "LABEL3_de");
+assertEquals("Label from db default language", "labels", label4, "LABEL4_en");
+assertEquals("Unknown label", "labels", label5, "#general.label5");
+assertEquals("Label with undefined language", "labels", label6, "LABEL6_es");
+assertEquals("Requesting label via TMLScript", "labels", label_tmlscript, "LABEL1_fr");
+assertEquals("Requesting label via attribute expression", "labels", this.item("LABEL1_fr"), "TheLabel");
+assertEquals("Requesting label via preprocessor expression", "labels", label_preprocessor, "LABEL1_fr");
+assertEquals("Requesting label with all parameters", "labels", label_params1, "A-B-C-D-E");
+assertEquals("Requesting label with some parameters", "labels", label_params2, "---D-E");
+
+assertEquals("Label from other property file", "labels", nongeneral_label, "NONGENERAL_LABEL1_de");
+assertEquals("Label from other container", "labels", otherlabels_label, "OTHERLABELS_NONGENERAL_LABEL1_de");
+
+var actionLabel = callAction("nonWebTMLLabel");
+assertEquals("Label from Non-WebTML-Environment", "labels", actionLabel, "LABEL4_en");
+</tml:script>
+
+</tml:range>
+
+</body>
+</html>

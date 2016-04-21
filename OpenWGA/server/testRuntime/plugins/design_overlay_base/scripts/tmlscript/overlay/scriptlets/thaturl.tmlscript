@@ -1,0 +1,1 @@
+return fileurl("images", "header-background.jpg");

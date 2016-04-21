@@ -1,0 +1,62 @@
+function Controller($cx) {
+	this.state = {
+		$mode: "view",
+		$options: {
+			optionFromController:"optionA"
+		},
+		theContext: $cx.path,
+		theProp: "TheProperty"
+	}
+	
+	this.util = new $.v7_2_M2.controllers.theportlet.PortletUtil();
+	this.util2 = new $$.PortletUtil();
+}
+
+
+Controller.prototype.doNumberOne = function($cx) {
+	WGA.log.info("Going to context " + $cx.path);
+	this.state.$mode = "edit";
+	this.state.$context = $cx;
+	this.state.$options.anotherOptionFromController = "optionB";
+	this.state.somethingDifferent = "yes";
+}
+
+Controller.prototype.getSomething = function() {
+	return "something";
+}
+
+Controller.prototype.getUtilSomething = function() {
+	return this.util.getSomething();
+}
+
+Controller.prototype.getUtil2Something = function() {
+	return this.util2.getSomething();
+}
+
+Controller.prototype.getSomethingWithParams = function(someParam) {
+	return "something plus:" + someParam;
+}
+
+Controller.prototype.getAppKey = function() {
+	return WGA.app().getDbKey();
+}
+
+Controller.prototype.getScopeIds1 = function(ServerScopeObject, AppScopeObject) {
+	return (ServerScopeObject.getId() + "/" +AppScopeObject.getId());
+}
+
+Controller.prototype.getScopeIds2 = function(ServerScopeObject, AppScopeObject) {
+	return (ServerScopeObject.getId() + "/" + AppScopeObject.getAppId());
+}
+
+Controller.prototype.setLocalState = function() {
+	this.theLocalState = "Yes!";
+}
+
+Controller.prototype.isWGAIsolated = function() {
+	return WGA.isIsolated();
+}
+
+Controller.prototype.isCxIsolated = function($cx) {
+	return  !$cx.isWebEnvironment() && $cx.request == null && $cx.response == null && $cx.httpsession == null;
+}

@@ -1,0 +1,9 @@
+function ThatObject() {
+
+	
+
+}
+
+ThatObject.prototype.doIt = function() {
+	return "Did it";
+}

@@ -1,0 +1,50 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests the new file related TMLForm methods
+	</PRE>
+	
+	<tml:form id="theform" source="none">
+	</tml:form>
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "TMLForm:NewFileMethods";
+		try {
+			
+			configFile = wgacore.getConfigFile();
+			tmlform.addFile(configFile, "wgaxml");
+			formFile = tmlform.getFile("wgaxml");
+			log.info("Form file is " + formFile.getAbsolutePath());
+			assertTrue("Added file to form", cat, "formFile != null");
+			
+			configXML = Packages.de.innovationgate.utils.WGUtils.readString(new java.io.FileReader(configFile));
+			formXML = tmlform.getFileText('wgaxml');
+			
+			assertEquals("File on form has equal contents as source file", cat, configXML, formXML);
+			
+			result = tmlform.removeFile("wgaxml");
+			assertTrue("Remove file operation succeeded", cat, "result == true");	
+			assertTrue("File was removed from TMLForm", cat, 'tmlform.getFile("wgaxml") == null');
+			
+			java.lang.System.gc();
+			java.lang.Thread.sleep(1000 * 60);
+			
+			assertTrue("File was removed from disc", cat, 'formFile.exists() == false');
+						
+			assertTrue("Original file still exists", cat, 'configFile.exists() == true');
+					
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

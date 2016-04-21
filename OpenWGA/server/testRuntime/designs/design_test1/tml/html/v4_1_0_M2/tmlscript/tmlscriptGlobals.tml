@@ -1,0 +1,47 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Test case description
+	</PRE>
+	
+	<hr>
+	
+	<tml:action id="tmlscriptGlobalScope">
+		var TheCore = "LocalVar";
+		return TheCore;
+	</tml:action>
+	
+	<tml:script>
+		var cat = "category";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertEquals("Registration of Class as TMLScript global", cat, WGUtils.encodeHTML("Hallo!<br>"), "Hallo!&#60;br&#62;");
+			assertEquals("Registration of Package as TMLScript global", cat, WGAPI.WGDatabase.ACCESSLEVEL_MANAGER, 90);
+			assertEquals("Registration of Java Object as TMLScript global", cat, TheCore.getCharacterEncoding(), "UTF-8");
+			assertEquals("Registration of TMLScript Object as TMLScript global", cat, ScriptObject.myVal, "Test");		
+			
+			// We must externalize this test bc. of Rhino behaviour: Local vars "overwrite" all global scope objects in the current script even before their definition!
+			var scopeObj = callAction("tmlscriptGlobalScope");
+			assertEquals("Local variables have precedence before TMLScript globals", cat, scopeObj, "LocalVar");
+			
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

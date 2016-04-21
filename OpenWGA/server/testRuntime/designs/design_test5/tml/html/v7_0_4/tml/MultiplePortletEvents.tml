@@ -1,0 +1,22 @@
+<html>
+	<head><tml:htmlhead/></head>
+	
+	<body>
+	
+			
+		<tml:action id="fireUserFilter">
+			var ev = createevent("user-filter");
+			portlet.fireevent(ev);
+			_actionFired = true;
+		</tml:action>
+	
+		<tml:action id="fireTagFilter">
+			var ev = createevent("tag-filter");
+			portlet.fireevent(ev);
+			_actionFired = true;
+		</tml:action>
+	
+		<tml:portlet ref="::MultiplePortletEvents_portlet1" ajax="true" name="theportlet1"/>
+		<tml:portlet ref="::MultiplePortletEvents_portlet2" ajax="true" name="theportlet2"/>
+	</body>
+</html>

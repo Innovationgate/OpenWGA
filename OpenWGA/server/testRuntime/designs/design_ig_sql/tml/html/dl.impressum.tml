@@ -1,0 +1,68 @@
+<html>
+<head>
+<tml:include type="tml" ref="HeadBereich" medium="html"/>
+<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="Impressum"/>"/>
+<script Language="Javascript" type="text/Javascript" src="<tml:url type="js" name="StandardScript"/>"></script>
+<script Language="Javascript" type="text/Javascript" src="<tml:url type="js" name="EdvonCheck"/>"></script>
+</head>
+<body bgcolor="#A0A29F" leftmargin="0" topmargin="0">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" >
+<tr>
+<td bgcolor="#000000" style="padding-left:5px">
+<font style="color:#FFC300; font-size:12pt; font-weight:bold">Impressum</font></td>
+<td bgcolor="#000000" align="right"><tml:image name="Logos" src="IGLogoschwarz.gif"> border=0</tml:image></td>
+</tr>
+<tr>
+<td align="right" background="<tml:url type="file" doc="BG" file="TopBGLiU.gif"/>"  height="17" colspan="2">
+<img src="<tml:url type="file" doc="BG" file="TopBGunten.jpg"/>" width="400" height="17"></td>
+</tr>
+</table>
+<table border="0" cellspacing="0" cellpadding="0">
+<tr>
+<td rowspan="3" valign="top">
+<tml:image name="blank"src="blank.gif"> width="125" height="20"</tml:image><br>
+<table border="0" cellspacing="0" cellpadding="0">
+<tml:children context="Root">
+<tr>
+<td class="childnav">
+<tml:if isselected="false">
+<tml:then>
+<tml:link/>
+</tml:then>
+<tml:else>
+<tml:item name="titel"/>
+</tml:else>
+</tml:if>
+</td></tr>
+</tml:children>
+</table>
+<tml:image name="blank"src="blank.gif"> width="1"</tml:image></td>
+<td>
+<table cellspacing="0" cellpading="0">
+<tr>
+<tml:siblings context="root">
+<tml:if isselected="true">
+<tml:then>
+<td class="reiterleiste" bgcolor="#5f655f"><tml:item name="titel"/></td>
+</tml:then>
+<tml:else>
+<td class="reiterleiste"><tml:link/></td>
+</tml:else>
+</tml:if>
+</tml:siblings>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td style="border-color:#000000;border-left-style:solid;border-width:1;padding-left:6px;padding-right:4px">
+<tml:image name="blank"src="blank.gif"> width="1" height="10"</tml:image></td>
+</tr>
+<tr>
+<td style="border-color:#000000;border-left-style:solid;border-width:1;padding-left:6px;padding-right:4px" valign="top" height="350">
+<tml:include type="innerlayout"/>
+</td>
+ </tr>
+ </table>
+</body>
+</html>

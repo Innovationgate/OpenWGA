@@ -1,0 +1,55 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests the functionality of changeactions on tml:inputs
+	</PRE>
+	
+	<hr>
+	
+	
+	<tml:action id="theChangeAction">
+		actionSeq = seq;
+	</tml:action>
+	
+	<tml:form id="changeaction" source="none">
+	
+		<h3>Wer wird Europameister 2008?</h3>
+		<tml:input name="select" type="select" changeaction="theChangeAction" options="Deutschland,Niederlande,Spanien"/>
+
+		<h3>Wer schiesst die meisten Tore?</h3>
+		<tml:input name="radio" type="radio" changeaction="theChangeAction" options="Oliver Neuville,David Villa,Christiano Ronaldo"/>
+
+		<h3>Was nervt an der Euro 2008?</h3>
+		<tml:input name="checkbox" type="checkbox" changeaction="theChangeAction" options="Moderatoren|mod,Regen|rain,Interviews|iv"/>
+	
+	</tml:form>
+	
+	
+	<tml:script>
+		var cat = "TML:ChangeAction";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			if (seq > 1) {
+				assertEquals("Change action has been called", cat, actionSeq, seq-1); 
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

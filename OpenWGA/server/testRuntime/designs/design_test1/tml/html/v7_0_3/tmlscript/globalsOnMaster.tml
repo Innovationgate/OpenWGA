@@ -1,0 +1,16 @@
+<tml:include designdb="testhdbmodel" ref="v7_0_3:tmlscript:globalsonmaster"/>
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing access to TMLScript globals inside a master function, run on a page action
+	</PRE>
+	
+	<hr>
+	<tml:button id="click1" clickaction="theaction">Do action</tml:button>
+
+	<tml:warnings/>
+</body>
+</html>

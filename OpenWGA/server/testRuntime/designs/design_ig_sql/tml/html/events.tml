@@ -1,0 +1,25 @@
+<tml:collection id ="event">
+<tml:query type="formula">
+_IGEvent="Ja" 
+</tml:query>
+<tml:foreach id="dumpevents" type="content" sourcetag="event" sortorder="descending" sortexpression="_EventDateStart">
+<table border="0" cellspacing="0" width="100%">
+<tr>
+<td class="BGRahmen_rechtsoffen">
+<b><a href="<tml:url/>"><tml:item name= "_Event"/></a></b> vom <tml:item name="_EventDateStart" format="dd.MM.yyyy"/> bis <tml:item name="_EventDateEnde" format="dd.MM.yyyy"/>
+</td>
+<td class="BGRahmen_linksoffen" align="right">
+<a href="<tml:url/>"><tml:img name="Navigation" src="NavTrans1.gif"> border="0"</tml:img></a>
+</td>
+</tr>
+<tr>
+<td colspan="2">
+<tml:item name="_EventOrt"/> <tml:item name= "_EventHalle"/><br>
+</td>
+</tr>
+<tr>
+<td colspan="2"><tml:img name="blank" src="blank.gif">width="1" height="10"</tml:img></td>
+</tr>
+</table>
+</tml:foreach>
+</tml:collection>

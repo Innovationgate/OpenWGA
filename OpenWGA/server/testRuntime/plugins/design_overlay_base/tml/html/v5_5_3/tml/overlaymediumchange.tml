@@ -1,0 +1,37 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	#00001441: Layout URLs in overlays do not include ":overlay" prefix if the medium is changed 
+	</PRE>
+	
+	<tml:include ref="overlay:v5_5_3:tml:overlaymediumchange"/>
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "WebTML:Overlays";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertEquals("Medium-changing layout URL stays in overlay", cat, theurl, meta("request", "wgaurl") + "/overlaytest/ipad/overlay:home.en.ipad");
+			registerAssertTrue("followMediumURL", "Overlay layout from other medium could be called via URL", cat);
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

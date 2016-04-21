@@ -1,0 +1,9 @@
+var x="Private field";
+
+this.outerFunction = function() {
+	return runMasterMethod(this.masterFunction);
+}
+
+this.masterFunction = function(){
+	return x; 
+}

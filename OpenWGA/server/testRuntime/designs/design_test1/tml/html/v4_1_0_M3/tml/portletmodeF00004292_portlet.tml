@@ -1,0 +1,32 @@
+
+<tml:action id="customAction">
+	asserttrue("F00004292_default", true);	
+</tml:action>
+
+
+<tml:script>
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+</tml:script>
+
+<tml:button clickaction="$refresh" portletmode="modeAfterRefresh" id="refresh">refresh</tml:button>
+<br>
+<tml:button clickaction="customAction" portletmode="modeAfterCustomAction" id="custom">custom</tml:button>
+<br>
+current mode:<tml:script>return portlet.mode</tml:script>
+<tml:script>
+	if (seq == 1) {
+		assertequals("portlet mode is 'view'", "tml:portletmode", portlet.mode, "view");
+		registerasserttrue("F00004292_default", "custom action called", "tml:portletmode");
+	} 
+	if (seq == 2) {
+		assertequals("portlet mode is 'modeAfterRefresh'", "tml:portletmode", portlet.mode, "modeAfterRefresh");
+	}
+	if (seq == 3) {
+		assertequals("portlet mode is 'modeAfterCustomAction'", "tml:portletmode", portlet.mode, "modeAfterCustomAction");
+	}
+</tml:script>

@@ -1,0 +1,7 @@
+<tml:script>
+assertEquals("Option with scope is available in correct portlet", "tml:portletscope", option("optionwithscope"), "scope");
+assertEquals("Option with implicit global scope is available anywhere", "tml:portletscope", option("optionwithimplicitscope"), "noscope");
+assertEquals("Option without scope is available anywhere", "tml:portletscope", option("optionwithoutscope"), "noscope");
+</tml:script>
+
+<tml:include ref="::optionscope_innerportlet"/>

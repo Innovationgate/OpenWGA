@@ -1,0 +1,38 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	#00001443: WebTML actions defined on WebTML modules in overlay designs do not use overlay addressation 
+	</PRE>
+	
+	<hr>
+	
+	<tml:include ref="overlay:v5_5_3:tml:OverlayPageAction"/>
+	
+	<tml:script>
+		var cat = "WebTML:Overlays";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			if (seq == 2) {
+				assertEquals("Page action from overlay could read overlay label", cat, thelabel, "OverlayLabel");
+			}		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

@@ -1,0 +1,4 @@
+
+<tml:include ref="{'::mode-' + portlet.mode}"/>
+
+<tml:button clickaction="$refresh" id="click6">Refresh 3</tml:button>

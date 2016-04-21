@@ -1,0 +1,27 @@
+<html>
+<head>
+<link rel="stylesheet" href="<tml:url type="css" name="wga3demo"/>"/>
+</head>
+<body>
+<h2>Sitemap</h2>
+<table width="100%">
+<tml:range id="sitemap" cachekey="this.meta('database', 'username')">
+	<tml:sitemap allareas="true">
+		<tr style="border-style:solid">
+		<tml:foreach type="level">
+			<td width="10">&nbsp;</td>
+		</tml:foreach>
+		<td width="*" colspan="10"><tml:link/></td>
+		</tr>
+	</tml:sitemap>
+	<tml:range var="avar">The Var</tml:range>
+</tml:range>
+</table>
+<p>
+Sitemap wurde <tml:if condition="this.taginfo('sitemap', 'cacheused') == true"><tml:then> aus dem WebTML-Cache geliefert</tml:then><tml:else> online berechnet</tml:else></tml:if>
+</p>
+
+
+<tml:warnings/>
+</body>
+</html>

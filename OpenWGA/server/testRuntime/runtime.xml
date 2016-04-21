@@ -1,0 +1,20 @@
+<WGARuntimeConfiguration>
+   <wgaDistribution>server</wgaDistribution>
+   <jvmOptions>-ea
+-XX:-OmitStackTraceInFastThrow
+-XX:+HeapDumpOnOutOfMemoryError
+-Dde.innovationgate.wga.debug=wga.websocket
+-Dde.innovationgate.wga.defaultplugins=external-default-plugins
+-Dde.innovationgate.wga.unittest=true
+-Dhibernate.jdbc.use_streams_for_binary=true
+-Djavax.net.ssl.keyStore={$java.home}/lib/security/cacerts
+-Djavax.net.ssl.keyStorePassword=changeit
+-Djavax.net.ssl.trustStore={$java.home}/lib/security/cacerts
+-Djavax.net.ssl.trustStorePassword=changeit
+-Dde.innovationgate.wga.skipLocalAdminLogins=true
+-Dde.innovationgate.license.DevelopmentModeEnabled=false
+-Dde.innovationgate.wga.enterprise.license.file={$cfg.dir}/wdslicense_ow.skey
+-Dde.innovationgate.wga.cachemanagement.verbose=false</jvmOptions>
+   <executionEnvironmentId>JavaSE-1.7</executionEnvironmentId>
+   <synchronizePlugins>false</synchronizePlugins>
+</WGARuntimeConfiguration>

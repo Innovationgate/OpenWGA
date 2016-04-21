@@ -1,0 +1,41 @@
+<html>
+<body>
+Running server side test: <tml:urlparameter name="test"/>
+<tml:script>
+var testClassName = request.getParameter("test");
+var dbkey = request.getParameter("dbkey");
+theException = "";
+try {
+	var testClass = wgacore.getLibraryLoader().loadClass(testClassName);
+	var testInstance = testClass.newInstance();
+	testInstance.getTestEnvironment().setDbKey(dbkey);
+	testInstance.getTestEnvironment().setPort(String(request.getServerPort()))
+	testInstance.getTestEnvironment().setWgaContextPath(request.getContextPath());
+	setvar("$testmodule", WGA.Utils.strReplace(String(testClassName.substring("de.innovationgate.wga.test.".length)), ".", ":", true));
+	testInstance.callServerSideExecute(this);
+	scriptFinished = true;
+}
+catch (e) {
+	if (e.javaException) {
+		log.error("Exception running server side test " + testClassName, e.javaException);
+		assertTrue("Exception running server side test '" + testClassName + "': " + e.javaException.getClass().getName() + " - " + e.javaException.message, "ServerSideTest", "false");
+	}
+	else {
+		log.error("Error running server side test " + testClassName + ": " + e.message);
+		assertTrue("Error running server side test '" + testClassName + "': " + e.message, "ServerSideTest", "false");
+	}
+	theException = e.message;
+}
+</tml:script>
+
+<tml:script>
+	if (!scriptFinished) {
+		assertTrue("Server side test '" + request.getParameter("test") + "' did not finish. However no error was detected. Maybe class loading problems?", "ServerSideTest", "false");
+	}
+</tml:script>
+<form id="result" name="result">
+<input name="exception" type="text" value="<tml:item name="theException"/>"/>
+</form>
+<tml:warnings/>
+</body>
+</html>

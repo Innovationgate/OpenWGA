@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+  <tml:htmlhead/>  
+</head>
+<body>
+<HR/>
+<PRE>
+This test checks:
+ - downgrade the access to an tml:input by the mode attribute
+</PRE>
+	<tml:form id="modeOnInputTag" source="content" 
+	          mode="{this.request.getParameter('formmode')}"
+	          persist="{this.request.getParameter('persist')}">
+	          
+	        <tml:range var="renderResult" output="true">  
+	        <tml:input type="text" name="aTextField" 
+	                   mode="{this.request.getParameter('fieldmode')}"/>
+			</tml:range>
+	</tml:form>
+</body>
+</html>
+
+<tml:script>
+	var category = "TMLForm:modeOnInputTag";
+	var formmode = this.request.getParameter('formmode');	
+	var fieldmode = this.request.getParameter('fieldmode');
+	var persist = this.request.getParameter('persist');	
+
+	var expectedResultEdit = "<input name=\"aTextField\" type=\"text\"  value=\"text from content\" >";
+	var expectedResultReadonly = "<input name=\"aTextField\" type=\"text\"  value=\"text from content\" disabled >";
+	var expectedResultView = "text from content";
+	
+	// check renderresult
+	if (formmode.equals("edit")) {	
+		if (fieldmode.equals("edit")) {
+			assertequals("Formmode is edit. Formfield can be rendered in 'edit'-Mode.", category, javaObject(renderResult).trim(), expectedResultEdit);
+		} else if (fieldmode.equals("readonly")) {
+			assertequals("Formmode is edit. Formfield can be rendered in 'readonly'-Mode.", category, javaObject(renderResult).trim(), expectedResultReadonly);
+		} else if (fieldmode.equals("view")) {
+			assertequals("Formmode is edit. Formfield can be rendered in 'view'-Mode.", category, javaObject(renderResult).trim(), expectedResultView);
+		}
+	} else if (formmode.equals("view")) {
+		if (fieldmode.equals("edit")) {
+			assertequals("Formmode is view. No upgrade of fieldmode to 'edit'.", category, javaObject(renderResult).trim(), expectedResultView);
+		} else if (fieldmode.equals("readonly")) {
+			assertequals("Formmode is view. Field can be switched to readonly.", category, javaObject(renderResult).trim(), expectedResultReadonly);
+		} else if (fieldmode.equals("view")) {
+			assertequals("Formmode is view. Formfield can be rendered in 'view'-Mode.", category, javaObject(renderResult).trim(), expectedResultView);
+		}	
+	} else if (formmode.equals("readonly")) {
+		if (fieldmode.equals("edit")) {
+			assertequals("Formmode is readonly. No upgrade of fieldmode to 'edit'.", category, javaObject(renderResult).trim(), expectedResultReadonly);
+		} else if (fieldmode.equals("readonly")) {
+			assertequals("Formmode is readonly. Formfield can be rendered in 'readonly'-Mode.", category, javaObject(renderResult).trim(), expectedResultReadonly);
+		} else if (fieldmode.equals("view")) {
+			assertequals("Formmode is readonly. Field can be switched to 'view'-Mode.", category, javaObject(renderResult).trim(), expectedResultView);
+		}	
+	}
+	
+	
+	
+</tml:script>

@@ -1,0 +1,16 @@
+<html>
+<head>
+  <tml:htmlhead/>
+</head>
+
+<tml:action id="x"/>
+
+
+<tml:action id="y">x = x + 1;</tml:action>
+
+<tml:action ref="x"/>
+
+<tml:action ref="y"/>
+<body>
+</body>
+</html>

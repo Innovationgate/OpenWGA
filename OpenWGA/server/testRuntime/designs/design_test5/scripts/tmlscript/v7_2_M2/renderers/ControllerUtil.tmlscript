@@ -1,0 +1,6 @@
+function ControllerUtil() {
+}
+
+ControllerUtil.prototype.getSomething = function() {
+	return "better than nothing";
+}

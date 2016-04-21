@@ -1,0 +1,29 @@
+<tml:script>
+	if(meta("db", "username")=="anonymous" && profile.remember_me=="autologin"){
+		// try to login:
+		if(!login(profile.username, profile.item("password"), meta("db", "domain")))
+			_login_error=true;
+	}	
+</tml:script>
+<html>
+	
+	<head>	
+		<tml:htmlhead/>
+		<link rel="stylesheet" href="<tml:url type="css" name="basic"/>">
+		<link rel="stylesheet" href="<tml:url type="css" name="rtf"/>">
+
+		<tml:include designdb="plugin-app-ui-3-1" ref="include:image-zoomer"/>		
+		<script>
+			Ext.onReady(function(){
+				ImageZoomer.init(".rtf a", "<tml:meta name="title"/>");
+				ImageZoomer.init(".rtf .photos img");
+				ImageZoomer.init(".rtf img.image-zoomer");
+			})
+		</script>
+	</head>
+	
+	<body>	
+		<tml:include ref="::body"/>		
+	</body>
+	
+</html>

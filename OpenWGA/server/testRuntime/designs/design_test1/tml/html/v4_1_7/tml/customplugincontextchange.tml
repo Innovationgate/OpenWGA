@@ -1,0 +1,43 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	</PRE>
+	
+	<hr>
+	
+	<tml:range var="contextisvalid">false</tml:range>
+	<tml:case context="plugin:de.innovationgate.testplugin" iscontextvalid="true">
+		<tml:range var="contextisvalid">true</tml:range>
+	</tml:case>
+	
+	<tml:script>
+		var cat = "Change context"
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			if(contextisvalid=="true"){
+				var dbReference = context('plugin:de.innovationgate.testplugin').db().getDbReference();
+				assertEquals("DB Reference", cat, dbReference, "plugin-testplugin");
+			}
+			else 
+				assertEquals("Context validation", cat, contextisvalid, "true");
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");	
+		}
+	</tml:script>
+
+	<tml:warnings/>
+</body>
+</html>

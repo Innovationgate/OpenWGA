@@ -1,0 +1,38 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests issue #00001157
+	</PRE>
+	
+	<tml:portlet name="theportlet" ref="::ActionFormPostingPortlet" ajax="true"/>
+	<hr>
+	<a id="click1" href="<tml:url type="action" form="theform">formUser = tmlform.name</tml:url>">Post</a>
+	
+	<tml:script>
+		var cat = "WebTML:Actions";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			if (seq == 2) {
+				assertEquals("Action received WebTML form", cat, formUser, "Oliver");
+			}		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

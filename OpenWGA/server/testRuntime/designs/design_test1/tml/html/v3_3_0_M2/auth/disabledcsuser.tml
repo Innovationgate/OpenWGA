@@ -1,0 +1,37 @@
+<html>
+
+
+<tml:action id="switchUserEnablement" master="true">
+var loginDB = db("logins");
+loginDB.openSession();
+var resultSet = loginDB.query("hql", "content.items['username'].text='disableTestUser'", null);
+var userDoc = resultSet.getContentList().get(0);
+userDoc.setItemValue("enabled", tmlparam1);
+userDoc.save();
+</tml:action>
+<body>
+
+
+<HR/>
+<PRE>
+Tests the disabled flag on user definitions in an authentication content store
+- Links enableUser/disableUser are called to enable/disable existing user "disableTestUser"
+- Login attempts are done against that user to see, if the flag is working as desired
+</PRE>
+<BR/>
+
+<a href="<tml:url action="switchUserEnablement" param1="true"/>" name="enableUser">Enable user</a>
+<a href="<tml:url action="switchUserEnablement" param1="false"/>" name="disableUser">Disable user</a>
+
+<tml:script>
+var correctResult = request.getParameter("correct");
+if (correctResult == null) {
+	return;
+}
+
+assertEquals("Loggin in user is: " + correctResult, "Auth:disabledCSUser", meta("db", "username"), correctResult);
+</tml:script>
+<tml:warnings/>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+<div align="right">
+	<a href="<tml:url context="docid:home"/>">Home</a>
+	|
+	<a href="javascript:openHelp()"><tml:script>return this.LANGUAGE=='de'?'Hilfe':'Help'</tml:script></a>
+	|
+	<a href="<tml:url layout="sitemap"/>" target="blank">Sitemap</a>
+</div>

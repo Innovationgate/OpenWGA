@@ -1,0 +1,67 @@
+ <tml:if condition="!( _Abbildung='')">
+<tml:then>
+<img src="<tml:item name="_Abbildung"/>" border=0>
+<br>
+</tml:then>
+</tml:if>
+<tml:if condition="Sprache='DE'">
+<tml:then>
+Innovation Gate ist ein Softwarehaus und Beratungsunternehmen mit Schwerpunkt auf dem Gebiet Web-Content-Management auf Basis von Lotus DOMINO.<br>
+Basis des Erfolges von Innovation Gate ist das Know-how seiner Mitarbeiter.
+</tml:then>
+</tml:if>
+<tml:if condition="Sprache='EN'">
+<tml:then>
+Innovation Gate is a software and consultant  company with focus on Web Content Management on basis of Lotus DOMINO.<br>
+The basis of our success is the know-how of our employees.
+</tml:then>
+</tml:if>
+<br>
+<br>
+<b><i>
+<tml:if condition="Sprache='DE'">
+<tml:then>
+Wir suchen einen/eine Mitarbeiter/in für den Bereich:
+</tml:then>
+</tml:if>
+<tml:if condition="Sprache='EN'">
+<tml:then>
+We are looking for an employee in the following areas:
+</tml:then>
+</tml:if>
+</i></b>
+<div class="Headline">
+<tml:item name="_JobTitel"/>
+</div>
+
+<br>
+<b>
+<tml:if condition="Sprache='DE'">
+<tml:then>
+Ihr Aufgabengebiet:
+</tml:then>
+</tml:if>
+<tml:if condition="Sprache='EN'">
+<tml:then>
+Your Job:
+</tml:then>
+</tml:if></b>
+<ul><li><tml:item name="_Aufgabe" divider="</li><li>"/></li></ul>
+
+<b>
+<tml:if condition="Sprache='DE'">
+</tml:then>
+Ihr Profil:
+<tml:then>
+</tml:if>
+<tml:if condition="Sprache='EN'">
+<tml:then>
+Your Profile:
+</tml:then>
+</tml:if>
+</b>
+<ul><li><tml:item name="_Profil" divider="</li><li>"/></li></ul>
+
+<b>Wie bieten:</b>
+<ul><li><tml:item name="_WirBieten" divider="</li><li>"/></li></ul> 
+ 

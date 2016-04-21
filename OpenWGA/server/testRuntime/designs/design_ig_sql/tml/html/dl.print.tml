@@ -1,0 +1,47 @@
+<html>
+<head>
+<tml:include type="tml" ref="HeadBereich" medium="html"/>
+<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="Print"/>"/>
+<script Language="Javascript" type="text/Javascript" src="<tml:url type="js" name="StandardScript"/>"></script>
+<script Language="Javascript" type="text/Javascript" src="<tml:url type="js" name="EdvonCheck"/>"></script>
+<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="Voting"/>"/>
+</head>
+<body bgcolor="#FFFFFF" leftmargin="0" topmargin="0">
+<div align=center>
+<table width=60%>
+<tr>
+<td>
+www.innovationgate.de
+<br>&copy; 
+<script type="text/javascript">
+<!--
+var jetzt = new Date();
+var Jahr = jetzt.getFullYear();
+document.write(Jahr);
+//-->
+</script>
+ Innovation Gate GmbH
+</td>
+
+<td>
+<div align=right><tml:image name="Logos" src="igWebLogoKlein.gif"> border=0 </tml:image></div>
+</td>
+</tr>
+
+<tr>
+<td colspan="2">
+
+<font size=-5>
+<tml:parents>
+&gt;<tml:item name="titel"/> 
+</tml:parents>
+</font>
+<hr>
+<tml:include type="innerlayout"/>
+</td>
+</tr>
+</table>
+
+</div>
+</body>
+</html>

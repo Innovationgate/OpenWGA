@@ -1,0 +1,10 @@
+function Controller() {
+}
+
+Controller.prototype.prepare = function() {
+	return {
+		$options: {
+		 	dispatchCustomTargetControllerRan: true
+		}
+	}
+}

@@ -1,0 +1,7 @@
+db().setAttribute("connectscript", true);
+
+// Register TMLScript globals
+registerGlobal("WGUtils", "de.innovationgate.utils.WGUtils");
+registerGlobal("WGAPI", "de.innovationgate.webgate.api");
+registerGlobal("TheCore", wgacore);
+registerGlobal("ScriptObject", { myVal: "Test" });

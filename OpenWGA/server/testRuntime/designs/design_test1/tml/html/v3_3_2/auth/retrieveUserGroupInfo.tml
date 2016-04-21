@@ -1,0 +1,62 @@
+<html>
+<head>
+  <tml:htmlhead/>
+</head>
+<body>
+<pre>
+Feature ID - gathering groups and users from jndiauthmodule
+</pre>
+
+<tml:script>
+var authModule = this.db().getAuthenticationModule();
+var queryable = authModule.isQueryable(Packages.de.innovationgate.webgate.api.auth.AuthenticationModule.QUERY_USERS_AND_GROUPS);
+asserttrue("Authmodule is queryable for users and groups.", "auth", queryable);
+
+// search with prefix t --> result should be only "cn=tbinias,ou=users,o=innogate,c=de"
+var userGroupInfos = javaObject(authModule.query("tb",Packages.de.innovationgate.webgate.api.auth.AuthenticationModule.QUERY_USERS_AND_GROUPS));
+var info = userGroupInfos.get(0);
+
+assertEquals("searchresult for 'tb' is 'cn=tbinias,ou=users,o=innovationgate,c=de'", "auth", info.getFullQualifiedName(), "cn=tbinias,ou=users,o=innovationgate,c=de");
+assertEquals("'cn=tbinias,ou=users,o=innovationgate,c=de' is a user", "auth", info.isUser(), true);
+assertEquals("'cn=tbinias,ou=users,o=innovationgate,c=de' is not a group", "auth", info.isGroup(), false);
+assertEquals("aliasnames of 'cn=tbinias,ou=users,o=innovationgate,c=de' present", "auth", info.getAliasNames().size()>0, true);
+assertEquals("aliasname of 'cn=tbinias,ou=users,o=innovationgate,c=de' is 'tbinias'", "auth", info.getAliasNames().get(0), "tbinias");
+
+// search with prefix p --> result should be pfahsel and group ProduktEntwicklung
+var userGroupInfos = javaObject(authModule.query("p",Packages.de.innovationgate.webgate.api.auth.AuthenticationModule.QUERY_USERS_AND_GROUPS));
+
+var fqdns = createList();
+for (i=0; i<userGroupInfos.size(); i++) {
+	fqdns.add(userGroupInfos.get(i).getFullQualifiedName());
+}
+
+assertTrue("searchresult for 'p' contains user 'cn=pfahsel,ou=users,o=innovationgate,c=de'", "auth", fqdns.contains("cn=pfahsel,ou=users,o=innovationgate,c=de"));
+assertTrue("searchresult for 'p' contains group 'cn=Produktentwicklung,ou=groups,o=innovationgate,c=de'", "auth", fqdns.contains("cn=Produktentwicklung,ou=groups,o=innovationgate,c=de"));
+
+// check if users in sub ou's of base node users are found
+var userGroupInfos = javaObject(authModule.query("hmeier",Packages.de.innovationgate.webgate.api.auth.AuthenticationModule.QUERY_USERS_AND_GROUPS));
+var info = userGroupInfos.get(0);
+assertEquals("users in sub-ou's of baseNodeUsers are found", "auth", info.getFullQualifiedName(), "cn=hmeier,ou=Ratingen,ou=users,o=innovationgate,c=de");
+
+
+
+
+// check if groups in sub ou's of base node groups are found
+var userGroupInfos = javaObject(authModule.query("Vert",Packages.de.innovationgate.webgate.api.auth.AuthenticationModule.QUERY_USERS_AND_GROUPS));
+
+var fqdns = createList();
+for (i=0; i<userGroupInfos.size(); i++) {
+	fqdns.add(userGroupInfos.get(i).getFullQualifiedName());
+}
+
+assertTrue("groups in baseNodeGroups are found even if there is a duplicate group in a sub ou", "auth", fqdns.contains("cn=Vertrieb,ou=groups,o=innovationgate,c=de"));
+assertTrue("groups in sub-ou's of baseNodeGroups are found", "auth", fqdns.contains("cn=Vertrieb,ou=Düsseldorf,ou=groups,o=innovationgate,c=de"));
+
+
+</tml:script>
+
+
+<tml:warnings/>
+
+</body>
+</html>

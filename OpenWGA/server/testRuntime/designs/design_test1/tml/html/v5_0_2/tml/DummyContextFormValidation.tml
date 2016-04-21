@@ -1,0 +1,43 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Checks if form validation is able to run on forms created via createForm(createFormInfo()) (#00000318)
+	</PRE>
+	
+	<tml:action id="validate">
+		var cat = "TML:FormValidation";
+		try {
+			assertTrue("Form validation on contextless created form can be called without errors", cat, "tmlform.validate()");
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:action>
+	
+		<hr>
+		
+	<tml:script>
+		var info = createFormInfo("x");
+		var form = createForm(info);
+	</tml:script>
+	
+	<tml:form id="x">
+		Field: <tml:input name="field"/>
+		
+		<tml:button id="validate" clickaction="validate">Validate</tml:button>
+		
+	</tml:form>
+	
+	<tml:warnings/>
+</body>
+</html>
+	
+	<hr>
+	
+	<tml:warnings/>
+</body>
+</html>

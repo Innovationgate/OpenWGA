@@ -1,0 +1,5 @@
+var title = tmlparam1;
+var cat = tmlparam2;
+var equal1 = tmlparam3;
+var equal2 = tmlparam4;
+assertEquals(title, cat, equal1, equal2);

@@ -1,0 +1,4 @@
+<a href="<tml:url type="action" ajax="true">
+portlet.fireEvent(createEvent("greetingsFromPortletA"));
+setSessionVar("greetingsSent", true);
+</tml:url>" id="click2">Greetings!</a>

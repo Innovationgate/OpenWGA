@@ -1,0 +1,82 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing portlet registration by portlet name (F00003012).
+	</PRE>
+	
+	<hr>
+	
+	<!-- Testing registration of portlet by name via TMLScript -->
+	
+	<tml:script>
+		cat = "PortletByName";
+		try {
+			portlet.registerPortletForName("daname", "v4_0_0_m2:tmlportlet:portletnameportlet1");		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, false);
+		}
+	</tml:script>
+	
+	<tml:portlet name="daname"/>
+	
+	<tml:script>
+		try {
+			assertTrue("Registered portlet was included", cat, "portlet1Ran != null");
+			thep = null;
+			thep = portlet.getPortletForName("daname");
+			assertTrue("Can retrieve portlet object by name", cat, "thep != null");
+			if (thep != null) {
+				assertEquals("Can retrieve portlet item", cat, thep.pitem1, true);	
+			}				
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:script>
+		try {
+			var pkey = portlet.getPortletForName("daname").getPortletKey();
+			portlet.unregisterPortletForName("daname");
+			thep = null;
+			thep = portlet.getPortletForName("daname");
+			assertTrue("Portlet was unregistered: Not retrievable via name", cat, "thep == null");
+			thep = portlet.getPortlet(pkey);
+			assertTrue("Portlet was unregistered: Not retrievable via key", cat, "thep == null");
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<!-- Testing Auto-Registration  -->
+	
+	<tml:portlet name="autoname" ref="v4_0_0_m2:tmlportlet:portletnameportlet2"/>
+	
+	<tml:script>
+		try {
+			cat = "PortletAutoRegister";
+			assertTrue("Registered portlet was included", cat, "portlet2Ran");
+			thep = null;
+			thep = portlet.getPortletForName("autoname");
+			assertTrue("Can retrieve portlet object by name", cat, "thep != null");
+			if (thep != null) {
+				assertEquals("Can retrieve portlet item", cat, thep.pitem2, true);	
+			}				
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

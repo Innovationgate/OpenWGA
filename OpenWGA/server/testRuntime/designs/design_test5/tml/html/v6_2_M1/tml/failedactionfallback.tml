@@ -1,0 +1,16 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests if portlet mode and context are set / not set when the called action succeeds / fails
+	</PRE>
+	
+	<hr>
+	
+	<tml:portlet name="theportlet" ref="::failedactionfallback_portlet"/>
+	
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests bugfix #00002177
+	</PRE>
+	
+	<hr>
+	
+	<tml:include designdb="overlaytest" ref="overlay:v6_0_7:tml:contextlessrequesturl"/>
+	
+	<tml:script>
+		var cat = "WebTML:00002177";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertEquals("URL is contextless for main context db", cat, mainurl, meta("request", "wgaurl") + "/" + db().getDbReference() + "/html/v6_0_7:tml:contextlessrequesturl." + LANGUAGE + ".html");	
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

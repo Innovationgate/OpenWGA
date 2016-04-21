@@ -1,0 +1,5 @@
+this.render = function($cx) {
+	var targetCx = $cx.context("docid:jjar-5xeqc8");
+	WGA.TMLPage.render(WGA.design().resolve("::dispatchcustomtarget"), targetCx)
+	WGA.TMLPage.render(WGA.design().resolve("::dispatchdefault"), targetCx)
+}

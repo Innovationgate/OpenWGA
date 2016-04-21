@@ -1,0 +1,15 @@
+<html>
+<head>
+  <tml:htmlhead/>
+</head>
+
+
+<body>
+	#<tml:script>
+		var doc = this.context("docid:owee-5aegzr").getdocument(); 
+		doc.lock();
+		// do some work
+		Packages.java.lang.Thread.sleep(30000);
+	</tml:script>#
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+  <tml:htmlhead/>
+  
+	<tml:action id="checkPostedValues">
+			// check posted form values
+			var category = "TMLForm:postOverrideSource";
+			this.assertequals("Posted value of aTextField is 'posted text'", category, tmlform.aTextField, "posted text");
+			this.assertequals("Posted value of aTextArea is 'posted textarea'", category, tmlform.aTextArea, "posted textarea");		
+			this.assertequals("Posted value of aDateField is '22.11.2005'", category, tmlform.aDateField, this.parsedate('22.11.2005', 'dd.MM.yyyy'));		
+			this.asserttrue("Posted value of aNumberField is 56", category, "tmlform.aNumberField === 56");		
+			this.assertequals("Posted value of aSelectBox is 3 -> Spanisch", category, tmlform.aSelectBox, "3");				
+			//does not work because of htmlunit bug with multiple selectbox
+			//this.asserttrue("Posted value of aMultiSelectBox is 'perl' and 'java'", category, "this.tmlform.enteredvalue('aMultiSelectBox').contains('java') && this.tmlform.enteredvalue('aMultiSelectBox').contains('perl') && this.tmlform.enteredvalue('aMultiSelectBox').size()==2");						
+			this.assertequals("Posted value of aCheckBox is 2 -> Post", category, tmlform.aCheckBox, "2");						
+			this.assertequals("Posted value of aRadioButton is 1 -> Yes", category, tmlform.aRadioButton, "1");								
+			this.asserttrue("Posted value of aBoolean is false -> no", category, "this.tmlform.aBoolean === false");										
+			this.assertequals("Posted value of aHidden is 'posted secret'", category, tmlform.aHidden, "posted secret");					
+	</tml:action>  
+</head>
+<body>
+
+
+<HR/>
+<PRE>
+This test checks the defaultvalue-attribute on tmlform as follows:
+ - the given default value is provided if form is empty
+ - posted values overwrite defaults
+</PRE>
+<BR/>
+
+Sequence:
+<tml:script>
+// sequence
+if (!isdefined('sequence')) {
+	this.setsessionvar("sequence", 1);
+
+} else {
+	this.sequence = this.sequence + 1;
+}
+
+// init formmode
+if (!isdefined('currentsource')) {
+	this.setsessionvar("currentsource", "none");
+}
+
+return this.sequence;
+</tml:script>
+
+<HR/>
+
+<tml:form id="aForm1" source="none" persist="{this.request.getParameter('persist')}">
+<table border="1">
+	<tr>
+		<td>A TextField</td>
+		<td><tml:input type="text" name="aTextField" default="some default text"/></td>
+	</tr>
+	<tr>
+		<td>A TextArea</td>
+		<td><tml:input type="textarea" name="aTextArea" default="some default text in this area"/></td>
+	</tr>	
+	<tr>
+		<td>A DateField</td>
+		<td><tml:input type="date" name="aDateField" id="aDate" format="dd.MM.yyyy" default="11.08.2005"/></td>
+	</tr>
+	<tr>
+		<td>A NumberField</td>
+		<td><tml:input type="number" name="aNumberField" default="4711"/></td>
+	</tr>	
+	<tr>
+		<td>A SelectBox</td>
+		<td><tml:input type="select" name="aSelectBox" 
+			       options="Deutsch | 1, Englisch | 2, Spanisch | 3"
+			       default="2"/></td>
+	</tr>
+	<tr>
+		<td>A MultiSelectBox</td>
+		<td><tml:input type="select" name="aMultiSelectBox" 
+			       options="Java | java, Perl | perl, C++ | c++, C# | C#, VisualBasic | vb"
+			       default="c++"
+			       multiple="true">size="5"</tml:input></td>
+	</tr>	
+	<tr>
+		<td>A CheckBox</td>
+		<td><tml:input type="checkbox" name="aCheckBox" 
+			       options="Email | 1,  Post | 2"
+			       default="1"/></td>
+	</tr>
+	<tr>
+		<td>A RadionButton</td>
+		<td><tml:input type="radio" name="aRadioButton" 
+			       options="Yes | 1,  No | 0, Maybe | 2"
+			       default="0"/></td>
+	</tr>
+	<tr>
+		<td>A Boolean</td>
+		<td><tml:input type="boolean" name="aBoolean" options="yes|true,no|false" default="true"/></td>
+	</tr>	
+	<tr>
+		<td>A Hidden</td>
+		<td><tml:input type="hidden" name="aHidden" default="secret hidden value"/></td>
+	</tr>	
+	<tr>
+		<td>Action</td>
+		<td><tml:button clickaction="checkPostedValues" id="checkPostedValues">checkPostedValues</tml:button></td>
+	</tr>		
+</table>
+</tml:form>
+<HR/>
+Form is persistent: <tml:script>return tmlform.ispersistent()</tml:script>
+</body>
+</html>
+
+<tml:script>	
+	if (this.sequence == 1) {
+		//test for default
+		this.assertequals("Default of aTextField is 'some default text'", "TMLForm:default", tmlform.aTextField, "some default text");
+		this.assertequals("Default of aTextArea is 'some default text in this area'", "TMLForm:default", tmlform.aTextArea, "some default text in this area");				
+		this.assertequals("Default of aDateField is '11.08.2005'", "TMLForm:default", tmlform.aDateField, this.parsedate('11.08.2005', 'dd.MM.yyyy'));
+		this.asserttrue("Default of aNumberField is '4711'", "TMLForm:default", "tmlform.aNumberField === 4711");
+		this.assertequals("Default of aSelectBox is '2 -> Englisch'", "TMLForm:default", tmlform.aSelectBox, "2");
+		this.assertequals("Default of aMultiSelectBox is 'c++'", "TMLForm:default", tmlform.aMultiSelectBox, "c++");
+		this.assertequals("Default of aCheckBox is '1 -> Email'", "TMLForm:default", tmlform.aCheckBox, "1");
+		this.assertequals("Default of aRadioButton is '0 -> No'", "TMLForm:default", tmlform.aRadioButton, "0");
+		this.asserttrue("Default of aBoolean is 'true -> yes'", "TMLForm:default", "tmlform.aBoolean === true");
+		this.assertequals("Default of aHidden is 'secret hidden value'", "TMLForm:default", tmlform.aHidden, "secret hidden value");
+		
+		// test entered values
+		this.assertequals("EValue of aTextField is 'some default text'", "TMLForm:enteredvalue()", tmlform.enteredvalue('aTextField'), "some default text");
+		this.assertequals("EValue of aTextArea is 'some default text in this area'", "TMLForm:enteredvalue()", tmlform.enteredvalue('aTextArea'), "some default text in this area");				
+		this.assertequals("EValue of aDateField is '11.08.2005'", "TMLForm:enteredvalue()", tmlform.enteredvalue('aDateField'), "11.08.2005");
+		this.assertequals("EValue of aNumberField is '4711'", "TMLForm:enteredvalue()", tmlform.enteredvalue('aNumberField'), "4711");
+		this.assertequals("EValue of aSelectBox is '2 -> Englisch'", "TMLForm:enteredvalue()", tmlform.enteredvalue('aSelectBox'), "2");
+		this.asserttrue("EValue of aMultiSelectBox is 'c++'", "TMLForm:enteredvalue()", "this.tmlform.enteredvalue('aMultiSelectBox').contains('c++') && this.tmlform.enteredvalue('aMultiSelectBox').size() == 1");		
+		this.asserttrue("EValue of aCheckBox is '1 -> Email'", "TMLForm:enteredvalue()", "this.tmlform.enteredvalue('aCheckBox').contains('1') && this.tmlform.enteredvalue('aCheckBox').size() == 1");
+		this.assertequals("EValue of aRadioButton is '0 -> No'", "TMLForm:enteredvalue()", tmlform.enteredvalue('aRadioButton'), "0");
+		this.assertequals("EValue of aBoolean is 'true -> yes'", "TMLForm:enteredvalue()", tmlform.enteredvalue('aBoolean'), "true");
+		this.assertequals("EValue of aHidden is 'secret hidden value'", "TMLForm:enteredvalue()", tmlform.enteredvalue('aHidden'), "secret hidden value");
+		
+		// test parsed values
+		this.assertequals("PValue of aTextField is 'some default text'", "TMLForm:parsedvalue()", tmlform.parsedvalue('aTextField'), "some default text");
+		this.assertequals("PValue of aTextArea is 'some default text in this area'", "TMLForm:parsedvalue()", tmlform.parsedvalue('aTextArea'), "some default text in this area");				
+		this.assertequals("PValue of aDateField is java.util.date - '11.08.2005'", "TMLForm:parsedvalue()", tmlform.parsedvalue('aDateField'), this.parsedate('11.08.2005', 'dd.MM.yyyy'));
+		this.asserttrue("PValue of aNumberField is 4711", "TMLForm:parsedvalue()", "this.tmlform.parsedvalue('aNumberField') === 4711");
+		this.assertequals("PValue of aSelectBox is '2' -> Englisch", "TMLForm:parsedvalue()", tmlform.parsedvalue('aSelectBox'), "2");
+		this.asserttrue("PValue of aMultiSelectBox is 'c++'", "TMLForm:parsedvalue()", "this.tmlform.parsedvalue('aMultiSelectBox').contains('c++') && this.tmlform.parsedvalue('aMultiSelectBox').size() == 1");		
+		this.asserttrue("PValue of aCheckBox is '1' -> Email", "TMLForm:parsedvalue()", "this.tmlform.parsedvalue('aCheckBox').contains('1') && this.tmlform.parsedvalue('aCheckBox').size() == 1");
+		this.assertequals("PValue of aRadioButton is '0' -> No", "TMLForm:parsedvalue()", tmlform.parsedvalue('aRadioButton'), "0");
+		this.asserttrue("PValue of aBoolean is true -> yes", "TMLForm:parsedvalue()", "this.tmlform.parsedvalue('aBoolean') == true");		
+		this.assertequals("PValue of aHidden is 'secret hidden value'", "TMLForm:parsedvalue()", tmlform.parsedvalue('aHidden'), "secret hidden value");		
+	}		
+</tml:script>
+
+<tml:script>
+	// check warnings
+	asserttrue("No tml:warnings detected", "Global:CheckTMLWarnings", this.tag.getWarnings().isEmpty());
+</tml:script>

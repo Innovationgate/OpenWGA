@@ -1,0 +1,49 @@
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td class="headline"><tml:option name="produkt"/></td>
+</tr>
+</table>
+
+<tml:collection>
+<tml:query db="wga2rn" type="view">
+webviewBugfixes;<tml:option name="produkt"/>;True
+</tml:query>
+<tml:query db="wga2rn" type="view">
+webviewFeatures;<tml:option name="produkt"/>;True
+</tml:query>
+
+<tml:foreach sortorder="descending" sortexpression="FixReleaseVersion + ' Build ' + FixBuildVersion" sortlanguage="native" >
+<tml:groupchange id="rn_vers" expressionlanguage="native" expression="FixReleaseVersion + ' Build ' + FixBuildVersion">
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<tr><td><img src="/icons/ecblank.gif" width="1" height="15"></td></tr>
+<tr><td class="BGRahmen" align="center"><b>Release <tml:taginfo sourcetag="rn_vers" name="currentvalue"/></b></td></tr>
+<tr><td><img src="/icons/ecblank.gif" width="1" height="15"></td></tr>
+</table>
+</tml:groupchange>
+
+<table border="0" cellspacing="0" cellpadding="0" width="100%">
+<tr>
+<td class="BGRahmen"><b>
+<tml:select>
+<tml:case condition="this.form=='newBug'" conditionlanguage="tmlscript">
+Bugfix: <tml:item name="topic" encode="html"/>
+</tml:case>
+<tml:case condition="this.form=='newFeature'" conditionlanguage="tmlscript">
+Neues Feature: <tml:item name="topic" encode="html"/>
+</tml:case>
+</tml:select>
+</b></td>
+</tr>
+<tr>
+<td><img src="/icons/ecblank.gif" width="1" height="10"></td>
+</tr>
+<tr>
+<td class="Rahmen"><tml:item name="description" encode="html"/></td>
+</tr>
+<tr>
+<td><img src="/icons/ecblank.gif" width="1" height="10"></td>
+</tr>
+</table>
+</tml:foreach>
+</tml:collection>
+

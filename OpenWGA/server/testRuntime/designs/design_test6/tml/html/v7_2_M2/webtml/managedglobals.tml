@@ -1,0 +1,40 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests some properties of managed globals (everything regarding events is in appevents.tml)
+	</PRE>
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			assertEquals("Server Scope Object: WGA is isolated", cat, item("serverScopeObject.isWGAIsolated"), true);
+			assertEquals("Server Scope Object: Injected context is isolated", cat, item("serverScopeObject.isCxIsolated"), true);
+			assertEquals("App Scope Object: WGA is isolated", cat, item("appScopeObject.isWGAIsolated"), true);
+			assertEquals("App Scope Object:  Injected context is isolated", cat, item("appScopeObject.isCxIsolated"), true);
+			assertEquals("Session Scope Object: WGA is isolated", cat, item("sessionScopeObject.isWGAIsolated"), false);
+			assertEquals("Session Scope Object:  Injected context is isolated", cat, item("sessionScopeObject.isCxIsolated"), false);	
+			assertEquals("Page Scope Object: WGA is isolated", cat, item("pageScopeObject.isWGAIsolated"), true);
+			assertEquals("Page Scope Object:  Injected context is isolated", cat, item("pageScopeObject.isCxIsolated"), true);	
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

@@ -1,0 +1,37 @@
+function Controller() {
+}
+
+Controller.prototype.prepare = function() {
+	this._collection = WGA.app().query("lucene", "CONTENTTYPE:standard && body:Webgate", {
+		highlight: true
+	});
+}
+
+Controller.prototype.standardDocuments = function() {
+	var it = this._collection.iterator();
+	while (it.hasNext()) {
+		yield new Doc(it.next());
+	}
+}
+
+Controller.prototype.standardDocumentsWrap = function() {
+	return this._collection.wrap(function (cx) {
+		return new Doc(cx);
+	});
+}
+
+function Doc(cx) {
+	this._cx = cx;
+	this._fragments = null;
+} 
+
+Doc.prototype.context = function() {
+	return this._cx;
+}
+
+Doc.prototype.fragments = function() {
+	if (this._fragments == null) {
+		this._fragments = this._cx.LANGUAGE;		
+	}
+	return this._fragments;
+}

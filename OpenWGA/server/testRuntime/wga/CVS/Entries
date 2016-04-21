@@ -1,0 +1,34 @@
+/.cvsignore/1.4/Thu Nov 26 14:28:13 2015//
+D/applog////
+/ci.skey/1.2/Mon Nov 23 11:09:39 2015/-kb/
+/des.key/1.1/Fri Nov 13 15:54:04 2009/-kb/
+D/design_encodingtest_iso88591////
+D/design_encodingtest_utf8////
+D/design_logins////
+D/design_test1////
+D/design_test3////
+D/design_testhdb////
+D/design_testplugin////
+D/dev-plugins////
+D/external-default-plugins////
+D/hsqldb////
+D/inittest////
+D/local////
+D/lucene////
+/migration.log.1/1.1/Fri Nov 13 15:54:05 2009/-kb/
+/openwga.key/1.1/Tue Jan 21 11:17:24 2014/-kb/
+D/resources////
+/testclasses.jar/1.931/Wed Apr 13 14:28:32 2016/-kb/
+/unittest.skey/1.2/Thu Jan  6 12:37:32 2011/-kb/
+D/unittest_substitutes////
+/users.xml/1.1/Fri Nov 13 15:54:05 2009//
+/wdslicense_ow.skey/1.1/Mon May 31 08:42:54 2010/-kb/
+/wdslicense_tb.skey/1.2/Thu Dec 16 13:25:37 2010/-kb/
+/wga.skey/1.1/Fri Nov 13 15:54:04 2009/-kb/
+/wga.xml/1.1/Fri Nov 13 15:54:05 2009//
+/wga_classic.xml/1.1/Fri Nov 13 15:54:05 2009//
+/wga_local.xml/1.1/Fri Nov 13 15:54:05 2009//
+/wgaconfig.xml/1.78/Wed Feb 17 11:10:26 2016//
+D/wgadata////
+/wgaunit.properties/1.7/Tue Nov 24 10:59:42 2015//
+D/xfiles-cs////

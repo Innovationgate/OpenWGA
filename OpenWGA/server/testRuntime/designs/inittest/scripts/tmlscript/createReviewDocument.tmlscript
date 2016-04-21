@@ -1,0 +1,4 @@
+var theDB = db("inittest");
+var con = theDB.getArea("home").createRootPage(theDB.getContentType("standard"), "ApproverAccessTest");
+con.publish("");
+return con.getContentKey().toString();

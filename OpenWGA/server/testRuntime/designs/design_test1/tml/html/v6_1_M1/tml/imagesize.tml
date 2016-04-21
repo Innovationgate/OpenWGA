@@ -1,0 +1,43 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests maxwidth/maxheight attribute on tml:image (#00002135)
+	</PRE>
+	
+	<hr>
+	
+	<tml:range var="image1" output="true">
+		<tml:image doc="images" file="large.png" maxwidth="100" maxheight="100"/>
+	</tml:range>	
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			var imgDoc = WGA.Html.parse(image1);
+			var img = imgDoc.getRootElement().element("BODY").elements().get(0);
+			assertEquals("Image was generated", cat, img.getName(), "IMG");
+			
+			var url = WGA.urlBuilder(img.attributeValue("src"));
+			assertEquals("Image URL contains maxwidth parameter", cat, url.getParameter("maxwidth"), "100");
+			assertEquals("Image URL contains maxheight parameter", cat, url.getParameter("maxheight"), "100");
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

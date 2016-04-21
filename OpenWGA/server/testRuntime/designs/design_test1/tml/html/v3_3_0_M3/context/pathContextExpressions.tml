@@ -1,0 +1,35 @@
+<html>
+<body>
+<pre>
+Tests the context path functionality, where multiple path expressions are issued at a time, divided by /
+</pre>
+<hr>
+
+<tml:range context="name:pathContextExpressions">
+<tml:script>
+
+var cat="context:pathExpressions";
+try {
+	assertEquals("Correct initial context", cat, UNIQUENAME, "pathcontextexpressions");
+	
+
+	var exp = "db:test1/name:home/children[0]";
+	assertEquals("Path expression without prefix", cat, context(exp).TITLE, "WebGate Anywhere 3");
+	
+	var exp2 = "path:" + exp;
+	assertEquals("Path expression with prefix", cat, context(exp2).TITLE, "WebGate Anywhere 3");
+	
+	var exp3 = "db:test1/name:home/parent";
+	assertEquals("Fail on error context path", cat, context(exp3, false), null);
+	assertEquals("Fallback context for error context path is initial context", cat, context(exp3).UNIQUENAME, "pathcontextexpressions");
+}
+catch (e) {
+	assertTrue("Error executing unit test: " + e.message, cat, false);
+}
+
+</tml:script>
+</tml:range>
+
+<tml:warnings/>
+</body>
+</html>

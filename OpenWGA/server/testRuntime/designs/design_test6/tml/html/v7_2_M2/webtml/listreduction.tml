@@ -1,0 +1,52 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+		Tests changes to list reduction in 7.2 (#00004611)
+	</PRE>
+	
+	<tml:foreach type="loop" count="3" var="listFromTag">x</tml:foreach>
+	<tml:foreach type="loop" count="1" var="singleValueListFromTag">x</tml:foreach>
+	
+	<tml:form id="theform">
+		<tml:input name="acheckbox" type="checkbox" options="a,b,c" defaultexpression="WGA.toList('a','b','c')"/>
+		<tml:input name="aselect" type="select" options="a,b,c" defaultexpression="'a'"/>
+	</tml:form>
+	
+	<hr>
+	
+	<tml:portlet name="theportlet" ref="listreduction_portlet:portlet"/>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+	
+		try {
+			assertEqualLists("Multivalue List from tag is not reduced", cat, listFromTag, ["x", "x", "x"]);
+			assertEquals("Single value List from tag is reduced", cat, singleValueListFromTag, "x");
+			assertEquals("Multivalue meta is not reduced", cat, context("db:test5/docid:8a8181dc050f238901050f2539ac0002").PASTAUTHORS, ["Master Session", "Master Session", "Master Session"]);
+			assertEquals("Multivalue form field is not reduced", cat, tmlform.acheckbox, ["a","b","c"]);
+			assertEquals("Single value form field is reduced", cat, tmlform.aselect, "a");
+			
+			profile.setItem("alist", WGA.toList("a","b","c"));
+			assertEquals("Multivalue user profile item is not reduced", cat, profile.alist, ["a","b","c"]);
+			assertEquals("Multivalue user profile meta is not reduced", cat, profile.LANGUAGES, ["de","en"]);	
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

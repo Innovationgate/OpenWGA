@@ -1,0 +1,68 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing WebTML scope functionality (#00000594)
+	</PRE>
+	
+	<hr>
+
+	<tml:include tmlscope="includescope" ref="::webtmlscope_inner"/>
+	
+	<tml:range tmlscope="rangescope">
+		
+		<tml:range var="{scoped:range_attvar}">TheAttVar</tml:range>
+		
+		<tml:script>
+			setVar(WGA.scoped("range_scriptvar"), "TheScriptVar");
+		</tml:script>
+		
+		<tml:range tmlscope="{WGA.scoped('cascaded')}">
+		
+			<tml:range var="{scoped:range_cascadedvar}">TheCascadedVar</tml:range>
+			
+		</tml:range>
+		
+		<a href="<tml:url type="action">setVar(WGA.scoped("actionvar"), "TheActionVar");</tml:url>" name="theAction">Action!</a>
+
+	</tml:range>
+	
+	
+	<tml:script>
+		var cat = "WebTML:Scope";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			
+			if (seq==2) {
+				assertEquals("Scope by include: Scoped by attribute", cat, item("include_attvar_includescope"), "TheAttVar");
+				assertEquals("Scope by include: Scoped by Script", cat, item("include_scriptvar_includescope"), "TheScriptVar");
+				assertEquals("Scope by include: Cascaded scoped", cat, item("include_cascadedvar_cascaded_includescope"), "TheCascadedVar");
+				
+				assertEquals("Scope by range: Scoped by attribute", cat, item("range_attvar_rangescope"), "TheAttVar");
+				assertEquals("Scope by range: Scoped by Script", cat, item("range_scriptvar_rangescope"), "TheScriptVar");
+				assertEquals("Scope by range: Cascaded scoped", cat, item("range_cascadedvar_cascaded_rangescope"), "TheCascadedVar");
+				
+				assertEquals("Scope in WebTML Action", cat, item("actionvar_rangescope"), "TheActionVar");
+			
+			}
+					
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

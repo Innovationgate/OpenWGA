@@ -1,0 +1,6 @@
+this.member = "Hallo!";
+
+function theMethod() {
+	return "Method!";
+}
+this.theMethod = theMethod;

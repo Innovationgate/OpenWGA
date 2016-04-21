@@ -1,0 +1,10 @@
+<html>
+<head><tml:htmlhead/></head>
+<body>
+<tml:script>
+
+	return this.db().getAuthenticationModule().getEMailAddress("tbinias");
+
+</tml:script>
+</body>
+</html>

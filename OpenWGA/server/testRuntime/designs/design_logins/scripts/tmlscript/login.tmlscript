@@ -1,0 +1,6 @@
+var hashedPassword = Packages.de.innovationgate.utils.WGUtils.hashPassword(password);
+var login = logins.get(username);
+if (login != null && login.password == hashedPassword) {
+	return login;
+}
+return null;

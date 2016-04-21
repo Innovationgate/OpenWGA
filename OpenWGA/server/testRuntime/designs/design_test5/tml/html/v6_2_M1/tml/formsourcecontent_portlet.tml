@@ -1,0 +1,56 @@
+
+	
+<tml:form id="form" source="content" context="name:home">
+
+	<tml:input type="text" name="formsourcetest"/>
+	
+	<tml:button clickaction="$store" id="click1" ajax="false"/>
+	<tml:button clickaction="$store" id="click2" ajax="true"/>
+	<tml:button clickaction="$refresh" id="click3" ajax="false"/>
+	<tml:button clickaction="$reset" id="click4" ajax="false"/>
+	
+	<tml:input name="timestamp" type="date" defaultexpression="WGA.createDate()" format="iso8601"/>
+
+</tml:form>
+
+
+	
+<tml:script>
+	function findCookie(name) {
+		for each (c in request.getCookies()) {
+			if (c.name==name) return c.value;
+		}
+		return null;
+	}
+	var clickStep = parseInt(findCookie("clickStep"));
+	var cat = findCookie("testId");
+	
+	try {
+		var homeDoc = context("name:home");
+		if (clickStep == 0) {
+			homeDoc.content().removeItem("formsourcetest");
+			homeDoc.content().save();
+			assertEquals("Form source was resetted", cat, homeDoc.formsourcetest, null);
+		}
+		else if (clickStep == 1) {
+			assertEquals("Form source stores data via Non-AJAX", cat, homeDoc.formsourcetest, "formsourcetest-click1-" + WGA.format(tmlform.timestamp, "iso8601"));
+			assertEquals("Form source stores data via Non-AJAX - Test AJAX state", cat, meta("request", "ajax"), false);
+		}
+		else if (clickStep == 2) {
+			assertEquals("Form source stores data via AJAX", cat, homeDoc.formsourcetest, "formsourcetest-click2-" + WGA.format(tmlform.timestamp, "iso8601"));
+			assertEquals("Form source stores data via AJAX - Test AJAX state", cat, meta("request", "ajax"), true);
+		}
+		else if (clickStep == 3) {
+			assertEquals("Form source contains arbitrary data from client", cat, tmlform.formsourcetest, "abc");
+		}
+		else if (clickStep == 4) {
+			assertEquals("Form source loaded data from backend correctly", cat, homeDoc.formsourcetest, tmlform.formsourcetest);
+		}
+		
+	}
+	catch (e) {
+		logException(e);
+		assertTrue("Exception running tests", cat, "false");
+	}
+</tml:script>
+	

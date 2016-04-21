@@ -1,0 +1,34 @@
+<html>
+<head><tml:htmlhead/></head>
+<body>
+
+<tml:action id="switchAssertionDebug">
+	this.assertiondebug(!this.isassertiondebug());
+</tml:action>
+
+<tml:action id="testDebug">
+	// create "false" assertions 
+	asserttrue("Asserttrue debugModeTest", "basic:assertiondebug", "false");
+	assertequals("Assertequals debugModeTest", "basic:assertiondebug", "x", "y");
+	// if second assertion fails, debugger should break on this line
+	var x = 0;
+</tml:action>
+
+Debug assertions is now: 
+<tml:script>
+	if (this.isassertiondebug()) {
+		return "enabled";
+	} else {
+		return "disabled";
+	}
+</tml:script>
+<HR/>
+
+<tml:button clickaction="switchAssertionDebug">Switch debug on/off</tml:button>
+<BR/><BR/>
+<tml:button clickaction="testDebug">Test debugmode</tml:button>
+
+<tml:warnings autohide="true"/>
+
+</body>
+</html>

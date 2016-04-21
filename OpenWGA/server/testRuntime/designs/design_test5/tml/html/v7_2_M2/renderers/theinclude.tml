@@ -1,0 +1,29 @@
+<tml:script>
+	WGA.TMLPage.setVar("includeField", $mc.theField);
+</tml:script>
+
+
+
+<tml:script>
+	function findCookie(name) {
+		for each (c in request.getCookies()) {
+			if (c.name==name) return c.value;
+		}
+		return null;
+	}
+	var clickStep = parseInt(findCookie("clickStep"));
+	var cat = findCookie("testId");
+	
+	try {
+		if (clickStep == 0) {
+			assertEquals("Include: Constructor ran", cat, includePrepareRan, "yes");
+			assertEquals("Include: Correct context", cat, includePrepareContext, context("docid:jjar-5xeqld").path);
+			assertEquals("Include: Correct design context", cat, includePrepareDesignContext, "v7_2_m2:renderers:theinclude.controller");
+			assertEquals("Include: Passing options from prepare()", cat, $option_anOptionForTheInclude, "Yay, options!");
+		}
+	}
+	catch (e) {
+		logException(e);
+		assertTrue("Exception running tests", cat, "false");
+	}
+</tml:script>

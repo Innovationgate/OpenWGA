@@ -1,0 +1,16 @@
+<div class="rtf">
+	<h1><tml:item name="headline" editor="textblock"/></h1>
+	
+	<div align="right">
+		<tml:item name="date" label="Date of the news" editor="date" format="longDate"/>
+	</div>
+	
+	<h2>
+		<tml:case isfilled="intro">
+			<tml:item name="intro" label="Intro" editor="rtf"/>
+		</tml:case>
+	</h2>
+	
+	<tml:item name="body" editor="rtf"/>
+		
+</div>

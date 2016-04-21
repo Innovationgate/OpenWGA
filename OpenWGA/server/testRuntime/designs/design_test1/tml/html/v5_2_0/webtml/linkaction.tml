@@ -1,0 +1,54 @@
+<tml:action id="theLinkAction">
+setVar("linkactionRan", true);
+setVar("linkactionContext", this.path);
+</tml:action>
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Testing functionality of attribute tml:portlet linkaction="action"
+	</PRE>
+	
+	<hr>
+	
+	Sequence: <tml:item name="seq"/>
+	
+	<tml:portlet ref="::linkaction-portlet" name="linkactionPortlet" linkaction="theLinkAction"/>
+	
+	<tml:script>
+				function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		
+		function countDocs(it) {
+			var count=0;
+			for (doc in Iterator(it)) {
+				count++;
+			}
+			return count;
+		}
+		
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			if (clickStep == 1) {
+				assertEquals("Link action ran", cat, linkactionRan, true);
+				assertEquals("Link action context is of docname home", cat, linkactionContext, context("name:home").path);
+				assertEquals("Normal context remained", cat, this.path, "db:test1<de>");			
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

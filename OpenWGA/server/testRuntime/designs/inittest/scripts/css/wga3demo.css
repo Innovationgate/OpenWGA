@@ -1,0 +1,45 @@
+a:visited,a,a:link{color:#028E8D;text-decoration:none;}
+a:hover,a:active{background:#028E8D;color:white;text-decoration:none;border-bottom:#028E8D dotted 1px}
+body{font:normal 11px verdana,arial,sans-serif;background-color:white;margin:0px 10px 10px 82px;}
+p,td{font-size:11px}
+
+blockquote{border-left:1px solid #999999;color:#999999;padding-left:10px;}
+.button{background-color:#028E8D;color:white;font-size:8pt}
+.line{color:#028E8D}
+
+.textinput {width:100%;border:dashed silver 1px;}
+.smalltextinput {border:dashed silver 1px;}
+
+.date{text-align:right;}
+.selectedDate{font-size:150%;padding-bottom:10px;border-bottom:solid 1px #999999}
+.login{width:100%;border:1px solid #028E8D;padding:3px}
+.selected{font-weight:bold;}
+
+.postbody{background:#FFFFFF;padding-bottom:30px;}
+.comments-body{margin-left:20px;margin-bottom:20px}
+.comments-title{background-color:beige;font-weight:bold}
+
+.headline{font-weight:bold;font-size:150%;}
+.abstract{font-style:italic}
+.commentslink{margin-bottom:0px;text-align:right;}
+.rubric{padding-left:10px;}
+.rubrictitle{font-weight:bold;padding-bottom:10px;padding-top:10px;}
+
+.title {font-size:24px;}
+.subtitle {}
+.calendar{margin-top:0px}
+.copyright{margin-top:20px;border-top:1px solid #028E8D;}
+
+.header {height:60px;border-bottom:1px solid #028E8D;color:#000000;padding:0px}
+.footer {border:1px solid #028E8D;color:#000000;background-color:white;padding:10px}
+.navigation{
+background:white;
+border-left:1px solid #028E8D;
+border-right:1px solid #028E8D;
+padding:10px;
+}
+.content{background-color:white;padding:10px;}
+
+.List1{background:#E9EAEF}
+.List2{background:#EAFCFB}
+

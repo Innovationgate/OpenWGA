@@ -1,0 +1,1 @@
+this.getObject3 = function() { return createObject(loadObjectDefinition(this, "v3_3_1:object3")); };

@@ -1,0 +1,31 @@
+<html>
+<body>
+<PRE>
+Test B0004636: db attribute ineffective on tml:url type="file"
+</PRE>
+<hr>
+
+<tml:url type="file" db="test3" doc="images" file="bomb.jpg" var="dburl1"/>
+
+<tml:range context="db:test3">
+	<tml:url type="file" doc="images" file="bomb.jpg" var="dburl2"/>
+	<tml:url type="file" doc="otherimages" file="bomb.jpg" var="dburl3"/>
+</tml:range>
+
+<tml:script>
+var category = "tml";
+try {
+	assertEquals("tml:url type=\"file\" uses db attribute", category, dburl1, request.getContextPath() + "/test3/file/images/bomb.jpg");
+	assertEquals("tml:url type=\"file\" without db attribute falls back to design db (if container present)", category, dburl2, request.getContextPath() + "/" + db().getDbReference() + "/file/images/bomb.jpg");
+	assertEquals("tml:url type=\"file\" without db attribute falls back to context db if container not present in design db", category, dburl3, request.getContextPath() + "/test3/file/otherimages/bomb.jpg");
+}
+catch (e) {
+	assertTrue("Exception executing test: " + e.message, category, false);
+}
+
+</tml:script>
+
+<tml:warnings/>
+
+</body>
+</html>

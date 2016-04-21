@@ -1,0 +1,85 @@
+function API() {
+}
+
+API.prototype.query = function() {
+    return HDBModel.getDocument("phones").getChildContentIterator(11);
+}
+
+API.prototype.resolve = function($cx, $restContext) {
+
+    var phoneId = HDBModel.getID($cx.content());
+    if (phoneId == "dell-venue") { // Testing resolve cancelling
+    	return null;
+    }
+    
+    var urlBuilder = WGA.urlBuilder($restContext.uri);
+    urlBuilder.setPath(urlBuilder.getPath() + "/" + phoneId);
+    var uri = urlBuilder.build(true);
+    
+    return {
+        id: phoneId,
+        title: $cx.TITLE,
+        href: uri
+    };
+}
+
+API.prototype.get = function($id) {
+
+	if ($id == "iphone") {
+		throw {code:404, message:"Very funny!"};
+	}
+
+    var con = WGA.app().db().getContentByName("phones." + $id);
+    if (con != null) {
+        return {
+            id: HDBModel.getID(con),
+            key: con.getDocumentKey(),
+            title: con.getTitle(),
+            storage: {
+                flash: con.getItemValue("storage_flash"),
+                ram: con.getItemValue("storage_ram")
+            }
+        }
+    }
+    else {
+        throw {code:404, message:"No phone of that id: " + $id};
+    }
+}
+
+API.prototype.put = function($id, $input) {
+    var con = WGA.app().db().getContentByName("phones." + $id);
+    if (con != null) {
+        if ($input.storage) {
+            con.setItemValue("storage_flash", $input.storage.flash);
+            con.setItemValue("storage_ram", $input.storage.ram);
+            con.save();
+            return this.get($id);
+        }
+        else {
+            throw {code:400, message:"Nothing writable in your input data"};
+        }
+    }
+    else {
+         throw {code:404, message:"No phone there mate!"};
+    }
+
+}
+
+API.prototype.delete = function($id, $restContext) {
+    var con = WGA.app().db().getContentByName("phones." + $id);
+    if (con != null) {
+        HDBModel.deleteContent(con);
+        return {status: "SUCCESS"};
+    }
+}
+
+API.prototype.post = function($input, $restContext) {
+    var con = HDBModel.createContent("phone", null, $input);
+    var phoneId = HDBModel.getID(con);
+    var urlBuilder = WGA.urlBuilder($restContext.uri);
+    urlBuilder.setPath(urlBuilder.getPath() + "/" + phoneId);
+    var uri = urlBuilder.build(true);
+    
+    $restContext.selfUri = uri;
+    return this.get(phoneId);
+}

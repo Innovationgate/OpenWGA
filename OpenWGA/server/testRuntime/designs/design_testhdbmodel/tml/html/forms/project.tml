@@ -1,0 +1,15 @@
+<h2>Project</h2>
+
+Name: <tml:input name="name" validation="$E_VALUE != ''" message="Enter a name!"/><br>
+
+
+Customer:
+<tml:case condition="tmlform.mode() == 'view' && content().getRelation('customer') != null">
+	<a href="<tml:url portletcontext="relation:customer"/>">
+</tml:case>
+
+<tml:input name="customer" type="select" relationtype="protected"/>
+
+<tml:case condition="tmlform.mode() == 'view' && content().getRelation('customer') != null">
+	</a>
+</tml:case>

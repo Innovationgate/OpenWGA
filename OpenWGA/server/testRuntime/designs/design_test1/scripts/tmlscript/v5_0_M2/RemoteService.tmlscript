@@ -1,0 +1,25 @@
+try {	
+	var file = tmlform.getFile("de.innovationgate.wga-app-framework.wgaplugin");
+	var filesize = file.length()/1048576;
+	
+	tmlform.removeFile("de.innovationgate.wga-app-framework.wgaplugin");
+	tmlform.setField("filesize",filesize);
+	
+	var pluginnames = getWGACore().getPluginSet().getPluginsByUniqueName().keySet();
+	var i_pluginnames = pluginnames.iterator();
+	var i=0;
+	
+	while(i_pluginnames.hasNext()){
+		if(file.getName().indexOf(i_pluginnames.next())!=-1)
+			break;
+		i++;
+	}
+
+	tmlform.setField("plugin",pluginnames.toArray()[i]);
+	
+	return tmlform;
+}
+catch (e) {
+	logException(e);
+	return null;
+}

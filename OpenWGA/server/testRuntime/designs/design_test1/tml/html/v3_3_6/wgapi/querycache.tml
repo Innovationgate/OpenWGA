@@ -1,0 +1,34 @@
+<html>
+<body>
+<PRE>
+Testing functionality of the WGAPI query cache:
+- Retrieving cached results
+- Notifying changes in the query environment (current context, additional query attributes
+</PRE>
+<hr>
+
+<!-- Test 1: Call same query 3 times. 2 times must be served by cache -->
+<tml:foreach id="fe1" type="loop" count="3">
+	<tml:query id="q1" cache="true" type="hql">content.title like '%a%'</tml:query>
+	
+	<tml:script>
+	var idx = taginfo("fe1", "iteration");
+	if (idx != 1) {
+		assertEquals("Use cached result", "WGAPI:QueryCache", taginfo("q1", "cacheused"), true);
+	}
+	</tml:script>
+</tml:foreach>
+
+
+<!-- Test 1: Call  query with altering contextes. Must never be served from cache since current document to exclude changes -->
+<tml:children context="docid:home">
+	<tml:query id="q2" cache="true" type="hql">content.title like '%a%'</tml:query>
+	
+	<tml:script>
+	assertEquals("Do not use cached result bc. of changing contextes", "WGAPI:QueryCache", taginfo("q2", "cacheused"), false);
+
+	</tml:script>
+</tml:children>
+
+</body>
+</html>

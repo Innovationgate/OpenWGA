@@ -1,0 +1,233 @@
+<!--  convert the XHTML into PDF with XSLFO -->
+<tml:element name="XSLT">
+<tml:option name="xml">
+<!--  convert the DOMINO output into XHTML -->
+<tml:element name="xhtml">
+<!-- Generate a XHTML Output from the Domino RTF field (boolean) -->
+<tml:option name="output-xml">yes</tml:option> 
+<!-- HTML entities will be replaced with numeric entities (boolean) -->
+<tml:option name="numeric-entities">yes</tml:option> 
+<!-- Generate adefault alt attribute for images (string)-->
+<tml:option name="alt-text">image</tml:option> 
+<!-- declare new not empty inline Tags (comma separetad list)-->
+<tml:option name="new-inline-tags">w:wrap,v:shapetype, v:stroke, v:formulas,v:f,v:path,o:lock,v:shape,v:imagedata</tml:option> 
+<!-- declare new empty inline Tags (comma separetad list)-->
+<tml:option name="new-empty-tags">w:wrap,v:shapetype, v:stroke, v:formulas,v:f,v:path,o:lock,v:shape,v:imagedata</tml:option> 
+<!--cleanUP for Doks from Word 2000 -->
+<tml:option name="word-2000">yes</tml:option> 
+<tml:body>
+<tml:eval language="tmlscript">
+return ("<html xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\" xmlns:w=\"urn:schemas-microsoft-com:office:word\">" + this.body + "</html>")
+</tml:eval>
+</tml:body>
+</tml:element>
+</tml:option>
+<tml:body>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:fo="http://www.w3.org/1999/XSL/Format">
+	<xsl:output method="html" indent="yes" encoding="ISO-8859-1" omit-xml-declaration="no"/>
+	<!--   Set the variables to 1 to allow Colors and Classes and to 0 to disallow -->
+	<xsl:variable name="SetFontColor">1</xsl:variable>
+	<xsl:variable name="SetFontSize">1</xsl:variable>
+	<xsl:variable name="SetTdColor">1</xsl:variable>
+	<!--- check for # in color attributes and real names -->
+	<xsl:template name="checkColor">
+		<xsl:param name="color"/>
+		<xsl:if test="$color != ''">
+			<xsl:choose>
+				<xsl:when test="contains($color,'#')">
+					<xsl:value-of select="$color"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:choose>
+						<xsl:when test="$color = 'red'">#FF0000</xsl:when>
+						<xsl:when test="$color = 'blue'">#0000FF</xsl:when>
+						<xsl:when test="$color = 'black'">#000000</xsl:when>
+						<xsl:when test="$color = 'white'">#FFFFFF</xsl:when>
+						<xsl:when test="$color = 'maroon'">#800000</xsl:when>
+						<xsl:when test="$color = 'green'">#008000</xsl:when>
+						<xsl:when test="$color = 'olive'">#808000</xsl:when>
+						<xsl:when test="$color = 'navy'">#000080</xsl:when>
+						<xsl:when test="$color = 'purple'">#800080</xsl:when>
+						<xsl:when test="$color = 'teal'">#008080</xsl:when>
+						<xsl:when test="$color = 'silver'">#C0C0C0</xsl:when>
+						<xsl:when test="$color = 'grey'">#808080</xsl:when>
+						<xsl:when test="$color = 'lime'">#00FF00</xsl:when>
+						<xsl:when test="$color = 'yellow'">#FFFF00</xsl:when>
+						<xsl:when test="$color = 'fuchsia'">#FF00FF</xsl:when>
+						<xsl:when test="$color = 'aqua'">#00FFFF</xsl:when>
+						<xsl:otherwise>#<xsl:value-of select="$color"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:if>
+	</xsl:template>
+	<xsl:template match="b">
+		<fo:inline font-weight="bold">
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+	<xsl:template match="i">
+		<fo:inline font-style="italic">
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+	<xsl:template match="u">
+		<fo:inline text-decoration="underline">
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+	<xsl:template match="font">
+		<xsl:variable name="fontColor">
+			<xsl:if test="$SetFontColor = 1">
+				<xsl:call-template name="checkColor">
+					<xsl:with-param name="color" select="@color"/>
+				</xsl:call-template>
+			</xsl:if>
+		</xsl:variable>
+		<fo:inline>
+			<xsl:if test="$SetFontSize = 1">
+				<xsl:if test="@size">
+					<xsl:attribute name="font-size"><xsl:value-of select="@size"/></xsl:attribute>
+				</xsl:if>
+			</xsl:if>
+			<xsl:if test="@color">
+				<xsl:attribute name="color"><xsl:value-of select="$fontColor"/></xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+	<xsl:template match="br">
+		<fo:block space-before="3pt"/>
+	</xsl:template>
+	<xsl:template match="p">
+		<fo:block space-before="3pt">
+			<xsl:if test="@align">
+				<xsl:attribute name="text-align"><xsl:value-of select="@align"/></xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates/>
+		</fo:block>
+	</xsl:template>
+	<xsl:template match="div">
+		<fo:inline>
+			<xsl:if test="@align">
+				<xsl:attribute name="text-align"><xsl:value-of select="@align"/></xsl:attribute>
+			</xsl:if>
+			<xsl:apply-templates/>
+		</fo:inline>
+	</xsl:template>
+	<xsl:template match="img">
+		<fo:external-graphic>
+			<xsl:if test="@src">
+				<xsl:attribute name="src"><xsl:text>http://<tml:item name="WGAPath" context="currentdocument"/>/<tml:meta type="database" name="dbkey"/>/</xsl:text><xsl:value-of select="@src"/></xsl:attribute>
+			</xsl:if>
+			<xsl:if test="@width">
+				<xsl:attribute name="content-width"><xsl:value-of select="@width"/><xsl:text>pt</xsl:text></xsl:attribute>
+			</xsl:if>
+			<xsl:if test="@height">
+				<xsl:attribute name="content-height"><xsl:value-of select="@height"/><xsl:text>pt</xsl:text></xsl:attribute>
+			</xsl:if>
+		</fo:external-graphic>
+	</xsl:template>
+	<xsl:template match="a">
+		<fo:inline>
+			<fo:basic-link external-destination="{@href}" color="#0000FF" text-decoration="underline">
+				<xsl:apply-templates/>
+			</fo:basic-link>
+		</fo:inline>
+	</xsl:template>
+	<xsl:template match="ol">
+		<fo:list-block provisional-distance-between-starts="10pt" provisional-label-separation="10pt">
+			<xsl:apply-templates/>
+		</fo:list-block>
+	</xsl:template>
+	<xsl:template match="ul">
+		<fo:list-block provisional-distance-between-starts="10pt" provisional-label-separation="10pt">
+			<xsl:apply-templates/>
+		</fo:list-block>
+	</xsl:template>
+	<xsl:template match="li">
+		<fo:list-item>
+			<fo:list-item-label end-indent="label-end()">
+				<fo:block>&#x2022;</fo:block>
+			</fo:list-item-label>
+			<fo:list-item-body start-indent="body-start()">
+				<fo:block>
+					<fo:inline>
+						<xsl:apply-templates/>
+					</fo:inline>
+				</fo:block>
+			</fo:list-item-body>
+		</fo:list-item>
+	</xsl:template>
+	<!--   check for tables and call the template "define Columns" with number of columns -->
+	<xsl:template match="table">
+		<fo:table table-layout="fixed" inline-progression-dimension.maximum="100%">
+			<xsl:if test="@border">
+				<xsl:if test="@border != '0' ">
+					<xsl:attribute name="border"><xsl:value-of select="@border"/><xsl:text> solid black</xsl:text></xsl:attribute>
+				</xsl:if>
+			</xsl:if>
+			<xsl:call-template name="defineColumns">
+				<xsl:with-param name="noOfCols" select="count(tr[1]/td)"/>
+			</xsl:call-template>
+			<fo:table-body>
+				<xsl:apply-templates/>
+			</fo:table-body>
+		</fo:table>
+	</xsl:template>
+	<!--  create a  tag for each column of the table  -->
+	<xsl:template name="defineColumns">
+		<xsl:param name="noOfCols"/>
+		<xsl:if test="$noOfCols > 0">
+			<xsl:variable name="rest" select="$noOfCols - 1"/>
+			<!--<xsl:value-of select="$noOfCols" />-->
+			<fo:table-column/>
+			<!--<xsl:value-of select="$rest" />-->
+			<xsl:call-template name="defineColumns">
+				<xsl:with-param name="noOfCols" select="$rest"/>
+			</xsl:call-template>
+		</xsl:if>
+	</xsl:template>
+	<xsl:template match="tr">
+		<fo:table-row keep-with-next="always">
+			<xsl:apply-templates/>
+		</fo:table-row>
+	</xsl:template>
+	<xsl:template match="td">
+		<fo:table-cell>
+			<!--<xsl:variable name="tborder" select="table/@border"/>-->
+			<xsl:variable name="TdColor">
+				<xsl:if test="$SetTdColor = 1">
+					<xsl:call-template name="checkColor">
+						<xsl:with-param name="color" select="@bgcolor"/>
+					</xsl:call-template>
+				</xsl:if>
+			</xsl:variable>
+			<xsl:if test="../../@border">
+				<xsl:if test="../../@border != '0' ">
+					<xsl:attribute name="border"><xsl:value-of select="../../@border"/><xsl:text> solid black</xsl:text></xsl:attribute>
+				</xsl:if>
+			</xsl:if>
+			<xsl:if test="../../@cellpadding">
+				<xsl:if test="../../@cellpadding != '0' ">
+					<xsl:attribute name="padding"><xsl:value-of select="../../@cellpadding"/><xsl:text>pt</xsl:text></xsl:attribute>
+				</xsl:if>
+			</xsl:if>
+			<xsl:if test="@colspan">
+				<xsl:attribute name="number-columns-spanned"><xsl:value-of select="@colspan"/></xsl:attribute>
+			</xsl:if>
+			<xsl:if test="@rowspan">
+				<xsl:attribute name="number-rows-spanned"><xsl:value-of select="@rowspan"/></xsl:attribute>
+			</xsl:if>
+			<xsl:if test="@bgcolor">
+				<xsl:attribute name="background-color"><xsl:value-of select="$TdColor"/></xsl:attribute>
+			</xsl:if>
+			<fo:block>
+				<xsl:apply-templates/>
+			</fo:block>
+		</fo:table-cell>
+	</xsl:template>
+</xsl:stylesheet>
+</tml:body>
+</tml:element>

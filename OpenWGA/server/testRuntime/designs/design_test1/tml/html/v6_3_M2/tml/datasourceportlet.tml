@@ -1,0 +1,38 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests if an AJAX portlet can be rendered with a data source in context (#00003256)
+	</PRE>
+	
+	<tml:range context="db:customjdbc">
+		<tml:portlet name="theportlet" ref="::datasourceportlet_portlet" ajax="true"/>
+	</tml:range>
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			assertEquals("Portlet was executed", cat, portletRan, "Yes");
+			assertEquals("Portlet had context on data source", cat, portletCx, "customjdbc");
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

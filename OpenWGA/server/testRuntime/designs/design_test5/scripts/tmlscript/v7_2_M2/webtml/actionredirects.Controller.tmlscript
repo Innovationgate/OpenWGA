@@ -1,0 +1,10 @@
+function Controller() {
+}
+
+Controller.prototype.doRedirect = function() {
+
+	return {
+		$redirect: {context: "db:test1/name:home"}
+	}
+
+}

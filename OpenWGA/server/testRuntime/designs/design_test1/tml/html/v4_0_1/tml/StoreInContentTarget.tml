@@ -1,0 +1,85 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<tml:action master="true" id="init">
+	try {
+		var conHome = context("name:home").content();
+		conHome.setItemValue("sicTargetTest", "empty");
+		conHome.save();
+	}
+	catch (e) {
+		logException(e);
+		assertTrue("Exception running tests", cat, "false");
+	}
+</tml:action>
+
+<tml:action master="true" id="sic">
+	try {
+		assertEquals("Store action is executed under different context than form target", "TML:storeInContentTarget", UNIQUENAME, "remoteimportbase");
+		tmlform.storeInContent();
+	}
+	catch (e) {
+		logException(e);
+		assertTrue("Exception running tests", cat, "false");
+	}
+	
+</tml:action>
+
+<body>
+	<PRE>
+	Tests the correct target context for tmlform.storeInContent(); (B0004202)
+	</PRE>
+	
+	<tml:form id="transientForm" context="name:home" source="content">
+		<tml:input name="sicTargetTest" type="text"/>
+	</tml:form>
+	
+	<tml:range context="name:remoteimportbase">
+		<a href="<tml:url form="transientForm" action="sic"/>" name="sicTransient">Store</a>
+	</tml:range>
+
+
+	<tml:form id="persistentForm" persist="true" context="name:home" source="content">
+		<tml:input name="sicTargetTest" type="text"/>
+	</tml:form>
+	
+	
+	<tml:range context="name:remoteimportbase">
+		<a href="<tml:url form="persistentForm" action="sic"/>" name="sicPersistent">Store</a>
+	</tml:range>
+	
+	<a href="<tml:url action="init"/>" name="init">Init</a>
+	
+	<tml:script>
+	
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+	
+		var cat = "category";
+		try {
+			
+			if (seq == 2) {
+				assertEquals("Transient form test field correctly initialized", "TML:storeInContentTarget", context("name:home").sicTargetTest, "empty");
+			}
+			else if (seq == 3) {
+				assertEquals("Transient form stores in correct target context", "TML:storeInContentTarget", context("name:home").sicTargetTest, "transient");
+			}
+			else if (seq == 4) {
+				assertEquals("Persistent form stores in correct target context", "TML:storeInContentTarget", context("name:home").sicTargetTest, "persistent");
+			}
+		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

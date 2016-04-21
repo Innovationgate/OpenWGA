@@ -1,0 +1,18 @@
+<HR/>
+This is the fire-event-portlet:
+<tml:action id="fireEvent">
+	var event = this.createEvent("normalEvent");
+	event.addParameter("myparam", "Hallo Welt!");
+	portlet.fireEvent(event);
+</tml:action>
+
+<tml:action id="fireEventAjax">
+	var event = this.createEvent("ajaxEvent");
+	event.addParameter("myparam", "Hallo Welt!");
+	portlet.fireEvent(event);
+</tml:action>
+
+
+<tml:button clickaction="fireEvent" id="fireEvent" ajax="false">fireEvent</tml:button>		
+<tml:button clickaction="fireEventAjax" id="fireEventAjax" ajax="true">fireEvent ajax</tml:button>		
+

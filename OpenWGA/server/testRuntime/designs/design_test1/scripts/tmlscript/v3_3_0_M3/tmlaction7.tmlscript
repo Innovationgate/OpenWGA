@@ -1,0 +1,6 @@
+if (tmlparam1 == true) {
+	return "Yes!";
+}
+else {
+	return "No!";
+}

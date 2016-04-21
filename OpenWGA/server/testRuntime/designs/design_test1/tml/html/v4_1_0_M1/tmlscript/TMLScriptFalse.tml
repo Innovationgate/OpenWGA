@@ -1,0 +1,57 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Test conformity with JavaScript standard for "false" values (B000047DE)
+	</PRE>
+	
+	<hr>
+	
+	<!-- Empty String -->
+	<tml:case condition="''">
+		<tml:script var="falseEmptyString">true</tml:script>
+	</tml:case>
+	
+	<!-- Null -->
+	<tml:case condition="null">
+		<tml:script var="falseNull">true</tml:script>
+	</tml:case>
+
+	<!-- NaN -->
+	<tml:case condition="Number.NaN">
+		<tml:script var="falseNaN">true</tml:script>
+	</tml:case>	
+
+	<!-- Undefined -->
+	<tml:case condition="undefined">
+		<tml:script var="falseUndefined">true</tml:script>
+	</tml:case>		
+	
+	<tml:script>
+		var cat = "TMLScript";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertTrue("Empty string evaluates to false", cat, "!isDefined('falseEmptyString')");
+			assertTrue("Null evaluates to false", cat, "!isDefined('falseNull')");
+			assertTrue("NaN evaluates to false", cat, "!isDefined('falseNaN')");
+			assertTrue("Undefined evaluates to false", cat, "!isDefined('falseUndefined')");		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

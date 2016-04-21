@@ -1,0 +1,40 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+		Test case for F000047C6:
+		- login as "manager"
+		- try to remove a content type which is in use for e.g. "standard"
+		- remove should be denied
+		- create a now content type which is therefore not in use
+		- try to delete this one - should work without exception
+	</PRE>
+	
+	<tml:script>
+		if (meta("db", "username") == "anonymous") {
+			login("manager", "manager", "default");
+		} 
+		registerassertequals("removeInUseContentTypeDenied", "Removing a contentType which is in use is denied", "WGAPI");
+		registerasserttrue("removeUnusedContentType", "Removing a contentType which is NOT in use work as expected", "WGAPI");
+
+		try {
+			db().getContentType("standard").remove();
+		} catch (e) {
+			assertequals("removeInUseContentTypeDenied", e.javaException.getClass().getName(), "de.innovationgate.webgate.api.WGIllegalStateException");
+		}
+		
+		try {
+			var contentType = db().createContentType("notInUse_F000047C6");
+			contentType.save();
+			db().getContentType("notInUse_F000047C6").remove();
+			asserttrue("removeUnusedContentType", true);
+		} catch (e) {
+			logException(e);
+		}				
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

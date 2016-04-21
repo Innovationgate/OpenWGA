@@ -1,0 +1,17 @@
+<tml:script>
+	return createdate();	
+</tml:script>
+<tml:script>
+	return Packages.java.text.DataFormat.format(createdate());	
+</tml:script>
+
+<BR>
+<tml:script>
+	return format(createdate(), null);	
+</tml:script>
+
+<tml:form id="test">
+<tml:input name="startdate" type="date" default="{createdate()}"/>
+<tml:button clickaction="$refresh"/>
+</tml:form>
+<tml:warnings/>

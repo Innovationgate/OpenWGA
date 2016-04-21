@@ -1,0 +1,17 @@
+This is Portlet B
+<tml:eventscript onevent="eventA" ajax="true">
+	if (portlet.eventCatchCount == null) {
+		portlet.eventCatchCount = 0;
+	}
+	portlet.eventCatchCount = portlet.eventCatchCount + 1;
+	portlet.save();
+	
+	asserttrue("eventHandled", true);
+</tml:eventscript>
+
+<tml:script>
+	return portlet.eventCatchCount;
+</tml:script>
+
+<tml:warnings/>
+

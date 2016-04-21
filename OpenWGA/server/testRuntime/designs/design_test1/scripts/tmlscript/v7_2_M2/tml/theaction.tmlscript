@@ -1,0 +1,13 @@
+var result = [];
+
+result.push("context:" + this.path);
+
+if (tmlparam1) {
+	result.push("param1:" + tmlparam1); 
+}
+
+if (thatGlobalObject) {
+	result.push("thatGlobalObject:" + thatGlobalObject);
+}
+
+return result.join(",");

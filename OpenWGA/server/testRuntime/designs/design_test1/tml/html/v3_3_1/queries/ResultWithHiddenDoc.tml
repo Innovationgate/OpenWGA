@@ -1,0 +1,75 @@
+<html>
+<body>
+
+<PRE>
+Testet das Verhalten von lucene und hql kollektionen die sichtgeschützte Dokumente beinhalten.
+
+Benötigtes Verhalten: 
+Sichtgeschützte Dokumente werden ausgeblendet
+
+Optimales Verhalten: 
+Kollektion füllt freigewordene Plätze in der Kollektion mit weiteren Ergebnissen auf 
+WGA 3.3: Nur Lucene. HQL lässt Plätze leer.
+WGA 4.0: HQL füllt Plätze auf.
+</PRE>
+<hr/>
+
+<h3>Lucene</h3>
+<ul>
+<tml:collection id="luceneSearch">
+	<tml:query type="lucene" options="sort:TITLE(asc)">horstköppel</tml:query>
+	<tml:foreach id="luceneFE" pagesize="5">
+		<li><tml:link/></li>
+	</tml:foreach>
+</tml:collection>
+</ul>
+
+Results of collection: <tml:taginfo sourcetag="luceneSearch" name="count"/><br/>
+
+<h3>HQL</h3>
+<ul>
+<tml:collection id="hqlSearch">
+	<tml:query type="hql">content.items['body'].text = 'horstköppel' ORDER BY content.title ASC</tml:query>
+	<tml:foreach id="HQLFE" pagesize="5">
+		<li><tml:link/></li>
+	</tml:foreach>
+</tml:collection>
+</ul>
+
+Results of collection: <tml:taginfo sourcetag="hqlSearch" name="count"/><br/>
+
+<tml:script>
+
+function isWGA4() {
+
+try {
+	java.lang.Class.forName("de.innovationgate.wgpublisher.WGAVersion");
+	return true;
+}
+catch (e) {
+	return false;
+}
+
+}
+
+
+assertEquals("Collection with hidden doc matches pagesize: Lucene", "queries", taginfo("luceneFE", "iteration"), 5);
+
+
+var correctHqlResults = 5;
+if (!isWGA4()) {
+	correctHqlResults = 4;
+}
+assertEquals("Collection with hidden doc matches pagesize: HQL", "queries", taginfo("HQLFE", "iteration"), correctHqlResults);
+
+
+</tml:script>
+
+<tml:script>
+assertEquals("Collection with hidden doc matches pagesize: No warnings", "queries", tag.getWarnings().size(), 0);
+</tml:script>
+
+<tml:warnings/>
+
+</body>
+</html>

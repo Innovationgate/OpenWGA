@@ -1,0 +1,26 @@
+<html>
+
+<tml:script>
+//runtime.debug();
+areas = WGA.createList();
+areas.addAll(db().getAreas().values());
+assertTrue("No errors when sorting a list of WGArea objects via WGA.sortList(areas)", "tmlscript", "WGA.sortList(areas).size() > 0");
+
+structEntries = db().getArea("home").getRootEntries();
+assertTrue("No errors when sorting a WGStructEntryList via WGA.sortList(structEntries, 'position')", "tmlscript", "WGA.sortList(structEntries, 'position').size() > 0");
+
+structEntries = db().getArea("home").getRootEntries();
+var sorted = WGA.sortList(structEntries, "titlepath");
+var expectedOrder = WGA.sortList(structEntries, "title");
+assertEquals("Sorting with a WebTML metadata value: WGA.sortList(structEntries, 'titlepath')", "tmlscript", sorted, expectedOrder);
+
+unsortedValues = WGA.createList("c,b,x,a", ",");
+sortedValues = WGA.createList("a,b,c,x", ",");
+assertTrue("No errors when sorting a list of Strings via WGA.sortList()", "tmlscript", "WGA.sortList(unsortedValues); true");
+assertEquals("Correct order after sorting a list of Strings via WGA.sortList()", "tmlscript", sortedValues, unsortedValues);
+
+</tml:script>
+<tml:warnings/>
+<body>
+</body>
+</html>

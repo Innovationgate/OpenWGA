@@ -1,0 +1,22 @@
+<validation>
+	
+	<msg text="{%label:news.please-enter-headline%}.">
+		<![CDATA[
+		// check for empty field or '<br/>' content
+		headline==null || headline.replace(/<br.*>/g, "")==""
+		]]>
+	</msg>
+
+	<msg text="{%label:news.please-enter-date%}.">
+		<![CDATA[
+		date==null
+		]]>
+	</msg>
+
+	<msg text="{%label:news.please-enter-body%}.">
+		<![CDATA[
+		body==null || body.replace(/<br.*>/g, "")==""
+		]]>
+	</msg>
+
+</validation>

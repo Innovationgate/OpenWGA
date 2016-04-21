@@ -1,0 +1,72 @@
+this.post = function(input, restContext) {
+
+	WGA.Master.runFunction(function(input, restContext) {
+		HDBModel.createContent("log", null, {ref: input.ref, message: input.message, files: restContext.files});
+	}, input, restContext);
+	
+	restContext.selfUri = restContext.uri + "/" + input.ref;
+
+}
+
+
+this.put = function(id, input, restContext) {
+
+	WGA.Master.runFunction(function(id, input, restContext) {
+		
+		var c = context("name:logs/np:" + id, false);
+		if (c == null) {
+			throw {code: 404, message: "Not found"};
+		}
+		
+		var params = HDBModel.newUpdateContentParams(c.content());
+		params.process = function(content) {
+			content.setItemValue("message", input.message);
+			for (var fileName in Iterator(WGA.getLookupKeys(restContext.files))) {
+				var stream = restContext.files.get(fileName);
+				content.attachFile(stream, fileName);
+				stream.close();
+			}
+		};
+		HDBModel.updateContent(params);
+		
+		
+	}, id, input, restContext);
+
+}
+
+this.putFile = function(id, fileName, input, restContext) {
+
+	WGA.Master.runFunction(function(id, fileName, input) {
+		
+		var c = context("name:logs/np:" + id, false);
+		if (c == null) {
+			throw {code: 404, message: "Not found"};
+		}
+		
+		var params = HDBModel.newUpdateContentParams(c.content());
+		params.process = function(content) {
+			content.attachFile(input, fileName);
+		};
+		HDBModel.updateContent(params);
+		input.close();
+		
+		
+	}, id, fileName, input);
+
+}
+
+this.get = function(id, restContext) {
+	
+	var c = context("name:logs/np:" + id, false);
+	if (c != null) {
+		return {
+			ref: c.ref,
+			message: c.message
+		}
+	}
+	else {
+		throw {code: 404, message: "Not found"};
+	}
+	
+	
+}

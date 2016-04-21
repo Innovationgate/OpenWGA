@@ -1,0 +1,43 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests if modern default actions ($r/$pc) are correctly debounced
+	</PRE>
+	
+	<hr>
+	
+	<tml:button id="click1" clickaction="$mc.incCounter">Increase Counter</tml:button>
+	<button type="button" onclick="location.reload()" id="click2">Reload</button>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			if (clickStep == 1) {
+				assertEquals("Counter was increased on action", cat, item("$mc.getActionCounter"), 1);
+				assertTrue("URL contains action link", cat, "WGA.Call.getParam('$action') != null");
+			}
+			else if (clickStep == 2) {
+				assertEquals("Counter is NOT increased on reload", cat, item("$mc.getActionCounter"), 1);
+				assertTrue("URL contains action link", cat, "WGA.Call.getParam('$action') != null");
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

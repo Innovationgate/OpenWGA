@@ -1,0 +1,64 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+  <tml:htmlhead/> 
+  <tml:script>
+  	  if (!isdefined("mode")) {		
+		  setsessionvar("mode", this.request.getParameter("formmode"));
+	  }
+	  if (!isdefined("persist")) {
+	  	  setsessionvar("persist", this.request.getParameter("persist"));
+	  }
+  </tml:script>
+  
+</head>
+<body>
+<HR/>
+<PRE>
+This test checks:
+ - access dynamically added formfields (without input-tag) via tml:script (pre and post submit)
+</PRE>
+
+
+	<tml:form id="dynamicFields" source="none" 
+	          mode="{this.mode}"
+	          persist="{this.persist}">
+
+			<tml:script>
+				// add dynamic field
+				tmlform.setfield("aDynamic", "dynamically added text");
+			</tml:script>
+	          
+	        <tml:input type="text" name="aText"/>
+	        <tml:button clickaction="$refresh" id="refresh">refresh</tml:button>		
+	</tml:form>
+</body>
+</html>
+
+
+
+<tml:script>
+	var category = "TMLForm:dynamicFields";
+	
+		
+	// check if formmode is set correctly
+	assertequals("Formmode is set correctly", category, this.mode, tmlform.getMode());	
+	
+
+	// check if form-persist is set correctly
+	if (this.persist.equals("true")) {
+		asserttrue("Form-Persist is set correctly", category, "tmlform.ispersistent()");
+	} else if (this.persist.equals("false")) {
+		asserttrue("Form-Persist is set correctly", category, "!tmlform.ispersistent()");
+	}
+	
+	// access dyn field
+	assertequals("Value of aDynamic is correct", category, tmlform.aDynamic, "dynamically added text");
+	assertequals("EValue of aDynamic is correct", category, tmlform.enteredvalue("aDynamic"), "dynamically added text");	
+	assertequals("PValue of aDynamic is correct", category, tmlform.parsedvalue("aDynamic"), "dynamically added text");		
+</tml:script>
+
+<tml:script>
+	// check warnings
+	asserttrue("No tml:warnings detected", "Global:CheckTMLWarnings", this.tag.getWarnings().isEmpty());
+</tml:script>

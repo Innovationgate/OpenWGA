@@ -1,0 +1,41 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests behaviour of failing context changes. (F00004252)
+	Since WGA4: A failing context change cancels the tag UNLESS it is a condition tag with specified attribute "iscontextvalid"
+	</PRE>
+	
+	<hr>
+	
+	<tml:script>
+		tag1Ran = false;
+		tag2Ran = false;
+	</tml:script>
+	
+	<tml:script context="name:doesnotexist">
+		tag1Ran = true;
+	</tml:script>
+	
+	<tml:case iscontextvalid="false" context="name:doesnotexist">
+		tag2Ran = true;
+	</tml:case>
+	
+	
+	<tml:script>
+		var cat = "TML:FailingContextChange";
+		try {
+			assertEquals("Failing tag 1 may not run", cat, tag1Ran, false);
+			assertEquals("Condition tag with istcontextvalid must run", cat, tag2Ran, false);		
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

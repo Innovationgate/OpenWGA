@@ -1,0 +1,26 @@
+<h2 align="center">IG Technology Partner</h2>
+<table cellspacing=0 cellpadding=5 width=100% border=0>
+<tml:collection id="PartnerDocs">
+<tml:query type="formula">
+_Partnerflag="Partner"
+</tml:query>
+<tml:foreach type="content" sortorder="descanding" sortexpression="_Partnername">
+<tr>
+<td class="BGRahmen_rechtsoffen">
+<b><tml:link/></b>
+</td>
+<td class="BGRahmen_linksoffen">
+<tml:if condition ="_url !=''">
+<tml:then><div align="right"><a target="partner" href="<tml:item name="_url"/>">
+<tml:img name="Navigation" src="NavTrans1.gif"> border="0" alt="zur Partnerwebseite"</tml:img></a>
+</div></tml:then>
+</tml:if>
+</td>
+</tr>
+<td colspan="2">
+<b><tml:item name= "_Partnername"/></b><br><tml:item name=" _Laenderkennung"/><tml:item name="_Stadt"/><br>
+</td>
+</tr>
+</tml:foreach>
+</tml:collection>
+</table>

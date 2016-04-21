@@ -1,0 +1,36 @@
+<html>
+<head>
+  <tml:htmlhead/>
+</head>
+<body>
+
+
+
+<tml:action id="check">
+	// validate
+	if (this.sequence == 1) {
+		assertequals("Date was set correctly.", "v3_3_5:tmlform", format(tmlform.field('datum'), "yyyy-MM-dd"), "2006-08-24");
+	} else if (this.sequence == 2) {
+		assertequals("Date was null.", "v3_3_5:tmlform", tmlform.field('datum'), null);
+	}	
+</tml:action>
+
+<tml:script>
+// sequence
+if (!isdefined('sequence')) {
+	this.setsessionvar("sequence", 1);
+
+} else {
+	this.sequence = this.sequence + 1;
+}
+</tml:script>
+
+<tml:form id="datum">
+	<tml:input name="datum" type="date" id="date" format="yyyy-MM-dd"/>	
+	<tml:button clickaction="check" id="check">check</tml:button>
+</tml:form>
+
+<tml:warnings/>
+
+</body>
+</html>

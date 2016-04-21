@@ -1,0 +1,31 @@
+<html>
+<body>
+<HR/>
+<PRE>
+Login/ logout via tmlscript F000040C2
+</PRE>
+<BR/>
+
+<tml:script>
+// open db logins
+var loginsDB = this.db("logins");
+assertEquals("not logged in", "tmlscript:login", loginsDB.isSessionOpen(), false);
+
+var result = this.login("tb", "sesam", "default");
+assertEquals("login method returned 'login was successful'", "login:tmlscript", result, true);
+
+// reopen db logins
+loginsDB.reopenSession();
+accessLevel = loginsDB.getSessionContext().getAccessLevel();
+assertEquals("logged in as manager", "tmlscript:login", accessLevel, loginsDB.ACCESSLEVEL_MANAGER);
+
+
+</tml:script>
+
+<tml:script>
+	// check warnings
+	asserttrue("No tml:warnings detected", "tmlscript:login", this.tag.getWarnings().isEmpty());
+</tml:script>
+
+</body>
+</html>

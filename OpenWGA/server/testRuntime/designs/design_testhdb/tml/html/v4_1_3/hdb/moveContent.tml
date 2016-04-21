@@ -1,0 +1,63 @@
+<html>
+<PRE>
+checks basic hdb functions
+
+the following structure is created in the hdb init-script:
+
+StorageA
+	StorageB
+		StorageC
+	StorageD
+StorageE
+	StorageF
+
+</PRE>
+<hr>
+
+<tml:script>
+	// create doc in storageC
+	var storageC = hdb().getStorage("storageA.storageB.storageC");
+	asserttrue("storageC retrieved", "hdb", storageC != null);
+	// create expected listener execution list
+	var shouldExecute = createlist();
+	shouldExecute.add("listenerC.preCreateContent");
+	shouldExecute.add("listenerB.preCreateContent");
+	shouldExecute.add("listenerA.preCreateContent");
+	shouldExecute.add("listenerC.postCreateContent");
+	shouldExecute.add("listenerB.postCreateContent");
+	shouldExecute.add("listenerA.postCreateContent");
+	
+	var contentC = hdb().createContent(storageC, "contentC", shouldExecute);
+	asserttrue("contentC created", "hdb", contentC != null);
+	assertequals("contentC is published", "hdb", contentC.status, "p"); 
+	
+	// move content C to storage F
+	var storageF = hdb().getStorage("storageE.storageF");
+	asserttrue("storageF retrieved", "hdb", storageF != null);
+	
+	shouldExecute = createlist();
+	shouldExecute.add("listenerC.preMoveContentFrom");
+	shouldExecute.add("listenerB.preMoveContentFrom");
+	shouldExecute.add("listenerA.preMoveContentFrom");
+	shouldExecute.add("listenerF.preMoveContentTo");
+	shouldExecute.add("listenerE.preMoveContentTo");
+	shouldExecute.add("listenerC.postMoveContentFrom");
+	shouldExecute.add("listenerB.postMoveContentFrom");
+	shouldExecute.add("listenerA.postMoveContentFrom");
+	shouldExecute.add("listenerF.postMoveContentTo");
+	shouldExecute.add("listenerE.postMoveContentTo");	
+	hdb().moveContent(contentC, storageF, shouldExecute);
+	
+	// delete content C in new hierarchie
+	shouldExecute = createlist();
+	shouldExecute.add("listenerF.preDeleteContent");
+	shouldExecute.add("listenerF.postDeleteContent");
+	shouldExecute.add("listenerE.preDeleteContent");
+	shouldExecute.add("listenerE.postDeleteContent");
+	hdb().deleteContent(contentC, shouldExecute);
+</tml:script>
+
+
+</html>
+
+

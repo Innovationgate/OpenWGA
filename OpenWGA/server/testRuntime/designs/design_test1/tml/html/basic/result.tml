@@ -1,0 +1,219 @@
+<%@ page import="de.innovationgate.wgpublisher.jsputils.JspHelper" %>
+<%@ page import="de.innovationgate.wgpublisher.webtml.utils.TMLContext" %>
+<%@ page import="java.util.List" %>
+<%@ page import="de.innovationgate.wgpublisher.test.TestCore" %>
+<html>
+<head><tml:htmlhead/></head>
+<body>
+<%
+JspHelper jspHelper = new JspHelper(pageContext);
+TMLContext context = jspHelper.getMainContext();
+
+TestCore testCore = jspHelper.getCore().getTestCore();
+
+if (!context.isdefined("testcore")) {
+	context.setsessionvar("testcore", testCore);
+}
+
+List assertions = testCore.getAllAssertions();
+context.setvar("assertions", assertions);
+context.setvar("assertionCount", new Integer(assertions.size()));
+context.setvar("failed", new Integer(0));
+%>
+
+<tml:action id="resetTestCore">
+testCore.reset();
+</tml:action>
+
+<tml:action id="showDetails">
+showDetails = parseInt(tmlparam1);
+</tml:action>
+
+<tml:action id="toggleErrorDisplay">
+if (istrue("showErrorsOnly")) {
+	showErrorsOnly = false;
+}
+else {
+	setSessionVar("showErrorsOnly", true);
+}
+</tml:action>
+
+<tml:if isdefined="showDetails">
+	<tml:then>
+		<tml:script id="selectDetailAssertion">
+		try {
+			var numberOfAssertion = parseInt(tmlparam1);
+			detailAssertion = assertions.get(numberOfAssertion - 1);
+		}
+		catch (e) {
+			log.error("Error:" + e.message);
+		}
+		</tml:script>
+		<h2>Assertion Details:</h2>
+		<table border="1" cellpadding="5">
+			<tr>
+				<td>Title</td>
+				<TD><tml:item name="detailAssertion" xpath="title"/></TD>
+			</tr>
+			<tr>
+				<td>Category</td>
+				<TD><tml:item name="detailAssertion" xpath="category"/></TD>
+			</tr>
+			<tr>
+				<td>Module</td>
+				<TD><tml:item name="detailAssertion" xpath="tmlModule"/></TD>
+			</tr>
+			<tr>
+				<td>Time</td>
+				<TD><tml:item name="detailAssertion" xpath="time"/></TD>
+			</tr>
+			<tr>
+				<td>Result</td>
+				<TD><tml:item name="detailAssertion" xpath="result"/></TD>
+			</tr>
+			<tr>
+				<td>Executed</td>
+				<TD><tml:item name="detailAssertion" xpath="executed"/></TD>
+			</tr>
+			<tr>
+				<td>Type</td>
+				<TD><tml:item name="detailAssertion" xpath="type"/></TD>
+			</tr>
+			<tr>
+				<td>Expression</td>
+				<TD><tml:item name="detailAssertion" xpath="expression"/></TD>
+			</tr>
+			<tr>
+				<td>Context path</td>
+				<TD><tml:item name="detailAssertion" xpath="contextPath"/></TD>
+			</tr>
+			<tr>
+				<td>Expression error message</td>
+				<TD>
+				<tml:case condition="detailAssertion.expressionError == true">
+					<tml:item name="detailAssertion" xpath="expressionErrorMsg"/></TD>
+				</tml:case>
+				</TD>
+			</tr>
+			<tr>
+				<td>Value 1</td>
+				<TD>
+					<!-- value start --><tml:item name="detailAssertion" xpath="valueObj1" encode="html"/><!-- value end -->
+				
+					<tml:script>
+					if (detailAssertion.valueObj1 == null) {
+						return " (null)";
+					}
+					else if (detailAssertion.valueObj1 == "") {
+						return " (empty string)";
+					}
+					else if (detailAssertion.valueObj1 instanceof java.util.List && detailAssertion.valueObj1.size() == 0) {
+						return " (empty list)";
+					}
+					else {
+						return " (" + javaObject(detailAssertion.rawValueObj2).getClass().getName() + ")";
+					}
+					</tml:script>
+				
+				</TD>
+			</tr>
+			<tr>
+				<td>Value 2</td>
+				<TD>
+					<!-- value start --><tml:item name="detailAssertion" xpath="valueObj2" encode="html"/><!-- value end -->
+					
+					<tml:script>
+					if (detailAssertion.rawValueObj2 == null) {
+						return " (null)";
+					}
+					else if (detailAssertion.rawValueObj2 == "") {
+						return " (empty string)";
+					}
+					else if (detailAssertion.rawValueObj2 instanceof java.util.List && detailAssertion.rawValueObj2.size() == 0) {
+						return " (empty list)";
+					}
+					else {
+						return " (" + javaObject(detailAssertion.rawValueObj2).getClass().getName() + ")";
+					}
+					</tml:script>
+					
+				</TD>
+			</tr>
+		</table>
+		<tml:button clickaction="$refresh">Close</tml:button>
+	</tml:then>
+	<tml:else>
+		<tml:range var="table">
+			<table border="1" cellpadding="5">
+				<THEAD>
+					<TR>
+						<TH>Time</TH>
+						<TH>Category</TH>
+						<TH>Title</TH>
+						<TH>Module</TH>			
+						<TH>Result</TH>
+					</TR>
+				</THEAD>
+				<TBODY>
+				<tml:foreach id="foreach" type="itemvalue" item="assertions" currentvalue="assertion">
+					<tml:case condition="isfalse('showErrorsOnly') || assertion.result == false">
+						<TR>
+							<TD><tml:item name="assertion" xpath="time"/></TD>
+							<TD><tml:item name="assertion" xpath="shortCategory"/></TD>
+							<TD>
+								<a href="<tml:url action="showDetails" param1="{ this.taginfo('foreach', 'iteration') }"/>">
+									<tml:item name="assertion" xpath="title"/>
+								</a>
+							</TD>
+							<TD>
+								<tml:item name="assertion" xpath="tmlModule"/>
+							</TD>			
+							<TD>
+								<tml:if condition="assertion.result == true">
+									<tml:then>
+										<tml:item name="assertion" xpath="result"/>
+									</tml:then>
+									<tml:else>
+										<tml:script>failed++</tml:script>
+										<span style="color:darkred; font-weight:bold;"><tml:item name="assertion" xpath="result"/></span>
+									</tml:else>
+								</tml:if>
+							</TD>	
+						</TR>
+					</tml:case>
+				</tml:foreach>
+				</TBODY>
+			</table>
+		</tml:range>
+		
+		<tml:if condition="failed == 0">
+			<tml:then>
+				<h2>WGA Unit Test Results: Test succeeded </h2>
+			</tml:then>
+			<tml:else>
+				<h2 style="color:darkred; font-weight:bold">WGA Unit Test Results: Test failed with <tml:item name="failed" format="#,##0"/> false assertions</h2>
+			</tml:else>
+		</tml:if>
+		
+		<p>Ran <tml:item name="assertionCount" format="#,##0"/> assertions.</p>
+		
+		<tml:button clickaction="resetTestCore">Clear all assertions</tml:button>
+		
+		<tml:if istrue="showErrorsOnly">
+			<tml:then>
+				<tml:button clickaction="toggleErrorDisplay">Show all assertions</tml:button>
+			</tml:then>
+			<tml:else>
+				<tml:button clickaction="toggleErrorDisplay">Show errors only</tml:button>
+			</tml:else>
+		</tml:if>
+		
+		
+		<tml:item name="table"/>	
+	</tml:else>
+</tml:if>
+
+<tml:warnings autohide="true"/>
+
+</body>
+</html>

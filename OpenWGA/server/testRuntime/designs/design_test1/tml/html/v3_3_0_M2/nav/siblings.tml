@@ -1,0 +1,18 @@
+<html>
+<body>
+<hr>
+<pre>
+Testing correct results on the count of a siblings navigator.
+</pre>
+<hr>
+<h2>Siblings</h2>
+<tml:siblings context="db:ig/area:home" id="nav1">
+<tml:foreach type="level">-</tml:foreach><tml:link/><br/>
+</tml:siblings>
+
+<tml:script>
+assertEquals("Correct count of elements in siblings navigator", "Navigation", taginfo('nav1', 'count'), 12);
+</tml:script>
+<tml:warnings/>
+</body>
+</html>

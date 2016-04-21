@@ -1,0 +1,20 @@
+<ul style="padding-left:15px;margin-left:0px;">
+<tml:script>
+var cal = createCalendar(createDate());
+cal.add(cal.DAY_OF_YEAR, -7);
+cutoffTime = cal.getTime();
+</tml:script>
+<tml:collection id="whatsnew">
+	<tml:query includecurrent="true">
+		content.lastmodified > '<tml:item format="yyyy-MM-dd HH:mm:ss" name="cutoffTime"/>'
+	</tml:query>	
+	<tml:foreach pagesize="5" sortorder="descending" sortexpression="this.LASTmodified">
+		<li><tml:link/></li>
+	</tml:foreach>
+</tml:collection>
+</ul>
+
+<tml:case condition="this.taginfo('whatsnew', 'count')==0">
+	- none -	
+</tml:case>
+

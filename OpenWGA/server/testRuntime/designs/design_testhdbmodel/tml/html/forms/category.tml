@@ -1,0 +1,6 @@
+<h2>Category</h2>
+
+Title: <tml:input name="title" meta="true"/><br>
+
+Allowed: <tml:input name="allowed" type="boolean"/>
+

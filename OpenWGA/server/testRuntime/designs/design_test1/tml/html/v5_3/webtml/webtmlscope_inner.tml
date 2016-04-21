@@ -1,0 +1,12 @@
+
+<tml:range var="{scoped:include_attvar}">TheAttVar</tml:range>
+
+<tml:script>
+	setVar(WGA.scoped("include_scriptvar"), "TheScriptVar");
+</tml:script>
+
+<tml:range tmlscope="{WGA.scoped('cascaded')}">
+
+	<tml:range var="{scoped:include_cascadedvar}">TheCascadedVar</tml:range>
+	
+</tml:range>

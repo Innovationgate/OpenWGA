@@ -1,0 +1,19 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests TMLScript access to ObjectFormatter's (F00003672)	
+	</PRE>
+	
+	<tml:script var="encoded">
+		var input = "<html><body><H1>Hallo Welt</H1></body></html>";
+		return encode("html", input);
+	</tml:script>
+	
+	<tml:script>
+		assertEquals("HTML-Text correct encoded.", "TMLScript:ObjectFormatter", encoded, "&#60;html&#62;&#60;body&#62;&#60;H1&#62;Hallo Welt&#60;/H1&#62;&#60;/body&#62;&#60;/html&#62;");
+	</tml:script>
+	
+</body>

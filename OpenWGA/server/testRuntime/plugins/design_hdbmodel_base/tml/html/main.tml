@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"> 
+<html>
+	<head><tml:htmlhead/></head>
+	<link rel="stylesheet" href="<tml:url type="css" name="basic-style"/>"/>
+	<link rel="stylesheet" href="<tml:url type="css" name="overlay:style"/>"/>
+</html>
+<body>
+	<tml:if condition="meta('db', 'useraccess') <= db().ACCESSLEVEL_AUTHOR">
+		<tml:then>
+			<tml:form id="login" source="none">
+				User: <tml:input name="user"/><br>
+				Password: <tml:input name="pwd"/>
+				<tml:button clickaction="login">Login</tml:button>
+			</tml:form>
+		</tml:then>
+		<tml:else>
+			<div style="float: right; width: 200px; border: 1px solid gray; padding: 3px; margin-bottom: 10px">
+				<tml:portlet name="messages" ref="messages:portlet" ajax="false"/>			
+			</div>
+		
+			<h1>RADiance</h1>
+		
+			<div id="body">
+				<tml:portlet name="display" ref="display:portlet" ajax="false"/>
+			</div>
+		</tml:else>
+	</tml:if>
+	
+	
+</body>

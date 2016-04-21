@@ -1,0 +1,16 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests basic portlet controller functionality
+	</PRE>
+	
+	<hr>
+	
+	<tml:portlet context="name:home" name="theportlet" ref="::theportlet:portlet"/>
+	
+	<tml:warnings/>
+</body>
+</html>

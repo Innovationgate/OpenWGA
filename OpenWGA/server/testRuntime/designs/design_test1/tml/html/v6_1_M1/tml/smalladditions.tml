@@ -1,0 +1,66 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+		Testing small WebTML additions from #00001483
+	</PRE>
+	
+	
+	<tml:case hasroles="master">
+		<tml:range var="hadroles">yes</tml:range>
+	</tml:case>
+	
+	<tml:case hasgroups="Admins, All">
+		<tml:range var="hadgroups">yes</tml:range>
+	</tml:case>
+	
+	<tml:range appendvar="appendme">a</tml:range>
+	<tml:range appendvar="appendme">b</tml:range>
+	<tml:range appendvar="appendme">c</tml:range>
+	
+	<tml:case condition="!isDefined('seq')">
+		<tml:range sessionvar="sessionappendme">d</tml:range>
+		<tml:range appendvar="sessionappendme">e</tml:range>
+		<tml:range appendvar="sessionappendme">f</tml:range>
+	</tml:case>
+	
+	<tml:case condition="seq == 1">
+			<tml:range appendvar="sessionappendme">g</tml:range>
+	</tml:case>
+	
+	<a id="click1" href="<tml:url/>">Click1</a>
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "WebTML";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			if (seq == 1) {
+				assertEquals("Attribute hasroles", cat, hadroles, "yes"); 		
+				assertEquals("Attribute hasgroups", cat, hadgroups, "yes");
+				assertEqualLists("Attribute appendvar", cat, appendme, ["a", "b", "c"]);
+			}
+			else if (seq == 2) {
+				assertEqualLists("Attribute appendvar on session var", cat, sessionappendme, ["d", "e", "f", "g"]);
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

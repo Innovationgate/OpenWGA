@@ -1,0 +1,82 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests a special case of unwanted WebTML variable interoperation, where (page) vars from designs with compliance < 7.2
+	make local vars of compliance >= 7.2 unusable because they cannot be overwritten:
+	
+	- Design with C7.2 writes a local var "thatvar" to value 1
+	- Design with C &lt; 7.2 writes a var "thatvar" to value 2, cannot access local vars, writes a page var
+	- Design with C7.2 wants to update local var "thatvar" to value 3, but the update functionality erratically updates the pagevar instead
+	- Upon reading local vars have priority over pagevar so "thatvar" for the C7.2 design remains at value 1, cannot be changed 
+	
+	</PRE>
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var cat = findCookie("testId");
+		registerAssertEquals("thatvar.1", "thatVar for compliance = 7.2 was inited with value 1", cat);
+		registerAssertEquals("thatvar.2", "ThatVar for compliance < 7.2 design is 2", cat);
+		registerAssertEquals("thatvar.3", "thatVar for compliance = 7.2 was updated with value 3", cat);
+	</tml:script>
+		
+	<tml:script>
+		thatvar = 1;
+	</tml:script>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			assertEquals("thatvar.1", thatVar, 1);	
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:include designdb="test1" ref="v7_2_M2:webtml:varpriority"/>
+	
+	<tml:script>
+		thatvar = 3;
+	</tml:script>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			assertEquals("thatvar.3", thatVar, 3);
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

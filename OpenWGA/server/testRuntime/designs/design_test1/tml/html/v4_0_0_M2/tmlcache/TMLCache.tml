@@ -1,0 +1,81 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<tml:action id="clearCache">
+WGA.Core.getWebTMLCache().clear();
+</tml:action>
+
+<tml:action id="modify">
+WGA.Master.runFunction(function() {
+	var con = context("name:home").content();
+	con.setItemValue("update", createDate());
+	con.save();
+});
+db().reopenSession();
+</tml:action>
+
+<body>
+	<PRE>
+	Tests the WebTML-Cache:
+	- Building of new cache entry
+	- Using of existing cache entry
+	- Let cache entry get stale after db modification
+	</PRE>
+	
+	<hr>
+	
+	<a id="click1" href="<tml:url action="clearCache"/>">Clear Cache</a>
+	<a id="click2" href="<tml:url action="$refresh"/>">Refresh</a>
+	<a id="click3" href="<tml:url action="modify"/>">Modify</a>
+	<a id="click4" href="<tml:url action="$refresh"/>">Refresh again</a>
+	
+	<tml:range id="v4tmlcache" cachekey="'key'" var="rangeContent" output="true" cachelatency="1">Cache me!</tml:range>
+	<tml:comment>
+	<tml:range id="v4tmlcache" cachekey="'anotherkey'" var="rangeContent2" output="true">Cache me too!</tml:range>
+	</tml:comment>
+	<tml:range id="v4tmlcache2" cachekey="'key'" var="rangeContent3" output="true">And dont forget me!</tml:range>
+	
+	<tml:range id="v6tmlcache" cachekey="'key'" var="rangeContent4" cacheupdate="never" cachelatency="1">This should not update</tml:range> 
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+	
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+
+		try {
+			assertEquals("Seq" + seq + ": Range has correct content", cat, rangeContent, "Cache me!");
+			if (clickStep==1) {
+				assertEquals("Seq1: Cache not yet used", cat, taginfo("v4tmlcache", "cacheused"), false); 
+			}
+			else if (clickStep==2) {
+				assertEquals("Seq2: Cache was used", cat, taginfo("v4tmlcache", "cacheused"), true);
+				assertEquals("Seq2: Cache with no cacheexpiry was used", cat, taginfo("v6tmlcache", "cacheused"), true);
+				//assertEquals("Seq2: Cache is isolated by cache key", cat, rangeContent2, "Cache me too!");
+				assertEquals("Seq2: Cache is isolated by range id", cat, rangeContent3, "And dont forget me!");
+			}
+			else if (clickStep==3) {
+				// Test is flaky (only!) on unittest server for unknown reasons
+				assertEquals("Seq3: Cache no more used bc. database changed", cat, taginfo("v4tmlcache", "cacheused"), false);
+				assertEquals("Seq3: Cache with no cacheexpiry still used after db update", cat, taginfo("v6tmlcache", "cacheused"), true);
+			}
+			else if (clickStep==4) {
+				assertEquals("Seq3: Cache no more used bc. latency expired", cat, taginfo("v4tmlcache", "cacheused"), false);
+				assertEquals("Seq3: Cache with no cacheexpiry no more used bc. latency expired", cat, taginfo("v6tmlcache", "cacheused"), false);
+			}
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

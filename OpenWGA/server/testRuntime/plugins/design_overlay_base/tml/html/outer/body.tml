@@ -1,0 +1,24 @@
+<div id="page" class="rounded-box">
+
+	<div id="header"><tml:include ref="::header"/></div>
+	<div id="mainnav"><tml:include ref="::mainnav"/></div>
+
+	<div id="childnav">
+		<tml:include ref="::childnav"/>
+	</div>
+			
+	<div id="content-wrapper">
+		<div id="content">
+			<tml:level from="3">
+				<div id="pathnav"><tml:include ref="::pathnav"/></div>						
+			</tml:level>
+			<tml:innerlayout/>
+			<tml:case condition="tml"><tml:include ref="{tml}"/></tml:case>
+		</div>
+		<div id="teaser" class="rounded-box"><tml:include ref="::teaser"/></div>
+		<div class="clear"></div>
+	</div>
+			
+	<div id="footer"><tml:include ref="::footer"/></div>
+	
+</div>

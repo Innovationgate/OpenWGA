@@ -1,0 +1,47 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests using JavaScript Generators/Iterators to feed tml:foreach (and the accompanying techniques to do that in a convenient way)
+	</PRE>
+	
+	<ul>
+		<tml:foreach item="$mc.standardDocuments" currentvalue="doc" pagesize="5" trim="true" var="theCollection" output="true"><li><tml:item name="doc.context.TITLE"/>: <tml:meta name="structkey"/> - <tml:item name="doc.fragments"/></tml:foreach>
+		<tml:foreach item="$mc.standardDocumentsWrap" currentvalue="doc" pagesize="5" trim="true" var="theCollection2" output="true"><li><tml:item name="doc.context.TITLE"/>: <tml:meta name="structkey"/> - <tml:item name="doc.fragments"/></tml:foreach>
+	</ul>
+	</ul>
+	
+	<hr>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			var shouldBeCollection = [
+			"<li>Contentpflege: jjar-5xeqgv - de",
+			"<li>Die Highlights: jjar-5xeqld - de",
+			"<li>Enterprise Dataintegration: jjar-5xeqkq - de",
+			"<li>Onlinehilfe: jjar-5xesg8 - de",
+			"<li>WebGate Anywhere 3: jjar-5xeqc8 - de"];
+		
+			assertEqualLists("Collection via generator function and object wrapper", cat, itemList("theCollection"), shouldBeCollection);
+			assertEqualLists("Collection via wrapped collection result", cat, itemList("theCollection2"), shouldBeCollection);
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

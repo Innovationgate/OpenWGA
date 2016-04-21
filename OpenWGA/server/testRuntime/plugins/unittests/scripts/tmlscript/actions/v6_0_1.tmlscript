@@ -1,0 +1,3 @@
+log.info("tml module action from plugin design called");
+var cat = "WebTML:Actions";
+assertTrue("Action from testplugin called", cat, true);

@@ -1,0 +1,5 @@
+log.info("Running ContentEventError.OnSave");
+if (db().getAttribute("ContentEventError.OnSave") == true) {
+	log.info("Cancelling ContentEventError.OnSave");
+	throw {msg: "This create event failed", code:1};
+}

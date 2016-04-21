@@ -1,0 +1,7 @@
+this.getInfo = function() {
+	return "Worked!";
+}
+
+this.getOverlayAction = function() {
+	return WGA.design(this).callAction("::overlayaction");
+}

@@ -1,0 +1,8 @@
+<html>
+ <head>
+  <tml:htmlhead/>
+ </head>
+ <body>
+	<tml:button clickaction="plugin-unittests/actions:v6_0_1" id="click1">call</tml:button>
+ </body>
+</html>

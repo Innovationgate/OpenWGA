@@ -1,0 +1,57 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0Transitional//EN">
+<html>
+<head>
+  <tml:htmlhead/> 
+</head>
+<body>
+<PRE>
+Test for FEATURE: F000044FE - Lucene highlighting of metas
+</PRE>
+
+<tml:collection>
+<tml:query type="lucene" db="test1" highlight="true">
+	Enterprise Dataintegration
+</tml:query>
+
+<tml:foreach pagesize="1">
+	<tml:range var="titleHighlightedDefault" output="true">
+			<tml:meta name="title" highlight="true" trim="true"/>
+	</tml:range>
+	<tml:range var="titleHighlighted" output="true">
+			<tml:meta name="title" highlight="true" 
+					  highlightprefix="<font color=\"red\">"
+					  highlightsuffix="</font>"
+					  trim="true"/>
+	</tml:range>
+</tml:foreach>
+
+<tml:script>
+	// check if hits are highlighted highlighted
+	asserttrue("title highlighted default (BOLD)", "lucene:highlightingMetas", titleHighlightedDefault.indexOf("<B>Enterprise</B> <B>Dataintegration</B>") != -1);
+	asserttrue("title highlighted by font", "lucene:highlightingMetas", titleHighlighted.indexOf("<font color=\"red\">Enterprise</font> <font color=\"red\">Dataintegration</font>") != -1);
+</tml:script>
+
+<HR>
+
+<tml:script>
+	// remove session attribute
+	removelucenequery();
+</tml:script>
+
+<tml:foreach pagesize="1">
+	<tml:range var="titleHighlightedAttrRemoved" output="true">
+			<tml:meta name="title" highlight="true" trim="true"/>
+	</tml:range>
+</tml:foreach>
+
+<tml:script>
+	// check if hits are not highlighted anymore
+	asserttrue("titel not highlighted -> query removed", "lucene:highlightingMetas", titleHighlightedAttrRemoved.indexOf("<B>") == -1);
+</tml:script>
+
+
+</tml:collection>
+<tml:warnings/>
+
+</body>
+</html>

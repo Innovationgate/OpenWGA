@@ -1,0 +1,14 @@
+
+<%
+	String urlPrefix = "http://" + request.getServerName() + ":" + request.getServerPort();
+%>
+<tml:element name="zip">
+	<tml:option name="target">test</tml:option>
+	<tml:option name="files">
+	
+		<%=urlPrefix%><tml:url type="file" doc="boerse" file="dax.gif"/>,
+		<%=urlPrefix%><tml:url type="file" doc="boerse" file="nemax.gif"/>,
+	
+	
+	</tml:option>
+</tml:element>

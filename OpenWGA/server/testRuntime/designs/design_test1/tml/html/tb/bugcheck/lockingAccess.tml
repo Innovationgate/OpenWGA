@@ -1,0 +1,13 @@
+<html>
+<head>
+  <tml:htmlhead/>
+</head>
+
+
+<body>
+	#<tml:script>
+		var core = this.context("docid:owee-5aegzr").getdocument().getCore(); 
+		//return doc.getItemValue("title.title;
+	</tml:script>#
+</body>
+</html>

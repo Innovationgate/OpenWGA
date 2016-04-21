@@ -1,0 +1,8 @@
+var remoteImport = tmlparam1;
+var importRowStruct = remoteImport.createChildEntry(db().getContentType("Standard"), tmlform.title);
+importRowStruct.save();
+var importRow = importRowStruct.createContent(db().getLanguage("de"), tmlform.title);
+importRow.setItemValue("item1", tmlform.item1);
+importRow.setItemValue("item2", tmlform.item2);
+importRow.setUniqueName(tmlform.uname);
+importRow.publish("No comment!");

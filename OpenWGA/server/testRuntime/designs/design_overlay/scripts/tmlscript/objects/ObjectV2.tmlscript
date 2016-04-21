@@ -1,0 +1,14 @@
+function ObjectV2() {
+}
+
+ObjectV2.prototype.doYourBit = function() {
+	return "My Bit";
+}
+
+ObjectV2.prototype.whatIsDollar = function() {
+	return String($);
+}
+
+ObjectV2.prototype.whatIsDoubleDollar = function() {
+	return String($$);
+}

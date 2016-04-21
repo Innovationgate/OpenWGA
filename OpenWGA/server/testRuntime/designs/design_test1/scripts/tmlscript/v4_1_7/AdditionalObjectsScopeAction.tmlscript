@@ -1,0 +1,9 @@
+try {
+	var wgacore1 = jobContext.wgaCore;
+	var wgacore2 = this.jobContext.wgaCore;
+	var db1 = this.db("test1");
+	return (wgacore1 != null && wgacore2 != null && db1 != null);
+}
+catch(e) {
+	return false;
+}

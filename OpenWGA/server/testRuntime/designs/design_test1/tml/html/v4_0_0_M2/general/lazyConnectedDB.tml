@@ -1,0 +1,26 @@
+<html>
+<body>
+	<PRE>
+	Tests the connection of lazily connected DBs.
+	</PRE>
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "LazyConnectedDB";
+		try {
+			assertTrue("Database 'designslave' is not connected", cat, !wgacore.getContentdbs().get("designslave").isConnected());
+			db("designslave");
+			assertTrue("Database 'designslave' is connected after first access", cat, wgacore.getContentdbs().get("designslave").isConnected());
+			assertTrue("Database 'designslave's designprovider is initialized", cat, db("designslave").getTMLModule("basic:result", "html") != null);
+			assertTrue("Database 'designslave's system file container is processed", cat, db("designslave").getAttribute("CSConfig") != null);			
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, false);
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

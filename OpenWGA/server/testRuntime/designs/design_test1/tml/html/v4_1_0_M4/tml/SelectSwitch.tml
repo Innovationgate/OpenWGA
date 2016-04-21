@@ -1,0 +1,89 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests the &lt;tml:select switch="expr"/&gt; functionality (F00002FFE)
+	</PRE>
+	
+	
+	<tml:select switch="'thevalue'">
+	
+		<tml:case value="anothervalue">
+			<tml:range var="t1anothervalue">true</tml:range>
+		</tml:case>
+	
+		<tml:case value="thevalue">
+			<tml:range var="t1thevalue1">true</tml:range>
+		</tml:case>
+		
+		<tml:case value="thevalue">
+			<tml:range var="t1thevalue2">true</tml:range>
+		</tml:case>
+	
+	</tml:select>
+	
+	
+	<tml:select switch="1">
+		<tml:case value="0">
+			<tml:range var="t2value0">true</tml:range>
+		</tml:case>
+		<tml:case value="1">
+			<tml:range var="t2value1">true</tml:range>
+		</tml:case>
+	</tml:select>
+	
+	
+	
+	<tml:select switch="1">
+		<tml:case value="0">
+			<tml:range var="t3value0">true</tml:range>
+		</tml:case>
+		<tml:caseelse>
+			<tml:range var="t3elsevalue">true</tml:range>
+		</tml:caseelse>
+	</tml:select>
+	
+	<tml:select switch="parseDate('01.01.2007', 'dd.MM.yyyy')">
+		<tml:case value="{parseDate('01.02.2007', 'dd.MM.yyyy')}">
+			<tml:range var="t4value0">true</tml:range>
+		</tml:case>
+		<tml:case value="{parseDate('01.01.2007', 'dd.MM.yyyy')}">
+			<tml:range var="t4value1">true</tml:range>
+		</tml:case>
+	</tml:select>
+	
+	<hr>
+	
+	<tml:script>
+		var cat = "TML:SelectSwitch";
+		
+		// Prepare sequence variable to be able to determine the request sequence number
+		if (isdefined("seq")) {
+			seq++;
+		}
+		else {
+			setSessionVar("seq", 1);
+		}
+		
+		try {
+			assertTrue("Wrong value does not match", cat, !isdefined("t1anothervalue"));
+			assertTrue("Correct value does match", cat, isdefined("t1thevalue1"));		
+			assertTrue("Second correct value does match", cat, !isdefined("t1thevalue2"));
+			assertTrue("Wrong pseudo-numeric value does not match", cat, !isdefined("t2value0"));		
+			assertTrue("Correct pseudo-numeric value does match", cat, isdefined("t2value1"));
+			assertTrue("Wrong pseudo-numeric value does not match", cat, !isdefined("t3value0"));		
+			assertTrue("Case else is used", cat, isdefined("t3elsevalue"));
+			assertTrue("Wrong pseudo-date value does not match", cat, !isdefined("t4value0"));		
+			assertTrue("Correct pseudo-date value does match", cat, isdefined("t4value1"));
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<html>
+<body>
+<PRE>
+Verifying a bug in this.dateOnly, where times would remain on hour 12 instead of 0.
+</PRE>
+<hr/>
+<tml:script>
+var date1 = parseDate("21.12.1999 13:00:00", "dd.MM.yyyy HH:mm:SS");
+var onlyDate1 = dateOnly(date1);
+var calendar1 = createCalendar(onlyDate1);
+assertEquals("dateOnly clears hour correclty: After 12pm", "TMLScript", calendar1.get(calendar1.HOUR_OF_DAY), 0);
+
+var date2 = parseDate("21.12.1999 11:00:00", "dd.MM.yyyy HH:mm:SS");
+var onlyDate2 = dateOnly(date2);
+var calendar2 = createCalendar(onlyDate2);
+assertEquals("dateOnly clears hour correclty: Before 12pm", "TMLScript", calendar2.get(calendar2.HOUR_OF_DAY), 0);
+</tml:script>
+<tml:warnings/>
+</body>
+</html>

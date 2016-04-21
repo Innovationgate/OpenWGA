@@ -1,0 +1,111 @@
+<!-- get the servername, -port and the projectname to build the path-->
+<tml:range var="SName"><%= request.getServerName() %></tml:range>
+<tml:range var="SPort"><%= request.getServerPort() %></tml:range>
+<tml:range var="Projekt"><%= request.getContextPath() %></tml:range>
+<!-- please dont insert spaces or newlines because they appears in the URL-->
+<tml:range var="WGAPath"><tml:item name="Sname"/><tml:if condition="SPort != '' "><tml:then>:<tml:item name="SPort"/></tml:then></tml:if><tml:if condition="Projekt != '' "><tml:then><tml:item name="Projekt"/></tml:then></tml:if></tml:range>
+<tml:range var="SerPath"><tml:item name="Sname"/><tml:if condition="SPort != '' "><tml:then>:<tml:item name="SPort"/></tml:then></tml:if></tml:range>
+<tml:element name="fop">
+<tml:option name="output">pdf</tml:option>
+<tml:body>
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<tml:include ref="entity"/>
+<fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
+<!-- Master Layout -->
+<fo:layout-master-set>
+<fo:simple-page-master master-name="Pressemeldung" 
+ page-height="29.7cm" 
+ page-width="21cm" 
+ margin-top="2cm" 
+ margin-bottom="2cm" 
+ margin-left="2.5cm" 
+ margin-right="2.5cm">
+<fo:region-body margin-top="3cm" column-count="3" margin-bottom="2cm"/>
+<fo:region-before extent="5cm"/>
+<fo:region-after extent="1cm"/>
+</fo:simple-page-master>
+</fo:layout-master-set>
+
+<!-- starts actual layout -->
+<fo:page-sequence master-reference="Pressemeldung">
+<!--- Kopfzeile mit Link -->
+
+<fo:static-content flow-name="xsl-region-before">
+<fo:block
+text-align="right"
+padding-bottom="5pt"
+>
+		<fo:external-graphic src="http://<tml:item name="SerPath" context="currentdocument"/><tml:url type="file" doc="WGALogo" file="wgalogo.gif"/>" width="100px"/>
+</fo:block>
+<fo:block
+font-size="20pt"
+font-style="italic"
+text-align="center"
+letter-spacing="3pt"
+>
+InnovationGate - News
+</fo:block>
+<fo:block
+font-size="8pt"
+border-top-color="#000000"
+border-top-style="solid"
+border-top-width="thin"
+border-bottom-color="#000000"
+border-bottom-style="solid"
+border-bottom-width="thin"
+padding="3pt"
+color="#000000"
+>
+ <fo:table>
+<fo:table-column/>
+<fo:table-column/>
+<fo:table-body>
+<fo:table-row>
+<fo:table-cell>
+<fo:block>Erstellt von WebGate Anywhere (c) für <tml:urlparameter name="Name"/> </fo:block>
+</fo:table-cell>
+<fo:table-cell>
+<fo:block text-align="right">
+<tml:item name="_date" format="dd.MM.yyyy"/>
+</fo:block>
+</fo:table-cell>
+</fo:table-row>
+</fo:table-body>
+</fo:table> 
+</fo:block>
+</fo:static-content >
+<!--  Region After (Fusszeile)-->
+<fo:static-content flow-name="xsl-region-after">
+<fo:block
+font-size="8pt"
+border="solid #000000 thin"
+padding="1pt"
+>
+<fo:table>
+<fo:table-column/>
+<fo:table-column/>
+<fo:table-body>
+<fo:table-row>
+<fo:table-cell>
+<fo:block><tml:item name="DocAuthor"/> </fo:block>
+</fo:table-cell>
+<fo:table-cell>
+<fo:block text-align="right">
+InnovationGate - News, Seite <fo:page-number/> von  <fo:page-number-citation ref-id="end"/>
+</fo:block>
+</fo:table-cell>
+</fo:table-row>
+</fo:table-body>
+</fo:table> 
+	</fo:block>
+</fo:static-content> 
+<!-- Body Region -->
+<fo:flow flow-name="xsl-region-body">
+<tml:innerlayout/> 
+<fo:block id="end"/>
+</fo:flow>
+
+</fo:page-sequence>
+</fo:root>
+</tml:body>
+</tml:element>

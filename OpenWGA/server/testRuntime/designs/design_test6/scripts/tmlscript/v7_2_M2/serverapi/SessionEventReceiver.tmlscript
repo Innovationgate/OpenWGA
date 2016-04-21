@@ -1,0 +1,12 @@
+function SessionEventReceiver() {
+}
+
+SessionEventReceiver.prototype.receiveTestUserProfile1 = function($event, $sessionId) {
+	
+	var userProfile = WGA.app().userProfile();
+	if (userProfile) {	
+		WGA.log.info("Receiving Event testUserProfile1 for session " + $sessionId + ": " + $event.params.param) ;
+		userProfile.testUserProfile1 = $event.params.param;
+	} 
+	
+}.listenToAppEvents("testUserProfile1");

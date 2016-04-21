@@ -1,0 +1,63 @@
+<html>
+
+<head><tml:htmlhead/></head>
+
+<body>
+	<PRE>
+	Tests TMLScript Objects 2.0 and the Resource Locator
+	</PRE>
+	
+	<hr>
+	<tml:include designdb="overlaytest" ref="overlay:v7_2_M2:designlocator"/>
+	
+	<tml:script>
+		function findCookie(name) {
+			for each (c in request.getCookies()) {
+				if (c.name==name) return c.value;
+			}
+			return null;
+		}
+		var clickStep = parseInt(findCookie("clickStep"));
+		var cat = findCookie("testId");
+		
+		try {
+			
+			assertEquals("$ points to design root", cat, String($), "test5/");
+			assertEquals("$$ points to current design folder ", cat, String($$), "test5/v7_2_m2:tmlscript");
+			
+			assertEquals("In overlay resource: $ points to overlay root", cat, singleDollarInOverlay, "overlaytest/overlay");
+			assertEquals("In overlay resource: $$ points to current design folder ", cat, doubleDollarInOverlay, "overlaytest/overlay:v7_2_m2");
+			
+			var thatObject1 = new $.v7_2_m2.tmlscript.ThatObject();
+			assertEquals("Created TMLScript Object 2.0 via $ resource locator", cat, thatObject1.doIt(), "Did it");
+			
+			var thatObject2 = new $$.ThatObject();
+			assertEquals("Created TMLScript Object 2.0 via $$ resource locator", cat, thatObject2.doIt(), "Did it");
+			
+			var thatObject3 = new $$.ThatDerivedObject();
+			assertEquals("Created derived TMLScript Object 2.0 via $$ resource locator", cat, thatObject3.doAnotherBit(), "Did something very different");
+			assertEquals("TMLScript Object 2.0 inheritance", cat, thatObject3.doIt(), "Did it");
+			
+			var thatObject4 = new $$["DB:overlaytest"].overlay.objects.ObjectV2();
+			assertEquals("Created TMLScript Object 2.0 from a different DB using locator function DB", cat, thatObject4.doYourBit(), "My Bit");
+			
+			assertEquals("$ inside object points to overlay root", cat, thatObject4.whatIsDollar(), "overlaytest/overlay");
+			assertEquals("$$ inside object points to object folder", cat, thatObject4.whatIsDoubleDollar(), "overlaytest/overlay:objects");
+			
+			assertEquals("Using resource locator as WGA.design() parameter", cat, WGA.design($$.thatobject).resourceName, "v7_2_m2:tmlscript:thatobject");
+			
+			assertEquals("Retrieving resource locator by Design.$", cat, String(WGA.design().$), "test5/v7_2_m2:tmlscript:objectsv2");
+			
+			var rendererObject = new $.v7_2_m2.renderers["basic.Controller"]();
+			assertEquals("Create prefixed object via [] syntax", cat, rendererObject.someOtherField, 3);
+					
+		}
+		catch (e) {
+			logException(e);
+			assertTrue("Exception running tests", cat, "false");
+		}
+	</tml:script>
+	
+	<tml:warnings/>
+</body>
+</html>

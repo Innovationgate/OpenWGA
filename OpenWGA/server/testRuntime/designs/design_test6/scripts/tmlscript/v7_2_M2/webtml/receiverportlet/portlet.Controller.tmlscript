@@ -1,0 +1,17 @@
+function Controller() {
+	WGA.log.info("Portlet controller created");
+	this.state = {
+		eventParam: "Nuffin",
+		eventParam2: "Nuffin"
+	}
+}
+
+Controller.prototype.doPageScopeEvent = function($portletEvent) {
+	WGA.log.info("Running portlet event triggered by websocket communication: " + $portletEvent.name);
+	this.state.eventParam = "Yes, we received the Portlet Event: " + $portletEvent.name;
+}
+
+Controller.prototype.doPageScopeEvent2 = function($urlParam_theData) {
+	WGA.log.info("Running action triggered by from websocket message: " + $urlParam_theData);
+	this.state.eventParam2 = "Yes, we received the message: " + $urlParam_theData;
+}

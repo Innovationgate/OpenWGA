@@ -1,0 +1,20 @@
+<html>
+<head>
+  <tml:htmlhead/>
+</head>
+<tml:comment>
+<tml:action id="update" timeout="120000">
+	var doc = this.context("docid:owee-5aegzr").getdocument(); 
+	doc.title = "HalloWelt";
+	while (true) { 
+		var x = 1; 
+		x = x + 1; 
+	};
+</tml:action>
+
+<body>
+	<tml:button clickaction="update">start update</tml:button>
+</body>
+</tml:comment>
+<%=request.getSession().getId()%>
+</html>
