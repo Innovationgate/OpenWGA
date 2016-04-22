@@ -32,11 +32,11 @@ ospackage {
     release = '1'
     arch = 'all'
     os = LINUX
-    maintainer = 'Innovation Gate GmbH'
-    packageDescription = "OpenWGA - Open Source Java CMS Platform\
- The OpenWGA Community Edition is a fully-featured CMS web platform for the needs of small and medium businesses, available under fair open source terms and without any fee.\
+    maintainer = 'Innovation Gate GmbH <support@innovationgate.com>'
+    summary = 'OpenWGA Open Source Java CMS Platform'
+    packageDescription = "The OpenWGA Community Edition is a fully-featured CMS web platform for the needs of small and medium businesses, available under fair open source terms and without any fee.\
  Visit http://www.openwga.com for more details."
-    license = "GPL 2.0 with OpenWGA plugin exception"
+    license = 'GPL 2.0 with OpenWGA plugin exception'
     
     requires('adduser')
     requires('oracle-java7-jdk|openjdk-7-jdk|java7-sdk')
@@ -44,7 +44,19 @@ ospackage {
     replaces('openwga')
     provides('openwga')
 
-    configurationFile('debianScripts/conffiles')
+    configurationFile('/etc/openwga/server.conf.local')
+    configurationFile('/etc/openwga/jmx.access')
+    configurationFile('/etc/openwga/jmx.passwd')
+    configurationFile('/etc/init.d/openwga')
+    configurationFile('/etc/logrotate.d/openwga')
+    configurationFile('/etc/openwga/tomcat/conf/catalina.policy')
+    configurationFile('/etc/openwga/tomcat/conf/catalina.properties')
+    configurationFile('/etc/openwga/tomcat/conf/context.xml')
+    configurationFile('/etc/openwga/tomcat/conf/logging.properties')
+    configurationFile('/etc/openwga/tomcat/conf/server.xml')
+    configurationFile('/etc/openwga/tomcat/conf/tomcat-users.xml')
+    configurationFile('/etc/openwga/tomcat/conf/web.xml')
+    
     postInstall file('debianScripts/postinst')
     preUninstall file('debianScripts/prerm')
     postUninstall file('debianScripts/postrm')
