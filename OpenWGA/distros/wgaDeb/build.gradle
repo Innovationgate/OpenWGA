@@ -129,8 +129,8 @@ task updateDebRepository(dependsOn: buildDeb) << {
     def debFile = buildDeb.archivePath
     println "Publishing debian package: ${debFile}"
     for (distro in linuxDistros) {
-        def reprepro_command = "/usr/bin/reprepro -C non-free -Vb ${localRepo} includedeb ${distro} ${debFile}";
-        ant.exec(command:reprepro_command}
+        def reprepro_command = "/usr/bin/reprepro -C non-free -Vb ${localRepo} includedeb ${distro} ${debFile}"
+        ant.exec(command:reprepro_command)
     }
 }
 updateDebRepository.onlyIf{
