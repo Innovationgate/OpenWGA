@@ -130,6 +130,7 @@ task updateDebRepository(dependsOn: buildDeb) << {
     println "Publishing debian package: ${debFile}"
     for (distro in linuxDistros) {
         def reprepro_command = "/usr/bin/reprepro -C non-free -Vb ${localRepo} includedeb ${distro} ${debFile}"
+        println reprepro_command
         ant.exec(command:reprepro_command)
     }
 }
