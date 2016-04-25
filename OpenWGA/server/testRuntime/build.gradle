@@ -1,5 +1,7 @@
 apply plugin: 'java'
 
+compileJava.options.encoding = 'ISO-8859-1'
+
 sourceSets {
     testlib {
         output.resourcesDir = 'plugins/unittests/java'

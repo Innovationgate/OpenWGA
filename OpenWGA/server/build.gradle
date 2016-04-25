@@ -8,10 +8,13 @@ buildscript {
     }
 }
 
+plugins {
+    id 'org.akhikhl.gretty' version '1.2.4'
+}
+
 apply plugin: 'java'
 apply plugin: 'war'
 apply plugin: 'maven-publish'
-apply plugin: 'org.akhikhl.gretty'
 
 compileJava.options.encoding = 'ISO-8859-1'
 
@@ -21,18 +24,25 @@ gretty {
     servletContainer='tomcat7'
     logDir='build'
     jvmArgs = ['-XX:MaxPermSize=256m',
-               '-Dde.innovationgate.wga.configpath=${testProject.file("wga")}',
-               '-Dde.innovationgate.wga.defaultplugins=${testProject.file("wga/external-default-plugins")}',
-               '-Dde.innovationgate.wga.unittest=true',
-               '-Dde.innovationgate.wga.unittest.logdir=${testProject.file("wga/test")}',
-               '-Dhibernate.jdbc.use_streams_for_binary=true',
-               '-Dde.innovationgate.wga.devplugins=${testProject.file("plugins")}'
+               "-Dde.innovationgate.wga.configpath=${testProject.file('wga')}",
+               "-Dde.innovationgate.wga.defaultplugins=${testProject.file('wga/external-default-plugins')}",
+               "-Dde.innovationgate.wga.unittest=true",
+               "-Dde.innovationgate.wga.unittest.logdir=${testProject.file('wga/test')}",
+               "-Dhibernate.jdbc.use_streams_for_binary=true",
+               "-Dde.innovationgate.wga.devplugins=${testProject.file('plugins')}",
+               "-Dde.innovationgate.wga.migration.design.root=${testProject.file('designs')}"
     ];
 }
 
 
 compileJava.options.encoding = 'ISO-8859-1'
 ant.basedir=project.rootDir
+
+configurations {
+    grettyRunnerTomcat7 { // To fix Gretty 1.2.4 issue which injects log4j-over-slf4j to the app classpath
+        exclude group: 'org.slf4j', module: 'log4j-over-slf4j'
+    }
+}
 
 dependencies {
     compile project(":wga");
@@ -45,6 +55,7 @@ dependencies {
     gretty 'org.apache.geronimo.specs:geronimo-activation_1.1_spec:1.1'
     gretty 'org.apache.geronimo.specs:geronimo-jta_1.1_spec:1.1.1'
     gretty 'org.glassfish.main.transaction:javax.transaction:3.1.2.2'
+    gretty testProject.fileTree(dir: 'tomcat/lib', include: ['*.jar'])
 
     
 }
