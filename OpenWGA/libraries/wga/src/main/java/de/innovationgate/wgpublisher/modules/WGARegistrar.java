@@ -191,6 +191,9 @@ public class WGARegistrar implements ModuleRegistrar {
         
         // Job options
         registry.addModuleDefinition(new JobOptionsModuleDefinition());
+        
+        // HTTP Session Managers
+        registry.addModuleDefinition(new InMemoryHttpSessionManagerModuleDefinition());
     }
     
     

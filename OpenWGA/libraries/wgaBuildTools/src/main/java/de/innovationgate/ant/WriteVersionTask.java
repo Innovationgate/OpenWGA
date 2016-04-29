@@ -123,7 +123,7 @@ public class WriteVersionTask extends BuildInformationTask {
             FileOutputStream out = new FileOutputStream(buildPropertiesFile);
             props.store(out, "Build information");
             out.close();
-            log("Wrote build signature " + signature + " to file: " + buildPropertiesFile.getPath());
+            System.out.println("Wrote build signature " + signature + " to file: " + buildPropertiesFile.getPath());
         }
         catch (FileNotFoundException e) {
             throw new BuildException("Exception using properties file: " + e.getClass().getName() + " - " + e.getMessage(), e);

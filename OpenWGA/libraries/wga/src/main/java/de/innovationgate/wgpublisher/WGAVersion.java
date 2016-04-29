@@ -41,6 +41,10 @@ public abstract class WGAVersion {
         try {
             if (WGACore.INSTANCE.getServletContext() != null) {
                 propsIn = WGACore.INSTANCE.getServletContext().getResourceAsStream("/WEB-INF/wgabuild.properties");
+                if (propsIn == null) {
+                    throw new Error("/WEB-INF/wgabuild.properties does not exist");
+                }
+                
                 BUILD_PROPERTIES.load(propsIn);
             }
             

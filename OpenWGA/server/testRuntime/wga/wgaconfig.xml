@@ -1245,7 +1245,7 @@
       <implClassName>de.innovationgate.wgpublisher.cluster.SingleNodeClusterService</implClassName>
    </clusterConfiguration>
    <httpSessionManagerConfiguration enabled="true">
-      <implClassName>de.innovationgate.enterprise.cluster.InMemoryHttpClusterSessionManager</implClassName>
+      <implClassName>de.innovationgate.wgpublisher.sessions.InMemoryHttpSessionManager</implClassName>
       <options class="java.util.LinkedHashMap"/>
    </httpSessionManagerConfiguration>
 </WGAConfiguration>

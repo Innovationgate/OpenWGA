@@ -127,6 +127,11 @@
       <callers/>
       <callerLevel>10</callerLevel>
     </de.innovationgate.wga.common.beans.csconfig.v1.RemoteAction>
+    <de.innovationgate.wga.common.beans.csconfig.v1.RemoteAction>
+      <moduleName>remotetest:clearassertions</moduleName>
+      <callers/>
+      <callerLevel>10</callerLevel>
+    </de.innovationgate.wga.common.beans.csconfig.v1.RemoteAction>
   </remoteActions>
   <mediaKeys>
     <de.innovationgate.wga.common.beans.csconfig.v1.MediaKey>
@@ -144,6 +149,12 @@
     <de.innovationgate.wga.common.beans.csconfig.v1.MediaKey>
       <key>httplogin</key>
       <mimeType>text/html</mimeType>
+      <binary>false</binary>
+      <httpLogin>true</httpLogin>
+    </de.innovationgate.wga.common.beans.csconfig.v1.MediaKey>
+    <de.innovationgate.wga.common.beans.csconfig.v1.MediaKey>
+      <key>xml</key>
+      <mimeType>text/xml</mimeType>
       <binary>false</binary>
       <httpLogin>true</httpLogin>
     </de.innovationgate.wga.common.beans.csconfig.v1.MediaKey>

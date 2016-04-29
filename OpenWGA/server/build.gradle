@@ -17,12 +17,16 @@ apply plugin: 'war'
 apply plugin: 'maven-publish'
 
 compileJava.options.encoding = 'ISO-8859-1'
+compileTestJava.options.encoding = 'ISO-8859-1'
 
 def testProject = project(":server:testRuntime")
 
 gretty {
     servletContainer='tomcat7'
     logDir='build'
+    integrationTestTask='test'
+    //contextPath=''
+    extraResourceBase 'build/extra'
     jvmArgs = ['-XX:MaxPermSize=256m',
                "-Dde.innovationgate.wga.configpath=${testProject.file('wga')}",
                "-Dde.innovationgate.wga.defaultplugins=${testProject.file('wga/external-default-plugins')}",
@@ -30,8 +34,13 @@ gretty {
                "-Dde.innovationgate.wga.unittest.logdir=${testProject.file('wga/test')}",
                "-Dhibernate.jdbc.use_streams_for_binary=true",
                "-Dde.innovationgate.wga.devplugins=${testProject.file('plugins')}",
-               "-Dde.innovationgate.wga.migration.design.root=${testProject.file('designs')}"
+               "-Dde.innovationgate.wga.migration.design.root=${testProject.file('designs')}",
+               "-Dde.innovationgate.wga.hsql.root=${testProject.file('wga/hsqldb')}"
     ];
+}
+
+farm {
+    webapp project, inplace: false
 }
 
 
@@ -50,6 +59,26 @@ dependencies {
     
     compileClasspath project(":wgaBuildTools");
     
+    testCompile project(":wga");
+    testCompile project(":tmlScript");
+    testCompile project(":wgaBuildTools")
+    testCompile project(":servicesClient")
+    testCompile project(":servicesClient:xfireClientFactory")
+    
+    testCompile 'javax.servlet:javax.servlet-api:3.0.1'
+    testCompile 'javax.websocket:javax.websocket-api:1.1'
+    testCompile 'javax.servlet.jsp:jsp-api:2.2'
+    testCompile 'javax.mail:javax.mail-api:1.4.7'
+    testCompile 'org.glassfish.jersey.core:jersey-client:2.19'
+    testCompile 'net.sourceforge.htmlunit:htmlunit:2.21'
+    testCompile 'org.apache.ant:ant:1.9.7'
+    testCompile 'org.glassfish.jersey.media:jersey-media-multipart:2.19'
+    testCompile 'org.glassfish.jersey.media:jersey-media-json-processing:2.19'
+    testCompile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.19'
+    testCompile 'com.sun.mail:javax.mail:1.4.7'
+    testCompile "junit:junit:4.12"
+    testCompile 'org.assertj:assertj-core:2.4.1'
+    
     gretty 'com.sun.mail:javax.mail:1.4.7'
     gretty 'javax.activation:activation:1.1.1'
     gretty 'org.apache.geronimo.specs:geronimo-activation_1.1_spec:1.1'
@@ -60,15 +89,17 @@ dependencies {
     
 }
 
+test {
+    systemProperty "wgaunit.port", "8080"
+    systemProperty "wgaunit.host", "localhost"
+    systemProperty "wgaunit.context", "/server"
+    ignoreFailures true
+}
+test.dependsOn testProject.tasks.build
 
 task writeVersion << {
     ant.taskdef(name:"writeVersion", classname:"de.innovationgate.ant.WriteVersionTask", classpath: configurations.compileClasspath.asPath)
-    ant.writeVersion(target:"server/build/tmp/wgabuild.properties", version: rootProject.version)
-    println "Wrote OpenWGA Version: ${rootProject.version}"
-}
-
-compileJava.doLast {
-    tasks.writeVersion.execute()
+    ant.writeVersion(target:"server/build/extra/WEB-INF/wgabuild.properties", version: rootProject.version)
 }
 
 publishing {
@@ -81,8 +112,10 @@ publishing {
 
 war {
     war.archiveName = "openwga-ce.war"
-    from('build/tmp') {
+    from('build/extra/WEB-INF') {
         include 'wgabuild.properties' into('WEB-INF')
     }
 }
+war.dependsOn writeVersion
+testClasses.dependsOn war
 

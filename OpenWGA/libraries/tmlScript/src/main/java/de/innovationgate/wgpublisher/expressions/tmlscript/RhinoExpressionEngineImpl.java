@@ -474,7 +474,7 @@ public class RhinoExpressionEngineImpl implements ExpressionEngine, RhinoExpress
 
                 return createExpressionResult(result, null);
             }
-            catch (Exception e) {
+            catch (Throwable e) {
                 Logger.getLogger("wga").error("Error in TMLScript processing", e);
                 return createExpressionResult(null, new de.innovationgate.webgate.api.WGExpressionException("Unexpected exception: " + e.getClass().getName() + ": " + e.getMessage(),
                         "(No source available)", e));

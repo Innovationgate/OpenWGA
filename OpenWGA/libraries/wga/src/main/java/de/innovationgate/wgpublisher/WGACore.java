@@ -3384,9 +3384,9 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
                 log.info("On platform " + arg0.getServletContext().getServerInfo() + " (Servlet Engine " + this.servletPlatform + ", JSP Engine " + this.jspPlatform + ")");
             }
             catch (Exception ecx) {
-                log.warn("Unable to retrieve platform info. Assuming Servlet Engine 2.3, JSP Engine 1.2");
-                this.servletPlatform = 2.2;
-                this.jspPlatform = 1.1;
+                log.warn("Unable to retrieve platform info. Assuming Servlet Engine 3.0, JSP Engine 2.2", ecx);
+                this.servletPlatform = 3.0;
+                this.jspPlatform = 2.2;
             }
             arg0.getServletContext().setAttribute(WGACore.ATTRIB_SERVLET_ENGINE, new Double(this.servletPlatform));
             arg0.getServletContext().setAttribute(WGACore.ATTRIB_JSP_ENGINE, new Double(this.jspPlatform));
