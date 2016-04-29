@@ -169,7 +169,7 @@
       <__active>true</__active>
       <__defaultPlugin>true</__defaultPlugin>
       <__reconnectDatabase>false</__reconnectDatabase>
-      <__filePath>/home/oliver/EclipseWorkspaces/WGA_HEAD.git/OpenWGA/OpenWGA/server/testRuntime/wga/external-default-plugins/fop-1.0.1.wgaplugin</__filePath>
+      <__filePath>/Users/ws/workspace-openwga-dev.git/OpenWGAServer/OpenWGA/server/testRuntime/wga/external-default-plugins/fop-1.0.1.wgaplugin</__filePath>
       <__installationKey>fop</__installationKey>
       <__pluginID>
         <uniqueName>de.innovationgate.fop</uniqueName>
@@ -187,7 +187,7 @@
       <__active>true</__active>
       <__defaultPlugin>true</__defaultPlugin>
       <__reconnectDatabase>false</__reconnectDatabase>
-      <__filePath>/home/oliver/EclipseWorkspaces/WGA_HEAD.git/OpenWGA/OpenWGA/server/testRuntime/wga/external-default-plugins/testplugin-1.0.1.wgaplugin</__filePath>
+      <__filePath>/Users/ws/workspace-openwga-dev.git/OpenWGAServer/OpenWGA/server/testRuntime/wga/external-default-plugins/testplugin-1.0.1.wgaplugin</__filePath>
       <__installationKey>testplugin</__installationKey>
       <__pluginID>
         <uniqueName>de.innovationgate.testplugin</uniqueName>
