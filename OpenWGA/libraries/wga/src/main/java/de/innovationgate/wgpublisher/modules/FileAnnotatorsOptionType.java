@@ -25,17 +25,20 @@
 
 package de.innovationgate.wgpublisher.modules;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 
+import de.innovationgate.utils.WGUtils;
 import de.innovationgate.wga.config.WGAConfiguration;
 import de.innovationgate.wga.modules.ModuleRegistry;
 import de.innovationgate.wga.modules.options.OptionType;
+import de.innovationgate.wga.modules.options.CommaSeparatedListOptionType;
 import de.innovationgate.wga.modules.options.OptionValueProvider;
 import de.innovationgate.wga.modules.options.OptionValueValidationException;
 import de.innovationgate.wga.modules.options.ValidationContext;
 
-public class FileAnnotatorsOptionType implements OptionType {
-    
+public class FileAnnotatorsOptionType extends CommaSeparatedListOptionType implements OptionType {    
     private ModuleRegistry _reg;
 
     public FileAnnotatorsOptionType(ModuleRegistry reg) {
@@ -54,18 +57,19 @@ public class FileAnnotatorsOptionType implements OptionType {
         return true;
     }
 
-    public boolean isMultiValue() {
-        return true;
-    }
-
     public boolean isRestricted() {
         return true;
     }
 
     public void validate(String value, Locale locale, ValidationContext cx) throws OptionValueValidationException {
         OptionValueProvider provider = getValueProvider(cx.getConfigCopy());
-        if (!provider.getProvidedValues().contains(value)) {
-            throw new OptionValueValidationException("The file annotator type '" + value + "' is unknown");
+        List<String> providedValues = provider.getProvidedValues();
+        Iterator<String> values = WGUtils.deserializeCollection(value, ",", true).iterator();
+        while (values.hasNext()) {
+            String singleValue = (String) values.next();
+            if (!providedValues.contains(singleValue)) {
+                throw new OptionValueValidationException("The file annotator type '" + singleValue + "' is unknown");
+            }
         }
     }
 
