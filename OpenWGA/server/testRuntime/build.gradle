@@ -11,4 +11,29 @@ dependencies {
     compile project(":wga")
     compile 'javax.servlet:javax.servlet-api:3.0.1'
     compile 'javax.websocket:javax.websocket-api:1.1'
+    
+    runtime 'org.glassfish.jersey.core:jersey-client:2.19'
+    runtime 'net.sourceforge.htmlunit:htmlunit:2.21'
+    runtime project(":wgaBuildTools")
+    runtime project(":servicesClient")
+    runtime project(":servicesClient:xfireClientFactory")
+    runtime 'org.assertj:assertj-core:2.4.1'
+
+    
+}
+
+task executeCurrentTest(dependsOn: compileTestJava) << {
+
+    ClassLoader antClassLoader = org.apache.tools.ant.Project.class.classLoader
+    configurations.runtime.each { File f ->
+        antClassLoader.addURL(f.toURI().toURL())
+    }
+    antClassLoader.addURL(project(":server").compileTestJava.destinationDir.toURI().toURL());
+
+    ant.importBuild 'test.xml'
+
+    ant.properties['wgaunit.context'] = '#NONE#'
+    ant.properties['wgaunit.port'] = '8080'
+    currentTest.execute()
+
 }
