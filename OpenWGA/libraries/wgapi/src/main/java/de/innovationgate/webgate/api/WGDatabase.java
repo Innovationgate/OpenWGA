@@ -184,6 +184,7 @@ public class WGDatabase implements Lockable, WGDesignChangeListener, PageHierarc
     public static final String EXTDATA_PATCH_LEVEL = "ddlpatchlevel";
     public static final String EXTDATA_DERIVATE_CREATORS = "filederivates_creators";
     public static final String EXTDATA_DERIVATE_REVISION = "filederivates_lastupdaterevision";
+    public static final String EXTDATA_CS_SYNC_RUNNING = "contentstore_syncing";
     
     /**
      * Extension data fields on the database which are no regular data and do not represent any database state and should be protected from data deletion operations 
