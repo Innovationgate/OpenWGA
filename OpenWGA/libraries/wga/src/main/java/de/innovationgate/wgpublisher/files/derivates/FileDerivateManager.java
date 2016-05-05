@@ -447,7 +447,7 @@ public class FileDerivateManager {
                 _status = "Starting derivate update";
                 
                 for (WGDatabase db : _core.getContentdbs().values()) {
-                    
+                                    	
                     DatabaseStatus dbStatus = getDatabaseStatus(db);
                     synchronized (dbStatus.updateMonitor) {
                     
@@ -464,7 +464,12 @@ public class FileDerivateManager {
                             }
                             
                             db.openSession();
-                            App app = _wga.app(db);
+                            Boolean sync = (Boolean)db.getExtensionData(WGDatabase.EXTDATA_CS_SYNC_RUNNING); 
+                        	if(sync!=null && sync==true){
+                        		continue;
+                        	}
+
+                        	App app = _wga.app(db);
                             
                             WGDatabaseRevision currentRevision = WGDatabaseRevision.forValue(db.getBackendRevision());
                             CurrentRun currentRun = new CurrentRun(currentRevision);
