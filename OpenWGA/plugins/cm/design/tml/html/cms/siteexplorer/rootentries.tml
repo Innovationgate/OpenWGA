@@ -1,0 +1,84 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_dbkey=option("dbkey");
+	if(_dbkey==null)
+		_dbkey=request.getParameter("dbkey");
+	if(_dbkey==null)
+		log.error("No dbkey specified");
+
+	var database=db(_dbkey)
+	var area=database.getArea(request.getParameter("area"));
+	// read rootentries
+	_entries=createlist();
+	var it=area.getRootEntries().iterator();
+	
+	var Area = AFW.area(area);
+	var Database = AFW.database(database); 
+	var user = Database.getUserName();
+	while(it.hasNext()){
+		var struct = it.next();
+		if(!struct.mayReadContent())
+			continue;
+		if(Area.isTrashArea()){
+			// check user who deleted this entry
+			var deletedBy = struct.getExtensionData("deletedBy");
+			if(deletedBy==user || Database.isManager())
+				_entries.add(struct);
+		}
+		else _entries.add(struct);
+	}
+</tml:script>
+
+<tml:foreach type="itemvalue" item="_entries" currentvalue="_entry">
+
+	<tml:range context="{'db:'+_dbkey+'/$struct:'+_entry.getStructKey().toString()}">
+
+		<tml:script>
+			// only show struct if it has some readable content or if it has NO content
+			// => hide struct if it HAS some content but nothing is readable.
+			//_hideStruct = document.getAllContent(false).isEmpty() && document.hasContent(null, null);
+			var allContent = document.getAllContent(false);
+			if(allContent.isEmpty())
+				allContent = document.getAllContent(true);	// check acrive docs
+			_hideStruct = allContent.isEmpty() && document.hasContent(null, null);
+		</tml:script>
+		
+		<tml:case isfalse="_hideStruct">
+			
+			<div class="struct" id="struct:<tml:script>return document.getStructKey()</tml:script>">
+				<tml:include ref="::entry">
+					<tml:option name="parent">area:<tml:urlparameter name="area"/></tml:option>
+				</tml:include>
+			</div>
+			<div class="children" style="display:none">
+				<div style="padding-left:<tml:script>return 16*document.getLevel()</tml:script>px">
+					<tml:img doc="images" file="loading.gif"/> loading ...
+				</div>
+			</div>
+		</tml:case>
+		
+	</tml:range>
+</tml:foreach>

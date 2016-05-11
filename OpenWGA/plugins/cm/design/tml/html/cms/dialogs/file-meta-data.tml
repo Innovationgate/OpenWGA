@@ -1,0 +1,177 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="writeFileMetas">
+	try{
+		
+		var filename = option("filename")
+
+		if(tmlform.filename != filename){
+			content().renameFile(filename, tmlform.filename);
+			content().save();
+			portlet.fireevent("CMS_attachments_changed")
+		}
+
+		var file_md = content().getFileMetaData(tmlform.filename)
+		file_md.title = tmlform.title
+		file_md.description = tmlform.description
+		file_md.copyright = tmlform.copyright
+		content().save()
+
+		_metas_updated=true;
+		
+		portlet.fireEvent("CMS_dialog_closed");
+		var ev = createevent("CMS_file_metas_changed")
+		ev.addParameter("filename", filename)
+		portlet.fireEvent(ev);
+	}
+	catch(e){
+		logException(e);
+		_error_msg = (e.javaException && e.javaException.message) || e.message  
+	}
+</tml:action>
+
+<tml:case isfilled="_error_msg">
+	<div class="error">
+		<tml:item name="_error_msg"/>
+	</div>
+</tml:case>
+
+<tml:case condition="_metas_updated">
+	<script>
+		if(BI.sitepanel.iframe.window)
+			BI.sitepanel.iframe.window.WGA.event.fireEvent("file-metas-updated", "cm", {
+				filename: "<tml:item name="filename" type="tmlform"/>"
+			})
+	</script>
+</tml:case>
+
+<tml:case context="[db:{option('dbkey')}/docid:{option('contentkey')}]" iscontextvalid="true">
+
+	<tml:script>
+		_file_md = content().getFileMetaData(option('filename'))
+		_fields = WGA.createList([
+			"title",
+			"copyright"
+		])
+	</tml:script>
+	
+	<tml:case condition="_file_md">
+		<tml:form id="file-metas" source="none" mode="{option('mode')}">
+			<script>
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", BI.dialog.autoHeight)
+				// submit function called from dialog handler and on RETURN
+				BI.dialog.submit=function(){					
+					BI.util.callAction("<tml:action ref="writeFileMetas"/>",
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"{%label:dialog.file-metas.updating%}");
+				}
+				<tml:case condition="!tmlform.editable">
+					BI.dialog.submitButton.hide();
+				</tml:case>
+			</script>
+			<div>
+				
+				<div style="float:left;width:100px;margin:10px">
+					
+					<tml:script>
+						_tumbnailURL = AFW.content().attachment(option('filename')).getThumbnailURL()
+						_srcset=null;
+						var file_md = content().getFileMetaData(option('filename'));
+						if(WGA.app().getPublisherOption(WGA.Core.DBATTRIB_USE_NONFINAL_HT_FEATURES)){
+							var ssc = WGA.service(Packages.de.innovationgate.wgpublisher.webtml.utils.SrcSetCreator);
+							if(file_md && ssc.getMaxAvailablePosterSize){
+								var fileOriginalSize = ssc.getMaxAvailablePosterSize(content(), file_md);
+								if (fileOriginalSize != null) {
+									_srcset = ssc.createSrcSet(_tumbnailURL, fileOriginalSize);
+								}
+							}
+						}
+					</tml:script>
+					<tml:case condition="_tumbnailURL">
+						<img src="<tml:item name="_tumbnailURL"/>" onload="BI.dialog.autoHeight()" style="max-width:100%"
+							<tml:case condition="_srcset">
+								srcset="<tml:item name="_srcset" encode="none"/>"
+							</tml:case>
+						>
+					</tml:case>
+					
+					<a target="_blank" style="display:block;margin:10px auto" href="<tml:url type="file" file="{option('filename')}" u_forcedownload="true"/>">Download ...</a>
+				</div>
+				
+				<div style="margin-left:120px">
+				    <table width="100%" border="0" cellspacing="5">
+				    	<tr>
+				    		<td width="80" valign="top">Name:</td>
+				    		<td>
+				    			<tml:comment><tml:script expression="_file_md.name"/></tml:comment>
+				    			<tml:input name="filename" cssclass="textinput" defaultexpression="_file_md.name"/>
+				    		</td>
+				    	</tr>
+				    	<tr>
+				    		<td>MimeType:</td>
+				    		<td>
+				    			<tml:input name="mimeType" cssclass="textinput" defaultexpression="_file_md.mimeType" mode="{WGA.app().isManager()?'edit':'view'}"/>
+				    		</td>
+				    	</tr>
+				    	<tr>
+				    		<td><tml:label key="file-meta.size"/>:</td>
+				    		<td><tml:script expression="AFW.Util.renderFileSize(_file_md.size)"/></td>
+				    	</tr>
+				    	<tml:case condition="_file_md.usage=='poster'">
+					    	<tr>
+					    		<td>Dimension:</td>
+					    		<td>
+					    			<tml:script expression="_file_md.displayWidth"/>
+					    			x
+					    			<tml:script expression="_file_md.displayHeight"/>
+					    			Pixel
+					    		</td>
+					    	</tr>
+				    	</tml:case>
+				    	<tml:foreach item="_fields" currentvalue="_field">
+							<tr>
+					     		<td><tml:label key="[file-meta.{_field}]"/>:</td>
+					     		<td valign="top">
+					     			<tml:input name="{_field}" cssclass="textinput" defaultexpression="_file_md[_field]"/>
+					     		</td>
+					     	</tr>
+				    	</tml:foreach>
+						<tr>
+				     		<td valign="top"><tml:label key="file-meta.description"/>:</td>
+				     		<td>
+				     			<tml:input name="description" type="textarea" cssclass="textinput" defaultexpression="_file_md.description"/>
+				     		</td>
+				     	</tr>
+					</table>
+				</div>
+				<div style="clear:both"></div>
+			</div>
+
+		</tml:form>
+	</tml:case>
+			
+</tml:case>
+

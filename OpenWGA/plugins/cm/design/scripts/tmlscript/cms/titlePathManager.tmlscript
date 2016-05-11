@@ -1,0 +1,68 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+var isTitlePath = db().getBooleanAttribute(WGA.Core.DBATTRIB_TITLEPATHURL, false);
+var isTPIndexing = db().getBooleanAttribute(WGA.Core.DBATTRIB_TITLEPATHURL_CONTENTINDEXING, false);
+var isTitlePathWithKeys = db().getBooleanAttribute(WGA.Core.DBATTRIB_TITLEPATHURL_INCLUDEKEYS, false)
+
+// check for title conflicts
+this.hasTitleConflict = function(title){
+	var database = db();
+	
+	if(isTitlePath && !isTPIndexing && !isTitlePathWithKeys){
+	
+		var tpManager = database.getAttribute("TitlePathManager");
+		var title = tpManager.normalizeURLTitle(title || TITLE)
+	
+		var siblings = content().getSiblingContents().iterator()
+		while(siblings.hasNext()){
+			var doc = siblings.next();
+			if(doc.getStructKey()!=STRUCTKEY 
+					&& tpManager.normalizeURLTitle(doc.getTitle()) == title
+					&& doc.getExtensionData("titlepathconflict")!=true 
+			){
+				return true
+			}
+		}
+	}
+	
+	return false;
+}
+
+this.hasTitlePathException = function(){
+	return isTitlePath && !isTPIndexing && !isTitlePathWithKeys && content().getExtensionData("titlepathconflict")==true 
+}
+
+this.setTitlePathException = function(flag){
+	content().writeExtensionData("titlepathconflict", flag)
+	log.info("title path conflict " + (flag ? "flaged.":"removed."));	
+}
+
+this.checkAndHandleTitlePathException = function(title){
+	if(this.hasTitleConflict(title))
+		this.setTitlePathException(true);
+	else if(this.hasTitlePathException())
+		this.setTitlePathException(false);
+}

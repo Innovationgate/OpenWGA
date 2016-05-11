@@ -1,0 +1,74 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<script>
+	WGA.event.register(
+		"<tml:script>return portlet.portletkey</tml:script>",
+		"CMS_contentkey_changed",
+		<tml:range context="db:plugin-contentmanager">
+			function(e){
+				Ext.get("image-lib-panel").setDisplayed(true);
+			}
+		</tml:range>
+	);
+	WGA.event.register(
+		"<tml:script>return portlet.portletkey</tml:script>",
+		"CMS_item_edit", 
+		function(e){
+			Ext.get("image-lib-panel").setDisplayed(e.params.editor=="rtf");
+		}
+	);
+</script>
+
+<div id="image-lib-panel">
+	<tml:case condition="CM.isPanelVisible('imageLib', option('dbkey'))" iscontextvalid="true">
+
+		<tml:script>
+			var dbs=wgacore.getContentdbs().values().iterator();
+			_imageLibDbs = WGA.createLookupTable();
+			
+			while(dbs.hasNext()){
+				// Fetch database
+				var database = dbs.next();
+				var Database = AFW.database(database);
+				
+				var imgLibRoot = database.getAttribute("ImageLibraryRoot")
+				if(imgLibRoot && Database.isPublishingAllowed()){
+					if (!database.isSessionOpen())
+						wgacore.openContentDB(database, request, false);
+					if(AFW.database(database).isReader())
+						_imageLibDbs.put(Database.getKey(), imgLibRoot);
+				} 
+			}
+		</tml:script>
+		
+		<tml:case condition="_imageLibDbs && !_imageLibDbs.isEmpty()">
+			<tml:form id="form-image-lib" source="none">
+				<tml:include ref="::window"/>
+			</tml:form>
+		</tml:case>
+
+	</tml:case>
+</div>

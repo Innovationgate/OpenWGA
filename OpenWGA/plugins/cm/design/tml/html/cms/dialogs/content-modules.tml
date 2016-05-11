@@ -1,0 +1,154 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="saveContentModules">
+
+	portlet.node_path = tmlform.node_path;
+	portlet.save(); 
+
+	var settings = CMM.getContentModulesSettingsData()||WGA.createLookupTable()
+	var forminfo = tmlform.formInfo;
+	var fields = tmlform.fieldnames.iterator()
+	while(fields.hasNext()){
+		var field = fields.next();
+		var reg = forminfo.getFieldRegistration(field);
+		if(reg){
+			//log.info("field " + field + "/" + reg.isStore() + "/" + reg.mode);
+			if(reg.isStore() && reg.mode==reg.EDIT_MODE){
+				settings.put(field, tmlform.fieldlist(field))
+			}
+			else {
+				settings.remove(field)
+				//log.info("removed local setting " + field);
+			}
+		}
+		else {
+			//log.info("no reg for field " + field);
+		}
+	}
+
+	// save setting for duplicated nodes:
+	var fields = tmlform.fieldList("duplicated_nodes").iterator(); 
+	while(fields.hasNext()){
+		var field = fields.next();
+		field && settings.put(field, tmlform.fieldlist(field))
+		//log.info("duplicated: " + field);
+	}
+
+	var deletedNodes = AFW.Util.list(createlist(tmlform.deleted_nodes, ",")).trim();
+	if(deletedNodes.size()){
+
+		function endsWith(s1, s2){
+			var i = s1.indexOf(s2);
+			return i>=0 && (i + s2.length == s1.length)
+		}
+	
+		// delete items from extension data "content-modules-settings":
+		var itemNames = settings.keySet().iterator();
+		var items = WGA.createLookupTable();		// clone map
+		items.putAll(settings)
+		while(itemNames.hasNext()){
+			var itemName = itemNames.next();
+			var it = deletedNodes.iterator();
+			while(it.hasNext()){
+				var ns  = it.next();
+				if(ns && endsWith(itemName, ns)){
+					log.info("delete setting " + itemName);
+					items.remove(itemName)
+				}
+			}
+		}
+		settings = items;			
+		
+		// delete items from content:
+		var itemNames = content().getItemNames().iterator();
+		while(itemNames.hasNext()){
+			var itemName = itemNames.next();
+			var it = deletedNodes.iterator();
+			while(it.hasNext()){
+				var ns  = it.next();
+				if(ns && endsWith(itemName, ns)){
+					log.info("delete item " + itemName);
+					content().removeItem(itemName)
+				}
+			}
+		}
+		
+	}
+	
+	if(!CMM.hasTemplate()){
+		CMM.writeContentModulesData(tmlform.doc_structure);
+	}		
+	CMM.writeContentModulesSettingsData(settings)
+	
+	content().save();
+	
+	var event=createEvent("CMS_dialog_closed");
+	portlet.fireEvent(event);
+	_actionDone=true;
+
+</tml:action>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.selectContent(BI.contentkey, BI.structkey);
+		</script>
+	</tml:then>
+	<tml:else>
+
+		<tml:form id="form-content-modules" context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}" htmlinput="ignore" onsubmit="return false;">
+			<script>
+				<tml:case istrue="_reloadPage">
+					BI.selectContent(BI.contentkey, BI.structkey);
+				</tml:case>
+			
+				<tml:case condition="option('mode')=='view'">
+					BI.dialog.submitButton.hide();
+				</tml:case>
+				
+				// submit function called from dialog handler and on RETURN
+				BI.dialog.submit=function(){
+					BI.contentModules.buildJson();
+					BI.util.callAction("<tml:action ref="saveContentModules"/>",
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"{%label:dialog.userdefined-metas.saving%}");
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+					BI.dialog.autoHeight();					
+				})
+			</script>
+		
+			<tml:case condition="tmlform.hasmessages()">
+				<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+				<hr size="1">
+			</tml:case>		
+		
+			<tml:include ref="::content-modules:config"/>
+		
+		</tml:form>
+
+	</tml:else>
+</tml:if>

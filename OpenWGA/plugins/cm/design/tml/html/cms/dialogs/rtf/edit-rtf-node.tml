@@ -1,0 +1,82 @@
+
+Configure &lt;<tml:option name="tag"/>&gt; Tag
+
+<tml:form id="node-edit">
+
+	<table width="100%">
+		<tr>
+			<td>Class:</td>
+			<td><tml:input name="class" type="text" cssclass="textinput"/></td>
+		</tr>
+		<tr>
+			<td>Style:</td>
+			<td><tml:input name="style" type="textarea" cssclass="textinput">
+				spellcheck="false"
+			</tml:input></td>
+		</tr>
+	</table>
+	
+	<a class="drop-down" href="javascript:void(0)" style="cursor:pointer" onclick="showHideInnerHTML(this);Ext.fly(this).toggleClass('drop-down-open')">
+		HTML Contents
+	</a>
+	<div id="node-innerhtml" style="display:none">
+		<tml:input name="html" type="textarea" cssclass="textinput">
+			spellcheck="false"
+			style="height: 200px"
+		</tml:input>
+		<button type="button" onclick="removeStyles()">Remove Styles</button>
+	</div>
+	
+	<script>
+		function showHideInnerHTML(el){
+			var s = Ext.fly(el).getNextSibling().style;
+			s.display = (s.display=="none" ? "block":"none")
+			BI.dialog.autoHeight();
+		}
+	
+		var editor = BI.rtftoolbar.getEditor();
+		var node = BI.rtftoolbar.selectionPath[<tml:option name="nodeindex"/>];
+		var range = editor.getRange();
+		range.selectNode(node);
+		//editor.focus();
+		
+		var form = document.forms["node-edit"];
+		form.elements["class"].value = node.getAttribute("class");
+		form.elements["style"].value = node.getAttribute("style");
+		form.elements["html"].value = node.innerHTML;
+		
+		BI.dialog.onHide=function(){
+			BI.rtftoolbar.selection.selectedIndex = -1;
+			//BI.rtftoolbar.restoreEditorSelection();
+			editor.setRange(range);
+			BI.rtftoolbar.update();
+		}
+		BI.dialog.submit=function(){
+			node.setAttribute("class", form.elements["class"].value);
+			node.setAttribute("style", form.elements["style"].value);
+			try{
+				node.innerHTML = form.elements["html"].value;
+			}
+			catch(e){
+				// Safari does not allow to set innerHTML to some nodes (IMG f. e.)
+			}
+			BI.dialog.hide(); 	
+			BI.rtftoolbar.update();
+				
+		}
+		
+		function removeStyles(){
+			var form = document.forms["node-edit"];
+			var t = form.elements["html"].value;
+			t = t.replace(/style="[^"]*"/g, "");		// remove all styles
+			t = t.replace(/class="([^"]*)"/g, function(str, cls){
+				if(cls.indexOf("wga-")>=0)
+					return "class=\""+cls+"\""
+				return "";
+			});
+			form.elements["html"].value = t;
+		}
+		
+	</script>
+	
+</tml:form>

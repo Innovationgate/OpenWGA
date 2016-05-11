@@ -1,0 +1,81 @@
+## LICENSE START ###############################################################
+## Copyright Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="restorePage">
+	callAction("cms:master:restore-from-trash", option("dbkey"), option("structkey"));	// move in master action
+	
+	event=createEvent("CMS_dialog_closed");
+	portlet.fireEvent(event);
+	
+	_actionDone=true;
+</tml:action>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.se.reload("<tml:option name="structkey"/>", function(){
+				BI.selectContent("<tml:option name="structkey"/>");
+			});
+		</script>
+	</tml:then>
+
+	<tml:else>
+
+		<tml:script>
+			// get some infos about the deleted document to present them to the author:
+			_Database = AFW.database(option("dbkey"));
+			_Struct = AFW.structentry(option("structkey"), _Database);
+			var struct = _Struct.WGObject;
+			
+			_deletedBy = struct.getExtensionData("deletedBy");
+			_deletedFrom = struct.getExtensionData("deletedFrom");
+				
+			var obj = _Database.WGObject.getDocumentByKey(_deletedFrom);
+			
+			if(obj.getType()==struct.TYPE_AREA)
+				_restoreTo = "Area " + obj.getName();
+			else if(obj.getType()==struct.TYPE_STRUCTENTRY){
+				_restoreTo = AFW.structentry(obj).getPathInfo()
+			}
+			else _restoreTo = "? " + _deletedFrom
+			
+		</tml:script>
+
+		<tml:label key="dialog.restore-deleted-page.confirm"/>
+		<fieldset style="padding:10px;margin-top: 5px;background:#efefef">
+			<tml:label key="page"/>: <b><tml:script expression="_Struct.getContentTitle(true)"/></b>
+			<br><tml:label key="deleted"/>: <b><tml:script expression="_Struct.WGObject.getLastModified()"/></b>
+			<tml:label key="by"/> <b><tml:item name="_deletedBy"/></b>
+			<br><tml:label key="restore-to"/>: <b><tml:item name="_restoreTo"/></b>
+		</fieldset>
+		<script>
+			BI.dialog.submit=function(){
+				BI.util.callAction("<tml:action ref="restorePage"/>", 
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"<tml:label key="dialog.restore-deleted-page.processing"/>");
+			}
+		</script>		
+	</tml:else>
+</tml:if>

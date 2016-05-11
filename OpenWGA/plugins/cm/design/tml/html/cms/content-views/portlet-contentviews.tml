@@ -1,0 +1,728 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<script>
+
+BI.ContentView = {	
+
+    init : function() {
+		
+		// 
+		var templateQueryType = "";
+		// some options	
+		var searchMode = 'optionAll';
+		var showArchived = false;
+		var showTrash = false;
+		// ... for remote paging
+		var pageStart = 0;
+		var pageLimit = 50;
+		var pagePagesize = pageLimit;
+		var queryType = "optionQueryHQL";
+		var queryOnlyPublished = true;
+		var allLanguages = true;
+		
+		// create dataStores for menus
+		var dsContentTypes = createContentTypeDS();	
+		var dsStatus = createStatusDS();
+		var dsMenu = createSearchMenuDS();
+		var dsQueryTypes = createQueryTypeDS();
+		var dsQueries = createQueriesDS();
+		dsQueries.on("beforeload", function(store, options) {
+	    	dsQueries.baseParams.querytype = queryType;
+	    });
+		
+		Ext.QuickTips.init();
+		
+		// need to load the stores here to make combo's setValue work correctly
+		dsMenu.load();
+		dsContentTypes.load();
+		dsStatus.load();
+		dsQueryTypes.load();
+		
+		// create dataStore containing initial content info
+		var dsLookup = createLookupDS('<tml:url type="tml" name="::mod-lookup-content"/>', {db: BI.dbkey, mode:searchMode});
+	
+        // special renderers to view column data
+      	
+		// status in detail
+		function renderStatus(value){
+	        switch (value) {
+		        case 'w': return '{%label:status.w%}';
+		        case 'p': return '{%label:status.p%}';
+		        case 'g': return '{%label:status.g%}';
+		        case 'a': return '{%label:status.a%}';
+		        case 'pending': return '{%label:status.pending%}';
+		    }
+	    }
+	    
+	    // plain title only
+	    function renderTitle(value) {
+		    var str = '<b>' + value + '</b>';
+		    return str;
+	    }
+
+		// table design
+        var cm = new Ext.grid.ColumnModel([
+			{id:'title',     header:'{%label:contentview.column.title%}',     sortable:true,  dataIndex:'title', renderer:renderTitle},
+			{id:'special',   header:'{%label:contentview.column.properties%}',sortable:false, dataIndex:'properties' },
+			{id:'autor',     header:'{%label:contentview.column.author%}',    sortable:true,  dataIndex:'author'},
+			{id:'owner',     header:'{%label:contentview.column.owner%}',     sortable:true,  dataIndex:'owner'},
+			{id:'doctype',   header:'{%label:contentview.column.pagetype%}',  sortable:true,  dataIndex:'doctype'},
+			{id:'uniquename',header:'{%label:contentview.column.uniquename%}',sortable:true,  dataIndex:'uniquename'},
+			{id:'lang',      header:'{%label:contentview.column.language%}',  sortable:true,  dataIndex:'langtitle'},
+			{id:'status',    header:'{%label:contentview.column.status%}',    sortable:true,  dataIndex:'status', renderer:renderStatus},
+			{id:'created',   header:'{%label:contentview.column.created%}',   sortable:true,  dataIndex:'created'},
+			{id:'modified',  header:'{%label:contentview.column.modified%}',  sortable:true,  dataIndex:'modified'}
+		]);
+
+		// do not allow multiple selection of grid rows
+		var singleSelectionModel = new Ext.grid.RowSelectionModel({singleSelect: true});
+        // create the Grid
+        var grid = new Ext.grid.Grid('contentviewgrid', {
+            ds: dsLookup,
+            cm: cm,
+            selModel: singleSelectionModel,
+            autoExpandColumn: 'title',
+            enableRowHeightSync: true,
+            loadMask: true
+        });
+		
+		
+		// layout to make the grid fit onto the whole content
+		// area        
+        var layout = Ext.BorderLayout.create({
+            center: { panels: [new Ext.GridPanel(grid)] }
+        }, 'contentviewgridpanel');
+        
+		
+		// render the grid!
+		grid.render();
+        
+        // get grid footer to create menus
+        var gridFoot = grid.getView().getFooterPanel(true);
+		
+	    // add a paging toolbar to the grid's footer...
+	    var paging = new Ext.PagingToolbar(gridFoot, dsLookup, {
+	        pageSize: pagePagesize,
+	        displayInfo: true
+	    });
+	    // and bind it to the lookup datastore
+	    paging.bind(dsLookup);
+	    	    
+		
+		// point to panel's toolbar    
+	    var tb = BI.contentpanel.toolbar; 
+		
+		
+		// add search Menu (combobox) to toolbar      
+	    var comboMenu = new Ext.form.ComboBox({
+			store: dsMenu,
+			valueField: 'option',
+			displayField: 'entry',
+			mode: 'remote',
+			triggerAction: 'all',
+			forceSelect: true,
+			forceAll: true,
+			selectOnFocus: false,
+			editable: false,
+			allowBlank: false
+		});
+		comboMenu.on('select', function() {
+			searchMode = comboMenu.getValue();
+			handleInputFields();
+			if (searchMode == "optionQuery") {
+				calculateQueryFieldWidth();
+				return;
+			}
+			executeSearch();
+		});
+		comboMenu.setValue(searchMode);
+
+
+		// add search Menu (combobox) to toolbar      
+	    var comboQueryType = new Ext.form.ComboBox({
+			width: 80,
+			store: dsQueryTypes,
+			valueField: 'option',
+			displayField: 'entry',
+			mode: 'remote',
+			triggerAction: 'all',
+			forceSelect: true,
+			forceAll: true,
+			selectOnFocus: false,
+			editable: false,
+			allowBlank: false
+		});
+		comboQueryType.on('select', function() {
+			queryField.clearValue();
+			queryType = comboQueryType.getValue();
+			dsQueries.load();
+		});
+		comboQueryType.setValue(queryType);
+
+
+	
+		// add content type selector combobox	
+		var comboContentTypes = new Ext.form.ComboBox({
+			store: dsContentTypes,
+			valueField: 'key',
+			displayField: 'key',
+			typeAhead: true,
+			mode: 'remote',
+			triggerAction: 'all',
+			forceSelect: true,
+			selectOnFocus: false, 
+			editable: false
+		});
+		comboContentTypes.on('select', function() {
+			searchMode = 'optionContentType';
+			handleInputFields();
+			executeSearch();
+		});
+
+
+
+		// add status selector combobox	
+		var comboStatus = new Ext.form.ComboBox({
+			store: dsStatus,
+			valueField: 'option',
+			displayField: 'entry',
+			typeAhead: true,
+			mode: 'remote',
+			triggerAction: 'all',
+			forceSelect: true,
+			minLength: 1,
+			selectOnFocus: false, 
+			editable: false
+		});
+		comboStatus.on('select', function() {
+			searchMode = 'optionStatus';
+			handleInputFields();
+			executeSearch();
+		});
+		comboStatus.setValue('w');
+			
+			
+	
+	
+		// add author text field...
+		var searchField = new Ext.form.TextField({
+			blankText:'{%label:contentview.searchfield.blank%}',
+			value:'{%label:contentview.searchfield.blank%}',
+			selectOnFocus: true,
+			allowBlank:false
+		});
+		// ... execute on enter....
+		searchField.on('specialkey', searchFieldKeyHandler, this);
+		
+		// Button to execute search for search-by-author
+		var searchButton = new Ext.Toolbar.Button({text:'{%label:contentview.dosearch%}', handler:buttonGoClicked});
+	
+		// add query text field
+		var queryField = new Ext.form.ComboBox({
+			store: dsQueries,
+			cls: "query-field",
+//			listClass: "query-field",
+//			triggerAction: 'query',
+			valueField: 'query',
+			displayField: 'name',
+			tpl: new Ext.Template("<div class='x-combo-list-item'><div style='float:left'>{name}</div><div style='float:right' class='{type}'>{type}</div></div>"),
+//			typeAhead: false,
+			mode: 'remote',
+//			forceSelect: false,
+//			selectOnFocus: false, 
+			editable: true,
+			minChars: 0
+		});
+		queryField.on("select", function(c, r, i) {
+			templateQueryType = r.get("type");
+		});
+		
+		queryField.on('specialkey', searchFieldKeyHandler, this);
+
+		// toggle "onlypublished" custom queries
+		var onlyPublishedToggleButton = new Ext.Toolbar.Button({
+	        pressed: queryOnlyPublished,
+	        enableToggle:true,
+      		cls: 'x-btn-icon',
+	        icon: "<tml:url type="file" db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="thumb_up.png"/>",
+			tooltip: "{%label:contentview.tooltip.only-published%}",
+	        toggleHandler: function() {
+	        	queryOnlyPublished = queryOnlyPublished ? false : true;
+	        }
+	    });
+
+		// toggle "alllanguages" custom queries
+		var allLanguagesToggleButton = new Ext.Toolbar.Button({
+	        pressed: allLanguages,
+	        enableToggle:true,
+      		cls: 'x-btn-icon',
+	        icon: "<tml:url type="file" db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="page_white_world.png"/>",
+	        tooltip: "{%label:contentview.tooltip.all-languages%}",
+	        toggleHandler: function() {
+	        	allLanguages = allLanguages ? false : true;
+	        }
+	    });
+
+		// Button to execute search for search-by-author
+		var execQueryButton = new Ext.Toolbar.Button({
+			icon: '<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="database_lightning.png"/>', 
+	      	cls: 'x-btn-text-icon',
+			text:'{%label:contentview.button.execute%}', 
+			handler:function() {
+				executeSearch();
+			}
+		});
+	
+		// separator between search-fields and showArchiveButton
+		var sep = new Ext.Toolbar.Separator();
+	
+		// toggleButton to show/hide archived documents in the result list
+		var archivedToggleButton = new Ext.Toolbar.Button({
+	        pressed: false,
+	        enableToggle:true,
+	        text: '{%label:contentview.showarchived%}',
+	        toggleHandler: toggleArchivedDocs
+	    });
+
+		// toggleButton to show/hide ztrash documents in the result list
+		var trashToggleButton = new Ext.Toolbar.Button({
+	        pressed: false,
+	        enableToggle:true,
+	        text: '{%label:contentview.showtrash%}',
+	        toggleHandler: toggleTrashDocs
+	    });
+	
+	
+		// add components only if toolbar contains nothing yet
+		if (tb.items.getCount() <= 1) {
+	        tb.addField(comboMenu);
+			tb.addSpacer();
+			tb.addField(comboContentTypes);
+			tb.addField(comboStatus);
+			tb.addField(searchField);	
+			tb.addButton(searchButton);
+			tb.addField(comboQueryType);
+			tb.addField(queryField);
+			tb.addField(onlyPublishedToggleButton);
+			tb.addField(allLanguagesToggleButton);
+			tb.addField(execQueryButton);
+			tb.add('->');
+			tb.add({
+			    icon: '<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="arrow_refresh.png"/>', 
+	      		cls: 'x-btn-icon',
+	      		tooltip: '{%label:dialog.image.refresh%}',
+	      		handler: function() {
+	      			//grid.dataSource.load();
+	      			dsLookup.reload();
+	      		}
+			});
+		}
+		
+		queryField.el.setWidth(500);
+
+		paging.add(sep);
+		paging.addButton(archivedToggleButton);
+		paging.addButton(trashToggleButton);
+		
+		    
+		    
+        // show/hide searchboxes considering searchMode
+        handleInputFields();
+	    	
+	    	
+	    	
+	    // 	*** LOAD THE DATASTORE ***
+		//executeSearch();
+	    
+	        
+		// double click loads selected content in contentstore-tab
+	    grid.on('rowdblclick', function(grid, rowindex, e){
+			//e.stopEvent();
+			BI.selectContent(dsLookup.getAt(rowindex).data.id, dsLookup.getAt(rowindex).data.skey);
+		});
+		function calculateQueryFieldWidth() {
+			var queryFieldWidth = tb.el.getWidth() - comboMenu.el.getWidth() - comboQueryType.el.getWidth() - (onlyPublishedToggleButton.el.getWidth()*3) - execQueryButton.el.getWidth() - 50;
+	    	queryField.el.setWidth(queryFieldWidth);
+	    	queryField.syncSize();
+		}
+		calculateQueryFieldWidth();
+		
+		Ext.EventManager.onWindowResize(function() {
+			calculateQueryFieldWidth();
+	    })
+		
+	    function buttonGoClicked(button, event) {
+		    executeSearch();
+	    }
+	    
+	    
+		// doing search by reloading datastore with diffrent params	    
+	    function executeSearch() { 
+		    
+		    var inp;
+		    		    
+		    switch (searchMode) {
+			    case 'optionAuthor':      inp = searchField.getValue(); break;
+			    case 'optionOwner':       inp = searchField.getValue(); break;
+			    case 'optionContentType': inp = comboContentTypes.getValue(); break;
+			    case 'optionStatus':      inp = comboStatus.getValue(); break;
+			    case 'optionQuery':		  inp = comboQueryType.getValue(); break;	
+		    }
+		    
+		    dsLookup.baseParams.input = inp;
+		    dsLookup.baseParams.db = BI.dbkey;
+		    dsLookup.baseParams.mode = searchMode;
+		    dsLookup.baseParams.archived = showArchived;
+		    dsLookup.baseParams.trash = showTrash;
+	    	dsLookup.baseParams.dbquery = escape(comboQueryType.getValue()=='optionQueryTemplate'?queryField.getValue():queryField.el.dom.value);
+			dsLookup.baseParams.querytype = comboQueryType.getValue();
+			dsLookup.baseParams.onlypublished = queryOnlyPublished;
+	    	dsLookup.baseParams.alllanguages = allLanguages;
+	    
+	    	dsLookup.baseParams.templateQueryType = templateQueryType;
+	    
+		    dsLookup.load({params:{
+			    start:pageStart,
+			    limit:pageLimit,
+			    mode:searchMode, 
+			    input:inp,
+			    
+			    archived:showArchived
+			}
+			});
+						
+			grid.getView().refresh();
+	    }
+	    
+	    dsLookup.on("beforeload", function(store, options) {
+	    	dsLookup.baseParams._lookupForeachPage = (options.params.start/pageLimit)+1;
+	    });
+	    	    
+	    // builds the datastore for the contentview
+	    function createLookupDS(url, params) {
+		    return new Ext.data.Store({
+	            proxy: new Ext.data.HttpProxy({
+	                    url: url
+	                }),
+	            baseParams: params,	      
+	            reader: new Ext.data.JsonReader({
+	                    id: 'id',
+	                    totalProperty: 'total',
+	                    root: 'data'                
+	            },
+	            [
+			        {name: 'id'},                   
+	                {name: 'skey'},
+	                {name: 'title'},
+	                {name: 'author'},
+	                {name: 'owner'},
+	                {name: 'doctype'},
+	                {name: 'language'},
+	                {name: 'langtitle'},
+	                {name: 'status'},                   
+	                {name: 'created'},
+	                {name: 'modified'},
+	                {name: 'uniquename' },
+	                {name: 'remote' },
+	                {name: 'properties'}
+	            ]),
+	            remoteSort: true
+	        });
+	    }
+	    
+	    	    
+	    // builds the datastore for the content type selector combobox
+	    function createContentTypeDS(url) {
+		    var ds = new Ext.data.Store({
+	            proxy: new Ext.data.HttpProxy({url: '<tml:url type="tml" name="::mod-lookup-contenttypes"/>'}),
+	            baseParams: { db: BI.dbkey },
+	            reader: new Ext.data.JsonReader({
+	            	    id: 'id',
+	                    totalProperty: 'total',
+	                    root: 'data'     
+	            },['key'])
+	        });    
+	        return ds;
+	    } 
+	    
+	    // load queries stored in profile
+	    function createQueriesDS() {
+	    	  var ds = new Ext.data.Store({
+	            proxy: new Ext.data.HttpProxy({url: '<tml:url type="tml" name="::mod-lookup-queries"/>'}),
+	            baseParams: { querytype: queryType, db: BI.dbkey },
+	            reader: new Ext.data.JsonReader({
+	            	    id: 'query',
+	                    totalProperty: 'total',
+	                    root: 'data'     
+	            },[
+	           	 { 	name:"name",
+    	            type:"string",
+    	            convert:function(v){
+                    	return BI.util.trim(unescape(v));
+                 	}
+                 },	
+	            
+	            {
+	            	name:"query",
+    	            type:"string",
+    	            convert:function(v){
+                    	return BI.util.trim(unescape(v));
+                 	}
+                },
+                
+                {name:"type", type:"string"}
+                
+                ])
+	        });    
+	        return ds;
+	    }
+	    
+	    	    
+	    // builds the datastore for the searchmenu from array
+	    function createSearchMenuDS() {
+		    var menuData={
+				data:[
+					{option:'optionAll',         entry:'{%label:contentview.searchby.view-all%}'},
+					{option:'optionMyDocs',      entry:'{%label:contentview.searchby.view-my%}'},  
+					{option:'optionRemote',      entry:'{%label:contentview.searchby.view-remote%}'},
+					{option:'optionRemoteParents',entry:'{%label:contentview.searchby.view-remote-parents%}'},					
+					{option:'optionContentType', entry:'{%label:contentview.searchby.pagetype%}'},
+					{option:'optionAuthor',      entry:'{%label:contentview.searchby.author%}'},
+					{option:'optionOwner',       entry:'{%label:contentview.searchby.owner%}'},
+					{option:'optionStatus',      entry:'{%label:contentview.searchby.status%}'},
+					{option:'optionQuery',       entry:'{%label:contentview.searchby.dbquery%}'}
+				],
+				total: 9
+			}
+			return new Ext.data.Store({
+		        proxy: new Ext.data.MemoryProxy(menuData),
+		        reader: new Ext.data.JsonReader({
+		        	id: id,
+		        	totalProperty: "total",
+		        	root: "data"
+		        },
+		        [
+					{name: 'option'},
+			        {name: 'entry'}
+			    ])
+	        });
+	    }		
+	    
+	    
+	    	    
+	    // builds the datastore for the searchmenu from array
+	    function createQueryTypeDS() {
+		    var menuData={
+				data:[
+					{option:'optionQueryHQL',      entry:'HQL'},
+					{option:'optionQuerySQL',      entry:'SQL'},
+					{option:'optionQueryLucene',   entry:'Lucene'} 
+					<tml:case condition="db(option('dbkey')).getTMLModule('queries:queries', 'html')!=null">
+					,{option:'optionQueryTemplate',   entry:'Template'}
+					</tml:case>
+				],
+				total: 3
+			}
+			return new Ext.data.Store({
+		        proxy: new Ext.data.MemoryProxy(menuData),
+		        reader: new Ext.data.JsonReader({
+		        	id: id,
+		        	totalProperty: "total",
+		        	root: "data"
+		        },
+		        [
+					{name: 'option'},
+			        {name: 'entry'}
+			    ])
+	        });
+	    }		
+	    	 
+	    	    
+	    // builds the datastore for the searchmenu from array
+	    function createStatusDS() {
+		    var menuData={
+				data:[
+					{option:'w', entry:'{%label:contentview.status.w%}'},
+					{option:'g', entry:'{%label:contentview.status.g%}'},
+					{option:'p', entry:'{%label:contentview.status.p%}'},
+					{option:'a', entry:'{%label:contentview.status.a%}'}
+				],
+				total: 4
+			}
+			return new Ext.data.Store({
+		        proxy: new Ext.data.MemoryProxy(menuData),
+		        reader: new Ext.data.JsonReader({
+		        	id: id,
+		        	totalProperty: "total",
+		        	root: "data"
+		        },
+		        [
+					{name: 'option'},
+			        {name: 'entry'}
+			    ])
+	        });
+	    }		
+	    
+	    	    
+	    // show/hide searchboxes considering searchMode
+	    function handleInputFields() {
+		    comboMenu.show();
+		    sep.show();
+		    archivedToggleButton.show();
+		    
+		    queryField.hide();
+		    comboQueryType.hide();
+		    execQueryButton.hide();		   
+		    allLanguagesToggleButton.hide();
+		    onlyPublishedToggleButton.hide();		    
+		    		    
+		    switch (searchMode) {
+			    case 'optionAll':
+					searchField.hide();
+				    comboContentTypes.hide();					
+					searchButton.hide();	
+					comboStatus.hide();			    
+					executeSearch();
+					break;
+					
+				case 'optionMyDocs':
+				    searchField.hide();
+				    comboContentTypes.hide();
+					searchButton.hide();	
+					comboStatus.hide();			    
+					executeSearch();
+					break;	    
+
+			    case 'optionContentType':
+				    searchField.hide();
+					searchButton.hide();				    
+				    comboContentTypes.show();
+				    comboStatus.hide();
+					break;	   
+
+			    case 'optionStatus':
+				    searchField.hide();
+					searchButton.hide();				    
+				    comboContentTypes.hide();
+				    comboStatus.show();
+				    sep.hide();
+				    archivedToggleButton.hide();
+					break;	   
+
+			    case 'optionAuthor':
+				    searchField.show();
+				    searchButton.show();				    
+				    comboContentTypes.hide();
+				    comboStatus.hide();
+				    executeSearch();
+					break;	 
+
+			    case 'optionOwner':
+				    searchField.show();
+				    searchButton.show();				    
+				    comboContentTypes.hide();
+				    comboStatus.hide();
+				    executeSearch();
+					break;	 
+
+			    case 'optionQuery':
+			    	archivedToggleButton.hide();
+				    searchField.hide();
+				    searchButton.hide();
+				    comboContentTypes.hide();
+				    comboStatus.hide();
+				    
+				    queryField.show();
+		    		comboQueryType.show();
+		    		execQueryButton.show();		   		    
+				    onlyPublishedToggleButton.show();		    
+				    allLanguagesToggleButton.show();
+				    
+					break;	 
+
+					
+				default: break;       
+		    }
+	    }
+	   
+
+		function searchFieldKeyHandler(field, e) {
+			var key = e.getKey();
+			if (key == 13) {
+				executeSearch();
+			}
+		}
+		
+		
+		function storeBeforeLoadEvent(datastore, options) {
+			options.params.mode = searchMode;		
+			switch (searchMode) {
+				case 'optionAuthor':
+					options.params.input = searchField.getValue();
+					break;
+				case 'optionContentType':
+					options.params.input = comboContentTypes.getValue();
+					break;
+				case 'optionStatus':
+					options.params.input = comboStatus.getValue();
+					break;
+				case 'optionQuery':
+					options.params.dbquery = escape(queryField.el.dom.value);
+					options.params.querytype = comboQueryType.getValue();
+					options.params.queryonlypublished = queryOnlyPublished;
+					options.params.alllanguages = allLanguages;
+					
+					
+					
+				default: break;
+			}	
+			options.params.archived = showArchived;
+		}
+		
+		
+		// show/hide documents with status 'archived'
+		function toggleArchivedDocs(button, pressed) {
+			showArchived = pressed;
+			executeSearch();
+		}
+
+		function toggleTrashDocs(button, pressed) {
+			showTrash = pressed;
+			executeSearch();
+		}
+	    
+    }
+    
+};
+
+// loads the ContentView grid
+Ext.onReady(BI.ContentView.init, BI.ContentView);
+
+</script>
+
+
+<div id="contentviewgridpanel">
+	<div id="contentviewgrid"></div>
+</div>

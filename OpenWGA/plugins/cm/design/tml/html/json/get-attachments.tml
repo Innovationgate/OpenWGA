@@ -1,0 +1,138 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	//console.log("attachments", request.getParameter("filter"), request.getParameter("filename"))
+	_sort = request.getParameter("sort")	
+	_type=request.getParameter("type");
+	_dbkey = request.getParameter("dbkey");
+	var key=request.getParameter("key");
+	if(!_type)
+		_type="content";
+		
+	_context='db:'+request.getParameter('dbkey');
+	switch (_type){
+		case "content":
+			_context += '/docid:'+key;
+			break;
+		case "file":
+			_context += '/$filecontainer:'+key;
+			break;
+	}
+	
+	_filter = function(filename){
+		var filter=request.getParameter("filter");
+		var Attachment = AFW.content(context(_context).content()).attachment(filename)	
+		switch(filter){
+			case "images":
+				return Attachment.getType().name=="images";
+				break;		
+			case "videos":
+				return Attachment.getType().name=="videos";
+				break;		
+			case "pdfs":
+				return Attachment.getType().name=="pdf-docs";
+				break;		
+			case "office":
+				return Attachment.getType().name=="office-docs";
+				break;
+			case "poster":
+				var extensions = ['jpg','jpeg','gif','png'];
+				var ext = filename.split(".").pop().toLowerCase();
+				if(extensions.indexOf(ext)!=-1)
+					return true;
+				else return (WGA.selectDerivate(context(_context), filename, "usage=poster")!=null)
+				break;
+			case "file":
+				var requested_filename = request.getParameter("filename");
+				if(filename==requested_filename)
+					return true;
+				else return false;
+				break;
+			default: return true;
+		}
+	}
+	
+</tml:script>
+
+<tml:if context="{_context}" iscontextvalid="true">
+	<tml:then>
+		<tml:script>
+			_attachments = WGA.createList()
+			_attachments.addAll(document.getFileNames());
+			if(_sort=="filetype"){			
+				WGA.sortList(_attachments, function(a,b){
+					var A = AFW.content().attachment(a);
+					var B = AFW.content().attachment(b);
+					if(A.getType().pos == B.getType().pos)
+						return a < b ? -1 : 1
+					else return (A.getType().pos < B.getType().pos ? -1 : 1)
+				});
+			}
+			else WGA.sortList(_attachments, function(a,b){
+				return a < b ? -1 : 1	// sort by name
+			});
+			_primary = document.getPrimaryFileName();
+		</tml:script>
+		<tml:range var="_result">
+		{
+			data:[
+				<tml:foreach type="itemvalue" item="_attachments" currentvalue="_filename" filter="_filter(_filename)">
+					<tml:script>
+						_Attachment = AFW.content().attachment(_filename);
+					</tml:script>
+					{
+						filetype: "<tml:script expression="label('filetype.'+_Attachment.getType().name)"/>",
+						id: "<tml:item name="_filename"/>",
+						primary: "<tml:script expression="_filename==_primary?'primary':''"/>",
+						name: "<tml:item name="_filename"/>",
+						<tml:if condition="_type=='content'">
+							<tml:then>
+								url: "<tml:url type="file" file="{_filename}"/>",
+								poster: "<tml:script expression="_Attachment.getPosterURL({checksum:true})"/>",
+								thumbnail: "<tml:script expression="_Attachment.getThumbnailURL({checksum:true})"/>",
+								mimetype: "<tml:script expression="_Attachment.mimeType"/>",
+								isImage: <tml:script expression="_Attachment.isImage()"/>,
+								isVideo: <tml:script expression="_Attachment.isVideo()"/>,
+								waiting_for_derivates: <tml:script expression="_Attachment.waitingForDerivates()"/>,
+							</tml:then>
+							<tml:else>url: "<tml:url db="{_dbkey}" type="file" doc="{request.getParameter('key')}" file="{_filename}"/>",</tml:else>
+						</tml:if>					
+						size: "<tml:script format="0" expression="_Attachment.fileSize"/>"
+					}
+					<tml:between>,</tml:between>
+				</tml:foreach>
+			],
+			context: "<tml:item name="_context"/>/<tml:item name="_type"/>"
+		}
+		</tml:range>
+		<tml:comment><tml:script>
+			console.log(_result);
+		</tml:script></tml:comment>
+		<tml:item name="_result" encode="none"/>
+	</tml:then>
+	<tml:else>
+		{data:[]}
+	</tml:else>		
+</tml:if>

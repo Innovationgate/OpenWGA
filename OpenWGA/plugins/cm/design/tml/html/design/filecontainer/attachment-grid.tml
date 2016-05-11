@@ -1,0 +1,106 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="deleteFiles">
+	var files=unescape(request.getParameter("files")).split("|");
+	//log.info("delete-file-action: " + files);
+	for(i in files)
+		document.removeFile(files[i]);
+	document.save();
+	var ev= createEvent("CMS_attachments_changed");
+	ev.addParameter("type", "file")
+	portlet.fireEvent(ev);
+</tml:action>
+
+<hr size="1">
+<div id="attachments-view" style="width:100%;height:200;margin-bottom:5px"></div>
+
+<script>
+	var tmp = function(){
+		var grid=BI.util.createAttachmentGrid("attachments-view", 'file', '<tml:option name="id"/>', true)
+		var ds=grid.getDataSource();
+		
+		<tml:case condition="option('mode')=='edit'">
+			grid.on("rowclick", function(){
+				tb.items.get(1).enable();
+			})
+		</tml:case>
+		
+		grid.on("rowdblclick", function(thegrid, index, ev){
+			var selection=grid.getSelections()[0];
+			//console.log(ev);
+			ev.stopEvent();
+			window.open(selection.data.url, "_blank");
+		})
+	
+		var gridHead = grid.getView().getFooterPanel(true);
+		var tb = new Ext.Toolbar(gridHead, [
+			    {
+			        text: '{%label:upload%}',
+			        icon: "../../plugin-wga-app-framework/file/icons/database_add.png",
+			        cls: "x-btn-text-icon",
+			        disabled: <tml:script>return option('mode')=="view"</tml:script>,
+			        handler : function(m, ev){
+						BI.dialog.show("upload", ev.target, {type:'file', key:'<tml:option name="id"/>'});
+			        }
+			    },
+			    {
+			        text: '{%label:delete%}',
+			        icon: "../../plugin-wga-app-framework/file/icons/database_delete.png",
+			        cls: "x-btn-text-icon",
+			        disabled: true,
+			        handler : function(m, ev){
+			        	var selections=grid.getSelections();
+			        	var files=[];
+			        	for(var i=0; i<selections.length; i++){
+							//console.log("delete", selections[i].data.name)
+							files.push(selections[i].data.name)
+						}
+						Ext.MessageBox.confirm('{%label:confirm-deletion%}', '{%label:query-delete-selected-attachments%}?', function(btn){
+							if(btn=="no")
+								return;
+							WGA.ajax.action({
+								action: "<tml:action ajax="norefresh" ref="deleteFiles"/>&files="+escape(files.join("|")),
+								id: "<tml:script>return portlet.portletkey</tml:script>",
+								graydiv: false,
+								mode: "norefresh"
+							});
+						});
+			        }
+			    }
+	    ]);
+
+		WGA.event.register(
+			"portlet-filecontainer",
+			"CMS_attachments_changed", 
+			function(e){
+				//console.log("filecontainer: CMS_attachments_changed", e);
+				if(e.params.type=="file"){
+					ds.load({params:{dbkey: BI.dbkey, type:'file', key:'<tml:option name="id"/>', who:'portlet-filecontainer'}});
+					tb.items.get(1).disable();
+				}
+			}
+		);
+	}();
+</script>

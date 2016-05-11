@@ -1,0 +1,308 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+/*
+	XML-Struktur:
+	
+	<bookmarks>
+		
+		<database key=" dbkey">
+			
+			<folder name="Bookmarks">
+			
+				// SYSTEM FOLDER, MAY NOT BE EDITED OR DELETED
+			
+			</folder>
+			
+			<folder name="folder1">
+				
+				<bookmark name="bookmark1" structkey="..."/>
+				<bookmark name="bookmark2" structkey="..."/>
+				<bookmark name="bookmark3" structkey="..."/>
+				
+			</folder>
+			
+			<folder name="folder2">
+				...
+			</folder>
+			
+		</database>
+		
+		<database key="dbkey2">
+			....
+		</database>
+		
+	</bookmarks>
+	
+	No nested folders supported!
+
+	NOTE: Still in development-state, thus the commented log-statements
+*/
+
+
+
+
+var xml = null;
+var database = null;
+var root = null;
+
+
+this.init = function(dbkey) {
+
+	database = dbkey;
+	
+	if (!profile.hasItem("content_manager_bookmarks")) 
+		createBookmarks();
+		
+	xml = parseXML(profile.content_manager_bookmarks);
+	
+	if (!hasDatabase(database)) {
+		addDatabase(database);
+		saveBookmarks();
+	}
+
+	root = xml.selectSingleNode('//database[@key="' + database + '"]');
+}
+
+
+function hasDatabase(dbkey) {
+	var db = xml.selectSingleNode('//database[@key="' + database + '"]');
+	return (db != null);
+}
+
+
+function addDatabase(dbkey) {
+	var db = xml.getRootElement().addElement("database");
+	db.addAttribute("key", dbkey);
+	var defaultFolder = db.addElement("folder");
+	defaultFolder.addAttribute("name", "Bookmarks");
+	//log.info("database '" + dbkey + "' added");
+}
+
+// xml speichern
+function saveBookmarks() {
+	profile.setItem("content_manager_bookmarks", xml.asXML());
+	profile.save();
+	//log.info("bookmarks saved");
+}
+
+// neue leere xml-struktur erzeugen und am profil speichern
+function createBookmarks() {
+	profile.content_manager_bookmarks = "<bookmarks></bookmarks>";
+	profile.save();
+	//log.info("bookmarks created");
+}
+
+
+this.removeBookmarks = function() {
+	profile.removeItem("content_manager_bookmarks");
+	profile.save();
+	//log.info("bookmarks removed");
+}
+
+
+// folder
+this.hasFolder = function(name) {
+	return (this.getFolder(name) != null);
+}
+
+
+this.getFolder = function(name) {
+	if (!name)
+		return this.getFolder("Bookmarks");
+	return xml.selectSingleNode('//database[@key="' + database + '"]/folder[@name="' + name + '"]');
+}
+
+
+this.addFolder = function(name) {
+	if (!this.hasFolder(name)) {
+		var folder = root.addElement("folder");
+		folder.addAttribute("name", name);
+		saveBookmarks();
+		return true;
+	}
+	return false;
+}
+
+
+this.removeFolder = function(name) {
+	var folder = this.getFolder(name);
+	if (folder) {
+		folder.detach();
+		saveBookmarks();
+		return true;
+	}
+	return false;
+}
+
+
+
+this.renameFolder = function(oldname, newname) {
+	if (oldname == newname)
+		return true;
+	if (this.hasFolder(newname))
+		return false;
+	var folder = this.getFolder(oldname);
+	if (folder) {
+		folder.setAttributeValue("name", newname);
+		saveBookmarks();
+		return true;
+	}
+	return false;
+}
+
+
+this.getFolders = function() {
+	var ret = createList();
+	var folders = xml.selectNodes('//database[@key="' + database + '"]/folder');
+	folders = folders.iterator();
+	while (folders.hasNext()) {
+		var folder = folders.next();
+		ret.add(folder.attribute("name").value);
+	}
+	return ret;
+}
+
+// bookmarks
+this.getBookmark = function(folder, name) {
+	return xml.selectSingleNode('//database[@key="' + database + '"]/folder[@name="' + folder + '"]/bookmark[@name="' + name + '"]');
+}
+
+
+this.getBookmarksForStructkey = function(structkey) {
+	return xml.selectNodes('//database[@key="' + database + '"]/*[@structkey="' + structkey + '"]');
+}
+
+
+this.structkeyIsBookmarked = function(structkey) {
+	return !this.getBookmarksForStructkey(structkey).isEmpty();
+}
+
+
+this.isBookmarked = function(structkey) {
+	return (!this.getBookmarksByStructkey(structkey).isEmpty());
+}
+
+
+this.hasBookmark = function(folder, name) {
+	var f = this.getFolder(folder);
+	if (f) {
+		return (this.getBookmark(folder, name) != null ? 1 : 0);		
+	}
+	return -1;
+}
+
+
+
+this.hasBookmarks = function(folder) {
+	return !xml.selectNodes('//database[@key="' + database + '"]/folder[@name="' + folder + '"]/bookmark').isEmpty();
+}
+
+
+this.addBookmark = function(folder, name, structkey) {
+	var f = this.getFolder(folder);
+	
+	switch (this.hasBookmark(folder, name)) {
+		case -1: // folder not found
+			//log.info("folder not found");
+			break;
+		
+		case 0:
+			//log.info("bookmark not found - creating new bookmark...");
+			var bookmark = f.addElement("bookmark");	
+			bookmark.addAttribute("name", name);
+			bookmark.addAttribute("structkey", structkey);
+			saveBookmarks();
+			return true;
+						
+		case 1: break; //log.info("bookmark already exists");
+	}
+
+	return false;
+}
+
+
+this.removeBookmark = function(folder, name) {
+	var bookmark = this.getBookmark(folder, name);
+	if (bookmark) {
+		bookmark.detach();
+		saveBookmarks();
+		return true;
+	}
+	return false;
+}
+
+
+this.renameBookmark = function(folder, oldname, newname) {
+	if (oldname == newname)
+		return true;
+	if (this.hasBookmark(folder, newname) !== 0)
+		return false;
+	var bookmark = this.getBookmark(folder, oldname);
+	if (bookmark) {
+		bookmark.setAttributeValue("name", newname);
+		saveBookmarks();
+		return true;
+	}
+	return false;
+}
+
+
+
+this.moveBookmark = function(source, dest, name) { 
+	var bookmark = this.getBookmark(source, name);
+	
+	if (!bookmark || this.hasBookmark(dest, name))
+		return false;
+		
+	var key = bookmark.attribute("structkey").value;
+	
+	this.addBookmark(dest, name, key);
+	this.removeBookmark(source, name);
+	
+	return true;	
+}
+
+
+this.getBookmarks = function(folder) {
+ 	var ret = createList();
+	var bookmarks = xml.selectNodes('//database[@key="' + database + '"]/folder[@name="' + folder + '"]/bookmark');
+	bookmarks = bookmarks.iterator();
+	while (bookmarks.hasNext()) {
+		var bookmark = bookmarks.next();
+		ret.add({
+			text: bookmark.attribute("name").value,
+			key: bookmark.attribute("structkey").value,
+			isContextValid: context("db:"+database+"/docid:"+bookmark.attribute("structkey").value, false) != null
+		});
+	}
+	return ret;
+}
+
+
+this.logXMLData = function() {
+	log.info(profile.content_manager_bookmarks || "Am Profil sind momentan keine Bookmarks gespeichert!");
+}
+
+

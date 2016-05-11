@@ -1,0 +1,86 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="deleteWorkflowLevel">
+		var database=db(option('dbkey'));
+		var wfE = database.getWorkflowEngine();
+		var wf = wfE.getWorkflowDefinitions().get(tmlparam1);
+	
+		if(!wf)
+			return log.error("Workflow " + tmlparam1 + " not found");;
+	
+		var wflevel = wf.getLevels().get(Number(tmlparam2)-1);
+		wf.removeLevel(wflevel);
+		wfE.saveWorkflowDefinition(wf);
+</tml:action>
+
+<tml:include ref="system:x-box">
+	<tml:option name="title">
+		<tml:script>
+			return option("wflevel").getName();
+		</tml:script>
+	</tml:option>
+	
+	<tml:option name="body">
+
+		<table width="100%">
+		
+			<tr>
+				<td width="150"><tml:label key="design.workflow.form.level.desc"/></td>
+				<td>
+					<b><tml:script>
+						return option("wflevel").getDescription();
+					</tml:script></b>
+				</td>
+			</tr>
+		
+			<tr>
+				<td width="150"><tml:label key="design.workflow.form.level.position"/>:</td>
+				<td>
+					<tml:script>
+						return option("wflevel").getPosition();
+					</tml:script>
+				</td>
+			</tr>
+		
+			<tr>
+				<td width="150"><tml:label key="design.workflow.form.level.approvers"/>:</td>
+				<td>
+					<tml:script divider=", ">
+						return option("wflevel").getReviewers();
+					</tml:script>
+				</td>
+			</tr>
+		
+		</table>
+		<div align="right">
+			<button type="button" onclick="BI.dialog.show('workflow-level', this, 
+				{workflow:'<tml:option name="workflow"/>', index:<tml:option name="index"/>})">
+					<tml:label key="edit"/>
+			</button>
+			<tml:button clickaction="deleteWorkflowLevel" param1="{option('workflow')}" param2="{option('index')}" ajax="true"><tml:label key="delete"/></tml:button>
+		</div>
+		
+	</tml:option>
+</tml:include>

@@ -1,0 +1,199 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="login">
+	var dbkey=tmlform.field("dbkey");		
+	var database=wgacore.getContentdbs().get(dbkey)
+	if(!database)
+		return tmlform.addmessage(label("login.database-not-found", createlist([encode("html", dbkey)])));
+	var domain = WGA.database(database).domain().name
+	
+	if(login(tmlform.username, tmlform.password, domain)){
+		log.info("OpenWGA Contentmanager: user '" + tmlform.username + "' logged in to database '" + tmlform.dbkey + "' in domain '" + domain + "' from IP " + request.getRemoteAddr());
+
+		try{
+			var wgdb = db(dbkey);	// opens a db session
+			if(!wgdb.isSessionOpen()){
+				tmlform.addMessage(label("login.user-is-no-author", WGA.createList([tmlform.username, dbkey])));
+				tmlform.addMessage(label("login.please-login-as-author"));
+				return;
+			}
+			log.info("user '" + tmlform.username + "' is logged in as " + AFW.database(database).getAccessLevelText())
+			
+			var url = layouturl("html", "contentstore")+"?dbkey="+dbkey;
+			if(request.getParameter("ua"))
+				url += "&ua=" + request.getParameter("ua")
+			if(request.getParameter("contentkey"))
+				url += "#" + dbkey + "/" + request.getParameter("contentkey")
+			else if(tmlform.hash)
+				url += tmlform.hash;
+			redirectto(url);
+		}
+		catch(e){
+			tmlform.addmessage(e.message)
+		}
+	}
+	else {
+		// is logon blocked?
+		if(WGACore.getBruteForceLoginBlocker().isLoginBlocked(domain, tmlform.username))
+			tmlform.addmessage(label("login.login-blocked", [tmlform.username]))
+		else tmlform.addmessage(label("login.login-error"))
+	}
+</tml:action>
+
+<html>
+	<head>	
+		<title>OpenWGA&trade; Content Manager</title>
+		<tml:htmlhead/>
+		<tml:include designdb="{pluginDbKey('de.innovationgate.wga-app-framework')}" ref="ext:include-css"/>
+		<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="wga"/>"/>
+		<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="splash"/>"/>
+		<link rel="icon" href="<tml:url type="static" file="images/brand/icon_32.png"/>"/>		
+	</head>
+	
+	<body>		
+	
+		<div id="splash">
+			<tml:include ref="system:x-box">
+				<tml:option name="body">
+
+					<div align="center">
+						<img src="<tml:url type="static" file="images/brand/logo_600.png"/>" style="width:300px;margin-top:10px">
+						<div style="color:gray;margin-bottom:20px">
+							<tml:include ref="releasestring"/>
+						</div>
+						<hr size="1">
+					</div>
+					
+					<div id="message"></div>
+					
+					<tml:form id="login" onsubmit="window.login();return false">
+						<tml:input name="hash" type="hidden"/>
+						<script>
+							function submitenter(e)
+							{
+								var keycode;
+								if (window.event)
+									keycode = window.event.keyCode;
+								else if(e)
+									keycode = e.which;
+								else return true;
+								
+								if (keycode == 13){
+									login();
+								   	return false;
+								}
+								else return true;
+							}
+							
+							window.login=function(){
+								document.forms.login.style.display="none";
+								document.getElementById("message").innerHTML = "Login ..."
+								document.forms.login.hash.value=location.hash;
+							   	WGA.callAction("<tml:action ref="login"/>");
+							}
+							
+						</script>
+					
+						<tml:case condition="tmlform.hasmessages()">
+							<div class="formmessage">
+								<tml:formmessages divider="<br/>"/>
+							</div>
+							<hr size="1">
+						</tml:case>		
+	
+						<tml:case context="{'db:'+option('dbkey')}" iscontextvalid="true" condition="meta('db', 'username')!='anonymous'">
+							<div class="formmessage">
+								<tml:script>
+									_Database = AFW.database(option('dbkey'));
+								</tml:script>
+								<tml:if condition="!_Database.hasDesign() && !_Database.isManager()">
+									<tml:then>
+										<tml:label key="login.init-db-design.needs-init-by-designer"/>
+									</tml:then>
+									<tml:else>
+										<tml:label key="login.user-is-no-author" param1="{meta('db', 'username')}" param2="{meta('db', 'title')}"/>
+										<tml:label key="login.please-login-as-author"/>
+									</tml:else>
+								</tml:if>
+							</div>
+							<hr size="1">
+						</tml:case>
+						
+						<div style="width:100%">
+							<table border="0" width="100%" cellspacing="0" cellpadding="0" >
+								<tr>
+									<td nowrap><tml:label key="login-to-site" param1="option('dbkey')"/>:</td>
+									<td>
+										<tml:if condition="option('dbkey')==null">
+											<tml:then>
+												<tml:input name="dbkey" default="{request.getParameter('dbkey')}">onKeyPress="return submitenter(event)"</tml:input>
+											</tml:then>
+											<tml:else>
+												<tml:script>
+													tmlform.dbkey=option("dbkey");
+												</tml:script>
+												<div style="padding-left:4px;font-weight:bold"><tml:item type="tmlform" name="dbkey" encode="html"/></div>											
+											</tml:else>
+										</tml:if>
+									</td>
+								</tr>
+								<tr>
+									<td width="1%">{%label:username%}:</td>
+									<td><tml:input name="username" default="{request.getParameter('username')}">onKeyPress="return submitenter(event)"</tml:input></td>
+								</tr>
+								<tr>
+									<td>{%label:password%}:</td>
+									<td><tml:input type="password" name="password" default="{request.getParameter('password')}">onKeyPress="return submitenter(event)"</tml:input></td>
+								</tr>
+							</table>
+						</div>
+						
+						<tml:input type="hidden" name="domain" default="{context('db:'+option('dbkey')).meta('db', 'domain')}"/>
+			
+						<hr size="1">
+						<p style="padding-top:5px">
+							<button type="submit">{%label:login%}</button>
+						</p>		
+						
+					</tml:form>
+					<script>
+						<tml:if condition="option('dbkey')==null">
+							<tml:then>
+								document.forms.login.dbkey.focus();
+							</tml:then>
+							<tml:else>
+								document.forms.login.username.focus();
+							</tml:else>
+						</tml:if>
+					</script>
+					
+				</tml:option>
+			</tml:include>
+		
+		</div>
+		
+	</body>
+	
+</html>

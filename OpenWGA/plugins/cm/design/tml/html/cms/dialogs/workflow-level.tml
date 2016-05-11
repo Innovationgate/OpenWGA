@@ -1,0 +1,212 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="saveWorkflowLevel">
+	if(!tmlform.validate())
+		return;
+	try{
+		var database=db(option('dbkey'));
+		var wfE = database.getWorkflowEngine();
+		var wf = wfE.getWorkflowDefinitions().get(option('workflow'));
+	
+		if(!wf)
+			return tmlform.addMessage(label("dialog.workflow-level.validation.wf-not-found", option("workflow")));
+	
+		var wflevel = wf.getLevels().get(Number(option('index'))-1);
+		wflevel.setName(tmlform.name);
+		wflevel.setPosition(tmlform.position);
+		wflevel.setDescription(tmlform.description);
+		wflevel.setReviewers(tmlform.fieldlist("reviewer"));
+		wflevel.setReviewerCount(tmlform.reviewercount);
+		
+		wfE.saveWorkflowDefinition(wf);
+		
+		_actionDone=true;
+		event=createEvent("CMS_dialog_closed");
+		portlet.fireEvent(event);
+	}
+	catch(e){
+		tmlform.addmessage(e.message);
+	}
+</tml:action>
+
+<tml:action id="createWorkflowLevel">
+	if(!tmlform.validate())
+		return;
+
+	try{
+		var database=db(option('dbkey'));
+		var wfE = database.getWorkflowEngine();
+		var wf = wfE.getWorkflowDefinitions().get(option('workflow'));
+	
+		if(!wf)
+			return tmlform.addMessage(label("dialog.workflow-level.validation.wf-not-found", option("workflow")));
+	
+		var wflevel = wf.createLevel(tmlform.name, tmlform.position);
+		wflevel.setDescription(tmlform.description);
+		wflevel.setReviewers(tmlform.fieldlist("reviewer"));
+		wflevel.setReviewerCount(tmlform.reviewercount);
+
+		wfE.saveWorkflowDefinition(wf);
+		
+		_actionDone=true;
+		event=createEvent("CMS_dialog_closed");
+		portlet.fireEvent(event);
+	}
+	catch(e){
+		tmlform.addmessage(e.message);
+	}
+</tml:action>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.design.workflowpanel.reload();
+		</script>
+	</tml:then>
+	<tml:else>
+		<tml:form id="workflow-level-form" 
+					source="none" 
+					onsubmit="BI.dialog.submit()">
+		
+			<script>
+				<tml:if condition="option('index')=='0'">
+					<tml:then>
+						BI.dialog.submit=function(){
+							BI.util.callAction("<tml:action ref="createWorkflowLevel"/>", 
+									"<tml:script>return portlet.portletkey</tml:script>",
+									"{%label:dialog.workflow-level.info.saving-wf-level%}");
+						}
+					</tml:then>
+					<tml:else>
+						// submit function called from dialog handler and on RETURN
+						BI.dialog.submit=function(){
+							BI.util.callAction("<tml:action ref="saveWorkflowLevel"/>", 
+									"<tml:script>return portlet.portletkey</tml:script>",
+									"{%label:dialog.workflow-level.info.saving-wf-level%}");
+						}
+					</tml:else>
+				</tml:if>
+				//BI.makeTextareasResizable("workflow-level-form");
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+					BI.dialog.autoHeight()
+					BI.dialog.onShow();
+				});
+				BI.dialog.onShow=function(){
+					try{
+						document.forms["workflow-level-form"].name.focus();
+					}
+					catch(e){};
+				}
+			</script>
+					
+			<tml:script>
+				if(option("index")!="0" && !tmlform.submitted){
+					var database=db(option('dbkey'));
+					var wfE = database.getWorkflowEngine();
+					var wf = wfE.getWorkflowDefinitions().get(option('workflow'));
+				
+					if(!wf)
+						return tmlform.addMessage(label("dialog.workflow-level.validation.wf-not-found", option("workflow")));
+				
+					var wflevel = wf.getLevels().get(Number(option('index'))-1);
+					
+					if(!wflevel)
+						return tmlform.addMessage(label("dialog.workflow-level.validation.wf-level-not-found", option("workflow"), option("index")));
+				
+					tmlform.name=wflevel.getName();
+					tmlform.position=wflevel.getPosition();
+					tmlform.reviewer=wflevel.getReviewers();
+					tmlform.reviewercount=wflevel.getReviewerCount();
+					tmlform.description=wflevel.getDescription();
+				}	
+			</tml:script>
+			
+			<tml:case condition="tmlform.hasmessages()">
+				<h3><tml:formmessages divider="<br/>"/></h3>
+				<hr size="1">
+			</tml:case>		
+		
+			
+			<table width="100%">
+			
+				<tr>
+					<td width="100">{%label:dialog.workflow-level.name%}:</td>
+					<td>
+						<tml:input name="name" cssclass="textinput required"
+							validation="$E_VALUE!=''"
+							message="{label('dialog.workflow-level.validation.enter-name')}"
+						/>
+					</td>
+				</tr>
+			
+				<tr>
+					<td width="150">{%label:dialog.workflow-level.position%}:</td>
+					<td>
+						<tml:input name="position" cssclass="textinput required"
+							default="0"
+							type="number"
+							validation="$P_VALUE!=null"
+							message="{label('dialog.workflow-level.validation.enter-position')}"
+						/>
+					</td>
+				</tr>
+			
+				<tr>
+					<td width="150">{%label:dialog.workflow-level.description%}:</td>
+					<td>
+						<tml:input name="description" cssclass="textinput" type="textarea"/>
+					</td>
+				</tr>
+
+				<tr>
+					<td width="150">{%label:dialog.workflow-level.reviewer%}:</td>
+					<td>
+						<tml:input name="reviewer" cssclass="textinput required"
+							type="textarea" multiple="true"
+							validation="!$P_VALUE.isEmpty()"
+							default="{context('db:'+option('dbkey')).meta('db', 'username')}"
+							message="{label('dialog.workflow-level.validation.enter-reviewer')}"
+						/>
+					</td>
+				</tr>
+				<tr>
+					<td width="150">{%label:dialog.workflow-level.reviewer-count%}:</td>
+					<td>
+						<tml:input name="reviewercount" cssclass="textinput required"
+							type="number"
+							default="1"
+							validation="$P_VALUE!=null"
+							message="{label('dialog.workflow-level.validation.enter-reviewer-count')}"
+						/>
+					</td>
+				</tr>
+
+			</table>
+			   	
+		</tml:form>
+
+	</tml:else>
+</tml:if>
+

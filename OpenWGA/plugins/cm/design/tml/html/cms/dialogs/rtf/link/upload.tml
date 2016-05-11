@@ -1,0 +1,140 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<script>
+	
+	BI.LinkDialog.uploadFileAttachment=function(){
+
+		var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+		if(form.file){
+			var existingFiles = [
+				<tml:script>
+					_files = content().getFileNames();
+				</tml:script>
+				<tml:foreach type="itemvalue" item="_files" currentvalue="_file">
+					"<tml:item name="_file"/>"<tml:between>,</tml:between>
+				</tml:foreach>
+			]
+			
+			var newfile = form.filename.value.replace(/\s+$/,"").replace(/^\s+/,"");
+			
+			if (newfile == "") {
+				alert("{%label:dialog.link.no-filename%}");
+				return;
+			}
+			
+			newfile += "." + BI.util.getFileInfo(form).ext;		
+			
+			for(var i=0; i<existingFiles.length; i++)
+				if(Ext.util.Format.lowercase(newfile) == Ext.util.Format.lowercase(existingFiles[i]) && !confirm("<tml:label key="dialog.upload.overwrite-query"/>"))
+					return;
+		}			
+		WGA.ajax.action({
+			id: "<tml:script>return portlet.portletkey</tml:script>",
+			action:"<tml:action>
+				
+				if (!tmlform.validate())
+					return;
+
+				if(tmlform.filenames.isEmpty()) 
+					return tmlform.addMessage(label('dialog.image.no-file-selected'));
+				
+				var filename=tmlform.filename.toLowerCase();
+				
+				var filepath=tmlform.filenames.get(0).toLowerCase();
+				var a=filepath.split(".");
+				if(a.length>1)
+					var ext="." + a[a.length-1];
+				else var ext="";
+				
+				if(document.getFileNames().contains(filename+ext)){
+					document.removeFile(filename+ext);
+					document.save();
+					log.info("file " + filename+ext + " removed");
+				}
+				this.tmlform.attach(document, filename+ext);
+				
+				document.save();				
+				tmlform.reset();
+				tmlform.linksource="intfile";
+				
+				portlet.setMode("view");
+				
+			</tml:action>"
+		});
+	}
+	
+	BI.LinkDialog.updateSaveAs=function(form){
+		form.filename.value=BI.util.getFileInfo(form).name;
+		Ext.get("file-upload-button").dom.disabled=false;
+	}
+	
+</script>
+
+<div style="padding: 3px">
+	<tml:if condition="tmlform.filenames.isEmpty()">
+		<tml:then>
+			<tml:input type="file" name="file">
+				size="45"
+				onchange="BI.LinkDialog.updateSaveAs(this.form)"
+			</tml:input>
+		</tml:then>
+		<tml:else>
+			<div class="img-dlg-upload-info">
+				<tml:script>return tmlform.filenames.get(0);</tml:script>
+				<script>
+					var button = Ext.get("file-upload-button");
+					button.update("{%label:save%}");
+					button.dom.disabled=false;
+				</script>
+			</div>		
+		</tml:else>
+	</tml:if>
+	
+	<table width="100%">
+		<tr>
+			<td width="1%" nowrap><tml:label key="dialog.image.save-as"/></td>
+			<td>
+				<tml:input name="filename" cssclass="textinput"
+						validation="$E_VALUE!=''"
+						message="{label('dialog.link.no-filename')}" 			
+				/>
+			</td>
+		</tr>
+	</table>
+	<tml:comment>Ext-Style Button</tml:comment>
+	<div class="x-dlg-btns x-dlg-btns-right">
+		<table class="x-btn-wrap x-btn" cellspacing="0" cellpadding="0" border="0" style="width: 75px;">
+			<tr>
+				<td class="x-btn-left"><i></i></td>
+				<td class="x-btn-center">
+					<em unselectable="on">
+						<button type="button" id="file-upload-button" disabled="disabled" class="x-btn-center x-btn-text" onClick="BI.LinkDialog.uploadFileAttachment()">{%label:dialog.image.upload%}</button>
+					</em>
+				</td>
+				<td class="x-btn-right"><i></i></td>
+			<tr>
+		</table>
+	</div>
+</div>	

@@ -1,0 +1,215 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="scaleImage">	
+	if(tmlform.validate()){
+		var _targetName = tmlform.filename;
+		var _sourceName = tmlform.fullFileName;
+		if (_sourceName && content().hasFile(_sourceName)) {
+			var img = content().getFileData(_sourceName);
+			var sc = createimagescaler(img);
+			
+			if (tmlform.suffix == 1) {
+				var suffix = '.png';
+				sc.usePNGForOutput();
+			} else {
+				var suffix = '.jpg';
+				sc.useJPEGForOutput();
+			}
+			
+			if (content().hasFile(_targetName + suffix)) {
+				content().removeFile(_targetName + suffix);
+				content().save();
+			}
+			
+			sc.shrinkToSize(tmlform.width, tmlform.height);
+			
+			try{
+				attachScaledImage(content(), sc, _targetName);
+				content().save();
+				setoption("filename", _targetName + suffix);
+				portlet.fireEvent(createEvent("CMS_attachments_changed"));
+			}
+			catch(e){
+				tmlform.addMessage(e.message);
+			}
+		}
+	}
+</tml:action>
+
+<tml:action id="keepFilename">
+	setoption("filename", tmlform.fullFileName);
+</tml:action>
+
+<div id="image-view">
+	<tml:form id="image-coords" source="none" context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}" >
+		<tml:script>
+			if (option('filename')) {
+				_filename = option('filename').toLowerCase();
+			}
+			if (_filename && content().hasFile(_filename)) {
+				
+				var img = content().getFileData(_filename);
+				try {
+					var sc = createimagescaler(img);
+					imgWidth = sc.getWidth();
+					imgHeight = sc.getHeight();
+					imgSize = content().getFileSize(_filename)
+					if (_filename.lastIndexOf('.') == _filename.length - 4) {
+						_filesuffix = _filename.substring(_filename.length - 3);
+						_name = _filename.substring(0, _filename.length - 4);
+					}
+				} catch (e) {
+					_imgException = true;
+				}
+			}
+		</tml:script>
+		
+		<tml:if istrue="_imgException">
+			<tml:then>
+				<font style="color: red; font-size: 18px; font-weight: bold">Unbekanntes Bildformat</font>
+			</tml:then>
+			<tml:else>
+				<tml:input type="hidden" name="fullFileName" default="{option('filename').toLowerCase()}"/>
+				<script>
+					WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+						BI.resizableDialog.onShow();
+					});
+				</script>
+				
+				<div id="img_container">
+					<tml:case condition="_filename && content().hasFile(_filename)">		
+						<img id="selected_image" src="<tml:url type="file" file="{_filename}"/>?uid=<tml:script expression="AFW.Util.generateUID()"/>"/>
+					</tml:case>
+				</div>
+				
+				<div id="form">
+					<div class="form-element">
+						<div class="form-element-header">
+							<tml:label key="metadata"/>:
+						</div>					
+						<tml:comment><b><tml:label key="dimensions"/>:</b><br></tml:comment>
+						<tml:label key="crop-image.width"/>:
+						<tml:item name="imgWidth" format="0"/> Pixel<br>
+						<tml:label key="crop-image.height"/>:
+						<tml:item name="imgHeight" format="0"/> Pixel<br>
+						<tml:label key="crop-image.size"/>:
+						<tml:script expression="AFW.Util.renderFileSize(imgSize)"/>
+					</div>
+					<div class="form-element">
+						<div class="form-element-header">
+							<tml:label key="crop-image.new-size"/>:
+						</div>
+
+						<tml:case condition="tmlform.hasmessages()">
+							<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+							<hr size="1">
+						</tml:case>
+						
+						<div style="font-weight:bold"><tml:label key="scale-image.width"/>:</div>
+						<div style="margin-bottom:10px">
+							<tml:input name="width" type="number" default="1000"
+								validation="$P_VALUE"
+								message="{label('dialog.image.invalid-width')}"
+								cssstyle="width:50px"
+							/> Pixel
+						</div>
+						<script>
+							try{
+								document.forms["image-coords"].width.select();
+							}
+							catch(e){}
+						</script>
+						
+						<b><tml:label key="scale-image.height"/>:</b><br>
+								
+						<tml:input name="height" type="number" default="1000"
+							validation="$P_VALUE"
+							message="{label('dialog.image.invalid-height')}"
+							cssstyle="width:50px"			
+						/> Pixel
+
+					</div>
+					<div class="form-element">
+						<div class="form-element-header">
+							<tml:label key="save-as"/>:
+						</div>
+
+						<b><tml:label key="filename"/>:</b>
+						<tml:input name="filename" cssstyle="width:100%" default="{_name}"/><br><br>
+							
+						<b><tml:label key="image-format"/>:</b><br>
+						<tml:input type="select" name="suffix" default="jpg" options="jpg|0,png|1" default="{_filesuffix == 'png' ? '1' : '0'}"/>
+								
+					</div>
+				</div>
+				
+				<script type="text/javascript">
+					Ext.onReady(function(){
+						var image = {
+							img				: Ext.get('selected_image'),
+							startWidth		: <tml:item name="imgWidth" format="0"/>,
+							startHeight		: <tml:item name="imgHeight" format="0"/>,
+							scalefactor		: 1,
+							ratio			: 1
+						};
+						
+						var imgcontainer = Ext.get('img_container');
+						
+						BI.resizableDialog.showButton(BI.resizableDialog.submitButton, "<tml:label key="scale-image"/>", function() {
+							WGA.ajax.action({
+							 	action: "<tml:action ref="scaleImage" ajax="true" portletmode="view"/>",
+							    graydiv: false,
+							  	id: "<tml:script>return portlet.portletkey</tml:script>"
+							});
+						});
+														
+						BI.resizableDialog.showButton(BI.resizableDialog.cancelButton, $L.cancel, function() {
+							WGA.ajax.action({
+							 	action: "<tml:action ref="keepFilename" ajax="true" portletmode="view"/>",
+							    graydiv: false,
+							  	id: "<tml:script>return portlet.portletkey</tml:script>"
+							});
+						});
+						
+						BI.resizableDialog.dialog.on("dialogscaled", function(){
+							var form = Ext.get('form');
+							if (form) {
+								form.setLeft(this.el.getWidth() - form.getWidth() - 20);
+							}
+							imgcontainer.show();
+						});
+						
+						var img = BI.resizableDialog.image(image, imgcontainer, {
+							width	:	Ext.get('form').getWidth() + 20,
+							height	:	Ext.get('form').getHeight()
+						});
+						img.init();
+					});
+				</script>
+			</tml:else>
+		</tml:if>
+	</tml:form>
+</div>

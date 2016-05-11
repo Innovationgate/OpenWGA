@@ -1,0 +1,138 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="forwardContent">
+	var contentkey=option("contentkey");
+	var structkey=option("structkey");
+	var dbkey=option("dbkey");
+	
+	if(!tmlform.validate())
+		return;
+	
+	var Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", database)
+	
+	try{
+		var mail=createMail();
+		if(mail==null){
+			tmlform.addMessage("Mail Server not configured for database " + meta("db", "dbkey"));
+			return;
+		}
+		mail.setMimeType("text/html");
+		mail.encodeText = true;
+		
+		var sender = Database.getUserEmail();
+		if(sender)
+			mail.setFrom(Database.getUserEmail(), WGA.Brand.name + " Content Manager");
+		
+		mail.to=tmlform.sendto;
+		mail.subject=tmlform.subject;
+		
+		var url = request.requestURL + "?dbkey=" + dbkey + "&contentkey=" + contentkey + "#"+dbkey+"/"+contentkey;
+		mail.body = encode("html", tmlform.comment);
+		mail.body += "<hr><a href='"+url+"'>"+label("dialog.forward-content.mail.click-here-to-open")+"</a>";
+		mail.send();
+		_actionDone = true;
+	}
+	catch(e){
+		tmlform.addMessage(e);
+		logException(e);
+	}
+
+</tml:action>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.dialog.dialog.hide();
+		</script>
+	</tml:then>
+	<tml:else>
+			
+		<tml:form id="forward-content-form" 
+					source="none" 
+					onsubmit="BI.dialog.submit()"
+					context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}">
+		
+			<div class="hidden"><button type="submit">submit</button></div>
+		
+			<script>
+				BI.dialog.submit=function(){
+					BI.util.callAction("<tml:action ref="forwardContent"/>", 
+							"<tml:script>return portlet.portletkey</tml:script>",
+							"{%label:dialog.forward-content.sending-content%}");
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+					BI.dialog.onShow();
+					BI.dialog.autoHeight();
+				});
+				BI.dialog.onShow=function(){
+					try{
+						document.forms["forward-content-form"].sendto.focus();
+					}
+					catch(e){}
+				}
+		
+			</script>
+										
+			<tml:case condition="tmlform.hasmessages()">
+				<h3><tml:formmessages divider="<br/>"/></h3>
+				<hr size="1">
+			</tml:case>		
+		
+		    <table width="100%" border="0" cellspacing="5">
+				<tr>
+		     		<td width="100">{%label:sendto%}:</td>
+		     		<td>
+		     			<tml:input name="sendto" meta="true" cssclass="textinput required"
+	     					validation="$E_VALUE!=''"
+	     					message="{label('dialog.forward-content.validation.sendto')}"
+		     			>
+		     				autocomplete="on"
+		     			</tml:input>
+		     		</td>
+		     	</tr>
+
+				<tr>
+		     		<td width="100">{%label:subject%}:</td>
+		     		<td>
+		     			<tml:input name="subject" meta="true" cssclass="textinput required"
+	     					validation="$E_VALUE!=''"
+	     					message="{label('dialog.forward-content.validation.subject')}"
+		     			/>
+		     		</td>
+		     	</tr>
+
+				<tr>
+		     		<td width="100">{%label:comment%}:</td>
+		     		<td>
+		     			<tml:input name="comment" type="textarea" cssclass="textinput"/>
+		     		</td>
+		     	</tr>
+		     	
+		   	</table>
+			   	
+		</tml:form>
+
+	</tml:else>
+</tml:if>

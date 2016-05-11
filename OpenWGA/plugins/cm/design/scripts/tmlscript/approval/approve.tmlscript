@@ -1,0 +1,84 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+try {
+	
+	var con = content();
+	log.info("Approving document " + con.getDocumentKey() + " with approval action from content manager");
+	
+	con.approve(tmlform.comment);
+	contentWasApproved = true;
+	
+	// check, if status is "published" and handle remote-documents in this case
+	if(con.getStatus()==con.STATUS_RELEASE){
+	
+		var afwKey = pluginDBKey("de.innovationgate.wga-app-framework");
+	
+		if (con.hasItem("remote_info")){									// get fresh items from remote document
+			var remote_info=con.getItemText("remote_info");
+			var sourcecontext=context(remote_info, false);
+			if(sourcecontext){
+				var sourcedoc=sourcecontext.content();
+				// copy all items from source document:
+				createObject(afwKey + "/content", con, con.database).copyRemoteData(sourcedoc);
+				log.info("copied items from " + remote_info);
+				
+				// add reference into remote document as master action:
+				callAction("cms:update-remote-reference", 
+						remote_info,
+						"db:"+con.getDatabase().getDbReference()+"/docid:"+con.getStructKey().toString()+"."+con.getLanguage().getName()+".0"
+					);				
+			}
+			else {
+				addwarning("denied to publish a document bc. remote document " + remote_info + " not found", false);
+				return tmlform.addmessage("Dokument kann nicht veröffentlich werden, weil das verbundene Dokument nicht gefunden wurde. \
+					Möglicherweise wurde es inzwischen gelöscht?\
+					Bitte löschen Sie die ungültige Verbindung.");
+			}
+		}
+		else{
+			// check, if published version has remote_info and remove this from remote document
+			if(published_content && published_content.hasItem("remote_info")){
+				// remove reference from remote document as master action:
+				callAction("cms:remove-remote-reference", 
+						published_content.getItemText("remote_info"),
+						"db:"+con.getDatabase().getDbReference()+"/docid:"+con.getStructKey().toString()+"."+con.getLanguage().getName()+".0"
+					);								
+			}
+		}
+		if (con.hasItem("remote_references"))
+			callAction("cms:update-remote-items", con);
+	
+	}
+		
+}
+catch (e) {
+	logException(e);
+	if (e.javaException) {
+		errorMsg = e.javaException.getClass().getName() + " - " + e.javaException.getMessage();
+	}
+	else {
+		errorMsg = e.message;
+	}
+}

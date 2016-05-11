@@ -1,0 +1,269 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_node = request.getParameter("node");
+	_dbkey=request.getParameter("dbkey");
+	//log.info("requested node: " + _node);
+</tml:script>
+
+[
+<tml:select>
+
+	<tml:case condition="_node=='contenttypes'">
+		<tml:script>
+			var database=db(_dbkey);
+			_nodes=createlist();
+			var it=database.getContentTypes().iterator();
+			while(it.hasNext())
+				_nodes.add(it.next());
+			sortList(_nodes);
+		</tml:script>
+		<tml:foreach type="itemvalue" item="_nodes" currentvalue="_node">
+			<tml:range context="{'db:'+_dbkey+'/$contenttype:'+_node.getName()}">
+				{
+					text: "<tml:meta name="name"/>",
+					id: "<tml:meta name="name"/>",
+					cls: "design-tree-node",
+	                icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="application_form.png"/>",
+					leaf: true
+				}
+				<tml:between>,</tml:between>
+			</tml:range>			
+		</tml:foreach>
+	</tml:case>
+
+	<tml:case condition="_node=='workflows'">
+		<tml:script>
+			var database=db(_dbkey);
+			var wfE = database.getWorkflowEngine();
+			_nodes = wfE.getWorkflowDefinitions().values();
+		</tml:script>
+		<tml:foreach type="itemvalue" item="_nodes" currentvalue="_node">
+			<tml:script>_wfname=_node.getName()</tml:script>			
+				{
+					text: "<tml:item name="_wfname"/>",
+					id: "<tml:item name="_wfname"/>",
+					cls: "design-tree-node",
+	                icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="sitemap.png"/>",
+					leaf: true
+				}
+			<tml:between>,</tml:between>
+		</tml:foreach>
+	</tml:case>
+
+
+	<tml:case condition="_node=='files'">
+		<tml:script>
+			var database=db(_dbkey);
+			_nodes=createlist();
+			var it=database.getFileContainers().iterator();
+			while(it.hasNext())
+				_nodes.add(it.next());
+			sortList(_nodes);
+		</tml:script>
+		<tml:foreach type="itemvalue" item="_nodes" currentvalue="_node">
+			<tml:range context="{'db:'+_dbkey+'/$filecontainer:'+_node.getName()}">
+				{
+					text: "<tml:meta name="name"/>",
+					id: "<tml:meta name="name"/>",
+					cls: "design-tree-node",
+	                icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="folder_image.png"/>",
+					leaf: true
+				}
+				<tml:between>,</tml:between>
+			</tml:range>
+		</tml:foreach>
+	</tml:case>
+
+	<tml:case condition="_node=='areas'">
+		<tml:script>
+			var database=db(_dbkey);
+			_nodes=createlist();
+			var it=database.getAreas().iterator();
+			while(it.hasNext()){
+				var area = it.next();
+				if(AFW.area(area).isTrashArea())
+					continue;
+				_nodes.add(area);
+			}
+			// sort areas:
+			sortList(_nodes, function(a,b){
+				if(a.name.charAt(0)=="$")
+					return 1;
+				else return a.name<b.name ? -1 : 1;
+			})
+		</tml:script>
+		<tml:foreach type="itemvalue" item="_nodes" currentvalue="_node">
+			<tml:script>
+				_name = _node.name;
+				_icon = "folder.png";
+				if(AFW.area(_node).isTemplateArea()){
+					_name = label("systemarea.templates");
+					_icon = "folder_page.png";
+				}
+				if(AFW.area(_node).isTrashArea()){
+					_name = label("systemarea.templates");
+					_icon = "folder_page.png";
+				}
+			</tml:script>
+			<tml:range context="{'db:'+_dbkey+'/$area:'+_node.getName()}">
+				{
+					text: "<tml:item name="_name"/>",
+					id: "<tml:meta name="name"/>",
+	                icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="{item:_icon}"/>",
+					leaf: true
+				}
+				<tml:between>,</tml:between>
+			</tml:range>
+		</tml:foreach>
+	</tml:case>
+
+	<tml:case condition="_node=='languages'">
+		<tml:script>
+			var database=db(_dbkey);
+			_nodes=createlist();
+			var it=database.getLanguages().values().iterator();
+			while(it.hasNext())
+				_nodes.add(it.next());
+			sortList(_nodes);
+		</tml:script>
+		<tml:foreach type="itemvalue" item="_nodes" currentvalue="_node">
+			<tml:range context="{'db:'+_dbkey+'/$language:'+_node.getName()}">
+				{
+					text: "<tml:meta name="title"/>",
+					id: "<tml:meta name="name"/>",
+	                icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="flag_orange.png"/>",
+					leaf: true
+				}
+				<tml:between>,</tml:between>
+			</tml:range>
+		</tml:foreach>
+	</tml:case>
+
+	<tml:case condition="_node=='tmls'">
+		<tml:script>
+			var database=db(_dbkey);
+			var root={
+				dirs: {},
+				files: []
+			};
+			var it=database.getTMLModules().iterator();
+			while(it.hasNext()){
+				var tml = it.next();
+				var medium = tml.getMediaKey();
+				var n = tml.getName();
+				var a = n.split(":");
+				var node=root;
+				
+				// handle medium as first dir:
+				if(!node.dirs[medium]){
+					node.dirs[medium]={dirs:{}, files:[]};		// create new dir
+				}
+				node = node.dirs[medium];
+				
+				for(var i=0; i<a.length-1; i++){
+					var dir = a[i];
+					if(!node.dirs[dir]){
+						node.dirs[dir]={dirs:{}, files:[]};		// create new dir
+					}
+					node = node.dirs[dir];
+				}
+				var tmlname=a[i];	// + ".tml";
+				node.files.push({name:tmlname,id:medium+":"+n, medium:medium});
+			}
+			var ret=outputDirs(root, "../../plugin-wga-app-framework/file/icons/monitor.png");
+			return ret;
+			
+			
+			function outputDirs(node, icon){
+				var ret = "";
+				for(d in node.dirs){
+					var dir = node.dirs[d];
+					if(ret!="")
+						ret += ",";
+					var ic = icon ? "icon:'"+icon+"'," : "icon:'../../plugin-wga-app-framework/file/icons/folder.png',";
+					ret += "{ text:'" + d + "',id:'"+d+"'," + ic + "cls:'design-tree-node', children:[" + outputDirs(dir) + "]}"
+					
+				}
+				for(d in node.files){
+					var file = node.files[d];
+					if(ret!="")
+						ret += ",";
+					ret += "{ text:'" + file.name + "', id:'" + file.id + "',cls:'design-tree-node',icon: '../../plugin-wga-app-framework/file/icons/page_white.png', leaf:true}"
+				}
+				return ret;
+			}
+		</tml:script>
+	</tml:case>
+
+
+	<tml:case condition="_node=='scripts'">
+		<tml:script>
+			var database=db(_dbkey);
+			var root={
+				dirs: {},
+				files: []
+			};
+			var it=database.getCSSJSModules().iterator();
+			while(it.hasNext()){
+				var module = it.next();
+				var type = module.getCodeType();
+				var n = module.getName();
+				var node=root;
+				
+				// handle type as first dir:
+				if(!node.dirs[type]){
+					node.dirs[type]={dirs:{}, files:[]};		// create new dir
+				}
+				node = node.dirs[type];				
+				node.files.push({name:n,id:type+":"+n});
+			}
+			var ret=outputDirs(root);
+			return ret;
+			
+			
+			function outputDirs(node, icon){
+				var ret = "";
+				for(d in node.dirs){
+					var dir = node.dirs[d];
+					if(ret!="")
+						ret += ",";
+					var ic = icon ? "icon:'"+icon+"'," : "icon:'../../plugin-wga-app-framework/file/icons/folder.png',";
+					ret += "{ text:'" + d + "',id:'"+d+"'," + ic + "cls:'design-tree-node', children:[" + outputDirs(dir) + "]}"
+					
+				}
+				for(d in node.files){
+					var file = node.files[d];
+					if(ret!="")
+						ret += ",";
+					ret += "{ text:'" + file.name + "', id:'" + file.id + "',cls:'design-tree-node',icon: '../../plugin-wga-app-framework/file/icons/page_white.png', leaf:true}"
+				}
+				return ret;
+			}
+		</tml:script>
+	</tml:case>
+
+</tml:select>
+]

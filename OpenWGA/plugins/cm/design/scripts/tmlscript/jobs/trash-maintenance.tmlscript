@@ -1,0 +1,34 @@
+var MAX_AGE = 5;	// 5 Days
+
+var log=jobContext.getLog();
+
+var dbkeys = jobContext.getOption("dbkeys");
+
+log.info("Trash maintenance started for dbs " + dbkeys)
+
+var now = createdate().time;
+
+var dbs = createList(dbkeys, ",").iterator();
+while(dbs.hasNext()){
+	var dbkey = dbs.next()
+	var database = db(dbkey);
+	if(!database)
+		continue;
+	log.info("check db " + dbkey);
+	var ta = database.getArea("$trash");
+	if(!ta)
+		continue;
+	var entries = ta.getRootEntries().iterator();
+	
+	while(entries.hasNext()){
+		var entry = entries.next();
+		var date = entry.getLastModified().time
+		var age = (now-date) / (1000 * 60 * 60 *24);		// days
+		//var age = (now-date) / (1000 * 60);					// minutes
+		if(age > MAX_AGE){
+			var deletedBy = entry.getExtensionData("deletedBy");
+			log.info("removing trash entry '" + entry.getTitle() + "' deleted by " + deletedBy + " with age " + parseInt(age) + " days");
+			entry.remove();
+		}
+	}
+}

@@ -1,0 +1,309 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+var table_toolbar_edit=new Ext.Toolbar.Button({
+
+	text: "<tml:label key="rtf.edit"/>",
+	cls: "x-btn-text-icon",
+	icon: "../../plugin-wga-app-framework/file/icons/table_gear.png",
+
+	menu: {
+		items: [
+			{
+				text: "<tml:label key="rtf.table.delete"/>",
+				cls: "x-btn-text-icon",
+				icon: "../../plugin-wga-app-framework/file/icons/table_delete.png",
+				handler: function(){
+					BI.rtftoolbar.restoreEditorSelection();
+					var el = editor.getNearestTagFromSelection("table");
+					if(el)
+						el.parentNode.removeChild(el);
+				}
+			},
+			"-",
+			{
+				text: "<tml:label key="rtf.table.row.insert-after"/>",
+				cls: "x-btn-text-icon",
+				icon: "../../plugin-wga-app-framework/file/icons/table_row_insert.png",
+				cmd: "InsertTableRow",
+				handler: doCommand
+			},
+			{
+				text: "<tml:label key="rtf.table.row.delete"/>",
+				cls: "x-btn-text-icon",
+				icon: "../../plugin-wga-app-framework/file/icons/table_row_delete.png",
+				cmd: "DeleteTableRow",
+				handler: doCommand
+			},
+			"-",
+			{
+				text: "<tml:label key="rtf.table.column.insert-after"/>",
+				cmd: "InsertTableCol",
+				handler: doCommand
+			},
+			{
+				text: "<tml:label key="rtf.table.column.delete"/>",
+				cmd: "DeleteTableCol",
+				handler: doCommand
+			},
+			"-",
+			{
+				text: "<tml:label key="rtf.table.cell.merge"/>",
+				cmd: "MergeTableCells",
+				handler: doCommand,
+				queryCommandEnabled: editor.mayMergeTableCells					
+			},
+			{
+				text: "<tml:label key="rtf.table.cell.split"/>",
+				cmd: "SplitTableCell",
+				handler: doCommand,
+				queryCommandEnabled: editor.maySplitTableCell					
+			}
+			
+		]
+	}
+})
+var tableMenu = new BI.rtf.TableMenu({
+	shadow: false,
+	handler: function() {
+		BI.rtftoolbar.restoreEditorSelection();
+		editor.createTable(this.tableRows, this.tableCols, '100%', '');
+	}
+});
+tableMenu.on('show', function(){
+	BI.rtftoolbar.saveEditorSelection();
+	BI.sitepanel.mask();				
+});
+tableMenu.on('hide', function(){
+	BI.sitepanel.unmask();	
+});
+var table_toolbar = new Ext.Toolbar("rtf-toolbar-table", [
+	{
+		cmd: "InsertTable",
+		cls: "x-btn-text-icon",
+		text: "<tml:label key="new"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/table_add.png",
+		tooltip: "<tml:label key="rtf.table.insert"/>",
+		menu: tableMenu
+	}
+	,table_toolbar_edit
+
+	,"->"
+	,{
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.table.append_paragraph"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/text_padding_bottom.png",
+		cmd: "section.appendParagraph",
+		queryCommandEnabled: function(){
+			return !WGA.isIE && editor.getNearestTagFromSelection("table")!=null
+		},
+		handler: function(){
+			var el = editor.getNearestTagFromSelection("table");
+			if(el){
+				var p = editor.doc.createElement("p");
+				p.appendChild(editor.doc.createElement("br"));
+				if(el.nextSibling)
+					el.parentNode.insertBefore(p, el.nextSibling);
+				else el.parentNode.appendChild(p);
+				editor.selection.selectNodeContents(p);
+			}
+			BI.rtftoolbar.update();
+		}
+	}
+	,{
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.table.insert_paragraph"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/text_padding_top.png",
+		cmd: "section.insertParagraph",
+		queryCommandEnabled: function(){
+			return !WGA.isIE && editor.getNearestTagFromSelection("table")!=null
+		},
+		handler: function(){
+			var el = editor.getNearestTagFromSelection("table");
+			if(el){
+				var p = editor.doc.createElement("p");
+				p.appendChild(editor.doc.createElement("br"));
+				el.parentNode.insertBefore(p, el);
+				editor.selection.selectNodeContents(p);
+			}
+			BI.rtftoolbar.update();
+		}
+	}
+
+]);
+
+function tableStyleHandler(menu, ev){
+	BI.rtftoolbar.restoreEditorSelection();
+	var els = editor.getNearestTagsFromSelection(menu.el_type);
+	for(var i=0; i<els.length; i++)
+		els[i].className=menu.el_style;
+	BI.rtftoolbar.update();
+}
+
+var menu = new Ext.menu.Menu()
+menu.add(new Ext.menu.CheckItem({
+	text: "<tml:label key="rtf.format.none"/>",
+	group: 'tableformats',
+	el_type: "table",
+	el_style: "",
+	handler: tableStyleHandler
+}))
+for(var i=0; i<BI.rtftoolbar.tableStyleList.length; i++){
+	var style = BI.rtftoolbar.tableStyleList[i].split("|");
+	menu.add(new Ext.menu.CheckItem({
+		text: style[0],
+		group: 'tableformats',
+		el_type: "table",
+		el_style: style[1],
+		handler: tableStyleHandler
+	}))
+}
+var tableStyleMenu = menu;
+var tableStyleButton = new Ext.Button("rtf-toolbar-table-tableStyles-button", {
+	text: "<tml:label key="rtf.no-styles-defined"/>",
+	menu: menu
+})
+
+var menu = new Ext.menu.Menu()
+menu.add(new Ext.menu.CheckItem({
+	text: "<tml:label key="rtf.format.none"/>",
+	group: 'trformats',
+	el_type: "tr",
+	el_style: "",
+	handler: tableStyleHandler
+}))
+for(var i=0; i<BI.rtftoolbar.trStyleList.length; i++){
+	var style = BI.rtftoolbar.trStyleList[i].split("|");
+	menu.add(new Ext.menu.CheckItem({
+		text: style[0],
+		group: 'trformats',
+		el_type: "tr",
+		el_style: style[1],
+		handler: tableStyleHandler
+	}))
+}
+var trStyleMenu = menu;
+var trStyleButton = new Ext.Button("rtf-toolbar-table-trStyles-button", {
+	text: "<tml:label key="rtf.no-styles-defined"/>",
+	menu: menu
+})
+
+var menu = new Ext.menu.Menu()
+menu.add(new Ext.menu.CheckItem({
+	text: "<tml:label key="rtf.format.none"/>",
+	group: 'tdformats',
+	el_type: "td",
+	el_style: "",
+	handler: tableStyleHandler
+}))
+for(var i=0; i<BI.rtftoolbar.tdStyleList.length; i++){
+	var style = BI.rtftoolbar.tdStyleList[i].split("|");
+	menu.add(new Ext.menu.CheckItem({
+		text: style[0],
+		group: 'tdformats',
+		el_type: "td",
+		el_style: style[1],
+		handler: tableStyleHandler
+	}))
+}
+var tdStyleMenu = menu;
+var tdStyleButton = new Ext.Button("rtf-toolbar-table-tdStyles-button", {
+	text: "<tml:label key="rtf.no-styles-defined"/>",
+	menu: menu
+})
+
+addUpdateListener(function(){
+	// check for being in a table
+	var ttag = editor.getNearestTagFromSelection("table");
+	if(ttag){
+		Ext.get("rtf-table-form").unmask();
+		table_toolbar_edit.enable();
+		updateMenu(table_toolbar_edit.menu);
+	}
+	else {
+		Ext.get("rtf-table-form").mask();
+		table_toolbar_edit.disable();
+		table_toolbar_edit.menu.hide();
+	}
+	
+	if(BI.rtftoolbar.tableStyleList.length>0){
+		var ttag = editor.getNearestTagFromSelection("table");
+		tableStyleMenu.items.each(function(item){
+			if(ttag){		
+				if(item.el_style==ttag.className){
+					tableStyleButton.setText(item.text);
+				}
+				item.setChecked(item.el_style==ttag.className)
+				tableStyleButton.enable();
+			}
+			else {
+				item.setChecked(false);
+				tableStyleButton.setText("<tml:label key="rtf.format.none"/>");
+				tableStyleButton.disable();
+			}
+		})
+	}
+	else tableStyleButton.disable();
+
+	if(BI.rtftoolbar.trStyleList.length>0){
+		var ttag = editor.getNearestTagFromSelection("tr");
+		trStyleMenu.items.each(function(item){
+			if(ttag){		
+				if(item.el_style==ttag.className){
+					trStyleButton.setText(item.text);
+				}
+				item.setChecked(item.el_style==ttag.className)
+				trStyleButton.enable();
+			}
+			else {
+				item.setChecked(false);
+				trStyleButton.setText("<tml:label key="rtf.format.none"/>");
+				trStyleButton.disable();
+			}
+		})
+	}	
+	else trStyleButton.disable();
+	
+	if(BI.rtftoolbar.tdStyleList.length>0){
+		var ttag = editor.getNearestTagFromSelection("td");
+		tdStyleMenu.items.each(function(item){
+			if(ttag){		
+				if(item.el_style==ttag.className){
+					tdStyleButton.setText(item.text);
+				}
+				item.setChecked(item.el_style==ttag.className)
+				tdStyleButton.enable();
+			}
+			else {
+				item.setChecked(false);
+				tdStyleButton.setText("<tml:label key="rtf.format.none"/>");
+				tdStyleButton.disable();
+			}
+		})
+	}	
+	else tdStyleButton.disable();
+
+	updateButtons(table_toolbar)	
+})
+

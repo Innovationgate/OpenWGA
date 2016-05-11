@@ -1,0 +1,171 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<div id="link-attachmentview-container">
+	<div id="link-attachmentview-toolbar"></div>
+	<div id="link-attachmentview" class="ychooser-view">
+		<tml:img doc="images" file="loading.gif"/> loading ...
+	</div>
+</div>
+
+<tml:script>
+	var wgakey = option("wgakey");
+	if(wgakey){
+		wgakey = wgakey.split("/");
+		if (wgakey.length == 2) {
+			_container = wgakey[0];
+			_filename = wgakey[1];
+		}
+	}
+</tml:script>
+
+<tml:input type="hidden" name="container" default="{_container}"/>
+<tml:input type="hidden" name="filename" default="{_filename}"/>
+
+<script>
+	
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function() {
+		try {
+			
+			var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+			
+			function selectFile(url, filename){
+				form.filename.value=filename||"";
+				BI.LinkDialog.selectLink(url, filename, form.container.value + "/" + filename);
+			}
+			
+			var dsFileContainer = new Ext.data.Store({
+			    proxy: new Ext.data.HttpProxy({
+			        url: '<tml:url type="tml" medium="html" layout="json:get-filecontainers"/>' 		        
+		        }),    
+		        baseParams: { dbkey: '<tml:option name="dbkey"/>' },
+		        reader: new Ext.data.JsonReader({
+			        id: 'id',
+		            root: 'data'                
+		        },
+		        [
+			        { name: 'id'   }, 
+			        { name: 'name' }	            
+		        ])
+			});
+
+	    	var combo = new Ext.form.ComboBox({
+			    store: dsFileContainer,
+			    displayField:'name',
+			    valueField: 'id',
+			    editable: false,
+			    mode: 'remote',
+			    triggerAction: 'all',
+			    emptyText:'{%label:dialog.image.select-container%}',
+			    selectOnFocus:true
+			});
+						
+			combo.on('select', function(cb, r, idx) {
+				form.container.value = r.id;
+				selectFile();
+				loadAttachments();
+			});
+			
+			var tb = new Ext.Toolbar('link-attachmentview-toolbar');	
+			tb.add("->", combo);
+
+
+			// define the grid containing attachments
+			
+			var datastore = new Ext.data.Store({
+			    proxy: new Ext.data.HttpProxy({
+			        url: '<tml:url type="tml" medium="html" layout="json:get-attachments"/>'	        
+		        }),    
+		        reader: new Ext.data.JsonReader({
+			        id: 'id',
+		            root: 'data'                
+		        },
+		        [
+			        { name: 'id'   }, 
+			        { name: 'name' },
+		            { name: 'url'  },		            
+		            { name: 'size' }
+		        ])
+			});
+			// init selections:
+			datastore.on('load', function() {
+	        	BI.LinkDialog.selectLink();
+	        	var node = datastore.getById(form.filename.value);
+				if (node) {
+					grid.getSelectionModel().selectRecords([node], false);
+					selectFile(node.data.url, node.data.id);
+				}
+	        });
+			
+			function loadAttachments() {
+				datastore.load({
+				  	params:{
+						type: 'file',
+						key: form.container.value,
+						dbkey: '<tml:option name="dbkey"/>'
+					}
+				});	
+			}								
+						
+	        var cm = new Ext.grid.ColumnModel([
+				{id:'name', header:'{%label:dialog.image.col-filename%}', sortable:true, dataIndex:'name' },
+				{id:'size', header:'{%label:dialog.image.col-filesize%}', sortable:true, align:"right", renderer: BI.util.renderFileSize, dataIndex:'size' }
+			]);
+	
+			// do not allow multiple selection of grid rows
+			var singleSelectionModel = new Ext.grid.RowSelectionModel({singleSelect: true});
+	        // create the Grid
+	        var grid = new Ext.grid.Grid('link-attachmentview', {
+	            ds: datastore,
+	            cm: cm,
+	            selModel: singleSelectionModel,
+	            autoExpandColumn: 'name',
+	            loadMask: (Ext.ieIE == false)  // no loading mask in ie due to known ext-bug
+	        });
+	         
+	        grid.on('rowclick', function(g, idx, e) {
+	        	var data = datastore.getAt(idx).data;
+	        	selectFile(data.url, data.id);
+	        });
+	        
+	        grid.on('rowdblclick', function(g, idx, e) {
+	        	BI.dialog.submit();
+	        });
+	        
+	        grid.render();   
+
+			// init container selection:			
+			if (form.container.value) {
+				combo.setValue(form.container.value);
+				loadAttachments();
+			}
+				
+	        
+		}
+		catch(ex) {
+			alert(ex.message);
+		}
+	});
+	
+</script>

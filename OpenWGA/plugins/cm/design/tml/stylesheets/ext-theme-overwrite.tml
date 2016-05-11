@@ -1,0 +1,77 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+/*
+ * Ext 1.1 Themes:
+ */
+ 
+ .x-form-grow-sizer {
+	/*font:normal 12px arial, helvetica, sans-serif;*/
+    left: -10000px;
+	padding: 0px 0px;
+    position: absolute;
+	top: -10000px;
+	visibility: hidden;
+	white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+}
+
+.x-toolbar{		/* overwrites default "gray" x-toolbar to "blue" */
+	border:0 none;
+	background: #E2ECF8;
+	padding:3px 2px 1px 2px;
+	border-bottom:1px solid #c0d7f4;
+}
+
+.x-grid {
+	border: solid gray 1px;
+}
+
+.ytheme-vista .contentinfo, .ytheme-aero .contentinfo{
+	overflow:none;
+	padding:5px;
+	background: transparent;
+}
+
+.x-btn-text-icon .x-btn-center .x-btn-text{
+	line-height: 11px;
+}
+
+.ytheme-vista .light-panel-bg{
+    background: url(<tml:url db="{pluginDbKey('de.innovationgate.wga-app-framework')}" type="file" doc="ext" file="ext-1.1.1/resources/images/vista/layout/panel-title-light-bg.gif"/>);
+}
+
+.ytheme-gray .light-panel-bg{
+    background: url(<tml:url db="{pluginDbKey('de.innovationgate.wga-app-framework')}" type="file" doc="ext" file="ext-1.1.1/resources/images/gray/layout/panel-title-light-bg.gif"/>);
+}
+.ytheme-aero .light-panel-bg{
+    background: url(<tml:url db="{pluginDbKey('de.innovationgate.wga-app-framework')}" type="file" doc="ext" file="ext-1.1.1/resources/images/aero/layout/panel-title-light-bg.gif"/>);
+}
+.ytheme-default .light-panel-bg{
+    background: url(<tml:url db="{pluginDbKey('de.innovationgate.wga-app-framework')}" type="file" doc="ext" file="ext-1.1.1/resources/images/default/layout/panel-title-light-bg.gif"/>);
+}

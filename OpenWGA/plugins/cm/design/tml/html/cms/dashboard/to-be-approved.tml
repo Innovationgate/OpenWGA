@@ -1,0 +1,77 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<h2><tml:label key="dashboard.to-be-approved-by-me"/>:</h2>
+
+<tml:script>
+	_workflows=WGA.createList();
+	var username = meta("database", "username");
+	var wfE = db().getWorkflowEngine();
+	var workflows = wfE.getWorkflowDefinitions().values().iterator()
+	while(workflows.hasNext()){
+		var wf = workflows.next();
+		var levels = wf.getLevels().iterator();
+		while(levels.hasNext()){
+			var level = levels.next();
+			if(level.reviewers.contains(username)){
+				_workflows.add({
+					name: wf.name,
+					level: level.name
+				})
+			}
+		}
+	}
+</tml:script>
+
+<tml:if condition="_workflows.size()">
+	<tml:then>
+		<tml:collection id="to-be-approved">
+			<tml:query type="hql" onlypublished="false" alllanguages="true">
+				content.status='g'
+				<tml:foreach item="_workflows" currentvalue="_workflow" appendvar="_query">
+					(content.items['wfname'].text = '<tml:script expression="_workflow.name"/>'
+					and content.items['wflevelnr'].text = '<tml:script expression="_workflow.level"/>')
+				</tml:foreach>
+				and (<tml:item name="_query" divider=" or " encode="none"/>)
+			</tml:query>
+			<ul>
+			<tml:foreach filter="!content().getWorkflow().isAlreadyApprovedByUser()">
+				<tml:include ref="::entry">
+					<p><tml:label key="dashboard.author"/>: <b><tml:metadata name="author"/></b></p>
+					<tml:case isfilled="ersetzungsgrund">
+						<p><tml:label key="dashboard.ersetzungsgrund"/>: <tml:item name="ersetzungsgrund"/></p>
+					</tml:case>
+				</tml:include>
+			</tml:foreach>
+			</ul>
+		</tml:collection>
+		<tml:case condition="taginfo('to-be-approved', 'count')==0">
+			<p class="no-docs"><tml:label key="dashboard.no-docs-found"/>.</p>
+		</tml:case>
+	</tml:then>
+	<tml:else>
+		<p class="no-docs"><tml:label key="dashboard.you-are-no-approver"/></p>
+	</tml:else>
+</tml:if>

@@ -1,0 +1,539 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="addKeyword">
+	var list = tmlform.fieldlist("keywords");
+	list.add(tmlform.new_keyword);
+	tmlform.keywords=list;
+	tmlform.new_keyword=null;	
+</tml:action>
+
+<tml:action id="saveMeta">
+	//log.info("saveaction: " + option('contentkey') + "/" + (option('contentkey')==''))
+	if(!tmlform.validate())
+		return;
+		
+	var mode_content = tmlparam1;
+		
+	try{
+		if(option('contentkey')!='undefined' && option('contentkey')!=''){
+			if(mode_content=="edit"){
+				content().getDatabase().getSessionContext().setClient( Packages.de.innovationgate.wgpublisher.WGACore.getBIClientString() );
+				// check for title conflicts
+				var TPM = createObject("cms:titlePathManager");
+				TPM.checkAndHandleTitlePathException(tmlform.title);
+				
+				// keywords:
+				var input = tmlform.keywords_input.replace(/\r\n/g, ",").split(/\s*,\s*/)
+				content().setKeywords(input);
+
+				tmlform.storeInContent(content())
+			}			
+		}
+
+		_actionDone=true;
+	}
+	catch(e){
+		tmlform.addMessage(e.message);
+		logException(e);
+	}
+</tml:action>
+
+<tml:script>
+	_dbkey=option("dbkey");
+	_structkey=option("structkey");
+	_contentkey=option("contentkey");
+	
+	var database = db(option("dbkey"));
+	
+	_Database=createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/database", database);
+
+	_UniqueNamesOnContents = (database.getAttribute("UniqueNamesOnContents")=='true' || database.getContentStoreVersion()<5);
+	
+	_ReadersOnContents = (database.getAttribute("ReadersOnContents")=='true' || database.getContentStoreVersion()<5 || !database.isPageReadersEnabled());
+
+</tml:script>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			//BI.se.reload();
+			BI.se.reloadParent(BI.structkey);
+			if(BI.contentkey)
+				BI.selectContent(BI.contentkey, BI.structkey);
+			else BI.selectContent(BI.structkey);
+		</script>
+	</tml:then>
+
+	<tml:else>
+		
+		<tml:if condition="_contentkey" context="[db:{_dbkey}/docid:{_contentkey}]" iscontextvalid="true">
+			<tml:then>
+				<tml:form id="edit-content-meta-form" 
+							cssstyle="display:inline"
+							cssclass="entryform"
+							source="content"
+							context="{'db:'+_dbkey + ((_contentkey!='undefined'&&_contentkey!='') ? '/docid:'+_contentkey : '/$_struct:'+_structkey)}">
+						
+					<div id="content-properties-main">
+						<div class="x-layout-inactive-content">
+						
+							<div id="basic-panel" style="padding:10px;overflow:auto">
+								<tml:case condition="tmlform.hasmessages()">
+									<h1>{%label:properties.could-not-save%}</h1>
+									<tml:formmessages divider="<br/>"/>
+									<hr size="1">
+								</tml:case>		
+								
+								<table width="100%" border="0" cellspacing="5">
+									<tml:case condition="_contentkey!='undefined' && _contentkey!=''">
+										<tml:script>
+											_Content=createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/content");
+											_mode_content = _mode = (!_Content.isInTrashArea() && _Content.getDatabase().isChiefEditor()) || (_Content.mayEditContent() && _Content.isDraft() && _Content.isMine()) ? "edit":"view";
+										</tml:script>
+										
+										<tr class="collection-title"><td colspan="2"><h1>{%label:properties.title.content-properties%}</h1></td></tr>
+										</tr>
+										<tr>
+											<td>{%label:key%}:</td>
+											<td><tml:meta name="key"/></td>
+										</tr>
+										<tr>
+											<td>{%label:version%}:</td>
+											<td><tml:meta name="version"/></td>
+										</tr>
+										<tr>
+											<td>{%label:status%}:</td>
+											<td><tml:label key="{'status.'+(content().isPendingRelease()?'pending':STATUS)}"/></td>
+										</tr>
+										<tr>
+											<td>{%label:language%}:</td>
+											<td><tml:meta name="languagetitle"/></td>
+										</tr>
+										
+										<tr>
+											<td valign="top">{%label:author%}:</td>
+											<td>
+												<tml:meta name="author"/>
+												<tml:case condition="EMAIL!=null && EMAIL!=''">
+													(<a href="mailto:<tml:meta name="email"/>"><tml:meta name="email"/></a>)
+												</tml:case>
+											</td>
+										</tr>
+										<tr>
+											<td width="120">{%label:properties.content-title%}:</td>
+											<td><tml:input name="title" meta="true"
+												mode="{_mode}" 
+												validation="$E_VALUE!=''"
+												message="{label('properties.content-title.validation')}"
+												cssclass="textinput required"/>
+											</td>
+										</tr>
+										<tml:case condition="db().getContentStoreVersion()>=5">
+											<tr>
+												<td width="120"><tml:label key="properties.browser-title"/>:</td>
+												<td><tml:input name="browsertitle" meta="true" mode="{_mode}" cssclass="textinput"/></td>
+											</tr>
+										</tml:case>
+										
+										<tml:case condition="_UniqueNamesOnContents || NAME">
+											<tr>
+												<td>{%label:properties.unique-name%}:</td>
+												<td>
+													<tml:script>
+														_uname_edit_mode = _mode
+														if(_mode=="edit" && !_Database.isManager())
+															_uname_edit_mode="view"	// uinque names may only changed by managers.
+													</tml:script>
+													<tml:input mode="{_uname_edit_mode}" name="uniquename" meta="true" cssclass="textinput"/>
+												</td>
+											</tr>
+										</tml:case>
+										<tr>
+											<td>{%label:description%}:</td>
+											<td><tml:input mode="{_mode}" name="description" meta="true" type="textarea" cssclass="textinput"/></td>
+										</tr>
+										<tr id="v-link-settings">
+											<td>{%label:properties.link%}:</td>
+											<td>
+												<span id="virtuallinkinfo">
+													<tml:case condition="VIRTUALLINK!=null && VIRTUALLINK!=''">
+														<tml:label key="[linktype.{meta('virtuallinktype')}]"/>
+														- <tml:meta name="virtuallink"/>
+														<tml:case condition="virtuallinktitle!=null && virtuallinktitle!=''">
+															(<b><tml:item name="virtuallinktitle"/></b>)<br>
+														</tml:case>
+													</tml:case>
+												</span>
+												<tml:case condition="_mode=='edit'">
+													
+													<button onclick="BI.struct.chooseVLink(this);return false">{%label:select%}</button>
+													<button onclick="BI.struct.deleteVLink(this);return false">{%label:delete%}</button>
+													<tml:input name="virtuallink" meta="true" type="hidden"/>
+													<tml:input name="virtuallinktitle" type="hidden"/>
+													<tml:input name="virtuallinktype" meta="true" type="hidden"/>
+													<tml:label key="content-panel.target"/>: <tml:input name="linktarget" meta="true" type="text"/>
+													(<tml:label key="content-panel.drop-link"/>)
+				
+													<script>
+														// define drop target for linls:
+														var droptarget=new Ext.dd.DropTarget("v-link-settings", {group:'se.tree-entry'});
+														droptarget.notifyDrop=function(dd, e, data){
+															var linktext = data.title;
+															var form = document.forms["edit-content-meta-form"];
+															form.virtuallink.value=data.key;
+															form.virtuallinktype.value="int";
+															form.virtuallinktitle.value=linktext;
+															document.getElementById("virtuallinkinfo").innerHTML=$L.linktype[form.virtuallinktype.value] + " - " + form.virtuallink.value+" (<b>"+linktext+"</b>)<br>";
+															Ext.get("v-link-settings").setStyle("background", "");
+															return true;
+													   	}
+													   	droptarget.notifyOver=function(dd, e, data){
+													   		Ext.get("v-link-settings").setStyle("background", "yellow");
+													   		return droptarget.dropAllowed;
+													   	}
+													   	droptarget.notifyOut=function(dd, e, data){
+													   		Ext.get("v-link-settings").setStyle("background", "");
+													   	}
+													   	
+													</script>
+												</tml:case>
+											</td>
+										</tr>
+										<tr>
+											<td>{%label:keywords%}:</td>
+											<td>
+												<tml:input mode="{_mode}" name="keywords_input" store="false" type="textarea" cssclass="textinput" default="{metalist('KEYWORDS')}"/>
+											</td>
+										</tr>
+										<tr>
+											<td width="120">{%label:valid-from%}:</td>							
+											<td>
+												<tml:input mode="{_mode}" name="validfrom" cssclass="datefield" type="date" meta="true" format="{label('format.date.short-with-time')}"/>
+											</td>
+										</tr>
+										<tr>
+											<td width="120">{%label:valid-to%}:</td>
+											<td>
+												<tml:input mode="{_mode}" name="validto" cssclass="datefield" type="date" meta="true" format="{label('format.date.short-with-time')}"/>
+											</td>
+										</tr>
+										<tr>
+											<td>{%label:properties.hide-content-when%}:</td>
+											<td><tml:input mode="{_mode}" name="ishiddenfrom" type="checkbox" meta="true" divider=" " options="{label('properties.navigation-options')}"/></td>
+										</tr>
+										
+										<tml:case condition="_ReadersOnContents || READERS">
+											<tr>
+												<td>
+													<tml:if condition="_mode=='edit' && _Database.isUserQueryable()">
+														<tml:then>
+															<a href="#" title="{%label:properties.button.ldap-lookup%}" 
+																	onclick="BI.dialog.show('ldap-lookup', this, {fieldid:'readers', textareadivid:'content-properties-main'})">
+																{%label:readers%}</a>:
+														</tml:then>
+														<tml:else>
+															{%label:readers%}:
+														</tml:else>	
+													</tml:if>					
+												</td>
+												<td>
+													<tml:input mode="{_mode}" name="readers" meta="true" multiple="true" type="textarea" cssclass="textinput">id="readers"</tml:input>
+												</td>
+											</tr>
+										</tml:case>
+										
+										<tml:case condition="db().getContentStoreVersion()>=5">
+											<tr>
+												<td>
+													<tml:if condition="_mode=='edit' && _Database.isUserQueryable()">
+														<tml:then>
+															<a href="#" title="{%label:properties.button.ldap-lookup%}" 
+																	onclick="BI.dialog.show('ldap-lookup', this, {fieldid:'coauthors', textareadivid:'content-properties-main'})">
+																<tml:label key="coauthors"/></a>:
+														</tml:then>
+														<tml:else>
+															<tml:label key="coauthors"/>:
+														</tml:else>	
+													</tml:if>					
+												</td>
+												<td>
+													<tml:input mode="{_mode}" name="coauthors" meta="true" multiple="true" type="textarea" cssclass="textinput">id="coauthors"</tml:input>
+												</td>
+											</tr>
+											<tr>
+												<td>
+													<tml:if condition="_mode=='edit' && _Database.isUserQueryable()">
+														<tml:then>
+															<a href="#" title="{%label:properties.button.ldap-lookup%}" 
+																	onclick="BI.dialog.show('ldap-lookup', this, {fieldid:'readers', textareadivid:'content-properties-main'})">
+																<tml:label key="owner"/></a>:
+														</tml:then>
+														<tml:else>
+															<tml:label key="owner"/>:
+														</tml:else>	
+													</tml:if>					
+												</td>
+												<td>
+													<tml:input mode="{_mode}" name="owner" meta="true" type="text" cssclass="textinput">id="readers"</tml:input>
+												</td>
+											</tr>
+										</tml:case>
+									</tml:case>
+								
+								</table>
+								<hr size="1">
+								<button type="button" onclick="BI.dialog.show('page-settings', this)"><tml:label key="dialog.page-settings.title"/></button>
+								<br><br>
+							</div>
+						
+							<tml:case condition="_contentkey!='undefined' && _contentkey!=''">
+								<div id="attachments-panel" style="padding:10px;overflow:auto;border:solid silver 1px"></div>
+							
+								<div id="items-panel" style="padding:10px;overflow:auto">
+									<tml:include ref="::mod-items"/>
+								</div>
+						
+								<div id="history-panel" style="padding:10px;overflow:auto">
+							
+									<b>{%label:properties.workflow-history%}:</b><br>				
+									<tml:meta name="wfhistory" divider="<hr size='1'>"/>
+									<hr size="1">
+									
+									<b>{%label:properties.change-history%}:</b>
+									<tml:script>
+										_authors=content().getPastAuthors();
+										_dates=content().getPastEditDates();
+										_count=_authors.size();
+										if(_count>10)
+											_count=10;
+									</tml:script>
+									
+									<table width="100%" class="collection">
+										<tr class="collection-title">
+											<td>{%label:revision%}</td>
+											<td>{%label:author%}</td>
+											<td>{%label:date%}</td>
+										</tr>
+										<tml:foreach type="loop" count="{_count}" currentvalue="i">
+											<tr>
+												<td valign="top">
+													<tml:script>
+														var index = parseInt(i);
+														if(_authors.size() - index >= 0 ) {
+															return (_authors.size() - index) + 1;
+														}
+													</tml:script>			
+												</td>
+												<td>
+													<tml:script>
+														var index = parseInt(i);
+														if( _authors.size() - index >= 0 ){
+															return _authors.get( _authors.size() - index);
+														}
+													</tml:script>
+												</td>	
+												<td nowrap valign="top">	
+													<tml:script>
+														var index = parseInt(i);
+														if( _dates.size() - index >= 0 ){
+															return _dates.get(_dates.size() - index);
+														}
+													</tml:script>		
+												</td>
+											</tr>
+										</tml:foreach>
+									</table>
+								</div>
+							</tml:case>
+					
+						</div>
+					
+					</div>
+		
+		
+					<script>
+						BI.propertiespanel.enableToolbarButtons(<tml:script expression="_mode=='edit'"/>)
+						// submit function called from dialog handler and on RETURN
+						BI.propertiespanel.submit=function(){
+							if(BI.propertiespanel.grid){
+								BI.propertiespanel.grid.destroy();
+								BI.propertiespanel.grid=null;
+								//console.log("grid destroyed");
+							}
+							WGA.ajax.callAction("<tml:action ref="saveMeta" param1="{_mode_content}" param2="{_mode_struct}"/>", 
+								"<tml:script>return portlet.portletkey</tml:script>");
+						}		
+					</script>
+					
+				</tml:form>
+
+				<script>
+				
+					window.$ajaxInfo_<tml:script>return portlet.portletkey</tml:script>=$ajaxInfo_<tml:script>return portlet.portletkey</tml:script>;
+				
+					// create attachment grid
+					<tml:case context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}" iscontextvalid="true">
+						<tml:script>	
+							_mode = _Content.mayEditContent() && (_Content.isDraft() || _Content.getDatabase().isChiefEditor()) ? "edit":"view";
+						</tml:script>
+						var attachmentgrid = function(){
+							
+							var grid = BI.propertiespanel.grid = BI.util.createAttachmentGrid("attachments-panel", "content", BI.contentkey);
+							var ds=grid.getDataSource();
+							
+							<tml:if condition="_mode=='edit'">
+								<tml:then>
+									grid.on("rowclick", function(){
+										tb.items.get(1).enable();
+									})
+								</tml:then>
+								<tml:else>
+									grid.on("beforeedit", function(e){return false});
+								</tml:else>
+							</tml:if>
+		
+							grid.on("afteredit", function(e){
+								WGA.ajax.action({
+										action: "<tml:action ajax="norefresh">
+												var file_to_rename=unescape(request.getParameter("file"));
+												var new_filename=unescape(request.getParameter("new_filename"));
+												callAction("cms:rename-file", file_to_rename, new_filename);
+										</tml:action>&file="+escape(e.originalValue)+"&new_filename="+escape(e.value),
+										id: "<tml:script>return portlet.portletkey</tml:script>",
+										graydiv: false,
+										mode: "norefresh"
+									}
+								);
+							})
+						
+							
+							var gridHead = grid.getView().getFooterPanel(true);
+							var tb = new Ext.Toolbar(gridHead, [
+								    {
+								        text: '{%label:add%}',
+								        icon: "../../plugin-wga-app-framework/file/icons/database_add.png",
+								        cls: "x-btn-text-icon",
+								        disabled: <tml:script>return _mode=="view"</tml:script>,
+								        handler : function(m, ev){
+											BI.dialog.show("upload", ev.target, {type:'content', key:BI.contentkey});
+								        }
+								    },
+								    {
+								        text: '{%label:delete%}',
+								        icon: "../../plugin-wga-app-framework/file/icons/database_delete.png",
+								        cls: "x-btn-text-icon",
+								        disabled: true,
+								        handler : function(m, ev){
+								        	var selections=grid.getSelections();
+								        	var files=[];
+								        	for(var i=0; i<selections.length; i++){
+												//console.log("delete", selections[i].data.name)
+												files.push(selections[i].data.name)
+											}
+											Ext.MessageBox.confirm('{%label:confirm-deletion%}', '{%label:query-delete-selected-attachments%}?', function(btn){
+												if(btn=="no")
+													return;
+												WGA.ajax.action({
+														action: "<tml:action ajax="norefresh">
+																var files=unescape(request.getParameter("files")).split("|");
+																//log.info("delete-file-action: " + files);
+																for(i in files)
+																	content().removeFile(files[i]);
+																content().save();
+																var ev= createEvent("CMS_attachments_changed");
+																portlet.fireEvent(ev);
+														</tml:action>&files="+escape(files.join("|")),
+														id: "<tml:script>return portlet.portletkey</tml:script>",
+														graydiv: false,
+														mode: "norefresh"
+													}
+												);
+											});
+											
+								        }
+								    }
+						    ]);
+						
+							WGA.event.register(
+								"portlet-content-properties",
+								"CMS_attachments_changed", 
+								function(e){
+									ds.load({params:{dbkey: BI.dbkey, key: BI.contentkey, type:'content', who:'portlet-content-properties'}});
+									tb.items.get(1).disable();
+								}
+							);
+							
+							return grid;
+						}();
+					</tml:case>
+					
+					var layout = new Ext.BorderLayout("content-properties-main", {
+				              //hideOnLayout: true,
+				              center: {
+				                  autoScroll: true,
+				                  useShim:true,
+				                  tabPosition:"top",
+				                  closeOnTab: false,
+				                  titlebar:false
+				              }
+				          });
+				
+					layout.beginUpdate();
+					
+					layout.add('center', new Ext.ContentPanel('basic-panel', {title: '{%label:properties.tab-basis%}', fitToFrame: true}));
+					<tml:case condition="_contentkey!='undefined' && _contentkey!=''">
+						//layout.add('center', new Ext.ContentPanel('attachments-panel', {title: '{%label:properties.tab-attachments%}', fitToFrame: true}));
+						var gridpanel=new Ext.GridPanel(attachmentgrid, {title: '{%label:properties.tab-attachments%}', fitToFrame: false})
+						layout.add('center', gridpanel);
+						<tml:case condition="_Database.isChiefEditor()">
+							layout.add('center', new Ext.ContentPanel('items-panel', {title: '{%label:properties.tab-items%}', fitToFrame: true}));
+						</tml:case>
+						layout.add('center', new Ext.ContentPanel('history-panel', {title: '{%label:properties.tab-history%}', fitToFrame: true}));
+					</tml:case>
+					
+					layout.getRegion("center").showPanel("basic-panel");
+					layout.endUpdate();						
+				
+					BI.makeDateFields("content-properties-main", "{%label:format.ext.date.short-with-time%}");
+					BI.makeTextareasResizable("content-properties-main");
+					BI.makeComboBoxes("content-properties-main");
+					BI.makeInputFields("content-properties-main");
+					
+					if(document.forms["edit-content-meta-form"].title)
+						document.forms["edit-content-meta-form"].title.focus();
+					
+				</script>
+			</tml:then>
+			<tml:else>
+				<h1 style="margin:50px"><tml:label key="properties.no-content-selected"/></h1>
+				<script>
+					BI.propertiespanel.enableToolbarButtons(false)
+				</script>
+			</tml:else>
+		</tml:if>
+
+	</tml:else>
+</tml:if>

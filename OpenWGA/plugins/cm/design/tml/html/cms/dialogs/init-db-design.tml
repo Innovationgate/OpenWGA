@@ -1,0 +1,158 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="init-design">
+
+	try{	
+		var database = db(option("dbkey"));
+		if(tmlform.area){
+			var el = database.createArea(tmlform.area);
+			el.save();
+		}
+		if(tmlform.language){
+			var el = database.createLanguage(tmlform.language, tmlform.language);
+			el.save();
+		}
+		if(tmlform.contenttype){
+			var el = database.createContentType(tmlform.contenttype);
+			if(tmlform.outerlayout)
+				el.setOuterLayoutName(tmlform.outerlayout)
+			if(tmlform.innerlayout)
+				el.setInnerLayoutName(tmlform.innerlayout)
+			el.save();
+			_ct_created = true;
+		}
+		if(AFW.database(database).hasDesign()){
+			_actionDone=true;
+		}
+	}
+	catch(e){
+		tmlform.addMessage(e.message);
+		logException(e);
+	}
+</tml:action>
+
+<tml:form id="init-design" source="none">
+
+	<tml:case istrue="_ct_created">
+		<div class="error">
+			<tml:label key="dialog.init-db-design.contenttype-created-info" param1="{tmlform.outerlayout}" param2="{tmlform.innerlayout}"/>
+		</div>		
+	</tml:case>
+	
+	<tml:if istrue="_actionDone">
+		<tml:then>
+			<script>
+				BI.selectContent();
+				BI.se.reload();				
+				<tml:case condition="!_ct_created">
+					BI.dialog.hide();
+				</tml:case>
+				BI.dialog.submitButton.hide();
+				BI.dialog.closeButton.setText("<tml:label key="close"/>");
+				BI.dialog.autoHeight();
+			</script>
+		</tml:then>
+		<tml:else>
+		
+			<script>
+				BI.dialog.submit=function(){
+					BI.util.callAction("<tml:action ref="init-design"/>", 
+							"<tml:script>return portlet.portletkey</tml:script>",
+							"{%label:dialog.init-db-design.creating-design-elements%}");
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+					BI.dialog.autoHeight();
+				});
+			</script>
+		
+			<tml:case condition="tmlform.hasmessages()">
+				<h3><tml:formmessages divider="<br/>"/></h3>
+				<hr size="1">
+			</tml:case>		
+		
+			<div class="warning" style="border-bottom: solid silver 1px">
+				<h1><tml:label key="dialog.init-db-design.database-needs-initialisation"/></h1>
+				<tml:label key="dialog.init-db-design.description"/>				
+			</div>		
+			
+			<table width="100%" border="0" cellspacing="5">
+				<tml:script>
+					// check areas
+					var areas = db(option("dbkey")).getAreas().iterator();
+					_hasAreas=false;
+					while(areas.hasNext()){
+						var area = areas.next()
+						if(!area.systemArea){
+							_hasAreas=true;
+							break;
+						}
+					}
+				</tml:script>
+				<tml:case isfalse="_hasAreas">
+					<tr><td colspan="2"><b><tml:label key="dialog.init-db-design.no-areas-found"/></b></td></tr>
+					<tr>
+						<td><tml:label key="dialog.init-db-design.create-area"/>:</td>
+						<td><tml:input name="area" cssclass="textinput" default="contents"/></td>
+					</tr>
+				</tml:case>
+		
+				<tml:script>
+					// check languages
+					_langs = db(option("dbkey")).getLanguages().size();
+				</tml:script>
+				<tml:case condition="_langs==0">
+					<tr><td colspan="2"><b><tml:label key="dialog.init-db-design.no-languages-found"/></b></td></tr>
+					<tr>
+						<td><tml:label key="dialog.init-db-design.create-language"/>:</td>
+						<td><tml:input name="language" mode="view" cssclass="textinput" default="{db(option('dbkey')).getDefaultLanguage()}"/></td>
+					</tr>
+				</tml:case>
+		
+				<tml:script>
+					// check content types
+					_langs = db(option("dbkey")).getContentTypes().size();
+				</tml:script>
+				<tml:case condition="_langs==0">
+					<tr><td colspan="2"><b><tml:label key="dialog.init-db-design.no-contenttypes-found"/></b></td></tr>
+					<tr>
+						<td><tml:label key="dialog.init-db-design.create-contenttype"/>:</td>
+						<td><tml:input name="contenttype" cssclass="textinput" default="standard"/></td>
+					</tr>
+					<tr>
+						<td><tml:label key="dialog.init-db-design.tml-for-outerlayout"/>:</td>
+						<td><tml:input name="outerlayout" cssclass="textinput" default="outer:standard"/></td>
+					</tr>
+					<tr>
+						<td><tml:label key="dialog.init-db-design.tml-for-innerlayout"/>:</td>
+						<td><tml:input name="innerlayout" cssclass="textinput" default="inner:standard"/></td>
+					</tr>
+				</tml:case>
+		
+			</table>
+			
+		</tml:else>
+	</tml:if>
+
+</tml:form>

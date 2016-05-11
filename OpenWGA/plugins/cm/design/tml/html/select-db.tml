@@ -1,0 +1,95 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<html>
+	<head>	
+		<title><tml:script expression="WGA.Brand.name" encode="html"/> Content Manager</title>
+		<tml:htmlhead/>
+		<tml:include designdb="{pluginDbKey('de.innovationgate.wga-app-framework')}" ref="ext:include-css"/>
+		<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="wga"/>"/>
+		<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="splash"/>"/>	
+		<link rel="icon" href="<tml:url type="static" file="images/brand/icon_32.png"/>"/>	
+	</head>
+	
+	<body>		
+	
+		<div id="splash">
+			<tml:include ref="system:x-box">
+				<tml:option name="body">
+
+					<div align="center">
+						<img src="<tml:url type="static" file="images/brand/logo_600.png"/>" style="width:300px;margin-top:10px">
+						<div style="color:gray;margin-bottom:20px">
+							<tml:include ref="releasestring"/>
+						</div>
+						<hr size="1">
+					</div>
+					
+					<div id="message"></div>
+					
+					<form id="select_db" onsubmit="document.forms.select_db.style.display='none';document.getElementById('message').innerHTML='Login ...'">
+						
+						<tml:case hasurlparameter="debug">
+							<input name="debug" type="hidden" value="<tml:urlparameter name="debug"/>">
+						</tml:case>
+						
+						<div style="width:100%;">
+
+							<tml:case hasoption="dbkey">
+								<div class="formmessage">
+									<tml:label key="login.database-not-found" param1="{option('dbkey')}"/>
+									<br>
+									<tml:option name="dberror"/>
+								</div>
+								<hr size="1">
+							</tml:case>
+	
+							<table border="0" width="100%" cellspacing="0" cellpadding="0" >
+								<tr>
+									<td width="1%"><tml:label key="site-key"/>:</td>
+									<td>
+										<input name="dbkey" value="<tml:urlparameter name="dbkey"/>">
+									</td>
+								</tr>
+							</table>
+						</div>
+						
+						<hr size="1">
+						<p style="padding-bottom:1px">
+							<button type="submit"><tml:label key="action.continue"/></button>
+						</p>		
+						
+					</form>
+					<script>
+						document.forms.select_db.dbkey.focus();
+					</script>
+					
+				</tml:option>
+			</tml:include>
+		
+		</div>
+		
+	</body>
+	
+</html>

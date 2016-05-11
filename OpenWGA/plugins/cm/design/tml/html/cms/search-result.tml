@@ -1,0 +1,114 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_query=request.getParameter("query");
+	_dbkey=request.getParameter("dbkey");
+</tml:script>
+
+<div class="header">
+	<tml:label key="searchresult.message" param1="{request.getParameter('query')}"/>
+</div>
+
+<tml:collection>
+	<tml:query id="lucene-query" db="{_dbkey}" type="lucene" onlypublished="false" alllanguages="true" highlight="true">
+		<tml:item name="_query"/>
+	</tml:query>
+
+	<tml:if condition="taginfo('lucene-query', 'error') != null">
+		<tml:then>
+			<tml:include ref="system:x-box">
+				<tml:option name="body">
+				<tml:script encode="html">
+					return taginfo("lucene-query", "error").message
+				</tml:script>
+				</tml:option>
+			</tml:include>
+		</tml:then>
+
+		<tml:else>
+		
+			<table width="100%" class="collection">
+				<tr class="collection-title">
+					<td width="1%" align="right">{%label:relevance%}</td>
+					<td>{%label:document%}</td>
+				</tr>
+				<tml:foreach id="search-loop">
+					<tr class="<tml:script expression="(taginfo('search-loop', 'iteration') %2) ? 'list1':'list2'"/>">
+						<td align="right"><tml:script format="#.0"> return SEARCHSCORE*100</tml:script>%</td>
+						<td>
+							<h3><a href="#" onclick="BI.selectContent('<tml:meta name="key"/>', '<tml:meta name="structkey"/>')"><tml:meta name="title"/></a></h3>
+							
+							<tml:script>
+								_fragments={};
+								_hasFragments=false;
+								var len = 75;
+								var items=createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/content").getItemNames().iterator();
+								while(items.hasNext()){
+									var item = items.next();
+									var fragment = bestFragments(item, len, 3, "<span class='lucene-highlight'>", "</span>")
+									if(!fragment.isEmpty()){
+										_fragments[item]=fragment;
+										_hasFragments=true;
+									}
+								}
+							</tml:script>
+							<tml:case istrue="_hasFragments">
+								<div class="lucene-fragments">
+									<tml:script>
+										ret="";
+										for (f in _fragments){
+											ret += "<b>" + f + ":</b><br>";
+											var fragment=_fragments[f];
+											for(i=0; i<fragment.size(); i++)
+												ret += "... " + fragment.get(i) + " ...<br>"
+										}
+										return ret;
+									</tml:script>
+								</div>
+							</tml:case>									
+							
+							<p>{%label:pagetype%}: <tml:script>return createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/contenttype", CONTENTTYPE).getAlias()</tml:script></p>
+							<p>{%label:location%}: <b>[<tml:meta name="area"/>]</b> 
+							<tml:case condition="!isRoot()">
+								/
+								<tml:navigator type="path" context="parent">
+									<b><a href="#" onclick="BI.selectContent('<tml:meta name="key"/>', '<tml:meta name="structkey"/>')"><tml:meta name="title"/></a></b>
+									<tml:between> / </tml:between>
+								</tml:navigator>
+							</tml:case>
+							</p>
+							<p><tml:meta name="languagetitle"/> / <tml:label key="{'status.'+STATUS}"/> / {%label:version%} <tml:meta name="version"/></p>
+							<p>{%label:last-modified%}: <tml:meta name="modified"/> {%label:by%} <tml:meta name="author"/></p>
+						</td>
+					</tr>
+				</tml:foreach>
+			</table>
+			
+		</tml:else>
+	</tml:if>
+	
+</tml:collection>
+
+

@@ -1,0 +1,196 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<div id="bookmarktree"></div>
+
+<script>
+	WGA.portlet.onload.register(
+		"<tml:script>return portlet.portletkey</tml:script>",
+		function(){
+			BI.dialog.onHide=function() {
+				WGA.ajax.action({
+					id: "<tml:script>return portlet.portletkey</tml:script>",
+					action:"<tml:action>portlet.fireEvent(createEvent("CMS_bookmarks_updated"))</tml:action>"
+				});
+			};
+			
+			BI.BookmarkManager.toolbar = new Ext.Toolbar('bookmarktoolbar');
+			BI.BookmarkManager.toolbar.add(
+				{
+	        		id: 'addFolder',
+	        		icon: '<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="folder_add.png"/>',
+	        		cls: 'x-btn-icon',
+	        		tooltip: '<tml:label key="dialog.bookmarks.new-folder"/>',
+	        		handler: function() {
+	        			BI.BookmarkManager.setPortletMode("new-folder");
+	        		}
+	    		},
+	    		
+	    		{
+	    			id: 'editFolder',
+	        		icon: '<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="folder_edit.png"/>',
+	        		cls: 'x-btn-icon',
+	        		tooltip: '<tml:label key="dialog.bookmarks.edit-folder"/>',
+					handler: function() {
+	        			BI.BookmarkManager.setPortletMode("edit-folder");
+	        		}
+	    		},
+	    		
+	    		{
+	    			id: 'deleteFolder',
+	        		icon: '<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="folder_delete.png"/>',
+	        		cls: 'x-btn-icon',
+	        		tooltip: '<tml:label key="dialog.bookmarks.delete-folder"/>',
+	    			handler: function() {
+	        			BI.BookmarkManager.setPortletMode("delete-folder");
+	        		}
+	    		},
+	    		
+	    		'->',
+	    		
+	    		{
+	    			id: 'editBookmark',
+	        		icon: '<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_edit.png"/>',
+	        		cls: 'x-btn-icon',
+	        		tooltip: '<tml:label key="dialog.bookmarks.edit-bookmark"/>',
+	        		handler: function() {
+	        			BI.BookmarkManager.setPortletMode("edit-bookmark");
+	        		}
+	    		},
+	    		
+	    		{
+	    			id: 'deleteBookmark',
+	        		icon: '<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_delete.png"/>',
+	        		cls: 'x-btn-icon',
+	        		tooltip: '<tml:label key="dialog.bookmarks.delete-bookmark"/>',
+	        		handler: function() {
+	        			BI.BookmarkManager.setPortletMode("delete-bookmark");
+	        		}
+	    		}
+	    		
+	    	);
+			
+			BI.dialog.autoHeight();
+			BI.BookmarkManager.enableFolderEdit(false);
+			BI.BookmarkManager.enableBookmarkEdit(false);					
+			
+			BI.BookmarkManager.tree = new Ext.tree.TreePanel("bookmarktree", {
+		        animate:true, 
+		        loader: new Ext.tree.TreeLoader({
+		        	dataUrl:'./cms:dialogs:bookmarks:get-bookmarks.int.html',
+		        	baseParams: {
+		        		dbkey: "<tml:option name="dbkey"/>"
+		        	}
+		        }),
+		        enableDD:true,
+		        rootVisible:false
+		    });			
+		
+		    var root = new Ext.tree.AsyncTreeNode({
+		        text: "Bookmarks (<tml:option name="dbkey"/>)",
+		        icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="star.png"/>",
+		        cls: "root", 
+		        id:'root',
+		        allowDrag: false,
+		        allowDrop: false
+		    });
+		    
+		    BI.BookmarkManager.tree.setRootNode(root);
+		    
+		    BI.BookmarkManager.tree.on("append", function(tree, parentnode, newnode) {
+				if(newnode.attributes.type=="folder" && newnode.attributes.has_children==false){
+					newnode.render();
+					newnode.expand(false);
+				}
+			});
+		
+			BI.BookmarkManager.tree.on("click", function(node, e) {
+				var form = BI.BookmarkManager.getForm();
+				if (node.attributes.type=="folder") {
+					form.folder.value = node.id;
+					node.toggle();
+					BI.BookmarkManager.enableBookmarkEdit(false);
+					// use may not edit or delete system folder "Bookmarks"
+					BI.BookmarkManager.enableFolderEdit(node.id == "Bookmarks" ? false : true);
+				}
+				else {
+					form.folder.value = node.parentNode.id;
+					form.bookmark.value = node.id;
+					BI.BookmarkManager.enableBookmarkEdit(true);
+					BI.BookmarkManager.enableFolderEdit(false);
+				}					
+			}, this);
+
+
+			BI.BookmarkManager.tree.on("dblclick", function(node, e) {     	
+	        	if (node.attributes.type == "bookmark") 
+	        		BI.BookmarkManager.setPortletMode("edit-bookmark");
+	        	else {
+	        		if (node.id != "Bookmarks") BI.BookmarkManager.setPortletMode("edit-folder");
+	        	}
+	        	
+	        }, this);
+			
+			
+			BI.BookmarkManager.tree.on("nodedragover", function(e) {
+				var source = e.data.node;
+				var dest = e.target;
+				
+				for (var i in dest.childNodes) {
+					var node = dest.childNodes[i];
+					if (node.id == source.id) return false;
+				}
+				
+				BI.BookmarkManager.getForm().parent.value = source.parentNode.id;
+				
+				return true;
+			});
+			
+			BI.BookmarkManager.tree.on("nodedrop", function(e) {
+				var source = e.data.node;
+				var dest = e.target;
+				var form = BI.BookmarkManager.getForm();
+				
+				form.folder.value = dest.id;
+				form.bookmark.value = source.id;
+				
+				WGA.ajax.action({
+					id: "<tml:script>return portlet.portletkey</tml:script>",
+					action:"<tml:action>
+						var _BookmarkManager = createObject("cms:bookmark-manager", option("dbkey"));
+						_BookmarkManager.moveBookmark(tmlform.parent, tmlform.folder, tmlform.bookmark);
+					</tml:action>"
+				});
+			});					
+			
+		    BI.BookmarkManager.tree.render();
+		    root.expand(false, true);
+		}
+	);
+</script>
+
+<tml:input name="folder" type="hidden"/>
+<tml:input name="bookmark" type="hidden"/>	
+
+<tml:input name="parent" type="hidden"/>	

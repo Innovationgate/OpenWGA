@@ -1,0 +1,206 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_dbkey=option("dbkey");
+	if(_dbkey==null)
+		_dbkey=request.getParameter("dbkey");
+	if(_dbkey==null){
+		_dbkey=content().database.dbReference;
+		log.info("No dbkey specified");
+	}
+	_features=request.getParameter("features") || "create";
+	
+	// read all areas from DB
+	_areas=createlist();
+	var database=db(_dbkey);
+	var Database = AFW.database(database);
+	var it=database.getAreas().iterator();
+	while(it.hasNext()){
+		var area = it.next()
+		if(area.systemArea)
+			continue;
+		if(area.name=="hdb-content" && !Database.isManager())
+			continue;
+		var visiblefor = area.getExtensionData("CM_area_visible")
+		if(visiblefor && visiblefor.size() && !database.isMemberOfUserList(visiblefor))
+			continue;
+		if(area.mayReadContent())	
+			_areas.add(area);
+	}
+	
+	var area = Database.getTemplateArea();
+	if(area && area.mayReadContent())
+		_areas.add(area);
+	area = Database.getTrashArea();
+	if(area && area.mayReadContent())
+		_areas.add(area);
+	
+</tml:script>
+
+<div class="siteexplorer">
+
+	<tml:foreach type="itemvalue" item="_areas" currentvalue="_area">
+
+		<tml:case condition="_area.name.charAt(0)=='$' && !_systemAreas">
+			<tml:script>
+				_systemAreas=true;
+			</tml:script>
+			<hr size="1" style="height:1px;border:none;background:gray">
+		</tml:case>
+		
+		<tml:range context="{'db:'+_dbkey+'/$area:'+_area.getName()}">
+		
+			<tml:script>
+				_Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", option("dbkey"))
+				_Area = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/area", document);
+				_hasRootEntries = document.getRootEntryIterator(1).hasNext();
+				if(_Area.isTrashArea() && !_Database.isManager()){
+					var user = _Database.getUserName();
+					_hasRootEntries=false;
+					var entries = _Area.WGObject.getRootEntryIterator(10);
+					while(entries.hasNext()){
+						var struct = entries.next();
+						var deletedBy = struct.getExtensionData("deletedBy");
+						if(deletedBy==user){
+							_hasRootEntries=true;
+							break;
+						}
+					}
+				}
+			</tml:script>
+		
+			<div class="area-container" <tml:case isfirstloop="false">style="margin: 5px 0"</tml:case>>
+				<tml:script>
+					_class = "area light-panel-bg";
+					_title = label("area") + " " + NAME;
+					if(NAME.charAt(0)=="$"){
+						_class += " " + NAME.substr(1) + (_Area.isTrashArea() && _hasRootEntries ? " filled":"")
+						_title = label("systemarea."+NAME.substr(1));
+					}
+				</tml:script>
+				<div class="<tml:item name="_class"/>" id="area:<tml:meta name="name"/>">
+					
+					<script>
+						var el=Ext.get("area:<tml:meta name="name"/>");
+						el.unselectable();
+						
+						el.removeAllListeners();
+						el.on("click", BI.se.toggleEntryEvent, el);
+	
+						el.on("contextmenu", function(ev){
+							var h=BI.menu.context.getEl().getHeight();
+							var xy=ev.xy;
+							var doc_h=Ext.lib.Dom.getViewportHeight();
+							if(xy[1]+h>doc_h)
+								xy[1]-=h;
+							WGA.event.fireEvent("CMS_area_contextmenu", "siteexplorer", {area:"<tml:meta name="name"/>"})
+							BI.menu.areacontext.area="<tml:meta name="name"/>";
+							BI.menu.areacontext.showAt(xy);
+							Ext.lib.Event.stopEvent(ev);
+						}, el);
+	
+						var area=BI.se.areas["area:<tml:meta name="name"/>"]={
+							type: "area",
+							isTemplateArea: <tml:script expression="_Area.isTemplateArea()"/>,
+							name:"<tml:meta name="name"/>",
+							mayEditChildren: <tml:script>return _Area.mayEditChildren()</tml:script>,
+							haschildren: <tml:item name="_hasRootEntries"/>,
+							isexpanded:false,
+							isloaded:false
+						}
+						
+						BI.se.registerDD(el, area);		// register for drag&drop operations
+					</script>
+				
+					<table cellpadding="0" cellspacing="0" border="0">
+						<tr>
+							<td width="1%" class="twisty<tml:case istrue="_hasRootEntries"> collapsed</tml:case>">
+								&nbsp;
+							</td>
+							<td class="entrytitle title"><tml:item name="_title"/></td>
+							<td width="1%">
+								<tml:if condition="_Area.isTrashArea() && _hasRootEntries">
+									<tml:then>
+										<tml:img db="@afw" doc="icons" file="bin_closed.png">
+											ext:width="200px"
+											ext:qtitle="<tml:label key="se.empty-trash"/>"
+											ext:qtip="<tml:label key="se.empty-trash.tip"/>"
+											id="empty-trash"
+											style="margin-right:3px"
+										</tml:img>
+										<script>
+											var el=Ext.get("empty-trash");
+											el.mon("click", function(ev){
+												BI.dialog.show("empty-trash", this, {});
+												ev.stopEvent();
+											}, el);
+										</script>										
+									</tml:then>
+									<tml:elseif condition="_Area.mayCreatePage() && _features.indexOf('create')>=0">
+										<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="bullet_toggle_plus.png">
+											ext:width="200px"
+											<tml:if condition="_Area.isTemplateArea()">
+												<tml:then>
+													ext:qtitle="<tml:label key="se.create-template"/>"
+													ext:qtip="<tml:label key="se.create-template-info" param1="{NAME}"/>"
+												</tml:then>
+												<tml:else>
+													ext:qtitle="{%label:se.create-rootpage%}"
+													ext:qtip="<tml:label key="se.create-rootpage-in-area" param1="{NAME}"/>"
+												</tml:else>
+											</tml:if>
+											id="createrootpage:<tml:meta name="name"/>"
+										</tml:img>
+										<script>
+											var el=Ext.get("createrootpage:<tml:meta name="name"/>");
+											el.mon("click", function(ev){
+												BI.dialog.show("create-page", this, {root:'true', area:'<tml:script>return NAME.replace(/'/g, "\\'")</tml:script>'});
+												ev.stopEvent();
+											}, el);
+										</script>
+									</tml:elseif>
+								</tml:if>
+							</td>				
+									
+						</tr>
+					</table>
+					
+				</div>
+				<div class="children" style="display:none">
+					<tml:img doc="images" file="loading.gif"/> loading ...			
+				</div>
+		
+			</div>
+		
+		</tml:range>
+	</tml:foreach>
+
+</div>
+
+<div style="text-align:center; margin:10px">
+	<tml:include ref="releasestring"/>
+	<br>
+	&copy; Innovation Gate GmbH
+</div>

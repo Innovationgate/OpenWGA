@@ -1,0 +1,131 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="empty-trash">
+
+	var users = tmlform.fieldlist("users");
+
+	var Database = AFW.database(option("dbkey"));
+	var user = Database.getUserName();
+	_messages = WGA.createList();
+	
+	log.info("empty trash in db '" + option("dbkey") + "' for users " + users); 
+	var trash = Database.getTrashArea();
+	if(trash){		
+		var structs = trash.getRootEntries().iterator();
+		while(structs.hasNext()){
+			var struct = structs.next();
+			// check user who deleted this entry
+			var deletedBy = struct.getExtensionData("deletedBy");
+			if(users.contains(deletedBy)){
+				var Struct = AFW.structentry(struct);
+				try{
+					struct.performRemoveCheck(true);
+				}
+				catch(e){
+					log.info("Deletion of '" + Struct.getContentTitle() + "' from trash not allowed: " + e.javaException.message);
+					_messages.add("Deletion of '" + Struct.getContentTitle() + "' from trash not allowed: " + e.javaException.message);
+					continue;
+				}
+				var remotelist=Struct.getRemoteList();
+				if(struct.remove() && (remotelist.remote_references.size() || remotelist.remote_infos.size()))
+					callAction("::archive-remote-docs", remotelist);		// remove remote docs in separate thread
+			}			
+		}
+	}
+	else log.info("trash area not found in " + dbkey);
+
+	if(_messages.isEmpty()){
+		event=createEvent("CMS_dialog_closed");
+		portlet.fireEvent(event);
+		
+		_actionDone=true;
+	}
+</tml:action>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.se.reload();
+		</script>
+	</tml:then>
+	<tml:else>
+		<tml:form id="move-to-trash">
+		<tml:if condition="_messages && _messages.size()">
+			<tml:then>
+				<div class="warning">
+					<tml:item name="_messages" divider="<br>"/>
+				</div>
+				<script>
+					BI.dialog.submitButton.hide();
+				</script>
+			</tml:then>
+			<tml:else>
+				<tml:script>
+					_Database = AFW.database(option('dbkey'))
+				</tml:script>
+				<tml:if condition="_Database.isManager()">
+					<tml:then>
+					<div class="warning">
+						<h1><tml:label key="dialog.empty-trash.you-are-manager"/></h1>
+						<tml:label key="dialog.empty-trash.you-are-able-to-clear-all"/>.
+						<tml:script>
+							var trash = _Database.getTrashArea();
+							var users = WGA.createLookupTable()
+							var structs = trash.getRootEntries().iterator();
+							while(structs.hasNext()){
+								users.put(structs.next().getExtensionData("deletedBy"), true);
+							}
+							_users = users.keySet()
+						</tml:script>
+						<p><tml:label key="dialog.empty-trash.clear-trash-for-users"/>:</p>
+						<tml:input name="users" type="checkbox" multiple="true" default="{_Database.getUserName()}" optionsitem="_users"/>
+					</div>
+					</tml:then>
+					<tml:else>
+						<p><tml:label key="dialog.empty-trash.clear-trash-for-user" param1="{_Database.getUserName()}"/>.</p>
+						<tml:input name="users" type="hidden" default="{_Database.getUserName()}"/>
+					</tml:else>
+				</tml:if>
+				<tml:label key="dialog.empty-trash.confirm"/>
+			</tml:else>
+		</tml:if>		
+		<script>
+			BI.dialog.onShow=function(){
+				BI.dialog.autoHeight();
+			}
+			WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+				BI.dialog.onShow();
+			})
+
+			BI.dialog.submit=function(){
+				BI.util.callAction("<tml:action ref="empty-trash"/>", 
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"<tml:label key="dialog.empty-trash.processing"/>");
+			}
+		</script>
+		</tml:form>		
+	</tml:else>
+</tml:if>

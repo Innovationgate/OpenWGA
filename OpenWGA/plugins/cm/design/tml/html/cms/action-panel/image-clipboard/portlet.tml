@@ -1,0 +1,208 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="add-to-clipboard">
+	if(!_CM_attachment_clipboard)
+		setSessionVar("_CM_attachment_clipboard", createlist());
+	var filenames = tmlform.fieldlist("cb_filenames").iterator();
+	while(filenames.hasNext()){
+		var key = tmlform.cb_dbkey + "/" + tmlform.cb_contentkey + "/" + filenames.next();
+		if(key && !_CM_attachment_clipboard.contains(key))
+			_CM_attachment_clipboard.add(key);
+	}
+	tmlform.cb_filenames="";
+</tml:action>
+
+<tml:action id="clear-attachment-clipboard">
+	setSessionVar("_CM_attachment_clipboard", createlist());
+	tmlform.cb_filenames="";
+</tml:action>
+
+<script>
+	WGA.event.addListener(
+		"<tml:script>return portlet.portletkey</tml:script>",
+		"CMS_contentkey_changed",
+		<tml:range context="db:plugin-contentmanager">
+			function(e){
+				Ext.get("form-image-clipboard").setDisplayed(true);
+			}
+		</tml:range>
+	);
+	WGA.event.addListener(
+		"<tml:script>return portlet.portletkey</tml:script>",
+		"CMS_item_edit", 
+		function(e){
+			Ext.get("form-image-clipboard").setDisplayed(e.params.editor=="rtf");
+		}
+	);
+</script>
+
+<tml:form id="form-image-clipboard" source="none">
+
+	<tml:case condition="_CM_attachment_clipboard && itemlist('_CM_attachment_clipboard').size()>0">
+				
+		<tml:include ref="system:info-window" o_collapsed="true">
+			<tml:option name="title">
+				<tml:label key="clipboard.title"/> (<tml:script expression="itemlist('_CM_attachment_clipboard').size()"/>)
+			</tml:option>
+			<tml:option name="bodystyle">padding:0 0 5px 0</tml:option>
+			
+			<div id="cb-image-view" class="ychooser-view" style="height:auto"></div>
+			<div id="cb-toolbar" align="right" style="padding:5px 5px 0;border-top:solid silver 1px"></div>
+			
+			<tml:option name="onexpand">
+				if(Ext.get("cb-image-view").dom.innerHTML!="")
+					return;
+			
+				/*
+				 * Image Icon View:
+				 */
+				var store = new Ext.data.Store({
+				    proxy: new Ext.data.HttpProxy({
+				        url: '<tml:url type="tml" medium="html" layout="::json-images"/>'	        
+			        }),    
+			        reader: new Ext.data.JsonReader({
+				        id: 'id',
+			            root: 'data'                
+			        },
+			        [
+				        { name: 'id'   }, 
+				        { name: 'name' },
+				        { name: 'shortName'},
+				        { name: 'filetype' },     
+			            { name: 'url'  },
+			            { name: 'poster'  },
+			            { name: 'thumbnail'  },
+			            { name: 'mimetype'  },
+			            { name: 'type'  },
+			            { name: 'container'  },
+			            { name: 'key'  },
+			            { name: 'dbkey'  },
+			            { name: 'size' }
+			            
+			        ])
+				});
+	
+				<tml:case condition="AFW.request().HTML5DragDropSupported">
+					store.on("load", function(){
+						Ext.select("#cb-image-view .thumb-wrap").each(function(el){
+							el.dom.addEventListener("dragstart", function(e){
+								var items = [];
+								var selections = view.selections;
+								var me_selected=false;
+								if(selections.length){
+									for(var i=0; i < selections.length; i++){
+										var parts = selections[i].id.split("/");
+										parts.pop();
+										var id = parts.join("/");
+										var record = store.getById(id);
+										items.push(record.data)
+										if(this.id==selections[i].id)
+											me_selected=true;
+									}		
+								}
+								if(!me_selected){
+									var parts = this.id.split("/");
+									parts.pop();
+									var id = parts.join("/");
+									var record = store.getById(id);
+									items=[record.data]
+								}
+								e.dataTransfer.setData("wga/files", JSON.stringify(items));
+								e.dataTransfer.effectAllowed = "copyLink";
+								e.dataTransfer.setDragImage(this, 50, 50);
+								return false;
+							}, false);
+						})				
+					})
+				</tml:case>
+				
+				var tpl = new Ext.Template(
+					'<div class="thumb-wrap {primary}" style="{clear}" id="{id}/cb" draggable="true">',
+						'<div class="thumb" style="background-image:url(\'{thumbnail}\')"></div>',
+						'<span>{name}</span>',
+					'</div>'
+				);
+				
+				var view = new BI.util.GroupedView('cb-image-view', tpl, 
+					{
+						emptyText : '<div style="padding:10px;"><tml:label key="content-attachments.no-images-found"/></div>',						
+						multiSelect: true,
+						store: store,
+						groupchange: "filetype",
+						cols: 2
+					}
+				);
+				view.on('dblclick', function(vw, index, node, e){
+					var id = node.id.split("~")[0];					
+					var record = store.getById(id);
+					BI.dialog.show("file-meta-data", node, {
+						filename:record.data.name,
+						dbkey: record.data.dbkey,
+						contentkey: record.data.container,
+						mode:'view'
+					});
+				});
+
+				<tml:case condition="!AFW.request().HTML5DragDropSupported">
+					var dz = new BI.util.attachmentViewDragZone({
+						view: view,
+						sitepanel_mask_msg: "<tml:label key="drop-attachment-msg"/>",
+						no_images_label: "<tml:label key="content-attachments.images-selected"/>"
+					})
+				</tml:case>
+				
+				new Ext.Button("cb-toolbar", {
+					text: "<tml:label key="clipboard.clear"/>",
+					handler: function(){
+						WGA.ajax.callAction('<tml:action ref="clear-attachment-clipboard"/>', '<tml:script expression="portlet.portletkey"/>')
+					}
+				})
+	
+				store.load();
+	
+			</tml:option>	
+			
+		</tml:include>
+		
+	</tml:case>
+	
+	<tml:input type="hidden" name="cb_dbkey"/>
+	<tml:input type="hidden" name="cb_contentkey"/>
+	<tml:input type="textarea" multiple="true" name="cb_filenames" cssstyle="display:none"/>
+	
+	<script>
+		WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "CMS_clipboard_attach_files", function(ev){
+			var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+			form.cb_contentkey.value = ev.params.contentkey;
+			form.cb_dbkey.value = ev.params.dbkey;
+			var filenames = ev.params.filenames;
+			for(var i=0; i<filenames.length; i++)
+				form.cb_filenames.value += filenames[i]+"\n"
+			WGA.ajax.callAction('<tml:action ref="add-to-clipboard"/>', '<tml:script expression="portlet.portletkey"/>')
+		})	
+	</script>
+
+</tml:form>

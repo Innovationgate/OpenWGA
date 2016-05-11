@@ -15,7 +15,6 @@ project(":servicesClient").projectDir = file("libraries/servicesClient")
 include ":servicesClient:xfireClientFactory"
 project(":servicesClient:xfireClientFactory").projectDir = file("libraries/servicesClient/xfireClientFactory") 
 
-
 include ":wgaBuildTools"
 project(":wgaBuildTools").projectDir = file("libraries/wgaBuildTools")
 
@@ -28,5 +27,9 @@ project(":tmlScript").projectDir = file("libraries/tmlScript")
 include ":wgaDeb"
 project(":wgaDeb").projectDir = file("distros/wgaDeb")
 
+include ":plugins-cm"
+project(":plugins-cm").projectDir = file("plugins/cm")
+
 include ":server"
 include ":server:testRuntime"
+

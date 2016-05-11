@@ -1,0 +1,696 @@
+<div style="margin:-5px;padding:0px">
+	<div style="height:455px;">
+		<div id="doc-structure-toolbar"></div>
+		<div>
+			<div id="doc-structure" style="float:left;width:200px;height:431px;overflow:auto"></div>
+			<div id="doc-structure-editor" style="margin-left:200px; height:430px; width:285px; overflow:auto;">
+				<div style="padding:1px 3px;min-height:428px;border-left:solid silver 1px">
+					<tml:portlet name="module-settings" ref="::portlet-module-settings" ajax="true"/>
+				</div>
+			</div>
+			<div class="clear"></div>
+		</div>
+	</div>
+</div>
+<tml:script>
+	tmlform.doc_structure = CMM.getExtensionData(CMM.getModulesSource(), "content-modules")||"{}";
+
+	var settings_map = CMM.getModulesSettingsMap();
+	if(settings_map){
+		var settings = settings_map.keySet().iterator();
+		while(settings.hasNext()){
+			var setting = settings.next();
+			tmlform.setField(setting, settings_map.get(setting))
+		}
+	}
+
+	_mode = option("mode");
+	if(CMM.hasTemplate())
+		_mode="view";
+
+</tml:script>
+<tml:input type="hidden" store="false" name="doc_structure"/>
+<tml:input type="hidden" store="false" name="deleted_nodes"/>
+<tml:input type="hidden" store="false" name="node_path"/>
+
+<script>
+WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+	/*
+	 * Read module definitions
+	 */
+	var ALL = true;
+	var modules = [];
+	var modReg = {};		// temporary used to store module id-s so that thay are only registered once.
+	<tml:script>
+		_mods = CMM.getConfigTMLs();
+	</tml:script>
+	<tml:foreach type="itemvalue" item="_mods" currentvalue="_mod">
+		var mods = [<tml:include designdb="{_mod.dbkey}" ref="{_mod.configtml}"/>]
+		for(var i=0; i<mods.length; i++){
+			var mod = mods[i];
+			var id = mod.id;
+			if(!modReg[id]){
+				mod.designdb="<tml:script expression="_mod.dbkey"/>";
+				modules.push(mod);
+				modReg[id]=true;
+			}
+		}
+	</tml:foreach>
+
+	var sections = BI.sitepanel.iframe.window.WGA.CMM.sections;
+	
+	for(var i=0; i<modules.length; i++){
+		var module = modules[i];
+		if(!module.type)
+			module.type="content"
+		if(!module.icon){
+			if(module.type=="container")
+				module.icon = "<tml:url db="@afw" type="file" doc="icons" file="folder_table.png"/>"
+			else module.icon = "<tml:url db="@afw" type="file" doc="icons" file="page_white_text.png"/>"
+		}
+	}
+
+	function findModuleConfig(id){
+		for (var i=0; i < modules.length; i++) {
+  			if (modules[i].id==id || modules[i].id_alias==id) 
+  				return modules[i];	
+  		}
+  		// module not found
+  		// happens if module config has been changed and content referes non existing module
+  		// How should we handle this ???
+  		
+  		//alert("unable to find module config for id " + id);
+  		return null;
+	}
+	function isAllowedParent(id, parent_id, section_id){
+		var mod = findModuleConfig(id)
+		if(!mod)
+			return false;	// should not happen.
+			
+		// check section:
+		var s = sections[section_id];
+		if(!s){
+			return false;
+		}
+		if(s!==ALL){
+			var found = false;
+			for(var i=0; i<s.length; i++){
+				if(s[i]==id){
+					found=true;
+					break;
+				}
+			}
+			if(!found)
+				return false;
+		}
+			
+		if(!mod.allowedparents || mod.allowedparents.length==0)
+			return true;
+		for(var i=0; i<mod.allowedparents.length; i++){
+			if(mod.allowedparents[i]==parent_id)
+				return true;
+		}
+		return false;
+	}
+	
+	function hasModule(id){
+		var found = false;
+		function findByModuleId(node){
+			if(node.attributes.data && node.attributes.data.module_id==id){
+				found = true;
+				return false; // stop iteration
+			}
+			else node.eachChild(findByModuleId)
+		}
+		root.eachChild(findByModuleId)
+		return found;		
+	}
+	
+	/*
+	 * Create Ext.tree
+	 */
+	var tree = new Ext.tree.TreePanel("doc-structure", {
+        id: 'doc-structure-tree',
+        autoScroll: true,
+        rootVisible: false,
+        enableDD: <tml:script expression="_mode=='edit'"/>,
+        width: 200
+	})
+	var root = new Ext.tree.TreeNode({
+		id: 'doc-structure',
+		text: '<tml:label key="content-modules.tree-root"/>',
+		icon: "<tml:url db="@afw" type="file" doc="icons" file="layout_content.png"/>"
+	})
+	tree.setRootNode(root);
+
+	function findSection(node){
+		while(node.getDepth()>1){
+			node = node.parentNode;
+		}
+		return node.attributes.section;
+	}
+
+	/*
+	 * read structure from document and create tree nodes from it
+	 */
+	var doc_structure = <tml:script expression="tmlform.doc_structure"/>;
+
+  	function buildTree(module_configs, treeNode){
+
+	  	function createTreeNode(module) {
+	  	
+	  		var module_config = findModuleConfig(module.module_id);
+	  		
+	  		var treeNode = new Ext.tree.TreeNode({
+	  			id:		module.id,
+	      		text:	module.title,
+	      		icon:	module_config ? module_config.icon : "<tml:url db="@afw" type="file" doc="icons" file="bullet_error.png"/>",
+	      		data:	module
+	  		});
+	  		return treeNode;
+	  	}
+
+		for(var i=0; i < module_configs.length; i++){
+			var module_config = module_configs[i];
+			var node = createTreeNode(module_config);
+			if(module_config.children){
+				buildTree(module_config.children, node);
+			}
+			treeNode.appendChild(node);
+		}
+	}
+	
+	for(section in sections){
+  		var treeNode = new Ext.tree.TreeNode({
+  			id:			"section_"+section,
+  			icon: 		"<tml:url db="@afw" type="file" doc="icons" file="layout_content.png"/>",
+  			cls: 		"light-panel-bg tree-root",
+      		text:		section,
+      		allowDrag: 	false,
+      		section:	section
+  		});
+  		root.appendChild(treeNode);
+  		buildTree(doc_structure[section]||[], treeNode);
+	}
+	
+	tree.render();
+
+	/*
+	 * Ext.Tree is created.
+	 * Add event handler
+	 */
+	<tml:case condition="_mode=='edit'">
+		// add an inline editor for the nodes
+	    var nodeEditor = new Ext.tree.TreeEditor(tree, {
+	        allowBlank:false,
+	        blankText:'A name is required',
+	        selectOnFocus:true
+	    });
+	    nodeEditor.on("beforestartedit", function(){
+	    	if(selectedNode.getDepth()<=1)
+	    		return false
+	    	else return true; 
+	    })
+		nodeEditor.on("complete", function(editor, value){
+			selectedNode.attributes.data.title = value;
+			selectedNode.setText(value);
+	
+			var module_config = findModuleConfig(selectedNode.attributes.data.module_id)
+			WGA.event.fireEvent("doc-structure-treenode-selected", "*", {
+				config: module_config,
+				module: selectedNode.attributes.data
+			})
+		})
+	</tml:case>
+	
+	var selectedNode;
+	tree.getSelectionModel().on("selectionchange", function(model, node, ev){
+		
+		selectedNode = node;
+		if(node)
+			document.forms['<tml:script expression="tmlform.formid"/>'].node_path.value = node.getPath();		
+		
+		<tml:case condition="_mode=='view'">
+			if (node.getDepth()<=1) {	// root
+				WGA.event.fireEvent("doc-structure-treenode-selected", "*", {})
+			}
+			else{
+				var module_config = findModuleConfig(node.attributes.data.module_id)
+				WGA.event.fireEvent("doc-structure-treenode-selected", "*", {
+					config: module_config,
+					module: node.attributes.data,
+					parent_mod_id: node.parentNode.getDepth()>1 && node.parentNode.attributes.data.id
+				})
+			}
+			return;
+		</tml:case>
+		
+		addButton.menu.removeAll();
+		removeButton.disable();
+		duplicateButton.disable();
+		addButton.disable()
+		
+		if(!node){
+			WGA.event.fireEvent("doc-structure-treenode-selected", "*", {})
+			return;
+		}
+
+		if (node.getDepth()==1) {	// root
+			if (menueButtons.length)
+				addButton.enable()
+			else addButton.disable();
+			for (var i = 0; i < menueButtons.length; i++) {
+				var button = menueButtons[i];
+				if(button.singleton && hasModule(button.id))
+					continue;
+				if(isAllowedParent(button.id, "root", node.attributes.section)){
+					addCreateButton(button)
+					//addButton.menu.add(button);
+				}
+			}
+			WGA.event.fireEvent("doc-structure-treenode-selected", "*", {})
+		}
+		else {
+			removeButton.enable();
+			duplicateButton.enable();
+			var module_config = findModuleConfig(node.attributes.data.module_id)
+			
+			WGA.event.fireEvent("doc-structure-treenode-selected", "*", {
+				config: module_config,
+				module: node.attributes.data,
+				parent_mod_id: node.parentNode.getDepth()>1 && node.parentNode.attributes.data.id
+			})
+
+			if(!module_config || module_config.type=="content")
+				return;		// no add-buttons for type content
+				
+			var allowedchildren = module_config.allowedchildren;
+			if(!allowedchildren){
+				// all modules are allowed in this case
+				allowedchildren = [];
+				for(var i=0; i < modules.length; i++)
+					allowedchildren.push(modules[i].id);
+			}
+			if(allowedchildren.length){
+				addButton.enable();
+				var section = findSection(node);
+				for (var i=0; i < menueButtons.length; i++) {
+					var button = menueButtons[i];
+					if(button.singleton && hasModule(button.id))
+						continue;
+					for (var j = 0; j < allowedchildren.length; j++) {					
+						if (allowedchildren[j] == button.id && isAllowedParent(button.id, node.attributes.data.module_id, section))
+							addCreateButton(button)
+					}
+				}
+			}
+		}
+		
+	})
+	
+	tree.on("nodedragover", function(dropEvent){
+	
+		var node = dropEvent.dropNode;
+		var targetNode = dropEvent.target;
+
+		if(node.getDepth()<=1)
+			return false;
+
+		var allowedchildren;
+
+		if(dropEvent.point=='append')
+			targetNode = dropEvent.target;
+		else if(dropEvent.point=='above' || dropEvent.point=='below'){
+    		// check parent node in this case
+    		var targetNode = targetNode.parentNode;
+		}
+		else{
+			return false;		// should not happen
+		}
+		
+		if(!isAllowedParent(node.attributes.data.module_id, targetNode.getDepth()<=1 ? "root" : targetNode.attributes.data.module_id, findSection(targetNode))){
+			return false;
+		}
+		
+		if (targetNode.getDepth()<=1){
+			return true;
+		}
+		
+		var target_module_config = findModuleConfig(targetNode.attributes.data.module_id);
+		if(target_module_config.type=="content")
+			return false;
+			
+		allowedchildren = target_module_config.allowedchildren;
+		if(!allowedchildren)
+			return true;		// all allowed
+		
+		for(var i = 0; i < allowedchildren.length; i++){
+			if(node.attributes.data.module_id == allowedchildren[i]){
+				return true;
+			}
+		}
+		return false;
+	})
+	
+	/*
+	 * Create menue buttons
+	 */
+	var menueButtons = [];
+	function addModuleHandler(menu){
+		var module_config = findModuleConfig(menu.id);
+		var uid = module_config.id;
+		if(module_config.singleton)
+			uid += "_module";
+		else uid += "_" + BI.util.guid();
+			
+		var treeNode = new Ext.tree.TreeNode({
+  			id:		uid,
+      		text:	module_config.title,
+      		icon:	module_config.icon,
+      		data:	{
+      			id:				uid,
+	      		title:			module_config.title,
+	      		module_id:		module_config.id
+	      	}
+  		});
+		selectedNode.appendChild(treeNode);
+		selectedNode.expand();
+		treeNode.select();
+		//nodeEditor.triggerEdit(treeNode);
+	}
+
+	for (var i=0; i < modules.length; i++) {		
+		var module = modules[i];
+		if(module.id){
+			menueButtons.push({
+				text:		module.title,
+				id:			module.id,
+				category:	module.category,
+				singleton:	module.singleton, 
+				cls:		'x-btn-text-icon',
+				icon:		module.icon,
+				handler: 	addModuleHandler
+			});
+		}
+	}
+	menueButtons.sort(function(a,b){
+		var ca = a.category||"";
+		var cb = b.category||"";
+
+		if(ca==cb)
+			return strcmp(a.text, b.text);
+		return strcmp(ca, cb);
+
+		function strcmp(a,b){
+			return (a<b) ? -1 : (a==b) ? 0 : 1;
+		}
+	})
+	
+	var addButton = new Ext.Toolbar.Button({
+		disabled: true,
+		text: "<tml:label key="add"/>",
+		cls: "x-btn-text-icon",
+		icon: '<tml:url db="@afw" type="file" doc="icons" file="application_add.png"/>',
+		menu: []
+	})
+	var removeButton = new Ext.Toolbar.Button({
+		cls: "x-btn-text-icon",
+		text: "<tml:label key="delete"/>",
+		icon: '<tml:url db="@afw" type="file" doc="icons" file="application_delete.png"/>',
+		disabled: true,
+		handler: function(b, ev){			
+			var form = document.forms['<tml:script expression="tmlform.formid"/>'];
+			addToDeleteField(selectedNode);
+			
+			var parent = selectedNode.parentNode;
+			var prev = selectedNode.previousSibling;
+			parent.removeChild(selectedNode);
+			if(prev)
+				prev.select();
+			else parent.select();
+
+			/* Helper function */			
+			function addToDeleteField(node){
+				form.deleted_nodes.value += (","+node.id);
+				for(var i=0; i<node.childNodes.length; i++){
+					addToDeleteField(node.childNodes[i])
+				}
+			}
+			
+		}
+	})
+
+	var duplicateButton = new Ext.Toolbar.Button({
+		cls: "x-btn-icon",
+		icon: '<tml:url db="@afw" type="file" doc="icons" file="application_double.png"/>',
+		tooltip: "<tml:label key="content-modules.duplicate-module"/>",
+		disabled: true,
+		handler: function(){
+			var id_list = [];
+			duplicateTo(selectedNode, selectedNode.parentNode);
+			WGA.event.fireEvent("module-node-dubplicated", "*", {ids:id_list})
+			
+			function duplicateTo(source, dest){
+				var module_config = findModuleConfig(source.attributes.data.module_id);
+				if(module_config.singleton)
+					return;		// can't be duplicated.
+				var uid = module_config.id + "_" + BI.util.guid()
+				id_list.push(source.id + "|" + uid);			
+				var treeNode = new Ext.tree.TreeNode({
+		  			id:		uid,
+		      		text:	module_config.title,
+		      		icon:	module_config.icon,
+		      		data:	{
+		      			id:				uid,
+			      		title:			module_config.title,
+			      		module_id:		module_config.id
+			      	}
+		  		});
+				dest.appendChild(treeNode);
+				for(var i=0; i < source.childNodes.length; i++)
+					duplicateTo(source.childNodes[i], treeNode);
+			}
+		}
+	})
+	
+	function addCreateButton(button){
+		//console.log("addCreateButton", addButton.menu.items, addButton.menu.items.get("rtf"));
+		var b = addButton;
+		var category = button.category;
+		if(category){
+			b = addButton.menu.items.get(category) || addButton.menu.add({
+					id: category,
+					text: category,
+					menu: []
+			});
+		}
+		b.menu.add(button);
+	}
+
+	/*
+	 * Create Toolbar with our buttons
+	 */
+	var tb = new Ext.Toolbar('doc-structure-toolbar', [
+		addButton,
+		removeButton,
+		duplicateButton,
+		<tml:case condition="option('mode')=='edit'">
+			"-",
+			<tml:script>
+				// check, if we may paste modules from clipboard
+				_mayPaste = false;
+				if(db().getContentStoreVersion() < db().CSVERSION_WGA5)
+					return;		// relation not supported
+				if(isdefined("_CM_clipboard_context")){
+					var doc = context(_CM_clipboard_context, false)
+					if(!doc)
+						return;
+					doc = doc.document;
+					var template;
+					if(doc instanceof Packages.de.innovationgate.webgate.api.WGStructEntry){							
+						if(doc.getDocumentKey()==content().getStructEntry().getDocumentKey())
+							return;
+						template = doc.getReleasedContent(LANGUAGE);
+					}
+					if(doc instanceof Packages.de.innovationgate.webgate.api.WGContent){
+						template = doc;
+					}
+					if(template && CMM.getExtensionData(template, "content-modules"))
+						_mayPaste = true;
+				}
+			</tml:script>
+			<tml:case istrue="_mayPaste">
+				{
+					cls: "x-btn-icon",
+					icon: '<tml:url db="@afw" type="file" doc="icons" file="page_paste.png"/>',
+					tooltip: "<tml:label key="action.paste-modules-from-clipboard"/>",
+					handler: function(){
+						if(confirm("<tml:label key="action.paste-modules-from-clipboard"/>?"))
+							WGA.ajax.callAction('<tml:action>
+							
+								var doc = context(_CM_clipboard_context, false)
+								if(!doc)
+									return;
+								doc = doc.document;
+								var template;
+								if(doc instanceof Packages.de.innovationgate.webgate.api.WGStructEntry){							
+									template = struct.getReleasedContent(LANGUAGE);
+									if(!template)
+										log.info("struct on clipboard has no released contens in language " + LANGUAGE);
+								}
+								if(doc instanceof Packages.de.innovationgate.webgate.api.WGContent)
+									template = doc;
+								if(template){
+									content().removeRelation("created-from-template");
+									CMM.writeExtensionData(content(), "content-modules", CMM.getExtensionData(template, "content-modules"));
+									CMM.writeExtensionData(content(), "content-modules-settings", CMM.getExtensionData(template, "content-modules-settings"));
+									content().save();
+									tmlform.reset();
+									_reloadPage = true;
+								}
+								else log.info("Unable to read modules from clipboard");
+							</tml:action>', '<tml:script expression="portlet.portletkey"/>')
+					}
+				},
+			</tml:case>
+			<tml:if condition="CMM.hasTemplate()">
+				<tml:then>
+				{
+					cls: "x-btn-icon",
+					icon: '<tml:url db="@afw" type="file" doc="icons" file="link_break.png"/>',
+					tooltip: "<tml:label key="action.remove-link-to-template"/>",
+					handler: function(){
+						if(confirm("<tml:label key="action.remove-link-to-template"/>?"))
+							WGA.ajax.callAction('<tml:action ref="cms:remove-template-link"/>', '<tml:script expression="portlet.portletkey"/>')
+					}
+				},
+				</tml:then>
+				<tml:else>
+				
+					<tml:script>
+						// check, if templates are available for the seletced content type
+						_templates = WGA.createList();
+						var templateArea = AFW.database().getTemplateArea();
+						if(templateArea){
+							var structs = templateArea.getRootEntries().iterator();
+							while(structs.hasNext()){
+								struct = structs.next();
+								if(struct.getContentType().getName() == CONTENTTYPE){
+									var c = struct.getReleasedContent(LANGUAGE)
+									if(c)
+										_templates.add(c);
+								}
+							} 
+						}
+					</tml:script>
+					
+					<tml:case condition="_templates.size()">
+						{
+							cls: "x-btn-icon",
+							tooltip: "<tml:label key="action.create-link-to-template"/>",
+							icon: '<tml:url db="@afw" type="file" doc="icons" file="link.png"/>',
+							menu: [
+								<tml:foreach type="itemvalue" item="_templates">
+									{
+										text: "<tml:meta name="title"/>",
+										handler: function(){
+											if(confirm("<tml:label key="action.create-link-to-template"/>?"))
+												WGA.ajax.callAction("<tml:action>								
+														try{
+															var source = context('docid:'+option('contentkey')).content();
+															log.info("link '" + source.getTitle() + "' to template '" + TITLE + "'");
+															source.setRelation("created-from-template", content(), content().RELATIONTYPE_PROTECTED);
+															source.removeExtensionData("content-modules");
+															source.removeExtensionData("content-modules-settings");
+															source.save();
+															tmlform.reset();
+															_reloadPage = true;
+														}
+														catch(e){
+															logException(e);
+														}
+													</tml:action>", "<tml:script expression="portlet.portletkey"/>");
+										}
+									}<tml:between>,</tml:between>
+								</tml:foreach>
+							]
+						},
+					</tml:case>
+				
+				</tml:else>
+			</tml:if>
+		</tml:case>
+		
+		"->",
+		{
+			cls: "x-btn-text-icon",
+			icon: '<tml:url db="@afw" type="file" doc="icons" file="arrow_out.png"/>',
+			text: "expand all",
+			handler: function(){
+				tree.expandAll();
+			}
+		}
+		,{
+			text: "collapse all",
+			cls: "x-btn-text-icon",		
+			icon: '<tml:url db="@afw" type="file" doc="icons" file="arrow_in.png"/>',
+			handler: function(){
+				tree.collapseAll();
+				WGA.event.fireEvent("doc-structure-treenode-selected", "*", {})
+			}
+		}
+	]);
+
+	<tml:if hasoption="section">
+		<tml:then>
+			tree.selectPath("/doc-structure/section_<tml:option name="section"/>");
+		</tml:then>
+		<tml:elseif condition="portlet.node_path">
+			tree.selectPath("<tml:item name="node_path" type="portlet"/>");
+		</tml:elseif>
+	</tml:if>
+	 
+	if(selectedNode)
+		selectedNode.expand();
+	else tree.selectPath(root.firstChild.getPath());
+
+	/*
+	 * Helper functions
+	 */
+	function buildJson(node, obj) {
+		if (node.getDepth()>1) {
+			var chObj = node.attributes.data
+			var children = node.childNodes;
+			chObj.children = []
+			if(children.length){
+				for (var i = 0; i < children.length; i++)
+					buildJson(children[i], chObj.children);
+			}
+			obj.push(chObj);
+		}
+		else {
+			var children = node.childNodes;
+			for (var i = 0; i < children.length; i++)
+				buildJson(children[i], obj);
+		}
+	}
+
+	function updateStructField(){
+		var json = {};
+		
+		var sectionNodes = tree.root.childNodes;
+		for(var i=0; i<sectionNodes.length; i++){
+			var node = sectionNodes[i];
+			json[node.attributes.section]=[];
+			buildJson(node, json[node.attributes.section]);
+		}
+		
+		document.forms['<tml:script expression="tmlform.formid"/>'].doc_structure.value = Ext.encode(json);	
+	}
+	BI.contentModules={
+		buildJson: updateStructField
+	}
+	
+})	
+</script>
+

@@ -1,0 +1,328 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="publishContent">
+	var contentkey=option("contentkey");
+	var structkey=option("structkey");
+	var dbkey=option("dbkey");
+	var database = db(dbkey);
+
+	// check for title conflicts
+	var TPM = createObject("cms:titlePathManager");
+	TPM.checkAndHandleTitlePathException(tmlform.title);	
+	
+	log.info("publish content " + contentkey);
+
+	_link_errors=createlist();
+	tmlform._internallinks = deleteDoubles(tmlform.fieldlist("_internallinks"));
+	tmlform._externallinks = deleteDoubles(tmlform.fieldlist("_externallinks"));
+
+	if(tmlform.ignore_link_errors!="ignore"){
+
+		// check external links:	
+		var checker = new Packages.de.innovationgate.igutils.LinkChecker();
+		
+		// CM 1.2:
+		// set Proxy parameter from setup document
+		var checker_proxy = new Packages.de.innovationgate.igutils.LinkChecker();
+		var config=context("currentdocument/name:$linkchecker", false);
+		if(config && config.useproxy=="true"){
+			//log.info("use proxy settings " + config.proxyhost + ":"+ config.proxyport);
+			try{
+				if(config.useproxylogin=="true")
+					checker_proxy.setProxy(config.proxyhost, config.proxyport, config.proxyusername, config.proxypassword);
+				else checker_proxy.setProxy(config.proxyhost, config.proxyport);
+			}
+			catch(e){
+				tmlform.addMessage(e);
+			}
+			var proxyexceptions=createlist(config.proxyexceptions.replace(/ /g,""), ",");
+		}
+		else var proxyexceptions=createlist();
+	
+		if(tmlform.hasMessages())
+			return tmlform.validate();
+		// end linkchecker proxy setup
+		
+		var urls=tmlform.fieldlist("_externallinks").iterator();
+		while(urls.hasNext()){
+			var url = urls.next();
+			if(url=="")
+				continue;		// should only happen in older wga installations
+			// analyse URL to decide to use proxy or not
+			var a = url.split("://");
+			if(a.length<2)
+				continue;		// no valid link
+			var relurl = a[1];
+			var domain = relurl.split("/")[0]
+			domain=domain.split(":")[0]		// ignore port
+			try{
+				var code;			
+				if(proxyexceptions.contains(domain))
+					code = checker.check(url);
+				else code = checker_proxy.check(url);
+			}catch(e){
+				_link_errors.add({url:url, msg:e.message});
+				tmlform.addMessage(url + ": " + e.message);
+			}
+			//log.info("check url: " + url + ", Status " + code);
+			if(code && code==407)
+				tmlform.addMessage(label("dialog.publish-content.linkchecker.invalid_proxy_login"))				
+			else if(code && code!=200 && code!=401){
+				var msg = label("dialog.publish-content.linkchecker.external_link_returned_status", createlist([url,String(code)]))
+				_link_errors.add({url:url, msg:msg});
+				tmlform.addMessage(msg);
+			}
+		}
+		if(tmlform.hasMessages())
+			_linkchecker_errors=true;
+
+		// check internal links:
+		var LC = createObject("cms:linkchecker", option("dbkey"));
+		var urls=tmlform.fieldlist("_internallinks").iterator();
+		while(urls.hasNext()){
+			var url = urls.next();
+			if(url=="")
+				continue;
+			try{
+				LC.checkInternalLink(content(), url);
+			}
+			catch(e){
+				var msg = e.label ? label("dialog.publish-content.linkchecker.internal_link."+e.label, createlist([url].concat(e.label_params))) : e.message;
+				_link_errors.add({url:url, msg:msg});
+				tmlform.addMessage(msg);		
+				_linkchecker_errors=true;
+			}
+			
+		}
+		if(_linkchecker_errors)
+			return tmlform.validate();;
+	
+	} // end lickchecker
+	
+	if(!tmlform.validate())
+		return;
+
+	var contentkeyObject = Packages.de.innovationgate.webgate.api.WGContentKey.parse(contentkey, database);
+	var cdoc = database.getContentByKey(contentkeyObject);				
+	var comment=tmlform.wfcomment;
+	var replacementreason=tmlform.replacementreason;
+	tmlform.removeField("wfcomment");
+	tmlform.removeField("replacementreason");
+	tmlform.removeField("ignore_link_errors");
+	
+	try{	
+		// check, if published version has remote_info and later remove this from remote document
+		var published_content=cdoc.getStructEntry().getReleasedContent(cdoc.getLanguage().getName());					
+	
+		tmlform.storeInContent(cdoc);
+		cdoc.publish(comment, replacementreason);		
+		
+		if(cdoc.getStatus()==cdoc.STATUS_RELEASE)
+			createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/content", cdoc).handleRemoteActions(published_content);
+		
+		_actionDone=true;
+		_new_structkey=cdoc.getStructKey().toString();
+		_new_contentkey=cdoc.getContentKey().toString();
+	}
+	catch(e){
+		log.error(e);
+		tmlform.addMessage(e);
+	}
+</tml:action>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.dialog.dialog.hide();
+			BI.selectContent("<tml:item name="_new_contentkey"/>", "<tml:item name="_new_structkey"/>");
+		</script>
+	</tml:then>
+	<tml:else>
+			
+		<tml:form id="publish-content-form" 
+					source="content" 
+					onsubmit="BI.dialog.submit()"
+					context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}">
+		
+			<div class="hidden"><button type="submit">submit</button></div>
+
+			<div style="display:none">				
+				<tml:input cssstyle="width:100%" name="_internallinks" type="textarea" multiple="true"/>
+				<tml:input cssstyle="width:100%" name="_externallinks" type="textarea" multiple="true"/>
+			</div>
+		
+			<tml:script>
+				_has_public_content=false;
+			
+				var database = db(option("dbkey"));
+				var contentkey=option("contentkey");
+				
+				var contentkeyObject = Packages.de.innovationgate.webgate.api.WGContentKey.parse(contentkey, database);
+				var cdoc=database.getContentByKey(contentkeyObject);				
+				var sdoc=cdoc.getStructEntry();
+				_has_public_content = sdoc.getReleasedContent(cdoc.getLanguage().getName())!=null;
+				//log.info("_has_public_content="+_has_public_content);
+				
+				_Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", database)
+				_Content = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/content", cdoc)	
+				
+			</tml:script>
+							
+			<tml:case condition="tmlform.hasmessages()">
+				<h3>{%label:dialog.publish-content.validation-errors%}:</h3>
+				
+					<ul style="list-style:disc;padding-left:20px">
+						<li><tml:formmessages divider="</li><li>"/></li>
+					</ul>
+					<script>
+						var links = BI.util.getLinks(['<tml:script expression="_Content.getItemNames()" divider="','"/>'], false);
+						<tml:foreach type="itemvalue" item="_link_errors" currentvalue="_url">
+							BI.util.markLinks(links, "<tml:script expression="_url.url"/>", "<tml:script expression="_url.msg"/>");
+						</tml:foreach>
+					</script>
+				
+				<hr size="1">
+			</tml:case>		
+
+ 			<tml:case condition="createObject('cms:titlePathManager').hasTitleConflict()">
+     			<h1 class="error"><tml:label key="publish.title-conflict" param1="{TITLE}"/></h1>
+     			<hr size="1">
+ 			</tml:case>
+		
+			<tml:if context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}" iscontextvalid="true">
+				<tml:then>
+				    <table width="100%" border="0" cellspacing="5">
+						<tr>
+				     		<td width="100">{%label:title%}:</td>
+				     		<td>
+				     			<tml:input name="title" meta="true" cssclass="textinput required"
+			     					validation="$E_VALUE!=''"
+			     					message="{label('dialog.publish-content.validation.title')}"
+				     			/>
+				     		</td>
+				     	</tr>
+				     	
+						<tml:case condition="WORKFLOW">
+							<tr>
+					     		<td width="100">{%label:workflow%}:</td>
+					     		<td><b><tml:meta name="workflow"/></b></td>
+					     	</tr>
+						</tml:case>
+						
+						<tr>
+				     		<td width="100">{%label:valid-from%}:</td>
+				     		<td>
+				     			<tml:input name="validfrom" meta="true" type="date" cssclass="datefield" format="{label('format.date.short-with-time')}"/>
+				     		</td>
+				     	</tr>
+						<tr>
+				     		<td width="100">{%label:valid-to%}:</td>
+				     		<td>
+				     			<tml:input name="validto" meta="true" type="date" cssclass="datefield" format="{label('format.date.short-with-time')}"/>
+				     		</td>
+				     	</tr>
+		
+				     	<tml:case istrue="_has_public_content">
+							<tr>
+					     		<td width="100" valign="top">{%label:replacement-reason%}:</td>
+					     		<td>
+					     			<tml:input name="replacementreason" type="textarea" cssclass="textinput"/>
+					     		</td>
+					     	</tr>
+				     	</tml:case>
+				     	
+						<tr>
+				     		<td width="100" valign="top">{%label:comment%}:</td>
+				     		<td>
+				     			<tml:input name="wfcomment" type="textarea" cssclass="textinput"/>
+				     		</td>
+				     	</tr>
+						
+						<tml:script>
+							var linkcheck_config=context("currentdocument/name:$linkchecker", false);
+							if(linkcheck_config==null || linkcheck_config.no_check_on_publish!="no-check")
+								_show_check_option=true;
+							else tmlform.ignore_link_errors="ignore";
+						</tml:script>
+						
+						<tml:case istrue="_show_check_option">
+							<tr>
+					     		<td></td>
+					     		<td>
+					     			<tml:input name="ignore_link_errors" store="false" type="checkbox" options="{label('dialog.publish-content.ignore_link_errors.options')}"/>
+					     		</td>
+					     	</tr>
+				     	</tml:case>
+				     	
+				   	</table>
+				   					   	
+				</tml:then>
+				<tml:else>
+					Context not valid: <tml:option name="contentkey"/>
+				</tml:else>
+			</tml:if>
+
+			<script>
+			
+				// get all links
+				var t_ext = document.forms['publish-content-form'].elements['_externallinks'];
+				var t_int = document.forms['publish-content-form'].elements['_internallinks'];
+				t_ext.value = "";
+				t_int.value = "";
+				
+				var links = BI.util.getLinks(['<tml:script expression="_Content.getItemNames()" divider="','"/>']);
+
+				for(var i=0; i<links.internal.length; i++){
+					var link = links.internal[i].url;
+					t_int.value = t_int.value + link+"\n";
+				}
+				for(var i=0; i<links.external.length; i++){
+					var link = links.external[i].url;
+					t_ext.value = t_ext.value + link+"\n";
+				}
+				
+				BI.dialog.submit=function(){
+					BI.util.callAction("<tml:action ref="publishContent"/>", 
+							"<tml:script>return portlet.portletkey</tml:script>",
+							"{%label:dialog.publish-content.publishing-content%}");
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+					BI.dialog.onShow();
+					BI.makeDateFields("publish-content-form", "{%label:format.ext.date.short-with-time%}");
+					BI.dialog.autoHeight();
+				});
+				BI.dialog.onShow=function(){
+					try{
+						document.forms["publish-content-form"].title.focus();
+					}
+					catch(e){}
+				}
+		
+			</script>
+			   	
+		</tml:form>
+
+	</tml:else>
+</tml:if>

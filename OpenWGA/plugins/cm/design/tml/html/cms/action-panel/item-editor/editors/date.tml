@@ -1,0 +1,73 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<ul>
+	<li class="textfield-info"><tml:label key="format.date.short-with-time-help"/></li>
+</ul>
+<div id="bi-date-editor" style="margin-top:10px"></div>
+
+<div style="display:none">
+	<tml:input name="fielddata" type="date" format="{label('format.date.short-with-time')}"
+		validation="$E_VALUE=='' || $P_VALUE!=null"
+		message="{label('format.invalid-date')}"
+		default="{format(item(tmlform.edititem), label('format.date.short-with-time'))}"
+	/>
+</div>
+
+<script>
+
+	var el_edit = BI.sitepanel.iframe.window.document.getElementById("item_<tml:item name="edititem" type="tmlform"/>")
+	el_edit.style.display="inline";
+	
+	var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+	Ext.DomHelper.overwrite(el_edit, {
+		tag: "input",
+		style: "border: 3px solid #7eadd9"
+	})
+	el_edit.firstChild.value=form.fielddata.value
+	
+	var editor = new Ext.DatePicker();
+	var initdate = Date.parseDate(form.fielddata.value, "<tml:label key="format.ext.date.short-with-time"/>")
+	if(initdate)
+		editor.setValue(initdate);
+	editor.on("select", function(datepicker, date){
+		var cdate = Date.parseDate(el_edit.firstChild.value, "<tml:label key="format.ext.date.short-with-time"/>")
+		if(cdate){
+			date.setHours(cdate.getHours());
+			date.setMinutes(cdate.getMinutes());
+		}
+		el_edit.firstChild.value=date.format("<tml:label key="format.ext.date.short-with-time"/>");
+	})
+	editor.render("bi-date-editor");
+
+	var inputel = Ext.get(el_edit.firstChild);
+	inputel.addKeyListener(13, BI.contenteditor.saveField);
+	if(!Ext.isGecko)
+		inputel.addKeyListener(27, BI.contenteditor.cancelEdit);
+
+	BI.contenteditor.getFieldData=function(){
+		return el_edit.firstChild.value;
+	}
+	
+</script>

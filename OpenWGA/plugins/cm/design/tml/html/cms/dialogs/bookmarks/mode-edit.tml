@@ -1,0 +1,180 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="deletebookmark">
+	var _BookmarkManager = createObject("cms:bookmark-manager", tmlform.dbkey);
+	if (!_BookmarkManager.removeBookmark(portlet.folder, portlet.bookmark))
+		tmlform.addMessage(label("dialog.bookmarks.cannot-delete-bookmark"));
+	portlet.setMode("view");
+</tml:action>
+
+<tml:action id="renamebookmark">
+	if (!tmlform.validate()) 
+		return;
+	var _BookmarkManager = createObject("cms:bookmark-manager", tmlform.dbkey);
+	if (_BookmarkManager.renameBookmark(portlet.folder, portlet.bookmark, tmlform.newbookmarkname))
+		portlet.setMode("view");
+	else tmlform.addMessage(label("dialog.bookmarks.bookmark-already-exists"));
+</tml:action>
+
+<tml:action id="createfolder">
+	if (javaObject(tmlform.newfoldername).contains(",")) {
+		tmlform.addmessage(label("dialog.bookmarks.invalid-characters"));
+		return tmlform.validate();
+	}
+
+	if (!tmlform.validate()) 
+		return;
+		
+	var _BookmarkManager = createObject("cms:bookmark-manager", tmlform.dbkey);
+	if (!_BookmarkManager.addFolder(tmlform.newfoldername))
+		return tmlform.addMessage(label("dialog.bookmarks.folder-already-exists"));
+	portlet.setMode("view");
+</tml:action>
+
+<tml:action id="renamefolder">
+	if (javaObject(tmlform.newfoldername).contains(",")) {
+		tmlform.addmessage(label("dialog.bookmarks.invalid-characters"));
+		return tmlform.validate();
+	}
+	if (!tmlform.validate()) 
+		return;
+	var _BookmarkManager = createObject("cms:bookmark-manager", tmlform.dbkey);
+	if (_BookmarkManager.renameFolder(portlet.folder, tmlform.newfoldername))
+		portlet.setMode("view");
+	else tmlform.addMessage(label("dialog.bookmarks.folder-already-exists"));
+</tml:action>
+
+<tml:action id="deletefolder">
+	var _BookmarkManager = createObject("cms:bookmark-manager", tmlform.dbkey);
+	if (!_BookmarkManager.removeFolder(portlet.folder))
+		tmlform.addMessage(label("dialog.bookmarks.cannot-delete-folder"));
+	portlet.setMode("view");
+</tml:action>
+
+<tml:script var="_toolbartitle">
+	return label("dialog.bookmarks." + portlet.getMode());
+</tml:script>
+
+<script>
+	WGA.portlet.onload.register(
+		"<tml:script>return portlet.portletkey</tml:script>",
+		function(){
+			BI.BookmarkManager.toolbar = new Ext.Toolbar('bookmarktoolbar');
+			BI.BookmarkManager.toolbar.add(
+				"<tml:item name="_toolbartitle"/>",	
+				"->",
+	    		{
+	    			id: 'deleteBookmark',
+	        		icon: '<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="cancel.png"/>',
+	        		cls: 'x-btn-icon',
+	        		tooltip: 'Cancel',
+	        		handler: function() {
+	        			BI.BookmarkManager.setPortletMode("view");
+	        		}
+	    		}  		
+	    	);
+	    	
+	    	BI.dialog.autoHeight();						
+	    }
+	);
+</script>
+
+<tml:input name="dbkey" default="{option('dbkey')}" type="hidden"/>
+
+<div id="bookmarktree">
+
+	<tml:case condition="tmlform.hasmessages()">
+		<ul>
+			<li class="warning"><tml:formmessages divider="<br/>"/></li>
+		</ul>
+		<hr size="1">
+	</tml:case>	
+
+	<tml:case portletmode="edit-bookmark, delete-bookmark">
+		<label>
+			<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="folder.png"/>
+			<tml:item type="portlet" name="folder"/>
+		</label>
+		
+		<tml:case portletmode="edit-bookmark">
+			<script>
+				BI.BookmarkManager.getForm().newbookmarkname.focus();
+				BI.BookmarkManager.submitAction="<tml:action ref="renamebookmark"/>";
+			</script>
+			<label><tml:label key="dialog.bookmarks.enter-new-bookmark-title"/>:</label>
+			<tml:input name="newbookmarkname" cssclass="textinput required" default="{portlet.bookmark}" validation="$E_VALUE != ''" message="{label('dialog.bookmarks.name-empty')}"/>				
+			<div class="buttons">
+				<button onclick="BI.dialog.submit()"><tml:label key="save"/></button>
+				<button onclick="BI.BookmarkManager.setPortletMode('view')"><tml:label key="cancel"/></button>
+			</div>
+		</tml:case>
+	
+		<tml:case portletmode="delete-bookmark">
+			<label>
+				<tml:label key="dialog.bookmarks.delete-bookmark-query" param1="{portlet.bookmark}"/>
+			</label>
+			<div class="buttons">
+				<tml:button clickaction="deletebookmark" ajax="true"><tml:label key="dialog.bookmarks.delete-yes"/></tml:button>
+				<button onclick="BI.BookmarkManager.setPortletMode('view')"><tml:label key="dialog.bookmarks.delete-no"/></button>				
+			</div>
+		</tml:case>		
+		
+	</tml:case>
+	
+	<tml:case portletmode="new-folder">
+		<script>
+			BI.BookmarkManager.getForm().newfoldername.focus();
+			BI.BookmarkManager.submitAction="<tml:action ref="createfolder"/>";
+		</script>
+		<label><tml:label key="dialog.bookmarks.enter-folder-title"/>:</label>
+		<tml:input name="newfoldername" cssclass="textinput required" validation="$E_VALUE != ''" message="{label('dialog.bookmarks.name-empty')}"/>
+		<div class="buttons">
+			<button onclick="BI.dialog.submit()"><tml:label key="save"/></button>
+			<button onclick="BI.BookmarkManager.setPortletMode('view')"><tml:label key="cancel"/></button>
+		</div>
+	</tml:case>
+		
+	<tml:case portletmode="edit-folder">
+		<script>
+			BI.BookmarkManager.getForm().newfoldername.focus();
+			BI.BookmarkManager.submitAction="<tml:action ref="renamefolder"/>";
+		</script>
+		<label><tml:label key="dialog.bookmarks.enter-new-folder-title"/>:</label>
+		<tml:input name="newfoldername" cssclass="textinput required" validation="$E_VALUE != ''" default="{portlet.folder}" message="{label('dialog.bookmarks.name-empty')}"/>
+		<div class="buttons">
+			<button onclick="BI.dialog.submit()"><tml:label key="save"/></button>
+			<button onclick="BI.BookmarkManager.setPortletMode('view')"><tml:label key="cancel"/></button>
+		</div>
+	</tml:case>
+		
+	<tml:case portletmode="delete-folder">
+		<label><tml:label key="dialog.bookmarks.delete-folder-query" param1="{portlet.folder}"/></label>
+		<div class="buttons">
+			<tml:button clickaction="deletefolder" ajax="true"><tml:label key="dialog.bookmarks.delete-yes"/></tml:button>
+			<button onclick="BI.BookmarkManager.setPortletMode('view')"><tml:label key="dialog.bookmarks.delete-no"/></button>				
+		</div>
+	</tml:case>
+		
+</div>

@@ -1,0 +1,104 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="rotateImage">	
+		var _sourceName = tmlparam1;
+		var _targetName = tmlparam2;
+
+		if (_sourceName && _targetName && content().hasFile(_sourceName)) {
+			var img = content().getFileData(_sourceName);
+			var sc = createimagescaler(img);
+			
+			if (tmlform.suffix == 1) {
+				var suffix = '.png';
+				sc.usePNGForOutput();
+			} else {
+				var suffix = '.jpg';
+				sc.useJPEGForOutput();
+			}
+			
+			content().removeFile(_sourceName);
+			content().save();
+			
+			if (tmlparam3 == "left") sc.rotateImageLeft();
+			else if (tmlparam3 == "right") sc.rotateImageRight();
+			
+			try{
+				sc.attachScaledImage(content(), _targetName);
+				content().save();
+				
+				setoption("filename", _targetName + sc.getFormatSuffix());
+				autoSize = true;
+				portlet.fireEvent(createEvent("CMS_attachments_changed"));
+			}
+			catch(e){
+				tmlform.addMessage(e.message);
+			}
+		}
+	
+</tml:action>
+
+<tml:action id="mirrorImage">	
+	var _sourceName = tmlparam1;
+		var _targetName = tmlparam2;
+
+		if (_sourceName && _targetName && content().hasFile(_sourceName)) {
+			var img = content().getFileData(_sourceName);
+			var sc = createimagescaler(img);
+			
+			if (tmlform.suffix == 1) {
+				var suffix = '.png';
+				sc.usePNGForOutput();
+			} else {
+				var suffix = '.jpg';
+				sc.useJPEGForOutput();
+			}
+			
+			content().removeFile(_sourceName);
+			content().save();
+			
+			if (tmlparam3 == "vert") sc.mirrorImageVertical();
+			else if (tmlparam3 == "hori") sc.mirrorImageHorizontal();
+			
+			try{
+				sc.attachScaledImage(content(), _targetName);
+				content().save();
+				
+				setoption("filename", _targetName + sc.getFormatSuffix());
+				autoSize = true;
+				portlet.fireEvent(createEvent("CMS_attachments_changed"));
+			}
+			catch(e){
+				tmlform.addMessage(e.message);
+			}
+		}
+</tml:action>
+
+<div class="form-element-toolbar">
+	<a href="<tml:url type="action" action="rotateImage" ajax="true" param1="{option('sourceName')}" param2="{option('targetName')}" param3="left"/>" id="rotate_left" title="<tml:label key="rotate-image-anticlockwise"/>"><tml:image db="@afw" doc="icons" file="shape_rotate_anticlockwise.png"/></a>
+	<a href="<tml:url type="action" action="rotateImage" ajax="true" param1="{option('sourceName')}" param2="{option('targetName')}" param3="right"/>" id="rotate_right" title="<tml:label key="rotate-image-clockwise"/>"><tml:image db="@afw" doc="icons" file="shape_rotate_clockwise.png"/></a>
+	<a href="<tml:url type="action" action="mirrorImage" ajax="true" param1="{option('sourceName')}" param2="{option('targetName')}" param3="vert"/>" id="mirror_vertical" title="<tml:label key="mirror-image-vertical"/>"><tml:image db="@afw" doc="icons" file="shape_flip_vertical.png"/></a>
+	<a href="<tml:url type="action" action="mirrorImage" ajax="true" param1="{option('sourceName')}" param2="{option('targetName')}" param3="hori"/>" id="mirror_horizontal" title="<tml:label key="mirror-image-horizontal"/>"><tml:image db="@afw" doc="icons" file="shape_flip_horizontal.png"/></a><br>
+</div>

@@ -1,0 +1,103 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+this.login = function(dbkey, username, password, contentkey){
+	var database=wgacore.getContentdbs().get(dbkey)
+	if(!database){
+		return label("login.database-not-found", createlist([encode("html", dbkey)]))
+	}
+	var domain = WGA.database(database).domain().name
+	
+	if(login(username, password, domain)){
+		log.info("OpenWGA Contentmanager: user '" + username + "' logged in to database '" + dbkey + "' in domain '" + domain + "' from IP " + request.getRemoteAddr());
+		try{
+			var wgdb = db(dbkey);	// opens a db session
+			if(!wgdb.isSessionOpen()){
+				return WGA.design(this).label("login.user-is-no-author", WGA.createList([tmlform.username, dbkey]))
+			}
+			log.info("user '" + username + "' is logged in as " + AFW.database(database).getAccessLevelText())
+			if(!AFW.database(database).isAuthor())
+				return WGA.design(this).label("login.user-is-no-author", WGA.createList([tmlform.username, dbkey]))
+						
+			redirectto(this.getAuthoringURL(dbkey, contentkey));
+		}
+		catch(e){
+			logException(e);
+			return e.message
+		}
+	}
+	else {
+		// is logon blocked?
+		if(WGACore.getBruteForceLoginBlocker().isLoginBlocked(domain, username))
+			return WGA.design(this).label("login.login-blocked", [username])
+		else return WGA.design(this).label("login.login-error")
+	}
+}
+
+this.getAuthoringURL=function(dbkey, contentkey){
+	var url = WGA.urlBuilder(WGA.design(this).resolve("contentstore").layoutURL())
+	if(dbkey)
+		url.setParameter("dbkey", dbkey);
+	if(contentkey){
+		url.setParameter("contentkey", contentkey);
+		return url.build(true)+"#"+dbkey+"/"+contentkey
+	}
+	else return url.build(true)
+}
+
+this.setConfig = function(config){
+	var menu = config.menu || {}
+	for(var m in menu){
+		var values = menu[m];
+		for(var i=0; i<values.length; i++){
+			values[i].id = AFW.Util.generateUID();
+		} 
+	}
+	db().setAttribute("CM.config", config);
+}
+
+this.getConfig = function(dbkey){
+	return (dbkey ? db(dbkey) : db()).getAttribute("CM.config") || {};
+}
+
+this.getConfigValue = function(val){
+	if(typeof(val)=="function"){
+		try{
+			return val.call(context("this"))
+		}
+		catch(e){
+			return e;
+		}
+	}
+	else return val
+}
+
+this.isPanelVisible = function(panel, dbkey){
+	var config = this.getConfig(dbkey);
+	var val = config.panels && config.panels[panel]
+	if(val===undefined)
+		return true
+	return Boolean(this.getConfigValue(val))
+}

@@ -1,0 +1,668 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="db-changed">
+	portlet.context = context("db:" + portletEvent.getParameter("dbkey"))
+</tml:action>
+
+<tml:eventscript onevent="CMS_dbkey_changed" action="db-changed"/>
+
+<tml:script>
+	_Database = AFW.database();
+	_username = _Database.getShortestUserAlias();
+	_accessleveltext = _Database.getAccessLevelText();
+</tml:script>
+
+<tml:range labelfile="menu">
+
+<table width="100%" cellpadding="0" cellspacing="0">
+	<tr>
+		<td><div id="header-toolbar"></div></td>
+		<td align="right"><div id="userinfo"></div></td>
+	</tr>
+</table>
+
+<script>
+
+	if(typeof(BI.menu)=="undefined")
+		BI.menu={};
+	
+	BI.menu.create = new Ext.menu.Menu({
+       	items: [
+       		
+        	{	text: "{%label:create.new_page%} ...",
+        		observer: "create-new-page",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_add.png"/>",
+        		handler: function(){
+					BI.sitepanel.showCreateAreas(true);
+				}
+        	},
+        	{	text: "{%label:create.new_language%} ...",
+        		observer: "create-content",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_white_add.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("create-content", ev.target);
+        		}
+        	}
+       	]
+	});
+	BI.menu.create.on("beforeshow", function(){
+		Ext.get("web-content-wrapper").mask();
+	});
+	BI.menu.create.on("beforehide", function(){
+		Ext.get("web-content-wrapper").unmask();
+	});
+	
+	/*
+	 * Web Views
+	 */
+	<tml:script>
+		_views = WGA.createList(["browser", "phone", "phone-landscape", "tablet", "tablet-landscape"])
+	</tml:script>
+	var items = []
+	<tml:foreach item="_views" currentvalue="_view">
+		items.push(
+			new Ext.menu.CheckItem(
+			{
+				text: "<tml:label key="[webview.{_view}]"/>",
+				cssclass: "<tml:item name="_view"/>",
+				group: 'webviews',
+				checked: <tml:script expression="_view=='browser'"/>,
+				handler: function(m){
+					BI.changeWebView(m.cssclass);
+				}
+			})
+		)
+	</tml:foreach>
+	
+	BI.menu.webview = new Ext.menu.Menu({
+       	items: items
+	});
+	BI.menu.webview.on("beforeshow", function(){
+		Ext.get("web-content-wrapper").mask();
+	});
+	BI.menu.webview.on("beforehide", function(){
+		Ext.get("web-content-wrapper").unmask();
+	});
+
+	
+	BI.menu._delete = new Ext.menu.Menu({
+       	items: [
+        	{	text: "{%label:delete.delete_page%} ...",
+        		observer: "delete-page",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_delete.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("delete-page", ev.target);
+        		}
+        	},
+        	{	text: "{%label:delete.delete_content%} ...",
+        		observer: "delete-content",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_white_delete.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("delete-content", ev.target);
+        		}
+        	},
+        	{	text: "{%label:delete.archive_content%} ...",
+        		observer: "archive-content",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_white_database.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("archive-content", ev.target);
+        		}
+        	}
+       	]
+	});
+	
+	BI.menu.edit = new Ext.menu.Menu({
+       	items: [
+        	{	text: "{%label:edit.copy_content%} ...",
+        		observer: "copy-content",
+        		icon: "<tml:url db="@afw" type="file" doc="icons" file="page_copy.png"/>",
+        		handler: function(m, ev){
+        			BI.clipboard.copyContent()
+        		}
+        	},
+        	{	text: "{%label:edit.paste_content%} ...",
+        		observer: "paste-content",
+        		icon: "<tml:url db="@afw" type="file" doc="icons" file="page_paste.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("paste-content", ev.target);
+        		}
+        	},
+        	"-",
+        	{	text: "{%label:edit.edit_content%} ...",
+        		observer: "edit-content",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_white_edit.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("edit-content", ev.target);
+        		}
+        	},
+        	{	text: "{%label:edit.check_out%} ...", 
+        		observer: "get-content",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_white_go.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("edit-content", ev.target);
+        		}
+        	},
+        	{text: "{%label:edit.publish_content%} ...", 
+        		observer: "publish-content",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_white_world.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("publish-content", ev.target);
+        		}
+        	},
+        	"-",
+        	{text: "{%label:edit.approve_content%} ...", 
+        		observer: "approve-content",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="thumb_up.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("approve-content", ev.target);
+        		}
+        	},
+        	{text: "{%label:edit.reject_content%} ...", 
+        		observer: "reject-content",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="thumb_down.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("reject-content", ev.target);
+        		}
+        	},
+        	"-",
+        	{	text: "{%label:delete%}",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="bin.png"/>",
+        		menu: BI.menu._delete
+        	},
+        	"-",
+        	{	text: "{%label:edit.properties%} ...",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_white_gear.png"/>",
+	        	observer: "edit-properties",
+        		handler: function(m, ev){
+					BI.propertiespanel.show();       		
+				}
+        	}
+       	]
+	})
+	BI.menu.edit.on("beforeshow", function(){
+		Ext.get("web-content-wrapper").mask();
+	});
+	BI.menu.edit.on("beforehide", function(){
+		Ext.get("web-content-wrapper").unmask();
+	});
+	
+	<tml:script>
+		var dbs=wgacore.getContentdbs().values().iterator();
+		var mydomain=meta("db", "domain");
+		var wgaconfig = wgacore.getWgaConfiguration()
+		var vhost_filter = Packages.de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
+		var vHost = vhost_filter.findMatchingHost(wgaconfig, request);
+		
+		_dbs=WGA.createList();
+		
+		while(dbs.hasNext()){
+			// Fetch database
+			var database = dbs.next();
+			var Database = AFW.database(database);
+			
+			if(!Database.isAuthoringAllowed())
+				continue;
+			if(!database.hasFeature(database.FEATURE_FULLCONTENTFEATURES))
+				continue;
+			var domain=database.getAttribute(wgacore.DBATTRIB_DOMAIN)
+			if(mydomain==domain){
+				// check V-Hosts
+				if(vHost && !vhost_filter.isDBKeyAllowed(wgaconfig, vHost, Database.getKey()))
+					continue;
+			
+				// Open the database, if possible
+				if (!database.isSessionOpen()) {
+					wgacore.openContentDB(database, request, false);
+					if (!database.isSessionOpen())
+						continue;
+				}
+				// check access rights:
+				if(AFW.database(database).isAuthor())	// this open a db session
+					_dbs.add(database);
+			}
+		}
+		
+		// sort db list:
+		_dbs = WGA.sortList(_dbs, function(a,b){
+			var akey= a.getTitle();
+			var bkey= b.getTitle();
+			if(akey < bkey)
+				return -1
+			else return 1;
+		})
+	</tml:script>
+
+	var db_menu = BI.menu.dbs = new Ext.menu.Menu({
+       	items: [
+		<tml:foreach type="itemvalue" item="_dbs" currentvalue="_db">
+			new Ext.menu.CheckItem(
+			{
+				text: "<tml:script>return _db.getTitle()</tml:script>",
+				group: 'contentstores',
+				dbkey: "<tml:script>return _db.getDbReference()</tml:script>",
+                checked: "<tml:script>return _db.getDbReference()</tml:script>"==BI.dbkey,
+				handler: function(){
+					BI.selectDb("<tml:script>return _db.getDbReference()</tml:script>", "");
+				}
+			})
+			<tml:between>,</tml:between>
+		</tml:foreach>
+		]
+	});
+	
+	BI.menu.agents = new Ext.menu.Menu()		// empty by default. Will be filled by portlet-menu-observer
+	BI.agents_menu = new Ext.menu.Item(
+    	{	text: "{%label:start_agent%}",
+    		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="script.png"/>",
+    		menu: BI.menu.agents
+    	}
+	);
+	
+	BI.menu.admin = new Ext.menu.Menu({
+		items:[
+	       	{	text: "{%label:linkchecker-config%}",
+	       		disabled: <tml:script expression="!_Database.isAdmin()"/>,
+	       		observer: "admins-only",
+	       		handler: function(m, ev){
+	       			BI.dialog.show("linkchecker-config", ev.target);
+	       		}
+	       	},
+	       	{	text: "{%label:login-as-admin%}",
+	       		disabled: <tml:script expression="_Database.isAdmin()"/>,
+	       		observer: "no-admin",
+	       		handler: function(m, ev){
+	       			BI.dialog.show("admin-login", ev.target);
+	       		}
+	       	}        				
+		]
+	});
+	
+	BI.menu.contentmanager = new Ext.menu.Menu({
+       	items: [
+        	{	text: "<tml:label key="about" param1="{WGA.Brand.name}"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("about", ev.target);
+        		}
+        	},
+        	"-",
+        	{
+        		text: "{%label:administration%}",
+        		disabled: !<tml:script expression="wgacore.isAdministrativePort(request.getServerPort())"/>,
+        		menu: BI.menu.admin
+        	},
+        	"-",
+        	{	text: "{%label:preferences%} ...",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="cog.png"/>", 
+        		handler: function(m, ev){
+        			BI.dialog.show("settings", ev.target);
+        		}
+        	},
+        	"-",
+        	{	text: "{%label:search%} ...", 
+				icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_white_magnify.png"/>",
+        		handler: function(m, ev){
+	        		BI.dialog.show("search", ev.target);
+	        	}
+        	},
+        	{	text: "{%label:change_database%}",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="database_go.png"/>", 
+        		menu: db_menu
+        	},
+        	BI.agents_menu,
+        	"-",
+        	{	text: "{%label:change_user%} ...", 
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="group_go.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("login", ev.target);
+        		}
+        	},
+        	{	text: "{%label:quit%}", 
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="door_out.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("quit", ev.target);
+        		}
+        	}
+        ]
+	});
+	BI.menu.contentmanager.on("beforeshow", function(){
+		Ext.get("web-content-wrapper").mask();
+	});
+	BI.menu.contentmanager.on("beforehide", function(){
+		Ext.get("web-content-wrapper").unmask();
+	});
+	
+	BI.toolbarbuttons={
+		cms:[
+			new Ext.Toolbar.Button({
+				cls: "x-btn-text-icon",
+				icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="application.png"/>",
+				text: "{%label:webview%}",
+		        menu : BI.menu.webview
+	        })
+			,new Ext.Toolbar.Button({
+					cls: "x-btn-text-icon",
+					icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="add.png"/>",
+					text: "{%label:create%}",
+			        menu : BI.menu.create
+			})
+			,new Ext.Toolbar.Button({
+					cls: "x-btn-text-icon",
+					icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="pencil.png"/>",
+					text: "{%label:edit%}",
+			        menu : BI.menu.edit
+			})
+			,new Ext.Toolbar.Separator()
+			,new Ext.Toolbar.Button({
+					id:'content-view-button',
+					cls: "x-btn-text-icon",
+					icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="application_view_columns.png"/>",
+					text: "{%label:content%}",
+		       		handler: function(m, ev){
+		       			BI.contentpanel.activate();
+		       		}
+			})
+			,new Ext.Toolbar.Separator()
+			,new Ext.Toolbar.Button({
+				id: "dashboard",
+				cls: "x-btn-text-icon",
+				icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="application_view_tile.png"/>",
+				text: "Dashboard",
+	       		handler: function(m, ev){
+	       			BI.dashboardpanel.activate();
+	       		}
+			})
+		]
+		
+		,fieldedit:[
+			new Ext.Toolbar.Button({
+					id: "save-and-continue",
+					cls: "x-btn-text-icon",
+					icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="disk.png"/>",
+					text: "{%label:fieldedit.save-and-continue%}",
+					tooltip: $L.RTFToolbar.save_and_continue,
+		       		handler: function(m, ev){
+		       			BI.contenteditor.saveFieldAndContinue();
+		       		}
+			})
+			,new Ext.Toolbar.Button({
+					cls: "x-btn-text-icon",
+					icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="accept.png"/>",
+					text: "{%label:fieldedit.save-and-close%}",
+					tooltip: $L.RTFToolbar.save_and_close,
+		       		handler: function(m, ev){
+		       			BI.contenteditor.saveField();
+		       		}
+			})
+			,new Ext.Toolbar.Button({
+					cls: "x-btn-text-icon",
+					icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="cancel.png"/>",
+					text: "{%label:fieldedit.cancel-edit%}",
+					tooltip: $L.cancel,
+		       		handler: function(m, ev){
+		       			BI.contenteditor.cancelEdit();
+		       		}
+			})
+		]
+		
+	};
+
+	BI.showToolbarButtons=function(type){
+		//console.log("showToolbarButtons", type);
+		for(c in BI.toolbarbuttons){
+			var buttons=BI.toolbarbuttons[c];			
+			for (var i=0; i<buttons.length; i++){
+				try{
+					if(c==type)
+						buttons[i].show();
+					else buttons[i].hide();
+				} catch(e){	// Buttons may not be rendered
+					//console.log("unable to show/hide button", buttons[i])
+				}					
+			}
+		}	
+	};
+	BI.showToolbarButtons("cms");
+	
+	var tb = BI.toolbar = new Ext.Toolbar("header-toolbar");
+    tb.add(
+    	{
+			cls: "x-btn-text",	
+			text: "<b><tml:script expression="WGA.Brand.name" encode="html"/> {%label:appName%}</b>",
+			menu: BI.menu.contentmanager
+        }
+   	);
+ 	// add all buttons to toolbar: 	
+	for(c in BI.toolbarbuttons){
+		var buttons = BI.toolbarbuttons[c];
+		for(i=0; i<buttons.length; i++){
+			tb.add(buttons[i])
+		}
+	}
+	
+	var tb = BI.toolbar_user = new Ext.Toolbar("userinfo");
+	var username="<tml:script>return _username.length>40? _username.substr(0,37) + "...":_username</tml:script>";
+    tb.add(
+    	{
+        	cls: "x-btn-text-icon",
+        	icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="user.png"/>",
+        	id: "login-info",
+        	text: "<b>"+username+"</b> (<tml:item name="_accessleveltext"/>)",
+        	tooltip: "{%label:button.change_user.tooltip%}",
+        	handler: function(m, ev){
+       			BI.dialog.show("login", ev.target);
+       		}
+		},
+		"-",
+    	{
+        	cls: "x-btn-icon",
+        	icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="magnifier.png"/>",
+        	tooltip: "{%label:button.search.tooltip%}",
+        	handler: function(m, ev){
+       			BI.dialog.show("search", ev.target);
+       		}
+		}
+    );
+
+	// context menu:
+	BI.menu.context=new Ext.menu.Menu({
+		items: [
+        	{	text: "{%label:create.new_childpage%} ...", 
+        		observer: "create-page",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_add.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("create-page", ev.target);
+        		}
+        	},
+			"-",
+        	{	text: "{%label:delete.delete_page%} ...",
+        		observer: "delete-page",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_delete.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("delete-page", ev.target);
+        		}
+        	},
+			"-",
+        	{	text: "{%label:copy-page%}",
+        		observer: "copy-page",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_copy.png"/>",
+        		handler: function(m, ev){
+        			BI.clipboard.copy();
+        		}
+        	},
+        	{	text: "{%label:paste-page%} ...",
+        		observer: "paste-page",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_paste.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("paste-page", ev.target);
+        		}
+        	},
+			"-",
+        	{	text: "{%label:edit.page-settings%} ...",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_gear.png"/>",
+	        	handler: function(m, ev){
+					BI.dialog.show("page-settings", ev.target);       		
+				}
+        	}
+		]
+	});
+	BI.menu.context.on("beforeshow", function(){
+		Ext.get("web-content-wrapper").mask();
+	});
+	BI.menu.context.on("beforehide", function(){
+		Ext.get("web-content-wrapper").unmask();
+	});
+
+
+	// area context menu:
+	BI.menu.areacontext=new Ext.menu.Menu({
+		items: [
+        	{	text: "{%label:create.new_rootpage%} ...",
+        		observer: "create-rootpage-in-area",
+        		//id: "m-create-rootpage",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_add.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("create-page", ev.target, {root:'true', area:BI.menu.areacontext.area.replace(/'/g, "\\'")});
+        		}
+        	},
+			"-",
+        	{	text: "{%label:paste-page%} ...",
+        		observer: "paste-rootpage-in-area",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="page_paste.png"/>",
+        		handler: function(m, ev){
+        			BI.dialog.show("paste-page", ev.target, {area:BI.menu.areacontext.area.replace(/'/g, "\\'")});
+        		}
+        	}
+		]
+	});
+	BI.menu.areacontext.on("beforeshow", function(){
+		Ext.get("web-content-wrapper").mask();
+	});
+	BI.menu.areacontext.on("beforehide", function(){
+		Ext.get("web-content-wrapper").unmask();
+	});
+
+
+	// more context menu:
+	BI.menu.morecontext=new Ext.menu.Menu({
+		items: [
+        	{	text: "{%label:more.next-page%} ...",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="application_side_list.png"/>",
+        		handler: function(m, ev){
+        			BI.se.updateMore(BI.menu.morecontext.structkey, BI.menu.morecontext.page);
+        		}
+        	},
+        	{	text: "{%label:more.all-pages%} ...",
+        		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="application_side_tree.png"/>",
+        		handler: function(m, ev){
+        			BI.se.reloadStruct(BI.menu.morecontext.structkey, {pagesize:1000});
+        		}
+        	}
+		]
+	});
+	BI.menu.morecontext.on("beforeshow", function(){
+		Ext.get("web-content-wrapper").mask();
+	});
+	BI.menu.morecontext.on("beforehide", function(){
+		Ext.get("web-content-wrapper").unmask();
+	});
+
+
+
+	WGA.event.register(
+		"panel-header",
+		"WGA_user_changed",
+		function(event){
+			var userbutton=BI.toolbar_user.items.get("login-info");
+			var username=event.params.username; 
+			var username=username.length>40 ? username.substr(0,37)+"..." : username;
+			
+			userbutton.setText("<b>"+username+"</b> ("+event.params.accessleveltext+")");
+		}
+	);
+
+	BI.enablemenus=function(observer, enable){
+		for(m in BI.menu){
+			var items=BI.menu[m].items;
+			items.each(function(item){
+			    if(item.observer && item.observer==observer)
+			    	enable ? item.enable() : item.disable()
+			})
+		}
+	}
+	
+	BI.enableContentviewButton=function(enable) {
+		for(var i in BI.toolbarbuttons.cms) {
+			var item = BI.toolbarbuttons.cms[i];
+			if (item.id == 'content-view-button') {
+				enable ? item.enable() : item.disable()
+			}
+		}	
+	}
+	
+	// custom Menus
+	<tml:script>
+		_menu = WGA.createLookupTable();
+		var config = CM.getConfig();
+		if(config.menu){
+			for(var m in config.menu){
+				_menu.put(m, config.menu[m])
+			}
+		}
+		_keys = _menu.keySet();
+	</tml:script>
+	<tml:foreach item="_keys" currentvalue="_key">
+		<tml:script>
+			_values = WGA.createList(_menu.get(_key));
+		</tml:script>
+		<tml:foreach item="_values" currentvalue="_value">
+			<tml:case isfirstloop="true">
+				BI.menu["<tml:item name="_key"/>"].add("-");
+			</tml:case>
+			BI.menu["<tml:item name="_key"/>"].add({
+				id: "custom-menuitem-<tml:script expression="CM.getConfigValue(_value.id)"/>",
+				text: "<tml:script expression="CM.getConfigValue(_value.text)"/>",
+				icon: "<tml:script expression="CM.getConfigValue(_value.icon) || ''"/>",
+				observer: "custom-menu-items",
+				disabled: true,
+				handler: function(){
+					customMenuHandler({
+						action: "<tml:script expression="CM.getConfigValue(_value.action)"/>",
+						dialog: "<tml:script expression="CM.getConfigValue(_value.dialog)"/>"
+					})
+				}
+			})
+		</tml:foreach>
+	</tml:foreach>
+	function customMenuHandler(m){
+		if(m.dialog)
+			BI.dialog.show("custom-dialog", null, {tml:m.dialog});
+	}
+	
+</script>
+</tml:range>
+
+<tml:portlet name="menu-observer" ref="::portlet-menu-observer" ajax="true"/>
+

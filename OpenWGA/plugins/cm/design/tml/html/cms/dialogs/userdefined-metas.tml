@@ -1,0 +1,81 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_Content=createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/content", option("contentkey"), option("dbkey"));
+</tml:script>
+
+<tml:action id="saveUserMetas">
+	if(tmlform.storeInContent(content())){
+		var event=createEvent("CMS_dialog_closed");
+		portlet.fireEvent(event);
+		_actionDone=true;
+	}
+</tml:action>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.selectContent(BI.contentkey, BI.structkey);
+		</script>
+	</tml:then>
+	<tml:else>
+
+		<tml:form id="form-userdefined-metas" context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}" mode="{option('mode')||'view'}" htmlinput="ignore">
+
+			<tml:case condition="tmlform.hasmessages()">
+				<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+				<hr size="1">
+			</tml:case>		
+		
+			<tml:include ref="{_Content.getUserdefinedMetasTML()}" designdb="{option('dbkey')}"/>
+		
+			<script>
+				<tml:case condition="option('mode')=='view'">
+					BI.dialog.submitButton.hide();
+				</tml:case>
+				
+				// submit function called from dialog handler and on RETURN
+				BI.dialog.submit=function(){					
+					BI.util.callAction("<tml:action ref="saveUserMetas"/>",
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"{%label:dialog.userdefined-metas.saving%}");
+				}
+				BI.dialog.onShow=function(){
+					try{
+						document.forms["form-userdefined-metas"].fields[0].focus();
+					}
+					catch(e){}					
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+					BI.dialog.onShow();
+					BI.makeDateFields("form-userdefined-metas", "{%label:format.ext.date.short%}");
+					BI.dialog.autoHeight();					
+				})
+			</script>
+		
+		</tml:form>
+
+	</tml:else>
+</tml:if>

@@ -1,0 +1,220 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script var="_query">
+
+	_filter = function(doc){
+		if (request.getParameter("trash")=="true")
+			return true; 
+		else return this.AREA != "$trash"
+	}
+
+	var MAX_STORED_QUERIES = 10;
+	
+	var query = "1 = 1";
+	_qtype = "hql";
+	_onlypublished = "false";
+	_alllanguages = "true";
+		
+	switch (request.getParameter("mode")) {
+		
+		case 'optionAll':
+			break;
+			
+		case 'optionAuthor':
+			query = "lower(content.author) like lower('%" + request.getParameter("input") + "%')";    
+			break;
+
+		case 'optionOwner':
+			query = "lower(content.owner) like lower('%" + request.getParameter("input") + "%')";    
+			break;		
+		
+		case 'optionContentType':
+			query = "content.structentry.contenttype.name = '" + request.getParameter("input") + "'"; 
+			break;
+			
+		case 'optionStatus':
+			query = "content.status = '" + request.getParameter("input") + "'";
+			break;
+			
+		case 'optionMyDocs':
+			var me = context("db:"+request.getParameter('db')).meta("database", "username")
+			query = "content.author = '" + me + "' OR  content.owner = '" + me + "'"
+			break;	
+			
+		case 'optionStatus':
+			query = "content.status = '" + request.getParameter("input") + "'";	
+			break;
+			
+		case 'optionRemote':
+			query = "content.items['remote_info'] != null and content.items['remote_info'].text != ''";
+			break;
+			
+		case 'optionRemoteParents':
+			query = "content.items['remote_references'] != null and content.items['remote_references'].text != ''";		
+			break;
+			
+		case 'optionQuery':
+			query = unescape(request.getParameter("dbquery"));
+			_onlypublished = request.getParameter("onlypublished");
+			_alllanguages = request.getParameter("alllanguages");
+			storeQueryInProfile = true;
+			switch (request.getParameter("querytype")) {
+				case "optionQueryTemplate":
+					_qtype = request.getParameter("templateQueryType");
+					storeQueryInProfile = false;
+					break;
+				case "optionQueryHQL": _qtype = "hql"; break;
+				case "optionQuerySQL": _qtype = "sql"; break;
+				case "optionQueryLucene": _qtype = "lucene"; break;								
+			}
+			
+			if (storeQueryInProfile) {
+				var storedQueries = profile.itemList("CM_stored_custom_queries") || createList();
+				var value = _qtype+"|"+query;
+				if(!storedQueries.contains(value)){
+					storedQueries.add(value)
+					while(storedQueries.size()>MAX_STORED_QUERIES)
+						storedQueries.remove(0);
+					profile.setItem("CM_stored_custom_queries", storedQueries);
+					profile.save();
+				}
+			}
+			
+			return query;	
+	}
+
+
+	// exclude archived documents
+	if (request.getParameter("mode") != "optionStatus" && request.getParameter("archived") == 'false') 
+		query += " and content.status != 'a'";
+		
+	keyword = "content.title";
+	
+	
+	// map sort-column on wga metadata
+	switch (request.getParameter("sort")) {
+		case "title":     keyword = "content.title";   break;
+		case "author":    keyword = "content.author";  break;
+		case "owner":     keyword = "content.owner";  break;
+		case "doctype":   keyword = "content.structentry.contenttype.name"; break;
+		case "status":    keyword = "content.status";  break;
+		case "created":   keyword = "content.created"; break;
+		case "modified":  keyword = "content.lastmodified";break;	
+		case "langtitle": keyword = "content.language";break;
+		case "uniquename":keyword = "content.uniquename";break;
+	}	 
+		
+	// sort results
+	query += ' order by ' + keyword;
+	
+
+	if (request.getParameter("dir") == "ASC") {
+		query += ' asc';
+	}
+	if (request.getParameter("dir") == "DESC") {
+		query += ' desc';
+	}
+
+	return query;
+</tml:script>
+
+
+
+
+<tml:collection id="_lookup">
+	<tml:comment>
+		cache="false" since cache is not dropped when creating draft-copies or deleting content
+	</tml:comment>
+	<tml:query id="_query" type="{_qtype}" db="{request.getParameter('db')}" onlypublished="{_onlypublished}" alllanguages="{_alllanguages}" max="10000" cache="false">
+		<tml:item name="_query"/>			
+	</tml:query>	
+</tml:collection>
+
+
+{
+data:[
+<tml:foreach id="_lookupForeach" sourcetag="_lookup" pagesize="50" filllastpage="false" filter="_filter()">
+   
+	    {
+	        id: "<tml:meta name="key"/>",
+	        skey: "<tml:meta name="structkey"/>",
+	        title: "<tml:script>
+	        	var str = TITLE.replace(/"/g, "\\\"");
+	        	if(AREA=="$trash")
+	        		return "<i style=\\\"color:red\\\">"+str+"</i>";
+	        	return str;
+	        </tml:script>",
+	        author: "<tml:meta name="author"/>",
+	        owner: "<tml:meta name="owner"/>",
+	        doctype: "<tml:meta name="doctype"/>", 
+	        language: "<tml:meta name="language"/>",
+	        langtitle: "<tml:meta name="languagetitle"/>",
+	        status: "<tml:script expression="STATUS==content().STATUS_REVIEW && content().isPendingRelease() ? 'pending':STATUS"/>",
+	        created: "<tml:meta name="created" format="{label('format.date.short-with-time')}"/>",
+	        modified: "<tml:meta name="modified" format="{label('format.date.short-with-time')}"/>",
+	        uniquename: "<tml:script expression="NAME||PAGENAME"/>",
+	        remote: "<tml:script>
+	        	if (isdefined("remote_info")) return "remote_info";
+	        	if (isdefined("remote_references")) return "remote_references";
+	        </tml:script>"
+	        
+	        ,properties: "<tml:script>
+	        	var str = "";
+
+	        	str += '<span style=\'display:inline; float:left; width: 1px; height: 16px;\'>&nbsp;</span>';
+	        	
+	        	if (remote_info != null && remote_info != '')
+					str += '<span style=\'background: url(../../plugin-wga-app-framework/file/icons/transmit_blue.png); display:inline; float:left; width: 16px; height: 16px;\' qtip=\''+label("contentview.property.content-consumer")+'\'>&nbsp;</span>';
+
+				if (remote_references != null && remote_references != '')
+					str += '<span style=\'background: url(../../plugin-wga-app-framework/file/icons/transmit_go.png); display:inline; float:left; width: 16px; height: 16px;\' qtip=\''+label("contentview.property.content-provider")+'\'>&nbsp;</span>';
+	        	
+	        	if (content().getFileNames().size() > 0)
+	        		str += '<span style=\'background: url(../../plugin-wga-app-framework/file/icons/attach.png); display:inline; float:left; width: 16px; height: 16px;\' qtip=\''+label("contentview.property.attachments")+'\'>&nbsp;</span>';
+	        		
+	        	if (content().isVirtual())
+	        		str += '<span style=\'background: url(../../plugin-wga-app-framework/file/icons/link.png); display:inline; float:left; width: 16px; height: 16px;\' qtip=\''+label("contentview.property.virtual")+'\'>&nbsp;</span>';
+	        		
+	        	if (content().isHiddenFrom().size() > 0)
+	        		str += '<span style=\'background: url(../../plugin-wga-app-framework/file/icons/eye.png); display:inline; float:left; width: 16px; height: 16px;\' qtip=\''+label("contentview.property.hidden")+'\'>&nbsp;</span>';
+	        	
+	        	if (content().getValidFrom() || content().getValidTo())
+	        		str += '<span style=\'background: url(../../plugin-wga-app-framework/file/icons/date.png); display:inline; float:left; width: 16px; height: 16px;\' qtip=\''+label("contentview.property.visibility-range")+'\'>&nbsp;</span>';
+
+				if(AREA=="$trash")
+					str += '<span style=\'background: url(../../plugin-wga-app-framework/file/icons/bin_closed.png); display:inline; float:left; width: 16px; height: 16px;\' qtip=\''+label("contentview.property.visibility-range")+'\'>&nbsp;</span>';
+
+	        	return str;	        
+	        </tml:script>"
+	    }	 
+	  	
+	   	<tml:between>,</tml:between>
+	    
+</tml:foreach>
+],
+total: <tml:taginfo sourcetag="_lookup" name="count" format="0"/>
+}
+

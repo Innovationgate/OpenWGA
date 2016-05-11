@@ -1,0 +1,116 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="setKeywords">
+	var list = createlist(tmlform.tags, ",").iterator();
+	var keywords = createlist();
+	// trim:
+	while(list.hasNext()){
+		var v = javaObject(list.next()).trim();
+		if(v)
+			keywords.add(v);
+	}
+	content().setKeywords(keywords);
+	content().save();
+	var event=createEvent("CMS_title_changed");
+	portlet.fireEvent(event);
+</tml:action>
+
+<tml:form id="tag-editor" context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}">
+	<tml:script>
+		_cloud={};
+		_tags=[];
+		_total=0;
+	</tml:script>
+	
+	<tml:range  var="_default"><tml:metadata name="keywords" divider=", "/></tml:range>
+	<tml:input type="textarea" cssstyle="width:100%" name="tags" default="{_default}"/>	
+	
+	<tml:collection>
+		<tml:query db="{option('dbkey')}" includecurrent="true" max="50">
+			content.keywords[0]!=''
+			order by content.lastmodified DESC
+		</tml:query>
+		<tml:foreach>
+			<tml:script>
+				var it = metalist("keywords").iterator();
+				while(it.hasNext()){
+					var tag = it.next().toLowerCase();
+					if(!_cloud[tag]){
+						_cloud[tag]=0;
+						_tags.push(tag);
+					}
+					_cloud[tag]++;
+					_total++;
+				}
+			</tml:script>
+		</tml:foreach>
+	</tml:collection> 
+	
+	<tml:label key="existing-keywords"/>:
+	<div>	
+		<tml:script>
+			ret = "";
+			_tags.sort()
+			for(var i=0; i<_tags.length; i++){
+				var tag=_tags[i];
+				if(_cloud[tag]){
+					var rat = (_cloud[tag]-1)/_total;	// 0<= rat <= 1					
+					var size = 100*(1+8* Math.log((Math.E-1)*rat+1));
+					if(size>300)
+						size=300;
+					ret += '<a href="javascript:addKeyword(\'' + tag + '\')"'
+					ret += ' style="font-size:' + size + '%" title="'+_cloud[tag]+' ' + label('document-s') + '">'
+					ret += tag
+					ret += '</a> ';
+				}
+			} 
+			return ret;
+		</tml:script>
+	</div>
+
+	<script>
+		function addKeyword(tag){
+			var el = document.forms["tag-editor"].tags;
+			var keywords = el.value.split(",");
+			for(var i=0; i<keywords.length; i++){
+				var keyword = keywords[i];
+				var exp = new RegExp("\\s*"+tag+"\\s*")
+				if(exp.test(keyword))
+					return;
+			}
+			if(el.value)
+				el.value += ", ";
+			el.value += tag;
+		}
+	
+		// submit function called from dialog handler
+		BI.dialog.submit=function(){			
+			WGA.ajax.callAction("<tml:action ref="setKeywords"/>", "<tml:script expression="portlet.portletkey"/>");
+			BI.dialog.hide();
+		}
+		WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", BI.dialog.autoHeight);
+	</script>
+
+</tml:form>

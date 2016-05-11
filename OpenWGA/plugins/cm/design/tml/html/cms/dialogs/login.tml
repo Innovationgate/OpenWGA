@@ -1,0 +1,225 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="login">
+
+	if(!callAction("cms:check-user-login", option("dbkey")))
+		return;
+
+	if(login(tmlform.username, tmlform.password, tmlform.domain)){
+
+		WGA.domain(tmlform.domain).auth().applyAccessFilter(db().getAttribute("CM.FilterUids").get(db().ACCESSLEVEL_CHIEF_EDITOR), WGA.database(option("dbkey")));
+	
+		var Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", option("dbkey"));
+		
+		var event=createEvent("WGA_user_changed");
+		event.addParameter("username", Database.getShortestUserAlias());
+		event.addParameter("accesslevel", Database.getAccessLevel());
+		event.addParameter("accessleveltext", Database.getAccessLevelText());
+		portlet.fireEvent(event);
+		
+		_actionDone=true;
+		event=createEvent("CMS_dialog_closed");
+		portlet.fireEvent(event);
+
+	}
+	else tmlform.addmessage("Anmeldefehler. Bitte prüfen Sie Benutzername und Kennwort.")		
+</tml:action>
+
+<tml:script>
+	_Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", option("dbkey"));	
+</tml:script>
+
+<tml:form id="login" source="none">
+
+	<script>
+		<tml:if istrue="_actionDone">
+			
+			<tml:then>
+			</tml:then>
+			
+			<tml:else>
+				// submit function called from dialog handler
+				BI.dialog.submit=function(){
+					BI.util.callAction("<tml:action ref="login"/>", 
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"{%label:dialog.login.logging-in%}");
+				}
+				BI.dialog.onShow=function(){
+					BI.dialog.autoHeight();
+					try{
+						document.forms["login"].username.focus();
+					}
+					catch(e){}
+				}
+				
+				WGA.portlet.onload.register(
+					"<tml:script>return portlet.portletkey</tml:script>",
+					function(){
+						BI.dialog.onShow();
+					}
+				);
+			</tml:else>
+		</tml:if>
+	</script>
+	
+
+	<tml:case condition="tmlform.hasmessages()">
+		<b class="warning"><tml:formmessages divider="<br/>"/></b>
+		<hr size="1">
+	</tml:case>		
+
+	<table border="0" cellspacing="4" style="table-layout:fixed;width:100%">
+		<tr>
+			<td width="100" nowrap valign="top">{%label:user%}:</td>
+			<td>
+				<div style="overflow:hidden;text-overflow:ellipsis;font-weight:bold"><tml:script>return _Database.getUserName()</tml:script></div>
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">{%label:aliases%}:</td>
+			<td>
+				<div style="overflow:hidden;text-overflow:ellipsis">
+					<tml:script divider="<br>">return AFW.Util.list(_Database.getUserAliases()).trim()</tml:script>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td width="1%" valign="top">{%label:email%}:</td>
+			<td><tml:script divider="<br>">return _Database.getUserEmail()</tml:script></td>
+		</tr>
+		<tr>
+			<td width="1%" valign="top">{%label:groups%}:</td>
+			<td>
+				<div style="max-height: 100px; overflow:auto">
+					<tml:script expression="_Database.getUserGroups()" divider="<br>"/>
+				</div>
+			</td>
+		</tr>
+		
+		<tr>
+			<td width="1%" valign="top">{%label:roles%}:</td>
+			<td><tml:script divider="<br>">return _Database.getUserRoles()</tml:script></td>
+		</tr>
+		
+		<tr>
+			<td width="1%" valign="top">{%label:access%}:</td>
+			<td>
+				<tml:comment><b><tml:script>return _Database.getAccessLevelText()</tml:script></b>
+				<br></tml:comment>
+				<div id="access-level"></div>
+				<script>
+					<tml:script>
+						_levels = WGA.createList();
+
+						var filterMap = db().getAttribute("CM.FilterUids");
+						var currentLevel = _Database.getAccessLevel()
+						var orgLevel = currentLevel;
+						var app = WGA.app(option('dbkey'))
+						if(app.domain().auth().getAccessFilter(app))
+							orgLevel = db(option('dbkey')).getSessionContext().getOriginalUserAccess().getAccessLevel()
+						if(currentLevel != orgLevel)
+							_levels.add(orgLevel);
+						var levels = filterMap.keySet().iterator();
+						while(levels.hasNext()){
+							var level = levels.next();
+							if(level<=orgLevel && level!=currentLevel && !_levels.contains(level))
+								_levels.add(level);
+						}
+					</tml:script>
+					<tml:if condition="_levels.size()">
+						<tml:then>
+							new Ext.Button("access-level", {
+								text: "<tml:script>return _Database.getAccessLevelText()</tml:script>"
+								,menu: {
+									items: [
+										<tml:foreach item="_levels" currentvalue="_level">
+											{
+												text: "<tml:script expression="db().accessLevelText(_level)"/>",
+												level: "<tml:item name="_level"/>",
+												handler: function(){
+													WGA.ajax.action({
+														action: "<tml:action>
+																var level = request.getParameter("level")
+																log.info("CM: set access level to " + level + " (" + db().accessLevelText(level) + ")");
+																var filterMap = db().getAttribute("CM.FilterUids");
+																var filter = filterMap.get(Number(level));
+																var app = WGA.app(option('dbkey'));
+																app.domain().auth().applyAccessFilter(filter, app)
+										
+																var Database = AFW.database(option("dbkey"));
+																var event=createEvent("WGA_user_changed");
+																event.addParameter("username", Database.getShortestUserAlias());
+																event.addParameter("accesslevel", Database.getAccessLevel());
+																event.addParameter("accessleveltext", Database.getAccessLevelText());
+																portlet.fireEvent(event);
+																
+																event=createEvent("CMS_dialog_closed");
+																portlet.fireEvent(event);
+															</tml:action>",
+														params: {
+															level: this.level
+														}
+													})
+												}
+											}<tml:between>,</tml:between>
+										</tml:foreach>
+									]
+								}
+							})
+						</tml:then>
+						<tml:else>
+							Ext.get("access-level").update("<b><tml:script>return _Database.getAccessLevelText()</tml:script></b>")
+						</tml:else>
+					</tml:if>
+				</script>
+			</td>
+		</tr>
+		
+		<tr>
+			<td width="1%" valign="top">{%label:privileges%}:</td>
+			<td>
+				<tml:label key="{'privileges.may'+(_Database.getUserAccess().mayDeleteDocuments()?'':'Not')+'DeleteDocuments'}"/>
+				<br>
+				<tml:label key="{'privileges.may'+(_Database.getUserAccess().mayMoveStructEntries()?'':'Not')+'MoveDocuments'}"/>
+			</td>
+		</tr>
+		<tml:case isfalse="_actionDone">
+			<tr>
+				<td colspan="2"><hr size="1"></td>
+			</tr>
+			<tr>
+				<td width="1%" nowrap valign="top">{%label:dialog.login.new-user%}:</td>
+				<td><tml:input cssclass="textinput" name="username"/></td>
+			</tr>
+			<tr>
+				<td>{%label:password%}:</td>
+				<td><tml:input cssclass="textinput" type="password" name="password"/></td>
+			</tr>
+		</tml:case>
+	</table>
+	
+	<tml:input type="hidden" name="domain" default="{context('db:'+option('dbkey')).meta('db', 'domain')}"/>
+
+</tml:form>

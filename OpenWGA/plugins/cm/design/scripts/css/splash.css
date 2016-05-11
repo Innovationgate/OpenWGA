@@ -1,0 +1,58 @@
+/*******************************************************************************
+  *Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+  *
+  *This file is part of the OpenWGA server platform.
+  *
+  *OpenWGA is free software: you can redistribute it and/or modify
+  *it under the terms of the GNU General Public License as published by
+  *the Free Software Foundation, either version 3 of the License, or
+  *(at your option) any later version.
+  *
+  *In addition, a special exception is granted by the copyright holders
+  *of OpenWGA called "OpenWGA plugin exception". You should have received
+  *a copy of this exception along with OpenWGA in file COPYING.
+  *If not, see <http://www.openwga.com/gpl-plugin-exception>.
+  *
+  *OpenWGA is distributed in the hope that it will be useful,
+  *but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *GNU General Public License for more details.
+  *
+  *You should have received a copy of the GNU General Public License
+  *along with OpenWGA in file COPYING.
+  *If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+#splash{
+	position:absolute;
+	left:30%;
+	top:10%;
+	padding-top:50px;
+	padding-left: 10px;
+	padding-right: 10px;
+	width:40%;
+	z-index:11000;	
+}
+#splash *{
+    font: normal 10pt verdana,tahoma,helvetica;
+}
+
+#splash td{
+	padding:1px;
+}
+#splash input{
+	width:100%;
+}
+#splash .formmessage{
+	color:red;
+}
+
+#splash hr{
+	color: silver;
+}
+
+#splash input, #splash textarea{
+	border: solid silver 1px;
+	padding: 4px;
+	line-height: 18px;
+	height: 27px;
+}

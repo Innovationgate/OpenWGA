@@ -1,0 +1,124 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_dbkey=option("dbkey");
+	_structkey=request.getParameter("structkey");
+	_page = String(parseInt(request.getParameter("page")) || 1);
+	
+	var pagesize = parseInt(request.getParameter("pagesize"));
+	//log.info("pagesize="+ pagesize + "; _page=" + _page);
+	
+	if(_dbkey==null)
+		_dbkey=request.getParameter("dbkey");
+	if(_dbkey==null)
+		log.error("No dbkey specified");
+
+	var database=db(_dbkey)
+	var struct=database.getStructEntryByKey(request.getParameter("structkey"));
+	_indent = 16*(struct.getLevel()+1)-3;
+	_entries=createlist();
+
+	var it;
+	if(pagesize){
+		it=struct.getChildEntryIterator(pagesize+1)
+		it.skip((_page-1)*pagesize);
+	}
+	else it=struct.getChildEntries().iterator()
+
+	for(var i=0; (pagesize ? (i<pagesize) : true) && it.hasNext(); i++){
+		var struct = it.next()
+		if(struct.mayReadContent())
+			_entries.add(struct);
+	}
+	_hasNext = it.hasNext();
+
+</tml:script>
+
+<tml:foreach item="_entries" currentvalue="_entry">
+	<tml:range context="{'db:'+_dbkey+'/$struct:'+_entry.getStructKey().toString()}">
+
+		<tml:script>
+			// only show struct if it has some readable content or if it has NO content
+			// => hide struct if it HAS some content but nothing is readable.
+			var allContent = document.getAllContent(false);
+			if(allContent.isEmpty())
+				allContent = document.getAllContent(true);	// check acrive docs
+			_hideStruct = allContent.isEmpty() && document.hasContent(null, null);
+
+			if(!hideStruct){
+				if(document.getAllContent(false).isEmpty() && context("plugin:de.innovationgate.contentmanager").profile.hide_archived_only)
+					_hideStruct = true;
+			}
+		</tml:script>
+		
+		<tml:case isfalse="_hideStruct">
+			<div class="struct" id="struct:<tml:script>return document.getStructKey()</tml:script>">
+				<tml:include ref="::entry">
+					<tml:option name="parent">struct:<tml:item name="_structkey"/></tml:option>
+				</tml:include>
+			</div>
+			<div class="children" style="display:none">
+				<div style="padding-left:<tml:item name="_indent"/>px">
+					<tml:img doc="images" file="loading.gif"/> loading ...
+				</div>
+			</div>
+			
+		</tml:case>
+		
+	</tml:range>
+</tml:foreach>
+
+<tml:case istrue="_hasNext">	
+	<div class="struct" id="struct:<tml:item name="_structkey"/>-more"> 
+		<div style="text-align:left;padding-left:<tml:item name="_indent"/>px" onclick="BI.se.updateMore('<tml:item name="_structkey"/>', '<tml:script format="0" expression="Number(_page)+1"/>')"
+				ext:width="150" 
+				ext:qtip="weitere Einträge laden ...">
+			<table cellpadding="0" cellspacing="0" border="0">
+				<tr>					
+					<td width="1%">
+						<tml:img db="{pluginDbKey('de.innovationgate.wga-app-framework')}" doc="icons" file="bullet_add.png"/>
+					</td>
+					<td><i><tml:label key="se.more-entries"/></i></td>
+				</tr>
+			</table>
+			
+		</div>
+	</div>
+	<script>
+		var el = Ext.get("struct:<tml:item name="_structkey"/>-more");
+		el.unselectable();	
+		el.on("contextmenu", function(ev){
+			var h=BI.menu.context.getEl().getHeight();
+			var xy=ev.xy;
+			var doc_h=Ext.lib.Dom.getViewportHeight();
+			if(xy[1]+h>doc_h)
+				xy[1]-=h;
+			BI.menu.morecontext.structkey = "<tml:item name="_structkey"/>";
+			BI.menu.morecontext.page = <tml:script format="0" expression="Number(_page)+1"/>;
+			BI.menu.morecontext.showAt(xy);
+			Ext.lib.Event.stopEvent(ev);
+		}, el);
+	</script>
+</tml:case>

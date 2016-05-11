@@ -1,0 +1,112 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	var prefix = tmlform.query || option("query");
+	
+	// lookup user and groups
+	_usersGroups = null;
+	if(prefix && prefix.replace(/\*/g, "")){
+		var authModule = db(option('dbkey')).getAuthenticationModule();
+		var queryType = Packages.de.innovationgate.webgate.api.auth.AuthenticationModule.QUERY_USERS_AND_GROUPS;
+		if (authModule.isQueryable(queryType)) {
+			try{
+				_usersGroups = authModule.query(prefix, queryType);
+				tmlform.addMessage(_usersGroups.size() + " " + label("entries-found"));
+			}
+			catch(e){
+				//log.info(e.message);
+				tmlform.addMessage("error: " + e.message);
+			}
+		}
+	}
+</tml:script>
+
+<script>
+	BI.util.ldap={
+		saveUser: function(name){
+			var el=Ext.get("<tml:option name="fieldid"/>");
+			if(el){
+				if(el.dom.value!="")
+					el.dom.value += "\n";
+				el.dom.value += name;
+				BI.dialog.hide();
+				var divid = "<tml:option name="textareadivid"/>";
+				BI.makeTextareasResizable(divid);				
+			}
+			else alert("field '<tml:option name="fieldid"/>' not found");
+		}
+	}
+</script>
+
+<tml:form id="ldap" source="none">
+
+	<tml:case condition="tmlform.hasMessages()">
+		<b><tml:formmessages divider="<br/>"/></b>
+		<hr size="1">		
+	</tml:case>
+
+	<div style="height:300;overflow:auto">
+		<table border="0" cellspacing="5" cellpadding="5" class="collection" width="100%">
+			<tr colaspan="collection-title">
+				<td>{%label:dialog.ldap.username%}</td>
+				<td>{%label:dialog.ldap.type%}</td>
+				<td>{%label:dialog.ldap.aliases%}</td>
+			</tr>
+			<tml:foreach type="itemvalue" item="_usersGroups" currentvalue="_current">
+				<tr onclick="BI.util.ldap.saveUser('<tml:script>return _current.getFullQualifiedName();</tml:script>')" 
+						onmouseover="Ext.get(this).addClass('selected')"
+						onmouseout="Ext.get(this).removeClass('selected')"
+						style="cursor: pointer;">
+				    <td><tml:script>return _current.getFullQualifiedName().replace(/,/g, ", ");</tml:script></td>
+				    <td>
+				    	<tml:script>
+				    		if (_current.isUser()) { 
+				    			return "User" 
+				    		} else {
+				    			return "Group"
+				    		}
+				    	</tml:script>
+				    </td>    
+				    <td><tml:script divider=", ">return _current.getAliasNames();</tml:script></td>
+			   </tr> 
+			</tml:foreach>
+		</table>
+	</div>
+	
+	<hr size="1">
+	<tml:input name="query" default="{option('query')}" focus="true">size="40"</tml:input>
+	<button type="submit" onclick="WGA.ajax.callAction('<tml:action ref="$refresh"/>', '<tml:script expression="portlet.portletkey"/>')">Suchen</button>
+
+	<script>
+		WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+			BI.dialog.autoHeight();
+			document.forms.ldap.query.focus();
+		});
+	</script>
+	
+</tml:form>
+
+
+

@@ -1,0 +1,57 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<div class="dashboard">
+
+	<h1 style="font-size:2em;padding:20px 20px 0"><tml:meta type="database" name="title"/></h1>
+
+	<div style="float:left;width:50%">
+		<div class="block">
+			<tml:include ref="::my-drafts"/>
+		</div>
+		<tml:comment><div class="block">
+			<tml:include ref="::review"/>
+		</div></tml:comment>
+	</div>
+	
+	<div style="float:left;width:50%">
+		<div class="block">
+			<tml:include ref="::trash-entries"/>
+		</div>
+		<div class="block">
+			<tml:include ref="::waiting-to-be-approved"/>
+		</div>
+		<div class="block">
+			<tml:include ref="::to-be-approved"/>
+		</div>
+	</div>
+	
+	<tml:case hasoptions="body">
+		<div class="block" style="clear:both">
+			<tml:option name="body"/>
+		</div>
+	</tml:case>
+	
+</div>

@@ -1,0 +1,76 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<div id="link-attachmentview-container">
+	<div id="link-attachmentview-toolbar"></div>
+	<div id="link-attachmentview" class="ychooser-view"></div>
+</div>
+
+<script>
+
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function() {
+		try {
+			var tb = new Ext.Toolbar('link-attachmentview-toolbar', [
+				'<tml:label key="dialog.link.select-document"/>'
+			]);
+			
+			var sitemap = new BI.util.structTree('link-attachmentview', BI.dbkey, BI.language, "<tml:url type="tml" medium="html" layout="json:get-attachment-docs"/>");
+			
+			sitemap.tree.on("click", function(node, e) {
+	        	var a = node.id.split(":");
+	        	if(a[0]=="node-struct" && !node.disabled)
+		        	BI.LinkDialog.selectLink(a[1], node.attributes.text, a[1]);
+		        else BI.LinkDialog.selectLink();
+	        }, this);
+	        
+	       sitemap.tree.on("dblclick", function(node, e) {
+	        	var a = node.id.split(":");
+	        	if(a[0]=="node-struct" && !node.disabled)
+		        	BI.dialog.submit();
+	        }, this);
+
+			<tml:script var="_context">
+				return "db:"+ option("dbkey") + "/docid:" + option("wgakey");
+			</tml:script>
+
+	        <tml:case condition="option('wgakey') != null && option('wgakey') != '' && context(_context, false) != null">
+		        sitemap.tree.selectPath("/root/<tml:script>
+	            	return createObject(
+	            		pluginDbKey("de.innovationgate.wga-app-framework")+"/structentry", 
+	            		context(_context).content().getStructEntry(), 
+	            		option('dbkey')).getPath("node-", "/")
+		            </tml:script>", null, function(success, node){
+			        	var a = node.id.split(":");
+			        	if(success && a[0]=="node-struct" && !node.disabled)
+				        	BI.LinkDialog.selectLink(a[1], node.attributes.text, a[1]);
+				        else BI.LinkDialog.selectLink();
+		            });
+	        </tml:case>
+			
+		}
+		catch(ex) {
+			//console.log(ex);
+		}
+	});
+</script>

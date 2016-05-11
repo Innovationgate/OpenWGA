@@ -1,0 +1,199 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>	
+	_type=option("type");
+	if(!_type)
+		_type="content";
+		
+	_context='db:'+option('dbkey');
+	switch (_type){
+		case "content":
+			_context += '/docid:'+option('key')
+			break;
+		case "file":
+			_context += '/$filecontainer:'+option('key')
+			break;
+	}
+	
+</tml:script>
+
+<tml:if context="{_context}" iscontextvalid="true">
+	<tml:then>
+		
+		<tml:form id="file-upload" source="none" maxuploadsize="-1">
+			<tml:include ref="system:formmessages"/>
+			
+			<div id="upload-attachments-view" style="width:100%;height:200;margin-bottom:5px"></div>
+			
+			<tml:input type="hidden" name="file_to_rename"/>
+			<tml:input type="hidden" name="new_filename"/>
+			
+			<script>
+				var grid=BI.util.createAttachmentGrid("upload-attachments-view", "<tml:item name="_type"/>", "<tml:option name="key"/>")
+				grid.on("afteredit", function(e){
+					document.forms['<tml:script expression="tmlform.formid"/>'].file_to_rename.value=e.originalValue;
+					document.forms['<tml:script expression="tmlform.formid"/>'].new_filename.value=e.value			
+					WGA.ajax.action({
+							action: "<tml:action ajax="norefresh">
+									callAction("cms:rename-file", tmlform.file_to_rename, tmlform.new_filename);
+							</tml:action>",
+							id: "<tml:script>return portlet.portletkey</tml:script>",
+							graydiv: false,
+							mode: "norefresh"
+						}
+					);
+				})				
+				WGA.event.register(
+					"<tml:script expression="portlet.portletkey"/>",
+					"CMS_attachments_changed", 
+					function(e){
+						grid.getDataSource().load({params:{dbkey: BI.dbkey, key: BI.contentkey, type:'content', who:'dialog:upload'}});
+					}
+				);
+			</script>
+		
+			<script>
+				BI.dialog.onShow=function(){
+					BI.dialog.autoHeight();
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+					BI.dialog.onShow();
+				})
+				BI.dialog.submit=function(){
+				
+					var existingFiles = {
+						<tml:script>
+							_files = document.getFileNames();
+						</tml:script>
+						<tml:foreach type="itemvalue" item="_files" currentvalue="_file">
+							"<tml:script expression="_file.toLowerCase()"/>":true<tml:between>,</tml:between>
+						</tml:foreach>
+					}
+					
+					var form_el = document.forms['file-upload'].file; 
+					var uploads = [];
+					if(form_el.files){
+						// check for HTML5 File API interface (multiple files uploads)
+						for(var i=0; i<form_el.files.length; i++){
+							uploads.push(BI.util.getFileName(form_el.files[i].name||form_el.files[i].fileName).filename);
+							// Notes to file API:
+							// the filename property is named "name" in FF but "fileName" in Safari!							
+						}
+					}
+					else uploads = [BI.util.getFileName(document.forms['file-upload'].file.value).filename];
+					
+					// confirm to overwrite existing files
+					var overwrites = []
+					for(var i=0; i<uploads.length; i++){
+						var file = uploads[i];
+						if(existingFiles[file])
+							overwrites.push(file)
+					}
+					if(overwrites.length>0)
+						if(!confirm("The following files already exists:\n" + overwrites.join("\n") + "\nOverwrite these files?"))
+							return;
+									
+					BI.util.callAction("<tml:action param1="{_type}">
+							if(tmlform.filenames.isEmpty())
+								return tmlform.addMessage(label('dialog.upload.please-select-a-file-to-upload'));
+							var count = tmlform.filenames.size(); 
+							log.info("CM: " + count + " files uploaded: " + tmlform.filenames);
+							for(var i=0; i<count; i++){
+								var filename=tmlform.filenames.get(i);
+								var filedata = new Packages.java.io.FileInputStream(tmlform.getFile(filename));
+								var a=filename.split(".");
+								if(a.length>1)
+									var ext="." + a[a.length-1];
+								else var ext="";
+								filename = isEmptyValue(tmlform.filename) ? filename : tmlform.filename+ext
+								filename = WGA.Utils.normalizeUnicode(filename);
+								filename=filename.toLowerCase();
+								if(document.getFileNames().contains(filename)){
+									document.removeFile(filename);
+									log.info("file " + filename + " replaced");
+								}
+								document.attachFile(filedata, filename)
+							}
+							document.save();
+							tmlform.reset();
+							
+							event=createEvent("CMS_attachments_changed");
+							event.addParameter("type", tmlparam1)
+							portlet.fireEvent(event);
+							
+						</tml:action>", "<tml:script>return portlet.portletkey</tml:script>", "upload");
+				}
+				
+				BI.util.updateSaveAs=function(el, save_as_fieldname){
+					if(el.files && el.files.length>1){
+						document.getElementById("save-as-field").style.display="none";
+						el.form[save_as_fieldname].value = "";
+					}
+					else {
+						el.form[save_as_fieldname].value=BI.util.getFileName(el.value).name
+						document.getElementById("save-as-field").style.display="block";
+					}
+				}
+				BI.util.getFileName=function(f){
+					f = f.replace(/\//g, "\\");		// replace / (used on unix systems) with \ (used on windows) 
+					var filepath=f.split("\\");
+					var filename=filepath[filepath.length-1].split(".");
+					var ext = filename[filename.length-1];
+					filename.pop();		// remove file extension
+					filename=filename.join(".");
+					if(BI.sitepanel.iframe.window.WGA.translateFilename)
+						filename=BI.sitepanel.iframe.window.WGA.translateFilename(filename)
+					filename = filename.toLowerCase();
+					ext = ext.toLowerCase();
+					return {
+						name: filename,
+						ext: ext,
+						filename: filename + "." + ext
+					}
+				}
+				
+			</script>
+			
+			<tml:input type="file" name="file">
+				size="45"
+				multiple=""
+				onchange="BI.util.updateSaveAs(this, 'filename')"
+			</tml:input>
+			<div  id="save-as-field">
+				<table width="100%">
+					<tr>
+						<td width="1%" nowrap><tml:label key="save-as"/>:</td>
+						<td><tml:input name="filename" cssclass="textinput"/></td>
+					</tr>
+				</table>
+			</div>
+		</tml:form>
+	</tml:then>
+	
+	<tml:else>
+		invalid context: <tml:item name="_context"/>
+	</tml:else>
+</tml:if>
+

@@ -1,0 +1,68 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="clearRemoteInfo">
+	content().removeItem("remote_info");
+	content().save();
+	_actionDone=true;
+	event=createEvent("CMS_dialog_closed");
+	portlet.fireEvent(event);
+</tml:action>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.selectContent(BI.contentkey, BI.structkey);
+		</script>
+	</tml:then>
+	<tml:else>
+
+		<tml:form id="clear-remote-form"
+			context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}"
+		>
+		
+			<script>
+				BI.dialog.submit=function(){
+					BI.util.callAction("<tml:action ref="clearRemoteInfo"/>", 
+							"<tml:script>return portlet.portletkey</tml:script>",
+							"{%label:dialog.clear-remote.deleting-remote-info%}");
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", BI.dialog.autoHeight);
+			</script>
+		
+			<tml:if context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}" iscontextvalid="true">
+				<tml:then>
+					<h1>{%label:are-you-sure%}</h1>
+					<div style="padding-left:30px;margin-top:10px;background:url('../../plugin-wga-app-framework/file/icons/page_white_edit.png') no-repeat 0px 0px;">
+						{%label:dialog.clear-remote.query-remote-info%}
+					</div>
+				</tml:then>
+				<tml:else>
+					Context not valid: <tml:option name="contentkey"/>
+				</tml:else>
+			</tml:if>
+			   	
+		</tml:form>
+	</tml:else>
+</tml:if>

@@ -1,0 +1,237 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+var database;
+
+this.init=function(dbobj){
+	if(!dbobj)
+		database=this.WGObject=db();
+	else if(typeof dbobj == "string")
+		database=this.WGObject=db(dbobj);
+	else if(dbobj instanceof Packages.de.innovationgate.webgate.api.WGDatabase)
+		database=this.WGObject=dbobj;
+	else database=this.WGObject=dbobj.WGObject;
+	
+}
+
+/**
+ * check internal link
+ * @param String link: link in the form meduim/layout/key or just key (older format)
+ */
+this.checkInternalLink=function(document, link){
+	var medium, layout, key;
+	var a = link.split("?")[0].split("/");
+	var lang = document.getLanguage().getName();
+	
+	//log.info("check: " + a + "/" + a.length);
+	
+	if(a.length==1){
+		//log.info("link has old style format: " + a);
+		try{
+			return this.getContentByKey(a[0], lang);	// old format: key or filename only
+		}
+		catch(e){
+			//log.info("exeption in this.getContentByKey: " + e.message);
+			try{
+				return this.checkForFile(document.getContentKey().toString(), a[0], lang);
+			}
+			catch(e){
+				throw{
+					message: "Content or File '" + a + "' not found",
+					label: "content-or-file-not-found",
+					label_params: [a[0]]
+				}
+			}
+		}		
+	}
+	
+	var medium = a.shift();
+	if(a.length)
+		layout = a.shift();
+	else throw {
+		message:"link has no layout info",
+		label: "link-has-no-layout",
+		label_params: [link]
+	}
+
+	if(a.length)
+		key = a.shift();
+
+	var ext_dbkey;
+	if(a.length)
+		ext_dbkey = a.shift();
+
+	switch(medium){
+		case "file":
+			if(ext_dbkey){
+				try{
+					var doc = db(ext_dbkey).getContentByKey(layout)
+					if(doc.hasFile(key))
+						return;
+					else throw{
+						message: "File " + key + " not found in db " + ext_dbkey + ", content " + layout,
+						label: "content-or-file-not-found",
+						label_params: [key]
+					}
+				}
+				catch(e){
+					throw{
+						message: "Document " + layout + " not found in db " + ext_dbkey,
+						label: "content-or-file-not-found",
+						label_params: [key]
+					}
+				}
+			}
+			else if(!key){
+				// internal file: layout contains file name
+				if(document.hasFile(layout))
+					return;
+				else throw{
+					message: "File " + layout + " not found in content " + document.getContentKey(),
+					label: "file-not-found",
+					label_params: [document.getContentKey(), layout]
+				}
+			}
+			return this.checkForFile(layout, key);
+
+		case "js":
+			return this.checkForJS(layout);
+
+		case "css":
+			return this.checkForCSS(layout);
+
+		case "login":
+		case "logout":
+			return;		// ignore this
+
+		default:	// this is a normal content link
+			if(layout!="default" && database.getTMLModule(layout, medium)==null){
+				throw {
+					message:"TML Module " + layout + " not found for medium " + medium,
+					label: "tml-not-found",
+					label_params: [medium, layout]
+				}
+			}
+			if(key)
+				return this.getContentByKey(key, lang)
+				
+	}
+	
+}
+
+this.checkForFile=function(container_or_contentkey, file, lang){
+	// check file container
+	if(!file) throw{
+		message: "Missing filename in link",
+		label: "missing-filename",
+		label_params: []
+	}
+	var container=database.getFileContainer(container_or_contentkey);
+	if(container==null){
+		// try to find content document
+		try{
+			container=this.getContentByKey(container_or_contentkey, lang);
+		}
+		catch(e){
+			throw{
+				message: "file container or content '" + container_or_contentkey + "' not found",
+				label: "filecontainer-not-found",
+				label_params: [container_or_contentkey]
+			}
+		}
+	}
+	if(!container.hasFile(file)) throw{
+		message: "File " + file + " not found in container or content " + container_or_contentkey,
+		label: "file-not-found",
+		label_params: [container_or_contentkey, file]
+	}
+}
+
+this.checkForJS=function(module){
+}
+
+this.checkForCSS=function(module){
+}
+
+/**
+ * check if content with given key is available
+ * @param String key: either contentkey, structkey or unique name
+ * @param String lang: the language to look for in case key is a unique name
+ */
+this.getContentByKey=function(key, lang){
+
+	
+	var lang = lang || database.getDefaultLanguage()
+
+	try{
+		var doc = database.getContentByKey(key);
+		if(doc==null) throw{
+			message:"invalid content key"
+		}	
+		return doc;
+	}
+	catch(e){	// no contentkey found
+		//log.info("no contentkey found " + key + "/" + e.message);
+		// try structkey:		
+		var struct = database.getStructEntryByKey(key);
+		if(struct){				// we found a struct entry with key as structkey
+			//log.info("struct found");
+			if(struct.getArea().name=="$trash") throw{
+				message:"Link to document in trash",
+				label: "document-is-in-trash",
+				label_params: [key]
+			}
+			var doc = struct.getReleasedContent(lang);
+			if(!doc) throw{
+				message:"No released content found for struct entry in language " + lang,
+				label: "released-content-not-found",
+				label_params: [key, lang]
+			}
+			else return doc;
+		}		
+
+		var doc = database.getContentByName(key, lang);
+		if(doc)
+			return doc;		// we found a doc with key as unique name in given language
+	
+		doc = database.getContentByName(key);
+		if(doc)
+			return doc;		// we found a doc with key as unique name in the default language
+	
+		// try context:
+		doc = context("db:" + database.getDbReference() + "/docid:"+key, false);
+		//log.info("try context docid:"+key + " / " + doc)
+		if(doc)
+			return doc;		// context is OK
+		
+		throw{
+			message: "Key or name not found",
+			label: "key-not-found",
+			label_params: [key]
+		}	
+	
+	}
+
+}
+

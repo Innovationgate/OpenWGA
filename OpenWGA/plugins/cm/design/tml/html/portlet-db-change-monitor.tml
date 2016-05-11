@@ -1,0 +1,78 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="db-changed">
+	log.info("db changed from " + tmlform.old_dbkey + " to " + tmlform.dbkey);
+
+	var dbkeys = request.getSession().getAttribute(Packages.de.innovationgate.contentmanager.filter.ResourceAccessFilter.SESSION_ATTRIB_EDITABLE_DATABASE);
+	if(!dbkeys)
+		dbkeys=WGA.createList()
+	if(!dbkeys.contains(tmlform.dbkey))
+		dbkeys.add(tmlform.dbkey)
+
+	request.getSession().setAttribute(Packages.de.innovationgate.contentmanager.filter.ResourceAccessFilter.SESSION_ATTRIB_EDITABLE_DATABASE, dbkeys);
+
+	if(tmlform.old_dbkey)
+		WGA.app(tmlform.old_dbkey).domain().auth().removeAccessFilter(WGA.database(tmlform.old_dbkey))
+	WGA.app(tmlform.dbkey).domain().auth().applyAccessFilter(db().getAttribute("CM.FilterUids").get(db().ACCESSLEVEL_CHIEF_EDITOR), WGA.database(tmlform.dbkey));
+	
+	var ev = createevent("CMS_contentkey_changed");
+	ev.addParameter("dbkey", tmlform.dbkey);
+	ev.addParameter("contentkey", tmlform.contentkey);
+	ev.addParameter("structkey", tmlform.structkey);
+	portlet.fireevent(ev)
+	
+	var ev = createevent("CMS_dbkey_changed");
+	ev.addParameter("dbkey", tmlform.dbkey);
+	portlet.fireevent(ev)
+	
+</tml:action>
+
+<tml:form id="check-db-change-form" source="none">
+	<tml:input name="dbkey" type="hidden" defaultexpression="option('dbkey')"/>
+	<tml:input name="old_dbkey" type="hidden"/>
+	<tml:input name="contentkey" type="hidden" defaultexpression="option('contentkey')"/>
+	<tml:input name="structkey" type="hidden" defaultexpression="option('structkey')"/>
+	
+	<script>
+		WGA.event.addListener(
+			"<tml:script expression="portlet.portletkey"/>",
+			"CMS_monitor_contentkey_changed",
+			function(ev){
+				var dbkey=ev.params.dbkey;
+				var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+				if(form.dbkey.value!=dbkey){
+					BI.dbpath=BI.wgaurl+"/"+dbkey;
+					form.old_dbkey.value= form.dbkey.value;
+					form.dbkey.value= dbkey;
+					form.contentkey.value = ev.params.contentkey||"";
+					form.structkey.value = ev.params.structkey||"";	
+					WGA.ajax.callAction("<tml:action ref="db-changed"/>", "<tml:script expression="portlet.portletkey"/>");
+				}
+				else WGA.event.fireEvent("CMS_contentkey_changed", "<tml:script expression="portlet.portletkey"/>", ev.params)
+			}
+		);
+	</script>
+</tml:form>

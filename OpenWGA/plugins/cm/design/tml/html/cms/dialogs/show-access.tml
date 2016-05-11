@@ -1,0 +1,196 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	var dbkey=option("dbkey");
+	var structkey=option("structkey");
+	_contentkey=option("contentkey");
+	_Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", dbkey);	
+	_Struct = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/structentry", structkey, dbkey)
+	if(_contentkey){
+		_Content=createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/content", _contentkey, dbkey);
+	}
+</tml:script>
+
+<table border="0" cellspacing="2" style="background-color:#efefef;border:solid silver 1px">
+	<tr>
+		<td width="1%" nowrap valign="top">{%label:user%}:</td>
+		<td><b><tml:script>return _Database.getUserName()</tml:script></b></td>
+	</tr>
+	<tml:case condition="!_Database.getUserGroups().isEmpty()">
+		<tr>
+			<td width="1%" valign="top">{%label:groups%}:</td>
+			<td><tml:script divider="<br>">
+				var gs = _Database.getUserGroups();
+				if(gs.size()>5){
+					var info = "<i>... (" + (gs.size()-5) + " more)</i>";
+					gs = gs.subList(0, 4);
+					gs.add(info);
+				}
+				return gs;
+			</tml:script></td>
+		</tr>
+	</tml:case>
+	<tml:case condition="!_Database.getUserRoles().isEmpty()">
+		<tr>
+			<td width="1%" valign="top">{%label:roles%}:</td>
+			<td><tml:script divider=", ">return _Database.getUserRoles()</tml:script></td>
+		</tr>
+	</tml:case>
+		
+	<tr>
+		<td width="1%">{%label:access%}:</td>
+		<td><b><tml:script>return _Database.getAccessLevelText()</tml:script></b></td>
+	</tr>
+
+	<tr>
+		<td width="1%" valign="top">{%label:privileges%}:</td>
+		<td>
+			<tml:label key="{'privileges.may'+(_Database.getUserAccess().mayDeleteDocuments()?'':'Not')+'DeleteDocuments'}"/>
+			<br>
+			<tml:label key="{'privileges.may'+(_Database.getUserAccess().mayMoveStructEntries()?'':'Not')+'MoveDocuments'}"/>
+		</td>
+	</tr>
+</table>
+<br>
+
+<tml:if condition="_contentkey">
+	<tml:then>
+		
+		<h4 style="border-bottom:solid gray 1px"><tml:label key="dialog.access.edit-content" param1="{_Content.getTitle()}"/>:</h4>
+		<div
+			<tml:if condition="_Content.mayEditContent()">
+				<tml:then> class="may">
+					{%label:dialog.access.you-may-edit-the-document%}
+				</tml:then>
+				<tml:else> class="may-not">
+					<b style="color:red">{%label:dialog.access.you-may-not-edit-the-document%}.</b>
+					<br>
+					<tml:script>return _Content.getReason()</tml:script>
+				</tml:else>
+			</tml:if>
+		</div>
+		
+		<h4 style="border-bottom:solid gray 1px">{%label:dialog.access.create-version%}:</h4>
+		<div
+			<tml:if condition="_Content.mayCreateContent()">
+				<tml:then> class="may">
+					{%label:dialog.access.you-may-create-version%}.
+				</tml:then>
+				<tml:else> class="may-not">
+					<b style="color:red">
+						{%label:dialog.access.you-may-not-create-version%}.
+					</b>
+					<br>
+					<tml:script>return _Content.getReason()</tml:script>
+				</tml:else>
+			</tml:if>
+		</div>
+		
+		<h4 style="border-bottom:solid gray 1px"><tml:label key="dialog.access.create-page" param1="{_Content.getTitle()}"/>:</h4>
+		<div
+			<tml:if condition="_Content.mayCreatePage()">
+				<tml:then> class="may">
+					{%label:dialog.access.you-may-create-page%}.
+				</tml:then>
+				<tml:else> class="may-not">
+					<b style="color:red">
+						{%label:dialog.access.you-may-not-create-page%}.
+					</b>
+					<br>
+					<tml:script>return _Content.getReason()</tml:script>
+				</tml:else>
+			</tml:if>
+		</div>
+		
+		<h4 style="border-bottom:solid gray 1px"><tml:label key="dialog.access.delete-content" param1="{_Content.getLanguageTitle()}" param2="{_Content.getTitle()}"/>:</h4>
+		<div
+			<tml:if condition="_Content.mayDeleteContent()">
+				<tml:then> class="may">
+					{%label:dialog.access.you-may-delete-content%}.
+				</tml:then>
+				<tml:else> class="may-not">
+					<b style="color:red">
+						{%label:dialog.access.you-may-not-delete-content%}.
+					</b>
+					<br>
+					<tml:script>return _Content.getReason()</tml:script>
+				</tml:else>
+			</tml:if>
+		</div>
+		
+	</tml:then>
+	
+	<tml:else>
+		<h4 style="border-bottom:solid gray 1px">{%label:dialog.access.create-version%}:</h4>
+		<div
+			<tml:if condition="_Struct.mayCreateContent()">
+				<tml:then> class="may">
+					{%label:dialog.access.you-may-create-version%}.
+				</tml:then>
+				<tml:else> class="may-not">
+					<b style="color:red">
+						{%label:dialog.access.you-may-not-create-version%}.
+					</b>
+					<br>
+					<tml:script>return _Struct.getReason()</tml:script>
+				</tml:else>
+			</tml:if>
+		</div>
+		
+		<h4 style="border-bottom:solid gray 1px"><tml:label key="dialog.access.create-page" param1="{_Struct.getTitle()}"/>:</h4>
+		<div
+			<tml:if condition="_Struct.mayCreatePage()">
+				<tml:then> class="may">
+					{%label:dialog.access.you-may-create-page%}.
+				</tml:then>
+				<tml:else> class="may-not">
+					<b style="color:red">
+						{%label:dialog.access.you-may-not-create-page%}.
+					</b>
+					<br>
+					<tml:script>return _Struct.getReason()</tml:script>
+				</tml:else>
+			</tml:if>
+		</div>
+		
+	</tml:else>
+	
+</tml:if>
+
+<h4 style="border-bottom:solid gray 1px"><tml:label key="dialog.access.delete-page" param1="{_Struct.getTitle()}"/>:</h4>
+<div
+	<tml:if condition="_Struct.mayDeletePage(true)">
+		<tml:then> class="may">
+			{%label:dialog.access.you-may-delete-page%}.
+		</tml:then>
+		<tml:else> class="may-not">
+			<b style="color:red">
+				{%label:dialog.access.you-may-not-delete-page%}.
+			</b>
+			<br>
+			<tml:script>return _Struct.getReason()</tml:script>
+		</tml:else>
+	</tml:if>
+</div>

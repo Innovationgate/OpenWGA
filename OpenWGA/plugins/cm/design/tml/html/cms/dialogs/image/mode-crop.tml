@@ -1,0 +1,594 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="crop-image">
+	var _selectedX = parseInt(tmlform.field('x'));
+	var _selectedY = parseInt(tmlform.field('y'));
+	var _selectedWidth = parseInt(tmlform.field('width'));
+	var _selectedHeight = parseInt(tmlform.field('height'));
+	
+	var _targetName = tmlform.filename;
+	var _sourceName = tmlform.fullFileName;
+	if (_sourceName && content().hasFile(_sourceName)) {
+		var img = content().getFileData(_sourceName);
+		var sc = createimagescaler(img);
+		if (tmlform.suffix == 0) {
+			var suffix = '.jpg';
+			sc.useJPEGForOutput();
+		} else if (tmlform.suffix == 1) {
+			var suffix = '.png';
+			sc.usePNGForOutput();
+		}
+		
+		if (content().hasFile(_targetName + suffix)) {
+			content().removeFile(_targetName + suffix);
+			content().save();
+		}
+
+		sc.crop(_selectedX, _selectedY, 
+			Math.min(_selectedWidth, sc.width-_selectedX), 
+			Math.min(_selectedHeight, sc.height-_selectedY)
+		);
+		
+		attachScaledImage(content(), sc, _targetName);
+		content().save();
+		setoption("filename", _targetName + suffix);
+	}
+	portlet.fireEvent(createEvent("CMS_attachments_changed"));
+	_actionDone = true;
+</tml:action>
+
+<tml:action id="keepFilename">
+	setoption("filename", tmlform.fullFileName);
+</tml:action>
+
+<tml:form id="image-coords" source="none" context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}" >
+	<tml:input name="x" type="hidden"/>
+	<tml:input name="y" type="hidden"/>
+	
+	<tml:script>
+		_filename = option('filename').toLowerCase();
+		
+		if (_filename && content().hasFile(_filename)) {
+			
+			var img = content().getFileData(_filename);
+			try {
+				var sc = createimagescaler(img);
+				imgWidth = sc.getWidth();
+				imgHeight = sc.getHeight();
+				imgSize = content().getFileSize(_filename)
+				if (_filename.lastIndexOf('.') == _filename.length - 4) {
+					_filesuffix = _filename.substring(_filename.length - 3);
+					_filename = _filename.substring(0, _filename.length - 4);
+				}
+			} catch (e) {
+				_imgException = true;
+			}
+		}
+	</tml:script>
+
+	<tml:if istrue="_imgException">
+		<tml:then>
+			<font style="color: red; font-size: 18px; font-weight: bold">Unbekanntes Bildformat</font>
+			<script>
+				BI.resizableDialog.submitButton.disable();
+			</script>
+		</tml:then>
+		<tml:elseif istrue="_actionDone">
+			BI.resizableDialog.dialog.hide(null);
+		</tml:elseif>
+		<tml:else>
+			<div id="image-crop">
+				<script>
+					// submit function called from dialog handler and on RETURN
+					BI.resizableDialog.submit=function(){					
+						BI.util.callAction("<tml:action ref="crop-image"/>",
+							"<tml:script>return portlet.portletkey</tml:script>",
+							"{%label:dialog.scale-image.scaling%}");
+					}
+					BI.resizableDialog.onShow=function(){
+						try{
+							document.forms["image-coords"].width.focus();
+						}
+						catch(e){}					
+					}
+					WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+						BI.resizableDialog.onShow();
+					})
+				</script>
+				
+				<div id="img_container">
+					<tml:case condition="option('filename').toLowerCase() && content().hasFile(option('filename').toLowerCase())">		
+						<img id="selected_image" src="<tml:url type="file" file="{option('filename').toLowerCase()}"/>?uid=<tml:script expression="AFW.Util.generateUID()"/>"/>
+					</tml:case>
+				</div>
+				
+				<div id="form">
+				
+					<div class="form-element">
+						<div class="form-element-header">
+							<tml:label key="metadata"/>:
+						</div>					
+						<tml:label key="crop-image.width"/>:
+						<tml:item name="imgWidth" format="0"/> Pixel<br>
+						<tml:label key="crop-image.height"/>:
+						<tml:item name="imgHeight" format="0"/> Pixel<br>
+						<tml:label key="crop-image.size"/>:
+						<tml:script expression="AFW.Util.renderFileSize(imgSize)"/>
+					</div>
+				
+					<div class="form-element">
+						<div class="form-element-header">
+							<tml:comment><tml:label key="metadata"/>:</tml:comment>
+							<tml:label key="crop-image.new-size"/>:
+						</div>					
+						<b><tml:label key="dimensions"/>:</b><br>
+						<tml:label key="crop-image.width"/>:<br>
+						<tml:input type="number" name="width" format="0">style="width: 80px;"</tml:input>&nbsp;px<br>
+						<tml:label key="crop-image.height"/>:<br>
+						<tml:input type="number" name="height" format="0">style="width: 80px;"</tml:input>&nbsp;px<br><br>
+			
+						<b><tml:label key="crop-image.ratio"/>:</b><br>
+						<tml:input name="ratio" type="radio" cssstyle="margin-right:3px" changeaction="keepFilename" ajax="true" options="{label('general','crop-image.ratio-options')}" default="0"/><br><br>
+						<tml:case condition="{tmlform.ratio == 1}">
+							<tml:input name="ratio_x" type="number" format="0">style="width: 40px;"</tml:input>&nbsp;:&nbsp;
+							<tml:input name="ratio_y" type="number" format="0">style="width: 40px;"</tml:input>
+							<a href="#" id="swap_ratio"><tml:image db="@afw" doc="icons" file="arrow_refresh.png"/></a><br>
+						</tml:case>
+					</div>
+					
+					<div class="form-element">
+						<div class="form-element-header">
+							<tml:label key="save-as"/>:
+						</div>
+						<b><tml:label key="filename"/>:</b><br>
+						<tml:input type="text" name="filename" default="{_filename}" cssstyle="width:100%"/><br><br>
+						<tml:input type="hidden" name="fullFileName" default="{option('filename').toLowerCase()}"/>
+						
+						<b><tml:label key="crop-image.file-extension"/>:</b><br>
+						<tml:input type="select" name="suffix" options="jpg|0, png|1" default="{_filesuffix == 'png' ? '1' : '0'}"/>
+						<br><br>
+					</div>
+				</div>
+
+				<div id="img_layer">
+					<tml:script>
+						_Request = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/request");
+					</tml:script>
+					<tml:case condition="_Request.isIE">
+						<tml:comment>IE Patch</tml:comment>
+						<div style="height: 100%; width: 100%; background: white; -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=0)'; filter: alpha(opacity=0);"></div>
+					</tml:case>
+					
+				</div>
+				<div id="layer-top" class="layer">&nbsp;</div>
+				<div id="layer-right" class="layer">&nbsp;</div>
+				<div id="layer-bottom" class="layer">&nbsp;</div>
+				<div id="layer-left" class="layer">&nbsp;</div>
+				
+				<script type="text/javascript">			
+					Ext.onReady(function(){				
+												
+						BI.resizableDialog.crop = function() {					
+							
+							var selectionMask = new Ext.Resizable(Ext.get('img_layer'), {
+								draggable		: true,
+								handles			: 'all',
+								dynamic			: true,
+								pinned			: true,
+								constrainTo		: 'img_container',
+								preserveRatio	: true
+							});
+												
+							var imgcontainer = Ext.get('img_container');
+								
+							var layers = {	
+								top				: Ext.get('layer-top'),
+								right			: Ext.get('layer-right'),
+								bottom			: Ext.get('layer-bottom'),
+								left			: Ext.get('layer-left')
+							};
+							
+							var image = {
+								img				: Ext.get('selected_image'),
+								startWidth		: <tml:item name="imgWidth" format="0"/>,
+								startHeight		: <tml:item name="imgHeight" format="0"/>,
+								scalefactor		: 1,
+								ratio			: 1
+							};
+						
+							var startResize = false;
+		
+							var resizableMask = selectionMask.el;
+							
+							resizableMask.setScaledSize = function(width, height, name) {
+								
+								if (name) {
+									if (<tml:script expression="tmlform.ratio"/> != 2) {
+										switch(name) {
+											case "width":	while((width / this.ratioX) * this.ratioY > image.startHeight) width -= 1;
+															height = (width / this.ratioX) * this.ratioY;
+															break;
+											case "height":	while((height / this.ratioY) * this.ratioX > image.startWidth) height -= 1;
+															width = (height / this.ratioY) * this.ratioX;
+															break;
+										}
+									}
+									this.originalWidth = width;
+									this.originalHeight = height;
+									this.setWidth(width * image.scalefactor);
+									this.setHeight(height * image.scalefactor);
+								} else {
+									this.setWidth(imgcontainer.getWidth());
+									this.setHeight(imgcontainer.getHeight());
+								}
+								selectionMask.dd.constrainTo(imgcontainer);		
+								resizeLayers(true);			
+							}
+												
+							resizableMask.setRatio = function(x, y) {			
+								this.setX(imgcontainer.getX());
+								this.setY(imgcontainer.getY());
+								
+								selectionMask.preserveRatio = false;
+														
+								this.originalWidth = image.startWidth;
+								this.originalHeight = image.startHeight;
+								
+								if (x > y) {
+									var _w = this.originalWidth;
+									while(_w / x % 1 != 0 || _w / x % 1 == 0 && (_w / x) * y > image.startHeight) _w -= 1;
+									this.originalWidth = _w;
+									this.originalHeight = (_w / x * y);
+								} else if (x < y) {
+									var _h = this.originalHeight;
+									while(_h / y % 1 != 0 || _h / y % 1 == 0 && (_h / y) * x > image.startWidth) _h -= 1;
+									this.originalHeight = _h;
+									this.originalWidth = (_h / y * x);
+								} else {
+									var newSize = this.originalWidth > this.originalHeight ? this.originalHeight : this.originalWidth;
+									this.originalWidth = newSize;
+									this.originalHeight = newSize;
+								}
+								
+								this.setWidth(this.originalWidth * image.scalefactor);
+								this.setHeight(this.originalHeight * image.scalefactor);
+								
+								selectionMask.dd.constrainTo(imgcontainer);
+								selectionMask.preserveRatio = true;
+								this.ratioX = x;
+								this.ratioY = y;
+								
+								resizeLayers(true);
+							}
+							
+							function resetFields() {
+								document.forms['image-coords']['width'].value = image.startWidth;
+								document.forms['image-coords']['height'].value = image.startHeight;
+							}
+							
+							function updateFields(width, height, resize) {
+								
+								if (width && height && resize == true) {
+									var _width = width / image.scalefactor;
+									var _height = height / image.scalefactor;
+									
+									if (_width > image.startWidth) {
+										_width = image.startWidth;
+										if (<tml:script expression="tmlform.ratio"/> != 2) {
+											_height = (_width / resizableMask.ratioX) * resizableMask.ratioY;
+											if (_height > image.startHeight) {
+												_height = image.startHeight;
+											}
+										}
+									}
+									if (_height > image.startHeight) {
+										_height = image.startHeight;
+										if (<tml:script expression="tmlform.ratio"/> != 2) {
+											_width = (_height / resizableMask.ratioY) * resizableMask.ratioX;
+											if (_width > image.startWidth) {
+												_width = image.startWidth;
+											}
+										}
+									}
+									
+									document.forms['image-coords']['width'].value = Math.round(_width);
+									document.forms['image-coords']['height'].value = Math.round(_height);
+								} else if (<tml:script expression="tmlform.ratio"/> != 2) {
+									document.forms['image-coords']['width'].value = Math.round(resizableMask.originalWidth);
+									document.forms['image-coords']['height'].value = Math.round(resizableMask.originalHeight);
+								}
+							}
+																									
+							function calcRatio(x, y) {						
+								var formats = [
+									{
+										x: 2,
+										y: 1
+									},
+									{
+										x: 3,
+										y: 2
+									},
+									{
+										x: 4,
+										y: 3
+									},
+									{
+										x: 16,
+										y: 9
+									}
+								];
+								
+								var knownFormat = false;
+								for (var i = 0; i < formats.length; i++) {
+									var cFormat = formats[i];
+									var erg = (cFormat.x / cFormat.y) - (x/y);
+									
+									if (erg < 0.01 && erg > -0.01) {
+										x = cFormat.x;
+										y = cFormat.y;
+										knownFormat = true;
+										break;
+									}
+									
+									erg = (cFormat.y / cFormat.x) - (x/y);
+			
+									if (erg < 0.01 && erg > -0.01) {
+										x = cFormat.y;
+										y = cFormat.x;
+										knownFormat = true;
+										break;
+									}		
+								}
+								
+								if (knownFormat == false) {
+									if (x > y) var t = y;
+									else var t = x;
+									
+									for (; t > 0; t--) {
+										if (x % t == 0 && y % t == 0) {
+											x /= t;
+											y /= t;
+											break;
+										} 
+									}				
+								}
+								
+								resizableMask.ratioX = x;
+								resizableMask.ratioY = y;
+								
+								if (document.forms['image-coords']['ratio'][1].checked == true) {
+									document.forms['image-coords']['ratio_x'].value = resizableMask.ratioX;
+									document.forms['image-coords']['ratio_y'].value = resizableMask.ratioY;
+								}
+							}
+														
+							function writeXY() {
+								document.forms['image-coords']['x'].value = Math.round((resizableMask.getX() - imgcontainer.getX()) / image.scalefactor);
+								document.forms['image-coords']['y'].value = Math.round((resizableMask.getY() - imgcontainer.getY()) / image.scalefactor);
+							}
+							
+							function resizeLayer(layer, x, y, width, height) {
+								if (layer.getX() != x) layer.setX(x);
+								if (layer.getY() != y) layer.setY(y);
+								if (layer.getWidth() != width) layer.setWidth(width);
+								if (layer.getHeight() != height) layer.setHeight(height);
+							}
+						
+							
+							function resizeLayers(update) {
+								if (update == true) {
+									updateFields(resizableMask.getWidth(), resizableMask.getHeight(), startResize);
+								}				
+								
+								var maskX = Math.floor(resizableMask.getX());
+								var maskY = Math.floor(resizableMask.getY());
+								var containerX = Math.floor(imgcontainer.getX());
+								var containerY = Math.floor(imgcontainer.getY());
+				
+								resizeLayer(layers.top, containerX, containerY, maskX + resizableMask.getWidth() - containerX, maskY - containerY);
+								resizeLayer(layers.bottom, maskX, maskY + resizableMask.getHeight(), imgcontainer.getWidth() - (maskX - containerX), imgcontainer.getHeight() - resizableMask.getHeight() - (maskY - containerY));	
+								resizeLayer(layers.right, layers.top.getX() + layers.top.getWidth(), containerY, imgcontainer.getWidth() - layers.top.getWidth(), imgcontainer.getHeight() - layers.bottom.getHeight());	
+								resizeLayer(layers.left, containerX, maskY, imgcontainer.getWidth() - layers.bottom.getWidth(), imgcontainer.getHeight() - layers.top.getHeight());
+								writeXY();	
+							};					
+												
+							document.body.onmousemove = function(e) {
+								if (startResize == true) {
+									resizeLayers(true);				
+								}		
+							}
+												
+							selectionMask.dd.startDrag = function(x,y) {
+								startResize = true;
+							}
+			
+							selectionMask.dd.onMouseUp = function(e) {
+								startResize = false;
+								if (resizableMask.getX() < imgcontainer.getX()) resizableMask.setX(imgcontainer.getX());
+								if (resizableMask.getY() < imgcontainer.getY()) resizableMask.setY(imgcontainer.getY());
+								resizeLayers(false);
+							}
+																															
+							selectionMask.on('beforeresize', function(t, e){
+								startResize = true;
+							});
+							
+							selectionMask.on('resize', function(t, w, h, e){
+								this.dd.constrainTo(imgcontainer);						
+								resizeLayers();
+								
+								var minX = imgcontainer.getX();
+								
+								var maxX = minX + imgcontainer.getWidth();
+								var minY = imgcontainer.getY();
+								var maxY = minY + imgcontainer.getHeight();
+								
+								var maskX = resizableMask.getX();
+								var maskY = resizableMask.getY();
+								
+								var _width = w;
+								var _height = h;
+								
+								if (maskX < minX) {
+									resizableMask.setX(minX);
+									_width -= minX - maskX;
+								}
+								
+								if (maskY < minY) {	
+									resizableMask.setY(minY);
+									_height -= minY - maskY;
+								}
+															
+								if (_width + maskX > maxX) {
+									_width = maxX - maskX;
+								}
+								
+								if (_height + maskY > maxY) {
+									_height = maxY - maskY;
+								}
+								
+								if ((_width != w || _height != h) && startResize == true) {
+									startResize = false;
+									t.resizeTo(_width , _height);
+								}
+								
+								startResize = false;
+							});					
+							
+							
+							if (BI.resizableDialog.dialog.hasListener('dialogscaled')) {
+								BI.resizableDialog.dialog.events.dialogscaled.clearListeners();
+							}
+							
+							BI.resizableDialog.dialog.on("dialogscaled", function(){
+								var form = Ext.get('form');
+								if (form) {
+									form.setLeft(this.el.getWidth() - form.getWidth() - 20);
+									resizableMask.setX(Math.ceil(imgcontainer.getX()));
+									resizableMask.setY(Math.ceil(imgcontainer.getY()));					
+									resizableMask.setScaledSize(image.startWidth, image.startHeight);
+									calcRatio(image.startWidth, image.startHeight);
+									imgcontainer.show();
+									resetFields();
+								}
+							});
+							
+							function init() {												
+								resizableMask.originalWidth = image.startWidth;
+								resizableMask.originalHeight = image.startHeight;
+								
+								BI.resizableDialog.showButton(BI.resizableDialog.submitButton, "<tml:label key="crop-image"/>", function() {
+									WGA.ajax.action({
+									 	action: "<tml:action ref="crop-image" ajax="true" portletmode="view"/>",
+									    graydiv: false,
+									  	id: "<tml:script>return portlet.portletkey</tml:script>"
+									});
+								});
+																
+								BI.resizableDialog.showButton(BI.resizableDialog.cancelButton, $L.cancel, function() {
+									WGA.ajax.action({
+									 	action: "<tml:action ref="keepFilename" ajax="true" portletmode="view"/>",
+									    graydiv: false,
+									  	id: "<tml:script>return portlet.portletkey</tml:script>"
+									});
+								});
+								
+								var img = BI.resizableDialog.image(image, imgcontainer, {
+									width	:	Ext.get('form').getWidth() + 20,
+									height	:	Ext.get('form').getHeight()
+								});
+								img.addInitializeListener(BI.resizableDialog.dialog);
+								img.init();
+													
+								writeXY();
+								switch ('<tml:script expression="tmlform.ratio"/>') {
+									case "0" :	calcRatio(image.startWidth, image.startHeight);
+												break;
+									case "1" :	calcRatio(image.startWidth, image.startHeight);
+												break;
+									case "2" :	selectionMask.preserveRatio = false;
+												break;	
+								}
+							}
+							init();
+							
+							WGA.portlet.registerObject("<tml:script expression="portlet.portletkey"/>", selectionMask);
+															
+							return {
+								init: init,
+								resizableMask: resizableMask
+							}
+						}();
+																		
+						function validateSizeFields(e,d) {
+							var width = document.forms['image-coords']['width'].value;
+							var height = document.forms['image-coords']['height'].value;
+							if (!isNaN(width) && !isNaN(height)) {
+								var _width = Math.abs(parseInt(width));
+								var _height = Math.abs(parseInt(height));
+								if (_width > <tml:item name="imgWidth" format="0"/>) {
+									_width = <tml:item name="imgWidth" format="0"/>;	
+								}
+								if (_height > <tml:item name="imgHeight" format="0"/>) {
+									_height = <tml:item name="imgHeight" format="0"/>;	
+								} 
+								BI.resizableDialog.crop.resizableMask.setScaledSize(_width, _height, this.name);
+							}					
+						}
+						
+						function validateRatioFields() {
+							var x = document.forms['image-coords']['ratio_x'].value;
+							var y = document.forms['image-coords']['ratio_y'].value;
+							if (!isNaN(x) && !isNaN(y) && x != 0 && y != 0) {	
+								BI.resizableDialog.crop.resizableMask.setRatio(Math.abs(parseInt(x)), Math.abs(parseInt(y)));
+							}
+						}
+		
+						document.forms['image-coords']['width'].onchange = validateSizeFields;
+						document.forms['image-coords']['height'].onchange = validateSizeFields;
+						
+						if ('<tml:script expression="tmlform.ratio"/>' == '1') {
+							document.forms['image-coords']['ratio_x'].onchange = validateRatioFields;
+							document.forms['image-coords']['ratio_y'].onchange = validateRatioFields;
+							
+							function swapRatio() {
+								var tmp = document.forms['image-coords']['ratio_x'].value;
+								document.forms['image-coords']['ratio_x'].value = document.forms['image-coords']['ratio_y'].value;
+								document.forms['image-coords']['ratio_y'].value = tmp;
+								var x = document.forms['image-coords']['ratio_x'].value;
+								validateRatioFields();
+							};
+							Ext.get('swap_ratio').on('click', swapRatio);
+						}	
+						
+					});
+								
+				</script>
+			</div>
+		</tml:else>
+	</tml:if>
+</tml:form>

@@ -1,0 +1,92 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+##MDSET directAccess=true
+
+<tml:script>
+	
+	// requested query (= string entered in combobox)
+	_reqQuery = request.getParameter("query");
+		
+	// requested query type (hql / sql / lucene)
+	switch (request.getParameter("querytype")) {
+		case "optionQueryHQL": 	    _reqType = "hql";      break;
+		case "optionQuerySQL":	    _reqType = "sql";      break;
+		case "optionQueryLucene":   _reqType = "lucene";   break;	
+		case "optionQueryTemplate": _reqType = "template"; break;			
+	}
+	_queries = profile.itemList("CM_stored_custom_queries");
+	_queryCount = 0;
+	_nodes = createList();
+</tml:script>
+
+<%-- predefined queries --%>
+<tml:if condition="_reqType == 'template'">
+	<tml:then>
+		<tml:include ref="queries:queries" designdb="{request.getParameter('db')}" var="_xml"/>
+		<tml:script expression="parseXML(_xml).selectNodes('//query')" var="_predefinedQueries"/>
+		<tml:case condition="_predefinedQueries!=null">
+			<tml:foreach type="itemvalue" item="_predefinedQueries" currentvalue="_query">
+				<tml:item name="_query" xpath="@type" var="_type"/>
+					<tml:range var="_node">
+					{
+						name: "<tml:item name="_query" xpath="@name"/>",
+						query: "<tml:script expression="escape(_query.getText())"/>",
+						type: "<tml:item name="_query" xpath="@type"/>"
+					}
+					</tml:range>
+					<tml:script expression="_nodes.add(_node)" output="false"/>
+			</tml:foreach>
+		</tml:case>
+	</tml:then>
+	<tml:else>	
+		<tml:case condition="_queries != null && _queries.isEmpty() == false">
+			<%-- queries stored in profile --%>	
+			<tml:foreach type="itemvalue" item="_queries" currentvalue="_query">
+				<tml:script>
+					var token = _query.split("|");
+					_storedType = token[0];
+					_storedQuery =  token.pop()
+				</tml:script>
+				<tml:case condition="_reqQuery==null || (_storedType == _reqType && _storedQuery != null && javaObject(_storedQuery).startsWith(_reqQuery))">
+					<tml:range var="_node">
+					{
+						name: "<tml:script expression="escape(_storedQuery)"/>",
+						query: "<tml:script expression="escape(_storedQuery)"/>",
+						type: "<tml:item name="_reqType" context="this"/>"
+					} 
+					</tml:range>
+					<tml:script expression="_nodes.add(_node)" output="false"/>				
+				</tml:case>
+			</tml:foreach>
+		</tml:case>
+	</tml:else>
+</tml:if>
+
+{data:[
+	<tml:foreach type="itemvalue" item="_nodes" currentvalue="_node" divider=",">
+		<tml:item name="_node"/>
+	</tml:foreach>
+]
+}

@@ -1,0 +1,95 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", request.getParameter("dbkey"));
+</tml:script>
+
+<html>
+	<head>
+		<script>
+			WGA={};
+			WGA.contentinfo={
+				dbkey: "<tml:script>return request.getParameter("dbkey")</tml:script>",
+				structkey: "<tml:script>return request.getParameter("structkey")</tml:script>"
+			}
+		</script>		
+	</head>
+	
+	<body>
+		
+		<tml:if context="{'db:'+request.getParameter('dbkey')+'/$struct:'+request.getParameter('structkey')}" iscontextvalid="true">
+			<tml:then>
+			
+				<tml:script>
+					_Struct = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/structentry", document);
+				</tml:script>
+			
+				<tml:if condition="_Struct.hasContent(_Database.getPreferedLanguage(), false)">
+					<tml:then>
+						<h1>{%label:no-content.no-reader-title%}</h1>
+						<tml:label key="no-content.no-reader-message" param1="{_Database.getPreferedLanguageTitle()}"/>
+					</tml:then>
+					<tml:else>
+						<h1>{%label:no-content.title%}</h1>
+						<tml:label key="no-content.message" param1="{TITLE}"/>
+					</tml:else>
+				</tml:if>
+				
+				<tml:script>
+					_contentlist=sortList(document.getAllContent(true), "status", "down");
+				</tml:script>
+				<tml:case condition="!_contentlist.isEmpty()">
+					<hr>
+					{%label:no-content.other-versions%}:
+					<ul>
+					<tml:foreach type="itemvalue" item="_contentlist" currentvalue="_content">
+					
+						<tml:groupchange expression="STATUS" id="gc">
+							</ul><h2><tml:label key="{'status.'+STATUS}"/></h2><ul>
+						</tml:groupchange>
+					
+						<li>
+							<a href="<tml:script expression="contenturl('html', null, true)"/>">
+								<tml:label key="version"/> <tml:meta name="version"/> (<tml:meta name="modified"/>, <tml:meta name="languagetitle"/>)
+							</a>
+							<div style="float:right">
+								<button 
+									onclick="window.parent.BI.dialog.show('create-content', this, {structkey:'<tml:script>return document.getStructKey()</tml:script>',contentkey:'<tml:meta name="key"/>'});"
+								><tml:label key="no-content.new-version-from-this"/></button>
+							</div>
+							<div style="clear:right"></div>
+						</li>
+					</tml:foreach>
+					</ul>
+				</tml:case>
+			</tml:then>
+			<tml:else>
+				<h1>{%label:no-content-found.title%}</h1>
+				<tml:label key="no-content-found.message" param1="{request.getParameter('structkey')}"/>
+			</tml:else>
+		</tml:if>
+		
+	</body>
+</html>

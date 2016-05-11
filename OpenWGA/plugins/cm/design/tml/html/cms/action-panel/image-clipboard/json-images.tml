@@ -1,0 +1,107 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	var attachments = _CM_attachment_clipboard || WGA.createList();
+	_attachments = WGA.createList()
+	
+	for(var attachment in Iterator(attachments)){
+		var parts = attachment.split("/");
+		var dbkey = parts[0];
+		var contentkey = parts[1];
+		if(context("db:"+dbkey+"/docid:"+contentkey, false))
+			_attachments.add(attachment);
+	}
+	
+	_attachments = WGA.sortList(_attachments, function(a,b){
+
+		try{
+			var parts = a.split("/");
+			var dbkey = parts[0];
+			var contentkey = parts[1];			
+			var filename_a = parts[2];
+			var doc = context("db:"+dbkey+"/docid:"+contentkey, false);
+			var A = AFW.content(doc.content()).attachment(filename_a);
+	
+			var parts = b.split("/");
+			var dbkey = parts[0];
+			var contentkey = parts[1];
+			var filename_b = parts[2];				
+			var doc = context("db:"+dbkey+"/docid:"+contentkey, false);
+			var B = AFW.content(doc.content()).attachment(filename_b);
+
+			if(A.getType().pos == B.getType().pos)
+				return filename_a < filename_b ? -1 : 1
+			else return (A.getType().pos < B.getType().pos ? -1 : 1)
+		}
+		catch(e){
+			// should not happen
+			logException(e);
+			return -1;
+		}
+	})
+	
+</tml:script>
+{
+	data:[
+		<tml:foreach type="itemvalue" item="_attachments" currentvalue="_entry">
+			<tml:script>
+				var a = _entry.split("/");
+				_dbkey = a[0];
+				_contentkey = a[1];
+				_filename = a[2];				
+				_doc = context("db:"+_dbkey+"/docid:"+_contentkey, false);
+			</tml:script>
+			<tml:case context="[db:{_dbkey}/docid:{_contentkey}]" iscontextvalid="true">
+				<tml:script>
+					/*_file_md = content().getFileMetaData(_filename)
+					_img = WGA.selectDerivate(_filename, "usage=poster")*/
+					_Attachment = AFW.content().attachment(_filename);
+				</tml:script>
+				{
+					type: "extfile",
+					key: "<tml:script expression="STRUCTKEY+'.'+LANGUAGE+'.0/'+_filename+'/'+_dbkey"/>",
+					container: "<tml:script expression="STRUCTKEY+'.'+LANGUAGE+'.0'"/>",
+					dbkey: "<tml:item name="_dbkey"/>",
+					id: "<tml:item name="_entry"/>",
+					name: "<tml:item name="_filename"/>",
+					shortName: "<tml:script>
+							if (_filename.length > 12) {
+								return _filename.substr(0, 10) + '...';
+							}
+							return _filename;
+					</tml:script>",
+					mimetype: "<tml:script expression="_Attachment.mimeType"/>",
+					url: "<tml:url type="file" file="{_filename}"/>",
+					poster: "<tml:script expression="_Attachment.getPosterURL()"/>",
+					thumbnail: "<tml:script expression="_Attachment.getThumbnailURL()"/>",
+					filetype: "<tml:script expression="label('filetype.'+_Attachment.getType().name)"/>",
+					size: <tml:script format="0">return _Attachment.fileSize</tml:script>
+				}
+				<tml:between>,</tml:between>
+			</tml:case>
+		</tml:foreach>
+	]
+}

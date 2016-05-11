@@ -1,0 +1,73 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:include designdb="@afw" ref="ext:include-js-all">
+	<tml:option name="debug"><tml:urlparameter name="debug"/></tml:option>
+</tml:include>
+
+<tml:if condition="request.getParameter('debug')=='true'">
+	<tml:then>
+		<script type="text/javascript" src="<tml:url type="js" name="ext-ext"/>"></script>
+		
+		<tml:if condition="label('cm.ui-language')=='de'">
+			<tml:then>
+				<script type="text/javascript" src="<tml:url type="js" name="ext-lang-de"/>"></script>
+				<script type="text/javascript" src="<tml:url type="js" name="labels_de"/>"></script>
+			</tml:then>
+			<tml:else>
+				<script type="text/javascript" src="<tml:url type="js" name="labels_en"/>"></script>
+			</tml:else>
+		</tml:if>
+
+		<script type="text/javascript" src="<tml:url db="@afw" type="js" name="rtfeditor2"/>"></script>
+		<script type="text/javascript" src="<tml:url db="@afw" type="js" name="file-uploader"/>"></script>
+		<script type="text/javascript" src="<tml:url type="js" name="bi"/>"></script>
+		<script type="text/javascript" src="<tml:url type="js" name="bi-util"/>"></script>
+		<script type="text/javascript" src="<tml:url type="js" name="rtftoolbar"/>"></script>
+		<script type="text/javascript" src="<tml:url type="js" name="siteexplorer.js"/>"></script>
+		<script type="text/javascript" src="<tml:url type="js" name="sitepanel"/>"></script>
+		<script type="text/javascript" src="<tml:url type="js" name="dialog"/>"></script>
+		<script type="text/javascript" src="<tml:url type="js" name="layout"/>"></script>	
+
+		<script type="text/javascript" src="<tml:url type="js" name="design"/>"></script>
+		<script type="text/javascript" src="<tml:url type="js" name="bi-combotree"/>"></script>
+		<script type="text/javascript" src="<tml:url type="js" name="upload-manager"/>"></script>
+		
+		<script type="text/javascript" src="<tml:url type="js" name="resizable-dialog"/>"></script>
+		<script type="text/javascript" src="<tml:url type="js" name="dialog-image"/>"></script>
+		
+		<script src="<tml:url type="js" name="shCore"/>"></script>
+		<script src="<tml:url type="js" name="shBrushJs"/>"></script>
+
+		<script type="text/javascript" src="<tml:url type="tml" medium="javascript" name="rtftoolpanel"/>"></script>
+	</tml:then>
+
+	<tml:else>
+		<script type="text/javascript" src="<tml:url type="tml" medium="javascript" name="all"/>?lang=<tml:label key="cm.ui-language"/>"></script>
+	</tml:else>
+
+</tml:if>
+
+<tml:include ref="init-bi"/>
+

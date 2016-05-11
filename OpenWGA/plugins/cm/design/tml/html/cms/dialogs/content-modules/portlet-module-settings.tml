@@ -1,0 +1,146 @@
+<tml:action id="refresh">
+	var fields = tmlform.getfieldnames().iterator()
+	while(fields.hasNext()){
+		var field = fields.next();
+		tmlform.setField(field, tmlform.fieldList(field));
+	}
+</tml:action>
+
+<tml:action id="updateModuleSettings">
+	// remove existing fields for current module:
+	function endsWith(s1, s2){
+		var i = s1.indexOf(s2);
+		return i>=0 && (i + s2.length == s1.length)
+	}
+
+	var fields = tmlform.getfieldnames().iterator()
+	while(fields.hasNext()){
+		var field = fields.next();
+		if(field=="setting_source_"+tmlform.mod_id)
+			continue;
+		if(endsWith(field, tmlform.mod_id))
+			tmlform.removefield(field)
+	}
+
+	var settings_map = CMM.getModulesSettingsMap(tmlform.field("setting_source_"+tmlform.mod_id), tmlform.mod_id);
+	if(settings_map){
+		var settings = settings_map.keySet().iterator();
+		while(settings.hasNext()){
+			var setting = settings.next();
+			if(setting=="setting_source_"+tmlform.mod_id)
+				continue;
+			tmlform.setField(setting, settings_map.get(setting))
+		}
+	}
+</tml:action>
+
+<tml:action id="duplicateModules">
+	var ids = WGA.createList(tmlform.ids_to_duplicate.split(",")).iterator();
+	while(ids.hasNext()){
+		var parts = ids.next().split("|");
+		var sid = parts[0];
+		var did = parts[1];
+		var fields = tmlform.getfieldnames().iterator()
+		while(fields.hasNext()){
+			var field = fields.next();
+			var parts = field.split(sid);
+			if(parts.length==2 && parts[1]==""){
+				tmlform.setField(parts[0]+did, tmlform.field(field));
+				// add field to "duplicated_nodes" so that they can be saved even if we don't have a field-reg:
+				tmlform.appendToField("duplicated_nodes",parts[0]+did);
+			}
+		}
+	}
+</tml:action>
+
+<tml:input name="designdb" type="hidden" store="false"/>
+<tml:input name="settingstml" type="hidden" store="false"/>
+<tml:input name="title" type="hidden" store="false"/>
+
+<tml:input name="mod_title" type="hidden" store="false"/>
+<tml:input name="mod_id" type="hidden" store="false"/>
+<tml:input name="parent_mod_id" type="hidden" store="false"/>
+<tml:input name="ids_to_duplicate" type="hidden" store="false"/>
+
+<script>
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "doc-structure-treenode-selected", function(ev){
+		var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+		var config = ev.params.config;
+		if(config){
+			form.designdb.value = config.designdb;
+			form.settingstml.value = config.settingstml||"";
+			form.title.value=config.title;
+		}
+		else {
+			form.title.value="";
+			form.settingstml.value = "";
+			if(ev.params.module)
+				form.title.value="<span style='color:red'>no module config found for id '" + ev.params.module.module_id + "'</span>";
+		}
+		
+		var module = ev.params.module;
+		if(module){
+			form.mod_title.value=module.title;
+			form.mod_id.value=module.id;
+		}
+
+		form.parent_mod_id.value=ev.params.parent_mod_id||""
+		
+		WGA.ajax.callAction('<tml:action ref="{option('mode')=='view' ? '$refresh':'refresh'}"/>', '<tml:script expression="portlet.portletkey"/>')
+	})
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "CMS_attachments_changed", function(ev){
+		WGA.ajax.callAction("<tml:action ref="$refresh"/>", "<tml:script expression="portlet.portletkey"/>");
+	})
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "module-node-dubplicated", function(ev){
+		var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+		form.ids_to_duplicate.value = ev.params.ids.join(",");
+		WGA.ajax.callAction("<tml:action ref="duplicateModules"/>", "<tml:script expression="portlet.portletkey"/>");
+	})
+</script>
+
+<tml:if condition="tmlform.title">
+	<tml:then>
+		<h1><tml:item name="mod_title" type="tmlform"/></h1>
+		<tml:label key="dialog.content-modules.module"/>: <tml:item name="title" type="tmlform"/>
+		<tml:case condition="CMM.hasTemplate()">
+			<br>
+			Quelle: <tml:input name="{'setting_source_'+tmlform.mod_id}" type="select"
+							mode="{option:mode}"
+							options="Vorlage|template,Aktuelles Dokument|document" default="template" 
+							changeaction="updateModuleSettings" ajax="true"/>
+		</tml:case>
+		<hr size="1">
+		
+		<tml:case condition="tmlform.settingstml">
+	
+			<tml:script>
+				var parts = tmlform.settingstml.split("/");	
+				if(parts.length>1){
+					_designdb = parts[0];
+					_tml = parts[1];
+				}
+				else{
+					_tml = tmlform.settingstml
+					_designdb = tmlform.designdb;
+				} 
+				// calculate edit mode:
+				if(tmlform.field("setting_source_"+tmlform.mod_id)=="template")
+					_mode = "view";
+				else _mode = option("mode");
+			</tml:script>
+	
+			<div>
+				<tml:include designdb="{_designdb}" ref="{_tml}" o_ns="{tmlform.mod_id}" tmlscope="{tmlform.mod_id}">
+					<tml:option name="mode" expression="_mode"/>
+					<tml:option name="parent-scope" expression="tmlform.parent_mod_id"/>
+					<tml:option name="cm_dbkey" expression="context('main').meta('db', 'dbkey')"/>
+				</tml:include>
+			</div>
+		</tml:case>
+	</tml:then>
+	<tml:elseif condition="option('mode')=='edit'">
+		<div style="margin:50px;text-align:center">
+			<tml:label key="dialog.content-modules.select-tree-node"/>
+		</div>
+	</tml:elseif>
+</tml:if>

@@ -1,0 +1,80 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tr>
+	<td>{%label:database%}:</td>
+	<td>
+		<tml:script>
+			var domain=context("db:"+option("dbkey")).meta("db", "domain");
+			var dbs=tag.core.getDatabasesForDomain(domain);
+			_opts=createlist();
+			_opts.add(label('please-select-option'));
+			for(var i=0; i<dbs.size(); i++){
+				var att=dbs.get(i).getAttribute(wgacore.DBATTRIB_ISREMOTECS);
+				var isRemoteContentStore = (att!=null && att.equalsIgnoreCase('true'))						
+				if(isRemoteContentStore)
+					_opts.add(dbs.get(i).getTitle()+"|"+dbs.get(i).getDbReference());
+			}
+		</tml:script>
+		<tml:input name="remotedb" type="select" options="{itemlist('_opts')}" 
+				default="" 
+				validation="$E_VALUE!=''"
+				message="{label('please-select-database')}"
+				changeaction="$refresh" ajax="true"
+		/>
+	</td>
+</tr>
+<tml:case condition="tmlform.remotedb!=''">
+	<tr>
+		<td>{%label:document%}:</td>
+		<td>
+			<tml:input name="remotekey" type="hidden" cssstyle="width:100%"
+				validation="$E_VALUE!=''"
+				message="{label('dialog.create-content.please-select-remote-document')}"
+			/>
+												
+			<div id="struct-tree" style="height:150;overflow:auto;font-size:75%;border:solid silver 1px"></div>
+			<script>
+				var stree = new BI.util.structTree("struct-tree", "<tml:script>return tmlform.remotedb</tml:script>", "<tml:option name="language"/>")
+				stree.tree.on("beforeclick", function(n){
+					return !n.disabled					
+				})
+				stree.tree.on("click", function(n, e){
+	            	//console.log("tree click", n, e);
+	            	var val=n.id.split(":")
+	            	if(val[0]=="node-struct")
+	            		document.forms["<tml:script> return tmlform.formid</tml:script>"].remotekey.value=val[1];
+	            	else document.forms["<tml:script> return tmlform.formid</tml:script>"].remotekey.value="";
+	            })
+	            <tml:case condition="tmlform.remotekey!=null && tmlform.remotekey!=''">
+	            	stree.tree.selectPath("/root/<tml:script>
+	            		//log.info(tmlform.remotedb + "/" + tmlform.remotekey);
+	            		return createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/structentry", tmlform.remotekey, tmlform.remotedb).getPath("node-", "/")
+	            	</tml:script>");
+	            </tml:case>
+			</script>
+		</td>
+	</tr>
+</tml:case>
+

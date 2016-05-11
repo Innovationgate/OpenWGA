@@ -1,0 +1,53 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_node = request.getParameter("node");
+	_BookmarkManager = createObject("cms:bookmark-manager", request.getParameter("dbkey"));
+	_elements = _node == "root" ? _BookmarkManager.getFolders() : _BookmarkManager.getBookmarks(_node);
+</tml:script>
+
+[
+<tml:foreach type="itemvalue" item="_elements" currentvalue="_element" divider=",">
+	<tml:script var="_icon" trim="true">
+			if (_node != "root")
+			return _element.isContextValid ? "page.png" : "page_error.png";
+		return _element == "Bookmarks" ? "folder_star.png" : "folder.png"
+	</tml:script>
+	{
+		id: "<tml:script>return _node == "root" ? _element : _element.text</tml:script>",
+		type: "<tml:script>return _node == "root" ? "folder" : "bookmark"</tml:script>",
+		text: "<tml:script>return _node == "root" ? _element : _element.text</tml:script>",		
+		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="{_icon}"/>",
+		leaf: <tml:script expression="!(_node == 'root')"/>,
+		allowDrag: <tml:script expression="_node != 'root'"/>,
+		allowDrop: <tml:script expression="_node == 'root'"/>,
+		has_children: <tml:script>
+			if (_node == "root")
+				return _BookmarkManager.hasBookmarks(_element);
+			return false;
+		</tml:script>
+	}
+</tml:foreach>
+]

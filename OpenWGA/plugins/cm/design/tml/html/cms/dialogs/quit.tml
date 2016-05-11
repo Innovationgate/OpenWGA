@@ -1,0 +1,84 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="quit">
+
+	request.getSession().removeAttribute(WGACore.ATTRIB_BROWSERINTERFACE);
+	request.getSession().removeAttribute(WGACore.ATTRIB_BI_VERSION4);
+	request.getSession().removeAttribute(wgacore.ATTRIB_NO_CONTENT_NOTIFCATION_URL);
+	request.getSession().removeAttribute(wgacore.ATTRIB_VIRTUAL_CONTENT_URL);
+
+	WGA.app(tmlform.dbkey).domain().auth().removeAccessFilter(WGA.database(tmlform.dbkey))
+
+	_actionDone=true;
+	tmlform.storeinprofile();
+
+	var c = context('db:'+ tmlform.dbkey + "/docid:" + tmlform.structkey, false);
+	if(!c)
+		c = context('db:'+ tmlform.dbkey);
+	_url = c.contenturl();
+	
+	if(tmlform.logout_on_exit=='true'){
+		var domain = c.meta("db", "domain")
+		WGA.Auth.logout(domain)
+		log.info("Logged out from domain " + domain);
+	}
+	
+</tml:action>
+
+<tml:form id="login" source="profile">
+
+	<script>
+		<tml:if istrue="_actionDone">			
+			<tml:then>
+				<tml:if condition="tmlform.redirect_on_logout=='true'">
+					<tml:then>location.href="<tml:item name="_url"/>"</tml:then>
+					<tml:else>location.href="<tml:url/>"</tml:else>
+				</tml:if>
+			</tml:then>
+			<tml:else>
+				// submit function called from dialog handler
+				BI.dialog.submit=function(){
+					BI.util.callAction("<tml:action ref="quit"/>", 
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"{%label:dialog.quit.quitting-cm%}");
+				}
+				
+				WGA.portlet.onload.register(
+					"<tml:script>return portlet.portletkey</tml:script>",
+					BI.dialog.autoHeight
+				);
+			</tml:else>
+		</tml:if>
+	</script>
+	
+	<tml:input name="logout_on_exit" type="checkbox" default="true" options="{label('dialog.logout.logout_options')}"/>
+	<br>
+	<tml:input name="redirect_on_logout" type="checkbox" options="{label('dialog.logout.redirect_options')}"/>
+
+	<tml:input name="dbkey" store="false" type="hidden" default="{option('dbkey')}"/>
+	<tml:input name="structkey" store="false" type="hidden" default="{option('structkey')}"/>
+	
+</tml:form>

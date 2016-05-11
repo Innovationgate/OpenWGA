@@ -1,0 +1,160 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="refresh">
+	var ev = createevent("file-selected")
+	ev.addParameter("field", tmlparam1)
+	portlet.fireevent(ev)
+</tml:action>
+
+<tml:script>
+	_fieldname = WGA.scoped(option("fieldname")||"image");
+</tml:script>
+
+<tml:input name="{_fieldname}" type="hidden" mode="{option:mode}"/>
+
+<div style="margin:10px" id="select_file_Combo-<tml:item name="_fieldname"/>"></div>
+
+<tml:script>
+	var derivate = option("derivate");
+	var extensions=option("file-extensions");
+	var mimetype=option("mimetype");
+	var filenames = content().getFileNames();
+
+	if(derivate || extensions || mimetype){
+		_filenames = WGA.createList();
+		if(derivate && db().hasFeature(db().FEATURE_CONTENT_FILE_DERIVATES)){
+			for(var filename in Iterator(filenames)){
+				if(WGA.selectDerivate(filename, derivate))
+					_filenames.add(filename);
+			}
+		}
+		if(mimetype){
+			for(var filename in Iterator(filenames)){
+				var file_md = content().getFileMetaData(filename);
+				if(file_md.mimeType.indexOf(mimetype)==0 && !_filenames.contains(filename))
+					_filenames.add(filename);
+			}
+		}
+		if(extensions){
+			extensions += ",";
+			for(var filename in Iterator(filenames)){
+				var ext = filename.split(".").pop().toLowerCase() + ",";
+				if(extensions.indexOf(ext)>=0 && !_filenames.contains(filename))
+					_filenames.add(filename);
+			}
+		}
+	}
+	else _filenames = filenames;	// take it all
+	_filenames = WGA.sortList(_filenames);
+</tml:script>
+
+<script>
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+		var opts = [
+			["<tml:script expression="option('empty-text')||label('none')"/>", "", ""],
+			<tml:foreach item="_filenames" currentvalue="_filename">
+				<tml:script>
+					_url = AFW.content().attachment(_filename).getThumbnailURL()
+				</tml:script>
+				[
+					"<tml:item name="_filename" encode="none"/>",
+					"<tml:case condition="_url">background-image:url(<tml:item name="_url"/>)</tml:case>",
+					"<tml:item name="_url"/>"
+				]<tml:between>,</tml:between>
+			</tml:foreach>
+		];
+		var store = new Ext.data.SimpleStore({
+			fields: ['filename', 'background', 'url'],
+			data: opts
+		})
+		
+		var tpl = '<div class="x-combo-list-item clearfix">'
+				+ '<div style="width:25px;height:25px;float:left;background-size:contain;background-position:0 center;background-repeat:no-repeat;{background};"></div>'
+				+ '<div style="line-height:25px;margin-left:30px">{filename}</div>'
+			+ '</div>';
+			
+		var combo = new Ext.form.ComboBox({
+			tpl: tpl,
+			store: store,
+			displayField:'filename',
+			value: "<tml:item name="{_fieldname}" type="tmlform" encode="none"/>",
+			itemSelector: "div.my-combo-list-item",
+			typeAhead: true,
+			mode: 'local',
+			disabled: <tml:script expression="option('mode')=='view'"/>,
+			triggerAction: 'all',
+			emptyText:'<tml:script expression="option('empty-text')||label('none')"/>',
+			width: WGA.isIE ? 245 : 265,
+			renderTo: "select_file_Combo-<tml:item name="_fieldname"/>"
+		});
+		combo.on("select", function(c,rec){
+			document.forms['<tml:script expression="tmlform.formid"/>'].elements["<tml:item name="_fieldname"/>"].value = combo.getValue();
+			WGA.ajax.callAction('<tml:action ref="refresh" param1="{_fieldname}"/>')
+		})
+	})
+</script>	
+
+<tml:script>
+	_filename = tmlform.field(_fieldname);
+</tml:script>
+<tml:case condition="_filename">
+	<div style="margin:10px">
+	
+		<tml:if condition="content().hasFile(_filename)">
+			<tml:then>
+				<div style="float:left;width:40px">
+					<tml:script>
+						var attachment = AFW.content().attachment(_filename)
+						if(attachment.getType()=="others" && option("icon"))
+							_url = option("icon")
+						else _url = attachment.getThumbnailURL()
+					</tml:script>
+					<tml:case condition="_url">
+						<img src="<tml:item name="_url"/>" style="max-width:40px;max-height:30px">
+					</tml:case>
+				</div>
+				<div style="margin-left:50px">
+					<tml:script>
+						var file = content().getFileMetaData(_filename);
+						_size = file.getSize();
+						_date = file.getLastmodified()
+						_mimetype = file.getMimeType()
+					</tml:script>
+					<tml:item name="_mimetype"/> - <tml:script expression="AFW.Util.renderFileSize(_size)"/>
+					<br>
+					<tml:item name="_date"/>
+				</div>
+				<div style="clear:left"></div>
+			</tml:then>
+			<tml:else>
+				<h1 class="error">
+					File not found
+				</h1>
+			</tml:else>
+		</tml:if>
+	</div>
+</tml:case>
+

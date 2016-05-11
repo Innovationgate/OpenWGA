@@ -1,0 +1,112 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:form id="form-ce-panel" source="none">
+
+	<tml:input name="dbkey" type="hidden"/>
+	<tml:input name="contentkey" type="hidden"/>
+	<tml:input name="structkey" type="hidden"/>
+
+	<script>
+		WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "CMS_contentkey_changed", function(e){
+			//console.log("ce-panel: refresh");
+			var form = document.forms['form-ce-panel'] 
+			form.dbkey.value=e.params.dbkey;
+			form.contentkey.value=e.params.contentkey;
+			form.structkey.value=e.params.structkey;
+			
+			WGA.ajax.callAction("<tml:action ref="$refresh"/>", "<tml:script expression="portlet.portletkey"/>");
+		});
+	</script>
+	
+	<tml:case context="[db:{tmlform.dbkey}/docid:{tmlform.structkey}]" iscontextvalid="true">
+		<div style="padding:10px">
+
+			<h1><tml:meta name="title"/></h1>
+			<button>Neues Unterdokument</button>
+			
+			<div style="padding: 5px 0">
+				Parent: <tml:range context="parent">
+					<a href="javascript:BI.selectContent('<tml:meta name="key"/>')"><tml:metadata name="title"/></a>
+				</tml:range>
+			</div>
+			
+			<tml:script>
+				_type = haschildren() ? "children" : "siblings";
+				_key = KEY
+			</tml:script>
+			
+			<tml:navigator type="{_type}" sortexpression="MODIFIED" sortorder="descending">
+	
+				<tml:script>
+					var d = createcalendar(dateonly(createdate()))
+					if(MODIFIED.after(d.time)){
+						_date = label("latest-updates.today");
+						_format = "HH:mm";
+						return;
+					}
+	
+					d.add(d.DAY_OF_YEAR, -1)
+					if(MODIFIED.after(d.time)){
+						_date = label("latest-updates.yesterday");
+						_format = "HH:mm"
+						return;
+					}
+	
+					d.add(d.DAY_OF_YEAR, -5)
+					if(MODIFIED.after(d.time)){
+						_date = label("latest-updates.last-7-days");
+						_format = "EEEE"
+						return;
+					}
+
+					d.add(d.DAY_OF_YEAR, -25)
+					if(MODIFIED.after(d.time)){
+						_date = label("latest-updates.last-30-days");
+						_format = "dd.MM"
+						return;
+					}
+	
+					_date = label("latest-updates.older-then-30-days");
+					_format = "MMM yy"
+				</tml:script>
+			
+				<tml:groupchange id="groupchange" expression="_date">
+					<div style="font-weight:bold;border-bottom:solid silver 1px;margin-top:20px">
+						<tml:taginfo sourcetag="groupchange" name="currentvalue" />:
+					</div>
+				</tml:groupchange>
+	
+				<div style="padding: 5px 0">
+					<tml:comment><a href="javascript:BI.selectContent('<tml:meta name="key"/>')"><tml:metadata name="title"/></a></tml:comment>
+					<a style="padding:5px 0;display:block;<tml:case condition="KEY==_key">background:#efefef;</tml:case>" href="<tml:url/>" target="wga-contentmanager-iframe"><tml:meta name="title"/></a>
+					<br>
+					<tml:meta name="modified"/>
+				</div>
+			</tml:navigator>
+		</div>
+	</tml:case>
+
+</tml:form>

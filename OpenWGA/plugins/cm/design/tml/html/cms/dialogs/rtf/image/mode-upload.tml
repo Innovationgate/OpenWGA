@@ -1,0 +1,292 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	// check for Image Scaler
+	var modReg = wgacore.getModuleRegistry();
+	var scalers = modReg.getModulesForType(Packages.de.innovationgate.wga.modules.types.ImageScalerModuleType) 
+	_hasScaler = (scalers && scalers.size()>0)
+</tml:script>
+
+<div id="imageview-container">
+	<div id="imageview-toolbar"></div>
+	<div id="imageview" class="ychooser-view" style="padding:3px">
+
+		<tml:if condition="tmlform.filenames.isEmpty()">
+			<tml:then>
+				<tml:input type="file" name="file">
+					size="45"
+					onchange="BI.ImageDialog.updateSaveAs(this.form)"
+				</tml:input>
+			</tml:then>
+			<tml:else>
+				<div class="img-dlg-upload-info">
+					<tml:script>return tmlform.filenames.get(0);</tml:script>
+				</div>		
+			</tml:else>
+		</tml:if>
+					
+		<table width="100%">
+			<tr>
+				<td width="1%" nowrap><tml:label key="dialog.image.save-as"/>:</td>
+				<td>
+					<tml:input name="filename" cssclass="textinput"
+						validation="$E_VALUE!=''"
+						message="{label('dialog.image.no-filename')}" 
+					/>
+				</td>
+			</tr>
+			
+			<tr><td>&nbsp;</td></tr>
+			
+			<tml:case istrue="_hasScaler">
+				<tr>
+					<td colspan="2">
+						<tml:input type="checkbox" name="scale" options="{label('dialog.image.scale')+'|yes'}" default="{portlet.upload_scale}">
+							onclick="BI.ImageDialog.toggleScalingOptions()"
+						</tml:input>
+					</td>
+				</tr>
+			</tml:case>
+			
+		</table>
+		
+		<div id="scaling-options" style="display:none">
+			<table width="100%">
+				<tr><td colspan="2"><hr></td></tr>
+									
+				<tr>
+					<td><tml:label key="dialog.image.size"/>:</td>
+					<td>
+						<tml:input type="number" format="0" name="imgwidth" default="{format(portlet.upload_scale_imgwidth,'0')||250}"
+							validation="$P_VALUE>0"
+							message="{label('dialog.image.invalid-width')}"
+						>size="5"</tml:input>
+						&nbsp;x&nbsp;
+						<tml:input type="number" format="0" name="imgheight" default="{format(portlet.upload_scale_imgheight,'0')||250}"
+							validation="$P_VALUE>0"
+							message="{label('dialog.image.invalid-height')}"
+						>size="5"</tml:input>
+						&nbsp;px
+					<td>			
+				</tr>
+				<tr>
+					<td>Format:</td>
+					<td><tml:input type="select" name="imgtype" default="{portlet.upload_scale_imgtype||'JPG'}" options="JPG,PNG">size="5"</tml:input><td>			
+				</tr>		
+				
+				<tr>
+					<td colspan="2">
+						<tml:input type="checkbox" name="enlarge" default="{portlet.upload_scale_enlarge}"
+						options="{label('dialog.image.enlarge')+'|yes'}"/>
+					</td>
+				</tr>
+				
+				<tr><td colspan="2"><hr></td></tr>
+			</table>
+		</div>
+		
+		<tml:comment>Ext-Style Button</tml:comment>
+		<div class="x-dlg-btns x-dlg-btns-right">
+			<table class="x-btn-wrap x-btn" cellspacing="0" cellpadding="0" border="0" style="width: 75px;">
+				<tr>
+					<td class="x-btn-left"><i></i></td>
+					<td class="x-btn-center">
+						<em unselectable="on">
+							<button type="button" id="img-upload-button" disabled="disabled" class="x-btn-center x-btn-text" onclick="BI.ImageDialog.uploadFileAttachment()">
+								<tml:script>
+									return tmlform.filenames.isEmpty() ? label("dialog.image.upload") : label("dialog.image.save");
+								</tml:script>
+							</button>
+						</em>
+					</td>
+					<td class="x-btn-right"><i></i></td>
+				<tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+<script>
+
+	var tb = new Ext.Toolbar('imageview-toolbar', [
+		'<tml:label key="dialog.image.headline.upload-file"/>...', 
+		'->',
+		{
+       		icon: '<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="cancel.png"/>', 
+       		cls: 'x-btn-icon',
+       		tooltip: '{%label:cancel%}',
+       		handler: function() {
+       			WGA.ajax.callAction("<tml:action>
+       				tmlform.reset();
+					portlet.setMode("view"); 
+       			</tml:action>", "<tml:script>return portlet.portletKey</tml:script>");
+       		}
+   		}
+	]);
+	BI.dialog.submitButton.disable();
+	<tml:case condition="!tmlform.filenames.isEmpty()">
+		Ext.get("img-upload-button").dom.disabled=false;
+	</tml:case>
+	
+	BI.ImageDialog.toggleScalingOptions=function() {
+		var el = document.forms['<tml:script expression="tmlform.formid"/>'].scale;
+		if(el){
+			var scalingOptions = Ext.get("scaling-options");		
+			scalingOptions.dom.style.display = el.checked ? "block" : "none";
+		}				
+	}
+	BI.ImageDialog.toggleScalingOptions();
+	
+	BI.ImageDialog.uploadFileAttachment=function(){
+		
+		var form = document.forms['<tml:script expression="tmlform.formid"/>'];
+		if(form.file){
+			if(form.file.value=="")
+				return alert("<tml:label key="dialog.image.no-file-selected"/>");
+			
+			var existingFiles = [
+				<tml:script>
+					_files = content().getFileNames();
+				</tml:script>
+				<tml:foreach type="itemvalue" item="_files" currentvalue="_file">
+					"<tml:item name="_file"/>"<tml:between>,</tml:between>
+				</tml:foreach>
+			]
+			
+			var newfile = form.filename.value.replace(/\s+$/,"").replace(/^\s+/,"");
+			
+			if (newfile == "") {
+				alert("{%label:dialog.image.no-filename%}");
+				return;
+			}
+			
+			newfile += "." + BI.util.getFileInfo(form).ext;				
+			
+			for(var i=0; i<existingFiles.length; i++) {
+				if(Ext.util.Format.lowercase(newfile) == Ext.util.Format.lowercase(existingFiles[i]) && !confirm("<tml:label key="dialog.upload.overwrite-query"/>"))
+					return;
+			}
+		}
+		
+		WGA.ajax.action({
+			id: "<tml:script>return portlet.portletkey</tml:script>",
+			action: "<tml:action>	
+				
+				if (!tmlform.validate())
+					return;
+
+				if(tmlform.filenames.isEmpty()) 
+					return tmlform.addMessage(label('dialog.image.no-file-selected'));
+				
+				log.info("CM: uploading image " + tmlform.filenames);
+
+				// calculate filename and extenssion:
+				var filename = tmlform.filename.toLowerCase();
+				var ext = "";
+				// get extension from uploaded file
+				var filepath=tmlform.filenames.get(0);
+				var a=filepath.split(".");
+				if(a.length>1){
+					ext=a[a.length-1].toLowerCase();
+				}
+
+				if(tmlform.scale=="yes"){
+					var extensions = createList("jpg,jpeg,png,gif,bmp,tif", ",");
+				}
+				else {
+					var extensions = createList("jpg,jpeg,png,gif", ",");
+				}
+
+				// check for valid extension:				
+				if (!extensions.contains(ext)) {
+					tmlform.reset();
+					return tmlform.addMessage(label("dialog.image.invalid-filetype") + ": '" + ext + "'");
+				}
+				
+				if(tmlform.scale=="yes"){
+					//log.info("scaling image ...");
+					/*
+					if (tmlform.imgwidth < 1 || tmlform.imgwidth == null || tmlform.imgheight < 1 || tmlform.imgheight == null)
+						return tmlform.addMessage(label("dialog.image.invalid-size"));
+					*/							
+					var scaler = createImageScaler(tmlform.getfile(tmlform.filenames.get(0)));
+					if (!scaler) {
+						tmlform.reset();
+						return tmlform.addMessage(label("dialog.image.invalid-file"));
+					}
+					if(tmlform.enlarge=="yes")
+						scaler.growToSize(tmlform.imgwidth, tmlform.imgheight);
+					scaler.shrinkToSize(tmlform.imgwidth, tmlform.imgheight);
+					switch(tmlform.imgtype){
+						case "PNG":
+							scaler.usePNGForOutput();
+							break;
+						case "JPG":
+							scaler.useJPEGForOutput();
+							break;
+					}
+					if(document.getFileNames().contains(filename+"."+ext)){
+						document.removeFile(filename+"."+ext);
+						document.save();
+						log.info("CM: file " + filename+"."+ext + " removed");
+					}
+					tmlform.attachScaledImage(document, scaler, filename);
+				}
+				else{
+					if(document.getFileNames().contains(filename+"."+ext)){
+						document.removeFile(filename+"."+ext);
+						document.save();
+						log.info("CM: file " + filename+"."+ext + " removed");
+					}
+					this.tmlform.attach(document, filename+"."+ext);
+				}
+				
+				document.save();
+				portlet.setMode("view");
+
+				portlet.upload_scale = tmlform.scale;					
+				portlet.upload_scale_imgwidth = tmlform.imgwidth;
+				portlet.upload_scale_imgheight = tmlform.imgheight;
+				portlet.upload_scale_imgtype = tmlform.imgtype;
+				portlet.upload_scale_enlarge = tmlform.enlarge;
+				portlet.save();
+				
+				tmlform.reset();
+				tmlform.currentselection=filename+"."+ext;
+				tmlform.imagesource="intfile";
+				
+				portlet.fireEvent(createEvent("CMS_attachments_changed"));
+				
+			</tml:action>"
+			});
+	}
+	
+	BI.ImageDialog.updateSaveAs=function(form){
+		form.filename.value=BI.util.getFileInfo(form).name;
+		Ext.get("img-upload-button").dom.disabled=false;
+	}
+		
+</script>
+	

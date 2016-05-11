@@ -1,0 +1,208 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+/**
+ * check all links using items "_externallinks" and "_internalelinks"
+ */
+
+var report = {
+	start: "Linkchecker started at " + createdate(),
+	dbreports: []
+}
+var error = false;
+var log=this.jobContext.getLog();
+log.info("CM Linkchecker started");
+
+var checker = new Packages.de.innovationgate.igutils.LinkChecker();
+
+var thequery="content.status='p' AND (content.items['_externallinks'].text!='' OR content.items['_internallinks'].text!='')";
+var queryoptions=createLookupTable();
+queryoptions.put(this.db().QUERYOPTION_ONLYRELEASED, true)
+
+var config = context("name:$linkchecker", false);
+if(config){
+	
+	log.info("linkchecker config: " + config.dbkeys);
+	
+	var dbkeys = config.itemList("dbkeys").iterator(); 
+	while(dbkeys.hasNext()){
+		var dbkey = dbkeys.next();
+		if(dbkey=="")
+			continue;
+		var db = this.db(dbkey);
+		if(db)
+			log.info("checking links in database " + db.getTitle());
+		else{
+			log.warn("configured database " + dbkey + " not found");
+			// prepare report for this db
+			var dbreport={
+				db: dbkey + " (not connected)",
+				docs: []
+			}
+			report.dbreports.push(dbreport);
+			continue;
+		}
+		
+		// prepare report for this db
+		var dbreport={
+			db: db.getTitle() + " (" + dbkey + ")",
+			docs: []
+		}
+		report.dbreports.push(dbreport);
+		
+		var resultset=db.query("hql", thequery, queryoptions);
+		
+		var clist=resultset.getContentList();
+		log.info(clist.size()+" documents found");
+		var it=clist.iterator();
+		
+		var LC = createObject("cms:linkchecker", db);
+		
+		while (it.hasNext()){
+			var doc=it.next();
+			if(doc.getVirtualLink())
+				continue;		// ignore virtual documents 
+			log.info("check links in document: " + doc.getTitle());
+			var docreport={
+				title: doc.getTitle(),
+				url: config.rooturl+"/"+dbkey+"/html/default/"+doc.getContentKey(),
+				links: []
+			}
+			dbreport.docs.push(docreport);
+			
+			// check external links:
+			var urls = doc.getItemValueList("_externallinks").iterator();
+			while(urls.hasNext()){
+				var url = urls.next();
+				var linkreport={
+					url: url,
+					type: "external",
+					error: false,
+					msg: "OK"
+				}
+				try{
+					var code = checker.check(url);
+					if(code!=200 && code!=401){
+						error = true;
+						linkreport.error=true;
+						linkreport.msg="Status code: " + code;
+						docreport.links.push(linkreport);
+					}
+					else if(config.options=="all")
+						docreport.links.push(linkreport);
+				}catch(e){
+					error = true;
+					linkreport.error=true;
+					linkreport.msg=e.message;
+					docreport.links.push(linkreport);
+				}
+				log.info("checked external url: " + url + ", Status " + code);
+			}
+			
+			// internal links:
+			var urls = doc.getItemValueList("_internallinks").iterator();
+			while(urls.hasNext()){
+
+				var url = urls.next();
+				var linkreport={
+					url: url,
+					type: "internal",
+					error: false,
+					msg: "OK"
+				}
+
+				if(url) try{
+					LC.checkInternalLink(doc, url);
+					if(config.options=="all"){
+						docreport.links.push(linkreport);
+					}
+				}catch(e){
+					error = true;
+					linkreport.error=true;
+					linkreport.msg=e.message;
+					docreport.links.push(linkreport);
+				}
+				log.info("checked internal link: " + url + ", Error " + linkreport.error);
+			}
+			
+			
+		}
+	}
+	
+	log.info("Finched checking links.")
+	
+	report.finished="Linkchecker finished at " + createdate();
+	
+	if(error || config.options=="all"){
+
+		log.info("Create mail report ...");
+		 	
+		var body = "<style>td{background-color:#efefef}</style>";
+		body += report.start + "<br>";
+		
+		body += "<table width='100%'>"
+		body += "<tr><th>Document</th><th>Linktype</th><th>Link</th><th>Status</th></tr>"
+
+		for(var i=0; i<report.dbreports.length; i++){
+			var dbreport = report.dbreports[i];
+			body += "<tr><td style='background-color:white' colspan='4'>Database: <b>" + dbreport.db + ":</b></td></tr>";
+			var docreports=dbreport.docs;
+			if(docreports.length>0){
+				for(var j=0; j<docreports.length; j++){
+					var docreport=docreports[j];
+					var linkreports=docreport.links;
+					if(linkreports.length==0)
+						continue;
+					body += "<tr><td rowspan='"+ linkreports.length + "'><a href='"+docreport.url+"'>"+docreport.title+"</a></td>"
+					for(var k=0; k<linkreports.length; k++){
+						var linkreport=linkreports[k];
+						if(k>0)
+							body += "<tr>"
+						body += "<td>"+linkreport.type+"</td><td>"+linkreport.url+"</td>"
+						if(linkreport.error)
+							body += "<td style='color:red'>"
+						else body += "<td>"
+						body += linkreport.msg+"</td></tr>";
+					}
+				}
+			}
+			else body += "<tr><td colspan='4'>No reports</td></tr>"
+			
+		}
+		body += "</table>"
+
+		body += "<br>" + report.finished;
+		
+		//var mail = createmail(config.mailserver, config.mailserver_username||"", config.mailserver_password||"");
+		var mail = createmail();
+		mail.setSubject("OpenWGA Content Manager Linkcheck Report");
+		mail.setBody(body);
+		mail.setTo(config.email);
+		mail.setFrom("OpenWGA-Content-Manager");
+		mail.setMimeType("text/html");
+		mail.send();
+		log.info("Report sent to " + config.email);
+	}
+}
+else log.info("No linkchecker configuration found");

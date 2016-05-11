@@ -1,0 +1,52 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:input name="fielddata" type="hidden"/>
+
+<script>
+	var editoroptions = {};
+	<tml:case condition="tmlform.editoroptions">
+		try{
+	 		editoroptions = Ext.decode("<tml:script expression="AFW.Util.encodeForScript(tmlform.editoroptions)"/>");
+	 	}
+	 	catch(e){
+	 		Ext.Msg.alert("Unable to parse RTF-Editor Options", 
+	 			"<tml:script expression="AFW.Util.encodeForScript(tmlform.editoroptions)"/><hr size='1'><b>" + e + "</b>");
+	 	}
+	</tml:case>
+	var editor = new AFW.RTF.editor("item_<tml:item name="edititem" type="tmlform"/>", {
+		document: BI.sitepanel.iframe.document,
+		contentinfo: BI.sitepanel.iframe.window.WGA.contentinfo,
+		autofocus: true,
+		css: editoroptions.css,
+		style: editoroptions.style,
+		width: "100%"
+	});
+
+	window.setTimeout(editor.focus, 100);
+
+	BI.contenteditor.getFieldData=function(){
+		return editor.getRTFHTML();
+	}
+</script>

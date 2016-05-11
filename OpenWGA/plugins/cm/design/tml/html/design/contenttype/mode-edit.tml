@@ -1,0 +1,104 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="saveContentType">
+	if(!tmlform.validate())
+		return;
+	var close_flag = tmlform.close_flag=="true";
+	try{
+		switch(tmlform.positioning){
+			case "fixParentDocs":
+				tmlform.allowedpositions=createlist(tmlform.ap_parents.split(","))
+				break;
+			case "fixDocTypes":
+				tmlform.allowedpositions=createlist(tmlform.ap_contenttypes.split(","))
+				break;
+		}
+		
+		tmlform.eventsavecontent = "tmlscript/"+tmlform.ui_savecontent;
+		tmlform.eventworkflowmail = "tmlscript/"+tmlform.ui_workflowmail;
+		tmlform.eventcreatecontent = "tmlscript/"+tmlform.ui_createcontent;
+
+		tmlform.removeField("ui_createcontent")
+		tmlform.removeField("ui_savecontent")
+		tmlform.removeField("ui_workflowmail")
+		
+		// remove all fields that are defined by schema.xml
+		if(document.isMetaDeterminedInSchema){
+			var fields = tmlform.fieldnames.iterator()
+			while(fields.hasNext()){
+				var field = fields.next();
+				if(document.isMetaDeterminedInSchema(field)){
+					tmlform.removefield(field)
+				}
+			}
+		}
+		
+		// save inner/outer layout:
+		var Database=AFW.database();
+		if(tmlform.outerlayout)
+			document.setOuterLayoutName(Database.TMLName.fromDisplayName(tmlform.outerlayout));
+		if(tmlform.innerlayout)
+			document.setInnerLayoutName(Database.TMLName.fromDisplayName(tmlform.innerlayout));
+		
+		tmlform.storeInDocument(document)
+
+		if(close_flag)
+			_new_mode="view";
+	}
+	catch(e){
+		logException(e);
+		tmlform.addmessage(e.message);
+	}
+</tml:action>
+
+<tml:if context="{'db:'+_dbkey+'/$contenttype:'+option('id')}" iscontextvalid="true">
+	<tml:then>
+		<tml:form id="contenttype-form" cssclass="entryform" mode="edit" htmlinput="ignore" onsubmit="return false">
+
+			<tml:include ref="::form"/>
+			<script>
+			
+				dp.SyntaxHighlighter.HighlightAll('code_savecontent');
+				dp.SyntaxHighlighter.HighlightAll('code_createcontent');
+				dp.SyntaxHighlighter.HighlightAll('code_workflowmail');
+				
+				// submit function called from dialog handler and on RETURN
+				BI.design.contenttype_panel.submit=function(close){
+					document.forms["contenttype-form"].close_flag.value=close;
+					WGA.ajax.callAction("<tml:action ref="saveContentType"/>", 
+						"<tml:script>return portlet.portletkey</tml:script>");
+				}	
+				BI.makeTextareasResizable("ct-panel");
+				BI.makeComboBoxes("form-contenttype");
+			</script>
+			
+		</tml:form>
+	</tml:then>
+
+	<tml:else>
+		<tml:label key="design.error.invalidcontext"/>: <tml:option name="id"/>
+	</tml:else>
+</tml:if>
