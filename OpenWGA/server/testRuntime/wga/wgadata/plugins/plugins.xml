@@ -25,7 +25,7 @@
       <__active>true</__active>
       <__defaultPlugin>true</__defaultPlugin>
       <__reconnectDatabase>false</__reconnectDatabase>
-      <__filePath>${wga.defaultpluginsdir}/de.innovationgate.contentmanager-7.2.0.wgaplugin</__filePath>
+      <__filePath>/Users/ws/workspace-openwga-dev.git/OpenWGAServer/OpenWGA/server/build/extra/WEB-INF/default-plugins/de.innovationgate.contentmanager-7.2.0.0.b644.wgaplugin</__filePath>
       <__installationKey>contentmanager</__installationKey>
       <__pluginID>
         <uniqueName>de.innovationgate.contentmanager</uniqueName>
@@ -34,7 +34,7 @@
           <minorVersion>2</minorVersion>
           <maintenanceVersion>0</maintenanceVersion>
           <patchVersion>0</patchVersion>
-          <buildVersion>226</buildVersion>
+          <buildVersion>231</buildVersion>
         </version>
       </__pluginID>
     </WGAPlugin>
