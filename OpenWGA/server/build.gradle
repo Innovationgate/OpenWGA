@@ -86,7 +86,7 @@ dependencies {
     gretty 'org.glassfish.main.transaction:javax.transaction:3.1.2.2'
     gretty testProject.fileTree(dir: 'tomcat/lib', include: ['*.jar'])
 
-	compile project(":plugins-cm")
+	compile project(":plugin-cm")
 
 }
 
@@ -123,7 +123,7 @@ task buildPlugins(type: Copy) {
 	from '../plugins/cm/build/distributions'
    	into 'build/extra/WEB-INF/default-plugins' 	
 }
-buildPlugins.dependsOn project(":plugins-cm").tasks.buildPlugin
+buildPlugins.dependsOn project(":plugin-cm").tasks.buildPlugin
 
 war.dependsOn writeVersion, buildPlugins
 testClasses.dependsOn war

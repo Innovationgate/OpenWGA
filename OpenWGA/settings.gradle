@@ -27,8 +27,8 @@ project(":tmlScript").projectDir = file("libraries/tmlScript")
 include ":wgaDeb"
 project(":wgaDeb").projectDir = file("distros/wgaDeb")
 
-include ":plugins-cm"
-project(":plugins-cm").projectDir = file("plugins/cm")
+include ":plugin-cm"
+project(":plugin-cm").projectDir = file("plugins/cm")
 
 include ":server"
 include ":server:testRuntime"
