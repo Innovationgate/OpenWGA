@@ -1,8 +1,8 @@
-apply plugin: 'java'
 
 dependencies {
     compile project(":wga");
-    compile project(":wgapi");
+    compile project(":wgapi");    
+    compile project(":wgaBuildTools");    
     compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
     compileClasspath 'javax.servlet.jsp:jsp-api:2.2'
 }
@@ -15,7 +15,17 @@ sourceSets {
 	}
 } 
 
-task buildPlugin(type: Zip, dependsOn: build){
+task updatePluginVersion{
+	def version = "${openwga_version_major}.${openwga_version_minor}.${openwga_version_maintenance}.${openwga_version_patch}"
+	def build = "${openwga_version_build}"
+	println "Update plugin to version ${version} Build ${openwga_version_build}"
+
+    ant.taskdef(name:"UpdatePluginVersion", classname:"de.innovationgate.ant.UpdatePluginVersion", classpath: configurations.compileClasspath.asPath)
+    ant.UpdatePluginVersion(designDir: "design", version: "${version}", build: "${build}")
+
+}
+
+task buildPlugin(type: Zip, dependsOn: [build, updatePluginVersion]){
     archiveName = "de.innovationgate.contentmanager-${project.version}.wgaplugin"    
     from('design') {
         into '/'

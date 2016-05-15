@@ -105,9 +105,6 @@ ospackage {
 
 }
 
-buildDeb {   
-}
-build.dependsOn buildDeb
 buildDeb.dependsOn configurations.server
 
 task updateDebRepository(dependsOn: buildDeb) << {
