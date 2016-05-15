@@ -495,11 +495,18 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      * @see de.innovationgate.wgpublisher.webtml.utils.Context#getvar(java.lang.String)
      */
 	@Override
-    public Object getvar(String name) {
+    public Object getvar(String name) throws WGAPIException {
 		if (name == null) {
 	        return null;
 	    }	    
 		name = name.toLowerCase();
+		
+        if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
+            Object value = getDesignContext().retrieveLocalVar(name);
+            if (!(value instanceof NullPlaceHolder)) {
+                return value;
+            }
+        }
 		
 		Map vars = _environment.getPageVars();
 		if (vars.containsKey(name)) {
