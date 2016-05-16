@@ -1,13 +1,13 @@
-<de.innovationgate.wga.common.beans.csconfig.v4.CSConfig>
+<de.innovationgate.wga.common.beans.csconfig.v5.CSConfig>
   <initScript></initScript>
   <connectionScript>init:connect</connectionScript>
   <anonymousAccessLevel>-1</anonymousAccessLevel>
   <defaultAccessLevel>30</defaultAccessLevel>
-  <versionCompliance>wga7.0</versionCompliance>
+  <versionCompliance>wga7.1</versionCompliance>
   <publisherOptions>
     <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
       <name>DesignEncoding</name>
-      <value>ISO-8859-1</value>
+      <value>UTF-8</value>
     </de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
     <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
       <name>isHDB</name>
@@ -61,7 +61,7 @@
       <schedule>0 00 01 * * ?</schedule>
     </de.innovationgate.wga.common.beans.csconfig.v1.JobDefinition>
   </jobDefinitions>
-  <pluginConfig class="de.innovationgate.wga.common.beans.csconfig.v4.PluginConfig">
+  <pluginConfig class="de.innovationgate.wga.common.beans.csconfig.v5.PluginConfig">
     <id>
       <uniqueName>de.innovationgate.contentmanager</uniqueName>
       <version>
@@ -69,7 +69,7 @@
         <minorVersion>2</minorVersion>
         <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>231</buildVersion>
+        <buildVersion>644</buildVersion>
       </version>
     </id>
     <title>OpenWGA Content Manager</title>
@@ -110,6 +110,7 @@
     <showOnStartPage>false</showOnStartPage>
     <clearDatabaseOnUpdate>false</clearDatabaseOnUpdate>
     <disablePluginInit>false</disablePluginInit>
+    <options/>
   </pluginConfig>
   <shortcuts>
     <de.innovationgate.wga.common.beans.csconfig.v2.Shortcut>
@@ -121,9 +122,9 @@
   <staticClasspath>false</staticClasspath>
   <minimumWGAVersion>
     <majorVersion>7</majorVersion>
-    <minorVersion>0</minorVersion>
+    <minorVersion>2</minorVersion>
     <maintenanceVersion>0</maintenanceVersion>
     <patchVersion>0</patchVersion>
     <buildVersion>0</buildVersion>
   </minimumWGAVersion>
-</de.innovationgate.wga.common.beans.csconfig.v4.CSConfig>
+</de.innovationgate.wga.common.beans.csconfig.v5.CSConfig>

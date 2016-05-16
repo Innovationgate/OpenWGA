@@ -94,7 +94,7 @@
 	<div class="struct" id="struct:<tml:item name="_structkey"/>-more"> 
 		<div style="text-align:left;padding-left:<tml:item name="_indent"/>px" onclick="BI.se.updateMore('<tml:item name="_structkey"/>', '<tml:script format="0" expression="Number(_page)+1"/>')"
 				ext:width="150" 
-				ext:qtip="weitere Einträge laden ...">
+				ext:qtip="weitere EintrÃ¤ge laden ...">
 			<table cellpadding="0" cellspacing="0" border="0">
 				<tr>					
 					<td width="1%">

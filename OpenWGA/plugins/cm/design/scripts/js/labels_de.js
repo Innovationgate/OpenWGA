@@ -24,31 +24,31 @@
  ******************************************************************************/
 $L={
 	cancel: "Abbrechen",
-	close: "Schließen",
+	close: "SchlieÃŸen",
 	save: "Speichern",
-	saveandclose: "Speichern & Schließen",
+	saveandclose: "Speichern & SchlieÃŸen",
 	edit: "Bearbeiten",
 	edit_field: "Feld bearbeiten",
 	cancel_edit: "Bearbeitung abbrechen",
 	please_wait: "Bitte warten",
 	filename: "Dateiname",
-	filesize: "Größe",
-	remove: "Löschen",
-	deleting: "Lösche ..."
+	filesize: "GrÃ¶ÃŸe",
+	remove: "LÃ¶schen",
+	deleting: "LÃ¶sche ..."
 }
 
 $L.headings=[
-	"Überschrift 1",
-	"Überschrift 2",
-	"Überschrift 3",
-	"Überschrift 4",
-	"Überschrift 5",
-	"Überschrift 6"
+	"Ãœberschrift 1",
+	"Ãœberschrift 2",
+	"Ãœberschrift 3",
+	"Ãœberschrift 4",
+	"Ãœberschrift 5",
+	"Ãœberschrift 6"
 ]
 
 $L.goto={
 	title: "Gehe zu ...",
-	msg: "Bitte geben Sie einen Schlüssel oder eindeutigen Namen ein"
+	msg: "Bitte geben Sie einen SchlÃ¼ssel oder eindeutigen Namen ein"
 }
 
 $L.layout={
@@ -58,7 +58,7 @@ $L.layout={
 $L.statusbar={
 	contentdocument: "Inhaltsdokument",
 	loaded: "geladen",
-	no_content_for_page: "Kein Inhaltsdokument für Seite",
+	no_content_for_page: "Kein Inhaltsdokument fÃ¼r Seite",
 	found: "gefunden",
 	no_wga_page: "Angezeigte Seite ist keine OpenWGA Inhaltsseite.",
 	loading_page: "lade Seite"
@@ -76,7 +76,7 @@ $L.searchpanel= {
 
 $L.propertypannel = {
 	title: "Inhaltseigenschaften",
-	button_tooltip: "<h1>Speichern</h1>Klicken Sie hier, um Ihre Änderungen zu speichern" 
+	button_tooltip: "<h1>Speichern</h1>Klicken Sie hier, um Ihre Ã„nderungen zu speichern"
 }
 
 $L.contentviewpanel = {
@@ -86,10 +86,10 @@ $L.contentviewpanel = {
 $L.se={
 	tooltip_reload_se : "Siteexplorer aktualisieren",
 	tooltip_copy: "Seite in die Zwischenablage kopieren",
-	tooltip_paste: "Seite aus der Zwischenablage einfügen",
+	tooltip_paste: "Seite aus der Zwischenablage einfÃ¼gen",
 	tooltip_create_rootpage: "Neue Hauptseite",
 	tooltip_create_childpage: "Neue Unterseite",
-	tooltip_delete_page: "Seite löschen",
+	tooltip_delete_page: "Seite lÃ¶schen",
 	tooltip_page_settings: "Seiteneigenschaften"
 }
 
@@ -98,19 +98,19 @@ $L.dialogs=[
 		id: 				"login",
 		title: 				"Benutzer oder Berechtigung wechseln ...",
 		submitButtonText: 	"Anmelden",
-		submitOnEnter: 		true		
+		submitOnEnter: 		true
 	},
 	{
 		id: 				"admin-login",
 		title: 				"Als OpenWGA Administrator anmelden ...",
 		submitButtonText: 	"Anmelden",
-		submitOnEnter: 		true		
+		submitOnEnter: 		true
 	},
 	{
 		id: 				"linkchecker-config",
 		title: 				"Linkchecker Konfiguration ...",
 		submitButtonText: 	"Konfiguration speichern",
-		submitOnEnter: 		false		
+		submitOnEnter: 		false
 	},
 	{
 		id: 				"quit",
@@ -120,8 +120,8 @@ $L.dialogs=[
 	},
 	{
 		id: "publish-content",
-		title: 				"Inhalt veröffentlichen ...",
-		submitButtonText:	"Veröffentlichen",
+		title: 				"Inhalt verÃ¶ffentlichen ...",
+		submitButtonText:	"VerÃ¶ffentlichen",
 		submitOnEnter:		false
 	},
 
@@ -131,89 +131,89 @@ $L.dialogs=[
 		submitButtonText:	"Seite erstellen",
 		submitOnEnter:		true
 	},
-	
+
 	{
 		id: "create-content",
 		title: 				"Neue Sprachversion erstellen ...",
 		submitButtonText:	"Sprachversion erstellen",
 		submitOnEnter:		true
 	},
-	
+
 	{	id: "delete-page",
-		title: 				"Seite und alle Unterseiten löschen ...",
-		submitButtonText:	"Seite löschen",
+		title: 				"Seite und alle Unterseiten lÃ¶schen ...",
+		submitButtonText:	"Seite lÃ¶schen",
 		submitOnEnter:		true
 	},
-	
+
 	{	id: "delete-content",
-		title: 				"Inhaltsversion löschen ...",
-		submitButtonText:	"Version löschen",
+		title: 				"Inhaltsversion lÃ¶schen ...",
+		submitButtonText:	"Version lÃ¶schen",
 		submitOnEnter:		true
 	},
-	
+
 	{	id: "archive-content",
 		title: 				"Inhaltsversion archivieren ...",
 		submitButtonText:	"Version archivieren",
 		submitOnEnter:		true
 	},
-	
+
 	{	id: "show-access",
 		title: 				"Berechtigungen ..."
 	},
-		
+
 	{	id: "approve-content",
 		title: 				"Inhalt genehmigen ...",
 		submitButtonText:	"Genehmigen"
 	},
-	
+
 	{	id: "reject-content",
 		title: 				"Freigabe des Inhalts ablehnen ...",
 		submitButtonText:	"Ablehnen"
 	},
 
 	{	id: "reject-pending-content",
-		title: 				"Freigabestatus zurücknehmen ...",
+		title: 				"Freigabestatus zurÃ¼cknehmen ...",
 		submitButtonText:	"In Arbeit setzen"
 	},
-	
+
 	{	id: "edit-content",
 		title: 				"Inhalt bearbeiten ...",
 		submitButtonText:	"Arbeitskopie erzeugen",
 		submitOnEnter:		true
 	},
-	
+
 	{	id: "settings",
 		title: 				"Einstellungen bearbeiten ...",
 		submitButtonText:	"Speichern",
 		submitOnEnter:		true
 	},
-	
-	{	id: "search", 
+
+	{	id: "search",
 		title: 				"Inhaltsdokument suchen ...",
 		submitButtonText:	"Suchen",
 		submitOnEnter:		true
 	},
-	
-	{	id: "move-page", 
+
+	{	id: "move-page",
 		title: 				"Seite verscheiben ...",
 		submitButtonText:	"Verschieben",
 		submitOnEnter:		true
 	},
-	
-	{	id: "clear-remote", 
-		title: 				"Verbindung zu Dokument löschen ...",
-		submitButtonText:	"Verbindung löschen",
+
+	{	id: "clear-remote",
+		title: 				"Verbindung zu Dokument lÃ¶schen ...",
+		submitButtonText:	"Verbindung lÃ¶schen",
 		submitOnEnter:		true
 	},
 
 	{	id: "about",
-		title: 				"Über OpenWGA Content Manager ..."
+		title: 				"Ãœber OpenWGA Content Manager ..."
 	},
 
 	{	id: "upload",
 		title: 				"Datei hochladen ...",
 		submitButtonText:	"Hochladen",
-		closeButtonText:	"Schließen"
+		closeButtonText:	"SchlieÃŸen"
 	},
 
 	{	id: "forward-content",
@@ -233,61 +233,61 @@ $L.dialogs=[
 	},
 
 	{	id: "paste-page",
-		title: 				"Seite aus der Zwischenablage einfügen ...",
-		submitButtonText:	"Einfügen"
+		title: 				"Seite aus der Zwischenablage einfÃ¼gen ...",
+		submitButtonText:	"EinfÃ¼gen"
 	},
 
 	{	id: "paste-content",
-		title: 				"Inhaltselemente aus der Zwischenablage einfügen ...",
-		submitButtonText:	"Einfügen"
+		title: 				"Inhaltselemente aus der Zwischenablage einfÃ¼gen ...",
+		submitButtonText:	"EinfÃ¼gen"
 	},
 
 	{	id: "ldap-lookup",
 		title: 				"LDAP Verzeichnis ..."
 	},
-	
+
 	{
 		id: "rtf:insert-link",
-		title: 				"Link einfügen ...",
-		submitButtonText: 	"Einfügen",
+		title: 				"Link einfÃ¼gen ...",
+		submitButtonText: 	"EinfÃ¼gen",
 		submitOnEnter:		true
 	},
 
 	{
 		id: "rtf:insert-image",
-		title: 				"Grafik einfügen ...",
-		submitButtonText: 	"Einfügen",
+		title: 				"Grafik einfÃ¼gen ...",
+		submitButtonText: 	"EinfÃ¼gen",
 		submitOnEnter:		true
 	},
-	
+
 	{
 		id: "bookmarks:add-bookmark",
-		title: 				"Bookmark hinzufügen ...",
+		title: 				"Bookmark hinzufÃ¼gen ...",
 		submitButtonText: 	"Speichern",
 		submitOnEnter: 		true
 	},
-	
+
 	{
 		id: "bookmarks:manage-bookmarks",
 		title: "Bookmarks verwalten ...",
 		submitOnEnter: true
-	},	
+	},
 
 	{
 		id: "check-links",
-		title: "Links prüfen ...",
-		submitButtonText: 	"Links prüfen"
-	}	
+		title: "Links prÃ¼fen ...",
+		submitButtonText: 	"Links prÃ¼fen"
+	}
 
 	,{
 		id: "start-agent",
 		title: "Starte Agent ...",
-		submitButtonText: 	"Ausführen"
+		submitButtonText: 	"AusfÃ¼hren"
 	}
-	
+
 	,{
 		id: "tag-editor",
-		title: "Schlüsselwörter",
+		title: "SchlÃ¼sselwÃ¶rter",
 		submitButtonText: "Speichern"
 	}
 
@@ -308,17 +308,17 @@ $L.dialogs=[
 		title: "Bild Skalieren",
 		submitButtonText: "Bild skalieren"
 	}
-		
+
 	,{
 		id: "view-image",
 		title: "Bild betrachten",
 		cancelButtonText: "Schliessen"
 	}
-	
+
 	,{
 		id: "userdefined-section",
 		title: "Abschnittsinhalt",
-		submitButtonText: "Einfügen"
+		submitButtonText: "EinfÃ¼gen"
 	}
 
 	,{
@@ -335,10 +335,10 @@ $L.dialogs=[
 
 	,{
 		id: "restore-deleted-page",
-		title: "Gelöschte Seite wiederherstellen",
+		title: "GelÃ¶schte Seite wiederherstellen",
 		submitButtonText: "Wiederherstellen"
 	}
-	
+
 	,{
 		id: "user-info",
 		title: "User Information"
@@ -352,7 +352,7 @@ $L.dialogs=[
 
 	,{
 		id: "image-item-editor",
-		title: "Bild auswählen",
+		title: "Bild auswÃ¤hlen",
 		submitButtonText: "Speichern"
 	}
 
@@ -367,7 +367,7 @@ $L.dialogs=[
 		title: "Datei Metadaten",
 		submitButtonText: "Aktualisieren"
 	}
-	
+
 	,{
 		id: "edit-video",
 		title: "Video",
@@ -404,7 +404,7 @@ $L.panels = {
 	cssjs: "Script/CSS",
 	filecontainer: "Dateicontainer",
 	workflow: "Workflow",
-	
+
 	alternativeParam: "(neu)"
 }
 
@@ -416,28 +416,28 @@ $L.contentComparePanel={
 $L.RTFToolbar={
 	zoom: "Feld Zoomen",
 	editHelper: "Absatzmarkierungen ein-/ausblenden",
-	undo: "Rückgängig",
+	undo: "RÃ¼ckgÃ¤ngig",
 	redo: "Wiederholen",
-	paste: "Ohne Formattierungen einfügen",
+	paste: "Ohne Formattierungen einfÃ¼gen",
 	removeFormatting: "Alle Formatierungen entfernen",
 	bold: "Fett",
 	italic: "Kursiv",
 	underline: "Unterstrichen",
-	justifyLeft: "Linksbündig",
-	justifyRight: "Rechtsbündig",
+	justifyLeft: "LinksbÃ¼ndig",
+	justifyRight: "RechtsbÃ¼ndig",
 	justifyCenter: "Zentriert",
 	justifyFull: "Blocksatz",
-	indent: "Einrücken",
-	outdent: "Ausrücken",
+	indent: "EinrÃ¼cken",
+	outdent: "AusrÃ¼cken",
 	bulletList: "Unnummerierte Liste",
 	enumList: "Nummerierte Liste",
-	insertLink: "Link erstellen/ändern",
-	insertTable: "Tabelle einfügen",
-	insertImage: "Bild erstellen/ändern",
+	insertLink: "Link erstellen/Ã¤ndern",
+	insertTable: "Tabelle einfÃ¼gen",
+	insertImage: "Bild erstellen/Ã¤ndern",
 	editImage: "Bild bearbeiten",
-	unlink: "Link löschen",
+	unlink: "Link lÃ¶schen",
 	save_and_continue: "Zwischenspeichern",
-	save_and_close: "Speichern und Schließen" 
+	save_and_close: "Speichern und SchlieÃŸen"
 }
 
 $L.linktype={
@@ -447,5 +447,5 @@ $L.linktype={
 	intfile: "Datei aus diesem Dokument",
 	extfile: "Datei aus beliebigem Dokument",
 	file: "Datei aus Dateicontainer",
-	primaryfile: "Primäre Datai aus Dokument"		
+	primaryfile: "PrimÃ¤re Datei aus Dokument" 
 }

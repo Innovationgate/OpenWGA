@@ -44,7 +44,7 @@
 		portlet.fireEvent(event);
 
 	}
-	else tmlform.addmessage("Anmeldefehler. Bitte prüfen Sie Benutzername und Kennwort.")		
+	else tmlform.addmessage("Anmeldefehler. Bitte prÃ¼fen Sie Benutzername und Kennwort.")		
 </tml:action>
 
 <tml:script>

@@ -52,9 +52,9 @@ try {
 			}
 			else {
 				addwarning("denied to publish a document bc. remote document " + remote_info + " not found", false);
-				return tmlform.addmessage("Dokument kann nicht veröffentlich werden, weil das verbundene Dokument nicht gefunden wurde. \
-					Möglicherweise wurde es inzwischen gelöscht?\
-					Bitte löschen Sie die ungültige Verbindung.");
+				return tmlform.addmessage("Dokument kann nicht verÃ¶ffentlich werden, weil das verbundene Dokument nicht gefunden wurde. \
+					MÃ¶glicherweise wurde es inzwischen gelÃ¶scht?\
+					Bitte lÃ¶schen Sie die ungÃ¼ltige Verbindung.");
 			}
 		}
 		else{

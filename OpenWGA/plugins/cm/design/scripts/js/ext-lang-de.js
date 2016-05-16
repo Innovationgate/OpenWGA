@@ -26,30 +26,22 @@
  * Ext JS Library 1.0 Beta 1
  * Copyright(c) 2006-2007, Ext JS, LLC.
  * licensing@extjs.com
- * 
+ *
  * http://www.extjs.com/license
  */
 
-/*
-Ext.View.prototype.emptyText = "";
-Ext.grid.Grid.prototype.ddText = "%0 Zeile(n) ausgew‰lt";
-Ext.TabPanelItem.prototype.closeText = "Diesen Tab schlieﬂen";
-Ext.form.Field.prototype.invalidText = "Der Wert des Feldes ist nicht korrekt";
-Ext.UpdateManager.defaults.indicatorText = '<div class="loading-indicator">¸bertrage Daten ...</div>';
-*/
-
-Ext.UpdateManager.defaults.indicatorText = '<div class="loading-indicator">¸bertrage Daten ...</div>';
+Ext.UpdateManager.defaults.indicatorText = '<div class="loading-indicator">√úbertrage Daten ...</div>';
 
 if(Ext.View){
    Ext.View.prototype.emptyText = "";
 }
 
 if(Ext.grid.Grid){
-   Ext.grid.Grid.prototype.ddText = "{0} Zeile(n) ausgew‰hlt";
+   Ext.grid.Grid.prototype.ddText = "{0} Zeile(n) ausgew√§hlt";
 }
 
 if(Ext.TabPanelItem){
-   Ext.TabPanelItem.prototype.closeText = "Diesen Tab schlieﬂen";
+   Ext.TabPanelItem.prototype.closeText = "Diesen Tab schlie√üen";
 }
 
 if(Ext.form.Field){
@@ -59,7 +51,7 @@ if(Ext.form.Field){
 Date.monthNames = [
    "Januar",
    "Februar",
-   "M‰rz",
+   "M√§rz",
    "April",
    "Mai",
    "Juni",
@@ -96,15 +88,15 @@ Ext.util.Format.date = function(v, format){
 
 Ext.apply(Ext.DatePicker.prototype, {
    todayText         : "Heute",
-   minText           : "Dieses Datum liegt von dem erstmˆglichen Datum",
-   maxText           : "Dieses Datum liegt nach dem letztmˆglichen Datum",
+   minText           : "Dieses Datum liegt von dem erstm√∂glichen Datum",
+   maxText           : "Dieses Datum liegt nach dem letztm√∂glichen Datum",
    disabledDaysText  : "",
    disabledDatesText : "",
 	monthNames		: Date.monthNames,
 	dayNames		: Date.dayNames,
-   nextText          : 'N‰chster Monat (Strg/Control + Rechts)',
+   nextText          : 'N√§chster Monat (Strg/Control + Rechts)',
    prevText          : 'Vorheriger Monat (Strg/Control + Links)',
-   monthYearText     : 'Monat ausw‰hlen (Strg/Control + Hoch/Runter, um ein Jahr auszuw‰hlen)',
+   monthYearText     : 'Monat ausw√§hlen (Strg/Control + Hoch/Runter, um ein Jahr auszuw√§hlen)',
    todayTip          : "Heute ({0}) (Leertaste)",
    format            : "d.m.Y"
 });
@@ -114,7 +106,7 @@ Ext.apply(Ext.PagingToolbar.prototype, {
    afterPageText  : "von {0}",
    firstText      : "Erste Seite",
    prevText       : "vorherige Seite",
-   nextText       : "n‰chste Siete",
+   nextText       : "n√§chste Siete",
    lastText       : "letzte Seite",
    refreshText    : "Aktualisieren",
    displayMsg     : "Anzeige Eintrag {0} - {1} von {2}",
@@ -130,17 +122,17 @@ Ext.apply(Ext.form.TextField.prototype, {
 });
 
 Ext.apply(Ext.form.NumberField.prototype, {
-   minText : "Der Mindestwert f¸r dieses Feld ist {0}",
-   maxText : "Der Maximalwert f¸r dieses Feld ist {0}",
+   minText : "Der Mindestwert f√ºr dieses Feld ist {0}",
+   maxText : "Der Maximalwert f√ºr dieses Feld ist {0}",
    nanText : "{0} ist keine Zahl"
 });
 
 Ext.apply(Ext.form.DateField.prototype, {
    disabledDaysText  : "nicht erlaubt",
    disabledDatesText : "nicht erlaubt",
-   minText           : "Das Datum in diesem Feld muﬂ nach dem {0} liegen",
-   maxText           : "Das Datum in diesem Feld muﬂ vor dem {0} liegen",
-   invalidText       : "{0} ist kein valides Datum - es muﬂ im Format {1} eingegeben werden",
+   minText           : "Das Datum in diesem Feld mu√ü nach dem {0} liegen",
+   maxText           : "Das Datum in diesem Feld mu√ü vor dem {0} liegen",
+   invalidText       : "{0} ist kein valides Datum - es mu√ü im Format {1} eingegeben werden",
    format            : "Tag.Monat.Jahr"
 });
 
@@ -171,6 +163,6 @@ Ext.apply(Ext.grid.PropertyColumnModel.prototype, {
 });
 
 Ext.apply(Ext.SplitLayoutRegion.prototype, {
-   splitTip            : "Ziehen, um Grˆﬂe zu ‰ndern.",
-   collapsibleSplitTip : "Ziehen, um Grˆﬂe zu ‰ndern. Doppelklick um Panel auszublenden."
+   splitTip            : "Ziehen, um Gr√∂√üe zu √§ndern.",
+   collapsibleSplitTip : "Ziehen, um Gr√∂√üe zu √§ndern. Doppelklick um Panel auszublenden."
 });
