@@ -851,14 +851,6 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         
         String lcName = name.toLowerCase();
         
-        // Local variables (since 7.2)
-        if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
-            Object value = getDesignContext().retrieveLocalVar(name);
-            if (!(value instanceof NullPlaceHolder)) {
-                return value;
-            }
-        }
-        
 		Map<String,Object> pageVars = _environment.getPageVars();
         
         // Portlet variables
@@ -879,6 +871,14 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
                     return value;
                 }
                 
+            }
+        }
+
+        // Local variables (since 7.2)
+        if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
+            Object value = getDesignContext().retrieveLocalVar(name);
+            if (!(value instanceof NullPlaceHolder)) {
+                return value;
             }
         }
         
