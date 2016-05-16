@@ -60,59 +60,55 @@
 	
 </tml:script>
 
-	<tml:case condition="tmlform.hasMessages()">
-		<b><tml:formmessages divider="<br/>"/></b>
-		<hr size="1">		
-	</tml:case>
+<tml:case condition="tmlform.hasMessages()">
+	<b><tml:formmessages divider="<br/>"/></b>
+	<hr size="1">		
+</tml:case>
 
-	<h1><tml:label key="{tmlform.user_lookup_label}"/>?</h1>
-	<tml:input name="{tmlform.user_lookup_field}" multiple="true" type="textarea" cssstyle="width:100%"/>
+<h1><tml:label key="{tmlform.user_lookup_label}"/>?</h1>
+<tml:input name="{tmlform.user_lookup_field}" multiple="true" type="textarea" cssstyle="width:100%"/>
 
-	<div style="height:300;overflow:auto">
-		<table border="0" cellspacing="5" cellpadding="5" class="collection" width="100%">
-			<tr colaspan="collection-title">
-				<td>{%label:dialog.ldap.username%}</td>
-				<td>{%label:dialog.ldap.type%}</td>
-				<td>{%label:dialog.ldap.aliases%}</td>
-			</tr>
-			<tml:foreach type="itemvalue" item="_usersGroups" currentvalue="_current">
-				<tr onclick="WGA.ajax.callAction('<tml:action ref="setFieldValue" ajax="true" param1="{_current.getFullQualifiedName()}"/>')"
-						onmouseover="Ext.get(this).addClass('selected')"
-						onmouseout="Ext.get(this).removeClass('selected')"
-						style="cursor: pointer;">
-				    <td><tml:script>return _current.getFullQualifiedName().replace(/,/g, ", ");</tml:script></td>
-				    <td>
-				    	<tml:script>
-				    		if (_current.isUser()) { 
-				    			return "User" 
-				    		} else {
-				    			return "Group"
-				    		}
-				    	</tml:script>
-				    </td>    
-				    <td><tml:script divider=", ">return _current.getAliasNames();</tml:script></td>
-			   </tr> 
-			</tml:foreach>
-		</table>
-	</div>
-	
-	<hr size="1">
-	<tml:input name="query" default="{option('query')}" focus="true">size="40"</tml:input>
-	<button type="submit" onclick="WGA.ajax.callAction('<tml:action ref="$refresh"/>', '<tml:script expression="portlet.portletkey"/>')">Suchen</button>
+<div style="height:300;overflow:auto">
+	<table border="0" cellspacing="5" cellpadding="5" class="collection" width="100%">
+		<tr colaspan="collection-title">
+			<td>{%label:dialog.ldap.username%}</td>
+			<td>{%label:dialog.ldap.type%}</td>
+			<td>{%label:dialog.ldap.aliases%}</td>
+		</tr>
+		<tml:foreach type="itemvalue" item="_usersGroups" currentvalue="_current">
+			<tr onclick="WGA.ajax.callAction('<tml:action ref="setFieldValue" ajax="true" param1="{_current.getFullQualifiedName()}"/>')"
+					onmouseover="Ext.get(this).addClass('selected')"
+					onmouseout="Ext.get(this).removeClass('selected')"
+					style="cursor: pointer;">
+			    <td><tml:script>return _current.getFullQualifiedName().replace(/,/g, ", ");</tml:script></td>
+			    <td>
+			    	<tml:script>
+			    		if (_current.isUser()) { 
+			    			return "User" 
+			    		} else {
+			    			return "Group"
+			    		}
+			    	</tml:script>
+			    </td>    
+			    <td><tml:script divider=", ">return _current.getAliasNames();</tml:script></td>
+		   </tr> 
+		</tml:foreach>
+	</table>
+</div>
 
-	<script>
-		WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
-			BI.dialog.autoHeight();
-			BI.dialog.setTitle("<tml:label key="dialog.ldap.title"/>");
-			BI.dialog.submitButton.setText("<tml:label key="finished"/>")
-			BI.dialog.closeButton.hide();
-			document.forms['<tml:script expression="tmlform.formid"/>'].elements.query.select();
-			BI.dialog.submit=function(){					
-				BI.util.callAction("<tml:action ref="back" portletmode="view"/>")
-			}
-		});
-	</script>
-	
+<hr size="1">
+<tml:input name="query" default="{option('query')}" focus="true">size="40"</tml:input>
+<button type="submit" onclick="WGA.ajax.callAction('<tml:action ref="$refresh"/>', '<tml:script expression="portlet.portletkey"/>')">Suchen</button>
 
-
-<tml:comment><tml:button clickaction="$refresh" portletmode="view" ajax="true">Zurück</tml:button></tml:comment>
+<script>
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+		BI.dialog.autoHeight();
+		BI.dialog.setTitle("<tml:label key="dialog.ldap.title"/>");
+		BI.dialog.submitButton.setText("<tml:label key="finished"/>")
+		BI.dialog.closeButton.hide();
+		document.forms['<tml:script expression="tmlform.formid"/>'].elements.query.select();
+		BI.dialog.submit=function(){					
+			BI.util.callAction("<tml:action ref="back" portletmode="view"/>")
+		}
+	});
+</script>
