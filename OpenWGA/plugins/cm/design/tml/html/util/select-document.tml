@@ -37,7 +37,7 @@
 		    disabled: <tml:script expression="option('mode')=='view'"/>,
 			valueField: 'id',
 			displayField: 'text',
-			emptyText:'Bitte w‰hlen Sie ein Dokument aus'
+			emptyText:'Bitte w√§hlen Sie ein Dokument aus'
 			<tml:case context="{'db:'+option('dbkey')+'/docid:'+tmlform.field(option('fieldname'))}" iscontextvalid="true">
 	        	,path: "/root/<tml:script expression="AFW.structentry().getPath('node-', '/')"/>"
 	 	   </tml:case>
