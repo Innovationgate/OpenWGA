@@ -2,7 +2,8 @@
 dependencies {
     compile project(":wga");
     compile project(":wgapi");    
-    compile project(":wgaBuildTools");    
+    
+    compileClasspath project(":wgaBuildTools");    
     compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
     compileClasspath 'javax.servlet.jsp:jsp-api:2.2'
 }
