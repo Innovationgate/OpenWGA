@@ -16,7 +16,7 @@ sourceSets {
 	}
 } 
 
-task updatePluginVersion{
+task updatePluginVersion << {
 	def version = "${openwga_version_major}.${openwga_version_minor}.${openwga_version_maintenance}.${openwga_version_patch}"
 	def build = "${openwga_version_build}"
 	println "Update plugin to version ${version} Build ${openwga_version_build}"
