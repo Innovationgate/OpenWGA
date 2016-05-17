@@ -1,0 +1,153 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="scaleImage">
+	log.info("scale image " + option('filename') + ", " + TITLE);
+	
+	if(tmlform.validate()){
+	
+		// calculate filename and extension:
+		var org_filename = option('filename').toLowerCase();
+		var filename = org_filename;
+		var ext = "";
+		var a=org_filename.split(".");
+		if(a.length>1){
+			ext=a.pop();
+			filename = a.join(".");
+		}
+
+		var extensions = createList("jpg,jpeg,png,gif,bmp,tif", ",");
+
+		// check for valid extension:				
+		if (!extensions.contains(ext)) {
+			return tmlform.addMessage(label("dialog.image.invalid-filetype") + ": '" + ext + "'");
+		}
+		
+		var filedata = document.getFileData(org_filename);
+		if(!filedata)
+			return tmlform.addMessage(label("dialog.image.file-not-found") + ":" + org_filename);
+		var scaler = createImageScaler(filedata)
+		if (!scaler) {
+			return tmlform.addMessage(label("dialog.image.invalid-file"));
+		}
+		
+		if(tmlform.fileextension=="jpg")
+			scaler.useJPEGForOutput();
+		else if(tmlform.fileextension=="png")
+			scaler.usePNGForOutput();
+				
+		scaler.shrinkToSize(tmlform.width, tmlform.height);
+
+		if(document.getFileNames().contains(tmlform.filename.toLowerCase()+"."+tmlform.fileextension)){
+			document.removeFile(tmlform.filename+"."+tmlform.fileextension);
+			document.save();
+		}
+		try{
+			tmlform.attachScaledImage(document, scaler, tmlform.filename);
+			document.save();
+			portlet.fireEvent(createEvent("CMS_attachments_changed"));
+			portlet.fireEvent(createEvent("CMS_dialog_closed"));
+		}
+		catch(e){
+			tmlform.addMessage(e.message);
+		}	
+	}
+</tml:action>
+
+<tml:form id="scale-image" source="none" context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}">
+
+	<script>
+		// submit function called from dialog handler and on RETURN
+		BI.dialog.submit=function(){					
+			BI.util.callAction("<tml:action ref="scaleImage"/>",
+				"<tml:script>return portlet.portletkey</tml:script>",
+				"{%label:dialog.scale-image.scaling%}");
+		}
+		BI.dialog.onShow=function(){
+			BI.dialog.autoHeight();
+			try{
+				document.forms["scale-image"].width.focus();
+			}
+			catch(e){}					
+		}
+		WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+			BI.dialog.onShow();
+		})
+	</script>
+	
+	<tml:case condition="tmlform.hasmessages()">
+		<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+		<hr size="1">
+	</tml:case>		
+
+	<table width="100%"
+		<tr>
+			<td width="100"><tml:label key="scale-image.width"/>:</td>
+			<td>
+				<tml:input name="width" type="number" default="1000"
+					validation="$P_VALUE"
+					message="{label('dialog.image.invalid-width')}"
+				/>
+				Pixel
+				</td>
+		</tr>
+		<tr>
+			<td><tml:label key="scale-image.height"/>:</td>
+			<td>
+				<tml:input name="height" type="number" default="1000"
+					validation="$P_VALUE"
+					message="{label('dialog.image.invalid-height')}"				
+				/>
+				Pixel
+			</td>
+		</tr>
+		<tr>
+			<td><tml:label key="save-as"/>:</td>
+			<td>
+				<tml:script>
+					// calculate filename and extension:
+					var org_filename = option('filename').toLowerCase();
+					_filename = org_filename;
+					var a=org_filename.split(".");
+					if(a.length>1){
+						var ext = a.pop();	// remove extension
+						_filename = a.join(".");
+						ext = ext.toLowerCase();
+						if(ext=="jpg"||ext=="png")
+							tmlform.fileextension=ext;
+					}
+				</tml:script>
+				<tml:input name="filename" cssstyle="width:80%" default="{_filename}"/>
+			</td>
+		</tr>
+		<tr>
+			<td><tml:label key="image-format"/>:</td>
+			<td>
+				<tml:input type="select" name="fileextension" default="jpg" options="jpg,png"/>
+			</td>
+		</tr>
+	</table>
+	
+</tml:form>

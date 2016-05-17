@@ -1,0 +1,111 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+
+	_redirect=false;
+    var Request = AFW.request();
+    
+	if(!Request.isIE && !Request.isGecko && !Request.isSafari){
+		_browser_not_supported = Request.userAgent;
+		return;
+	}
+	
+	_dbkey= _dbkey || request.getParameter("dbkey");
+	if(!_dbkey){
+		// check for custom login URL:
+		var custom_login_url = WGA.Core.getWgaConfiguration().getServerOptions().get("CM.customLoginURL");
+		if(custom_login_url)
+			redirectto(custom_login_url);
+		return;
+	}
+	setOption("dbkey", _dbkey);
+
+	_Database = AFW.database(_dbkey);
+
+	if(!_Database.isAuthor()){
+		var custom_login_url = WGA.Core.getWgaConfiguration().getServerOptions().get("CM.customLoginURL");
+		if(custom_login_url){
+			var b = WGA.urlBuilder(custom_login_url)
+			b.setParameter("dbkey", _dbkey)
+			b.setParameter("contentkey", request.getParameter("contentkey"))
+			redirectto(b.build(true));
+		}
+	}
+
+	if(!_Database.isValid()){
+		setOption("dberror", _Database.initError||label("database-not-found-on-server"));
+		return;
+	}
+	if(!_Database.isAuthoringAllowed()){
+		setOption("dberror", label("authoring-not-allowed"));
+		return;
+	}
+
+	setOption("dbtitle", _Database.getTitle());
+	
+	// try to autologin user:
+	var username = request.getParameter("username");
+	var password = request.getParameter("password");
+	if(username && password){
+		var database=wgacore.getContentdbs().get(_dbkey)
+		if(!database)
+			return;
+		var domain = WGA.database(database).domain().name;
+		if(login(username, password, domain)){
+			_redirect=true;
+			var url = layouturl("html", "contentstore")+"?dbkey="+_dbkey;
+			if(request.getParameter("ua"))
+				url += "&ua=" + request.getParameter("ua")
+			if(request.getParameter("contentkey"))
+				url += "#" + _dbkey + "/" + request.getParameter("contentkey")
+			redirectto(url);		
+		}
+	}
+	
+</tml:script>
+
+<tml:case isfalse="_redirect">
+	<tml:if isdefined="_browser_not_supported">
+	
+		<tml:then>
+			<tml:include ref="browser-not-supported">
+				<tml:option name="browser"><tml:item name="_browser_not_supported"/></tml:option>
+			</tml:include>
+		</tml:then>
+	
+		<tml:elseif condition="!_dbkey || !_Database.isValid() || !_Database.isAuthoringAllowed()">
+			<tml:include ref="select-db"/>
+		</tml:elseif>
+		
+		<tml:elseif condition="!_Database.isAuthor() || (!_Database.hasDesign() && !_Database.isManager())">
+			<tml:include ref="login"/>
+		</tml:elseif>
+	
+		<tml:else>
+			<tml:include ref="mod-contentstore"/>
+		</tml:else>
+	
+	</tml:if>
+</tml:case>

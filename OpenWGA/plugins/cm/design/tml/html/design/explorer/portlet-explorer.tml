@@ -1,0 +1,108 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	var database=db(option('dbkey'));
+	var wfe = database.getWorkflowEngine();
+	_hasWorkflows=true;
+	if(wfe instanceof Packages.de.innovationgate.webgate.api.workflow.WGDefaultWorkflowEngine)
+		_hasWorkflows=false;
+</tml:script>
+
+<script>
+	BI.design.reload=function(){
+		WGA.ajax.callAction("<tml:action ref="$refresh"/>", "<tml:script>return portlet.portletkey</tml:script>");
+	}
+
+	// disable create TML/Script/Filecontainer
+	<tml:script>
+		_Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", option("dbkey"));
+	</tml:script>
+	BI.enablemenus("mayEditFileContainer", <tml:script>return _Database.mayEditDesign(content().TYPE_FILECONTAINER)</tml:script>);
+	BI.enablemenus("mayCreateWorkflows", <tml:script expression="_hasWorkflows"/>);
+	
+	BI.design.currentDbKey = BI.dbkey;
+	WGA.event.register(
+		"<tml:script>return portlet.portletkey</tml:script>",
+		"CMS_contentkey_changed", 
+		function(e){
+			if(e.params.dbkey != BI.design.currentDbKey){
+				BI.design.reload();
+			}
+		}
+	);
+</script>
+
+<div id="contenttype-tree" class="info"></div>
+<script>
+	var tree = BI.design.contenttype_tree = new BI.design.designTree("contenttype-tree", BI.design.contenttype_panel, "contenttypes", "<tml:label key="design.portletexplorer.contenttypes"/>")
+	tree.panel.on("activate", function(params){
+		if(params.id)
+			this.selectPath("/contenttypes/" + params.id)
+		else this.unselect()
+	}, tree)
+</script>
+
+<div id="areas-tree" class="info"></div>
+<script>
+	var tree = BI.design.areatree = new BI.design.designTree("areas-tree", BI.design.areapanel, "areas", "<tml:label key="design.portletexplorer.areas"/>")
+	tree.panel.on("activate", function(params){
+		if(params.id)
+			this.selectPath("/areas/" + params.id)
+		else this.unselect()
+	}, tree)
+</script>
+
+<div id="language-tree" class="info"></div>
+<script>
+	var tree = BI.design.languagetree = new BI.design.designTree("language-tree", BI.design.languagepanel, "languages", "<tml:label key="design.portletexplorer.languages"/>")
+	tree.panel.on("activate", function(params){
+		if(params.id)
+			this.selectPath("/languages/" + params.id)
+		else this.unselect()
+	}, tree)
+</script>
+
+<div id="files-tree" class="info"></div>
+<script>
+	var tree = BI.design.filestree = new BI.design.designTree("files-tree", BI.design.filepanel, "files", "<tml:label key="design.portletexplorer.filecontainers"/>")
+	tree.panel.on("activate", function(params){
+		if(params.id)
+			this.selectPath("/files/" + params.id)
+		else this.unselect()
+	}, tree)
+</script>
+
+<tml:case istrue="_hasWorkflows">
+	<div id="workflows-tree" class="info"></div>
+	<script>
+		var tree = BI.design.workflowtree = new BI.design.designTree("workflows-tree", BI.design.workflowpanel, "workflows", "<tml:label key="design.portletexplorer.workflows"/>")
+		tree.panel.on("activate", function(params){
+			if(params.id)
+				this.selectPath("/workflows/" + params.id)
+			else this.unselect()
+		}, tree)
+	</script>
+</tml:case>

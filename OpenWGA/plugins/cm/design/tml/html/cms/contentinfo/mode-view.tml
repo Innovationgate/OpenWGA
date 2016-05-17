@@ -1,0 +1,208 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_validations=null;
+	_isValide=true;
+	
+	try{
+	
+		_Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", tmlform.dbkey)
+		_Content = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/content", tmlform.contentkey, _Database)
+		
+		if(!_Content.isDraft())
+			return;
+
+		var contenttype=_Content.getContentTypeName();
+		_validationtml="validations:"+contenttype;
+		var tml=db(option('dbkey')).getTMLModule(_validationtml, "html");
+		if(tml!=null)
+			_hasvalidation=true;				
+	}
+	catch (e)
+	{}
+	
+</tml:script>
+
+<tml:if context="{'db:'+tmlform.dbkey+'/docid:'+tmlform.contentkey}" iscontextvalid="true">
+	<tml:then>
+
+		<script>
+			BI.sitepanel.contentinfo.setTitle("<tml:label key="page"/>: <tml:script expression="_Content.getTitleJsEncoded()"/>")
+		</script>
+
+		<tml:case istrue="_hasvalidation">
+			<tml:include ref="{_validationtml}" designdb="{tmlform.dbkey}" var="_xml"/>
+			<tml:script>
+				_validations=parseXML(_xml).selectNodes("//msg");
+			</tml:script>
+		</tml:case>
+
+		<tml:case condition="ersetzungsgrund!=null && ersetzungsgrund!=''">
+			<div class="reviewinfo">
+				{%label:replacement-reason%}:<br>
+				<tml:item name="ersetzungsgrund"/>
+			</div>							
+			<hr size="1" color="silver">
+		</tml:case>
+
+		<table cellspacing="4">
+			<tr>
+				<td>{%label:pagetype%}:</td>
+				<td>
+					<tml:script>
+						_pagetype=createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/contenttype", CONTENTTYPE, _Database).getAlias()
+					</tml:script>
+					<tml:if condition="_Database.isChiefEditor()">
+						<tml:then>
+							<a href="#" onclick="BI.design.contenttype_panel.show({id:'<tml:meta name="CONTENTTYPE"/>'})"><b><tml:item name="_pagetype"/></b></a>
+						</tml:then>
+						<tml:else>
+							<b><tml:item name="_pagetype"/></b>
+						</tml:else>
+					</tml:if>
+				</td>				
+			</tr>
+			<tr>
+				<td>{%label:language%}:</td>
+				<td>
+					<tml:if condition="_Database.isChiefEditor()">
+						<tml:then>
+							<a href="#" onclick="BI.design.languagepanel.show({id:'<tml:meta name="LANGUAGE"/>'})"><b><tml:meta name="languagetitle"/></b></a>
+						</tml:then>
+						<tml:else>
+							<b><tml:meta name="languagetitle"/></b>
+						</tml:else>
+					</tml:if>
+				</td>
+			</tr>
+			<tr>
+				<td valign="top">{%label:status%}:</td>
+				<td>
+					<b><tml:label key="{'status.'+STATUS}"/></b>
+					<tml:case condition="!_Content.isMine()">
+						<br>
+						<tml:script>_author = AUTHOR.length>30? AUTHOR.substr(0,27) + "...":AUTHOR</tml:script>
+						<tml:comment><tml:if condition="EMAIL!=null && EMAIL!=''">
+							<tml:then>
+								({%label:by%} <a href="mailto:<tml:meta name="email"/>"><tml:item name="_author"/></a>)
+							</tml:then>
+							<tml:else>({%label:by%} <tml:item name="_author"/>)</tml:else>
+						</tml:if></tml:comment>
+					</tml:case>
+				</td>
+			</tr>
+		</table>
+		<hr size="1" color="silver">
+
+		<tml:case condition="_validations!=null && _Content.isMine()">
+			<tml:foreach type="itemvalue" item="_validations" currentvalue="_validation" context="{'db:'+tmlform.dbkey+'/docid:'+tmlform.contentkey}">
+				<tml:case condition="{_validation.getText()}">
+					<div class="warning">
+						<tml:item name="_validation" xpath="@text"/>
+					</div>
+					<tml:script>
+						_isValide=false;
+					</tml:script>						
+				</tml:case>
+			</tml:foreach>
+			<tml:case isfalse="_isValide">
+				<hr size="1" color="white">
+			</tml:case>
+		</tml:case>
+		
+		<tml:case condition="_Content.mayEditContent() && (STATUS==content().STATUS_DRAFT)">
+			<tml:if condition="_Content.isMine()">
+				<tml:then>
+					<tml:case istrue="_isValide">
+						<button	type="button" onclick="BI.dialog.show('publish-content', this)">
+							{%label:actions.publish%}
+						</button>
+					</tml:case>
+					<tml:case condition="_Content.hasUserdefinedMetas()"> 
+						<tml:script>
+							_mode="view";
+							if(!_Content.isContentConsumer() && _Content.isMine() && STATUS==content().STATUS_DRAFT)
+								_mode="edit"
+						</tml:script> 
+						<button	type="button" onclick="BI.dialog.show('userdefined-metas', this, {mode:'<tml:item name="_mode"/>'})">
+							{%label:actions.edit-userdefined-metas%}
+						</button>
+					</tml:case>
+					
+				</tml:then>
+				<tml:else>
+					<button	type="button" onclick="BI.dialog.show('edit-content', this)">								
+						{%label:actions.checkout%}
+					</button>
+				</tml:else>
+			</tml:if>
+		</tml:case>
+		
+		<tml:case condition="(STATUS==content().STATUS_RELEASE || STATUS==content().STATUS_ARCHIVE) && _Content.mayEditContent()">
+			<button type="button" onclick="BI.dialog.show('edit-content', this)">
+				{%label:actions.edit%}
+			</button>
+		</tml:case>
+		
+		<tml:case condition="STATUS==content().STATUS_REVIEW && _Content.isApprover()">
+			<button	type="button" onclick="BI.dialog.show('approve-content', this)">
+				{%label:actions.approve%}
+			</button>
+			<button type="button" onclick="BI.dialog.show('reject-content', this)">
+				{%label:actions.reject%}
+			</button>
+		</tml:case>
+		
+		<tml:case condition="_Database.isAuthor() && _Database.hasValidLicense()">
+			<button type="button" id="create-button" onclick="BI.sitepanel.showCreateAreas(true)">
+				{%label:actions.create-page%}
+			</button>		
+			<script>
+				if(!BI.sitepanel.hasCreateAreas())
+					Ext.get("create-button").hide();
+			</script>
+		</tml:case>
+		
+		
+	</tml:then>
+	
+	<tml:elseif context="{'db:'+tmlform.dbkey+'/$struct:'+tmlform.structkey}" iscontextvalid="true">
+		<script>
+			BI.sitepanel.contentinfo.setTitle("<tml:label key="page"/>: <tml:meta name="title"/>")
+		</script>
+		<button type="button" id="create-button" onclick="BI.dialog.show('create-content', this)">
+			{%label:actions.create-content-version%}
+		</button>		
+	</tml:elseif>
+	
+	<tml:else>
+		<script>
+			BI.sitepanel.contentinfo.setTitle("{%label:actions.title.external-site%}")
+		</script>
+		{%label:actions.external.no-wga-site%}
+	</tml:else>
+</tml:if>
+
+

@@ -105,9 +105,6 @@ ospackage {
 
 }
 
-buildDeb {   
-}
-build.dependsOn buildDeb
 buildDeb.dependsOn configurations.server
 
 task updateDebRepository(dependsOn: buildDeb) << {
@@ -129,7 +126,7 @@ task updateDebRepository(dependsOn: buildDeb) << {
     def debFile = buildDeb.archivePath
     println "Publishing debian package: ${debFile}"
     for (distro in linuxDistros) {
-        def reprepro_command = "/usr/bin/reprepro -C non-free -Vb ${localRepo} includedeb ${distro} ${debFile}"
+        def reprepro_command = "/usr/bin/reprepro -C main -Vb ${localRepo} includedeb ${distro} ${debFile}"
         println reprepro_command
         ant.exec(command:reprepro_command)
     }

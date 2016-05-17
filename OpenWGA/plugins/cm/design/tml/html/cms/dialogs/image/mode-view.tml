@@ -1,0 +1,208 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="keepFilename">
+	setoption("filename", tmlparam1);
+</tml:action>
+
+<tml:script>
+	//log.info("image dbkey = " + option("dbkey") + ", contentkey=" + option("contentkey") + ", file=" + option("filename"));
+	var Content = AFW.content(option("contentkey"), option("dbkey"));
+	if(option("mode"))
+		_mode = option("mode"); 
+	else _mode = Content.getDatabase().isChiefEditor() || (Content.mayEditContent() && Content.isDraft() && Content.isMine()) ? "edit":"view";
+</tml:script>
+
+<div id="image-view">
+	<tml:form id="image-coords" source="none" context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}" >
+		<tml:script>
+			if (option('filename')) {
+				_filename = option('filename').toLowerCase();
+			}
+			if (_filename && content().hasFile(_filename)) {
+				_hasImageScaler = false;
+				_hasCropMethod = false;
+				_hasRotateMethod = false;
+				var img = content().getFileData(_filename);
+				try {
+					var sc = createimagescaler(img);
+					if (sc) _hasImageScaler = true;				
+					if (sc.crop) _hasCropMethod = true;
+					if (sc.rotateImageRight && sc.rotateImageLeft && sc.mirrorImageVertical && sc.mirrorImageHorizontal) _hasRotateMethod = true;
+				} catch (e) {
+					
+					//_imgException = true;
+				}
+				if (_filename.lastIndexOf('.') == _filename.length - 4) {
+					_filesuffix = _filename.substring(_filename.length - 3);
+					_name = _filename.substring(0, _filename.length - 4);
+				}
+			}
+			//log.info("mode: " + _mode);
+		</tml:script>
+		
+		
+		<script>
+			WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+				BI.resizableDialog.onShow();
+			});
+								
+			function imageLoaded(myimg) {
+				Ext.onReady(function() {
+					var image = {
+						img: Ext.get('selected_image'),
+						startWidth: myimg.width,
+						startHeight: myimg.height,
+						scalefactor: 1,
+						ratio: 1
+					};
+					
+					if (Ext.get('imgWidth')) {
+						Ext.get('imgWidth').insertHtml("beforeBegin", "<tml:label key="crop-image.width"/>:&nbsp;" + image.startWidth + "px", false);
+					}
+					if (Ext.get('imgWidth')) {
+						Ext.get('imgHeight').insertHtml("beforeBegin", "<tml:label key="crop-image.height"/>:&nbsp;" + image.startHeight + "px", false);
+					}
+					
+					var imgcontainer = Ext.get('img_container');
+					
+					var filesize = BI.util.renderFileSize(<tml:script format="0">return content().getFileSize(_filename)</tml:script>);
+					Ext.get('filesize').insertHtml("beforeBegin", filesize, false);
+					
+					BI.resizableDialog.dialog.setTitle("<tml:item name="_filename"/>");
+					BI.resizableDialog.hideButton(BI.resizableDialog.submitButton);
+					BI.resizableDialog.showButton(BI.resizableDialog.cancelButton, $L.close, BI.resizableDialog.dialog.hide);
+					if (BI.resizableDialog.dialog.hasListener('dialogscaled')) {
+						BI.resizableDialog.dialog.events.dialogscaled.clearListeners();
+					}
+					BI.resizableDialog.dialog.on("dialogscaled", function(){
+						var form = Ext.get('form');
+						if (form) {
+							form.setLeft(this.el.getWidth() - form.getWidth() - 20);
+						}
+						imgcontainer.show();
+					});
+					
+					var img = BI.resizableDialog.image(image, imgcontainer, {
+						width	:	Ext.get('form').getWidth() + 20,
+						height	:	Ext.get('form').getHeight()
+					});
+					img.addInitializeListener(BI.resizableDialog.dialog);
+					<tml:case condition="!pMode">
+						img.addInitializeListener(BI.resizableDialog.dialog);
+					</tml:case>
+					
+					<tml:case condition="autoSize == true">
+						BI.resizableDialog.autoSize();
+						img.addInitializeListener(BI.resizableDialog.dialog);
+					</tml:case>
+					
+					img.init();
+				});
+			}
+			
+		</script>
+		
+		<div id="img_container">
+			<tml:case condition="_filename && content().hasFile(_filename)">		
+				<img id="selected_image" onload="imageLoaded(this)" src="<tml:url type="file" file="{_filename}"/>?uid=<tml:script expression="AFW.Util.generateUID()"/>"/>
+			</tml:case>
+		</div>
+		
+		<div id="form">
+			<div class="form-element">
+				<div class="form-element-header">
+					<tml:label key="metadata"/>:
+				</div>
+				
+				<b><tml:label key="filename"/>:</b><br>
+				<tml:item name="_name"/><br><br>
+				
+				<b><tml:label key="crop-image.file-extension"/>:</b><br>
+				<tml:script>
+					if (_filesuffix == 'png') return 'PNG';
+					else return 'JPG';
+				</tml:script>
+				<br><br>
+				
+				<b><tml:label key="filesize"/>:</b><br>
+				<div id="filesize"></div><br>
+				
+				<b><tml:label key="dimensions"/>:</b><br>
+				<div id="imgWidth"></div>
+				<div id="imgHeight"></div>
+				
+			</div>
+			<div class="form-element">
+				<div class="form-element-header">
+					<tml:label key="actions"/>:
+					<tml:case condition="_hasRotateMethod == true && _mode == 'edit'">
+						<tml:include ref="::rotate" o_sourceName="{_filename}" o_targetName="{_name}"/>
+					</tml:case>
+				</div>
+				
+				<div>
+					<tml:case condition="_hasCropMethod == true && _mode == 'edit'">
+						<div id="image-crop-button" style="margin:3px 0"></div>
+					</tml:case>
+					<tml:case condition="_hasImageScaler == true && _mode == 'edit'">
+						<div id="image-scale-button" style="margin:3px 0"></div>
+					</tml:case>					
+					<div id="image-download-button" style="margin:3px 0"></div>
+					
+					<script>
+						<tml:case condition="_hasCropMethod == true && _mode == 'edit'">
+							new Ext.Button("image-crop-button", {
+								minWidth: 150,
+								text: "<tml:label key="crop-image"/>",
+								disabled: <tml:script expression="_mode=='view'"/>,
+								handler: function(){
+									WGA.ajax.callAction('<tml:action portletmode="crop" ref="keepFilename" param1="{option('filename').toLowerCase()}"/>', '<tml:script expression="portlet.portletkey"/>')
+								}
+							});
+						</tml:case>
+						<tml:case condition="_hasImageScaler == true && _mode == 'edit'">
+							new Ext.Button("image-scale-button", {
+								minWidth: 150,
+								disabled: <tml:script expression="_mode=='view'"/>,
+								text: "<tml:label key="scale-image"/>",
+								handler: function(){
+									WGA.ajax.callAction('<tml:action portletmode="scale" ref="keepFilename" param1="{option('filename').toLowerCase()}"/>', '<tml:script expression="portlet.portletkey"/>')
+								}
+							});
+						</tml:case>
+						new Ext.Button("image-download-button", {
+							minWidth: 150,
+							text: "<tml:label key="download-image"/>",
+							handler: function(){
+								location.href = "<tml:url type="file" file="{_filename}"/>?forcedownload=true";
+							}
+						});
+					</script>
+				</div>
+			</div>
+		</div>
+	</tml:form>
+</div>

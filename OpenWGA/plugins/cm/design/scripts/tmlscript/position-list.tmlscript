@@ -1,0 +1,65 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+this.getChildrenList=function(struct_or_area, ignore){
+
+	var position_list=WGA.createList();
+
+	position_list.add(label("dialog.create-page.position-options-start-of-list")+"|start");
+	
+	var children = struct_or_area.getChildEntries().iterator();
+	while(children.hasNext()){
+		var doc=children.next();
+		var Doc = AFW.structentry(doc) 
+		if(!Doc.getBestContent(LANGUAGE) && Doc.hasContent(LANGUAGE, false))
+			continue;		// content read protected
+		
+		if(doc==ignore){
+			if(!doc.getPreviousSibling())
+				position_list.remove(0);		// no "start" in list when I'm the first
+			continue;		// ignore myself 
+		}
+		if(ignore && doc.getNextSibling()==ignore){			
+			continue;		// ignore my previous sibling
+		}
+
+		var text = label("dialog.create-page.position-options-after-document") + " '" + Doc.getContentTitle() +"'";
+		var next = doc.getNextSibling(); 
+		if(next && (next.getPosition()-doc.getPosition() <= 1)){ 
+			text += " (" + label("dialog.create-page.position-options-reorder") + ")";
+		}
+		position_list.add(text + "|" + doc.getStructKey().toString());
+	}
+	
+	return position_list;
+}
+
+this.getSiblingsList=function(Struct){
+	var Parent;
+	if(Struct.isRoot())
+		Parent = AFW.area(Struct.WGObject.getArea());
+	else Parent = AFW.structentry(Struct.getParentEntry())
+	return this.getChildrenList(Parent, Struct.WGObject);
+}

@@ -1,0 +1,62 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="archiveRemoteDocs" master="true" async="true">
+	var remotelist=tmlparam1.remote_references;
+	//log.info("archiving " + remotelist.size() + " documents ...");
+	for(var i=0; i < remotelist.size(); i++){
+		var remote_info=remotelist.get(i)
+		var remotecontext=context(remote_info, false);
+		if(remotecontext==null){
+			log.error("remove-remote-doc: remote document " + remote_info + " not found");
+			continue;
+		}
+		var remotedoc=remotecontext.content();
+		log.info("archiving remote document " + remote_info + " with title " + remotedoc.getTitle());
+		remotedoc.archive("archived because remote document has been deleted");
+	}
+	
+	var remotelist=tmlparam1.remote_infos;
+	for(var i=0; i < remotelist.size(); i++){
+		var remote_info=remotelist.get(i);
+		var r_key=remote_info.get(0);
+		var r_context=remote_info.get(1);
+
+		var remotecontext=context(r_context, false);
+		if(remotecontext==null){
+			log.info("unable to find remote document " + r_context + ". Already deleted?");
+			continue;			// doc removed ?
+		}
+		var remotedoc=remotecontext.content();
+		log.info("updating remote_reference in remote document " + r_context + " with title " + remotedoc.getTitle());
+		var ref=remotedoc.getItemValueList("remote_references");
+		if(ref.contains(r_key)){
+			ref.remove(r_key);
+			remotedoc.setItemValue("remote_references", ref);
+			if(remotedoc.save())
+				log.info("remote_references updated: " + remotedoc.getTitle());
+			else log.error("error saving remotedoc after remote_references update:" + remotedoc.getTitle());
+		}
+	}
+</tml:action>

@@ -1,0 +1,72 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<h2><tml:label key="dashboard.my-docs-in-trash"/>:</h2>
+<tml:script>
+	var user = meta("database", "username");
+	var area = db().getArea("$trash");
+	var entries = area.getRootEntryIterator(10);
+	_docs = WGA.createList();
+	while(entries.hasNext()){
+		var entry = entries.next();
+		var deletedBy = entry.getExtensionData("deletedBy");
+		if(deletedBy==user){
+			_docs.add(entry);
+		}		
+	}
+</tml:script>
+
+<tml:if condition="_docs.size()">
+	<tml:then>
+		<ul>
+		<tml:foreach item="_docs" currentvalue="_doc">
+			<tml:script>
+				_Struct = AFW.structentry(_doc);
+				var deletedFrom = _doc.getExtensionData("deletedFrom");
+				var parent = db().getDocumentByKey(deletedFrom);
+				_path = AFW.structentry(parent).getPathInfo(" / ")
+			</tml:script>
+			<li style="margin:10px 0">
+				<a href="#" data-wgakey="<tml:script expression="_Struct.getKey()"/>">
+					<tml:script expression="_Struct.getContentTitle()"/>
+				</a>
+				<p>
+					<tml:label key="dashboard.deleted-on" 
+						param1="{AFW.Util.timeElapsed(_Struct.WGObject.getLastModified())}" 
+						param2="{WGA.format(_Struct.WGObject.getLastModified(),label('format.date.short'))}"/>
+				</p>
+				<p><tml:label key="dashboard.location"/>: <tml:item name="_path"/></p>
+			</li>
+			
+		</tml:foreach>
+		</ul>
+		<p><tml:label key="dashboard.please-cleanup-trash"/>.</p>
+	</tml:then>
+	
+	<tml:else>
+		<p class="no-docs"><tml:label key="dashboard.no-docs-found"/>.</p>
+	</tml:else>
+
+</tml:if>

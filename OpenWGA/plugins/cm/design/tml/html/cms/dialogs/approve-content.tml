@@ -1,0 +1,124 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="approveContent">
+	var contentkey=option("contentkey");
+	var structkey=option("structkey");
+	var dbkey=option("dbkey");
+	
+	log.info("approve content " + contentkey);
+	if(!tmlform.validate())
+		return;
+
+	try{		
+	
+		// check, if published version has remote_info and later remove this from remote document
+		var published_content=content().getStructEntry().getReleasedContent(content().getLanguage().getName());					
+	
+		content().approve(tmlform.comment);		
+		
+		// check, if status is "published" and handle remote-documents in this case
+		if(content().getStatus()==content().STATUS_RELEASE)
+			createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/content", content()).handleRemoteActions(published_content);
+						
+		_actionDone=true;
+		event=createEvent("CMS_dialog_closed");
+		portlet.fireEvent(event);
+		
+	}
+	catch(e){
+		log.error(e);
+		tmlform.addMessage(e);
+	}
+</tml:action>
+
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.selectContent(BI.contentkey, BI.structkey);
+		</script>
+	</tml:then>
+
+	<tml:else>
+		
+		<tml:form id="approve-content-form"
+					source="content" 
+					context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}">
+		
+			<script>
+				// submit function called from dialog handler and on RETURN
+				BI.dialog.submit=function(){
+					BI.util.callAction("<tml:action ref="approveContent"/>", 
+							"<tml:script>return portlet.portletkey</tml:script>",
+							"{%label:dialog.approve-content.approving%}");
+				}
+				BI.dialog.onShow=function(){
+					document.forms["approve-content-form"].comment.focus();
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", BI.dialog.autoHeight);
+			</script>
+			
+			<tml:case condition="tmlform.hasmessages()">
+				<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+				<hr size="1">
+			</tml:case>		
+				
+			<tml:if context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}" iscontextvalid="true">
+				<tml:then>
+		
+					<table width="100%" border="0" cellspacing="5">
+						<tr>
+							<td>{%label:title%}:</td>
+							<td><b><tml:meta name="title"/></b></td>
+						</tr>
+						<tr>
+							<td valign="top">{%label:author%}:</td>
+							<td><tml:meta name="author"/></td>
+						</tr>
+						<tr>
+				     		<td width="100" valign="top">{%label:comment%}:</td>
+				     		<td>
+				     			<tml:script>tmlform.comment=""</tml:script>
+				     			<tml:input name="comment" type="textarea" cssclass="textinput" cssstyle="height:80"/>
+				     		</td>
+				     	</tr>
+				     	<tr><td colspan="2">
+				     		{%label:dialog.approve-content.mail-info%}
+				     	</td></tr>
+				     		   	
+				   	</table>
+		
+				</tml:then>
+				<tml:else>
+					Context not valid: <tml:script>return option("contentkey")</tml:script>
+				</tml:else>
+			</tml:if>
+			   	
+		</tml:form>
+		
+	</tml:else>
+</tml:if>
+
+		

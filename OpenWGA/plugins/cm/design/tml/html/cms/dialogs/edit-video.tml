@@ -1,0 +1,160 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:case context="[db:{option('dbkey')}/docid:{option('contentkey')}]" iscontextvalid="true">
+
+	<tml:script>
+		_mode = option("mode");
+		_filename = option('filename')
+		_file_md = content().getFileMetaData(_filename)
+
+		// used as URL parameter for file uploads
+		_so=AFW.Util.serializeJsObject({
+			dbkey: meta("database", "dbkey"),
+			contentkey: KEY,
+			filename: _filename
+		})				
+
+		// poster:
+		_poster=null;
+		_time=_file_md.getCustomFieldValue("time");
+		var d = WGA.selectDerivate(_filename, "usage=poster")
+		if(d){
+			var url = WGA.urlBuilder(fileurl(_filename))
+			var cs = d.getSha512Checksum()
+			url.setParameter("derivate", "usage=poster");
+			url.setParameter("cs", cs);
+			_poster = url.build();
+		}
+		
+		// alternative sources from derivates
+		_alt_source=null
+		var mt = _file_md.mimeType
+		if(mt=="video/webm" && WGA.selectDerivate(_filename, "usage=video,type=video/mp4"))
+			_alt_source = "video/mp4"
+		if(mt=="video/mp4" && WGA.selectDerivate(_filename, "usage=video,type=video/webm"))
+			_alt_source = "video/webm"
+	</tml:script>
+
+	<video id="edit-video" preload="metadata" controls="controls" style="max-width:100%"
+		<tml:case condition="_poster">
+			poster="<tml:item name="_poster"/>"
+		</tml:case>
+	>
+		<source src="<tml:url file="{_filename}"/>" type="<tml:script expression="_file_md.mimeType"/>"/>
+		<tml:case condition="_alt_source">
+			<source src="<tml:url file="{_filename}" derivate="[usage=video,type={_alt_source}]"/>" type="<tml:item name="_alt_source"/>"/>
+		</tml:case>
+	</video>
+	
+	<script>
+	
+		!function(){
+			var video_el = Ext.get("edit-video").dom;
+			var v_width;
+			var v_height;
+			try{
+				v_width=video_el.videoWidth;
+				v_height=video_el.videoHeight;
+				<tml:case condition="_time">
+					video_el.currentTime = <tml:item name="_time"/>;
+				</tml:case>
+			}
+			catch(e){}
+			
+			video_el.addEventListener("loadedmetadata", function(){
+				BI.dialog.autoHeight();
+				v_width=video_el.videoWidth;
+				v_height=video_el.videoHeight;
+				<tml:case condition="_time">
+					video_el.currentTime = <tml:item name="_time"/>;
+				</tml:case>
+			}, true);
+			
+			BI.dialog.onHide = function(){
+				video_el.pause();
+			}
+	
+			<tml:case condition="_mode=='view' || !db().hasFeature(db().FEATURE_CONTENT_FILE_DERIVATES) || AFW.request().isIE || AFW.request().isTrident">
+				BI.dialog.submitButton.hide();
+			</tml:case>
+	
+			BI.dialog.submit=function(){
+				var canvas = document.createElement("canvas");
+				canvas.width=v_width;
+				canvas.height=v_height;
+				var ctx = canvas.getContext('2d');
+				ctx.drawImage(video_el, 0, 0);
+				if(canvas.toBlob){
+					canvas.toBlob(uploadFile, "image/jpeg", .95)
+				}
+				else{
+					dataURItoBlob(canvas.toDataURL("image/jpeg", .95), uploadFile)
+				}
+				BI.dialog.hide();
+			}
+
+			function uploadFile(file)
+			{
+				BI.UploadManager.upload(file, {
+					url: "<tml:url type="tml" name="::edit-video:html5-upload-video-poster"/>",
+					params: {
+						so: "<tml:item name="_so"/>",
+						time: video_el.currentTime
+					},
+					callback: function(){
+						WGA.event.fireEvent("CMS_attachments_changed");
+						BI.sitepanel.iframe.window.WGA.event.fireEvent("derivates-updated", "cm", {
+							filename: "<tml:option name="filename"/>"
+						})
+					}
+				})
+			}
+			
+			// helper function needed for webkit
+
+			function dataURItoBlob(dataURI, callback) {
+			    // convert base64 to raw binary data held in a string
+			    var byteString = atob(dataURI.split(',')[1]);
+			
+			    // separate out the mime component
+			    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+			
+			    // write the bytes of the string to an ArrayBuffer
+			    var arrayBuffer = new ArrayBuffer(byteString.length);
+			    var _ia = new Uint8Array(arrayBuffer);
+			    for (var i = 0; i < byteString.length; i++) {
+			        _ia[i] = byteString.charCodeAt(i);
+			    }
+			
+			    var dataView = new DataView(arrayBuffer);
+			    var blob = new Blob([dataView], { type: mimeString });
+			    callback(blob);
+			}
+			
+		}();
+	</script>
+	
+</tml:case>

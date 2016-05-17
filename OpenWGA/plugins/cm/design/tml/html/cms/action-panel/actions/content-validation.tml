@@ -1,0 +1,94 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_Content=AFW.content();
+	_validations=null;
+	_isValide=true;
+	if(!_Content.isDraft())
+		return;
+
+	try{
+		var contenttype=_Content.getContentTypeName();
+		var tmls = WGA.createList([
+			"wga:content-manager:validations:"+contenttype,
+			"wga:content-manager:validations:default",
+			"content-manager:validations:"+contenttype,
+			"content-manager:validations:default",
+			"validations:"+contenttype		// WGA 6.0 Fallback
+		])	
+		if(WGA.design(db()).isCustomized())
+			tmls.addAll(0, WGA.createList([
+				"overlay:wga:content-manager:validations:"+contenttype,
+				"overlay:wga:content-manager:validations:default",
+				"overlay:content-manager:validations:"+contenttype,
+				"overlay:content-manager:validations:default",
+				"overlay:validations:"+contenttype 	// WGA 6.0 Fallback
+			]))
+		_validationtml=_Content.checkforTML(tmls)
+	}
+	catch (e){
+		logException(e);
+	}
+</tml:script>
+
+<tml:case condition="_validationtml">
+	<tml:include ref="{_validationtml}" designdb="{db().getDbReference()}" var="_xml"/>
+	<tml:script>
+		_validations=parseXML(_xml).selectNodes("//msg");
+	</tml:script>
+</tml:case>
+
+<tml:case condition="_validations">
+		
+	<tml:range var="_output" output="false">
+		<div class="info">
+			<div class="x-layout-panel-hd x-layout-panel-hd-text">
+				{%label:validation.title%}
+			</div>
+			<div style="padding:5px">
+				<tml:foreach type="itemvalue" item="_validations" currentvalue="_validation">
+					<tml:case condition="{_validation.getText()}">
+						<div class="warning">
+							<tml:case condition="_validation.selectSingleNode('@item')!=null">
+								{%label:field%} <tml:item name="_validation" xpath="@item"/>:<br>
+							</tml:case>
+							<tml:item name="_validation" xpath="@text"/>
+						</div>
+						<tml:script>
+							_isValide=false;
+						</tml:script>						
+					</tml:case>
+				</tml:foreach>
+			</div>
+		</div>
+	</tml:range>
+	
+	<tml:case isfalse="_isValide">
+		<tml:item name="_output"/>
+	</tml:case>
+	
+</tml:case>
+

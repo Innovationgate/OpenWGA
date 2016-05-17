@@ -1,0 +1,177 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="editContent">
+	//log.info("edit content " + contentkey);
+	if(!tmlform.validate())
+		return;
+
+	var database=content().getDatabase();
+	var Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", database)	
+	var cdoc=content();
+					
+	var sdoc = cdoc.getStructEntry();
+	
+	// try to find draft copy
+	var draftdoc=sdoc.getContent(cdoc.getLanguage().getName(), cdoc.STATUS_DRAFT) 
+	if(draftdoc==null){
+		try{
+			draftdoc=cdoc.createDraftCopy();
+			tmlform.storeInContent(draftdoc);
+		}
+		catch(e){
+			tmlform.addMessage(e.message);
+			logException(e);
+			return;
+		}
+	}
+	else{
+		var sessionContext=database.getSessionContext();
+		var username=sessionContext.getUser();
+		if(draftdoc.getAuthor()!=username){
+			draftdoc.setMetaData(draftdoc.META_AUTHOR , username);
+			draftdoc.save();
+		}
+	}
+
+	_actionDone=true;
+	_new_structkey=draftdoc.getStructKey().toString();
+	_new_contentkey=draftdoc.getContentKey().toString();
+
+	event=createEvent("CMS_dialog_closed");
+	portlet.fireEvent(event);
+
+</tml:action>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.selectContent("<tml:item name="_new_contentkey"/>", "<tml:item name="_new_structkey"/>");
+		</script>
+	</tml:then>
+	<tml:else>
+		<tml:form id="edit-content-form" 
+					source="content" 
+					onsubmit="BI.dialog.submit()"
+					context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}">
+		
+			<script>
+				// submit function called from dialog handler and on RETURN
+				BI.dialog.submit=function(){
+					BI.util.callAction("<tml:action ref="editContent"/>", 
+							"<tml:script>return portlet.portletkey</tml:script>",
+							"{%label:dialog.edit-content.creating-draft-copy%}");
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+					BI.dialog.autoHeight()
+					BI.dialog.onShow();
+				});
+				BI.dialog.onShow=function(){
+					try{
+						document.forms["edit-content-form"].title.focus();
+					}
+					catch(e){};
+				}
+			</script>
+		
+			
+			<tml:case condition="tmlform.hasmessages()">
+				<h3><tml:formmessages divider="<br/>"/></h3>
+				<hr size="1">
+			</tml:case>		
+		
+			<tml:if context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}" iscontextvalid="true">
+				<tml:then>
+					<tml:script>
+						// try to find draft copy
+						var cdoc=content();
+						_draftdoc=cdoc.getStructEntry().getContent(cdoc.getLanguage().getName(), cdoc.STATUS_DRAFT)
+						var sessionContext=content().getDatabase().getSessionContext();
+						_username=sessionContext.getUser();
+					</tml:script>		
+					<tml:if condition="_draftdoc!=null">
+						<tml:then>
+							<div style="padding-left:30px;margin-top:10px;background:url('../../plugin-wga-app-framework/file/icons/page_white_edit.png') no-repeat 0px 0px;">
+								{%label:dialog.edit-content.draft-exists%}<br>
+								<tml:if condition="_draftdoc.getAuthor()!=_username">
+									<tml:then>
+										<tml:range context="{'docid:'+_draftdoc.getContentKey().toString()}">
+											{%label:dialog.edit-content.draft-in-use-by%}:<br>
+											<ul>
+											<b style="color:red"><tml:meta name="author"/></b><br>
+											</ul>
+											{%label:dialog.edit-content.last-modified%}
+											<b style="color:red"><tml:script format="0">
+												var now=createdate();
+												var milis=createdate().time-MODIFIED.time;
+												return milis/1000/60/60/24;
+											</tml:script>
+											{%label:dialog.edit-content.last-modified2%}.
+											<br>
+											{%label:dialog.edit-content.whant-checkout%}
+											<script>
+												BI.dialog.submitButton.setText("{%label:dialog.edit-content.checkout%}");
+											</script>
+										</tml:range>
+									</tml:then>
+									<tml:else>
+										{%label:dialog.edit-content.whant-edit%}
+										<script>
+											BI.dialog.submitButton.setText("{%label:dialog.edit-content.switch-to-draft%}");
+										</script>
+									</tml:else>
+								</tml:if>
+							</div>
+							<br>
+						</tml:then>
+						<tml:else>
+						    <table width="100%" border="0" cellpadding="5">
+								<tr>
+						     		<td width="1%" nowrap>{%label:dialog.edit-content.new-title%}:</td>
+						     		<td>
+						     			<tml:input name="title" meta="true" cssclass="textinput required"
+					     					validation="$E_VALUE!=''"
+					     					message="{label('dialog.edit-content.validation-title')}"
+						     			/>
+						     		</td>
+						     	</tr>
+						     	<tr><td colspan="2">
+									<div style="padding-left:30px;margin-top:10px;background:url('../../plugin-wga-app-framework/file/icons/page_white_edit.png') no-repeat 0px 0px;">
+										{%label:dialog.edit-content.info-create-draft%}
+									</div>
+								</td></tr>
+						   	</table>
+							
+						</tml:else>
+					</tml:if>
+				</tml:then>
+				<tml:else>
+					Context not valid: <tml:script>return option("contentkey")</tml:script>
+				</tml:else>
+			</tml:if>
+			   	
+		</tml:form>
+	</tml:else>
+</tml:if>
+

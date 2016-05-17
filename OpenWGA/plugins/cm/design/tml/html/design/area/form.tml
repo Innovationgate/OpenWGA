@@ -1,0 +1,146 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:case condition="tmlform.hasmessages()">
+	<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+	<hr size="1">
+</tml:case>		
+
+<tml:script>
+	_getMode = function(metaname){	
+		if(document.isMetaDeterminedInSchema && document.isMetaDeterminedInSchema(metaname)){
+			return "view"
+		}
+		else return tmlform.mode();
+	}
+</tml:script>
+
+<table width="100%" cellspacing="10">
+
+	<tr>
+		<td width="100"><tml:label key="design.area.form.name"/>:</td>
+		<td>
+			<tml:input meta="true" name="name" cssclass="textinput required"
+				focus="true"
+				validation="$E_VALUE!=''"
+				message="Bitte geben Sie einen Namen ein"
+				mode="{option('mode')=='new'?'edit':'view'}"
+			/>
+		</td>
+	</tr>
+	
+	<tml:case condition="WGA.db(option('dbkey')).getContentStoreVersion()>=5 && db().isPageReadersEnabled()">
+		<tr>
+			<td>
+				<tml:if condition="_getMode('readers')=='edit' && AFW.database(option('dbkey')).isUserQueryable()">
+					<tml:then>
+						<a href="#" title="{%label:properties.button.ldap-lookup%}" 
+								onclick="BI.dialog.show('ldap-lookup', this, {fieldid:'readers', textareadivid:'design-area-panel'})">
+							<tml:label key="design.area.form.readers"/></a>:
+					</tml:then>
+					<tml:else>
+						<tml:label key="design.area.form.readers"/>:
+					</tml:else>	
+				</tml:if>
+			</td>
+			<td>
+				<tml:input type="textarea" mode="{_getMode('readers')}" meta="true" name="readers" multiple="true" cssclass="textinput">id="readers"</tml:input> 
+			</td>
+		</tr>
+	</tml:case>
+	
+	<tr>
+		<td valign="top">
+			<tml:if condition="_getMode('editors')=='edit' && AFW.database(option('dbkey')).isUserQueryable()">
+				<tml:then>
+					<a href="#" title="{%label:properties.button.ldap-lookup%}" 
+							onclick="BI.dialog.show('ldap-lookup', this, {fieldid:'editors', textareadivid:'design-area-panel'})">
+						{%label:design.area.form.editors%}</a>:
+				</tml:then>
+				<tml:else>
+					{%label:design.area.form.editors%}:
+				</tml:else>	
+			</tml:if>
+		</td>
+		<td>
+			<tml:input type="textarea" mode="{_getMode('editors')}" meta="true" name="editors" multiple="true" cssclass="textinput">id="editors"</tml:input> 
+		</td>
+	</tr>
+
+
+	<tml:case condition="WGA.db(option('dbkey')).getContentStoreVersion()>=5">
+		<tr>
+			<td valign="top">
+				<tml:if condition="_getMode('editors')=='edit' && AFW.database(option('dbkey')).isUserQueryable()">
+					<tml:then>
+						<a href="#" title="{%label:properties.button.ldap-lookup%}" 
+								onclick="BI.dialog.show('ldap-lookup', this, {fieldid:'visiblefor', textareadivid:'design-area-panel'})">
+							<tml:label key="design.area.form.visiblefor"/></a>:
+					</tml:then>
+					<tml:else>
+						<tml:label key="design.area.form.visiblefor"/>:
+					</tml:else>	
+				</tml:if>
+			</td>
+			<td>
+				<tml:script>
+					if(!tmlform.visiblefor)
+						tmlform.visiblefor = document.getExtensionData("CM_area_visible")
+				</tml:script>
+				<tml:input type="textarea" mode="{_getMode('editors')}" store="false" name="visiblefor" multiple="true" cssclass="textinput">id="visiblefor"</tml:input> 
+			</td>
+		</tr>
+		
+		<tr>
+			<td valign="top">
+				<tml:label key="properties.root-page-restrictions"/>
+			</td>
+			<td>
+				<span>
+					<tml:input name="rootpagerestrictions"
+						mode="{_getMode('rootpagerestrictions')}"
+						type="select"
+						options="{label('properties.root-page-restrictions-options')}"
+						ajax="true"
+						changeaction="$refresh"
+						meta="true"
+					/>
+				</span>
+				<tml:case condition="tmlform.field('rootpagerestrictions')=='fixDocTypes'">
+					<tml:script>
+						_docTypes = WGA.createList();
+						for (ct in Iterator(document.getDatabase().getContentTypes())) {
+							_docTypes.add(ct.getName());
+						}
+					</tml:script>
+					<br><tml:input mode="{_getMode('allowedroottypes')}" name="allowedroottypes"
+						multiple="true" type="checkbox" optionsitem="_docTypes" meta="true"/>
+				</tml:case>
+			</td>
+		</tr>
+		
+	</tml:case>
+	
+</table>

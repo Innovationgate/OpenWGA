@@ -1,0 +1,53 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_id = AFW.Util.generateUID();
+</tml:script>
+
+<div style="margin:<tml:script expression="AFW.request().isIE?5:10"/>px">
+	<tml:input type="hidden" name="{option('fieldname')}" mode="{option('mode')}"/>
+	<div id="<tml:item name="_id"/>"></div>
+	<script>
+		var combotree = new BI.ComboTree({
+			dbkey: "<tml:option name="dbkey"/>", 
+		    width: 265,
+		    disabled: <tml:script expression="option('mode')=='view'"/>,
+			valueField: 'id',
+			displayField: 'text',
+			emptyText:'Bitte wählen Sie ein Dokument aus'
+			<tml:case context="{'db:'+option('dbkey')+'/docid:'+tmlform.field(option('fieldname'))}" iscontextvalid="true">
+	        	,path: "/root/<tml:script expression="AFW.structentry().getPath('node-', '/')"/>"
+	 	   </tml:case>
+		});
+		combotree.on("select", function(ctree, node, e) {
+			document.forms['<tml:script expression="tmlform.formid"/>'].elements["<tml:option name="fieldname"/>"].value = ctree.getValue();
+			<tml:case hasoptions="changeaction">
+				WGA.ajax.callAction("<tml:option name="changeaction"/>");
+			</tml:case>
+		});
+		combotree.render("<tml:item name="_id"/>");
+	</script>
+</div>

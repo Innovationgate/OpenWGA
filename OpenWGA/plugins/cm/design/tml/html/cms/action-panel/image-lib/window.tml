@@ -1,0 +1,230 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="storeLibInPortlet">
+	portlet.lib_dbkey=tmlform.lib_dbkey;
+	portlet.album = tmlform.album;
+	portlet.save();
+</tml:action>
+
+<tml:action id="resetPortlet">
+	portlet.lib_dbkey="";
+	portlet.album = "";
+	portlet.setSessionVar("image-lib-window", "");
+	portlet.save();
+	tmlform.reset();	
+</tml:action>
+
+<tml:include ref="system:info-window" o_collapsed="true">
+	<tml:option name="title"><tml:label key="image-lib.title"/></tml:option>
+	<tml:option name="collapsed" expression="portlet.getSessionVar('image-lib-window')!='expanded'"/>
+	<tml:option name="bodystyle">padding:0 0 5px 0</tml:option>
+
+	<div id="attachment-source-toolbar" style="padding:5px 10px;border-bottom:solid silver 1px">
+
+		<tml:script>
+			_opts = _imageLibDbs.keySet();
+			if(!_opts.contains(portlet.lib_dbkey)){
+				portlet.lib_dbkey = _opts.iterator().next();
+				portlet.save();
+			}
+		</tml:script>
+
+		<tml:if condition="_opts.size()>1">
+			<tml:then>
+				<tml:input name="lib_dbkey" type="select" optionsitem="_opts" default="{portlet.lib_dbkey}" changeaction="storeLibInPortlet" ajax="true"/>
+			</tml:then>
+			<tml:else>
+				<tml:input name="lib_dbkey" type="hidden" default="{portlet.lib_dbkey}"/>
+			</tml:else>
+		</tml:if>
+		
+		<tml:script>
+			_opts=WGA.createList();
+			_root = _imageLibDbs.get(tmlform.lib_dbkey);
+		</tml:script>
+		<tml:case context="[db:{tmlform.lib_dbkey}/docid:{_root}]" iscontextvalid="true">
+			<tml:children>
+				<tml:script>
+					_opts.add(TITLE + "|" + WGA.serializeObject(javaObject(KEY)));
+				</tml:script>
+			</tml:children>
+		</tml:case>
+		<tml:case condition="_opts.size()">
+			<tml:input type="select" name="album" optionsitem="_opts" default="{portlet.album}">
+				onchange="BI.load_album_images()"
+			</tml:input>
+		</tml:case>
+		
+	</div>
+	<div id="image-lib-view" class="ychooser-view" style="height:auto"></div>
+	<div style="clear:both"></div>
+	
+	<script>
+	
+		WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function() {
+	
+			/*
+			 * Image Icon View:
+			 */
+			var store = new Ext.data.Store({
+			    proxy: new Ext.data.HttpProxy({
+			        url: '<tml:url type="tml" medium="html" layout="::json-images"/>'	        
+		        }),    
+		        reader: new Ext.data.JsonReader({
+			        id: 'id',
+		            root: 'data'                
+		        },
+		        [
+			        { name: 'id'   }, 
+			        { name: 'name' },
+			        { name: 'shortName'},     
+		            { name: 'url'  },
+		            { name: 'poster'  },
+		            { name: 'thumbnail'  },
+		            { name: 'mimetype'  },
+		            { name: 'type'  },
+					{ name: 'container'  },
+		            { name: 'key'  },
+		            { name: 'dbkey'  },
+		            { name: 'size' }
+		        ])
+			});
+			<tml:case condition="AFW.request().HTML5DragDropSupported">
+				store.on("load", function(){
+					Ext.select("#image-lib-view .thumb-wrap").each(function(el){
+						el.dom.addEventListener("dragstart", function(e){
+							var items = [];
+							var selections = view.selections;
+							var me_selected=false;
+							if(selections.length){
+								for(var i=0; i < selections.length; i++){
+									var id = selections[i].id.split("/")[0];
+									var record = store.getById(id);
+									items.push(record.data)
+									if(this.id==selections[i].id)
+										me_selected=true;
+								}		
+							}
+							if(!me_selected){
+								var id = this.id.split("/")[0];
+								items=[store.getById(id).data]
+							}
+							e.dataTransfer.setData("wga/files", JSON.stringify(items));
+							e.dataTransfer.effectAllowed="copyLink"
+							e.dataTransfer.setDragImage(this, 50, 50);
+							return false;
+						}, false);
+					})
+				})
+			</tml:case>
+			
+			BI.load_album_images = function(){
+				var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+				if(form.album){
+					store.load({
+					  	params:{
+					  		contentkey: form.album.value,
+							type: "content",
+							image_dbkey: form.lib_dbkey.value
+						}
+					});
+					WGA.ajax.action({
+						id: "<tml:script expression="portlet.portletkey"/>",
+						action: "<tml:action ref="storeLibInPortlet" ajax="norefresh"/>",
+						mode: "norefresh",
+						graydiv: false
+					})
+				}
+			}
+			<tml:case condition="portlet.getSessionVar('image-lib-window')=='expanded'">
+				BI.load_album_images();
+			</tml:case>
+			
+			var tpl = new Ext.Template(
+
+				'<div class="thumb-wrap {primary}" style="{clear}" id="{id}/ap" draggable="true">',
+					'<div class="thumb" style="background-image:url(\'{thumbnail}\')"></div>',
+					'<span>{name}</span>',
+				'</div>'
+			);
+			
+			var view = new BI.util.GroupedView('image-lib-view', tpl, 
+				{
+					emptyText : '<div style="padding:10px;"><tml:label key="content-attachments.no-images-found"/></div>',						
+					multiSelect: true,
+					store: store,
+					cols: 2
+				}
+			);
+
+			view.on('dblclick', function(vw, index, node, e){
+				var id = node.id.split("/")[0];					
+				var record = store.getById(id);
+				BI.dialog.show("file-meta-data", node, {
+					filename:record.data.name,
+					dbkey: record.data.dbkey,
+					contentkey: record.data.container,
+					mode:'view'
+				});
+			});
+
+			<tml:case condition="!AFW.request().HTML5DragDropSupported">
+				var dz = new BI.util.attachmentViewDragZone({
+					view: view,
+					sitepanel_mask_msg: "<tml:label key="drop-attachment-msg"/>",
+					no_images_label: "<tml:label key="content-attachments.images-selected"/>"
+				})
+			</tml:case>
+			
+		})
+	</script>
+
+	<tml:option name="onexpand">
+		BI.load_album_images();
+		WGA.ajax.action({
+			id: "<tml:script expression="portlet.portletkey"/>",
+			action: "<tml:action ajax="norefresh">
+							portlet.setSessionVar("image-lib-window", "expanded");
+							portlet.save()
+					</tml:action>",
+			mode: "norefresh",
+			graydiv: false
+		})
+	</tml:option>	
+
+	<tml:option name="oncollapse">
+		WGA.ajax.action({
+			id: "<tml:script expression="portlet.portletkey"/>",
+			action: "<tml:action ajax="norefresh">
+							portlet.setSessionVar("image-lib-window", "collapsed");
+							portlet.save()
+					</tml:action>",
+			mode: "norefresh",
+			graydiv: false
+		})
+	</tml:option>
+
+</tml:include>

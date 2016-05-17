@@ -1,0 +1,223 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="check-links">
+
+	_actionDone=true;
+	
+	_link_errors=createlist();
+	
+	// check external links:	
+	var checker = new Packages.de.innovationgate.igutils.LinkChecker();
+	
+	// set Proxy parameter from setup document
+	var checker_proxy = new Packages.de.innovationgate.igutils.LinkChecker();
+	var config=context("currentdocument/name:$linkchecker", false);
+	if(config && config.useproxy=="true"){
+		//log.info("use proxy settings " + config.proxyhost + ":"+ config.proxyport);
+		try{
+			if(config.useproxylogin=="true")
+				checker_proxy.setProxy(config.proxyhost, config.proxyport, config.proxyusername, config.proxypassword);
+			else checker_proxy.setProxy(config.proxyhost, config.proxyport);
+		}
+		catch(e){
+			tmlform.addMessage(e);
+		}
+		var proxyexceptions=createlist(config.proxyexceptions.replace(/ /g,""), ",");
+	}
+	else var proxyexceptions=createlist();
+
+	if(tmlform.hasMessages())
+		return;
+	// end linkchecker proxy setup
+	
+	var urls=tmlform.fieldlist("_externallinks").iterator();
+	while(urls.hasNext()){
+		var url = urls.next();
+		//log.info("check external link: " + url);
+		if(url=="")
+			continue;		// should only happen in older wga installations
+		// analyse URL to decide to use proxy or not
+		var a = url.split("://");
+		if(a.length<2)
+			continue;		// no valid link
+		var relurl = a[1];
+		var domain = relurl.split("/")[0]
+		domain=domain.split(":")[0]		// ignore port
+		try{
+			var code;			
+			if(proxyexceptions.contains(domain))
+				code = checker.check(url);
+			else code = checker_proxy.check(url);
+		}catch(e){
+			tmlform.addMessage(url + ": " + e.message);
+			_link_errors.add({url:url, msg:e.message});
+		}
+		//log.info("check url: " + url + ", Status " + code);
+		if(code && code==407)
+			tmlform.addMessage(label("dialog.publish-content.linkchecker.invalid_proxy_login"))				
+		else if(code && code!=200 && code!=401){
+			var msg=label("dialog.publish-content.linkchecker.external_link_returned_status", createlist([url,String(code)]))
+			tmlform.addMessage(msg);
+			_link_errors.add({url:url, msg:msg});
+		}
+	}
+	
+	// check internal links:
+	var LC = createObject("cms:linkchecker", option("dbkey"));
+	var urls=tmlform.fieldlist("_internallinks").iterator();
+	while(urls.hasNext()){
+		var url = urls.next();
+		if(url=="")
+			continue;
+		try{
+			LC.checkInternalLink(content(), url);
+		}
+		catch(e){
+			var msg = e.label ? label("dialog.publish-content.linkchecker.internal_link."+e.label, createlist([url].concat(e.label_params))) : e.message;
+			_link_errors.add({url:url, msg:msg});
+			tmlform.addMessage(msg);		
+			_linkchecker_errors=true;
+		}		
+	}
+
+</tml:action>
+
+<tml:form id="check-links-form" context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}">
+
+	<tml:script>
+		_Content = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/content")				
+	</tml:script>
+	
+	<div style="display:none">				
+		<tml:input cssstyle="width:100%" name="_internallinks" type="textarea" multiple="true"/>
+		<tml:input cssstyle="width:100%" name="_externallinks" type="textarea" multiple="true"/>
+	</div>
+
+	<tml:if istrue="_actionDone">
+		<tml:then>
+		
+			<script>
+				BI.dialog.submitButton.hide();
+				BI.dialog.closeButton.setText($L.close);
+				BI.dialog.autoHeight();
+			</script>
+			
+			<tml:if condition="tmlform.hasmessages()">
+				<tml:then>
+					<h3>{%label:dialog.check-links.validation-errors%}:</h3>
+					<ul style="list-style:disc;padding-left:20px">
+						<li><tml:formmessages divider="</li><li>"/></li>
+					</ul>
+					
+					<script>
+						var links = BI.util.getLinks(['<tml:script expression="_Content.getItemNames()" divider="','"/>'], false);
+						<tml:foreach type="itemvalue" item="_link_errors" currentvalue="_url">
+							BI.util.markLinks(links, "<tml:script expression="_url.url"/>", "<tml:script expression="_url.msg"/>");
+						</tml:foreach>
+					</script>
+				</tml:then>
+				<tml:else>
+					<div style="padding-left:20px;margin-top:10px;background:url('../../plugin-wga-app-framework/file/icons/accept.png') no-repeat 0px 0px;">
+						{%label:dialog.check-links.no-errors%}
+					</div>
+				</tml:else>
+			</tml:if>		
+	
+		</tml:then>
+		
+		<tml:else>
+			
+			<div id="internal-links-wrap" style="display:none">
+				<b>{%label:dialog.check-links.internal-links%}:</b>
+				<ul style="list-style-type:disc;padding-left: 20px" id="internal-links">
+				</ul>
+			</div>
+			<div id="external-links-wrap" style="display:none">
+				<b>{%label:dialog.check-links.external-links%}:</b>
+				<ul style="list-style-type:disc;padding-left: 20px" id="external-links">
+				</ul>
+			</div>
+
+			<script>
+				BI.dialog.submit=function(){
+					BI.util.callAction("<tml:action ref="check-links"/>", 
+							"<tml:script>return portlet.portletkey</tml:script>",
+							"{%label:dialog.check-links.checking-links%}");
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+					BI.dialog.autoHeight();
+				});
+
+
+				var t = new Ext.Template("<li>{link}</li>");
+
+				<tml:if condition="_Content.isMine() && STATUS==content().STATUS_DRAFT">
+					<tml:then>
+						// get all links from document:
+						var t_ext = document.forms['<tml:script expression="tmlform.formid"/>'].elements['_externallinks'];
+						var t_int = document.forms['<tml:script expression="tmlform.formid"/>'].elements['_internallinks'];
+						t_ext.value = "";
+						t_int.value = "";
+						var links = BI.util.getLinks(['<tml:script expression="_Content.getItemNames()" divider="','"/>']);
+		
+						for(var i=0; i<links.internal.length; i++){
+							var link = links.internal[i].url;
+							t.append('internal-links', {link: link});
+							t_int.value = t_int.value + link+"\n";
+						}
+						for(var i=0; i<links.external.length; i++){
+							var link = links.external[i].url;
+							t.append('external-links', {link: link});
+							t_ext.value = t_ext.value + link+"\n";
+						}
+						if(links.internal.length)
+							Ext.get("internal-links-wrap").dom.style.display="block";
+						if(links.external.length)
+							Ext.get("external-links-wrap").dom.style.display="block";
+						
+					</tml:then>
+					<tml:else>
+						<tml:case condition="!itemlist('_internallinks').isEmpty()">
+							<tml:foreach type="itemvalue" item="_internallinks" currentvalue="_link">
+								t.append("internal-links", {link: "<tml:item name="_link"/>"});
+							</tml:foreach>
+							Ext.get("internal-links-wrap").dom.style.display="block";
+						</tml:case>
+						<tml:case condition="!itemlist('_externallinks').isEmpty()">
+							<tml:foreach type="itemvalue" item="_externallinks" currentvalue="_link">
+								t.append("external-links", {link: "<tml:item name="_link"/>"});
+							</tml:foreach>
+							Ext.get("external-links-wrap").dom.style.display="block";						
+						</tml:case>
+					</tml:else>
+				</tml:if>
+
+				BI.dialog.autoHeight();
+			</script>		
+			
+		</tml:else>
+		
+	</tml:if>
+</tml:form>

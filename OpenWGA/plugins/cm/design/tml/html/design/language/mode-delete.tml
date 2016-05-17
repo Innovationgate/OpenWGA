@@ -1,0 +1,76 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="removeLanguage">
+	document.remove();
+	_removed=true;
+</tml:action>
+
+<tml:if istrue="_removed">
+	<tml:then>
+		<script>
+			BI.design.languagetree.removeSelectedNode();
+			BI.design.languagepanel.destroy();
+		</script>
+	</tml:then>
+	<tml:else>
+		<tml:if context="{'db:'+option('dbkey')+'/$language:'+option('id')}" iscontextvalid="true">
+			<tml:then>
+				<tml:include ref="::mode-view"/>
+				<script>
+				
+					<tml:script>
+						_may_delete = true;
+						try{
+							document.performRemoveCheck();
+						}
+						catch(e){
+							_may_delete = false;
+							_reason = e.javaException.message;
+						}
+					</tml:script>
+				
+					<tml:if condition="_may_delete">
+						<tml:then>
+							Ext.Msg.confirm("<tml:label key="design.language.delete.dlgcaption"/>", "<tml:label key="design.language.delete.dlgcontent"/>", function(btn, txt){
+								if(btn=='yes'){
+									WGA.ajax.callAction("<tml:action ref="removeLanguage"/>", "<tml:script>return portlet.portletkey</tml:script>");
+								}
+								else BI.design.languagepanel.reload("view");
+							});
+						</tml:then>
+						<tml:else>
+							BI.design.languagepanel.reload("view");
+							Ext.Msg.alert("<tml:label key="design.language.delete.not-allowed.msgtitle"/>", "<tml:item name="_reason"/>")
+						</tml:else>
+					</tml:if>
+				</script>
+			</tml:then>
+		
+			<tml:else>
+				<tml:label key="design.error.invalidcontext"/>: <tml:option name="id"/>
+			</tml:else>
+		</tml:if>		
+	</tml:else>
+</tml:if>

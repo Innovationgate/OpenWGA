@@ -1,0 +1,270 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+
+	if(profile.ytheme==null){
+		profile.ytheme="vista";
+		profile.save();
+	}
+
+	setOption("debug", request.getParameter("debug"));
+
+	request.getSession().setAttribute(WGACore.ATTRIB_BROWSERINTERFACE, true);
+	request.getSession().setAttribute(WGACore.ATTRIB_BI_VERSION4, true);
+	
+	request.getSession().setAttribute(wgacore.ATTRIB_NO_CONTENT_NOTIFCATION_URL, "/"+meta("db", "dbkey")+"/html/cms:no-content.int.html?dbkey=#DBKEY#&structkey=#KEY#");
+	request.getSession().setAttribute(wgacore.ATTRIB_VIRTUAL_CONTENT_URL, "/"+meta("db", "dbkey")+"/html/cms:virtual-doc.int.html?contentkey=#CONTENTKEY_UNIQUE_MODE#&u=#CONTENTKEY_URL_MODE#&structkey=#STRUCTKEY#&dbkey=#DBKEY#");
+
+	var dbkeys = request.getSession().getAttribute(Packages.de.innovationgate.contentmanager.filter.ResourceAccessFilter.SESSION_ATTRIB_EDITABLE_DATABASE);
+	if(!dbkeys)
+		dbkeys=WGA.createList()
+	if(!dbkeys.contains(option("dbkey")))
+		dbkeys.add(option("dbkey"))
+
+	request.getSession().setAttribute(Packages.de.innovationgate.contentmanager.filter.ResourceAccessFilter.SESSION_ATTRIB_EDITABLE_DATABASE, dbkeys);
+	
+	_Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", option("dbkey"))
+	_Request = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/request")
+
+	var releasedOnlyAttrib = java.lang.System.getProperty("de.innovationgate.cm.releasedOnly");
+	if(releasedOnlyAttrib=='true' || profile.show_released_only=="true"){
+		request.getSession().setAttribute(wgacore.ATTRIB_BI_COLLECTIONS_SHOW_RELEASED_ONLY, true);
+		log.info("Set CM to show releases content only");
+	}
+	else request.getSession().setAttribute(wgacore.ATTRIB_BI_COLLECTIONS_SHOW_RELEASED_ONLY, false);
+	
+	// create template area if cs is version>=5
+	if(_Database.getContentStoreVersion()>=5){
+		synchronizedFunction(function(){
+			if(!_Database.getTemplateArea())
+				callAction("cms:create-system-area", option("dbkey"), "templates");
+			if(!_Database.getTrashArea())
+				callAction("cms:create-system-area", option("dbkey"), "trash");
+		})();
+	}
+	
+	if(_Database.hasDesign()){
+		var app = WGA.app(option("dbkey"));
+		var auth = app.domain().auth()
+		if(!auth.getAccessFilter(app))
+			auth.applyAccessFilter(db().getAttribute("CM.FilterUids").get(db().ACCESSLEVEL_CHIEF_EDITOR), app);
+	}
+	
+</tml:script>
+<html>
+
+	<head>
+		<tml:case condition="AFW.request().IEVersion()==8">
+			<meta http-equiv="X-UA-Compatible" content="IE=8" />
+		</tml:case>
+		<title><tml:script expression="WGA.Brand.name" encode="html"/> Content Manager</title>
+		<link rel="icon" href="<tml:url type="static" file="images/brand/icon_32.png"/>"/>
+		
+		<link rel="stylesheet" type="text/css" href="<tml:url type="tml" medium="stylesheets" name="ext-theme-overwrite"/>"/>
+		
+		<tml:include designdb="{pluginDbKey('de.innovationgate.wga-app-framework')}" ref="ext:include-css">
+			<tml:script>
+				if(profile.ytheme!='default')
+					setOption("theme", profile.ytheme);
+			</tml:script>
+		</tml:include>
+
+		<link type="text/css" rel="stylesheet" href="<tml:url type="tml" medium="stylesheets" name="all"/>"/>
+		
+		<tml:htmlhead/>
+
+	</head>
+	
+	<body class="ytheme-<tml:item type="profile" name="ytheme"/>">
+		
+		<div id="loading-mask" style="width:100%;height:100%;background:white;position:absolute;z-index:10500;left:0;top:0;">&#160;</div>
+		<tml:include ref="splash-screen"/>
+		
+		<tml:comment>
+			include CSS and JS AFTER the splash screen!
+		</tml:comment>
+		
+		<tml:include ref="include-js-css-ext"/>
+
+		<div id="web-content-rtf-toolbar-wrapper">
+			<div id="web-content-rtf-toolbar"></div>
+		</div>
+		
+		<div class="ylayout-inactive-content x-layout-inactive-content">
+		
+			<div id="siteexplorer-panel">
+				<div id="siteexplorer-tb"></div>
+				<div id="siteexplorer-body"></div>
+			</div>
+			<tml:portlet name="area-contextmenu-observer" ref="cms:siteexplorer:portlet-area-contextmenu-observer" ajax="true"/>
+			
+			<tml:comment><div id="childexplorer-panel">
+				<div id="childexplorer-tb"></div>
+				<div id="childexplorer-body">
+					<tml:portlet ref="cms:childexplorer:portlet" name="childeplorer-portlet" ajax="true"/>
+				</div>
+			</div></tml:comment>
+
+			<div id="designexplorer-panel">
+				<div id="designexplorer-tb"></div>
+				<div id="designexplorer-body" class="BI-panel"></div>
+			</div>
+			
+			<div id="history-panel">
+				<tml:portlet name="history-portlet" ref="cms:history-portlet" ajax="true"/>
+			</div>
+			
+			<div id="site-panel"></div>
+			<div id="inner-site-panel"></div>
+			<div id="web-content-wrapper" <tml:case condition="profile.cm_scale_site_panel">class="scale<tml:item name="cm_scale_site_panel" type="profile"/>"</tml:case>>
+				<div class="padding">
+					<div class="phone-border">
+						<iframe 
+							id="web-content"
+							name="wga-contentmanager-iframe" 
+							frameborder="0"
+							border="0"
+							src="<tml:url type="tml" layout="sitepanel-init"><tml:param name="dbkey" expression="option('dbkey')"/></tml:url>"
+						></iframe>
+					</div>
+				</div>
+			</div>
+			
+			<div id="actions-panel">
+				<tml:include ref="cms:action-panel:render"/>
+			</div>
+			
+			<div id="status-panel" class="light-panel-bg">
+				<span><tml:script>return wgacore.getReleaseString()</tml:script></span>
+				<span id="statustext">{%label:splash.message%} ...</span>
+			</div>
+		
+			<div id="header-panel">
+				<tml:portlet ajax="true" name="panel-header" ref="cms:panel-header" context="[db:{option('dbkey')}]"/>
+			</div>
+
+		</div>
+
+		<div id="BI-resizable-dialog">
+			<div class="x-dlg-hd ydlg-hd">no title</div>
+		    <div class="x-dlg-bd ydlg-bd">
+				<tml:portlet name="resizable-dialog" ref="system:portlet-resizable-dialog" ajax="true"/>
+			</div>
+		</div>
+		
+		<div id="BI-dialog">
+		    <div class="x-dlg-hd ydlg-hd">no title</div>
+		    <div class="x-dlg-bd ydlg-bd">
+			    <tml:portlet name="modal-dialog" ref="system:portlet-modal-dialog" ajax="true"/>
+		    </div>
+		</div>
+
+		<tml:portlet name="sessioncheck" ref="session-check" ajax="true"/>
+		<tml:portlet name="usercheck" ref="portlet-user-change-monitor" ajax="true"/>
+		<tml:portlet name="dbcheck" ref="portlet-db-change-monitor" ajax="true"/>
+		<tml:portlet name="image-editor" ref="cms:image-editor" ajax="true"/>
+						
+		<script>
+			Ext.onReady(function(){
+				BI.dialog.initModalDialog();
+				BI.resizableDialog.initDialog();
+				
+				Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
+				
+				BI.layout.init();	// init border layout
+				BI.rtftoolbar.createToolbar();
+				
+				<tml:case condition="_Database.isChiefEditor()">
+					BI.design.createExplorer();
+				</tml:case>
+
+				BI.se.initDragDrop();
+				
+				Ext.QuickTips.init();
+				
+				BI.se.rootEl=Ext.get("siteexplorer-body");
+				BI.sitepanel.init();
+				
+				var mask = Ext.get('loading-mask');
+				mask.hide(true, 1, function(){
+						Ext.get("splash").puff({duration:.25,remove:true});
+						
+						<tml:script>
+							// check if db needs init wizzard
+							var dbkey = request.getParameter("dbkey");
+							_hasDesign = AFW.database(dbkey).hasDesign();
+						</tml:script>
+						<tml:if istrue="_hasDesign">
+							<tml:then>
+								// show Content:
+								var url=location.href.split("#");
+								if(url.length>1 && url[1]!="" && url[1]!="undefined"){
+									var a=url[1].split("/");
+									BI.selectDb(a[0], a[1]);
+								}
+								else BI.selectContent("");
+							</tml:then>
+							<tml:else>
+								BI.showToolbarButtons("cms")
+								BI.dialog.show("init-db-design");
+							</tml:else>
+						</tml:if>
+					}
+				);
+
+				WGA.event.register("CMS-Root", "CMS_backend_error", function(ev){
+					Ext.Msg.alert('Error', ev.params.message);
+				});
+				
+				<tml:case condition="AFW.request().HTML5FileUploadsSupported">
+					/*
+					 * Generic File System Drag&Drop Handler
+					 */		
+					window.addEventListener("drop", function(e){
+						e.preventDefault();
+						e.stopPropagation();
+					    var dt = e.dataTransfer;
+					    var files = dt.files;
+					    if(files && files.length)
+							WGA.event.fireEvent("drop-from-desktop", "window", {files:files});
+					}, false)
+				
+					window.addEventListener("dragenter", function(e){
+						e.preventDefault();
+					}, true);
+					window.addEventListener("dragover", function(e){
+						e.preventDefault();
+					    var dt = e.dataTransfer;
+						if(WGA.isWebKit ? (dt.types.indexOf("Files")>=0) : (dt.types.contains("Files")))
+							dt.dropEffect = "copy";
+					}, true);
+				</tml:case>
+				
+			})
+		</script>	
+
+	</body>
+
+</html>

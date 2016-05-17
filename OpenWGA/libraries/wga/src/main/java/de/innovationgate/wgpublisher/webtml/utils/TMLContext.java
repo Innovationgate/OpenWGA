@@ -482,10 +482,10 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         }
         
         if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
-            getDesignContext().setLocalVarOnModule(name.toLowerCase(), value);
+            getDesignContext().setLocalVarOnModule(name, value);
         }
         else {
-            _environment.getPageVars().put(name.toLowerCase(), value);
+            _environment.getPageVars().put(name, value);
         }
 		
 		
@@ -495,11 +495,17 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      * @see de.innovationgate.wgpublisher.webtml.utils.Context#getvar(java.lang.String)
      */
 	@Override
-    public Object getvar(String name) {
+    public Object getvar(String name) throws WGAPIException {
 		if (name == null) {
 	        return null;
 	    }	    
-		name = name.toLowerCase();
+		
+        if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
+            Object value = getDesignContext().retrieveLocalVar(name);
+            if (!(value instanceof NullPlaceHolder)) {
+                return value;
+            }
+        }
 		
 		Map vars = _environment.getPageVars();
 		if (vars.containsKey(name)) {
@@ -845,14 +851,6 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         
         String lcName = name.toLowerCase();
         
-        // Local variables (since 7.2)
-        if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
-            Object value = getDesignContext().retrieveLocalVar(lcName);
-            if (!(value instanceof NullPlaceHolder)) {
-                return value;
-            }
-        }
-        
 		Map<String,Object> pageVars = _environment.getPageVars();
         
         // Portlet variables
@@ -875,16 +873,24 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
                 
             }
         }
+
+        // Local variables (since 7.2)
+        if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
+            Object value = getDesignContext().retrieveLocalVar(name);
+            if (!(value instanceof NullPlaceHolder)) {
+                return value;
+            }
+        }
         
 		// Regular page (request) variables
-		if (pageVars.containsKey(lcName)) {
-			return pageVars.get(lcName);
+		if (pageVars.containsKey(name)) {
+			return pageVars.get(name);
 		}
 
 		// Session variables
 		Map<String,TransientObjectWrapper<Object>> sessionVars = _environment.getSessionVars();
-		if (sessionVars.containsKey(lcName)) {			
-			return sessionVars.get(lcName).get();
+		if (sessionVars.containsKey(name)) {			
+			return sessionVars.get(name).get();
 		}
         
 		return new NullPlaceHolder();
@@ -5327,7 +5333,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     }
     
     public void setLocalVar(String name, Object value) throws WGException {
-        getDesignContext().setLocalVar(name.toLowerCase(), value);
+        getDesignContext().setLocalVar(name, value);
     }
     
     private void isolate() {

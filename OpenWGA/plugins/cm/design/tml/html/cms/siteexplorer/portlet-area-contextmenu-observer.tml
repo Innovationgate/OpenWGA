@@ -1,0 +1,60 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:form id="form-area-contextmenu-observer">
+
+	<tml:input name="areaname" type="hidden"/>
+	<tml:input name="dbkey" type="text"/>
+
+	<script>
+	
+		WGA.event.register(
+			"<tml:script>return portlet.portletkey</tml:script>",
+			"CMS_area_contextmenu", 
+			function(e){
+				document.forms['form-area-contextmenu-observer'].areaname.value=e.params.area;
+				document.forms['form-area-contextmenu-observer'].dbkey.value=BI.dbkey;
+				WGA.ajax.callAction("<tml:action ref="$refresh"/>", "<tml:script>return portlet.portletkey</tml:script>");
+			}
+		);
+
+		<tml:case condition="tmlform.areaname!=mull && tmlform.areaname!=''">
+			<tml:script>
+				_Area=createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/area", tmlform.areaname, tmlform.dbkey);
+				// check paste
+				_mayPaste = false;
+				if(_CM_clipboard_context){
+					var source = context(_CM_clipboard_context).document;
+					var Contenttype = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/contenttype", source.getContentType().getName(), option('dbkey'))
+					_mayPaste = Contenttype.isAllowed(_Area.WGObject) && _Area.mayCreatePage()
+				}
+			</tml:script>
+			
+			BI.enablemenus("create-rootpage-in-area", <tml:script>return _Area.mayCreateRootPage()</tml:script>);
+			BI.enablemenus("paste-rootpage-in-area", <tml:script>return _mayPaste</tml:script>);
+		</tml:case>
+		
+	</script>
+</tml:form>
+

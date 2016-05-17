@@ -1,0 +1,49 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="updateRemoteItems" master="true" async="true">
+
+	var remotelist=tmlparam1.getItemValueList("remote_references");
+	log.info("updating " + remotelist.size() + " documents ...");
+	for(var i=0; i < remotelist.size(); i++){
+		var remote_info=remotelist.get(i);
+		var remote_context=context(remote_info, false);
+
+		if(remote_context==null){
+			log.info("Unable to find remote content " + remote_info);
+			continue;			// doc removed ?
+		}
+		var remotedoc=remote_context.content();
+		if(!remotedoc.hasItem("remote_info")){
+			// this may happen if the remote connection has been removed at the same moment as this doc is published.
+			log.info("remote document " + remote_info + " with title " + remotedoc.getTitle() + " not updated bc. it has no remote_info");
+			continue;
+		}
+		log.info("Updating remote document " + remote_info + " with title " + remotedoc.getTitle());
+		// copy all items to remote document:
+		createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/content", remotedoc).copyRemoteData(tmlparam1);
+						
+	}
+</tml:action>
+

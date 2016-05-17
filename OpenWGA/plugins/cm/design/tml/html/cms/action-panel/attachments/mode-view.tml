@@ -1,0 +1,429 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="copyImage">
+	var dbkey = request.getParameter("dbkey")	
+	var container = request.getParameter("container")	
+	var filename = WGA.Utils.normalizeUnicode(request.getParameter("filename"))
+	var doc = context("db:"+dbkey + "/docid:" + container).content()
+	var filedata = doc.getFileData(filename);
+	var file_metadata = doc.getFileMetaData(filename);
+	if(content().hasFile(filename))
+		content().removeFile(filename);
+	content().attachFile(filedata, filename)
+	file_metadata.pushData(content().getFileMetaData(filename))
+	content().save();
+	portlet.fireEvent("CMS_attachments_changed");
+</tml:action>
+
+<tml:script>
+	var _Content=AFW.content();
+	_mode = _Content.getDatabase().isChiefEditor() || (_Content.mayEditContent() && _Content.isDraft() && _Content.isMine()) ? "edit":"view";
+</tml:script>
+
+<tml:input type="hidden" name="attachments"/>
+<tml:input type="hidden" name="file_to_rename"/>
+<tml:input type="hidden" name="new_filename"/>
+
+<div id="attachment-tabs"></div>	<tml:comment>Must be outside info-window to create tabs when collapsed</tml:comment>
+
+<tml:include ref="system:info-window">
+	<tml:option name="var">BI.attachment_panel</tml:option>
+	<tml:option name="collapsed" expression="portlet.getSessionVar('content_attachment_window')!='expanded'"/>
+	<tml:option name="title">
+		{%label:content-attachments.title%}
+	</tml:option>
+	<tml:option name="bodystyle">padding:0 0 5px 0</tml:option>
+	<tml:option name="body">
+
+		<div id="attachment-toolbar-top"></div>
+
+		<div id="attachment-grid-view" <tml:case condition="portlet.view && portlet.view!='list'">class="x-hidden"</tml:case>></div>
+		<div id="attachment-image-view" style="height:auto" class="ychooser-view cols2<tml:case condition="portlet.view!='thumbnail'"> x-hidden</tml:case>"></div>
+
+		<div id="attachment-videos-view" style="height:auto;display:none" class="ychooser-view"></div>
+	
+		<div id="attachment-panel-body"></div>
+		<div id="attachment-toolbar"></div>
+	
+	
+		<tml:case condition="AFW.request().HTML5FileUploadsSupported">
+			<tml:if condition="_mode=='edit'">
+				<tml:then>
+					<tml:include ref="::HTML5FileUpload"/>
+				</tml:then>
+				<tml:else>
+					<script>
+						WGA.event.addListener(
+							"<tml:script expression="portlet.portletkey"/>",
+							"drop-from-desktop", 
+							function(e){
+								alert("<tml:label key="content-attachments.uploads-not-allowed"/>");
+							}
+						)			
+					</script>
+				</tml:else>
+			</tml:if>
+		</tml:case>
+		
+		<script>
+
+			WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function() {
+
+				<tml:include ref="::toolbar-top"/>
+							
+				<tml:case condition="AFW.request().HTML5DragDropSupported && STATUS==content().STATUS_DRAFT">
+					// Drop handler from other image panels:
+					Ext.get("form-attachments").on({
+						dragover: function(e){
+							e.preventDefault();
+							var isFilesDrop = WGA.isWebKit ? (e.browserEvent.dataTransfer.types.indexOf("wga/files")>=0) 
+								: (e.browserEvent.dataTransfer.types.contains("wga/files"))
+							if(isFilesDrop){
+								if(WGA.isWebKit){
+									// since we don't have access to dataTransfer's data we must set drop effect "copy". Just in case.
+									e.browserEvent.dataTransfer.dropEffect = "copy";
+									return;
+								}
+								var json = e.browserEvent.dataTransfer.getData("wga/files")
+								var data = JSON.parse(json)
+								if(!data || !data[0].container || data[0].container=="<tml:metadata name="KEY"/>"){
+									e.browserEvent.dataTransfer.dropEffect = "none";
+								}
+								else e.browserEvent.dataTransfer.dropEffect = "copy";
+							}
+						},
+						drop: function(e){
+							e.preventDefault();
+							var isFilesDrop = WGA.isWebKit ? (e.browserEvent.dataTransfer.types.indexOf("wga/files")>=0) 
+								: (e.browserEvent.dataTransfer.types.contains("wga/files"))
+							if(isFilesDrop){
+								try{
+									var json = e.browserEvent.dataTransfer.getData("wga/files")
+									var data = JSON.parse(json)
+									if(!data || !data[0].container || data[0].container=="<tml:metadata name="KEY"/>"){
+										e.browserEvent.dataTransfer.dropEffect = "none";
+										return;
+									}
+									e.browserEvent.dataTransfer.dropEffect = "copy";
+									WGA.ajax.action({
+										action: "<tml:action ref="copyImage" ajax="norefresh"/>",
+										graydiv: false,
+										mode: "norefresh",
+										params: {
+											dbkey: data[0].dbkey,
+											container: data[0].container,
+											filename: data[0].name.replace(/\+/g, "%2B")
+										}
+									});
+								}
+								catch(e){
+									e.browserEvent.dataTransfer.dropEffect = "none";
+								}
+							}
+						}
+					})
+				</tml:case>
+			
+				/*
+				 * Toolbar
+				 */
+				<tml:script>
+					// check for Image Scaler
+					var modReg = wgacore.getModuleRegistry();
+					var scalers = modReg.getModulesForType(Packages.de.innovationgate.wga.modules.types.ImageScalerModuleType)
+					_hasScaler = (scalers && scalers.size()>0)
+					if(_hasScaler){
+						_hasCropMethod=false;
+						var sc = scalers.get(getLookupKeys(scalers).get(0)).getImplementationClass().newInstance();
+						if(sc.crop)
+							_hasCropMethod=true;
+					}
+				</tml:script>
+		
+				var tools_menu = new Ext.menu.Menu({
+			       	items: [
+			       		{
+			        		text: "<tml:label key="mark-as-primary"/>",
+			        		disabled: <tml:script expression="_mode=='view'"/>,
+			        		handler: function(m, ev){
+			        			var selection=grid.getSelections()[0];
+								document.forms['<tml:script expression="tmlform.formid"/>'].attachments.value = selection.data.name
+								WGA.ajax.action({
+										action: "<tml:action ajax="norefresh">
+												var primary = content().getPrimaryFileName();
+												content().setPrimaryFileName(primary==tmlform.attachments ? null : tmlform.attachments);
+												content().save();
+												var ev= createEvent("CMS_attachments_changed");
+												portlet.fireEvent(ev);
+										</tml:action>",
+										id: "<tml:script>return portlet.portletkey</tml:script>",
+										graydiv: false,
+										mode: "norefresh"
+									}
+								);
+			        		}			       		
+			       		},
+			       		"-",
+			       		{
+			        		text: "<tml:label key="download-attachment"/>",
+			        		handler: function(m, ev){
+			        			var selection=grid.getSelections()[0];
+								location.href = selection.data.url + "?forcedownload=true";
+			        		}
+			        	},
+			       		{
+			        		text: "<tml:label key="open-in-new-window"/>",
+			        		handler: function(m, ev){
+			        			var selection=grid.getSelections()[0];
+			        			window.open(selection.data.url, "_blank");
+			        		}
+			        	},
+			        	{
+			        		text: "<tml:label key="content-attachments.file-metas"/>",
+			        		handler: function(m, ev){
+			        			var selection=grid.getSelections()[0];
+			        			BI.dialog.show("file-meta-data", null, {filename:selection.data.name,mode:'<tml:item name="_mode"/>'});
+			        		}
+			        	},
+			        	"-",
+			        	{
+			        		text: "<tml:label key="edit-image"/>",
+			        		id: "image-edit",
+			        		handler: function(m, ev){
+								BI.resizableDialog.show("view-image", null, {filename:grid.getSelections()[0].data.name,mode:'<tml:item name="_mode"/>'});
+			        		}
+			        	},
+			        	{
+			        		text: "<tml:label key="edit-video"/>",
+			        		id: "video-edit",
+			        		handler: function(m, ev){
+			        			var selection=grid.getSelections()[0];
+			        			BI.dialog.show("edit-video", null, {filename:selection.data.name,mode:'<tml:item name="_mode"/>'});
+			        		}
+			        	}			        	
+			       	]
+		       	});
+		       	
+				tools_menu.on("beforeshow", function(){
+					Ext.get("web-content-wrapper").mask();
+				});
+				tools_menu.on("beforehide", function(){
+					Ext.get("web-content-wrapper").unmask();
+				});
+		
+				var tb = new Ext.Toolbar("attachment-toolbar", [
+				    {
+				        text: '{%label:add%}',
+				        icon: "../../plugin-wga-app-framework/file/icons/database_add.png",
+				        cls: "x-btn-text-icon",
+				        id: "add",
+				        disabled: <tml:script expression="_mode=='view'"/>,
+				        handler : function(m, ev){
+							BI.dialog.show("upload", ev.target, {type:'content', key:BI.contentkey});
+				        }
+				    },
+				    {
+				        text: '{%label:delete%}',
+				        icon: "../../plugin-wga-app-framework/file/icons/database_delete.png",
+				        cls: "x-btn-text-icon",
+				        id: "delete",
+				        disabled: true,
+				        handler : function(m, ev){
+				        	var selections=grid.getSelections();
+				        	var files=[];
+				        	var filenames = ""
+				        	for(var i=0; i<selections.length; i++){
+								files.push(selections[i].data.name)
+								filenames += "<li>"+selections[i].data.name+"</li>"
+							}
+							var msg = "<tml:label key="query-delete-selected-attachments"/>?<ul style='list-style-type:disc;padding:5px 20px'>"+filenames+"</ul>"
+							var msgbox = Ext.MessageBox.confirm('{%label:confirm-deletion%}', msg, function(btn){
+								if(btn=="no")
+									return;
+								document.forms['<tml:script expression="tmlform.formid"/>'].attachments.value=files.join("|")			
+								WGA.ajax.action({
+										action: "<tml:action ajax="norefresh">
+												var files=tmlform.attachments.split("|");
+												for(i in files)
+													content().removeFile(files[i]);
+												content().save();
+												var ev= createEvent("CMS_attachments_changed");
+												portlet.fireEvent(ev);
+										</tml:action>",
+										id: "<tml:script>return portlet.portletkey</tml:script>",
+										graydiv: false,
+										mode: "norefresh"
+									}
+								);
+							});
+							//msgbox.getDialog().resizeTo(300, 100);
+				        }
+				    },
+				    "->",
+				    {
+				        icon: "../../plugin-wga-app-framework/file/icons/paste_plain.png",
+				        cls: "x-btn-icon",
+				        id: "copy-to-clipboard",
+				        disabled: true,
+				        handler: function(){
+							// file selected files
+							var ds=grid.getDataSource();
+							var sm = grid.getSelectionModel();
+							var filenames = [];
+							var items = sm.selections.items;
+							for(var i=0; i<items.length; i++){
+								filenames.push(items[i].data.name);
+							}
+				        	WGA.event.fireEvent("CMS_clipboard_attach_files", "<tml:script expression="portlet.portletkey"/>", {
+				        		dbkey: BI.dbkey,
+				        		contentkey: BI.contentkey,
+				        		filenames: filenames
+				        	})
+				        }
+				    },
+				    {
+				    	icon: "../../plugin-wga-app-framework/file/icons/wrench.png",
+				        cls: "x-btn-icon",
+				        id: "tools",
+				        disabled: true,
+				        menu: tools_menu	        
+				    }
+			    ]);
+	
+				<tml:include ref="::attachment-grid"/>
+				<tml:include ref="::attachment-thumbnails"/>
+			
+				/*
+				 * Event Listeners
+				 */
+				WGA.event.addListener(
+					"<tml:script expression="portlet.portletkey"/>",
+					"CMS_attachment_selected",
+					function(ev){
+						//console.log("fetched select event from " + ev.source, ev.params.items);
+						
+						if(ev.source!="attachment-image-view"){
+							// select images in view
+							thumbnail_view.clearSelections(true);
+							for(var i=0; i<ev.params.items.length; i++){
+								var item = ev.params.items[i];
+								thumbnail_view.select(item+"/ap", true, true);
+							}
+						}
+
+						if(ev.source!="attachment-grid-view"){
+							// select grid entries
+							var ds=grid.getDataSource();
+							var sm = grid.getSelectionModel();
+							sm.clearSelections();
+							var records = [];
+							for(var i=0; i<ev.params.items.length; i++){
+								var item = ev.params.items[i];
+								records.push(ds.getById(item));							
+							}
+							sm.selectRecords(records, false);
+						}
+
+						// Clipboard button:
+						if(ev.params.items.length==0){
+							tb.items.get("copy-to-clipboard").disable();
+						}						
+						else {
+							<tml:case condition="STATUS==content().STATUS_RELEASE">
+								tb.items.get("copy-to-clipboard").enable();
+							</tml:case>
+						}
+						// other buttons:
+						<tml:case condition="_mode=='edit'">
+							if(ev.params.items.length==0){
+								tb.items.get("delete").disable();
+							}						
+							else {
+								tb.items.get("delete").enable();
+							}
+						</tml:case>
+						if(ev.params.items.length==1 && grid.getSelections()[0]){								
+							tb.items.get("tools").enable();
+							
+							var selection =  grid.getSelections()[0].json;
+							
+							if(selection.isImage)
+								tools_menu.items.get("image-edit").enable();
+							else tools_menu.items.get("image-edit").disable();
+							
+							if(selection.isVideo)
+								tools_menu.items.get("video-edit").enable();
+							else tools_menu.items.get("video-edit").disable();
+							
+						}
+						else tb.items.get("tools").disable();
+						
+					}
+				)
+
+				WGA.event.addListener(
+					"<tml:script expression="portlet.portletkey"/>",
+					"CMS_attachments_changed",
+					function(ev){
+						BI.infoView.expand(BI.attachment_panel.dom);
+						grid.getDataSource().reload();
+						thumbnail_store.reload()						
+					}
+				)			
+
+			})		
+		
+		</script>
+		
+	</tml:option>
+
+	<tml:option name="onexpand">
+		WGA.event.fireEvent("CMS_attachments_changed");
+		WGA.ajax.action({
+			id: "<tml:script expression="portlet.portletkey"/>",
+			action: "<tml:action ajax="norefresh">
+							portlet.setSessionVar("content_attachment_window", "expanded");
+							portlet.save()
+					</tml:action>",
+			mode: "norefresh",
+			graydiv: false
+		})
+	</tml:option>
+
+	<tml:option name="oncollapse">
+		WGA.ajax.action({
+			id: "<tml:script expression="portlet.portletkey"/>",
+			action: "<tml:action ajax="norefresh">
+							portlet.setSessionVar("content_attachment_window", "collapsed");
+							portlet.save()
+					</tml:action>",
+			mode: "norefresh",
+			graydiv: false
+		})
+	</tml:option>
+
+</tml:include>
+

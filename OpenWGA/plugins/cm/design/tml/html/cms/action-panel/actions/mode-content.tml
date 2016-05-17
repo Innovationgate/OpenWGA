@@ -1,0 +1,344 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_Database = AFW.database()
+	_Struct=AFW.structentry()
+	_Content=AFW.content()
+	_fixparents=_Content.getFixParents();
+	_pending = (STATUS==content().STATUS_REVIEW && content().isPendingRelease());
+</tml:script>
+
+<tml:case condition="_Content.isMine()">
+	<tml:include ref="::content-validation"/>
+</tml:case>
+	
+<tml:script>_firstBlock=true;</tml:script>
+
+<tml:include ref="system:info-window" o_title="{label('actions.title')}">
+
+	<tml:option name="collapsed" expression="portlet.getSessionVar('content_action_window')=='collapsed'"/>
+	<tml:option name="onexpand">
+		WGA.ajax.action({
+			id: "<tml:script expression="portlet.portletkey"/>",
+			action: "<tml:action ajax="norefresh">
+							portlet.setSessionVar("content_action_window", "expanded");
+					</tml:action>",
+			mode: "norefresh",
+			graydiv: false
+		})
+	</tml:option>
+	<tml:option name="oncollapse">
+		WGA.ajax.action({
+			id: "<tml:script expression="portlet.portletkey"/>",
+			action: "<tml:action ajax="norefresh">
+							portlet.setSessionVar("content_action_window", "collapsed");;
+					</tml:action>",
+			mode: "norefresh",
+			graydiv: false
+		})
+	</tml:option>
+
+	<tml:case condition="_Content.mayEditContent() && (STATUS==content().STATUS_DRAFT)">
+		<tml:script>_firstBlock=false;</tml:script>
+									
+		<tml:if condition="_Content.isMine()">
+			<tml:then>
+				<tml:case istrue="_isValide">
+					<div class="section">
+						<h1>{%label:actions.section.publish%}:</h1>
+						<div class="list publish-content"
+								onmouseover="Ext.get(this).addClass('selected')"
+								onmouseout="Ext.get(this).removeClass('selected')"
+								onclick="BI.dialog.show('publish-content', this)"
+						>
+							{%label:actions.publish%}
+						</div>
+					</div>
+				</tml:case>
+			</tml:then>
+			<tml:else>
+				<div class="section">
+					<h1>{%label:actions.section.edit%}:</h1>
+					<div class="list checkout" 
+								onmouseover="Ext.get(this).addClass('selected')"
+								onmouseout="Ext.get(this).removeClass('selected')"
+								onclick="BI.dialog.show('edit-content', this)"
+					>								
+						{%label:actions.checkout%}
+					</div>
+				</div>
+			</tml:else>
+		</tml:if>
+		
+	</tml:case>
+	
+	<tml:case condition="(STATUS==content().STATUS_RELEASE || STATUS==content().STATUS_ARCHIVE) && _Content.mayEditContent()">
+		<tml:script>_firstBlock=false;</tml:script>
+		<div class="section">
+			<h1>{%label:actions.section.edit%}:</h1>	
+			<div class="list edit-content" 
+						onmouseover="Ext.get(this).addClass('selected')"
+						onmouseout="Ext.get(this).removeClass('selected')"
+						onclick="BI.dialog.show('edit-content', this)"
+			>								
+				<tml:label key="actions.edit"/>
+			</div>
+		</div>
+		
+	</tml:case>
+	
+	<tml:case condition="STATUS==content().STATUS_REVIEW">
+		<tml:script>
+			_firstBlock=false;
+			_wf = content().getWorkflow();
+		</tml:script>
+		<div class="section">
+			<tml:if condition="content().isPendingRelease() && (_Database.isEditor()||_Content.isAuthorOrOwner()||_wf.workflowRole==_wf.ROLE_APPROVER)">
+				<tml:then>
+					<h1>{%label:actions.section.edit%}:</h1>
+					<div class="list edit-content"
+								onmouseover="Ext.get(this).addClass('selected')"
+								onmouseout="Ext.get(this).removeClass('selected')"
+								onclick="BI.dialog.show('reject-pending-content', this)"
+					>
+						<tml:label key="actions.edit-pending"/>
+					</div>
+				</tml:then>
+				<tml:elseif condition="_Content.mayApprove()">
+					<h1>{%label:actions.section.workflow%}:</h1>
+					<div class="list approve-content"
+								onmouseover="Ext.get(this).addClass('selected')"
+								onmouseout="Ext.get(this).removeClass('selected')"
+								onclick="BI.dialog.show('approve-content', this)"
+					>
+						{%label:actions.approve%}
+					</div>
+					<div class="list reject-content"
+								onmouseover="Ext.get(this).addClass('selected')"
+								onmouseout="Ext.get(this).removeClass('selected')"
+								onclick="BI.dialog.show('reject-content', this)"
+					>
+						{%label:actions.reject%}
+					</div>
+				</tml:elseif>
+			</tml:if>
+		</div>
+	</tml:case>
+	
+	<div class="section" id="section-create">
+		<a class="drop-down<tml:script>return _firstBlock?" drop-down-open":""</tml:script>" href="javascript:void(0)" style="cursor:pointer" onclick="BI.util.toggleElement(Ext.get(this).getNextSibling());Ext.get(this).toggleClass('drop-down-open')">
+			<h1>{%label:actions.section.create%}</h1>
+		</a>
+		<div style="display:<tml:script>return _firstBlock?"block":"none"</tml:script>;padding-left:8px">
+	
+			<div id="content-action-create-button" style="display:none"> 
+				<div class="list create-page"
+					onmouseover="Ext.get(this).addClass('selected')"
+					onmouseout="Ext.get(this).removeClass('selected')"
+					onclick="BI.sitepanel.showCreateAreas(true);"
+				>
+					{%label:actions.create-page%}
+				</div>											
+			</div>
+			<script>
+				if(BI.sitepanel.hasCreateAreas()){
+					Ext.get("content-action-create-button").show();
+				}
+				<tml:case condition="!_Content.mayCreateContent() && _fixparents.isEmpty()">
+					else Ext.get("section-create").setDisplayed(false);
+				</tml:case>
+			</script>
+		
+			<tml:case condition="!_fixparents.isEmpty()">
+				<tml:foreach type="itemvalue" item="_fixparents" currentvalue="_parent">
+					<tml:script>
+						var a=_parent.split("|");
+						_pagetype=a[0];
+						_preferedParent=a[1];
+					</tml:script>
+					<div class="list create-page"
+							onmouseover="Ext.get(this).addClass('selected')"
+							onmouseout="Ext.get(this).removeClass('selected')"
+							onclick="BI.dialog.show('create-page', this, {
+									pagetype:'<tml:item name="_pagetype"/>',
+									parentkey:'<tml:item name="_preferedParent"/>'
+								})"
+					>
+						<tml:script>
+							var Contenttype = createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/contenttype", _pagetype);
+							return Contenttype.getAlias()
+						</tml:script>
+					</div>
+				</tml:foreach>
+			</tml:case>
+	
+			<tml:case condition="_Content.mayCreateContent()">
+				<div class="list create-content-version"
+						onmouseover="Ext.get(this).addClass('selected')"
+						onmouseout="Ext.get(this).removeClass('selected')"
+						onclick="BI.dialog.show('create-content', this)"
+				>
+					{%label:actions.create-content-version%}
+				</div>
+			</tml:case>
+		</div>
+	</div>
+	
+	<tml:case condition="_Content.mayArchiveContent() || _Content.mayDeletePage() || _Content.mayDeleteContent()">
+		<div class="section">
+			<a class="drop-down" href="javascript:void(0)" style="cursor:pointer" onclick="BI.util.toggleElement(Ext.get(this).getNextSibling());Ext.get(this).toggleClass('drop-down-open')">
+				<h1>{%label:actions.section.delete%}</h1>
+			</a>
+			<div style="display:none;padding-left:8px;">
+				<tml:case condition="_Content.mayDeletePage()">
+					<div class="list delete-page" 
+								onmouseover="Ext.get(this).addClass('selected')"
+								onmouseout="Ext.get(this).removeClass('selected')"
+								onclick="BI.dialog.show('delete-page', this)"
+					>								
+						{%label:actions.delete-page%}
+					</div>
+				</tml:case>
+				
+				<tml:case condition="_Content.mayDeleteContent()">
+					<div class="list delete-content" 
+								onmouseover="Ext.get(this).addClass('selected')"
+								onmouseout="Ext.get(this).removeClass('selected')"
+								onclick="BI.dialog.show('delete-content', this)"
+					>								
+						{%label:actions.delete-content%}	
+					</div>
+				</tml:case>
+	
+				<tml:case condition="_Content.mayArchiveContent()"> 
+					<div class="list archive-content" 
+								onmouseover="Ext.get(this).addClass('selected')"
+								onmouseout="Ext.get(this).removeClass('selected')"
+								onclick="BI.dialog.show('archive-content', this)"
+					>								
+						{%label:actions.archive-content%}
+					</div>
+				</tml:case>
+			</div>
+		</div>
+		
+	</tml:case>
+	
+	<div class="section">
+		<h1>{%label:actions.section.other%}:</h1>
+	
+		<div class="list check-links" id="check-links-action" style="display:none"
+					onmouseover="Ext.get(this).addClass('selected')"
+					onmouseout="Ext.get(this).removeClass('selected')"
+					onclick="BI.dialog.show('check-links', this)"
+		>				
+			{%label:actions.check-links%}
+		</div>
+		<script>
+			<tml:if condition="_Content.isMine() && STATUS==content().STATUS_DRAFT">
+				<tml:then>
+					if(BI.util.getLinks(['<tml:script expression="_Content.getItemNames()" divider="','"/>']).count>0)
+						Ext.get("check-links-action").dom.style.display="block";
+				</tml:then>
+				<tml:elseif condition="STATUS!=content().STATUS_DRAFT && (!isEmpty('_internallinks') || !isEmpty('_externallinks'))"> 
+					Ext.get("check-links-action").dom.style.display="block";
+				</tml:elseif>
+			</tml:if>
+		</script>
+	
+		<tml:case condition="_Content.hasOtherVersions()">
+			<div class="list compare-contents" 
+						onmouseover="Ext.get(this).addClass('selected')"
+						onmouseout="Ext.get(this).removeClass('selected')"
+						onclick="BI.contentComparePanel.show()"
+			>				
+				{%label:actions.content-compare%}
+			</div>
+		</tml:case>
+	
+		<tml:case condition="_Database.hasMailHost()">
+			<div class="list forward-content" 
+						onmouseover="Ext.get(this).addClass('selected')"
+						onmouseout="Ext.get(this).removeClass('selected')"
+						onclick="BI.dialog.show('forward-content', this)"
+			>								
+				{%label:actions.forward%}
+			</div>
+		</tml:case>
+		
+		<tml:case condition="_Content.isMine() && STATUS==content().STATUS_DRAFT">
+			<div class="list preview-content" id="action-preview-content"
+					onmouseover="Ext.get(this).addClass('selected')"
+					onmouseout="Ext.get(this).removeClass('selected')"
+					onclick="BI.sitepanel.togglePreview()"
+			>
+				<tml:label key="actions.toggle-edit-items"/>
+			</div>
+		</tml:case>
+		
+		<tml:script>
+			_mode="view";
+			if(!_Content.isContentConsumer() && _Content.isMine() && STATUS==content().STATUS_DRAFT)
+				_mode="edit"
+		</tml:script> 
+		<div class="list edit-content-modules" id="edit-content-modules-action" style="display:none"
+				onmouseover="Ext.get(this).addClass('selected')"
+				onmouseout="Ext.get(this).removeClass('selected')"
+				onclick="BI.dialog.show('content-modules', this, {mode:'<tml:item name="_mode"/>'})"
+		>
+			<tml:label key="actions.edit-content-modules"/>
+		</div>
+		<script>
+			try{
+				var cmm = BI.sitepanel.iframe.window.WGA.CMM;
+				if(cmm && cmm.hasSections)
+					Ext.get("edit-content-modules-action").dom.style.display="block";
+			}
+			catch(e){}
+		</script>
+	
+		<tml:case condition="_Content.hasUserdefinedMetas()">
+			<tml:script>
+				_mode="view";
+				if(!_Content.isContentConsumer() && _Content.isMine() && STATUS==content().STATUS_DRAFT)
+					_mode="edit"
+			</tml:script> 
+			<div class="list edit-userdefined-metas"
+					onmouseover="Ext.get(this).addClass('selected')"
+					onmouseout="Ext.get(this).removeClass('selected')"
+					onclick="BI.dialog.show('userdefined-metas', this, {mode:'<tml:item name="_mode"/>'})"
+			>
+				{%label:actions.edit-userdefined-metas%}
+			</div>
+		</tml:case>
+	
+	</div>
+								
+	<div align="right">
+		<a href="#" onclick="BI.dialog.show('show-access', this)">{%label:actions.access%} ...</a>
+	</div>
+
+</tml:include>

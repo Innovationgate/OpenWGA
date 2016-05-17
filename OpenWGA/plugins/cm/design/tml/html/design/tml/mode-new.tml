@@ -1,0 +1,60 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="createTML">
+	// check for valid name:	
+	var check = /[^a-zA-Z0-9_\.\-\:\$]/g	
+	if(check.test(tmlform.name)){
+		tmlform.addMessage(label("design.name-not-valid"));
+		tmlform.validate();
+		return;
+	}
+
+	if(!tmlform.validate())
+		return;
+	try{
+		var tml = db(option('dbkey')).createTMLModule(tmlform.name, tmlform.mediakey)
+		tmlform.storeInDocument(tml);
+		tml.save();
+		_new_mode="view";
+		_new_id=tmlform.mediakey + ":" + tmlform.name;
+	}
+	catch(e){
+		tmlform.addmessage(e.message)
+	}
+</tml:action>
+
+<tml:form id="tml-form" cssclass="entryform" source="none" onsubmit="return false">
+	<tml:include ref="::form"/>
+	<tml:input name="code" meta="true" type="textarea" cssclass="textinput"/>
+	<script>
+		// submit function called from dialog handler and on RETURN
+		BI.design.tmlpanel.submit=function(close){
+			WGA.ajax.callAction("<tml:action ref="createTML"/>", 
+				"<tml:script>return portlet.portletkey</tml:script>");
+		}	
+		BI.makeTextareasResizable("tml-form");	
+	</script>
+
+</tml:form>		

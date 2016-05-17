@@ -1,0 +1,92 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:input meta="true" name="innerlayout" type="hidden"/>
+
+<tml:range var="_link" output="false">
+	<tml:if context="{'db:'+option('dbkey')+'/$tml:'+tmlform.innerlayout+',html'}" iscontextvalid="true">
+		<tml:then>																		
+			<a href="#" id="innerlayout-link"
+				Ext:qtip="<tml:label key="design.contenttypes.layouts.quicktip"/> <tml:script>return tmlform.innerlayout</tml:script>" 
+				onclick="BI.design.tmlpanel.show({
+					id:'html:<tml:script>return tmlform.innerlayout</tml:script>'
+				})"><tml:script>return tmlform.innerlayout</tml:script></a>
+		</tml:then>
+		<tml:else>
+			<tml:script>
+				if(tmlform.innerlayout)
+					return tmlform.innerlayout + " <span style='color:red'>(design not found)</span>";
+				else return tmlform.mode()=="edit" ? label("design.contenttypes.layouts.drophere") : label("design.contenttypes.layout-none");
+			</tml:script>
+		</tml:else>
+	</tml:if>
+</tml:range>
+
+<table id="ct-innerLayout" width="100%" class="collection" style="border:solid silver 1px;background-color:#efefef">
+	<tr><td>
+		<tml:if condition="tmlform.mode()=='edit'">
+			<tml:then>
+				<div style="font-weight:bold;cursor:pointer" ext:qtip="<tml:label key="click-to-edit"/>" 
+					onclick="BI.util.editDivText(this, 
+							'<tml:item name="innerlayout" type="tmlform"/>',
+							function(value){
+								forms['<tml:script>return tmlform.formID</tml:script>'].innerlayout.value=value;
+								WGA.ajax.callAction('<tml:action ref="$refresh"/>', '<tml:script>return portlet.portletkey</tml:script>')
+							})">
+					<tml:item name="_link" encode="none"/>
+					<script>
+						var el=Ext.get("innerlayout-link");
+						if(el){
+							el.on("click", function(ev){
+								//console.log("link-click", ev);
+								ev.stopEvent();
+								BI.design.tmlpanel.show({
+									id:'html:<tml:script>return tmlform.innerlayout</tml:script>'
+								})
+							})
+						}
+					</script>							
+				</div>
+			</tml:then>
+			<tml:else><tml:item name="_link" encode="none"/></tml:else>
+		</tml:if>
+	</td></tr>
+</table>
+
+<tml:case condition="tmlform.mode()=='edit'">
+	<script>
+		var droptarget=new Ext.dd.DropTarget("ct-innerLayout", {group:'design-tmls'});
+		droptarget.notifyDrop=function(dd, e, data){
+			//console.log("dropped " + dd.id + " on dragtarget", data, data.node);
+			document.forms["contenttype-form"].dropkey.value=data.node.id;
+			WGA.ajax.callAction("<tml:action>
+					var tmlname=tmlform.dropkey.split(":")
+					tmlname.shift();	// forget media key
+					tmlform.innerlayout=tmlname.join(":");
+					//log.info("added: " + tmlform.dropkey);
+				</tml:action>", "<tml:script>return portlet.portletkey</tml:script>");
+	        return true;
+	   	}
+	</script>
+</tml:case>

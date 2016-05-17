@@ -1,0 +1,82 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<div id="rtf-link-clipboard-view" class="ychooser-view"></div>
+
+<script>
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function() {
+
+		var store = new Ext.data.Store({
+		    proxy: new Ext.data.HttpProxy({
+		        url: '<tml:url type="tml" medium="html" layout="cms:action-panel:image-clipboard:json-images"/>'	        
+	        }),    
+	        reader: new Ext.data.JsonReader({
+		        id: 'id',
+	            root: 'data'                
+	        },
+	        [
+		        { name: 'id'   }, 
+		        { name: 'name' },
+		        { name: 'shortName'},     
+	            { name: 'url'  },
+	            { name: 'type'  },
+	            { name: 'key'  },
+	            { name: 'dbkey'  },
+	            { name: 'size' }
+	            
+	        ])
+		});
+		store.load();
+		
+        var cm = new Ext.grid.ColumnModel([
+			{id:'name', header:'{%label:dialog.image.col-filename%}', sortable:true, dataIndex:'name' },
+			{id:'size', header:'{%label:dialog.image.col-filesize%}', sortable:true, align:"right", renderer: BI.util.renderFileSize, dataIndex:'size' }
+		]);
+
+		// do not allow multiple selection of grid rows
+		var singleSelectionModel = new Ext.grid.RowSelectionModel({singleSelect: true});
+        // create the Grid
+        var grid = new Ext.grid.Grid('rtf-link-clipboard-view', {
+            ds: store,
+            cm: cm,
+            selModel: singleSelectionModel,
+            autoExpandColumn: 'name',
+            loadMask: (Ext.ieIE == false)  // no loading mask in ie due to known ext-bug
+        });
+         
+        grid.on('rowclick', function(g, idx, e) {
+        	var data = store.getAt(idx).data;
+        	BI.dialog.submitButton.enable();
+			BI.LinkDialog.selectLink(data.url, data.name, data.key);
+        });
+        
+        grid.on('rowdblclick', function(g, idx, e) {
+        	BI.dialog.submit();
+        });
+        
+        grid.render();   
+		
+	});
+</script>

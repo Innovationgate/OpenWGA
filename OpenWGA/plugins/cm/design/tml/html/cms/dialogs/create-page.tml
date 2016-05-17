@@ -1,0 +1,498 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="createPage">
+
+	portlet.advanced=tmlform.advanced;
+	portlet.save();
+
+	// possible options:
+	var database = db(option("dbkey"));
+	var structkey = option("structkey");
+	var area=tmlform.area;		//option("area");
+	var parentkey = option("parentkey");
+	var pagetype = option("pagetype");
+	
+	var Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", database)
+	var Struct = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/structentry", structkey, Database)
+	
+	tmlform.docsource = tmlform.docsource || "local";
+	
+	if(tmlform.docsource=="remote-doc" && tmlform.remotedb!="" && tmlform.remotekey!=""){
+		var Struct = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/structentry", tmlform.remotekey, tmlform.remotedb)
+		if(Struct.getAllContentInStatus("p", tmlform.language).isEmpty()){
+			tmlform.addMessage(label('dialog.create-page.remote-doc-not-valid'));
+			return tmlform.validate();
+		}
+		tmlform.contenttype = Struct.getContentTypeName();
+	}
+	
+	if(!tmlform.validate())
+		return;
+	
+	profile.last_used_contenttype=tmlform.contenttype;
+	profile.save();
+	
+	var contenttype = database.getContentType(tmlform.contenttype);
+
+	// calculate parentdoc
+	var parentdoc=null;
+	if(area)
+		parentdoc=database.getArea(area);	// create rootentry in this area
+	else if (parentkey)
+		parentdoc=database.getStructEntryByKey(parentkey);
+	else parentdoc=database.getStructEntryByKey(structkey);		// create childentry
+
+	try{
+		var cdoc, sdoc;
+		
+		var Parent = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/" + (area?"area":"structentry"), parentdoc)
+		sdoc=Parent.createChildEntry(contenttype, tmlform.title);
+		
+		if(tmlform.position && tmlform.position!="auto"){
+			// set position:
+			var position;
+			if(tmlform.position=="start"){
+				position=Parent.getChildEntries().getByIndex(0).getPosition()-100;
+			}
+			else{
+				var after_position_struct=database.getStructEntryByKey(tmlform.position);
+				position=after_position_struct.getPosition();
+				var next = after_position_struct.getNextSibling();
+				if(next){
+					if(next.getPosition()-position<=1){
+						// renumber siblings in master action:
+						callAction("cms:renumberSiblings", option('dbkey'), tmlform.position); 
+						position += 10;
+					}
+					else position = (next.getPosition()+position) / 2;
+				}
+				else position += 100;
+			}
+			sdoc.setPosition(position);
+		}
+		
+		sdoc.save();
+		_new_structkey=sdoc.getStructKey().toString();
+
+		// check, if user wants a remote structure
+		if(tmlform.docsource=="remote-structure"){
+			log.info("create remote struture ...");
+			var hdb = getMainContext().hdb()
+			var storage = hdb.getOrCreateStorage("remote-structs");
+			var remoteInfo = hdb.createContent(storage, tmlform.title, {
+				destdb: option('dbkey'),
+				destkey: sdoc.getStructKey().toString(),
+				sourcedb: tmlform.remotedb,
+				sourcekey: tmlform.remotekey
+			});
+			remoteInfo.save();
+			var Struct = createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/structentry", sdoc);
+			Struct.copyFromRemote(tmlform.remotedb, tmlform.remotekey);
+		}
+		else{
+			var language = database.getLanguage(tmlform.language);
+			cdoc=sdoc.createContent(language, tmlform.title);
+			//cdoc.setAuthorEMail(Database.getUserEmail());	
+			cdoc.save();
+			_new_contentkey=cdoc.getContentKey().toString();
+	
+			// check, if user wants a remote document (content)
+			if(tmlform.docsource=="remote-doc"){
+				var remote_info="db:"+tmlform.remotedb + "/docid:" + tmlform.remotekey+"."+tmlform.language+".0";
+				cdoc.setItemValue("remote_info", remote_info);
+				
+				// copy all items from remote document (this also saves the document):
+				var sourcecontext=context(remote_info, false);
+				if(sourcecontext){
+					var sourcedoc = sourcecontext.content();
+					createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/content", cdoc).copyRemoteData(sourcedoc);
+				}
+				else addwarning("remote document '" + remote_info + "' not found", false);
+			}
+			else if(tmlform.page_template){
+				// copy all items from remote document (this also saves the document):
+				var c_exp = "db:" + option("dbkey") + "/docid:" + tmlform.page_template;
+				var sourcecontext=context(c_exp, false);
+				if(sourcecontext){
+					var sourcedoc = sourcecontext.content();
+					cdoc.setRelation("created-from-template", sourcecontext.content(), content().RELATIONTYPE_PROTECTED);
+					AFW.content(cdoc).copyRemoteData(sourcedoc, true /*include metas*/, false /*copy attachments*/, true /* no modules */);
+				}
+				else addwarning("template document '" + c_exp + "' not found", false);			
+			}
+		}
+					
+		_actionDone=true;
+		var event=createEvent("CMS_dialog_closed");
+		portlet.fireEvent(event);
+		
+	}
+	catch(e){
+		logException(e);
+		tmlform.addMessage(e);
+	}
+	
+</tml:action>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			<tml:if condition="option('parentkey')==null || option('parentkey')==''">
+				<tml:then>
+					BI.se.reload("<tml:item name="_new_structkey"/>", function(){
+						BI.selectContent("<tml:item name="_new_contentkey"/>", "<tml:item name="_new_structkey"/>");
+					});
+				</tml:then>
+				<tml:else>
+					BI.se.reloadStruct("<tml:option name="parentkey"/>", {
+						selectKeyAfterReload: "<tml:item name="_new_structkey"/>",
+						callback: function(){
+							BI.selectContent("<tml:item name="_new_contentkey"/>", "<tml:item name="_new_structkey"/>");
+						}
+					});
+				</tml:else>
+			</tml:if>
+		</script>
+	</tml:then>
+	<tml:else>
+		
+		<tml:form id="create-page-form" source="none">
+		
+			<script>
+				// submit function called from dialog handler and on RETURN
+				BI.dialog.submit=function(){					
+					BI.util.callAction("<tml:action ref="createPage"/>",
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"{%label:dialog.create-page.creating-page%}");
+				}
+				BI.dialog.onShow=function(){
+					BI.dialog.autoHeight();
+					try{
+						document.forms["create-page-form"].title.focus();
+					}
+					catch(e){}					
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+					BI.dialog.onShow();
+				})
+				
+				<tml:case condition="option('area')">
+					<tml:if condition="option('area')=='$templates'">
+						<tml:then>BI.dialog.setTitle("<tml:label key="dialog.create-page.title.create-template"/> ...");</tml:then>
+						<tml:else>
+							BI.dialog.setTitle("{%label:dialog.create-page.title.create-root-page%} ...");
+						</tml:else>
+					</tml:if>
+				</tml:case>
+			</script>
+		
+			<tml:script>				
+				
+				// possible options:
+				var database = db(option("dbkey"));
+				var contentkey = option("contentkey");
+				var structkey = option("structkey");
+				var area=option("area");
+				var parentkey = option("parentkey");
+				var pagetype = option("pagetype");
+				var Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", database)
+				
+				// calculate parentdoc
+				var parentdoc=null;
+				var Parent;
+				
+				if (option('createroot')!=null){
+					if(structkey)
+						area=database.getStructEntryByKey(structkey).getArea().getName();
+					else {
+						// find first area where I may create content
+						var areas=database.getAreas().iterator();
+						while(areas.hasNext()){
+							var Area = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/area", areas.next())
+							if(Area.mayCreatePage()){
+								area = Area.WGObject.getName();
+								break;
+							}
+						}
+					}
+				}
+				
+				if(area){
+					parentdoc=database.getArea(area);	// create rootentry in this area
+					_default_position=parentdoc.getRootEntries().size()+1;
+					Parent=AFW.area(parentdoc)
+					tmlform.area=area;
+				}				
+				else{
+					if (parentkey)
+						parentdoc=database.getStructEntryByKey(parentkey);
+					else parentdoc=database.getStructEntryByKey(structkey);		// create childentry
+					_default_position=parentdoc.getChildEntries().size()+1;
+					Parent=AFW.structentry(parentdoc);
+				}
+
+				_position_list=createObject("position-list").getChildrenList(Parent);
+				_position_list.add(0, label("dialog.create-page.position-options-auto")+"|auto");				
+				_default_position_list = _position_list.get(_position_list.size()-1).split("|")[1];
+				var att=database.getAttribute("defaultChildPosition");
+				if(att=="start" || att=="auto")
+					_default_position_list = att;
+								
+				// calculate parenttitle
+				if(area){
+					_parentTitle = (area=="$templates")?label("systemarea.templates"):area;
+				}
+				else _parentTitle=createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/structentry", parentdoc).getContentTitle();
+				
+				
+				function addPagetype(id, alias, description) {
+					tmlform.jsonPagetypes += "{id:'"+ id 
+									+"',alias:'"+AFW.Util.encodeForScript(alias)
+									+"',description:'"+AFW.Util.encodeForScript(description)+"'}";
+				}
+				
+				_pageTypesCount = database.getContentTypes().size();
+				
+				// read avalable pagetypes
+				if(pagetype && pagetype!=""){
+					//log.info("pagetype=" + pagetype);
+					tmlform.contenttype=pagetype;
+					tmlform.pagetypes="";
+					// json-array string for combobox
+					tmlform.jsonPagetypes = "{data:[";
+					var pagetypeObj = createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/contenttype", pagetype, database);
+					var alias=pagetypeObj.getAlias();
+					var description = pagetypeObj.getAliasDescription();
+					if(alias != "")
+						tmlform.pagetypes=alias + "|";	
+					tmlform.pagetypes += pagetype;			// one single value in this case
+					
+					addPagetype(pagetype, alias, description);
+					tmlform.jsonPagetypes += "]}";
+				}
+				
+				else{
+					if(tmlform.pagetypes==null){
+						tmlform.pagetypes="";
+						// json-array string for combobox
+						tmlform.jsonPagetypes = "{data:[";
+						tmlform.pagetypedescriptions=createLookupTable();
+						// get page types:
+						var pagetypes=database.getContentTypes();
+						var default_conttentype;
+						//log.info("find contenttypes for parent " + _parentTitle);
+						for(var i=0; i<pagetypes.size(); i++){
+							var pagetype=pagetypes.get(i);
+							var Contenttype=createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/contenttype", pagetype, database);
+							if(Contenttype.isAllowed(parentdoc)){
+								default_conttentype = pagetype.getName();
+								if(tmlform.pagetypes!="") {
+									tmlform.pagetypes+=",";
+									tmlform.jsonPagetypes += ",";
+								}
+								
+								//log.info("found: " + pagetype.getName());
+								
+								// look for aliases:
+								tmlform.pagetypes += Contenttype.getAlias() + "|" + pagetype.getName();
+								tmlform.pagetypedescriptions.put(pagetype.getName(), Contenttype.getAliasDescription());
+								addPagetype(pagetype.getName(), Contenttype.getAlias(), Contenttype.getAliasDescription());
+							}
+							//else log.info("pagetype " + pagetype.name + " not allowed");
+						}
+						tmlform.jsonPagetypes += "]}";
+					}
+					if(tmlform.contenttype==null){
+						var last_used=profile.last_used_contenttype;
+						if(last_used!=null && createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/contenttype", last_used, database).isAllowed(parentdoc)){
+							tmlform.contenttype=last_used;
+						}
+						else tmlform.contenttype=default_conttentype||null;
+					}
+				}
+				
+				// read avalable languages:
+				_langCount = database.getLanguages().values().size();
+				if(tmlform.languages==null){
+					tmlform.languages=Database.getLanguageOptions();
+					// get default language from current content language:
+					if(contentkey && contentkey!="undefined")	// undefined happens if a struct with noch content is selected!
+						tmlform.language = createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/content", contentkey, database).getLanguageName();
+					else tmlform.language = Database.getPreferedLanguage();
+				}
+				
+				// check if this CS should use remote documents in any form
+				//var database = db(option("dbkey"));
+				var att=database.getAttribute(wgacore.DBATTRIB_USEREMOTECS);
+				//log.info("att=" + att + "->" + (att!=null && att.equalsIgnoreCase('true')));
+				_useRemoteContentStores = (att!=null && att.equalsIgnoreCase('true'))
+				
+				_hasAdvancedOptions = (_position_list.size()>1 || _useRemoteContentStores)
+	
+				if(!tmlform.submitted){				
+					tmlform.advanced = portlet.advanced||"false";
+				}
+				if(tmlform.advanced!="true")
+					tmlform.docsource="local";
+					
+			</tml:script>
+			
+			<tml:case condition="tmlform.hasmessages()">
+				<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+				<hr size="1">
+			</tml:case>		
+		
+		    <table width="100%" border="0" cellspacing="5">
+				<tr>
+		     		<td width="100">{%label:title%}:</td>
+		     		<td>
+		     			<tml:input name="title" cssclass="textinput required"
+		     					validation="$E_VALUE!=''"
+		     					message="{label('validation.please-enter-title')}"
+		     			/>
+		     		</td>
+		     	</tr>
+
+				<tml:case condition="_pageTypesCount>1">
+			     	<tr>
+			     		<td valign="top">{%label:pagetype%}:</td>
+			     		<td>
+							<tml:input name="contenttype" type="hidden" 
+								validation="$E_VALUE!=null && $E_VALUE!=''" 
+								message="{label('dialog.create-page.validation.select-contenttype')}"
+							/>
+							<tml:include ref="::create-page:select-pagetype"/>
+							
+			     		</td>
+			     	</tr>
+					<tr>
+						<td></td>
+						<td>
+			     			<tml:script>
+								if(tmlform.contenttype)
+									return createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/contenttype", tmlform.contenttype, option("dbkey")).getAliasDescription();
+			     			</tml:script>
+						</td>
+					</tr>
+				</tml:case>
+				
+				<tml:case condition="_langCount>1">
+			     	<tr>
+			     		<td>{%label:language%}:</td>
+			     		<td>
+			     			<tml:input name="language" type="select" options="{tmlform.languages}" changeaction="$refresh" ajax="true"/>
+			     		</td>
+			     	</tr>
+				</tml:case>
+				
+				<tml:case condition="option('area')!='$templates'">
+					<tml:script>
+						// check, if templates are available for the seletced content type
+						_templates = createlist();
+						var database = db(option("dbkey"));
+						var templateArea = AFW.database(database).getTemplateArea();
+						if(templateArea && tmlform.contenttype && tmlform.language){
+							var structs = templateArea.getRootEntries().iterator();
+							while(structs.hasNext()){
+								struct = structs.next();
+								if(struct.getContentType().getName() == tmlform.contenttype){
+									var c = struct.getReleasedContent(tmlform.language)
+									if(c)
+										_templates.add(c.getTitle() + "|" + c.getContentKey());
+								}
+							} 
+						}
+						if(_templates.size())
+							_templates.add(0, label("none")+"|");					
+					</tml:script>
+					<tml:case condition="_templates.size()">
+						<tr>
+							<td><tml:label key="page-template"/>:</td>
+							<td>
+								<tml:input name="page_template" type="select" optionsitem="_templates"/>
+							</td>
+						</tr>
+					</tml:case>
+				</tml:case>
+
+				<tml:case condition="_useRemoteContentStores && tmlform.advanced=='true'">
+					<tr>
+						<td>{%label:dialog.create-page.doc-source%}:</td>
+						<td>
+							<tml:input name="docsource" type="select" options="{label('dialog.create-page.options.doc-sources')}"
+								ajax="true"
+								changeaction="$refresh"
+								default="local"
+							/>
+						</td>
+					</tr>
+				</tml:case>
+				<tml:case condition="tmlform.docsource!=null && tmlform.docsource!='local' && tmlform.advanced=='true'">
+					<tml:include ref="::select-remote">
+						<tml:option name="language"><tml:item name="language" type="tmlform"/></tml:option>
+					</tml:include>
+				</tml:case>
+				
+				<tml:case condition="tmlform.area!='$templates'">
+					<tr>
+						<td nowrap>
+							<tml:script>
+								return tmlform.area ? label("area") : label("create-under")
+							</tml:script>:
+						</td>
+						<td><b><tml:item name="_parentTitle"/></b></td>
+					</tr>
+				</tml:case>
+				
+				<tml:case condition="_position_list.size()>2">
+			     	<tr>
+			     		<td>Position:</td>
+			     		<td>
+			     			<tml:input mode="{tmlform.advanced=='true'?'edit':'view'}" name="position" type="select" optionsitem="_position_list" default="{_default_position_list}"/>			     			
+			     		</td>
+			     	</tr>
+				</tml:case>		
+
+				<tml:case condition="_hasAdvancedOptions">
+			     	<tr><td colspan="2">
+			     		<hr size="1">
+			     		<tml:input name="advanced" type="checkbox" changeaction="$refresh" ajax="true" options="{label('dialog.create-page.advanced.options')}"/>
+					</td></tr>
+				</tml:case>
+				
+		     	<tr><td colspan="2">
+					<div style="padding-left:30px;margin-top:10px;background:url('../../plugin-wga-app-framework/file/icons/page_add.png') no-repeat 0px 0px;">
+						<tml:script>
+							_docsource = tmlform.docsource || "local";
+						</tml:script>
+						<tml:label key="{'dialog.create-page.info-create-draft.'+(tmlform.docsource||'local')}"/>
+					</div>
+				</td></tr>
+
+		   	</table>
+			   	
+		</tml:form>
+	</tml:else>
+</tml:if>

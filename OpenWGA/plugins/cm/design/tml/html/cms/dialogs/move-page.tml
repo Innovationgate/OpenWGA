@@ -1,0 +1,234 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="movePage">
+
+	var from=option('fromstructkey');
+	var to=option('tostructkey');
+	var toarea=option('toarea');
+	var dbkey=option("dbkey");
+
+	try{
+		var database = db(dbkey);
+		var structEntry = database.getStructEntryByKey(from);
+		var targetEntry = toarea ? database.getArea(toarea) : database.getStructEntryByKey(to);
+
+		//log.info("CM: move page '" + structEntry.title + "' to new position");
+		if(structEntry!=targetEntry){
+
+			if(database.getContentStoreVersion()>=5){
+				// no extension data in case of contentstore version <5
+				if(toarea && AFW.area(toarea, database).isTrashArea()){
+					structEntry.writeExtensionData("deletedBy", AFW.database(database).getUserName());
+					structEntry.writeExtensionData("deletedFrom", structEntry.getParentNode().getNodeKey());
+				}
+				else{
+					structEntry.removeExtensionData("deletedBy");
+					structEntry.removeExtensionData("deletedFrom");								
+				}
+				structEntry.save();
+			}
+
+			database.moveStructEntry(structEntry, targetEntry);
+
+			// handle repositioning
+			if(tmlform.position){
+				// set position:
+				var Parent;
+				if(toarea)
+				 	Parent = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/area", targetEntry)
+				else Parent = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/structentry", targetEntry)
+				var position;
+				if(tmlform.position=="start"){
+					position=Parent.getChildEntries().getByIndex(0).getPosition()-100;
+				}
+				else{
+					var after_position_struct=database.getStructEntryByKey(tmlform.position);
+					position=after_position_struct.getPosition();
+					var next = after_position_struct.getNextSibling();
+					if(next){
+						if(next.getPosition()-position<=1){
+							// renumber siblings in master action:
+							callAction("cms:renumberSiblings", option('dbkey'), tmlform.position); 
+							position += 10;
+						}
+						else position = (next.getPosition()+position) / 2;
+					}
+					else position += 100;
+				}
+				structEntry.setPosition(position);
+				structEntry.save();
+				//log.info("new position = " + position);
+			}
+	
+			event=createEvent("CMS_dialog_closed");
+			portlet.fireEvent(event);
+			_actionDone=true;
+		}
+	}
+	catch(e){
+		log.error(e);
+		tmlform.addMessage(e);
+	}
+</tml:action>
+
+<tml:script>
+	var from=option('fromstructkey');
+	var to=option('tostructkey');
+	var toarea=option('toarea');
+	var dbkey=option("dbkey");
+	var toObject;
+	
+	_FromStruct=AFW.structentry(from, dbkey);
+	if(to){
+		_ToStruct=AFW.structentry(to, dbkey);
+		toObject = _ToStruct.WGObject;
+	}
+	if(toarea){
+		_ToArea=AFW.area(toarea, dbkey);
+		toObject = _ToArea.WGObject;
+	}
+	
+	_mayMove = true; 
+	try{
+		if(_ToArea && _ToArea.isTrashArea())
+			_FromStruct.WGObject.performRemoveCheck(true);
+		else db(dbkey).performStructMoveCheck(_FromStruct.WGObject, toObject);
+	}catch(e){
+		_mayMove = false;
+		_reason = e.message;
+	}						
+
+</tml:script>
+		
+<tml:form id="move-page-form">
+
+	<script>
+		<tml:if istrue="_actionDone">
+			<tml:then>
+				BI.se.reload(BI.structkey, function(){
+					BI.selectContent(BI.contentkey, BI.structkey)
+				});
+			</tml:then>
+			<tml:else>
+				// submit function called from dialog handler
+				BI.dialog.submit=function(){
+					BI.util.callAction("<tml:action ref="movePage"/>", 
+					"<tml:script>return portlet.portletkey</tml:script>",
+					"{%label:dialog.move-page.moving-page%}");
+				}
+				BI.dialog.onShow=function(){
+					//document.forms.login.username.focus();
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", BI.dialog.autoHeight);
+			</tml:else>
+		</tml:if>
+	</script>
+				
+	<tml:case condition="tmlform.hasmessages()">
+		<b class="warning"><tml:formmessages divider="<br/>"/></b>
+		<hr size="1">
+	</tml:case>		
+
+	<tml:if context="{_FromStruct.getContextPath()}" iscontextvalid="true">
+		<tml:then>
+			<table width="100%" border="0" cellspacing="5">
+				<tr>
+		     		<td width="1%">{%label:page%}:</td>						
+		     		<td><b><tml:script>return _FromStruct.getContentTitle()</tml:script></b></td>
+		     	</tr>		  
+				<tr>
+		     		<td width="1%" nowrap>{%label:dialog.move-page.move-to%}:</td>	
+		     		<td><b>
+			     		<tml:if condition="option('toarea')!=null">
+			     			<tml:then>
+			     				<tml:if condition="_ToArea.isTrashArea()">
+			     					<tml:then><tml:label key="systemarea.trash"/></tml:then>
+			     					<tml:elseif condition="_ToArea.isTemplateArea()">
+			     						<tml:label key="systemarea.templates"/>
+			     					</tml:elseif>
+			     					<tml:else>{%label:area%} <tml:option name="toarea"/></tml:else>
+			     				</tml:if>			     				
+			     			</tml:then>
+			     			<tml:else>					
+			     				<tml:script>return _ToStruct.getContentTitle()</tml:script>
+			     			</tml:else>
+			     		</tml:if>
+		     		</b></td>
+		     	</tr>
+		     	
+		     	<tml:if istrue="_mayMove">
+		     		<tml:then>
+		     	
+				     	<tml:case condition="!(_ToArea && _ToArea.isTrashArea())">
+							<tml:script>
+								_position_list=createObject("position-list").getChildrenList(option('toarea')?_ToArea:_ToStruct, document)		//createlist();
+							</tml:script>
+							<tml:case condition="_position_list.size()>1">
+								<tr>
+									<td width="1%">{%label:properties.position%}:</td>
+									<td>
+					     				<tml:input name="position" type="select" optionsitem="_position_list"/>
+									</td>
+								</tr>
+							</tml:case>
+							
+					     	<tr><td colspan="2">
+					     		<div class="warning">
+					     			{%label:dialog.move-page.info%}
+								</div>
+								<tml:case condition="option('toarea')!=null && !document.isRoot()">
+									<div class="warning">
+										<tml:label key="dialog.move-page.page-will-become-root-page" param1="{option('toarea')}"/>
+									</div>
+								</tml:case>
+					     	</td></tr>   	
+						</tml:case>
+						
+					</tml:then>
+					
+					<tml:else>
+						<tr><td colspan="2">
+							<hr size="1">
+							<div class="warning"> 
+								<h1><tml:label key="dialog.move-page.not-allowed"/>:</h1>
+								<tml:item name="_reason"/>
+							</div>
+							<script>
+								BI.dialog.submitButton.hide();
+							</script>
+						</td></tr>
+					</tml:else>
+						
+				</tml:if>
+		   	</table>
+			
+		</tml:then>
+		<tml:else>
+			document not found.
+		</tml:else>
+	</tml:if>
+	   	
+</tml:form>
+		

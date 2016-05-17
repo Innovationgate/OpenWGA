@@ -86,7 +86,8 @@ dependencies {
     gretty 'org.glassfish.main.transaction:javax.transaction:3.1.2.2'
     gretty testProject.fileTree(dir: 'tomcat/lib', include: ['*.jar'])
 
-    
+	compile project(":plugin-cm")
+
 }
 
 test {
@@ -113,9 +114,17 @@ publishing {
 war {
     war.archiveName = "openwga-ce.war"
     from('build/extra/WEB-INF') {
-        include 'wgabuild.properties' into('WEB-INF')
+        into('WEB-INF')
     }
 }
-war.dependsOn writeVersion
+
+task buildPlugins(type: Copy) {
+	//from (project(":plugins:cm").tasks.buildPlugin.archivePath)
+	from '../plugins/cm/build/distributions'
+   	into 'build/extra/WEB-INF/default-plugins' 	
+}
+buildPlugins.dependsOn project(":plugin-cm").tasks.buildPlugin
+
+war.dependsOn writeVersion, buildPlugins
 testClasses.dependsOn war
 

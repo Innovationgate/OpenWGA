@@ -252,9 +252,10 @@ public interface Context {
 
     /**
      * Retrieves a normal WebTML variable
+     * @throws WGAPIException 
      */
     @CodeCompletion(preferredCase="getVar")
-    public abstract Object getvar(String name);
+    public abstract Object getvar(String name) throws WGAPIException;
 
     /**
      * Returns if the current context document has child documents

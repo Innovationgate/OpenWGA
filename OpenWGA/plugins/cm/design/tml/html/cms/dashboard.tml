@@ -1,0 +1,72 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_dbkey = request.getParameter("dbkey")
+	var custom_tml;
+	try{
+		var tmls = WGA.createList([
+			"wga:content-manager:dashboard",
+			"content-manager:dashboard"
+		])	
+		if(WGA.design(_dbkey).isCustomized())
+			tmls.addAll(0, WGA.createList([
+				"overlay:wga:content-manager:dashboard",
+				"overlay:content-manager:dashboard"
+			]))
+		custom_tml = AFW.database(_dbkey).checkforTML(tmls)
+	}
+	catch (e){
+		logException(e);
+	}
+
+	if(custom_tml)
+		_tml = _dbkey + "/" + custom_tml;
+	else _tml = WGA.Core.getWgaConfiguration().getServerOptions().get("CM.dashboardTML"); 
+	if(!_tml)
+		_tml = "cms:dashboard:main"
+</tml:script>
+
+<tml:if condition="_tml">
+	<tml:then>
+		<div class="dashboard">
+			<tml:include ref="{_tml}" context="[db:{_dbkey}]"/>
+		</div>
+		<script>
+			Ext.get(document.body).on("click", function(ev){
+				ev.preventDefault();
+				var wgakey = ev.getTarget().getAttribute("data-wgakey")
+				if(wgakey)
+					BI.selectContent(wgakey)
+			})
+		</script>
+	</tml:then>
+	<tml:else>
+		<div style="margin:50px">
+			<h1>No Dashboard found.</h1>
+		</div>
+	</tml:else>
+</tml:if>
+

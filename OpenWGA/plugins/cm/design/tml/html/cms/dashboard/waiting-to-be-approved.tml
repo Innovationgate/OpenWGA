@@ -1,0 +1,52 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<h2><tml:label key="dashboard.my-docs-to-be-approved"/>:</h2>
+<tml:collection id="waiting-to-be-approved">
+	<tml:query type="hql" onlypublished="false" alllanguages="true">
+		content.items['<tml:script expression="Packages.de.innovationgate.webgate.api.workflow.WGStraightWorkflow.ITEM_INITIATOR.toLowerCase()"/>'].text='<tml:metadata name="username" type="database"/>'
+		and content.status='g'
+	</tml:query>
+	<ul>
+	<tml:foreach filter="!content().isPendingRelease()">
+		<tml:include ref="::entry">
+			Workflow: <tml:item name="wfname"/>/<tml:item name="wflevelnr"/>
+			<p>
+				<tml:label key="dashboard.approver"/>:
+				<b><tml:script divider=", ">
+					var wf = db().getWorkflowEngine().getWorkflowDefinitions().get(wfname);
+					for(var level in Iterator(wf.getLevels()))
+						if(level.name==wflevelnr)
+							return level.reviewers
+					return "";
+				</tml:script></b>
+			</p>
+		</tml:include>
+	</tml:foreach>
+	</ul>
+</tml:collection>
+<tml:case condition="taginfo('waiting-to-be-approved', 'count')==0">
+	<p class="no-docs"><tml:label key="dashboard.no-docs-found"/>.</p>
+</tml:case>

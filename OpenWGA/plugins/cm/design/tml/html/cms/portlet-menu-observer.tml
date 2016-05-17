@@ -1,0 +1,337 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:form id="form-menu-observer">
+
+	<tml:input name="dbkey" type="hidden" default="{option('dbkey')}"/>
+	<tml:input name="contentkey" type="hidden"/>
+	<tml:input name="structkey" type="hidden"/>
+
+	<script>
+		
+		BI.clipboard={
+			copy: function(){
+				document.forms['form-menu-observer'].dbkey.value=BI.dbkey;
+				document.forms['form-menu-observer'].contentkey.value=BI.contentkey;
+				document.forms['form-menu-observer'].structkey.value=BI.structkey;
+				WGA.ajax.callAction("<tml:action>
+						//log.info("cb-copy: " + tmlform.structkey);
+						setSessionVar("_CM_clipboard_context", "db:"+tmlform.dbkey+"/$struct:"+tmlform.structkey);
+					</tml:action>", "<tml:script>return portlet.portletkey</tml:script>");				
+				AFW.util.InfoWidget.msg("<tml:label key="content-info.clipboard"/>", "<tml:label key="content-info.page-inserted"/>");
+			},
+			copyContent: function(){
+				document.forms['form-menu-observer'].dbkey.value=BI.dbkey;
+				document.forms['form-menu-observer'].contentkey.value=BI.contentkey;
+				WGA.ajax.callAction("<tml:action>
+						setSessionVar("_CM_clipboard_context", "db:"+tmlform.dbkey+"/docid:"+tmlform.contentkey);
+					</tml:action>", "<tml:script>return portlet.portletkey</tml:script>");				
+				AFW.util.InfoWidget.msg("<tml:label key="content-info.clipboard"/>", "<tml:label key="content-info.content-inserted"/>");
+			}
+		}
+	
+		WGA.event.register(
+			"<tml:script>return portlet.portletkey</tml:script>",
+			"CMS_contentkey_changed", 
+			function(e){
+				document.forms['form-menu-observer'].dbkey.value=e.params.dbkey;
+				document.forms['form-menu-observer'].contentkey.value=e.params.contentkey;
+				document.forms['form-menu-observer'].structkey.value=e.params.structkey;
+				WGA.ajax.callAction("<tml:action ref="$refresh"/>", "<tml:script>return portlet.portletkey</tml:script>");
+			}
+		);
+
+		WGA.event.register(
+			"<tml:script>return portlet.portletkey</tml:script>",
+			"CMS_adminlogin", 
+			function(e){
+				document.forms['form-menu-observer'].dbkey.value=BI.dbkey;
+				document.forms['form-menu-observer'].contentkey.value=BI.contentkey;
+				document.forms['form-menu-observer'].structkey.value=BI.structkey;
+				WGA.ajax.callAction("<tml:action ref="$refresh"/>", "<tml:script>return portlet.portletkey</tml:script>");
+			}
+		);
+		
+		<tml:script>
+			_Database=createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/database", tmlform.dbkey);
+		</tml:script>
+		
+		<tml:case condition="_Database.isValid()">
+			// update user info
+			var userbutton=BI.toolbar_user.items.get("login-info");
+			var username = "<tml:script expression="_Database.getShortestUserAlias()"/>"
+			var username=username.length>40 ? username.substr(0,37)+"..." : username;
+			userbutton.setText("<b>"+username+"</b> (<tml:script expression="_Database.getAccessLevelText()"/>)");
+			try{
+			<tml:if condition="_Database.isChiefEditor()">
+				<tml:then>BI.design.createExplorer();</tml:then>
+				<tml:else>BI.design.removeExplorer();</tml:else>
+			</tml:if>
+			}catch(e){};
+		</tml:case>
+		
+		<tml:if condition="_Database.isDomino()">
+			<tml:then>
+				// disable content-view button for domino contentstores, since content-view uses 
+				// hql queries only
+				BI.enableContentviewButton(false);	
+			</tml:then>
+			<tml:else>
+				BI.enableContentviewButton(true);	
+			</tml:else>
+		</tml:if>
+		
+		BI.enablemenus("admins-only", <tml:script>return _Database.isAdmin()</tml:script>);
+		BI.enablemenus("no-admin", <tml:script>return !_Database.isAdmin()</tml:script>);
+
+		// Build Agents menu
+		BI.menu.agents.removeAll();
+		<tml:script>
+			_agents = createlist();
+			var tmls = db(tmlform.dbkey).getTMLModules().iterator();
+			while(tmls.hasNext()){
+				var tml = tmls.next();
+				var tmlname = tml.getName();
+				var mod = tml.getName().split(":") 
+
+				if(WGA.design(tmlform.dbkey).isCustomized()){
+					if(tmlname.indexOf("overlay:wga:content-manager:agents:")==0
+						|| tmlname.indexOf("overlay:content-manager:agents:")==0
+						|| tmlname.indexOf("overlay:agents:")==0
+					){
+						_agents.add(mod.pop() + "|" + tmlname);
+					}				
+				}
+				else{
+					if(tmlname.indexOf("wga:content-manager:agents:")==0
+						|| tmlname.indexOf("content-manager:agents:")==0
+						|| tmlname.indexOf("agents:")==0
+					){
+						_agents.add(mod.pop() + "|" + tmlname);
+					}				
+				}
+			}	
+		</tml:script>
+		<tml:foreach type="itemvalue" item="_agents" currentvalue="_agent">
+			BI.menu.agents.add(						
+			{
+				text: "<tml:script>
+							var ag_name = _agent.split("|")[0];
+							var title = label(db(option('dbkey')), null, null, "agent."+ag_name, null);
+							if(title.charAt(0)=="#"){
+								// check for overlay:
+								var title = label(db(option('dbkey')), "overlay:labels", null, "agent."+ag_name, null);
+								if(title.charAt(0)=="#")
+									return ag_name
+								else return title;
+							}
+							else return title;
+						</tml:script>",
+				icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="script_go.png"/>",
+				handler: function(m, ev){
+					BI.dialog.show("start-agent", ev.target, {tml:"<tml:script>return _agent.split("|")[1]</tml:script>"});
+				}
+			});
+		</tml:foreach>
+		<tml:if condition="_agents.isEmpty()">
+			<tml:then>BI.agents_menu.hide();</tml:then>
+			<tml:else>BI.agents_menu.show();</tml:else>
+		</tml:if>
+
+		
+		<tml:if context="{'db:'+tmlform.dbkey+'/docid:'+tmlform.contentkey}" iscontextvalid="true">
+			<tml:then>
+				<tml:script>
+					
+					_Struct = AFW.structentry(tmlform.structkey, _Database)
+					_Content = AFW.content(tmlform.contentkey, _Database)
+					
+					// check paste
+					_mayPaste = false;
+					_mayPasteContent = false;
+					if(_CM_clipboard_context){
+						var c = context(_CM_clipboard_context, false);
+						if(c){
+							var source = c.document;
+							if(source instanceof Packages.de.innovationgate.webgate.api.WGStructEntry && !_Struct.isChildrenOf(source)){
+								var Contenttype = AFW.contenttype(source.getContentType().name)								
+								_mayPaste = Contenttype.isAllowed(_Struct.WGObject) && _Struct.mayCreatePage();
+							}
+							else if(source instanceof Packages.de.innovationgate.webgate.api.WGContent 
+									&& _Content.isDraft()
+									&& content()!=source
+							)
+								_mayPasteContent = true;
+						}
+					}
+
+					// check content validations
+					_validations=null;
+					_isValide=true;
+					if(!_Content.isDraft())
+						return;
+				
+					try{
+						var contenttype=_Content.getContentTypeName();
+						_validationtml="validations:"+contenttype;
+						var tml=db(tmlform.dbkey).getTMLModule(_validationtml, "html");
+						if(tml!=null)
+							_hasvalidation=true;				
+					}
+					catch (e)
+					{}
+					
+				</tml:script>
+		
+				BI.enablemenus("create-new-page", BI.sitepanel.hasCreateAreas());
+		
+				BI.enablemenus("copy-page", true);
+				BI.enablemenus("copy-content", true);
+				BI.enablemenus("paste-page", <tml:script expression="_mayPaste"/>);
+				BI.enablemenus("paste-content", <tml:script expression="_mayPasteContent"/>);
+
+				BI.enablemenus("create-rootpage", <tml:script>return _Content.mayCreateRootPage()</tml:script>);
+				BI.enablemenus("create-page", <tml:script>return _Content.mayCreatePage()</tml:script>);
+				BI.enablemenus("create-content", <tml:script>return _Content.mayCreateContent()</tml:script>);
+		
+				BI.enablemenus("edit-content", <tml:script>return (STATUS==content().STATUS_RELEASE || STATUS==content().STATUS_ARCHIVE) && _Content.mayEditContent()</tml:script>);
+				BI.enablemenus("get-content", <tml:script>return _Content.mayEditContent() && (STATUS==content().STATUS_DRAFT) && !_Content.isMine()</tml:script>);
+		
+				<tml:case istrue="_hasvalidation">
+					<tml:include ref="{_validationtml}" designdb="{tmlform.dbkey}" var="_xml"/>	
+					<tml:script>
+						_validations=parseXML(_xml).selectNodes("//msg");
+					</tml:script>
+					<tml:foreach type="itemvalue" item="_validations" currentvalue="_validation">
+						<tml:case condition="{_validation.getText()}">
+							<tml:script>_isValide=false</tml:script>						
+						</tml:case>
+					</tml:foreach>
+				</tml:case>	
+				
+				BI.enablemenus("publish-content", <tml:script>return _Content.mayEditContent() && (STATUS==content().STATUS_DRAFT) && _Content.isMine() && _isValide</tml:script>);
+	
+				BI.enablemenus("approve-content", <tml:script>return STATUS==content().STATUS_REVIEW && _Content.isApprover()</tml:script>);
+				BI.enablemenus("reject-content", <tml:script>return STATUS==content().STATUS_REVIEW && _Content.isApprover()</tml:script>);
+				BI.enablemenus("edit-properties", true);
+				
+				BI.enablemenus("delete-page", <tml:script>return _Content.mayDeletePage()</tml:script>);
+				BI.enablemenus("delete-content", <tml:script>return _Content.mayDeleteContent()</tml:script>);
+				BI.enablemenus("archive-content", <tml:script>return _Content.mayArchiveContent()</tml:script>);
+
+				BI.menu.dbs.items.each(function(item){
+					item.setChecked ("<tml:script>return _Database.getKey()</tml:script>"==item.dbkey);
+				})
+				
+				// custom Menu items
+				<tml:script>
+					_items = WGA.createList();
+					var config = CM.getConfig();
+					if(config.menu){
+						for(var m in config.menu){
+							var items = config.menu[m]
+							for(var i=0; i< items.length; i++){
+								_items.add({
+									id: 		items[i].id, 
+									enabled: 	CM.getConfigValue(items[i].enabled),
+									text: 		CM.getConfigValue(items[i].text),
+									icon: 		CM.getConfigValue(items[i].icon)
+								})
+							}
+						}
+					}
+				</tml:script>
+				<tml:foreach item="_items" currentvalue="_item">
+					var item = Ext.getCmp("custom-menuitem-<tml:script expression="_item.id"/>")
+					var enabled = <tml:script expression="_item.enabled"/>;
+					item.setDisabled(!<tml:script expression="_item.enabled"/>);
+					item.setText("<tml:script expression="_item.text"/>");
+					item.icon = "<tml:script expression="_item.icon"/>";
+				</tml:foreach>
+				
+			</tml:then>
+			<tml:elseif context="{'db:'+tmlform.dbkey+'/$struct:'+tmlform.structkey}" iscontextvalid="true">
+				<tml:script>
+					_Struct = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/structentry", tmlform.structkey, _Database)					
+					// check paste
+					_mayPaste = false;
+					if(_CM_clipboard_context!=null){
+						var source = context(_CM_clipboard_context).document;
+						if(source instanceof Packages.de.innovationgate.webgate.api.WGStructEntry && !_Struct.isChildrenOf(source)){
+							var Contenttype = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/contenttype", source.getContentType().getName(), _Database)
+							_mayPaste = Contenttype.isAllowed(_Struct.WGObject) && _Struct.mayCreatePage()							
+						}
+					}
+				</tml:script>
+
+				BI.enablemenus("custom-menu-items", false);
+				BI.enablemenus("create-new-page", false);
+				BI.enablemenus("copy-page", true);
+				BI.enablemenus("paste-page", <tml:script expression="_mayPaste"/>);
+				BI.enablemenus("copy-content", false);
+				BI.enablemenus("paste-content", false);
+				
+				BI.enablemenus("create-rootpage", <tml:script>return _Struct.mayCreateRootPage()</tml:script>);
+				BI.enablemenus("create-page", <tml:script>return _Struct.mayCreatePage()</tml:script>);
+				BI.enablemenus("create-content", <tml:script>return _Struct.mayCreateContent()</tml:script>);
+		
+				BI.enablemenus("edit-content", false);
+				BI.enablemenus("get-content", false);
+				BI.enablemenus("publish-content", false);		
+				BI.enablemenus("approve-content", false);
+				BI.enablemenus("reject-content", false);
+				BI.enablemenus("edit-properties", false);
+				
+				BI.enablemenus("delete-page", <tml:script>return _Struct.mayDeletePage()</tml:script>);
+				BI.enablemenus("delete-content", false);
+				BI.enablemenus("archive-content", false);
+			
+			</tml:elseif>
+			<tml:else>
+				//console.log("menu-observer: not contentkey and no structkey");
+				BI.enablemenus("create-new-page", false);
+				BI.enablemenus("copy-page", false);
+				BI.enablemenus("paste-page", false);
+				BI.enablemenus("copy-content", false);
+				BI.enablemenus("paste-content", false);
+
+				BI.enablemenus("create-rootpage", false);
+				BI.enablemenus("create-page", false);
+				BI.enablemenus("create-content", false);
+		
+				BI.enablemenus("edit-content", false);
+				BI.enablemenus("get-content", false);
+				BI.enablemenus("publish-content", false);		
+				BI.enablemenus("approve-content", false);
+				BI.enablemenus("reject-content", false);
+				BI.enablemenus("edit-properties", false);
+				
+				BI.enablemenus("delete-page", false);
+				BI.enablemenus("delete-content", false);
+				BI.enablemenus("archive-content", false);
+			</tml:else>
+		</tml:if>
+	</script>
+	
+</tml:form>

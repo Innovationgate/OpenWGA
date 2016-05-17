@@ -1,0 +1,104 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_type=request.getParameter("type");
+	_dbkey = request.getParameter("dbkey");
+	var key=request.getParameter("key");
+	if(!_type)
+		_type="content";
+	
+		
+	_context='db:'+request.getParameter('dbkey');
+	switch (_type){
+		case "content":
+			_context += '/docid:'+key;
+			break;
+		case "file":
+			_context += '/$filecontainer:'+key;
+			break;
+	}
+</tml:script>
+
+<tml:case context="{_context}" iscontextvalid="true">
+	<tml:script>
+		_attachments = createlist();
+		var attachments=document.getFileNames().iterator();
+		
+		// check extenstions to see if attachment is an image
+		while(attachments.hasNext()){
+			var filename = attachments.next();
+			var filetypes = ['jpg','jpeg','gif','png'];
+			var subs = filename.split(".");
+			var supported = false;
+			for (i=0; i < filetypes.length; i++) {
+				if (subs[subs.length-1].toLowerCase() == filetypes[i]) {
+					_attachments.add(filename);
+					break;
+				}
+			}
+			if(_type=="content" && WGA.selectDerivate(filename, "usage=poster") && !_attachments.contains(filename))
+				_attachments.add(filename);
+			
+		}
+		_timestamp = createdate().time
+		_primary = document.getPrimaryFileName();
+	</tml:script>
+	{
+		data:[
+			<tml:foreach type="itemvalue" item="_attachments" currentvalue="_filename">
+				{
+					id: "<tml:item name="_filename"/>",
+					primary: "<tml:script expression="_filename==_primary?'primary':''"/>",
+					name: "<tml:item name="_filename"/>",
+					shortName: "<tml:script>
+						
+							if (_filename.length > 12) {
+								return _filename.substr(0, 10) + '...';
+							}
+							return _filename;
+						
+					</tml:script>",
+					url: "<tml:url db="{_dbkey}" type="file" doc="{request.getParameter('key')}" file="{_filename}"/>",
+					poster: "<tml:url db="{_dbkey}" type="file" doc="{request.getParameter('key')}" file="{_filename}" derivate="usage=poster"/>",
+					thumbnail: "<tml:script>
+						var url = WGA.urlBuilder(fileurl(_dbKey, request.getParameter('key'), _fileName))
+						url.setParameter("time", _timestamp);
+						if(db(_dbkey).hasFeature(db().FEATURE_CONTENT_FILE_DERIVATES))
+							url.setParameter("derivate", "usage=poster,width~100")
+						else{
+							url.setParameter("maxwidth", "100")
+							url.setParameter("maxheight", "100")
+						}
+						return url.build();
+					</tml:script>",
+					size: <tml:script format="0">return document.getFileSize(_filename)</tml:script>
+
+				}
+				<tml:between>,</tml:between>
+			</tml:foreach>
+		],
+		context: "<tml:item name="_context"/>/<tml:item name="_type"/>"
+	}
+</tml:case>		

@@ -1,0 +1,175 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.dialog.hide();
+			<tml:if istrue="_se_reload">
+				<tml:then>
+					BI.se.reload("<tml:item name="_new_structkey"/>", function(){
+						BI.selectContent("<tml:item name="_new_contentkey"/>", "<tml:item name="_new_structkey"/>");
+					})
+				</tml:then>
+				<tml:else>
+					BI.se.reloadParent("<tml:option name="structkey"/>", "<tml:item name="_new_structkey"/>", function(){
+						BI.selectContent("<tml:item name="_new_contentkey"/>", "<tml:item name="_new_structkey"/>");
+					});
+				</tml:else>
+			</tml:if>
+		</script>
+	</tml:then>
+	<tml:else>
+						
+		<tml:form id="delete-page-form">
+				
+			<script>
+				// submit function called from dialog handler and on RETURN
+				BI.dialog.submit=function(){
+					BI.util.callAction("<tml:action ref="cms:delete-page" param1="{option('dbkey')}" param2="{option('structkey')}" 
+								param3="{AFW.database(option('dbkey')).getUserName()}"/>", 
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"{%label:dialog.delete-page.deleting-content%}");
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", BI.dialog.autoHeight);
+				
+			</script>
+		
+			<tml:case condition="tmlform.hasmessages()">
+				<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+				<hr size="1">
+			</tml:case>		
+		
+			<tml:if context="{'db:'+option('dbkey')+'/$struct:'+option('structkey')}" iscontextvalid="true">
+				<tml:then>
+					<tml:script>
+						_Struct = createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/structentry", document);
+						_Database = createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/database", option('dbkey'));
+						
+						// check if user realy may delete this page:
+						_mayDelete = _Struct.mayDeletePage(true);
+						_reason = _Struct.getReason()
+					</tml:script>
+					
+					<tml:if istrue="_mayDelete">
+						<tml:then>
+							
+							<h1><tml:label key="dialog.delete-page.query-delete-page" param1="{_Struct.getContentTitle()}"/></h1>
+				     		
+				     		<tml:case condition="_Database.isJdbc()">
+								<tml:collection id="links-to-me" context="{'db:'+option('dbkey')}">
+									<tml:query alllanguages="true">
+										content.items['_internallinks'].text like '%<tml:script expression="_Struct.getKey()"/>%'
+									</tml:query>
+								</tml:collection>
+								<tml:case condition="taginfo('links-to-me', 'count')>0">
+						     		<hr size="1">
+									<div class="warning">
+										<h1>{%label:dialog.delete-page.info.link-references%}:</h1>
+										<ul style="list-style:disc;padding-left:25px">
+										<tml:foreach sourcetag="links-to-me">
+											<li><tml:path><tml:meta name="title"/><tml:between> / </tml:between></tml:path></li>
+										</tml:foreach>
+										</ul>
+									</div>
+								</tml:case>
+				     		</tml:case>
+				     		
+				     		<tml:script>
+				     			_remotelist = _Struct.getRemoteList();
+				     		</tml:script>
+				     		<tml:case condition="!_remotelist.remote_references.isEmpty()">
+				     			<div class="warning">
+				     				<tml:label key="dialog.delete-page.info-deleting-remote" param1="{_remotelist.remote_references.size()}"/>
+								</div>
+							</tml:case>
+							
+							<tml:script>
+								// check for unique names an remove them
+								_unames = getNames(document)
+								function getNames(struct){
+									var msg = WGA.createList();
+									var uname = struct.getUniqueName() 
+									if(uname){
+										msg.add("Entferne eindeutigen Namen '" + uname + "' von Seite " + struct.getTitle());
+									}
+									var docs = struct.getAllReleasedContent().values().iterator();
+									while(docs.hasNext()){
+										var doc = docs.next();
+										uname = doc.getUniqueName();
+										if(uname){
+											msg.add("Entferne eindeutigen Namen '" + uname + "' von Inhalt " +doc.getTitle());
+										}
+									}
+									var children = struct.getChildEntries().iterator();
+									while(children.hasNext())
+										msg.addAll(getNames(children.next()))
+									return msg;
+								}
+							</tml:script>
+							<tml:case condition="_unames.size()">
+								<div class="warning">
+									<h1><tml:label key="dialog.delete-page.removing-unames"/>:</h1>
+									<tml:item name="_unames" divider="<br>"/>
+									<h1><tml:label key="dialog.delete-page.website-may-not-work"/>.</h1>
+									<tml:case condition="!_Database.isManager()">
+										<h1><tml:label key="dialog.delete-page.needs-manager-access"/>.</h1>
+										<script>BI.dialog.submitButton.hide();</script>
+									</tml:case>
+								</div>
+							</tml:case>
+							
+							<hr size="1">
+						   	<h3>{%label:are-you-sure%}</h3>
+							<div style="padding-left:20px;margin-top:10px;background:url('../../plugin-wga-app-framework/file/icons/page_delete.png') no-repeat 0px 0px;">
+								{%label:dialog.delete-page.info-delete%}
+							</div>
+		
+
+						</tml:then>
+						
+						<tml:else>
+							<h1><tml:label key="dialog.delete-page.not-allowed" param1="{_Struct.getContentTitle()}"/></h1>
+							<div class="warning"><tml:item name="_reason"/></div>
+							<script>
+								BI.dialog.submitButton.hide();
+							</script>
+						</tml:else>
+						
+					</tml:if>
+
+				</tml:then>
+				<tml:else>
+					Document not found
+					<script>
+						BI.dialog.submitButton.hide();
+					</script>
+				</tml:else>
+			</tml:if>
+			   	
+		</tml:form>
+	</tml:else>
+	
+</tml:if>
+

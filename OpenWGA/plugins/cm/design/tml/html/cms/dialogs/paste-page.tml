@@ -1,0 +1,247 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="pastePage">
+	//log.info("paste page ...");
+	
+	try{
+		var source = context(_CM_clipboard_context).document;
+		var dest = document; 
+	
+		if(_new_structkey = copyStruct(source, dest, 
+					tmlform.recursive && tmlform.recursive=="true", 
+					tmlform.remotedocs=="true", 
+					tmlform.publish=="true",
+					tmlform.position)){				
+			_actionDone=true;
+			var event=createEvent("CMS_dialog_closed");
+			portlet.fireEvent(event);
+		}
+	}
+	catch(e){
+		tmlform.addMessage(e);
+	}
+	
+	function copyStruct(source, dest, recursive, createReferences, publish, position){
+		var ctname = source.getContentType().getName();
+		var Contenttype = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/contenttype", ctname);
+		if(!Contenttype.isValid()){
+			tmlform.addMessage(label("dialog.paste-page.contenttype-does-not-exist", createlist([ctname])));
+			return false;
+		}
+		if(!Contenttype.isAllowed(dest)){
+			tmlform.addMessage(label("dialog.paste-page.contenttype-not-allowed", createlist([Contenttype.getAlias()])));
+			return false;
+		}
+		  
+		var struct, children;
+		if(dest instanceof Packages.de.innovationgate.webgate.api.WGArea){
+			struct = dest.createRootEntry(Contenttype.WGObject, source.getTitle())
+			children = dest.getRootEntries();
+		}
+		else{
+			struct = dest.createChildEntry(Contenttype.WGObject, source.getTitle())
+			children = dest.getChildEntries();
+		}
+		
+		if(position && position!="auto"){
+			var pos;
+			if(position=="start"){
+				pos=children.getByIndex(0).getPosition()-100;
+			}
+			else{
+				var after_position_struct=dest.database.getStructEntryByKey(position);
+				pos=after_position_struct.getPosition();
+				var next = after_position_struct.getNextSibling();
+				if(next){
+					if(next.getPosition()-pos<=1){
+						// renumber siblings in master action:
+						callAction("cms:renumberSiblings", option('dbkey'), position); 
+						pos += 10;
+					}
+					else pos = (next.getPosition()+pos) / 2;
+				}
+				else pos += 100;
+			}
+			struct.setPosition(pos);
+		}
+		else struct.setPosition(source.getPosition());
+
+		struct.save();
+
+		var contentlist=source.getAllReleasedContent().values().iterator();
+		while(contentlist.hasNext()){
+			var cdoc=contentlist.next();
+			var langname = cdoc.getLanguage().getName();
+			var lang = db().getLanguage(langname)
+			if(lang==null || lang.isDummy()){
+				log.info("Content Manager Paste-operation: Language " + langname + " does not exist in destination db. Content ignored");
+				continue;
+			}
+			var newdoc = struct.createContent(lang, cdoc.getTitle());
+			if(createReferences){
+				var remote_info="db:"+source.getDatabase().getDbReference() + "/docid:" + source.getStructKey()+"."+langname+".0";
+				newdoc.setItemValue("remote_info", remote_info);
+			}
+			newdoc.save();
+			// copy all items
+			var Content = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/content", newdoc);
+			Content.copyRemoteData(cdoc, true);
+			if(publish)
+				newdoc.publish("copied from " + source.title);
+		}
+		if(recursive){
+			var children=source.getChildEntries().iterator();
+			while(children.hasNext()){
+				var child = children.next();
+				copyStruct(child, struct, recursive, createReferences, publish);
+			}	
+		}
+		return struct.getStructKey();
+	}
+	
+</tml:action>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.se.reload();
+		</script>
+	</tml:then>
+	<tml:else>
+		
+		<tml:form id="settings" source="profile" onsubmit="BI.dialog.submit()">
+		
+			<tml:case condition="tmlform.hasmessages()">
+				<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+				<hr size="1">
+			</tml:case>		
+			
+			<tml:script>
+				var area = option("area");
+				var structkey = option("structkey")
+				var dbkey = option("dbkey");
+				_Database=createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/database", dbkey);
+				
+				_isTemplateArea=false;
+				if(area){
+					_Parent=createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/area", area, dbkey);
+					_context = "db:"+dbkey+"/$area:"+area;
+					_title = label("area") + ": " + area;
+					if(_Parent.isTemplateArea()){
+						_isTemplateArea=true;
+						_title = label("systemarea.templates")
+					}
+				}
+				else{
+					_Parent=createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/structentry", structkey, dbkey);
+					_context = "db:"+dbkey+"/$struct:"+structkey
+					_title = _Parent.getContentTitle();
+				}
+			</tml:script>
+			
+			<tml:if context="{_context}" iscontextvalid="true">
+				<tml:then>
+				
+					<script>
+						// submit function called from dialog handler
+						BI.dialog.submit=function(){					
+							BI.util.callAction("<tml:action ref="pastePage"/>",
+								"<tml:script>return portlet.portletkey</tml:script>",
+								"{%label:dialog.paste-page.creating-pages%}");
+						}
+						WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", BI.dialog.autoHeight);
+					</script>
+
+					<table border="0" cellspacing="5" cellpadding="5">
+						<tr>
+							<td width="1%" valign="top">{%label:dialog.paste-page.source%}:</td>
+							<td>
+								<tml:range context="{_CM_clipboard_context}">
+									<b><tml:script expression="AFW.structentry(document).getContentTitle()"/></b>
+									<br>
+									<tml:label key="pagetype"/>: <tml:script expression="AFW.contenttype(CONTENTTYPE).getAlias()"/>
+									<br>
+									<tml:label key="database"/>: <tml:meta name="dbkey" type="db"/>
+								</tml:range>
+							</td>
+						</tr>
+						<tr>
+							<td width="1%" nowrap>{%label:dialog.paste-page.destination%}:</td>
+							<td><b><tml:item name="_title"/></b></td>
+						</tr>
+						<tml:script>
+							_position_list = createObject("position-list").getChildrenList(_Parent);
+						</tml:script>
+						<tml:case condition="_position_list.size()>1">
+							<tr>
+								<td width="1%">{%label:properties.position%}:</td>
+								<td>
+					     			<tml:input name="position" type="select" optionsitem="_position_list" default="{_default_position_list}"/>			     			
+								</td>
+							</tr>
+						</tml:case>
+
+						<tr><td colspan="2"><hr size="1"></td></tr>
+						<tml:case isfalse="_isTemplateArea">
+							<tr>
+								<td colspan="2"><tml:input name="recursive" type="checkbox" options="{label('dialog.paste-page.recursive.options')}" default="true"/></td>
+							</tr>
+						</tml:case>
+						<tml:case condition="tmlform.remotedocs!='true'">
+							<tr>
+								<td colspan="2"><tml:input name="publish" type="checkbox" options="{label('dialog.paste-page.publish.options')}" default="false"/></td>
+							</tr>
+						</tml:case>
+						
+						<tml:case condition="_Database.useRemoteDbs()">
+							<tr>
+								<td colspan="2"><tml:input name="remotedocs" changeaction="$refresh" ajax="true" type="checkbox" options="{label('dialog.paste-page.remotedocs.options')}"/></td>
+							</tr>
+						</tml:case>
+						
+				     	<tr><td colspan="2">
+							<div style="padding-left:30px;margin-top:10px;background:url('../../plugin-wga-app-framework/file/icons/page_paste.png') no-repeat 0px 0px;">
+								<tml:label key="dialog.paste-page.info"/>
+							</div>
+						</td></tr>
+
+					</table>
+				
+				</tml:then>
+
+				<tml:else>
+					context not vaild: <tml:item name="_context"/>
+					<script>
+						BI.dialog.submitButton.hide();
+					</script>
+				</tml:else>
+
+			</tml:if>
+				
+		</tml:form>
+		
+	</tml:else>
+</tml:if>
+

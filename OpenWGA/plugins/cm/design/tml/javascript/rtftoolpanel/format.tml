@@ -1,0 +1,436 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+/*
+ * Toolbars:
+ */
+
+var toolbar_para = new Ext.Toolbar("rtf-toolbar-para", [
+	{
+		cmd: "JustifyLeft",
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.paragraph.justify-left"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/text_align_left.png",
+		handler: doCommand
+	},
+	{
+		cmd: "JustifyCenter",
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.paragraph.justify-center"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/text_align_center.png",
+		handler: doCommand
+	},
+	{
+		cmd: "JustifyRight",
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.paragraph.justify-right"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/text_align_right.png",
+		handler: doCommand
+	},
+	{
+		cmd: "JustifyFull",
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.paragraph.justify-full"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/text_align_justify.png",
+		handler: doCommand
+	},
+	"-",
+	{
+		cmd: "Indent",
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.paragraph.indent"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/text_indent.png",
+		handler: doCommand
+	},
+	{
+		cmd: "Outdent",
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.paragraph.outdent"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/text_indent_remove.png",
+		handler: doCommand
+	},
+	"-",
+	{
+		cmd: "InsertUnorderedList",
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.list.bullets"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/text_list_bullets.png",
+		handler: doCommand
+	},
+	{
+		cmd: "InsertOrderedList",
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.list.enum"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/text_list_numbers.png",
+		handler: doCommand
+	}
+	
+]);
+
+/*
+ * Buttons
+ */
+
+var headingButtonMenuItems = [
+	new Ext.menu.CheckItem({
+		text: "<tml:label key="rtf.paragraph.heading-none"/>",
+		paraStyle: "",
+		group: 'headings',
+		handler: function(){
+			var el = editor.getParagraph();
+			if(el){
+				editor.selection.save();
+				editor.removeNode(el, true);
+				editor.selection.restore();
+				BI.rtftoolbar.update();
+			}
+		}
+	})
+	
+	,new Ext.menu.CheckItem({
+		text: "<tml:label key="rtf.paragraph.normal-heading"/>",
+		paraStyle: "p",
+		group: 'headings',
+		handler: headingHandler
+	})
+	,"-"
+]
+for(var i=0; i<6; i++){
+	var h = "h" + (i+1);
+	headingButtonMenuItems.push(
+		new Ext.menu.CheckItem({
+			text: $L.headings[i],
+			paraStyle: h,
+			disabled: BI.rtftoolbar.headings.indexOf(h)<0,
+			group: 'headings',
+			handler: headingHandler
+		})
+	)
+}
+
+var headingButton = new Ext.Button("rtf-toolbar-format-heading", {
+	text: "<tml:label key="rtf.paragraph.normal-heading"/>",
+	menu: {
+		items: headingButtonMenuItems
+	}
+});
+function headingHandler(m){
+	BI.rtftoolbar.restoreEditorSelection();
+	editor.execCmd("FormatBlock", m.paraStyle);
+	if(m.paraStyle!="p")
+		editor.getParagraph().className="";
+	BI.rtftoolbar.update();
+}
+function updateHeadingButton(){
+	headingButton.setText("<tml:label key="rtf.paragraph.heading-none"/>");
+	headingButton.menu.items.each(function(item){
+		if(item.paraStyle){
+			var isPara = editor.getNearestTagFromSelection(item.paraStyle);
+			if(isPara){
+				headingButton.setText(item.text);
+			}
+			item.setChecked(isPara)
+			//console.log(item.paraStyle + "=>" + isPara);
+		}
+		
+	})
+	if(BI.rtftoolbar.isCmdDisabled("formatblock"))
+		headingButton.disable();
+	else headingButton.enable();
+}
+
+/* 
+ * paragraph styles
+ */
+function pStyleHandler(menu, ev){
+	BI.rtftoolbar.restoreEditorSelection();
+
+	var el = Ext.fly(editor.getParagraph());	
+	if(el){
+		if(menu.checked)
+			el.removeClass(menu.el_style);			
+		else el.addClass(menu.el_style);
+		BI.rtftoolbar.update();
+	}			
+}
+
+var menu = new Ext.menu.Menu()
+for(var i=0; i<BI.rtftoolbar.paragraphStyleList.length; i++){
+	var style = BI.rtftoolbar.paragraphStyleList[i].split("|");
+	menu.add(new Ext.menu.CheckItem({
+		text: style[0],
+		el_style: style[1],
+		handler: pStyleHandler
+	}))
+}
+var pStyleMenu = menu;
+var pStyleButton = new Ext.Button("rtf-toolbar-format-style", {
+	text: BI.rtftoolbar.paragraphStyleList.length ? "<tml:label key="rtf.style.none"/>" : "<tml:label key="rtf.no-styles-defined"/>",
+	menu: menu
+})
+
+/*
+ * Textstyles
+ */
+if(BI.rtftoolbar.textStyleList.length)
+	Ext.get("rtf-has-text-styles").show();
+var textStyleMenu = new Ext.menu.Menu()
+for(var i=0; i<BI.rtftoolbar.textStyleList.length; i++){
+	var style = BI.rtftoolbar.textStyleList[i].split("|");
+	textStyleMenu.add(new Ext.menu.CheckItem({
+		text: style[0],
+		el_style: style[1],
+		handler: textStyleHandler
+	}))
+}
+var textStyleButton = new Ext.Button("rtf-toolbar-text-styles", {
+	text: BI.rtftoolbar.textStyleList.length ? "<tml:label key="rtf.style.none"/>" : "<tml:label key="rtf.no-styles-defined"/>",
+	menu: textStyleMenu
+})
+function textStyleHandler(menu, ev){
+	BI.rtftoolbar.restoreEditorSelection();
+	var el = Ext.fly(editor.getNearestTagFromSelection("span"));
+	if(el){
+		if(menu.checked){
+			el.removeClass(menu.el_style);
+			menu.setChecked(false);
+			if(!el.dom.className.replace(/\s/g, "")){
+				editor.removeNode(el.dom);
+			}
+		}			
+		else {
+			el.addClass(menu.el_style);
+			menu.setChecked(true);
+		}
+		BI.rtftoolbar.update();
+	}
+	else{
+		var range = editor.getRange();
+		var span = document.createElement("span");
+		span.className = menu.el_style
+		span.appendChild(range.extractContents());
+		range.insertNode(span);
+	}
+}
+
+
+/* 
+ * sections 
+ */
+var toolbar_section = new Ext.Toolbar("rtf-toolbar-section", [
+	{
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.section.add"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/textfield_add.png",
+		disabled: WGA.isIE,
+		handler: function(){
+			if(!editor.getParagraph())
+				editor.execCmd("FormatBlock", "p");
+			editor.selection.surround("div");
+			editor.selection.focus();
+			BI.rtftoolbar.update();
+		}
+	}
+	,{
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.section.remove"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/textfield_delete.png",
+		cmd: "section.remove",
+		queryCommandEnabled: function(){
+			return !WGA.isIE && editor.getNearestTagFromSelection("div")!=null
+		},
+		handler: function(){
+			var el = editor.getNearestTagFromSelection("div");
+			if(el){
+				editor.selection.save();				
+				editor.removeNode(el);
+				editor.selection.restore();
+				BI.rtftoolbar.update();
+			}
+		}
+	}
+	,"-"
+	,{
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.section.append_paragraph"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/text_padding_bottom.png",
+		cmd: "section.appendParagraph",
+		queryCommandEnabled: function(){
+			return !WGA.isIE && editor.getNearestTagFromSelection("div")!=null
+		},
+		handler: function(){
+			var el = editor.getNearestTagFromSelection("div");
+			if(el){
+				var p = editor.doc.createElement("p");
+				p.appendChild(editor.doc.createElement("br"));
+				if(el.nextSibling)
+					el.parentNode.insertBefore(p, el.nextSibling);
+				else el.parentNode.appendChild(p);
+				editor.selection.selectNodeContents(p);
+			}
+			BI.rtftoolbar.update();
+		}
+	}
+	,{
+		cls: "x-btn-icon",
+		tooltip: "<tml:label key="rtf.section.insert_paragraph"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/text_padding_top.png",
+		cmd: "section.insertParagraph",
+		queryCommandEnabled: function(){
+			return !WGA.isIE && editor.getNearestTagFromSelection("div")!=null
+		},
+		handler: function(){
+			var el = editor.getNearestTagFromSelection("div");
+			if(el){
+				var p = editor.doc.createElement("p");
+				p.appendChild(editor.doc.createElement("br"));
+				el.parentNode.insertBefore(p, el);
+				editor.selection.selectNodeContents(p);
+			}
+			BI.rtftoolbar.update();
+		}
+	}
+]);
+
+function sectionStyleHandler(menu, ev){
+	BI.rtftoolbar.restoreEditorSelection();
+
+	var el = Ext.fly(editor.getNearestTagFromSelection("div"));	
+	if(el){
+		if(menu.checked){
+			el.removeClass(menu.el_style);
+			menu.setChecked(false);
+		}			
+		else {
+			el.addClass(menu.el_style);
+			menu.setChecked(true);
+		}
+		BI.rtftoolbar.update();
+	}			
+}
+
+
+var menu = new Ext.menu.Menu()
+for(var i=0; i<BI.rtftoolbar.sectionStyleList.length; i++){
+	var style = BI.rtftoolbar.sectionStyleList[i].split("|");
+	menu.add(new Ext.menu.CheckItem({
+		text: style[0],
+		el_style: style[1],
+		handler: sectionStyleHandler
+	}))
+}
+var sectionStyleMenu = menu;
+var sectionStyleButton = new Ext.Button("rtf-toolbar-section-style", {
+	text: BI.rtftoolbar.sectionStyleList.length ? "<tml:label key="rtf.style.none"/>" : "<tml:label key="rtf.no-styles-defined"/>",
+	menu: menu
+})
+
+
+/*
+ * Update Listener
+ */
+addUpdateListener(function(){
+	
+	updateHeadingButton();
+
+	// text styles:
+	var span = editor.getNearestTagFromSelection("span");
+	if(span){
+		if(BI.rtftoolbar.textStyleList.length>0){
+			textStyleButton.enable();
+			var classes = [];
+			textStyleMenu.items.each(function(item){
+				var class_mach = span.className.indexOf(item.el_style)>=0;
+				if(class_mach){
+					classes.push(item.text) 
+				}
+				item.setChecked(class_mach)
+			})
+			if(classes.length)
+				textStyleButton.setText(classes.join(", "))
+			else textStyleButton.setText("<tml:label key="rtf.style.none"/>"); 
+		}
+		else textStyleButton.disable();
+	}
+	else{
+		textStyleButton.setText(BI.rtftoolbar.textStyleList.length ? "<tml:label key="rtf.style.none"/>" : "<tml:label key="rtf.no-styles-defined"/>")
+		textStyleMenu.items.each(function(item){
+			item.setChecked(false)
+		})
+	}
+
+	// paragraph styles:
+	var para = editor.getNearestTagFromSelection("p");	//editor.getParagraph()
+	if(para){
+		if(BI.rtftoolbar.paragraphStyleList.length>0){
+			pStyleButton.enable();
+			var classes = [];
+			pStyleMenu.items.each(function(item){
+				var class_mach = para.className.indexOf(item.el_style)>=0;
+				if(class_mach){
+					classes.push(item.text) 
+				}
+				item.setChecked(class_mach)
+			})
+			if(classes.length)
+				pStyleButton.setText(classes.join(", "))
+			else pStyleButton.setText("<tml:label key="rtf.style.none"/>"); 
+		}
+		else pStyleButton.disable();
+	}
+	else{
+		pStyleButton.disable();
+		pStyleButton.setText(BI.rtftoolbar.paragraphStyleList.length ? "<tml:label key="rtf.style.none"/>" : "<tml:label key="rtf.no-styles-defined"/>")
+	}
+
+	// section styles:
+	var section = editor.getNearestTagFromSelection("div");
+	if(section){
+		if(BI.rtftoolbar.sectionStyleList.length>0){
+			sectionStyleButton.enable();
+			var classes = [];
+			sectionStyleMenu.items.each(function(item){
+				var class_mach = section.className.indexOf(item.el_style)>=0;
+				if(class_mach){
+					classes.push(item.text) 
+				}
+				item.setChecked(class_mach)
+			})
+			if(classes.length)
+				sectionStyleButton.setText(classes.join(", "))
+			else sectionStyleButton.setText("<tml:label key="rtf.style.none"/>"); 
+		}
+		else sectionStyleButton.disable();
+	}
+	else{
+		sectionStyleButton.disable();
+		sectionStyleButton.setText(BI.rtftoolbar.sectionStyleList.length ? "<tml:label key="rtf.style.none"/>" : "<tml:label key="rtf.no-styles-defined"/>")
+	}
+
+
+	// check paragraph cmd-states
+	updateButtons(toolbar_para)
+	updateButtons(toolbar_section)
+
+})

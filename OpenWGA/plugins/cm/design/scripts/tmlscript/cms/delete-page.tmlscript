@@ -1,0 +1,96 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+var dbkey=tmlparam1||option("dbkey");
+var structkey=tmlparam2||option("structkey");
+
+var username = tmlparam3;
+
+log.info("delete page " + structkey);
+
+var database = db(dbkey);	
+var sdoc=database.getStructEntryByKey(structkey);
+
+// Calc new entry to be selected and then remove structentry
+
+var next=sdoc.getNextSibling();
+if(next==null){
+	next=sdoc.getPreviousSibling();
+}
+if(next==null){
+	next=sdoc.getParentEntry();		
+}
+if(next==null){
+	// last document is the area: change to first area that hase entries:
+	_se_reload = true;
+	var areas=database.getAreas().iterator();
+	while(areas.hasNext()){
+		var area=areas.next();
+		if(area==sdoc.area)
+			continue;
+		var rootentries=area.getRootEntries().iterator();
+		if(rootentries.hasNext()){
+			next=rootentries.next();
+			break;
+		}
+	}
+	// if we come to this point, there are no more documents in the database.
+	// don't know what to select in this case :-(
+}	
+//log.info("redirect to " + next.getStructKey().toString() + "/" + next.getTitle());
+
+try{
+	var Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", database)
+	var Struct = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/structentry", sdoc)
+
+	var remotelist=Struct.getRemoteList();
+	if(remotelist.remote_references.size()>0 && !Database.isManager()){
+		tmlform.addMessage(label("dialog.delete-page.error-deleting-remote"))
+		return;
+	}
+
+	// check if we have a trash area and move struct to it
+	var trasharea = Database.getTrashArea();
+	if(trasharea){
+		callAction("cms:master:move-to-trash", dbkey, sdoc, username); 
+		_se_reload = true;
+	}
+	else if(sdoc.remove())
+		callAction("::archive-remote-docs", remotelist);		// remove remote docs in separate thread
+
+	_actionDone=true;
+	_new_structkey=next.getStructKey().toString()
+	_new_contentkey="nothing";
+	
+	var clist=next.getAllContent();
+	if(!clist.isEmpty()){
+		_new_contentkey=clist.get(0).getContentKey().toString();
+	}
+}
+catch(e){
+	log.error(e);
+	tmlform.addMessage(e.message);
+}
+

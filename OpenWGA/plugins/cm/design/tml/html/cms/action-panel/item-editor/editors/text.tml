@@ -1,0 +1,71 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:include ref="::text-or-number"/>
+
+<button type="button" onclick="showLinkEditor()"><tml:label key="editor.text.button.insert-url-scriptlet"/></button>
+
+<script>
+	function showLinkEditor(){
+		var opts={linktype: 'exturl', URLOnly: true};
+		BI.dialog.show("rtf:insert-link", null, opts);
+		BI.dialog.callback=function(url, linktext, linkinfo, target){
+			var el_edit = BI.sitepanel.iframe.window.document.getElementById("item_<tml:item name="edititem" type="tmlform"/>")
+			var scriptlet = url;
+			switch(linkinfo.type){
+				case "int":
+					scriptlet = "{@!contenturl:"+linkinfo.key+"@}";
+					break;
+				case "intname":
+					scriptlet =  "{@!namedcontenturl:"+linkinfo.key+"@}";
+					break;
+				case "intfile":
+					scriptlet = "{@!fileurl:"+linkinfo.key+"@}";
+					break;
+				case "file":
+				case "extfile":
+					var key = linkinfo.key.split("/");
+					var container = key[0];
+					var filename = key[1];
+					scriptlet = "{@!fileurl:"+container+","+filename+"@}";
+					break;
+			}
+			el_edit.firstChild.value=scriptlet;
+		}
+	}
+	
+	if(!WGA.isIE){
+		// drag&dropt for link-url:
+		BI.sitepanel.ddhandler = new Ext.dd.DropTarget("web-content-wrapper", {
+		    ddGroup: "se.tree-entry",
+		    notifyDrop: function(dragObj){
+		    	if(confirm("<tml:label key="editor.text.query-paste"/>" + dragObj.dragData.title + " ?")){
+					var el_edit = BI.sitepanel.iframe.window.document.getElementById("item_<tml:item name="edititem" type="tmlform"/>")
+					el_edit.firstChild.value=dragObj.dragData.key;
+				}	    	
+			}
+		});	
+	}
+	
+</script>

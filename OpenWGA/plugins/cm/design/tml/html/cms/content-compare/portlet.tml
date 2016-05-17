@@ -1,0 +1,112 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:range context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}">
+<tml:script>
+	// get content versions:
+	var Struct=createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/structentry");
+	_versions=Struct.getAllContent(LANGUAGE, true);
+</tml:script>
+
+<script>
+	// datastore for content versions
+	var versionDS =  new Ext.data.Store({
+        proxy: new Ext.data.MemoryProxy({
+			data:[
+				<tml:foreach type="itemvalue" item="_versions" divider=",">
+					{
+						key:'<tml:meta name="key"/>',	
+						value:'Version <tml:meta name="version"/> @ <tml:meta format="{label('format.date.short-with-time')}" name="modified"/>',
+						url: '<tml:url/>'
+					}
+				</tml:foreach>
+			]
+		}),
+        reader: new Ext.data.JsonReader({
+        	id: id,
+        	root: "data"
+        },
+        [
+			{name: 'key'},
+	        {name: 'value'},
+	        {name: 'url'}
+	    ])
+	});
+	
+	var cb_left=new Ext.form.ComboBox({
+		store: versionDS,
+		valueField: 'key',
+		displayField: 'value',
+		//listWidth: 300,
+		width: 300,
+		triggerAction: 'all',
+		value: 'Version <tml:meta name="version"/> @ <tml:meta format="{label('format.date.short-with-time')}" name="modified"/>',
+		editable: false
+	});
+	//cb_left.setValue("<tml:meta name="key"/>");
+	cb_left.on('select', function(cb, record, index) {
+		Ext.get("version-left").dom.src=record.data.url;
+	});
+	
+	var cb_right=new Ext.form.ComboBox({
+		store: versionDS,
+		valueField: 'key',
+		displayField: 'value',
+		width: 300,
+		triggerAction: 'all',
+		value: 'Version <tml:script>
+				var c = context(_versions.get(1));
+				return c.VERSION + " @ " + format(c.MODIFIED, label("format.date.short-with-time"))
+			</tml:script>',
+		editable: false
+	})
+	cb_right.on('select', function(cb, record, index) {
+		Ext.get("version-right").dom.src=record.data.url;
+	});
+	
+	var tb = BI.contentComparePanel.toolbar;
+	tb.items.each(function(item){
+		try{
+			item.destroy();
+		}catch(e){};
+	})
+	tb.add(
+		cb_left,
+		"->",
+		cb_right
+	)
+</script>
+
+<table width="100%" height="100%" border="1">
+	<tr>
+		<td width="50%">
+			<iframe id="version-left" height="100%" width="100%" src="<tml:url/>"></iframe>
+		</td>
+		<td width="50%">
+			<iframe id="version-right" height="100%" width="100%" src="<tml:script>return context(_versions.get(1)).contenturl(null, null)</tml:script>"></iframe>
+		</td>
+	</tr>
+</table>
+
+</tml:range>

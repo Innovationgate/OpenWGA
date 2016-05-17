@@ -1,0 +1,79 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:form id="settings" source="profile" onsubmit="BI.dialog.submit()">
+
+	<tml:case condition="tmlform.hasmessages()">
+		<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+		<hr size="1">
+	</tml:case>		
+
+	<table border="0" cellspacing="5" cellpadding="5">
+		<tr>
+			<td width="1%">{%label:dialog.settings.theme%}:</td>
+			<td><tml:input name="ytheme" type="select" options="blue|default,aero,gray,black|vista"/></td>
+		</tr>
+		<tr>
+			<td width="1%" nowrap valign="top">{%label:dialog.settings.no-animation-for%}:</td>
+			<td><tml:input name="animation" type="checkbox" options="{label('dialog.settings.animation-options')}"/></td>
+		</tr>
+
+		<tml:comment>
+		<tr>
+			<td nowrap valign="top">{%label:dialog.settings.rtftoolbar%}:</td>
+			<td><tml:input name="rtftoolbar" type="checkbox" options="{label('dialog.settings.rtftoolbar-options')}"/></td>
+		</tr>
+		</tml:comment>
+		<tr>
+			<td valign="top">{%label:dialog.settings.se-pagesize%}:</td>
+			<td><tml:input name="se_pagesize" type="number" default="10"/></td>
+		</tr>
+		
+		<tml:case condition="wgacore.ATTRIB_BI_COLLECTIONS_SHOW_RELEASED_ONLY && !java.lang.System.getProperty('de.innovationgate.cm.releasedOnly')">
+		<tr>
+			<td></td>
+			<td><tml:input name="show_released_only" type="checkbox" options="{label('dialog.settings.show-released-only-options')}"/></td>
+		</tr>
+		</tml:case>
+
+		<tr>
+			<td></td>
+			<td><tml:input name="hide_archived_only" type="boolean" options="{label('dialog.settings.hide_archived_only-options')}"/></td>
+		</tr>
+		
+	</table>
+	
+	<tml:input type="hidden" name="domain" default="{context('db:'+option('dbkey')).meta('db', 'domain')}"/>
+
+	<script>
+		// submit function called from dialog handler
+		BI.dialog.submit=function(){
+			WGA.callAction("<tml:action ref="$store"/>");
+		}
+		WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", BI.dialog.autoHeight);
+	</script>
+	
+</tml:form>
+
+

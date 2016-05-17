@@ -1,0 +1,73 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:case condition="tmlform.hasmessages()">
+	<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+	<hr size="1">
+</tml:case>		
+
+<table width="100%">
+
+	<tr>
+		<td width="100"><tml:label key="design.tml.form.name"/>:</td>
+		<td><b><tml:input meta="true" name="name" cssclass="textinput required" trim="true"
+				validation="$E_VALUE!=''"
+				message="Bitte geben Sie einen Namen ein"
+				mode="{option('mode')=='new'?'edit':'view'}"				
+		/></b></td>
+	</tr>
+	<tr>
+		<td><tml:label key="design.tml.form.medium"/>:</td>
+		<td><tml:input meta="true" name="mediakey" cssclass="textinput"
+				validation="$E_VALUE!=''"
+				message="Bitte geben Sie einen Mediakey ein"
+				mode="{option('mode')=='new'?'edit':'view'}"				
+		/></td>
+	</tr>
+	<tr>
+		<td width="100"><tml:label key="design.tml.form.provider"/>:</td>
+		<td>
+			<tml:script>
+				var database = db(option('dbkey'));
+				var p =  database.getDesignProvider();
+				if(p && p instanceof Packages.de.innovationgate.wgpublisher.designsync.DBDesignProvider)
+					return p.getDesignDBKey() + " (Contentstore)"
+				var sync = database.getAttribute("designsync")
+				if(sync)
+					return sync.getDesignPath() + "/tml/"+MEDIAKEY+"/"+NAME.split(":").join("/")+".tml (Filesystem)";
+				return "local";
+			</tml:script>
+		</td>
+	</tr>
+	<tr>
+		<td width="100"><tml:label key="design.tml.form.direct_access"/>:</td>
+		<td><tml:input meta="true" name="directaccess" type="boolean" options="true,false" divider=" "/></td>
+	</tr>
+	<tr>
+		<td width="100"><tml:label key="design.tml.form.cachable"/>:</td>
+		<td><tml:input meta="true" name="cacheable" type="boolean" options="true,false" divider=" "/></td>
+	</tr>
+	
+</table>
+

@@ -1,0 +1,79 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:case condition="tmlform.hasmessages()">
+	<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+	<hr size="1">
+</tml:case>		
+
+<tml:script>
+	_getMode = function(metaname){	
+		if(document.isMetaDeterminedInSchema && document.isMetaDeterminedInSchema(metaname)){
+			return "view"
+		}
+		else return tmlform.mode();
+	}
+</tml:script>
+
+<table width="100%">
+
+	<tr>
+		<td width="100"><tml:label key="design.language.form.name"/>:</td>
+		<td>
+			<tml:input meta="true" name="name" cssclass="textinput required" trim="true"
+				validation="$E_VALUE!=''"
+				message="Bitte geben Sie einen Namen ein"
+				mode="{option('mode')=='new'?'edit':'view'}"
+			/>
+		</td>
+	</tr>
+	
+	<tr>
+		<td><tml:label key="design.language.form.title"/>:</td>
+		<td>
+			<tml:input meta="true" name="title" cssclass="textinput"
+				validation="$E_VALUE!=''"
+				message="Bitte geben Sie einen Titel ein"
+				mode="{_getMode('title')}"
+			/>
+		</td>
+	</tr>
+
+	<tr>
+		<td>
+			<tml:if condition="_getMode('editors')=='edit' && AFW.database(option('dbkey')).isUserQueryable()">
+				<tml:then>
+					<a href="#" title="{%label:properties.button.ldap-lookup%}" 
+							onclick="BI.dialog.show('ldap-lookup', this, {fieldid:'editors', textareadivid:'design-language-panel'})">
+						{%label:design.language.form.privileges%}</a>:
+				</tml:then>
+				<tml:else>
+					{%label:design.language.form.privileges%}:
+				</tml:else>	
+			</tml:if>
+		</td>
+		<td><tml:input name="editors" mode="{_getMode('editors')}" meta="true" type="textarea" cssclass="textinput" multiple="true">id="editors"</tml:input></td>
+	</tr>
+	
+</table>

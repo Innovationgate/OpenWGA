@@ -1,0 +1,164 @@
+/*******************************************************************************
+  *Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+  *
+  *This file is part of the OpenWGA server platform.
+  *
+  *OpenWGA is free software: you can redistribute it and/or modify
+  *it under the terms of the GNU General Public License as published by
+  *the Free Software Foundation, either version 3 of the License, or
+  *(at your option) any later version.
+  *
+  *In addition, a special exception is granted by the copyright holders
+  *of OpenWGA called "OpenWGA plugin exception". You should have received
+  *a copy of this exception along with OpenWGA in file COPYING.
+  *If not, see <http://www.openwga.com/gpl-plugin-exception>.
+  *
+  *OpenWGA is distributed in the hope that it will be useful,
+  *but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *GNU General Public License for more details.
+  *
+  *You should have received a copy of the GNU General Public License
+  *along with OpenWGA in file COPYING.
+  *If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+.siteexplorer{
+	margin: 5px;	
+}
+
+.area-container{
+	-moz-box-shadow: 0px 1px 5px gray;
+	-moz-border-radius: 5px;
+	-webkit-box-shadow: 0px 1px 5px gray;
+	-webkit-border-radius: 5px;
+	box-shadow: 0px 1px 5px gray;
+	border-radius: 5px;
+	border: solid gray 1px;
+	padding: 0;
+}
+
+.siteexplorer .templates .title{
+	background:url(../../plugin-wga-app-framework/file/icons/folder_page.png) no-repeat 0px 1px !important;
+	color: #5689EF;
+}
+.siteexplorer .trash .title{
+	background:url(../../plugin-wga-app-framework/file/icons/bin.png) no-repeat 0px 1px !important;
+	color: #5689EF;
+}
+
+.siteexplorer .area.trash.filled{
+	background: red;
+	background-image: linear-gradient(#FF0000 45%, #CC0000 55%);
+}
+
+.siteexplorer .trash.filled .title{
+	color: white;
+}
+
+.siteexplorer .area{
+	background-color:#efefef;
+	cursor:pointer;
+    border-bottom:1px solid #aca899;
+	padding:2px;
+    color:#555555;
+
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+}
+
+.siteexplorer .opened{
+	padding: 0 0 5px;
+	background-color:white;
+}
+
+.siteexplorer .opened .area{
+	-moz-border-radius-bottomleft: 0px;
+	-moz-border-radius-bottomright: 0px;
+	
+	-webkit-border-bottom-left-radius: 0px;
+	-webkit-border-bottom-right-radius: 0px;
+
+	border-bottom-left-radius: 0px;
+	border-bottom-right-radius: 0px;
+}
+
+.siteexplorer .struct{
+	padding:2px;
+	border-bottom:solid silver 1px;
+	cursor:pointer;
+}
+.siteexplorer .selected{
+	background-color:silver;	
+}
+
+.siteexplorer .children{
+}
+
+.siteexplorer .area .treeentry{
+}
+
+.siteexplorer .twisty{
+	padding-right:10px;
+}
+
+.siteexplorer .expanded{
+	background:url(../../plugin-wga-app-framework/file/ext/ext-1.1.1/resources/images/default/layout/ns-expand.gif) no-repeat 0px 3px;
+}
+.siteexplorer .collapsed{
+	background:url(../../plugin-wga-app-framework/file/ext/ext-1.1.1/resources/images/default/layout/expand.gif) no-repeat 0px 4px;
+}
+
+.siteexplorer .area .title{
+	padding-left:18px;
+	padding-top:2px;
+	padding-bottom:2px;
+	background:url(../../plugin-wga-app-framework/file/icons/folder.png) no-repeat 0px 0px;
+}
+
+.siteexplorer .struct .title{
+	padding-left:18px;
+	padding-top:2px;
+	padding-bottom:2px;
+	background:url(../../plugin-wga-app-framework/file/icons/page_edit.png) no-repeat 0px 0px;
+}
+.siteexplorer .struct .title-no-edit{
+	padding-left:18px;
+	padding-top:2px;
+	padding-bottom:2px;
+	background:url(../../plugin-wga-app-framework/file/icons/page.png) no-repeat 0px 0px;
+}
+.siteexplorer .struct .has-access-rights{
+	color:red;
+}
+.siteexplorer .struct .content-has-readers{
+	font-style: italic;
+}
+
+.siteexplorer .struct .not-visible{
+	opacity: 0.3;
+	filter: alpha(opacity=30);
+}
+
+.siteexplorer .dragover{
+	color:red;
+}
+.siteexplorer .drop-pos{
+	height:2px;
+}
+.siteexplorer .drop-pos .dragover{
+	background-color:red !important;
+	border-color:red;
+}
+
+.moveproxy{
+	background: url('../../plugin-wga-app-framework/file/icons/page.png') no-repeat 0px 0px;
+	padding-left:20px;
+	background-color:white;
+}
+
+.copyproxy{
+	background: url('../../plugin-wga-app-framework/file/icons/add.png') no-repeat 0px 0px;
+	padding-left:20px;
+	background-color:white;
+}

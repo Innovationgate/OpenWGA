@@ -1,0 +1,106 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:if condition="option('pagetype')!=null && option('pagetype')!=''">
+	<tml:then>
+		<tml:item type="tmlform" name="contenttype" aliases="{tmlform.pagetypes}"/>
+	</tml:then>
+	<tml:else>
+
+		<tml:input id="pagetype_selector" name="pagetype_selector" store="false">size="45"</tml:input>
+		
+		<script>	
+		
+			BI.PageTypeSelector = {
+				initialized : false
+			};
+		
+			WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>",
+				
+				function() {
+		
+					var dsContentTypes = new Ext.data.Store({
+					    proxy: new Ext.data.MemoryProxy(Ext.util.JSON.decode("<tml:script>return tmlform.jsonPagetypes</tml:script>")),
+				        reader: new Ext.data.JsonReader({
+					        id: 'id',
+				            root: 'data'                
+				        },
+				        [
+					        { name: 'id'   }, 
+					        { name: 'alias' },
+					        { name: 'description' } 	            
+				        ])
+					});
+					dsContentTypes.sort("alias");
+			    	
+			    	var tpl = new Ext.Template("<div style='padding:3px;border:solid #efefef 1px'><b>{alias}</b><br><i>{description}</i></div>").compile();
+			    	
+			    	var combo = new Ext.form.ComboBox({
+					   
+					    tpl: tpl,
+					    store: dsContentTypes,
+					    typeAhead : true,
+					    minChars : 1,
+					    displayField:'alias',
+					    valueField: 'id',
+					    editable: true,
+					    mode: 'local',
+					    width: 300,
+					    triggerAction: 'all',
+					    emptyText:'{%label:dialog.create-page.validation.select-contenttype%}',
+					    selectOnFocus:true
+					    
+					    ,listeners:{
+		
+							'select': function(combo, record, index) {
+								document.forms['create-page-form'].contenttype.value = record.data.id;
+								WGA.ajax.callAction("<tml:action ajax="true" ref="$refresh"/>", "<tml:script>return portlet.portletKey</tml:script>");						
+							}
+						}  
+					    
+					});
+					
+					combo.applyTo('pagetype_selector');
+					
+					
+					dsContentTypes.on('load', function(ds) {
+						if (combo && BI.PageTypeSelector.initialized == false) {
+													
+							<tml:if condition="tmlform.contenttype!='' && tmlform.contenttype!=null">
+								<tml:then>
+									combo.setValue("<tml:item type="tmlform" name="contenttype"/>");
+								</tml:then>
+							</tml:if>
+						
+							BI.PageTypeSelector.initialized = true;
+						}
+					});
+					
+					dsContentTypes.load();
+				}
+			
+			);
+		</script>
+	</tml:else>
+</tml:if>

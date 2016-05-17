@@ -1,0 +1,188 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="change-source">	
+	portlet.imagesource = tmlform.imagesource;
+	portlet.save();
+	if(tmlform.imagesource=="exturl")
+		tmlform.url="";
+</tml:action>
+
+<tml:action id="change-view-mode">
+	portlet.viewmode = tmlparam1;
+	portlet.save();
+</tml:action>
+
+<tml:action id="insert-image">
+	if (tmlform.validate()) {
+		switch(tmlform.imagesource){
+			case "exturl":
+				tmlform.wgakey = tmlform.imageurl;
+				break;
+			case "clipboard":
+				tmlform.imagesource = "extfile";
+				break;
+		}
+	
+		_actionDone = true;
+	}
+</tml:action>
+
+<tml:action id="requestDeleteImage">
+	tmlform.imagesource="deleteImage";
+	callAction("insert-image");
+</tml:action>
+
+<tml:form id="insert-image-form" htmlinput="true" source="none" maxuploadsize="-1">
+
+	<tml:script>
+		if(_modal_dialog_included)
+			tmlform.reset();
+	</tml:script>
+	
+	<tml:input name="wgakey" type="hidden" default="{option('wgakey')}" cssclass="textinput"/>
+		
+	<tml:if istrue="_actionDone">
+		<tml:then>
+			<script>
+	            BI.dialog.hide();
+	            if(BI.dialog.callback)
+	                BI.dialog.callback("<tml:item type="tmlform" name="imageurl"/>", 
+	                	"<tml:item type="tmlform" name="imagesource"/>",
+	                	"<tml:script expression="tmlform.title||''"/>",
+                		{
+	                		type: "<tml:item type="tmlform" name="imagesource"/>",
+	                		key: "<tml:item type="tmlform" name="wgakey"/>"
+	                	}
+	                );
+	        </script>
+		</tml:then>
+		<tml:else>	
+	
+			<script>
+				// submit function called from dialog handler
+				BI.dialog.submit=function(){
+					if(BI.dialog.submitButton.disabled)
+						return;
+					BI.util.callAction("<tml:action ref="insert-image"/>", 
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"inserting image...");
+				}
+				BI.ImageDialog = {};
+				BI.dialog.submitButton.disable();
+				<tml:if condition="option('wgakey')!=null&&option('wgakey')!=''">
+					<tml:then>
+						BI.dialog.submitButton.setText("<tml:label key="dialog.link.update"/>");
+					</tml:then>
+					<tml:else>
+						BI.dialog.submitButton.setText("<tml:label key="dialog.link.insert"/>");
+					</tml:else>
+				</tml:if>
+				
+				BI.dialog.onShow=function(){ 
+					BI.dialog.autoHeight();
+					try {
+						document.forms['insert-image-form'].imageurl.focus();
+					}
+					catch(ex) {
+						
+					}
+				}				
+				WGA.portlet.onload.register("<tml:script>return portlet.portletkey</tml:script>", BI.dialog.onShow);
+			</script>
+			
+					
+			<tml:case condition="tmlform.hasmessages()">
+				<b class="warning"><tml:formmessages divider="<br/>"/></b>
+				<hr size="1">
+			</tml:case>	
+		
+			<table width="100%" border="0" cellspacing="5">
+				
+				<tr>
+					<td width="100">{%label:dialog.image.source%}:</td>
+					<td>
+						<tml:script>
+							_opts = (option('hideexturl') == null || option('hideexturl') == 'false') ? label('dialog.image.sources') : label('dialog.image.sources.lite')
+							if((option('hideexturl') == null || option('hideexturl') == 'false') && _CM_attachment_clipboard && itemlist('_CM_attachment_clipboard').size()>0)
+								_opts += ("," + label("dialog.image.source.clipboard")+"|clipboard")
+						</tml:script>
+						<tml:input 
+							type="select" name="imagesource" cssclass="textinput" 
+							options="{_opts}"
+							changeaction="change-source" ajax="true"
+							default="{option('linktype')||portlet.imagesource||'exturl'}"
+						/>
+					</td>
+				</tr>
+				
+				<tml:if condition="tmlform.imagesource == 'exturl'">
+					<tml:then>
+						<tr>
+							<td width="100">Url:</td>
+							<td>
+								<tml:script>
+									_default = "http://";
+									if(option("linktype")=="exturl" && option("wgakey"))
+										_default = option("wgakey");
+								</tml:script>
+								<tml:input name="imageurl" cssclass="textinput required"
+									default="{_default}"
+							    	validation="$E_VALUE!=''"
+							     	message="{label('dialog.image.url-required')}"
+								/>
+							</td>
+						</tr>
+					</tml:then>
+					<tml:else>
+						<tml:input name="imageurl" validation="true" message="" type="hidden" cssclass="textinput required"/>
+					</tml:else>
+				</tml:if>
+
+				<tml:case condition="option('title')!=null">
+					<tr>
+						<td width="100">{%label:dialog.image.title%}:</td>
+						<td>
+							<tml:input 
+								name="title" cssclass="textinput" 
+								default="{option('title')||''}"
+							/>
+						</td>
+					</tr>
+				</tml:case>
+				
+			</table>
+
+			<tml:include ref="{'::image:mode-'+tmlform.imagesource}" context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}"/>
+			
+			<tml:case condition="option('deleteimage') && option('wgakey')">
+				<tml:button clickaction="requestDeleteImage" ajax="true">
+					<tml:label key="dialog.image.delete-image-from-item" param1="{option('wgakey')}"/>
+				</tml:button>
+			</tml:case>
+			
+		</tml:else>
+	
+	</tml:if>
+</tml:form>	

@@ -1,0 +1,243 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+BI.RTFToolpanel = function(){
+
+	var editor;		
+
+	var updateListener=[];
+	function addUpdateListener(f){
+		updateListener.push(f);
+	}
+	
+	function updateButtons(toolbar){
+		BI.rtftoolbar.updateButtons(toolbar);
+	}
+	
+	function updateMenu(menu){
+		BI.rtftoolbar.updateMenu(menu);
+	}		
+	
+	function doCommand(button, ev){
+		BI.rtftoolbar.restoreEditorSelection();
+		editor.execCmd(button.cmd, button.param||null);
+	};
+
+	var modeButton;
+	function modeButtonHandler(m, ev){
+		editor.changeViewMode(m.mode);
+		if(m.mode!="wysiwyg"){
+			BI.RTFToolpanel.hideTabs();
+			BI.rtftoolbar.hide();
+			BI.setStatus("");
+		}
+		else {
+			BI.RTFToolpanel.showTabs();
+			BI.rtftoolbar.showToolbarDialog();
+			BI.rtftoolbar.getEditor().focus();
+		}
+		modeButton.setText(m.text);
+	}
+	
+	
+	/*
+	 * public interface:
+	 */
+	return{
+
+		init: function(forceParagraphs){
+		
+			editor = BI.rtftoolbar.getEditor();
+			editor.ensureParagraphs=forceParagraphs||false;
+		
+			updateListener=[];
+			BI.rtftoolbar.toolpanel = BI.RTFToolpanel;
+
+			var tab;
+			var tabs = new Ext.TabPanel("rtf-tabs");
+			
+			tabs.addTab("rtf-tab-format", "<tml:label key="rtf.format"/>");
+			
+			tab = tabs.addTab("rtf-tab-table", "<tml:label key="rtf.table"/>");
+			if(BI.rtftoolbar.isCmdDisabled("inserttable"))
+				tab.disable();
+			
+			tab=tabs.addTab("rtf-tab-img", "<tml:label key="rtf.image"/>");
+			if(BI.rtftoolbar.isCmdDisabled("insertimg"))
+				tab.disable();
+			tab=tabs.addTab("rtf-tab-link", "<tml:label key="rtf.link"/>");
+			if(BI.rtftoolbar.isCmdDisabled("insertlink"))
+				tab.disable();
+		
+			tabs.activate("rtf-tab-format");
+		
+			// drag&drop for link-url:
+			BI.sitepanel.ddhandler = new Ext.dd.DropTarget("web-content-wrapper", {
+			
+			    notifyOver: function(dd, e, data){
+			    	if(editor.isEditorSelected() && editor.viewmode=="wysiwyg"){
+			    		if(data.grid){
+			    			for(var i=0; i<data.selections.length; i++){
+			    				var file = data.selections[i].json;
+								// check extension:
+								var ext = file.name.split(".").pop();
+								if((ext=="jpg"||ext=="png"||ext=="gif"||ext=="jpeg") && e.shiftKey){
+									if(editor.toolbar && editor.toolbar.isCmdDisabled("InsertImg"))
+				    					return BI.sitepanel.ddhandler.dropNotAllowed
+				    			}
+				    			else if(editor.toolbar && editor.toolbar.isCmdDisabled("InsertLink"))
+			    					return BI.sitepanel.ddhandler.dropNotAllowed 				    				    			
+			    			}
+			    		}
+		    			else if(editor.toolbar && editor.toolbar.isCmdDisabled("InsertLink"))
+	    					return BI.sitepanel.ddhandler.dropNotAllowed 				    				    			
+			    		return BI.sitepanel.ddhandler.dropAllowed
+			    	}
+			    	else return BI.sitepanel.ddhandler.dropNotAllowed
+			    },
+			    
+			    notifyDrop: function(dragObj, e, data){
+			    	//console.log("drop", e, d);
+			    	if(editor.isEditorSelected() && editor.viewmode=="wysiwyg"){
+			    		if(data.grid){		
+			    			// dropped from attachment panel
+			    			for(var i=0; i<data.selections.length; i++){
+								var file = data.selections[i].json;
+								//console.log("dropped", file);
+								// check extension:
+								var ext = file.name.split(".").pop();
+								
+								var type = file.type || "intfile";
+								var key = file.name;
+								if(type=="extfile")
+									key = file.key;
+								
+								var el;
+								if((ext=="jpg"||ext=="png"||ext=="gif"||ext=="jpeg") && e.shiftKey){
+									if(editor.toolbar && editor.toolbar.isCmdDisabled("InsertImg"))
+				    					continue;
+				    				
+				    				editor.focus();
+
+						        	if(!editor.getParagraph())
+						        		editor.execCmd("FormatBlock", "p");
+
+									el = editor.createImg(file.url, type)
+									AFW.RTF.setURLInfo(el, {type:type,key:key})
+									
+									if(!WGA.isIE)
+										editor.getRange().setStartAfter(el);
+									if(editor.toolbar && editor.toolbar.imageClassOnDrop)
+										el.className += " " + BI.rtftoolbar.imageClassOnDrop;
+								}
+								else{
+									if(editor.toolbar && editor.toolbar.isCmdDisabled("InsertLink"))
+				    					continue;
+				    				editor.focus();
+									el = editor.createLink(file.name, file.name /* default link text */, type);
+									AFW.RTF.setURLInfo(el, {type:type, key:key})
+									if(!WGA.isIE)
+										editor.getRange().setStartAfter(el);
+								}
+								if(BI.sitepanel.iframe.window.WGA.onFileDrop)
+									BI.sitepanel.iframe.window.WGA.onFileDrop(editor, file.name, el);
+							}
+			    		}
+			    		else if(data.type && data.key){		
+			    			// dropped from site explorer
+							if(editor.toolbar && editor.toolbar.isCmdDisabled("InsertLink"))
+		    					return;
+							var atag = editor.createLink(dragObj.dragData.key, dragObj.dragData.title, "int");
+							AFW.RTF.setURLInfo(atag, {type:"int", key:dragObj.dragData.key})
+							if(!WGA.isIE)
+								editor.getRange().setStartAfter(atag);
+						}
+						return true;
+					}
+				}
+			});	
+			BI.sitepanel.ddhandler.addToGroup("GridDD");
+			if(!WGA.isIE)
+				BI.sitepanel.ddhandler.addToGroup("se.tree-entry");
+			
+			modeButton = new Ext.Button("edititem-mode-button", {
+				text: "<tml:label key="rtf.mode.wysiwyg"/>",
+				menu: {
+					items: [
+						{
+							text: "<tml:label key="rtf.mode.wysiwyg"/>"
+							,cls: "x-btn-text-icon"
+							,icon: "../../plugin-wga-app-framework/file/icons/page_edit.png"
+							,mode: "wysiwyg"
+							,handler: modeButtonHandler
+						}
+						,{
+							text: "<tml:label key="rtf.mode.html"/>"
+							,cls: "x-btn-text-icon"
+							,icon: "../../plugin-wga-app-framework/file/icons/html.png"
+							,mode: "html"
+							,disabled: BI.rtftoolbar.isCmdDisabled("edithtml")
+							,handler: modeButtonHandler
+						}
+						,{
+							text: "<tml:label key="rtf.mode.preview"/>"
+							,cls: "x-btn-text-icon"
+							,icon: "../../plugin-wga-app-framework/file/icons/application_side_boxes.png"
+							,mode: "preview"
+							,handler: modeButtonHandler
+						}
+					]
+				}
+			})
+			
+			<tml:include ref="rtftoolpanel:format"/>
+			<tml:include ref="rtftoolpanel:table"/>
+			<tml:include ref="rtftoolpanel:image"/>	
+			<tml:include ref="rtftoolpanel:link"/>	
+			
+		},
+	
+		update: function(eventType){			
+			for(var i=0; i<updateListener.length; i++){
+				try{
+					updateListener[i](eventType)
+				}
+				catch(e){}
+			}
+		},
+		
+		showTabs: function(){
+			if(WGA.isIE7)
+				Ext.get("rtf-tabs").setDisplayed(true);
+			else Ext.get("rtf-tabs").removeClass("x-layout-inactive-content");
+		},
+		hideTabs: function(){
+			if(WGA.isIE7)
+				Ext.get("rtf-tabs").setDisplayed(false);
+			else Ext.get("rtf-tabs").addClass("x-layout-inactive-content");
+		}
+		
+	}
+
+}();	

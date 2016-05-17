@@ -1,0 +1,97 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+/*
+ * Grid View
+ */
+var dragIcon = document.createElement("img");
+dragIcon.src = "<tml:url type="file" doc="images" file="binary.png"/>"
+
+function setGridDragdropEvents(){
+	Ext.select("#attachment-grid-view .x-grid-viewport .x-grid-row").each(function(el){
+		el.dom.draggable=true;
+		el.dom.style.MozUserSelect= "none";
+		el.dom.style.webkitUserSelect= "none";
+		el.dom.style.webkitUserDrag= "element";
+		el.dom.addEventListener("dragstart", function(e){
+			var items = [];
+			var selections = grid.getSelections();
+			if(selections.length){
+				for(var i=0; i < selections.length; i++){
+					items.push(selections[i].json)
+				}		
+			}
+			e.dataTransfer.setData("wga/files", JSON.stringify(items));
+			e.dataTransfer.effectAllowed = "copyLink";
+			e.dataTransfer.setDragImage(dragIcon, 0, 0);
+			return false;
+		})
+	})
+}
+
+var grid = BI.util.createAttachmentGrid("attachment-grid-view", "content", BI.contentkey, 
+			false /*autoheight*/,
+			<tml:script expression="!AFW.request().HTML5DragDropSupported"/> /*EXT-drag-drop*/,
+			true /* lasy load*/,
+			function(){	// onload
+				<tml:case condition="AFW.request().HTML5DragDropSupported">
+					setGridDragdropEvents();
+				</tml:case>
+			}
+);
+
+var store = grid.getDataSource();
+store.load({
+	params:{
+		dbkey: BI.dbkey, key: BI.contentkey, type:'content', who:'attachment-grid-view',
+		filter: filefilter||""
+	}
+});
+
+var dd = grid.getView().dd;
+if(dd){
+	dd.onStartDrag = function(){
+		BI.sitepanel.mask("<tml:label key="drop-attachment-msg"/>");
+		return true;
+	}
+	dd.onEndDrag = function(data, e){
+		BI.sitepanel.unmask();
+		return true;
+	}
+}
+
+grid.getSelectionModel().on("selectionchange", function(){
+	var selections =  grid.getSelections();
+	var items = [];
+	for(var i=0; i<selections.length; i++)
+		items.push(selections[i].id)
+	WGA.event.fireEvent("CMS_attachment_selected", "attachment-grid-view", {items:items})
+})
+
+grid.on("beforeedit", function(e){return false});
+grid.on("dblclick", function(e){
+	var selection=grid.getSelections()[0];
+	BI.dialog.show("file-meta-data", e.target, {filename:selection.data.name,mode:'<tml:item name="_mode"/>'});	
+});

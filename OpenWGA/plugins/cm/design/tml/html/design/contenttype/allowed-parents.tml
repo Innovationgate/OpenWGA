@@ -1,0 +1,88 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="deleteParent">
+	var list=createlist(tmlform.ap_parents.split(","))
+	list.remove(tmlparam1);
+	var ret=[];
+	var it=list.iterator();
+	while(it.hasNext())
+		ret.push(it.next()) 
+	tmlform.ap_parents=ret.join(",");
+</tml:action>
+
+<tml:script>
+	_list=createlist(tmlform.ap_parents.split(","))
+	_list.remove("");
+</tml:script>
+
+<table id="ct-allowedpositions" width="100%" class="collection" style="border:solid silver 1px;background-color:#efefef">
+	
+	<tml:case condition="_getMode('allowedpositions')=='edit'">
+		<tml:case condition="_list.isEmpty()">
+			<tr><td colspan="2"><tml:label key="design.contenttypes.allowedparents.drophere"/></td></tr>
+		</tml:case>
+	</tml:case>
+	
+	<tml:foreach type="itemvalue" item="_list" currentvalue="_entry">
+		<tr>
+			<td style="border-bottom:solid silver 1px">
+				<tml:navigator type="path"  role="none" context="{'db:'+_dbkey+'/docid:'+_entry}">
+					<a href="#" onclick="BI.selectContent('<tml:meta name="structkey"/>')"><tml:meta name="title"/></a>
+					<tml:between>/</tml:between>
+				</tml:navigator>
+			</td>
+			
+			<tml:case condition="_getMode('allowedpositions')=='edit'">
+				<td align="right" style="border-bottom:solid silver 1px">
+					<tml:button clickaction="deleteParent" ajax="true" param1="{_entry}"><tml:label key="delete"/></tml:button>
+				</td>
+			</tml:case>
+			
+		</tr>
+	</tml:foreach>
+</table>
+
+<tml:case condition="_getMode('allowedpositions')=='edit'">
+	<script>
+		var droptarget=new Ext.dd.DropTarget("ct-allowedpositions", {group:'se.tree-entry'});
+		droptarget.notifyDrop=function(dd, e, data){
+			//console.log("dropped " + dd.id + " on dragtarget", data, data.key);
+			var form=document.forms["contenttype-form"];
+			if(form.ap_parents.value.indexOf(data.key)>=0)
+				return false;
+			form.dropkey.value=data.key;
+			WGA.ajax.callAction("<tml:action>
+					if(tmlform.ap_parents.indexOf(tmlform.dropkey)<=0){
+						if(tmlform.ap_parents!="")
+							tmlform.ap_parents += ",";
+						tmlform.ap_parents += tmlform.dropkey
+					}
+					//log.info("added: " + tmlform.dropkey);
+				</tml:action>", "<tml:script>return portlet.portletkey</tml:script>");
+	        return true;
+	   	}
+	</script>
+</tml:case>

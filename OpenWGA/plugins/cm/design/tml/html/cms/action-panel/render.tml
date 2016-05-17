@@ -1,0 +1,101 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="setModeAndContext">
+	var dbkey = request.getParameter("dbkey")
+	var contentkey = request.getParameter("contentkey")
+	var structkey = request.getParameter("structkey")
+	var c = null;
+	
+	if(contentkey){
+		portlet.setMode("content");
+		var c_exp = "db:"+dbkey+"/docid:"+contentkey
+		var c = context(c_exp, false)
+	}
+	else if(structkey){
+		portlet.setMode("struct");
+		var c_exp = "db:"+dbkey+"/$struct:"+structkey
+		var c = context(c_exp, false)
+	}
+	else portlet.setMode("view");
+	portlet.context=c;
+</tml:action>
+
+<tml:action id="setViewModeAndContext">
+	var dbkey = request.getParameter("dbkey")
+	var contentkey = request.getParameter("contentkey")
+	var c = null;
+	
+	if(contentkey){
+		var c_exp = "db:"+dbkey+"/docid:"+contentkey
+		var c = context(c_exp, false)
+	}
+	portlet.setMode("view");
+	portlet.context=c;
+</tml:action>
+
+<script>
+	WGA.event.register(
+		"<tml:script>return portlet.portletkey</tml:script>",
+		"CMS_contentkey_changed", 
+		function(e){
+			Ext.get("action-portlets").setDisplayed(true);
+			Ext.get("createpage").setDisplayed(false);
+		}
+	);
+	WGA.event.register(
+		"<tml:script>return portlet.portletkey</tml:script>",
+		"CMS_createpage", 
+		function(e){			
+			if(e.params.mode=="show"){
+				Ext.get("action-portlets").setDisplayed(false);
+				Ext.get("createpage").setDisplayed(true);
+			}
+			else{
+				Ext.get("action-portlets").setDisplayed(true);
+				Ext.get("createpage").setDisplayed(false);
+			}
+		}
+	);
+</script>
+
+<div id="action-portlets">
+	<tml:portlet name="item-editor" ref="::item-editor:portlet" ajax="true" portletmode="view"/>
+	<tml:portlet name="actions" ref="::actions:portlet" ajax="true" portletmode="view"/>
+	<tml:portlet name="custom-page-info" ref="::custom-page-info:portlet" ajax="true" portletmode="view"/>
+	<tml:portlet name="page-info" ref="::page-info:portlet" ajax="true" portletmode="loading"/>
+	<tml:portlet name="image-lib" ref="::image-lib:portlet" ajax="true"/>
+	<tml:portlet name="image-clipboard" ref="::image-clipboard:portlet" ajax="true"/>
+	<tml:portlet name="attachments" ref="::attachments:portlet" ajax="true"/>
+	<tml:portlet name="content-versions" ref="::content-versions:portlet" ajax="true" portletmode="view"/>
+</div>
+
+<div id="createpage" style="display:none">
+	<tml:include ref="system:info-window" o_title="{label('actions.create-page')}">
+		{%label:actions.create.click-on-create-section%}
+		<br>
+		<button type="button" onclick="BI.sitepanel.showCreateAreas(false)">{%label:cancel%}</button>
+	</tml:include>
+</div>

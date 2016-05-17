@@ -1,0 +1,469 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="updateMetas">
+	//log.info("saveaction: " + option('contentkey') + "/" + (option('contentkey')==''))
+	if(!tmlform.validate())
+		return;
+		
+	try{
+		var struct=document;
+	
+		// handle struct data
+		if(tmlform.struct_title)
+			struct.setTitle(tmlform.struct_title); 	
+		
+		struct.setWorkflowName(tmlform.struct_workflow||null);
+		struct.setMetaData(struct.META_CONTENTTYPE, tmlform.struct_contenttype);
+		if (tmlform.hasfield('struct_childpagerestrictions')) {
+			struct.setChildPageRestrictions(tmlform.field('struct_childpagerestrictions'));
+			if (tmlform.hasfield("struct_allowedchildtypes")) {
+				struct.setAllowedChildTypes(tmlform.fieldlist("struct_allowedchildtypes"));
+			}
+		}
+		
+		if(tmlform.hasField("struct_uniquename"))
+			struct.setUniqueName(tmlform.struct_uniquename || null);
+		
+		if(tmlform.selectAccessContent=="custom")
+			struct.setChildEditors(tmlform.fieldlist("struct_childeditors"));
+		else struct.setChildEditors(tmlform.fieldlist("selectAccessContent"));
+
+		if(tmlform.selectAccessStruct=="custom")
+			struct.setPageEditors(tmlform.fieldlist("struct_pageeditors"));
+		else struct.setPageEditors(tmlform.fieldlist("selectAccessStruct"));
+
+		if(tmlform.selectReaders=="custom")		
+			struct.setReaders(tmlform.fieldList("pagereaders"));
+		else struct.setReaders(WGA.createList());
+
+		// handle repositioning
+		if(tmlform.position){
+			// set position:
+			var Parent;
+			if(struct.isRoot())
+			 	Parent = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/area", struct.getArea())
+			else Parent = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/structentry", struct.getParentEntry())
+			var position;
+			if(tmlform.position=="start"){
+				position=Parent.getChildEntries().getByIndex(0).getPosition()-100;
+			}
+			else{
+				var after_position_struct=document.database.getStructEntryByKey(tmlform.position);
+				position=after_position_struct.getPosition();
+				var next = after_position_struct.getNextSibling();
+				if(next){
+					if(next.getPosition()-position<=1){
+						// renumber siblings in master action:
+						callAction("cms:renumberSiblings", option('dbkey'), tmlform.position); 
+						position += 10;
+					}
+					else position = (next.getPosition()+position) / 2;
+				}
+				else position += 100;
+			}
+			struct.setPosition(position);
+			//log.info("new position = " + position);
+		}
+
+		struct.save();
+		_actionDone=true;
+		var event=createEvent("CMS_dialog_closed");
+		portlet.fireEvent(event);
+	}
+	catch(e){
+		tmlform.addMessage(e.message);
+		logException(e);
+		struct.dropCore();		// resore original struct
+	}
+</tml:action>
+
+<tml:action id="user-lookup">
+	tmlform.user_lookup_field = tmlparam1
+	tmlform.user_lookup_label = tmlparam2
+	var fields = tmlform.getfieldnames().iterator()
+	while(fields.hasNext()){
+		var field = fields.next()
+		tmlform.setField(field, tmlform.fieldlist(field));
+	}
+</tml:action>
+
+<tml:script>
+	_dbkey=option("dbkey");
+	_structkey=option("structkey");
+	_Database=AFW.database(_dbkey);
+	_accessRightsRestricted = (_Database.WGObject.getAttribute("CM.accessRightsRestriction")=='true' && !_Database.isManager())
+</tml:script>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.se.reloadParent(BI.structkey, BI.structkey, function(){
+				BI.selectContent(BI.structkey);
+			});
+		</script>
+	</tml:then>
+
+	<tml:else>
+
+		<tml:script>
+			_Struct=AFW.structentry(document);
+			_mode = "edit";
+			try{
+				document.performSaveCheck();
+			}
+			catch(e){
+				_mode = "view";
+			}
+		</tml:script>
+
+		<script>
+			BI.dialog.setTitle("<tml:label key="dialog.page-settings.title"/>");
+			<tml:if condition="_mode=='edit'">
+				<tml:then>
+					BI.dialog.submitButton.setText("<tml:label key="save"/>");
+					BI.dialog.closeButton.setText("<tml:label key="cancel"/>");
+					BI.dialog.submitButton.show();
+					// submit function called from dialog handler		
+					BI.dialog.submit=function(){					
+						BI.util.callAction("<tml:action ref="updateMetas"/>",
+							"<tml:script>return portlet.portletkey</tml:script>",
+							"");
+					}
+				</tml:then>
+				<tml:else>
+					BI.dialog.closeButton.setText("<tml:label key="close"/>");
+					BI.dialog.submitButton.hide();
+				</tml:else>
+			</tml:if>					
+			BI.dialog.closeButton.show();
+			WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", BI.dialog.autoHeight);
+		</script>
+
+		<tml:case condition="tmlform.hasmessages()">
+			<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+			<hr size="1">
+		</tml:case>		
+	
+		<table width="100%" border="0" cellspacing="5">
+			
+			<tml:case condition="db().getContentStoreVersion()>=5">
+				<tr>
+					<td>{%label:properties.unique-name%}:</td>
+					<td>
+						<tml:script>
+							_uname_edit_mode = _mode
+							if(_mode=="edit" && !_Database.isManager())
+								_uname_edit_mode="view"	// uinque names may only changed by managers.
+						</tml:script>
+						<tml:input mode="{_uname_edit_mode}" name="struct_uniquename" default="{UNIQUENAME}" store="false" cssclass="textinput"/>
+					</td>
+				</tr>
+			</tml:case>
+			
+			<tml:comment>
+				Since WGA 5.4 we don't show page titles anymore
+				Since 2.4.4 we allow managers to edit the title
+			</tml:comment>
+			<tml:case condition="_Database.isManager()">
+				<tr>
+					<td width="1%">{%label:properties.pagetitle%}:</td>
+					<td>
+						<tml:input mode="{_mode}" store="false" name="struct_title" default="{TITLE}" 
+							validation="$E_VALUE!=''"
+							message="{label('properties.pagetitle.validation')}"
+							cssclass="textinput required"
+						/>
+					</td>
+				</tr>
+			</tml:case>
+	
+			<tml:case condition="_mode=='edit'">
+				<tr>
+					<td width="1%">{%label:properties.position%}:</td>
+					<td>
+						<tml:if condition="_change_position">
+							<tml:then>
+								<tml:script>
+									_position_list = createObject("position-list").getSiblingsList(_Struct);
+									_position_list.add(0, label("properties.position.do-not-change")+"|");	
+								</tml:script>
+								<tml:if condition="_position_list.size()>1">
+									<tml:then>							
+					     				<tml:input mode="{_mode}" name="position" type="select" optionsitem="_position_list" default=""/>
+					     			</tml:then>
+					     			<tml:else>
+					     				<tml:label key="properties.position.no-positions-avaliable"/>
+					     			</tml:else>			     			
+								</tml:if>
+							</tml:then>
+							<tml:else>
+								<a href="<tml:url type="action" ajax="true">
+									_change_position=true;
+								</tml:url>">
+									<tml:label key="properties.position.change-position"/>
+								</a>
+							</tml:else>
+						</tml:if>
+					</td>
+				</tr>
+			</tml:case>
+			
+			<tr>
+				<td width="30%">{%label:pagetype%}:</td>
+				<td>
+					<tml:script>
+						if(_mode=="edit")
+							_opts=_Database.getAllowedContentTypeOptions(_Struct.getParentEntry())
+						else _opts=_Struct.getContentTypeName();
+						if(!tmlform.struct_contenttype)
+							tmlform.struct_contenttype = _Struct.getContentTypeName();
+					</tml:script>
+					<tml:input 
+						mode="{_mode=='view' || !_Database.isManager() || !_Struct.getAllContentInStatus('g').isEmpty() || !_Struct.getAllContentInStatus('w').isEmpty() ? 'view':_mode}" 
+						store="false" name="struct_contenttype"
+						type="select"
+						options="{_opts}" 
+						changeaction="$refresh"
+						cssclass="textinput"
+					/>
+				</td>
+			</tr>
+			<tr>
+				<td width="1%" valign="top">{%label:workflow%}:</td>
+				<td>
+					<tml:script>
+						_opts=_Database.getWorkflows();
+						// find workflow default info
+						//var wf = document.getWorkflowName();
+						var wf = document.getMetaData(document.META_WORKFLOW_NAME)
+						var default_wf = _Database.WGObject.getContentType(tmlform.struct_contenttype).getWorkflow();
+						
+						var parent = document.getParentEntry()
+						while(parent){						
+							var p_wf = parent.getMetaData(document.META_WORKFLOW_NAME)
+							if(p_wf){
+								default_wf = p_wf
+								break;
+							}
+							parent = parent.getParentEntry() 
+						}
+						
+						_opts.add(0, label("properties.struct-workflow-default", WGA.createList([default_wf||"none"]))+"|");
+						if(!tmlform.struct_workflow){
+							tmlform.struct_workflow=(wf||"")
+						}
+					</tml:script>
+					<tml:input 
+						mode="{_mode=='view' || !_Database.isChiefEditor() ? 'view':_mode}" 
+						store="false" name="struct_workflow" 
+						type="select"
+						options="{_opts}"
+						cssclass="textinput"/>
+				</td>
+			</tr>
+			
+			<tml:case condition="!_accessRightsRestricted">
+				
+				<tml:case condition="db().getContentStoreVersion()>=5">
+					<tr>
+						<td valign="top">
+							<tml:label key="properties.child-page-restrictions"/>
+						</td>
+						<td>
+							<span>
+								<tml:input name="struct_childpagerestrictions"
+									mode="{_mode}"
+									type="select"
+									options="{label('properties.child-page-restrictions-options')}"
+									ajax="true"
+									changeaction="$refresh"
+									default="{document.getChildPageRestrictions()}"
+								/>
+							</span>
+							<tml:case condition="tmlform.field('struct_childpagerestrictions')=='fixDocTypes'">
+								<tml:script>
+									if(!tmlform.struct_allowedchildtypes){
+										tmlform.struct_allowedchildtypes=document.getAllowedChildTypes();
+									}
+									_docTypes = WGA.createList();
+									for (ct in Iterator(document.getDatabase().getContentTypes())) {
+										_docTypes.add(ct.getName());
+									}
+								</tml:script>
+								<div style="margin-top: 5px; max-height: 100px; overflow: auto">
+									<tml:input mode="{_mode}" name="struct_allowedchildtypes"
+										multiple="true" type="checkbox" optionsitem="_docTypes">
+											id="struct_allowedchildtypes"
+									</tml:input>
+								</div>
+							</tml:case>
+						</td>
+					</tr>
+				</tml:case>
+				<tr>
+					<td colspan="2" style="padding-top:10px">
+						<b><tml:label key="dialog.page-settings.personal-rights"/> ...</b>
+					</td>
+				</tr>
+				<tr>
+					<td valign="top">
+						<tml:script>
+							var childEditors=document.getChildEditors();
+							var value="";
+							if(!childEditors.isEmpty()){
+								value=childEditors.get(0);	
+								if(value!="" && value!="*" && value!="%none")
+									value="custom";
+							}
+							if(tmlform.selectAccessContent==null)
+								tmlform.selectAccessContent=value;
+						</tml:script>
+						<tml:if condition="tmlform.selectAccessContent=='custom' && _mode=='edit' && _Database.isUserQueryable()">
+							<tml:then>
+								<a href="<tml:url action="user-lookup" param1="struct_childeditors" param2="properties.who-may-create-children" portletmode="user-lookup" ajax="true"/>" title="{%label:properties.button.ldap-lookup%}">
+									{%label:properties.who-may-create-children%}</a>:
+							</tml:then>
+							<tml:else>
+								{%label:properties.who-may-create-children%}:
+							</tml:else>
+						</tml:if>
+					</td>
+					<td>
+						<span>
+							<tml:input name="selectAccessContent" 
+								type="select"
+								options="{label('properties.struct-editors-options')}"
+								store="false" 
+								mode="{_mode}"							
+								changeaction="$refresh"
+								ajax="true"
+							/>
+						</span>
+						<tml:case condition="tmlform.selectAccessContent=='custom'">
+							<tml:script>
+								if(!tmlform.struct_childeditors){
+									tmlform.struct_childeditors=document.getChildEditors();
+								}
+							</tml:script>
+							<tml:input mode="{_mode}" name="struct_childeditors"
+								multiple="true" type="textarea" cssclass="textinput" store="false">
+									id="struct_childeditors"
+							</tml:input>
+						</tml:case>
+					</td>
+				</tr>
+				<tr>
+					<td valign="top">
+						<tml:script>
+							var pageEditors=document.getPageEditors();
+							var value="";
+							if(!pageEditors.isEmpty()){
+								value=pageEditors.get(0);
+								if(value!="" && value!="*" && value!="%none")
+									value="custom";
+							}
+							if(tmlform.selectAccessStruct==null)
+								tmlform.selectAccessStruct = value;
+						</tml:script>
+						<tml:if condition="tmlform.selectAccessStruct=='custom' && _mode=='edit' && _Database.isUserQueryable()">
+							<tml:then>
+								<a href="<tml:url action="user-lookup" param1="struct_pageeditors" param2="properties.who-may-edit-this-page" portletmode="user-lookup" ajax="true"/>" title="{%label:properties.button.ldap-lookup%}">
+									{%label:properties.who-may-edit-this-page%}</a>:
+							</tml:then>
+							<tml:else>
+								{%label:properties.who-may-edit-this-page%}:
+							</tml:else>
+						</tml:if>
+					</td>
+					<td>
+						<span>
+							<tml:input name="selectAccessStruct" 
+								type="select"
+								options="{label('properties.struct-editors-options')}"
+								store="false" 
+								mode="{_mode}" 
+								changeaction="$refresh"
+								ajax="true"
+							/>
+						</span>
+						<tml:case condition="tmlform.selectAccessStruct=='custom'">
+							<tml:script>
+								if(!tmlform.struct_pageeditors){
+									tmlform.struct_pageeditors=document.getPageEditors();
+								}
+							</tml:script>
+							<tml:input mode="{_mode}" name="struct_pageeditors" 
+								multiple="true" type="textarea" cssclass="textinput" store="false">id="struct_pageeditors"</tml:input>
+						</tml:case>
+					</td>
+				</tr>
+				<tml:case condition="db(option('dbkey')).getContentStoreVersion()>=5 && db().isPageReadersEnabled()">
+					<tr>
+						<td valign="top">
+	
+							<tml:script>
+								if(tmlform.selectReaders==null)
+									tmlform.selectReaders = (document.getReaders().size() ? "custom":"")
+							</tml:script>
+	
+							<tml:if condition="tmlform.selectReaders=='custom' && _mode=='edit' && _Database.isUserQueryable()">
+								<tml:then>
+									<a href="<tml:url action="user-lookup" param1="pagereaders" param2="pagereaders" portletmode="user-lookup" ajax="true"/>" title="{%label:properties.button.ldap-lookup%}">
+										<tml:label key="pagereaders"/></a>:
+								</tml:then>
+								<tml:else>
+									<tml:label key="pagereaders"/>:
+								</tml:else>	
+							</tml:if>					
+						</td>
+						<td>
+							<div>
+								<tml:input name="selectReaders" 
+									type="select"
+									options="{label('properties.struct-readers-options')}"
+									store="false" 
+									mode="{_mode}" 
+									changeaction="$refresh"
+									ajax="true"
+								/>
+							</div>
+							<tml:case condition="tmlform.selectReaders=='custom'">
+								<tml:script>
+									if(!tmlform.pagereaders)
+										tmlform.pagereaders = document.getReaders();
+								</tml:script>
+								<tml:input mode="{_mode}" name="pagereaders" multiple="true" type="textarea" cssclass="textinput">id="pagereaders"</tml:input>
+							</tml:case>
+						</td>
+					</tr>
+				</tml:case>
+				
+			</tml:case>
+		</table>
+
+	</tml:else>
+</tml:if>
+	

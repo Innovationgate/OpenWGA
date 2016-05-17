@@ -1,0 +1,117 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:case context="[db:{option('dbkey')}/docid:{option('contentkey')}]" iscontextvalid="true">
+	<tml:script>
+		var itemValues = itemList(option("item"));
+		var iliReader = WGA.service(Packages.de.innovationgate.wgpublisher.webtml.utils.ImageLinkReader);
+		var ili = iliReader.read(itemValues);
+				
+		_filename = ili.getFile() || ""
+		_container = ili.getDoc() || ""
+		_dbkey = ili.getDb() || ""
+		_title = ili.getTitle() || ""
+		
+		_linktype= _container ? "extfile" : "intfile"
+		_wgakey = _filename;
+		if(_container){
+			_wgakey = _container + "/" + _filename
+			if(_dbkey)
+				_wgakey += "/" + _dbkey;
+			// check if container is a content key
+			if(_container.indexOf(".")<0)
+				_linktype="file"
+		}
+	</tml:script>
+	
+	<script>
+		BI.dialog.callback=function(url, linktype, title, linkdata){
+			console.log("BI.dialog.callback", url, linktype, title, linkdata);
+
+			var path = WGA.util.decodeURI(url).split("/");
+			var filename=path.pop();
+
+			var dbkey="";
+			var container = "";
+			if(linktype=="file" || linktype=="extfile"){
+				var parts = linkdata.key.split("/");
+				container = parts[0];
+				filename = parts[1];
+				dbkey = parts[2]||""
+			}
+			else if(linktype=="intfile"){
+				filename = linkdata.key
+			}
+
+			WGA.ajax.action({
+				params: {
+					edititem: "<tml:option name="item"/>",
+					title: title,
+					container: container,
+					dbkey: dbkey,
+					filename: filename,
+					linktype: linktype
+				},
+				action: "<tml:action>
+				
+					var linktype = request.getParameter("linktype");
+					var title = request.getParameter("title");
+					var container = request.getParameter("container");
+					var dbkey = request.getParameter("dbkey");
+					var filename = request.getParameter("filename");
+					var edititem = request.getParameter("edititem");
+				
+					if(linktype=="deleteImage")
+						content().removeItem(edititem);
+					else{
+						var iliReader = WGA.service(Packages.de.innovationgate.wgpublisher.webtml.utils.ImageLinkReader);
+						var ili = iliReader.create(filename);
+						if(container)
+							ili.setDoc(container);
+						if (title) {
+							ili.setTitle(title);
+						}
+						if(dbkey)
+							ili.setDb(dbkey);
+						content().setItemValue(edititem, iliReader.write(ili));
+					}
+					content().save();
+					_imgChanged = true;
+				</tml:action>"
+			})
+		}
+		<tml:case istrue="_imgChanged">
+			BI.selectContent();
+		</tml:case>
+	</script>
+	
+	<tml:include ref="::rtf:insert-image" 
+		o_linktype="{_linktype}"
+		o_deleteimage="true"
+		o_hideexturl="true"
+		o_title="{_title}"
+		o_wgakey="{_wgakey}" 
+	/>	
+</tml:case>

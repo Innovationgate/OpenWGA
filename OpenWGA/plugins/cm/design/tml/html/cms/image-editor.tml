@@ -1,0 +1,186 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:form id="image-editor-form">
+
+	<tml:input name="dbkey" type="hidden"/>
+	<tml:input name="contentkey" type="hidden"/>
+
+	<tml:script>
+		_so=AFW.Util.serializeJsObject({
+			dbkey: tmlform.dbkey,
+			contentkey: tmlform.contentkey
+		})
+	</tml:script>
+	
+	<script>
+		WGA.event.register(
+			"<tml:script>return portlet.portletkey</tml:script>",
+			"CMS_contentkey_changed", 
+			function(e){
+				var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+				form.dbkey.value=e.params.dbkey;
+				form.contentkey.value=e.params.contentkey;
+				WGA.ajax.callAction("<tml:action ref="$refresh" portletmode="view"/>");
+			}
+		);
+
+		BI.sitepanel.initImgDropHandler=function(itemname, item){
+			
+			var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+			
+			function isDesktopDrop(dt){
+				return WGA.isWebKit ? (dt.types.indexOf("Files")>=0) : (dt.types.contains("Files"))
+			}
+			function isFilesDrop(dt){
+				return WGA.isWebKit ? (dt.types.indexOf("wga/files")>=0) : (dt.types.contains("wga/files"))
+			}
+			
+			function storeFilenameToItem(filename, container, dbkey){
+			
+				WGA.ajax.action({
+					params: {
+						filename: filename,
+						container: container,
+						dbkey: dbkey,
+						edititem: itemname						
+					},
+					action: "<tml:action ajax="norefresh">
+						
+							var filename = request.getParameter("filename")
+							var container = request.getParameter("container")
+							var dbkey = request.getParameter("dbkey")
+							var edititem = request.getParameter("edititem")
+						
+							var iliReader = WGA.service(Packages.de.innovationgate.wgpublisher.webtml.utils.ImageLinkReader);
+							var ili = iliReader.create(filename);
+							ili.setTitle(filename);
+							if(container)
+								ili.setDoc(container);
+							if(dbkey)
+								ili.setDb(dbkey);
+							
+							var c = context("db:"+tmlform.dbkey + "/docid:"+tmlform.contentkey, false);
+							if(c){
+								c.content().setItemValue(edititem, iliReader.write(ili));
+								c.content().save();
+								log.info("saved " + filename + " in item " + edititem); 
+							}
+							else log.info("save image-item: invalid context")
+						</tml:action>",
+					id: "<tml:script expression="portlet.portletkey"/>",
+					mode: "norefresh"
+				})
+			}
+		
+			item.on("dragenter", function(e){
+				this.setStyle("opacity", .5);
+				e.preventDefault();
+			})
+			item.on("dragleave", function(e){
+				this.setStyle("opacity", 1);
+				e.preventDefault();
+			})
+			item.on("dragover", function(e){
+				e.preventDefault();
+				var dt = e.browserEvent.dataTransfer;
+				if(isFilesDrop(dt) || isDesktopDrop(dt)){
+					dt.dropEffect = "copy";
+				}
+				else dt.dropEffect = "none";
+			})
+			
+			item.on("drop", function(e){
+				
+				this.setStyle("opacity", 1);
+				e.preventDefault();
+				var dt = e.browserEvent.dataTransfer;
+				
+				if(isDesktopDrop(dt)){
+					for(var i=0; i<dt.files.length; i++){
+						var file = dt.files[i];
+						var ext = file.name.split(".").pop();
+						if("jpg,jpeg,png,gif".indexOf(ext)>=0){
+							var el = this;
+							BI.UploadManager.upload(file, {
+								url: "<tml:url type="tml" name="cms:action-panel:attachments:html5-upload-processor"/>",
+								params: {
+									so: "<tml:item name="_so"/>",
+									filename: file.name
+								},
+								callback: function(filename){
+									WGA.event.fireEvent("CMS_attachments_changed");
+									var img_el = el.child(".WGA-Item-Value img")
+									var url = "../../file/" + form.contentkey.value + "/"+filename.replace(/\+/g, "%2B");
+									if(img_el){
+										img_el.dom.src=url
+										img_el.dom.title=filename
+									}
+									else{
+										el.child(".WGA-Item-Value").createChild({
+											tag: "img",
+											src: url
+										})
+										el.child(".WGA-Item-Label").setStyle("display", "none");
+									}
+									storeFilenameToItem(filename);
+								}
+							})
+							break;	// only take the first image
+						}
+					}
+				}
+
+				else if(isFilesDrop(dt)){
+					var json = e.browserEvent.dataTransfer.getData("wga/files")
+					if(!json)
+						return;
+					var data = JSON.parse(json)
+					if(!data || !data[0] || !data[0].mimetype.indexOf("image/")==0)
+						return;
+					var file = data[0]
+					//console.log("image drop", file);
+					
+					var img_el = this.child(".WGA-Item-Value img")
+					if(img_el){
+						img_el.dom.src=file.url;
+						img_el.dom.title=file.name;
+					}
+					else{
+						this.child(".WGA-Item-Value").createChild({
+							tag: "img",
+							src: file.url
+						})
+						this.child(".WGA-Item-Label").setStyle("display", "none");
+					}
+					storeFilenameToItem(file.name, file.container, file.dbkey);
+				}
+			})
+		
+		}
+
+		
+	</script>
+
+</tml:form>

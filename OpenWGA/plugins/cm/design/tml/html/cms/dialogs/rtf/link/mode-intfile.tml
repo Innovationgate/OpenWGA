@@ -1,0 +1,148 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<div id="link-attachmentview-container">
+	<div id="link-attachmentview-toolbar"></div>
+	<div id="link-attachmentview" class="ychooser-view">
+		<tml:case portletmode="view">
+			<tml:img doc="images" file="loading.gif"/> loading ...
+		</tml:case>
+		<tml:case portletmode="upload">
+			<tml:include ref="::upload"/>
+		</tml:case>
+	</div>
+</div>
+
+<script>
+	
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function() {
+	
+		var tb = new Ext.Toolbar('link-attachmentview-toolbar');
+		
+		<tml:case portletmode="view">
+		
+			var datastore = new Ext.data.Store({
+			    proxy: new Ext.data.HttpProxy({
+			        url: '<tml:url type="tml" medium="html" layout="json:get-attachments"/>'	        
+		        }),    
+		        reader: new Ext.data.JsonReader({
+			        id: 'id',
+		            root: 'data'                
+		        },
+		        [
+			        { name: 'id'   }, 
+			        { name: 'name' },
+		            { name: 'url'  },		            
+		            { name: 'size' }
+		        ])
+			});
+			
+			tb.add(
+				 Ext.util.Format.ellipsis('{%label:page%}: <tml:script expression="AFW.Util.encodeForScript(TITLE)"/>', 35),
+				'->',
+				{
+	        		icon: '<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="attach.png"/>', 
+	        		cls: 'x-btn-icon',
+	        		tooltip: '{%label:dialog.image.upload%}',
+	        		handler: function() {
+	        			WGA.ajax.callAction("<tml:action>portlet.setMode("upload")</tml:action>", "<tml:script>return portlet.portletKey</tml:script>");
+	        		}
+	    		}
+			);
+			
+		
+	        var cm = new Ext.grid.ColumnModel([
+				{id:'name', header:'{%label:dialog.image.col-filename%}', sortable:true, dataIndex:'name' },
+				{id:'size', header:'{%label:dialog.image.col-filesize%}', sortable:true, align:"right", renderer: BI.util.renderFileSize, dataIndex:'size' }
+			]);
+	
+			// do not allow multiple selection of grid rows
+			var singleSelectionModel = new Ext.grid.RowSelectionModel({singleSelect: true});
+	        // create the Grid
+	        var grid = new Ext.grid.Grid('link-attachmentview', {
+	            ds: datastore,
+	            cm: cm,
+	            selModel: singleSelectionModel,
+	            autoExpandColumn: 'name'
+	        });
+	         
+	       grid.on('rowclick', function(g, idx, e) {
+	        	var data = datastore.getAt(idx).data;
+				BI.LinkDialog.selectLink(data.url, data.id, data.id);
+	        });
+	        
+	        grid.on('rowdblclick', function(g, idx, e) {
+	        	BI.dialog.submit();
+	        });
+	        
+	        grid.render('link-attachmentview');   
+			
+			datastore.load({
+			  	params:{
+					type: 'content',
+					key: '<tml:option name="contentkey"/>',	
+					dbkey: '<tml:option name="dbkey"/>'
+				}
+			});	
+			
+			
+			datastore.on('load', function() {
+					var key = '<tml:option name="wgakey"/>';
+		        	var node = datastore.getById(key);
+					if (node) {
+						BI.LinkDialog.selectLink(node.data.url, node.data.id, node.data.id);
+						grid.getSelectionModel().selectRecords([node], false);
+						// find row to focus
+						for (var i=0; i < datastore.data.items.length; i++) {
+							if (datastore.data.items[i].id == key) {
+								grid.getView().focusRow(i);
+								break;
+							}
+						}
+					}
+	        });		
+		</tml:case>
+		
+		<tml:case portletmode="upload">
+			
+			tb.add(
+				'<tml:label key="dialog.image.headline.upload-file"/> ...', 
+				'->',
+				{
+	        		icon: '<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="cancel.png"/>', 
+	        		cls: 'x-btn-icon',
+	        		tooltip: '{%label:cancel%}',
+	        		handler: function() {
+	        			WGA.ajax.callAction("<tml:action>
+	        					portlet.setMode("view");
+	        				</tml:action>", "<tml:script>return portlet.portletkey</tml:script>");
+	        		}
+	    		}
+			);
+			
+		</tml:case>
+	
+	});
+	
+</script>

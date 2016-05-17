@@ -1,0 +1,101 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>	
+	if (_modal_dialog_included){
+		portlet.setMode("view");	
+	}
+	_BookmarkManager = createObject("cms:bookmark-manager", option("dbkey"));
+</tml:script>
+
+<div id="bookmarktoolbar"></div>
+
+<tml:form id="bookmark-manager-form" source="none">
+	<script>
+		WGA.portlet.onload.register("<tml:script>return portlet.portletkey</tml:script>", BI.dialog.autoHeight);
+		
+		BI.BookmarkManager = {
+			tree: null,
+			toolbar: null,
+			submitAction: null,
+		
+			enableButton : function(id, enable) {
+				if (!this.toolbar)
+					return;
+				this.toolbar.items.each(function (item) {
+					if (item.id == id) enable ? item.enable() : item.disable();
+				});
+			},
+		
+			enableFolderEdit : function(enable) {
+				this.enableButton('editFolder', enable);
+				this.enableButton('deleteFolder', enable);
+			},
+			
+			enableBookmarkEdit : function(enable) {
+				this.enableButton('editBookmark', enable);
+				this.enableButton('deleteBookmark', enable);		
+			},
+			
+			setPortletMode : function(mode) {
+				this.getForm().portletmode.value = mode;
+				WGA.ajax.action({
+					id: "<tml:script>return portlet.portletkey</tml:script>",
+					action:"<tml:action>
+						if (tmlform.hasField("folder") && tmlform.hasField("bookmark")) {
+							portlet.folder = tmlform.folder;
+							portlet.bookmark = tmlform.bookmark;
+							portlet.save();
+						}
+						portlet.setMode(tmlform.portletmode);
+					</tml:action>"
+				});
+			},
+				
+			getForm : function() {
+				return document.forms['<tml:script expression="tmlform.formid"/>'];
+			}
+			
+		};		
+
+		BI.dialog.submit=function(){
+			if(BI.BookmarkManager.submitAction)
+				WGA.ajax.callAction(BI.BookmarkManager.submitAction, "<tml:script expression="portlet.portletkey"/>");
+		}
+	</script>
+	
+	<tml:select>
+		<tml:case portletmode="edit-folder,new-folder,delete-folder,edit-bookmark,delete-bookmark">
+			<tml:include ref="::mode-edit"/>
+		</tml:case>
+		
+		<tml:case portletmode="view">
+			<tml:include ref="::mode-view"/>
+		</tml:case>
+	</tml:select>
+	
+	<tml:input name="portletmode" type="hidden"/>
+	
+</tml:form>
+

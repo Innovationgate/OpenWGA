@@ -1,0 +1,465 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:input name="fielddata" type="hidden"/>
+
+<tml:script>
+	_so=AFW.Util.serializeJsObject({
+		dbkey: meta("database", "dbkey"),
+		contentkey: KEY
+	})
+	
+	var database = db(option("dbkey"));
+	_maxTextUploadSize = database.getAttribute("CM.MaxTextUploadSize");
+</tml:script>
+
+<script>		
+	var editoroptions = {};
+	<tml:case condition="tmlform.editoroptions">
+		try{
+	 		editoroptions = Ext.decode("<tml:script expression="AFW.Util.encodeForScript(tmlform.editoroptions)"/>");
+	 	}
+	 	catch(e){
+	 		Ext.Msg.alert("Unable to parse RTF-Editor Options", 
+	 			"<tml:script expression="AFW.Util.encodeForScript(tmlform.editoroptions)"/><hr size='1'><b>" + e + "</b>");
+	 	}
+	</tml:case>
+	var wga4editoroptions = Ext.decode("<tml:script expression="AFW.Util.encodeForScript(tmlform.wga4editoroptions)"/>");
+
+	var editor = new AFW.RTF.editor("item_<tml:item name="edititem" type="tmlform"/>", {
+		document: BI.sitepanel.iframe.document,
+		contentinfo: BI.sitepanel.iframe.window.WGA.contentinfo,
+		autofocus: true,
+		css: editoroptions.css,
+		style: editoroptions.style,
+		width: "100%",
+		editHelper: BI.rtftoolbar.editHelper,
+		pasteUnformatted: <tml:script>
+			var preventFormattedPasting = db(option("dbkey")).getAttribute("CM.PreventFormattedPasting");
+			return preventFormattedPasting=="incapablebrowsers"
+		</tml:script>,
+
+		onready: function(editor){
+			<tml:case condition="AFW.request().HTML5FileUploadsSupported && AFW.request().HTML5DragDropSupported">
+				// enable desktop file drag&drop
+
+				function isDesktopDrop(dt){
+					return WGA.isWebKit ? (dt.types.indexOf("Files")>=0) : (dt.types.contains("Files"))
+				}
+				function isFilesDrop(dt){
+					return WGA.isWebKit ? (dt.types.indexOf("wga/files")>=0) : (dt.types.contains("wga/files"))
+				}
+				
+				function forceCreateLink(){
+					if(editor.getNearestTagFromSelection("img"))
+						return false;
+					else if(editor.getNearestTagFromSelection("a"))
+						return true;
+					else{
+						var selection = editor.getSelectedText()
+						return !selection.isCollapsed
+					}
+				}
+				
+				function setDropEffect(e){
+					var dt = e.dataTransfer;
+					if(!isFilesDrop(dt) && !isDesktopDrop(dt))
+						dt.dropEffect = "none"
+					else dt.dropEffect = (e.shiftKey||forceCreateLink() ? "link":"copy");
+				}
+				
+				function ignoreEvent(e) {
+				    e.preventDefault();
+				}
+				function dragover(e) {
+					setDropEffect(e);
+				    e.preventDefault();
+				}
+				function dragenter(e) {
+					setDropEffect(e);
+					editor.focus();
+				    e.preventDefault();
+				}
+		
+				function drop(e) {
+					if(!e.dataTransfer){
+						return;
+					}
+					setDropEffect(e);
+
+				    e.preventDefault();
+				    e.stopPropagation();
+				    
+					if(e.dataTransfer.getData("wga/files")){
+						var data = JSON.parse(e.dataTransfer.getData("wga/files"))
+						if(forceCreateLink()){
+							insertAttachment(data[0], true);
+						}
+						else{
+							for(var i=0; i<data.length; i++)
+								insertAttachment(data[i], e.dataTransfer.dropEffect=="link");
+						} 
+						return;
+					}
+					if(!e.dataTransfer.files || e.dataTransfer.files.length==0){
+						return;
+					}
+				    
+					if(!editor.toolbar)
+						return;
+						
+					// Files drop from local file system:
+					if(forceCreateLink()){
+						if(!editor.toolbar.isCmdDisabled("InsertLink"))
+							handleFile.defer(100, this, [e.dataTransfer.files[0], "link"]);
+					}
+					else{
+					    for(var i=0; i<e.dataTransfer.files.length; i++){
+						    var file = e.dataTransfer.files[i];
+						    
+							// check if images/links are allowed in RTF config
+							if(e.dataTransfer.dropEffect=="copy" && file.type.indexOf("image/")==0){
+								// create image ?
+								if(editor.toolbar.isCmdDisabled("InsertImg")){
+									if(editor.toolbar.isCmdDisabled("InsertLink"))
+										return;		// no images and no links allowed
+									if (confirm("Images are not allowed. Do you want to create a link instead?"))
+										handleFile.defer(100, this, [file, "link"]);
+									else return;
+								}
+								else handleFile.defer(100, this, [file, "image"]);
+							}
+							else if(!editor.toolbar.isCmdDisabled("InsertLink"))
+								handleFile.defer(100, this, [file, "link"]);
+				    	}
+				    }
+				}
+				
+				function insertAttachment(file, as_link){
+					if(as_link && !editor.toolbar.isCmdDisabled("InsertLink")){
+						var el = editor.createLink(file.url, file.name, file.type||"intfile");
+						AFW.RTF.setURLInfo(el, {type:file.type||"intfile", key:file.key||file.name})
+						editor.getRange().setStartAfter(el);
+					}
+					else if(!editor.toolbar.isCmdDisabled("InsertImg")){
+						if(!file.poster)
+							return;
+			        	if(!editor.getParagraph())
+			        		editor.execCmd("FormatBlock", "p");
+						var el = editor.createImg(file.poster, file.type||"intfile")
+						AFW.RTF.setURLInfo(el, {type:file.type||"intfile", key:file.key||file.name})
+						el.alt = file.name;
+						editor.getRange().setStartAfter(el);
+					}
+				}
+				
+				function handleFile(file, cmd){
+					
+					var filename = file.name.toLowerCase();
+					var editor = BI.rtftoolbar.getEditor();
+					
+					if(cmd=="image"){
+			        	// create image
+			        	
+			        	if(!editor.getParagraph())
+			        		editor.execCmd("FormatBlock", "p");
+			        	
+						var el = editor.createImg("<tml:url type="file" doc="images" file="ajax-loader-2.gif"/>", "intfile")
+						AFW.RTF.setURLInfo(el, {type:"intfile", key:filename})
+						el.alt = "uploading ..."
+						editor.getRange().setStartAfter(el);
+						if(editoroptions.imageClassOnDrop)
+							el.className += " " + editoroptions.imageClassOnDrop; 
+						if(editoroptions.onImageDrop)
+							editoroptions.onImageDrop(editor, filename, el);
+
+						if(BI.sitepanel.iframe.window.WGA.onFileDrop)
+							BI.sitepanel.iframe.window.WGA.onFileDrop(editor, filename, el);
+						
+						BI.UploadManager.upload(file, {
+							url: "<tml:url type="tml" name="cms:action-panel:attachments:html5-upload-processor"/>",
+							params: {
+								so: "<tml:item name="_so"/>",
+								filename: file.name
+							},
+							callback: function(filename){
+						    	WGA.event.fireEvent("CMS_attachments_changed");
+						    	AFW.RTF.setURLInfo(el, {type:"intfile", key:filename})
+						    	el.src="../../file/<tml:meta name="key"/>/"+filename;
+						    	el.alt = filename;
+						    	el.style.opacity=null;
+							}
+						})
+						 
+					}
+					else{
+						// create link
+						var el = editor.createLink(filename, filename, "intfile");
+						AFW.RTF.setURLInfo(el, {type:"intfile", key:filename})
+						editor.getRange().setStartAfter(el);
+
+						if(BI.sitepanel.iframe.window.WGA.onFileDrop)
+							BI.sitepanel.iframe.window.WGA.onFileDrop(editor, filename, el);
+				        
+						BI.UploadManager.upload(file, {
+							url: "<tml:url type="tml" name="cms:action-panel:attachments:html5-upload-processor"/>",
+							params: {
+								so: "<tml:item name="_so"/>",
+								filename: file.name
+							},
+							callback: function(){
+						    	WGA.event.fireEvent("CMS_attachments_changed");
+						    	el.href="../../file/<tml:meta name="key"/>/"+filename;
+							}
+						})
+						 
+					}
+				}
+				
+				var dropbox = editor.iframe ? editor.iframe.contentWindow : editor.editelement;
+			    dropbox.addEventListener("dragenter", dragenter, true);
+			    dropbox.addEventListener("dragover", dragover, true);
+			    dropbox.addEventListener("drop", drop, true);
+					    
+			</tml:case>
+
+		}
+
+
+	});
+	
+	function showToolPanel(){
+		BI.rtftoolbar.setEditor(editor);
+		BI.rtftoolbar.sectionStyleList = editoroptions.sectionStyleList || [];
+		BI.rtftoolbar.paragraphStyleList = editoroptions.paragraphStyleList || wga4editoroptions.paragraphStyleList || [];
+		BI.rtftoolbar.tableStyleList = editoroptions.tableStyleList || wga4editoroptions.tableStyleList || [];
+		BI.rtftoolbar.trStyleList = editoroptions.trStyleList || wga4editoroptions.trStyleList || [];
+		BI.rtftoolbar.tdStyleList = editoroptions.tdStyleList || wga4editoroptions.tdStyleList || [];
+		BI.rtftoolbar.imageStyleList = editoroptions.imageStyleList || [];
+		BI.rtftoolbar.linkStyleList = editoroptions.linkStyleList || [];
+		BI.rtftoolbar.textStyleList = editoroptions.textStyleList || [];
+		BI.rtftoolbar.imageClassOnDrop = editoroptions.imageClassOnDrop;
+		BI.rtftoolbar.linkClassOnDrop = editoroptions.linkClassOnDrop;
+
+		// allowed H-Tags:		
+		BI.rtftoolbar.headings=editoroptions.headings||"h1,h2,h3,h4,h5,h6";
+		
+		BI.rtftoolbar.init(editoroptions.hideoptions||wga4editoroptions.hideoptions||"",
+					editoroptions.showoptions||wga4editoroptions.showoptions||"");
+		BI.rtftoolbar.show();
+	
+		BI.RTFToolpanel.init(<tml:script expression="tmlform.forceparagraphs=='1'"/>);
+		BI.RTFToolpanel.update();
+		BI.RTFToolpanel.showTabs();
+	}
+	showToolPanel.defer(200);		// init tools asynchron so that editor shows up fast
+	
+	/*
+	 * Methods used by save action to retrieve editor data:
+	 */
+	BI.contenteditor.getFieldData=function(){
+		return BI.rtftoolbar.getEditor().getRTFHTML();
+	}
+
+	BI.contenteditor.closeEditor = function(){
+		editor.closeEditor();
+		delete editor;
+	}
+	
+	<tml:case condition="_maxTextUploadSize">
+		BI.contenteditor.validate = function(){
+			var len = BI.rtftoolbar.getEditor().getRTFHTML().length/1000000; 
+			if(len > <tml:item name="_maxTextUploadSize" format="0"/>){
+				alert("RTF Field length of " + len + " MB exeeds max length of <tml:item name="_maxTextUploadSize"/> MB");
+				return false;
+			}
+			return true;
+		}
+	</tml:case>
+	
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "CMS_attachments_changed", function(){		
+		var eel = editor.iframe ? editor.doc.body : editor.editelement;
+		var now = new Date();
+		Ext.get(eel).select("img.wga-urltype-intfile").each(function(el){
+			var src = el.dom.src.split("?");
+			var params = {}
+			var cp = src[1];
+			if(cp){
+				cp = cp.split("=");
+				for(var i=0; i<cp.length; i++){
+					params[cp[0]] = cp[1]
+				}
+			}
+			params.ts=now.getTime();
+			console.log(params);
+			var new_params = []
+			for(var i in params)
+				new_params.push(i + "=" + params[i]);
+			
+			el.dom.src=src[0] + "?" + new_params.join("&");
+		})
+	})
+	
+</script>
+
+<hr size="1">
+
+<table>
+	<tr>
+		<td width="70"><tml:label key="rtf.mode"/>:</td>
+		<td><div id="edititem-mode-button"></div></td>
+	</tr>
+</table>
+
+<tml:script>
+	_Request = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/request")
+</tml:script>
+
+<div id="rtf-tabs" style="width:100%" <tml:case condition="!_Request.isIE7">class="x-layout-inactive-content"</tml:case>>
+	<div id="rtf-tab-format" style="overflow:hidden">
+	
+		<div id="rtf-has-text-styles" style="display:none">
+			<h2><tml:label key="rtf.text"/></h1>
+			<table width="100%">
+				<tr>
+					<td width="70"><tml:label key="rtf.text.style"/>:</td>
+					<td><div id="rtf-toolbar-text-styles"></div></td>
+				</tr>
+			</table>
+			<hr size="1">
+			<h2><tml:label key="rtf.paragraph"/></h1>
+		</div>
+		
+		<div id="rtf-toolbar-para"></div>
+		<table width="100%">
+			<tr>
+				<td width="70"><tml:label key="rtf.para-type"/>:</td>
+				<td><div id="rtf-toolbar-format-heading"></div></td>
+			</tr>
+			<tr>
+				<td width="70"><tml:label key="rtf.para-style"/>:</td>
+				<td><div id="rtf-toolbar-format-style"></div></td>
+			</tr>
+		</table>
+
+		<hr size="1">
+
+		<h2><tml:label key="rtf.section"/></h1>
+		<div id="rtf-toolbar-section"></div>
+		<table width="100%">
+			<tr>
+				<td width="70"><tml:label key="rtf.style"/>:</td>
+				<td><div id="rtf-toolbar-section-style"></div></td>
+			</tr>
+		</table>
+		
+	</div>
+	
+	<div id="rtf-tab-table">
+		<div id="rtf-toolbar-table"></div>
+		<div id="rtf-table-form">
+			<table width="100%">
+				<tr id="rtf-table-format-tableStyles">
+					<td><tml:label key="rtf.table"/>:</td>
+					<td><div id="rtf-toolbar-table-tableStyles-button"></div></td>
+				</tr>
+				<tr id="rtf-table-format-trStyles">
+					<td><tml:label key="rtf.table.row"/>:</td>
+					<td><div id="rtf-toolbar-table-trStyles-button"></div></td>
+				</tr>
+				<tr id="rtf-table-format-tdStyles">
+					<td><tml:label key="rtf.table.cell"/>:</td>
+					<td><div id="rtf-toolbar-table-tdStyles-button"></div></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<div id="rtf-tab-img">
+		<div id="rtf-toolbar-img"></div>
+		<div id="rtf-img-form" style="padding:3px">
+			<tml:label key="rtf.source"/>:<br>
+			<div id="rtf-img-type" style="font-weight:bold"><tml:label key="rtf.image.none-selected"/></div>
+			<div id="rtf-img-input-url-wraper" style="display:none">
+				<tml:label key="rtf.url"/>:<br>
+				<tml:input name="img_url" type="textarea" cssstyle="width:100%">id="rtf-img-input-url" rows="3"</tml:input>
+			</div>
+			<tml:label key="rtf.title"/>:<br>
+			<input autocomplete="off" name="img_title" style="width:100%" id="rtf-img-input-title">
+			<tml:label key="rtf.alt"/>:<br>
+			<input autocomplete="off" name="img_alt" style="width:100%" id="rtf-img-input-alt">
+			
+			<table width="95%">
+				<tr>
+					<td><tml:label key="rtf.text-flow"/>:</td>
+					<td><div id="rtf-img-input-align"></div></td>
+				</tr>
+				<tr>
+					<td width="80"><tml:label key="rtf.border-width"/>:</td>
+					<td><input autocomplete="off" id="rtf-img-input-border" size="4"></td>
+				</tr>
+				<tr>
+					<td><tml:label key="rtf.width-height"/>:</td>
+					<td><input autocomplete="off" id="rtf-img-input-width" size="4"> x <input autocomplete="off" id="rtf-img-input-height" size="4"></td>
+				</tr>
+				<tr>
+					<td><tml:label key="rtf.spacing"/>:</td>
+					<td><input autocomplete="off" id="rtf-img-input-padding" size="12"></td>
+				</tr>
+				<tr id="rtf-image-format-tdStyles">
+					<td><tml:label key="rtf.style"/>:</td>
+					<td><div id="rtf-toolbar-imageStyles-button"></div></td>
+				</tr>
+			</table>
+			
+		</div>
+	</div>
+
+	<div id="rtf-tab-link">
+		<div id="rtf-toolbar-link"></div>
+		<div id="rtf-link-form" style="padding:3px">
+			<tml:label key="rtf.link.type"/>:<br>
+			<div id="rtf-link-type" style="font-weight:bold"><tml:label key="rtf.link.none-selected"/></div>
+			<div id="rtf-link-input-url-wraper" style="display:none">
+				<tml:label key="rtf.url"/>:<br>
+				<tml:input name="link_url" type="textarea" cssstyle="width:100%">id="rtf-link-input-url"</tml:input>
+			</div>
+			<tml:label key="rtf.link.target"/>:<br>
+			<tml:input name="link_target" cssstyle="width:100%">id="rtf-link-input-target"</tml:input>
+			<tml:label key="rtf.title"/>:<br>
+			<tml:input name="link_title" cssstyle="width:100%">id="rtf-link-input-title"</tml:input>
+
+			<table>
+				<tr>
+					<td width="80"><tml:label key="rtf.style"/>:</td>
+					<td><div id="rtf-toolbar-linkStyles-button"></div></td>
+				</tr>
+			</table>
+			
+		</div>
+		
+	</div>
+
+</div>
+

@@ -1,0 +1,73 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<html>
+	<head>
+		<style>
+			body{
+				margin: 100px;
+			}
+			* {
+				font-family: sans-serif;
+			}
+			h1{
+				padding:20px;
+				line-height: 50px;
+				background: white;
+				border: solid silver 1px;
+				-moz-border-radius: 5px;
+				-moz-box-shadow: 1px 1px 10px silver;
+				-webkit-border-radius: 5px;
+				-webkit-box-shadow: 1px 1px 10px silver;
+				border-radius: 5px;
+				box-shadow: 1px 1px 10px #efefef;
+			}
+		</style>
+		<script>WGA_cm_init=true</script>
+	</head>
+	
+	<body>
+	
+		<tml:script>
+			// check if db needs init wizzard
+			_hasDesign =AFW.database(dbkey).hasDesign();
+		</tml:script>
+		<tml:if isfalse="_hasDesign">
+			<tml:then>
+				<h1><tml:label key="sitepanel.init.no-design"/></h1>
+			</tml:then>
+			<tml:else>
+				<h1>
+					<div style="float:left;margin-right:20px">
+						<tml:label key="sitepanel.init.message" param1="{dbkey}"/>
+					</div>
+					<tml:image doc="images" file="ajax-loader-2.gif">align="center"</tml:image>
+				</h1>
+			</tml:else>
+		</tml:if>
+	
+	</body>
+	
+</html>

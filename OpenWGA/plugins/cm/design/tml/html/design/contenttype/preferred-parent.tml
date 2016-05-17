@@ -1,0 +1,77 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="deleteParent">
+	tmlform.preferredparent=null;
+</tml:action>
+
+<tml:input type="hidden" name="preferredparent" meta="true"/>
+
+<table id="ct-preferredParent" width="100%" class="collection" style="border:solid silver 1px;background-color:#efefef">
+	<tml:if condition="tmlform.preferredparent==null || tmlform.preferredparent==''">
+		
+		<tml:then>
+			<tr><td colspan="2">
+				<tml:if condition="_getMode('preferredparent')=='edit'">
+					<tml:then><tml:label key="design.contenttypes.preferredparents.drophere"/></tml:then>
+					<tml:else>{%label:design.contenttypes.preferred-parent-none%}</tml:else>
+				</tml:if>
+			</td></tr>
+		</tml:then>
+		
+		<tml:else>
+			<tr>
+				<td style="border-bottom:solid silver 1px">
+					<tml:navigator type="path" role="none" context="{'db:'+_dbkey+'/docid:'+tmlform.preferredparent}">
+						<a href="#"
+							Ext:qtip="click here to open document <tml:meta name="title"/>" 
+							onclick="BI.selectContent('<tml:meta name="structkey"/>')"><tml:meta name="title"/></a>
+						<tml:between>/</tml:between>
+					</tml:navigator>
+				</td>
+				
+				<tml:case condition="_getMode('preferredparent')=='edit'">
+					<td align="right" style="border-bottom:solid silver 1px">
+						<tml:button clickaction="deleteParent" ajax="true"><tml:label key="delete"/></tml:button>
+					</td>
+				</tml:case>
+			</tr>
+		</tml:else>
+	</tml:if>
+</table>
+
+<tml:case condition="_getMode('preferredparent')=='edit'">
+	<script>
+		var droptarget=new Ext.dd.DropTarget("ct-preferredParent", {group:'se.tree-entry'});
+		droptarget.notifyDrop=function(dd, e, data){
+			//console.log("dropped " + dd.id + " on dragtarget", data, data.key);
+			document.forms["contenttype-form"].dropkey.value=data.key;
+			WGA.ajax.callAction("<tml:action>
+					tmlform.preferredparent=tmlform.dropkey;
+				</tml:action>", "<tml:script>return portlet.portletkey</tml:script>");
+	        return true;
+	   	}
+	</script>
+</tml:case>

@@ -1,0 +1,54 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<script>
+	BI.dbkey="<tml:option name="dbkey"/>";
+	BI.dbtitle="<tml:option name="dbtitle"/>";
+	BI.wgaurl="<tml:meta type="request" name="absolutewgaurl"/>";
+	BI.dbpath=BI.wgaurl+"/"+BI.dbkey;
+	
+	BI.wgapath="<tml:meta type="request" name="absolutewgaurl"/>/<tml:meta type="db" name="dbkey"/>";
+	BI.wgaContextPath="<tml:script>return this.getRequest().getContextPath();</tml:script>";
+	BI.POSITIONING_EVERYWHERE = "<tml:script>return Packages.de.innovationgate.webgate.api.WGContentType.POSITIONING_EVERYWHERE;</tml:script>";
+  	BI.POSITIONING_FIXEDPARENTS = "<tml:script>return Packages.de.innovationgate.webgate.api.WGContentType.POSITIONING_FIXEDPARENTS;</tml:script>";
+  	BI.POSITIONING_FIXEDPARENTTYPES = "<tml:script>return Packages.de.innovationgate.webgate.api.WGContentType.POSITIONING_FIXEDPARENTTYPES;</tml:script>";
+  	BI.POSITIONING_ROOTENTRIES = "<tml:script>return Packages.de.innovationgate.webgate.api.WGContentType.POSITIONING_ROOTENTRIES;</tml:script>";
+  	BI.POSITIONING_CHILDENTRIES = "<tml:script>return Packages.de.innovationgate.webgate.api.WGContentType.POSITIONING_CHILDENTRIES;</tml:script>";
+  	
+  	BI.noContentURL="<tml:url type="tml" layout="cms:no-content"/>";
+
+	BI.broken_link_image_url = "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="link_break.png"/>";
+  	
+  	BI.se.features="move,create";
+  	BI.animate={
+  		panels: <tml:script>return !profile.itemlist("animation").contains("panels")</tml:script>,
+  		dialogs: <tml:script>return !profile.itemlist("animation").contains("dialogs")</tml:script>,
+  		siteexplorer: <tml:script>return !profile.itemlist("animation").contains("siteexplorer")</tml:script>
+  	}
+
+	<tml:case condition="profile.hasItem('se_pagesize')">
+		BI.se.pageSize = <tml:script format="0">return profile.se_pagesize</tml:script>;
+	</tml:case>
+	
+</script>

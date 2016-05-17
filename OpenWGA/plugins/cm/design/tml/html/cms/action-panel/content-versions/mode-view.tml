@@ -1,0 +1,187 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>			
+	_archive=createlist();
+	_released_version=null;
+	_draft_version=null;
+	_review_version=null;
+	_currentversion=VERSION;
+	
+	var langs={};
+	
+	var sdoc=content().getStructEntry();
+	var contentlist=sdoc.getAllContent(true);
+	_versions = contentlist.size(); 
+	for(var i=0; i<contentlist.size(); i++){
+		var version=contentlist.get(i);
+		if(version.getLanguage().getName()!=LANGUAGE){
+			var lang=version.getLanguage().getName();
+			var status=version.getStatus();
+			var rating=0;
+			switch(status){
+				case version.STATUS_DRAFT:
+					rating=3;
+					break;
+				case version.STATUS_REVIEW:
+					rating=2;
+					break;
+				case version.STATUS_RELEASE:
+					rating=1;
+					break;
+			}
+			if(!langs[lang]){
+				langs[lang]={};
+				langs[lang].content=version;
+				langs[lang].rating=rating;
+			}
+			else{
+				if(rating>langs[lang].rating){
+					langs[lang].content=version;
+					langs[lang].rating=rating;
+				}
+			}
+			continue;
+		}
+		if(version.getStatus()==version.STATUS_ARCHIVE)
+			_archive.add(version);
+		/*if(version.getVersion()==VERSION)
+			continue;*/
+		if(version.getStatus()==version.STATUS_RELEASE)
+			_released_version=version;
+		else if(version.getStatus()==version.STATUS_DRAFT)
+			_draft_version=version;
+		else if(version.getStatus()==version.STATUS_REVIEW)
+			_review_version=version;
+	}
+	sortList(_archive, "version", "down");
+
+	_languages=createlist();
+	for(var i in langs){
+		_languages.add(langs[i].content)
+	}
+</tml:script>
+		
+
+<tml:case condition="_versions>1">
+	<tml:include ref="system:info-window">
+		
+		<tml:option name="collapsed" expression="portlet.getSessionVar('info_window')!='expanded'"/>
+		<tml:option name="onexpand">
+			WGA.ajax.action({
+				id: "<tml:script expression="portlet.portletkey"/>",
+				action: "<tml:action ajax="norefresh">
+								portlet.setSessionVar("info_window", "expanded");
+						</tml:action>",
+				mode: "norefresh",
+				graydiv: false
+			})
+		</tml:option>
+		<tml:option name="oncollapse">
+			WGA.ajax.action({
+				id: "<tml:script expression="portlet.portletkey"/>",
+				action: "<tml:action ajax="norefresh">
+								portlet.setSessionVar("info_window", "collapsed");;
+						</tml:action>",
+				mode: "norefresh",
+				graydiv: false
+			})
+		</tml:option>
+		
+		<tml:option name="title"><tml:label key="versions.title"/></tml:option>
+		
+		<tml:option name="body">
+			<tml:case condition="_released_version!=null || _draft_version!=null || _review_version!=null">
+				<h1>{%label:versions.actuel-content-versions%}:</h1>
+				<ul>					
+				<tml:case condition="_draft_version!=null">
+					<li><a <tml:case condition="_draft_version.getVersion()==_currentversion">class="selected"</tml:case> 
+						href="#" onclick="BI.selectContent('<tml:script>return _draft_version.getContentKey()</tml:script>')">
+						{%label:version%} <tml:script>return _draft_version.getVersion()</tml:script> ({%label:status.w%})
+					</a></li>
+				</tml:case>
+	
+				<tml:case condition="_review_version!=null">
+					<li><a <tml:case condition="_review_version.getVersion()==_currentversion">class="selected"</tml:case>
+						href="#" onclick="BI.selectContent('<tml:script>return _review_version.getContentKey()</tml:script>')">
+						{%label:version%} <tml:script>return _review_version.getVersion()</tml:script>
+						(
+							<tml:label key="{_review_version.isPendingRelease() ? 'status.pending':'status.g'}"/>
+						)
+					</a></li>
+				</tml:case>
+	
+				<tml:case condition="_released_version!=null">
+					<li><a <tml:case condition="_released_version.getVersion()==_currentversion">class="selected"</tml:case>
+						href="#" onclick="BI.selectContent('<tml:script>return _released_version.getContentKey()</tml:script>')">
+						{%label:version%} <tml:script>return _released_version.getVersion()</tml:script> ({%label:status.p%})
+					</a></li>
+				</tml:case>
+				</ul>
+			</tml:case>
+
+			<tml:case condition="!_archive.isEmpty()">
+				<h1>{%label:archive%}:</h1>				
+				<ul>
+				<tml:foreach id="archive-loop" type="itemvalue" item="_archive" currentvalue="_content" pagesize="{_fullarchive || STATUS==content().STATUS_ARCHIVE?'1000':'3'}">	
+					<li <tml:case condition="VERSION==_currentversion">class="selected"</tml:case>>
+						<a href="#" onclick="BI.selectContent('<tml:meta name="key"/>')"
+							title="<tml:item name="ersetzungsgrund"/>"
+						>
+							{%label:version%} <tml:meta name="VERSION"/> (<tml:meta name="modified" format="{label('format.date.short-with-time')}"/>)
+						</a>
+					</li>
+				</tml:foreach>
+				</ul>
+				<tml:case hasnextpage="archive-loop">
+					<div align="right">
+						<a href="#" onclick="WGA.ajax.callAction('<tml:action>
+								_fullarchive=true;								
+							</tml:action>', '<tml:script>return portlet.portletkey</tml:script>')">
+							<tml:script>return _archive.size()-3</tml:script> {%label:others%} ...
+						</a>		
+					</div>
+				</tml:case>
+				<br>
+
+			</tml:case>
+							
+			<tml:case condition="!_languages.isEmpty()">
+				<b>{%label:versions.other-languages%}:</b>				
+				<ul>
+				<tml:foreach type="itemvalue" item="_languages" currentvalue="_lang" sortexpression="LANGUAGETITLE" sortorder="ascending">	
+					<li>
+						<a href="#" onclick="BI.selectContent('<tml:meta name="key"/>')">
+							<tml:meta name="languagetitle"/>
+						</a>
+					</li>
+				</tml:foreach>
+				</ul>
+			</tml:case>
+
+		</tml:option>
+	</tml:include>
+	
+</tml:case>

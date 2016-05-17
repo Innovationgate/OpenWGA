@@ -1,0 +1,370 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+/*
+ * Imgage tab
+ */
+ 
+var img_toolbar = new Ext.Toolbar("rtf-toolbar-img", [
+	{
+		cmd: "InsertImg",
+		text: "<tml:label key="rtf.change-or-create"/>",
+		cls: "x-btn-text-icon",
+		tooltip: "<tml:label key="rtf.image.change-or-create"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/picture.png",
+		handler: function(button, ev){
+			BI.rtftoolbar.showImageDialog(button, ev);
+		}
+	}
+]);
+
+function imageAlignHandler(m, ev){
+	BI.rtftoolbar.restoreEditorSelection();
+	var el = editor.getNearestTagFromSelection("img");
+	if(el){
+		el.align=m.img_align;
+		//BI.rtftoolbar.update();
+		imageAlignMenu.items.each(function(item){
+			if(item.img_align==m.img_align){
+				imageAlignButton.setText(m.text);
+    	        var btnEl = imageAlignButton.getEl().child("button:first");
+				btnEl.setStyle('background-image', 'url(' +m.icon +')');
+			}
+		})
+	}
+}
+var imageAlignMenu = new Ext.menu.Menu({
+	items:[
+		{
+			text: "<tml:label key="rtf.image.align.none"/>",
+			img_align: "",
+			cls: "x-btn-text-icon",
+			icon: "../../plugin-wga-app-framework/file/icons/text_padding_top.png",
+			handler: imageAlignHandler
+		}
+		,{
+			text: "<tml:label key="rtf.image.align.left"/>",
+			img_align: "right",
+			cls: "x-btn-text-icon",
+			icon: "../../plugin-wga-app-framework/file/icons/text_padding_right.png",
+			handler: imageAlignHandler
+		}
+		,{
+			text: "<tml:label key="rtf.image.align.right"/>",
+			img_align: "left",
+			cls: "x-btn-text-icon",
+			icon: "../../plugin-wga-app-framework/file/icons/text_padding_left.png",
+			handler: imageAlignHandler
+		}
+	]		
+})
+var imageAlignButton = new Ext.Button("rtf-img-input-align", {
+	cls: "x-btn-text-icon",
+	icon: "../../plugin-wga-app-framework/file/icons/text_padding_top.png",
+	text: "<tml:label key="rtf.image.align.none"/>",
+	menu: imageAlignMenu
+})
+
+/* 
+ * image styles
+ */
+function imgStyleHandler(menu, ev){
+	BI.rtftoolbar.restoreEditorSelection();
+	var el = Ext.fly(editor.getNearestTagFromSelection("img"));	
+	if(el){
+		if(menu.checked)
+			el.removeClass(menu.el_style);			
+		else el.addClass(menu.el_style);
+		BI.rtftoolbar.update();
+	}			
+}
+
+var menu = new Ext.menu.Menu()
+for(var i=0; i<BI.rtftoolbar.imageStyleList.length; i++){
+	var style = BI.rtftoolbar.imageStyleList[i].split("|");
+	menu.add(new Ext.menu.CheckItem({
+		text: style[0],
+		el_style: style[1],
+		handler: imgStyleHandler
+	}))
+}
+var imgStyleMenu = menu;
+var imgStyleButton = new Ext.Button("rtf-toolbar-imageStyles-button", {
+	text: BI.rtftoolbar.imageStyleList.length ? "<tml:label key="rtf.style.none"/>" : "<tml:label key="rtf.no-styles-defined"/>",
+	menu: menu
+})
+
+
+var selectedImg;
+addUpdateListener(function(eventType){
+	imageAlignButton.setText("<tml:label key="rtf.image.align.none"/>");
+	
+	//BI.rtftoolbar.restoreEditorSelection();
+	// check for image tag
+	var tag = editor.getNearestTagFromSelection("img");
+	if(tag){
+		selectedImg = tag;
+		var imginfo = AFW.RTF.getURLInfo(tag);
+		var urltype = imginfo.type||"exturl";
+		if(urltype=="intfile" && eventType && eventType!="blur"){
+			WGA.event.fireEvent("CMS_attachment_selected", "rtf-editor", {items:[imginfo.key]})
+		} 
+		Ext.get("rtf-img-type").update('<a href="#">' + {
+			exturl: "<tml:label key="rtf.image.source.exturl"/>",
+			intfile: "<tml:label key="rtf.image.source.intfile"/>",
+			extfile: "<tml:label key="rtf.image.source.extfile"/>",
+			file: "<tml:label key="rtf.image.source.file"/>"						
+		}[urltype] + '</a>');
+		Ext.get("rtf-img-type").on("click", function(ev){
+			BI.rtftoolbar.showImageDialog(null, WGA.isIE?{target:null}:ev);
+		})		
+
+		if(urltype=="exturl")
+			Ext.get("rtf-img-input-url-wraper").setStyle("display", "block");
+		else Ext.get("rtf-img-input-url-wraper").setStyle("display", "none")
+
+		Ext.get("rtf-img-input-url").dom.value=tag.src
+		Ext.get("rtf-img-input-title").dom.value=tag.title;
+		Ext.get("rtf-img-input-alt").dom.value=tag.alt;
+		Ext.get("rtf-img-input-width").dom.value=tag.width;
+		Ext.get("rtf-img-input-height").dom.value=tag.height;
+
+		Ext.get("rtf-img-input-width").setStyle("color", tag.style.width ? "black" : "silver")
+		Ext.get("rtf-img-input-height").setStyle("color", tag.style.height ? "black" : "silver")
+		
+		var vstr = ""
+		var margins = tag.style.margin.match(/[0-9]+/g)
+		if(margins && margins.length)
+			vstr = margins.join(" ");
+		Ext.get("rtf-img-input-padding").dom.value=vstr;
+		
+		var vstr = ""
+		var bwidth = tag.style.borderWidth.match(/[0-9]+/g)
+		if(bwidth && bwidth.length)
+			vstr = bwidth[0];
+		Ext.get("rtf-img-input-border").dom.value=vstr;
+		
+		imageAlignButton.enable();
+		imageAlignMenu.items.each(function(item){
+			if(item.img_align==tag.align){
+				imageAlignButton.setText(item.text);
+    	        var btnEl = imageAlignButton.getEl().child("button:first");
+				btnEl.setStyle('background-image', 'url(' +item.icon +')');
+			}
+		})
+		
+		
+		// image styles:
+		if(BI.rtftoolbar.imageStyleList.length>0){
+			imgStyleButton.enable();
+			var classes = [];
+			imgStyleMenu.items.each(function(item){
+				var class_mach = tag.className.indexOf(item.el_style)>=0;
+				if(class_mach){
+					classes.push(item.text) 
+				}
+				item.setChecked(class_mach)
+			})
+			if(classes.length){
+				//imgStyleButton.setText(classes.join(", "))
+				var buttonText = classes[0];
+				if(classes.length>1)
+					buttonText += ", " + (classes.length-1) +" <tml:label key="more"/> ..."
+				imgStyleButton.setText(buttonText)
+			}
+			else imgStyleButton.setText("<tml:label key="rtf.style.none"/>"); 
+		}
+		else imgStyleButton.disable();
+
+	}
+	else {
+		imgStyleButton.disable();
+		imgStyleButton.setText(BI.rtftoolbar.imageStyleList.length ? "<tml:label key="rtf.style.none"/>" : "<tml:label key="rtf.no-styles-defined"/>")
+		
+		selectedImg = null;
+		
+		Ext.get("rtf-img-type").update("<tml:label key="rtf.image.none-selected"/>");
+		Ext.get("rtf-img-input-url-wraper").setStyle("display", "none");
+		
+		Ext.get("rtf-img-input-url").dom.value="";
+		Ext.get("rtf-img-input-title").dom.value="";
+		Ext.get("rtf-img-input-alt").dom.value="";
+		Ext.get("rtf-img-input-border").dom.value="";
+		Ext.get("rtf-img-input-width").dom.value=""
+		Ext.get("rtf-img-input-height").dom.value=""
+		Ext.get("rtf-img-input-padding").dom.value=""
+
+		imageAlignButton.disable();
+	}
+
+	updateButtons(img_toolbar)
+})
+
+/* setup key event handlers */
+
+var h_el = Ext.get("rtf-img-input-height");
+var w_el = Ext.get("rtf-img-input-width");
+var border_el = Ext.get("rtf-img-input-border");
+var padding_el = Ext.get("rtf-img-input-padding");
+var title_el = Ext.get("rtf-img-input-title");
+var alt_el = Ext.get("rtf-img-input-alt");
+
+function handleUpDown(event, el){
+	var step = event.shiftKey?10:1;
+	switch(event.getKey()){
+		case Ext.EventObject.UP:
+			el.value = Number(el.value)+step;
+			break;
+		case Ext.EventObject.DOWN:
+			el.value = Number(el.value)-step;
+			break;
+	}
+}
+
+var recalcHeight = new Ext.util.DelayedTask(function(){
+	var img = selectedImg;
+	
+	img.removeAttribute("width");
+	img.removeAttribute("height");
+	
+	if(!h_el.dom.value)
+		img.style.height="";
+	else if(h_el.dom.value != img.height){
+		img.style.height = h_el.dom.value+"px";
+		img.style.width="";
+	}
+	
+	h_el.setStyle("color", img.style.height ? "black" : "silver")
+	w_el.setStyle("color", img.style.width ? "black" : "silver")
+	
+	if(h_el.dom.value != img.height)
+		h_el.dom.value = img.height;
+	if(w_el.dom.value != img.width)
+		w_el.dom.value = img.width;
+})
+
+var recalcWidth = new Ext.util.DelayedTask(function(){
+	var img = selectedImg;
+	img.removeAttribute("height");
+	img.removeAttribute("width");
+	
+	if(!w_el.dom.value){
+		img.style.width="";
+	}
+	else if(w_el.dom.value != img.width){
+		img.style.width = w_el.dom.value+"px";
+		img.style.height="";
+		if(w_el.dom.value != img.width)
+			img.style.width="";
+	}
+
+	h_el.setStyle("color", img.style.height ? "black" : "silver")
+	w_el.setStyle("color", img.style.width ? "black" : "silver")
+	
+	if(h_el.dom.value != img.height)
+		h_el.dom.value = img.height;
+	if(w_el.dom.value != img.width)
+		w_el.dom.value = img.width;
+})
+
+h_el.on("keyup", function(event, el){
+	var img = selectedImg;
+	if(img){
+		handleUpDown(event, el);
+		recalcHeight.delay(250)
+	}
+	
+})
+
+
+w_el.on("keyup", function(event, el){
+	var img = selectedImg;
+	if(img){
+		handleUpDown(event, el);
+		recalcWidth.delay(250)
+	}
+	
+})
+
+border_el.on("keyup", function(event, el){
+	var img = selectedImg;
+	if(img){
+		handleUpDown(event, el);
+		function recalc(){
+			var w = border_el.dom.value
+			if(w){
+				img.style.borderWidth = w+"px";
+				img.style.borderStyle="solid"
+			}
+			else img.style.borderWidth = "";
+		}
+		recalc.defer(500)
+	}
+});
+
+padding_el.on("keyup", function(event, el){
+	var img = selectedImg;
+	if(img){
+		function recalc(){
+			var margins = padding_el.dom.value.match(/[0-9]+/g);
+			
+			if(!margins)
+				margins = [];
+			
+			var extel = Ext.fly(img);			
+			if(margins.length==2)
+				extel.setStyle("margin", margins[0]+"px "+margins[1]+"px");
+			else if(margins.length==4)
+				extel.setStyle("margin", margins[0]+"px "+margins[1]+"px " + margins[2]+"px "+margins[3]+"px");
+			else if(margins.length>=1)
+				extel.setStyle("margin", (margins[0]||0)+"px");
+			else extel.setStyle("margin", null);
+		}
+		recalc.defer(500)
+	}
+});
+
+title_el.on("keyup", function(event, el){
+	var img = selectedImg;
+	if(img){
+		function recalc(){
+			img.title = title_el.dom.value;
+		}
+		recalc.defer(500)
+	}
+});
+
+
+alt_el.on("keyup", function(event, el){
+	var img = selectedImg;
+	if(img){
+		function recalc(){
+			img.alt = alt_el.dom.value || img.src.split("/").pop();
+			if(alt_el.dom.value != img.alt)
+				alt_el.dom.value = img.alt;
+		}
+		recalc.defer(500)
+	}
+});
+

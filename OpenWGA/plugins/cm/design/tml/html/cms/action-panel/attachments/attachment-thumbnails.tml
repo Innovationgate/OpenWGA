@@ -1,0 +1,198 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+/*
+ * Thumbnail View:
+ */
+var tpl = new Ext.Template(
+	'<div data-filename="{id}" class="thumb-wrap {primary} {class}" style="{clear}" id="{id}/ap" draggable="true">',
+		'<div class="thumb" style="background-image:url(\'{thumbnail}\')">',
+			'<tml:image doc="images" file="ajax-loader.gif"/>',
+		'</div>',
+		'<span>{name}</span>',
+	'</div>'
+);
+
+var thumbnail_store = new Ext.data.Store({
+    proxy: new Ext.data.HttpProxy(new Ext.data.Connection({
+    	url: "<tml:url type="tml" name="json:get-attachments"/>",
+    	extraParams: {dbkey: BI.dbkey, type:"content", key: "<tml:meta name="key"/>", sort:"filetype"}
+    })),
+    reader: new Ext.data.JsonReader(
+    	{
+    		id: "id",
+    		totalProperty: "total",
+    		root: "data"
+    	},
+     	[
+     		{name: 'id'},
+     		{name: 'filetype'},
+           	{name: 'primary'},
+           	{name: 'name'},
+           	{name: 'url'},
+           	{name: 'poster'},
+           	{name: 'mimetype'},
+           	{name: 'isImage'},
+           	{name: 'isVideo'},
+           	{name: 'thumbnail'},
+           	{name: 'waiting_for_derivates'},
+           	{name: 'size', type: 'float'}
+      	]
+ 	)
+});
+
+var thumbnail_view = new BI.util.GroupedView('attachment-image-view', tpl, {
+	emptyText : '<div style="padding:10px;"><tml:label key="content-attachments.no-files-found"/></div>',						
+	multiSelect: true,
+	store: thumbnail_store,
+	prepareData: function(data, index){
+		//console.log("prepareData", data, index);
+		if(data.waiting_for_derivates)
+			data.class="waiting_for_derivates"
+		return data;
+	},
+	groupchange: "filetype",
+	cols: 2
+});
+
+thumbnail_view.on("refresh", function(view_el){
+	//console.log("waiting_for_derivates", view_el.query(".waiting_for_derivates"));
+	var els = view_el.query(".waiting_for_derivates")
+	for(var i=0; i< els.length; i++){
+		var el = els[i];
+		(function(el){
+			var c=0;
+			var el = el;
+			var id = el.id;
+			var filename = el.getAttribute("data-filename");
+			var timer = setInterval(function(){
+				//console.log("check waiting", el);
+				c++
+				if(!document.getElementById(id)){
+					clearInterval(timer);
+					//console.log("el no longer available");
+				}
+				thumbnail_store.proxy.load({
+						filter: "file",
+						filename: filename
+					}, thumbnail_store.reader, function(o, options, success){
+						//console.log("loaded", o, options, success);
+						if(o.records.length){
+							var r = o.records[0];
+							if(r.id!=filename)
+								return;		// should not happen
+							if(document.getElementById(id)){
+								if(r.data.thumbnail){
+									Ext.get(el).child(".thumb").setStyle("background-image", "url('" + r.data.thumbnail + "')");									
+								}
+								if(r.data.waiting_for_derivates===false){
+									clearInterval(timer);
+									Ext.get(el).removeClass("waiting_for_derivates");
+									if(BI.sitepanel.iframe.window)
+										BI.sitepanel.iframe.window.WGA.event.fireEvent("derivates-updated", "cm", {
+											filename:filename,
+											posterurl: r.data.poster
+										})
+								}								
+							}
+							//else console.log("el no longer available");
+						}
+					}
+				)
+				if(c >= 20){
+					clearInterval(timer);
+					//console.log("timeout waiting for derivate");
+					Ext.get(el).removeClass("waiting_for_derivates");
+				}
+			}, 1000)
+		})(el)
+	}
+})
+
+thumbnail_store.load({
+	params: {filter: filefilter}
+});
+
+
+thumbnail_view.on('selectionchange', function(){
+	var selections = thumbnail_view.selections;
+	var items = [];
+	for(var i=0; i < selections.length; i++){
+		var id = selections[i].id.split("/")[0];
+		items.push(id)
+	}		
+	WGA.event.fireEvent("CMS_attachment_selected", "attachment-image-view", {items:items})
+});
+
+thumbnail_view.on('dblclick', function(vw, index, node, e){
+	var selection=grid.getSelections()[0];
+	BI.dialog.show("file-meta-data", node, {filename:selection.data.name,mode:'<tml:item name="_mode"/>'});
+});
+
+
+WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "CMS_file_metas_changed", function(ev){
+	if(BI.sitepanel.iframe.window)
+		BI.sitepanel.iframe.window.WGA.event.fireEvent("CMS_file_metas_changed", "cm", ev.params)
+})
+
+<tml:if condition="AFW.request().HTML5DragDropSupported">
+	<tml:then>
+		// Use HTML5 Drag&Drop				
+		thumbnail_store.on("load", function(){
+			Ext.select("#attachment-image-view .thumb-wrap").each(function(el){
+				el.dom.addEventListener("dragstart", function(e){
+					var items = [];
+					var selections = thumbnail_view.selections;
+					var me_selected=false;
+					if(selections.length){
+						for(var i=0; i < selections.length; i++){
+							var id = selections[i].id.split("/")[0];
+							var record = store.getById(id);
+							items.push(record.data)
+							if(this.id==selections[i].id)
+								me_selected=true;
+						}		
+					}
+					if(!me_selected){
+						var id = this.id.split("/")[0];
+						var record = store.getById(id);
+						items=[record.data]
+					}
+					e.dataTransfer.setData("wga/files", JSON.stringify(items));
+					e.dataTransfer.effectAllowed = "copyLink"
+					e.dataTransfer.setDragImage(this, 0, 0);
+					return false;
+				}, false);
+			})
+		})
+	</tml:then>
+	<tml:else>
+		var dz = new BI.util.attachmentViewDragZone({
+			view: thumbnail_view,
+			sitepanel_mask_msg: "<tml:label key="drop-attachment-msg"/>",
+			no_images_label: "<tml:label key="content-attachments.images-selected"/>"
+		})
+	</tml:else>
+</tml:if>

@@ -1,0 +1,116 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:form id="portal-modal-dialog" persist="true">
+
+	<tml:input name="dbkey" type="hidden"/>
+	<tml:input type="hidden" name="contentkey"/>
+	<tml:input type="hidden" name="structkey"/>
+	<tml:input type="hidden" name="params"/>
+	<tml:input type="hidden" name="tml"/>
+
+	<script>	
+
+		BI.dialog.show=function(dialogname, el, params){
+			if(!BI.dialog.init(dialogname, el))
+				return;
+			document.forms["portal-modal-dialog"].tml.value=BI.dialog.dialogs[dialogname].tml;
+			document.forms["portal-modal-dialog"].dbkey.value=BI.dbkey;
+			document.forms["portal-modal-dialog"].contentkey.value=BI.contentkey||"";
+			document.forms["portal-modal-dialog"].structkey.value=BI.structkey||"";
+			
+			var encoded_params="";
+			for(p in params)
+				encoded_params += "&"+p+"="+escape(params[p]);
+			document.forms["portal-modal-dialog"].params.value=encoded_params;
+			
+			BI.dialog.submitButton.enable();
+			BI.dialog.closeButton.enable();
+			
+			WGA.ajax.callAction("<tml:action>
+					portlet.setMode("showdialog");
+				</tml:action>", "<tml:script>return portlet.portletkey</tml:script>");
+		}
+
+		BI.dialog.submit=function(){
+			// must be overwritten in dialog-portlet
+			alert("No submit function defined");
+		}
+		// may be overwritten in dialog-portlet:
+		BI.dialog.onShow = BI.dialog.onBeforeShow = BI.dialog.onHide = BI.util.emptyFN;
+
+		WGA.event.register(
+			"<tml:script>return portlet.portletkey</tml:script>",
+			"CMS_dialog_closed",
+			function(e){
+				//console.log("modal-dialog: closing dialog ...");
+				BI.dialog.hide(null);
+				WGA.ajax.callAction("<tml:action>
+						portlet.setMode("view");
+					</tml:action>", "<tml:script>return portlet.portletkey</tml:script>");
+			});
+
+	</script>
+	
+	<tml:script>
+		_tml=tmlform.tml;
+		setOption("dbkey", tmlform.dbkey);
+		setOption("contentkey", tmlform.contentkey);
+		setOption("structkey", tmlform.structkey);
+		try{
+			var encoded_params=tmlform.params;
+			var params_array=encoded_params.split("&");
+			for(p=0; p<params_array.length; p++){
+				var param=params_array[p].split("=");
+				if(param[0]!="")
+					setOption(param[0], unescape(param[1]));
+			}
+		}
+		catch(e){}
+		tmlform.tml=null;		// make sure that tmltorm.tml is empty 
+		
+		// check for Geck-Browsers:
+		_isGecko = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/request").isGecko
+		_modal_dialog_included=true;
+	</tml:script>
+	
+</tml:form>
+
+<div class="BI-dialog" <tml:case istrue="_isGecko">style="position:fixed;"</tml:case>>
+	<tml:select>
+		<tml:case portletmode="showdialog">
+			<tml:case condition="_tml!=null">
+				<tml:portlet name="{'dialog'+_tml}" ref="{_tml}" ajax="true"/>
+				<script>
+					BI.dialog.autoHeight();
+					BI.dialog.dialog.show(BI.animate.dialogs ? BI.dialog.el:null);
+				</script>
+			</tml:case>
+		</tml:case>
+		<tml:case portletmode="view">
+			<h1>No Dialog selected.</h1>
+		</tml:case>
+	</tml:select>
+</div>
+

@@ -1,0 +1,213 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="createContent">
+	if(!tmlform.validate())
+		return;
+
+	var structkey=option("structkey");
+	var dbkey=option("dbkey");
+
+	var database = db(dbkey);
+	var sdoc = database.getStructEntryByKey(structkey);				
+	var language = database.getLanguage(tmlform.language);	
+	
+	var Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", database)
+	
+	var cdoc=sdoc.createContent(language, tmlform.title);
+	
+	if(tmlform.docsource=="local"||tmlform.docsource==null){
+		// must we copy elements ?
+		var current_doc = context("db:"+option("dbkey")+"/docid:"+option("contentkey"), false);
+		if (current_doc){
+			AFW.content(cdoc).copyElements(tmlform.fieldlist("copy_from_current"), current_doc.content());
+		}
+	}
+	
+	cdoc.save();
+	
+	// check, if user wants a remote document
+	if(tmlform.docsource=="remote-doc"){
+		var remote_info="db:"+tmlform.remotedb + "/docid:" + tmlform.remotekey+"."+tmlform.language+".0";
+		cdoc.setItemValue("remote_info", remote_info);
+		
+		// copy all items from remote document (this also saves the document):
+		var sourcecontext=context(remote_info, false);
+		if(sourcecontext){
+			var sourcedoc = sourcecontext.content();
+			createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/content", cdoc).copyRemoteData(sourcedoc);
+		}
+		else addwarning("remote document '" + remote_info + "' not found", false);
+	}
+	_actionDone=true;
+	event=createEvent("CMS_dialog_closed");
+	portlet.fireEvent(event);
+
+	_new_structkey=sdoc.getStructKey().toString();
+	_new_contentkey=cdoc.getContentKey().toString();		
+
+</tml:action>
+
+<tml:script>
+	var database = db(option("dbkey"));
+	var att=database.getAttribute(wgacore.DBATTRIB_USEREMOTECS);
+	_useRemoteContentStores = (att!=null && att.equalsIgnoreCase('true'))
+</tml:script>
+
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.selectContent("<tml:item name="_new_contentkey"/>", "<tml:item name="_new_structkey"/>");
+		</script>
+	</tml:then>
+	
+	<tml:else>
+
+		<tml:form id="create-content-form" source="none">
+		
+			<script>
+				// submit function called from dialog handler and on RETURN
+				BI.dialog.submit=function(){
+					BI.util.callAction("<tml:action ref="createContent"/>", 
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"{%label:dialog.create-content.creating-content%}");
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+					BI.dialog.onShow();
+					BI.dialog.autoHeight();
+				});
+				BI.dialog.onShow=function(){
+					try{
+						document.forms["create-content-form"].title.focus();
+					}
+					catch(e){}
+					BI.makeComboBoxes("create-content-form");
+				};		
+			</script>
+		
+			<tml:script>
+				
+				var database = db(option("dbkey"));
+				var structkey=option("structkey");
+				var structentry = database.getStructEntryByKey(structkey);				
+		
+				//runtime.debug();
+		
+				// get languages:		
+				var langs = database.getLanguages().values().iterator();;
+				tmlform.languages="";
+				while(langs.hasNext()){
+					var lang=langs.next();
+					var langname=lang.getName().toLowerCase();
+					
+					if(!lang.mayCreateContent())
+						continue;
+					if(structentry.hasContent(langname, content().STATUS_RELEASE)
+							|| structentry.hasContent(langname, content().STATUS_REVIEW)
+							|| structentry.hasContent(langname, content().STATUS_DRAFT))
+						continue;
+			
+					if(tmlform.languages!="")
+						tmlform.languages += ","
+					tmlform.languages += lang.getTitle() + "|" + lang.getName();
+				}	
+		
+			</tml:script>
+		
+			<tml:case condition="tmlform.hasmessages()">
+				<h3><tml:formmessages divider="<br/>"/></h3>
+				<hr size="1">
+			</tml:case>		
+		
+			<tml:if condition="tmlform.languages==''">
+				<tml:then>
+					{%label:dialog.create-content.no-languages-available%}
+					<script>
+						BI.dialog.submitButton.hide();
+					</script>
+				</tml:then>
+				<tml:else>
+				    <table width="100%" border="0" cellspacing="5">
+						<tr>
+				     		<td width="100">{%label:title%}:</td>
+				     		<td>
+				     			<tml:input name="title" cssclass="textinput required"
+				     					validation="$E_VALUE!=''"
+				     					message="{label('validation.please-enter-title')}"
+				     			/>
+				     		</td>
+				     	</tr>
+				     	
+				     	<tr>
+				     		<td>{%label:language%}:</td>
+				     		<td>
+				     			<tml:input name="language" type="select" options="{tmlform.languages}"/>
+				     		</td>
+				     	</tr>
+		
+						<tml:case condition="_useRemoteContentStores">
+							<tr>
+								<td>{%label:dialog.create-page.doc-source%}:</td>
+								<td>
+									<tml:input name="docsource" type="select" options="{label('dialog.create-content.options.doc-sources')}"
+										ajax="true"
+										changeaction="$refresh"
+										default="local"
+									/>
+								</td>
+							</tr>
+							<tml:case condition="tmlform.docsource!=null && tmlform.docsource!='local'">
+								<tml:include ref="::select-remote">
+									<tml:option name="language"><tml:item name="language" type="tmlform"/></tml:option>
+								</tml:include>
+							</tml:case>
+						</tml:case>
+
+						<tml:case condition="option('contentkey')">							
+							<tr>
+								<td valign="top" colspan="2" style="border-top: solid #efefef 1px"><tml:label key="dialog.create-content.copy-from-current"/>:</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>
+									<tml:input name="copy_from_current" type="checkbox" options="{label('dialog.create-content.copy-from-current.options')}"/>
+								</td>
+							</tr>
+						</tml:case>
+						
+				     	<tr><td colspan="2">
+							<div style="padding-left:30px;margin-top:10px;background:url('../../plugin-wga-app-framework/file/icons/page_white_add.png') no-repeat 0px 0px;">
+								<tml:label key="{'dialog.create-page.info-create-draft.'+(tmlform.docsource||'local')}"/>
+							</div>
+						</td></tr>
+
+				   	</table>
+				</tml:else>
+			</tml:if>
+		  	
+		</tml:form>
+		
+	</tml:else>
+</tml:if>

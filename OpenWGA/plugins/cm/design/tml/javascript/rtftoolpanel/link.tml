@@ -1,0 +1,162 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+/*
+ * Link tab
+ */
+var link_toolbar = new Ext.Toolbar("rtf-toolbar-link", [
+	{
+		cmd: "InsertLink",
+		text: "<tml:label key="rtf.change-or-create"/>",
+		cls: "x-btn-text-icon",
+		tooltip: "<tml:label key="rtf.link.change-or-create"/>",
+		icon: "../../plugin-wga-app-framework/file/icons/link.png",
+		handler: function(button, ev){
+			BI.rtftoolbar.showLinkDialog(button, ev);					
+		}
+	}
+]);
+
+/* 
+ * link styles
+ */
+function linkStyleHandler(menu, ev){
+	BI.rtftoolbar.restoreEditorSelection();
+	var el = Ext.fly(editor.getNearestTagFromSelection("a"));	
+	if(el){
+		if(menu.checked)
+			el.removeClass(menu.el_style);			
+		else el.addClass(menu.el_style);
+		BI.rtftoolbar.update();
+	}			
+}
+
+var menu = new Ext.menu.Menu()
+for(var i=0; i<BI.rtftoolbar.linkStyleList.length; i++){
+	var style = BI.rtftoolbar.linkStyleList[i].split("|");
+	menu.add(new Ext.menu.CheckItem({
+		text: style[0],
+		el_style: style[1],
+		handler: linkStyleHandler
+	}))
+}
+var linkStyleMenu = menu;
+var linkStyleButton = new Ext.Button("rtf-toolbar-linkStyles-button", {
+	text: BI.rtftoolbar.linkStyleList.length ? "<tml:label key="rtf.style.none"/>" : "<tml:label key="rtf.no-styles-defined"/>",
+	menu: menu
+})
+
+var selectedLink;
+addUpdateListener(function(eventType){
+	// check for links
+	var atag = editor.getNearestTagFromSelection("a");
+	if(atag && atag.href){
+		selectedLink=atag;
+		var linkinfo = AFW.RTF.getURLInfo(atag);
+		var linktype = linkinfo.type
+		if(linktype=="intfile" && eventType && eventType!="blur"){
+			WGA.event.fireEvent("CMS_attachment_selected", "rtf-editor", {items:[linkinfo.key]})
+		} 
+		Ext.get("rtf-link-type").update('<a href="#">' + {
+			exturl: "<tml:label key="rtf.link.source.exturl"/>",
+			int: "<tml:label key="rtf.link.source.int"/>",
+			intfile: "<tml:label key="rtf.link.source.intfile"/>",
+			intname: "<tml:label key="rtf.link.source.intname"/>",
+			file: "<tml:label key="rtf.link.source.file"/>",
+			extfile: "<tml:label key="rtf.link.source.extfile"/>"
+		}[linktype||"exturl"] + '</a>');
+		Ext.get("rtf-link-type").on("click", function(ev){
+			BI.rtftoolbar.showLinkDialog(null, WGA.isIE?{target:null}:ev);
+		})
+		
+		var url=atag.href;
+		if(linktype=="exturl")
+			url = AFW.RTF.getURLInfo(atag).key || url;
+		var e = new RegExp(BI.dbpath+"/html/default/");
+		Ext.get("rtf-link-input-url").dom.value=url.replace(e, "");
+		Ext.get("rtf-link-input-target").dom.value=atag.target;
+		Ext.get("rtf-link-input-title").dom.value=atag.title;
+		if(linktype=="exturl")
+			Ext.get("rtf-link-input-url-wraper").setStyle("display", "block");
+		else Ext.get("rtf-link-input-url-wraper").setStyle("display", "none")
+		
+		// link styles:
+		if(BI.rtftoolbar.linkStyleList.length>0){
+			linkStyleButton.enable();
+			var classes = [];
+			linkStyleMenu.items.each(function(item){
+				var class_mach = atag.className.indexOf(item.el_style)>=0;
+				if(class_mach){
+					classes.push(item.text) 
+				}
+				item.setChecked(class_mach)
+			})
+			if(classes.length){
+				var buttonText = classes[0];
+				if(classes.length>1)
+					buttonText += ", " + (classes.length-1) +" <tml:label key="more"/> ..."
+				linkStyleButton.setText(buttonText)
+			}
+			else linkStyleButton.setText("<tml:label key="rtf.style.none"/>"); 
+		}
+		else linkStyleButton.disable();
+		
+	}
+	else {
+		selectedLink=null;
+		Ext.get("rtf-link-input-url-wraper").setStyle("display", "none");
+		Ext.get("rtf-link-type").update("<tml:label key="rtf.link.none-selected"/>");
+		Ext.get("rtf-link-input-url").dom.value="";
+		Ext.get("rtf-link-input-target").dom.value="";
+		Ext.get("rtf-link-input-title").dom.value="";
+		
+		linkStyleButton.disable();
+		linkStyleButton.setText(BI.rtftoolbar.linkStyleList.length ? "<tml:label key="rtf.style.none"/>" : "<tml:label key="rtf.no-styles-defined"/>")
+	}
+
+	updateButtons(link_toolbar)	
+});
+
+/* setup key event handlers */
+
+var link_target_el = Ext.get("rtf-link-input-target");
+var link_title_el = Ext.get("rtf-link-input-title");
+
+link_title_el.on("keyup", function(event, el){
+	if(selectedLink){
+		function recalc(){
+			selectedLink.title = link_title_el.dom.value;
+		}
+		recalc.defer(500)
+	}
+});
+
+link_target_el.on("keyup", function(event, el){
+	if(selectedLink){
+		function recalc(){
+			selectedLink.target = link_target_el.dom.value;
+		}
+		recalc.defer(500)
+	}
+});

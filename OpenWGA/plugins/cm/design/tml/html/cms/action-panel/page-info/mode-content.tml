@@ -1,0 +1,495 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_Database = AFW.database();
+	_Contenttype = AFW.contenttype(CONTENTTYPE);	
+	
+	_Content=AFW.content();
+	_may_edit_metas = _Content.getDatabase().isChiefEditor() || (_Content.mayEditContent() && _Content.isDraft() && _Content.isMine());
+	_Struct = AFW.structentry();
+
+	_accessRightsRestricted = (_Database.WGObject.getAttribute("CM.accessRightsRestriction")=='true' && !_Database.isManager())
+	
+	try{
+		_user_queryable = _Database.isDnQueryable();
+	}
+	catch(e){
+		_user_queryable = false;
+	}
+</tml:script>
+
+<tml:include ref="system:info-window">
+
+	<tml:option name="collapsed" expression="portlet.getSessionVar('content_info_window')!='expanded'"/>
+	<tml:option name="onexpand">
+		WGA.ajax.action({
+			id: "<tml:script expression="portlet.portletkey"/>",
+			action: "<tml:action ajax="norefresh">
+							portlet.setSessionVar("content_info_window", "expanded");
+							portlet.save()
+					</tml:action>",
+			mode: "norefresh",
+			graydiv: false
+		})
+	</tml:option>
+	<tml:option name="oncollapse">
+		WGA.ajax.action({
+			id: "<tml:script expression="portlet.portletkey"/>",
+			action: "<tml:action ajax="norefresh">
+							portlet.setSessionVar("content_info_window", "collapsed");
+							portlet.save()
+					</tml:action>",
+			mode: "norefresh",
+			graydiv: false
+		})
+	</tml:option>
+
+	<tml:option name="title">
+		<tml:label key="content-info.title"/>
+	</tml:option>
+	<tml:option name="body">
+		
+		<div style="width:100%;overflow:hidden">
+		<table border="0" width="100%">
+			<tr>
+				<td colspan="2">
+					<tml:if istrue="_may_edit_metas">
+						<tml:then>
+							<tml:form id="form-title-edit" htmlinput="ignore">
+								<tml:include ref="system:dyntextedit">
+									<tml:option name="fieldname">title</tml:option>
+									<tml:option name="value" mode="set"><tml:meta name="title"/></tml:option>
+									<tml:option name="action">
+										<tml:action ajax="norefresh">
+											var title = javaObject(tmlform.title).trim()
+											content().setTitle(title);
+											
+											// check for title conflicts
+											var TPM = createObject("cms:titlePathManager");
+											TPM.checkAndHandleTitlePathException(title);
+											
+											content().save();
+											var event=createEvent("CMS_title_changed");
+											portlet.fireEvent(event);
+										</tml:action>
+									</tml:option>
+								</tml:include>
+							</tml:form>
+						</tml:then>
+						<tml:else>
+							<b><tml:metadata name="title"/></b>
+						</tml:else>
+					</tml:if>
+
+					<tml:case condition="createObject('cms:titlePathManager').hasTitlePathException()">
+						<h1 class="error"><tml:label key="content-info.title-conflict"/></h1>
+					</tml:case>
+					
+					<tml:case condition="ersetzungsgrund!=null && ersetzungsgrund!=''">
+						<hr size="1">
+						<div class="reviewinfo">
+							{%label:content-info.replacementreason%}:<br>
+							<tml:item name="ersetzungsgrund"/>
+						</div>							
+					</tml:case>
+					
+					<tml:case condition="VIRTUALLINK">
+						<hr size="1">
+						<div class="reviewinfo">
+							{%label:virtual-document%}<br>
+							<a href="<tml:url/>" target="<tml:script expression="LINKTARGET||'wga-contentmanager-iframe'"/>">
+								<tml:script>
+									_title = virtuallinktitle || VIRTUALLINK
+								</tml:script>
+								<tml:script expression="_title.length>25 ? _title.substr(0, 22)+' ...' : _title"/> 
+							</a>
+						</div>
+					</tml:case>
+					
+					<tml:case isdefined="remote_info">
+						<div style="border:red 1px solid;background-color:white;padding:5px">
+							{%label:content-info.remote-doc-info%}<br>
+							<tml:if context="{remote_info}" iscontextvalid="true">
+								<tml:then>
+									<table>
+										<tr>
+											<td valign="top">{%label:database%}:</td>
+											<td><tml:meta name="title" type="db"/></td>
+										</tr>
+										<tr>
+											<td valign="top">{%label:document%}:</td>
+											<td>
+												<a href="#" onclick="BI.selectDb('<tml:meta name="dbkey" type="db"/>', '<tml:meta name="key"/>')">
+													<tml:meta name="title"/>
+												</a>
+											</td>
+										</tr>
+									</table>
+								</tml:then>
+								<tml:else>
+									<div style="color:red">{%label:content-info.warning-remote-doc-removed%}</div>
+								</tml:else>
+							</tml:if>
+							<tml:case condition="STATUS==content().STATUS_DRAFT">
+								<button style="font-size:8pt" onclick="BI.dialog.show('clear-remote', this);return false">
+									{%label:content-info.remove-remote-connection%}
+								</button>
+							</tml:case>
+						</div>
+					</tml:case>
+					
+				</td>
+			</tr>
+
+			<tml:case context="relation:created-from-template" iscontextvalid="true">
+				<tr>
+					<td><tml:label key="page-template"/>:</td>
+					<td>
+						<a href="javascript:BI.selectContent('<tml:meta name="key"/>')"><tml:metadata name="title"/></a>
+					</td>
+				</tr>
+			</tml:case>
+
+			<tr>
+				<td valign="top">
+					<tml:if condition="_may_edit_metas && _Database.isJdbc()">
+						<tml:then>
+							<a href="#" onclick="BI.dialog.show('tag-editor', this)" title="<tml:label key="click-to-edit"/>">Keywords</a>:
+						</tml:then>
+						<tml:else>
+							Keywords:
+						</tml:else>
+					</tml:if>
+				</td>
+				
+				<tml:if istrue="_may_edit_metas">
+					<tml:then>
+						<td>
+							<tml:form id="form-keywords-edit" htmlinput="ignore">
+								<tml:include ref="system:dyntextedit">
+									<tml:option name="fieldname">keywords</tml:option>
+									<tml:option name="value" mode="set"><tml:meta name="keywords" divider=", "/></tml:option>
+									<tml:option name="action">
+										<tml:action ajax="norefresh">
+											var list = createlist(tmlform.keywords, ",").iterator();
+											var keywords = createlist();
+											// trim:
+											while(list.hasNext()){
+												var v = javaObject(list.next()).trim();
+												if(v)
+													keywords.add(v);
+											}
+											content().setKeywords(keywords);
+											content().save();
+											var event=createEvent("CMS_title_changed");
+											portlet.fireEvent(event);
+										</tml:action>
+									</tml:option>
+								</tml:include>
+							</tml:form>
+						</td>
+					</tml:then>
+					<tml:else>
+						<td><b><tml:metadata name="keywords" divider=", "/></b></td>
+					</tml:else>
+				</tml:if>
+			</tr>
+			
+			<tr>
+				<td>{%label:version%}:</td>
+				<td><tml:meta name="version"/></td>
+			</tr>
+
+			<tml:case condition="!itemlist('remote_references').isEmpty() && remote_references!=''">
+				<tr>
+					<td>{%label:references%}</td>
+					<td>
+						<tml:foreach type="itemvalue" item="remote_references" currentvalue="_ref">
+							<tml:case iscontextvalid="true" context="{_ref}">
+								<tml:range var="_qtip">
+									DB: <tml:meta type="db" name="dbkey"/>
+									<br>Author: <tml:meta name="author"/>
+									<div style='border-top:solid silver 1px'>
+									Path: <tml:path>
+										<tml:meta name="title"/>
+										<tml:between>/</tml:between>
+									</tml:path>
+									</div>
+								</tml:range>
+								<a href="#" onclick="BI.selectDb('<tml:meta name="dbkey" type="db"/>', '<tml:meta name="key"/>')"
+									ext:width="250"
+									ext:qtip="<tml:item name="_qtip"/>"
+								 ><tml:meta name="title"/></a>
+							</tml:case>
+							<tml:between><br></tml:between>
+						</tml:foreach>
+					</td>
+				</tr>
+			</tml:case>
+			
+			<tml:case condition="NAME||PAGENAME">
+				<tr>
+					<td>{%label:uniquename%}:</td>
+					<td><tml:script expression="NAME||PAGENAME"/></td>
+				</tr>
+			</tml:case>
+			
+			<tr>
+				<td>{%label:status%}:</td>
+				<td><b>
+					<tml:script>
+						_pending = (STATUS==content().STATUS_REVIEW && content().isPendingRelease());
+					</tml:script>
+					<tml:label key="{'status.'+(_pending?'pending':STATUS)}"/>
+				</b></td>
+			</tr>
+			
+			<tml:case condition="STATUS==content().STATUS_REVIEW">			
+				<tml:script>
+					if(!_pending){
+						try{
+							var wf = content().getWorkflow();
+							_wf_level_name = wf.getWorkflowLevel().getName();
+							_wf_level_pos = wf.getWorkflowLevel().getPosition();
+							_wf_level_approver = wf.getWorkflowLevel().getReviewers();
+							_wf_level_index = wf.getWorkflowLevelIndex()
+						}
+						catch(e){}
+					}
+				</tml:script>
+				<tml:case isfilled="_wf_level_name">
+					<tr>
+						<td><tml:label key="workflow-level"/>:</td>
+						<td>
+							<b ext:qtip="Approver:<hr><tml:item name="_wf_level_approver" divider="<br>"/>"
+							><tml:item name="_wf_level_name"/></b>
+							(<tml:item name="_wf_level_index"/>)
+						</td>
+					</tr>
+				</tml:case>
+			</tml:case>
+			
+			
+			<tml:case condition="STATUS!=content().STATUS_ARCHIVE">
+
+				<tml:case condition="VALIDFROM!=null">
+					<tr>
+						<td nowrap>{%label:content-info.visable-from%}:</td>
+						<td><b><tml:meta name="validfrom" format="{label('format.date.short-with-time')}"/></b></td>
+					</tr>
+				</tml:case>
+				<tml:case condition="VALIDTO!=null">
+					<tr>
+						<td nowrap>{%label:content-info.visable-to%}:</td>
+						<td><b><tml:meta name="validto" format="{label('format.date.short-with-time')}"/></b></td>
+					</tr>
+				</tml:case>
+				
+				<tr><td colspan="2"><hr size="1"></td></tr>
+				
+				<tml:script>
+					_readers = createlist();
+					var readers = content().getReaders();
+					if(db().isPageReadersEnabled())
+						readers.addAll(content().getStructEntry().getReaders());
+					var readers = readers.iterator();
+					while(readers.hasNext()){
+						var reader = readers.next();
+						_readers.add(reader.length>20? reader.substr(0,17) + "...":reader)
+					}
+				</tml:script>
+				<tml:case condition="!_readers.isEmpty() && !_accessRightsRestricted">
+					<tr>
+						<td valign="top">{%label:readers%}:</td>
+						<td style="color:red">
+							<tml:script expression="_readers.get(0)"/>
+							<tml:case condition="_readers.size()>1">
+								<br>
+								<a style="color:red" href="#" onclick="this.style.display='none';document.getElementById('readers-list').style.display='block'">
+									<tml:label key="show-more-readers" param1="{format(_readers.size()-1, '0')}"/>
+								</a>
+								<div style="display:none" id="readers-list">
+									<tml:foreach count="{_readers.size()-1}" currentvalue="_i">
+										<tml:script expression="_readers.get(_i)"/>
+										<tml:between><br></tml:between>
+									</tml:foreach>
+								</div>
+							</tml:case>
+						</td>
+					</tr>
+				</tml:case>
+
+				<tr>
+					<td>{%label:pagetype%}:</td>
+					<td>
+						<tml:script>
+							_pagetype=_Contenttype.getAlias()
+						</tml:script>
+						<tml:if condition="_Database.isChiefEditor()">
+							<tml:then>
+								<a href="#" onclick="BI.design.contenttype_panel.show({id:'<tml:meta name="CONTENTTYPE"/>'})"><b><tml:item name="_pagetype"/></b></a>
+							</tml:then>
+							<tml:else>
+								<b><tml:item name="_pagetype"/></b>
+							</tml:else>
+						</tml:if>
+					</td>
+				</tr>
+				
+				<tml:case condition="OWNER">
+					<tr>
+						<td><tml:label key="owner"/>:</td>
+						<td><b>
+							<tml:script>
+								_owner = OWNER.length>20? OWNER.substr(0,17) + '...':OWNER
+							</tml:script>
+							<tml:if istrue="_user_queryable">
+								<tml:then>
+									<a href="#" onclick="BI.dialog.show('user-info', this, {dn:'<tml:meta name="owner"/>'})">
+										<tml:item name="_owner"/>
+									</a>
+								</tml:then>
+								<tml:else>
+									<tml:item name="_owner"/>
+								</tml:else>
+							</tml:if>
+						</b></td>
+					</tr>
+				</tml:case>
+				
+				<tr>
+					<td valign="top">{%label:author%}:</td>
+					<td>
+						<tml:script>
+							_author = AUTHOR.length>20? AUTHOR.substr(0,17) + "...":AUTHOR
+						</tml:script>
+						<b>
+							<tml:if istrue="_user_queryable">
+								<tml:then>
+									<a href="#" onclick="BI.dialog.show('user-info', this, {dn:'<tml:meta name="author"/>'})">
+										<tml:item name="_author"/>
+									</a>
+								</tml:then>
+								<tml:else>
+									<tml:item name="_author"/>
+								</tml:else>
+							</tml:if>
+						</b>
+					</td>
+				</tr>
+				<tr>
+					<td>{%label:language%}:</td>
+					<td>
+						<tml:if condition="_Database.isChiefEditor()">
+							<tml:then>
+								<a href="#" onclick="BI.design.languagepanel.show({id:'<tml:meta name="LANGUAGE"/>'})"><b><tml:meta name="languagetitle"/></b></a>
+							</tml:then>
+							<tml:else>
+								<b><tml:meta name="languagetitle"/></b>
+							</tml:else>
+						</tml:if>
+					</td>
+				</tr>
+				
+				<tr>
+					<td>{%label:workflow%}:</td>
+					<td>
+						<tml:if condition="_Database.isChiefEditor() && WORKFLOW">
+							<tml:then>
+								<a href="#" onclick="BI.design.workflowpanel.show({id:'<tml:meta name="WORKFLOW"/>'})"><b><tml:meta name="workflow"/></b></a>
+							</tml:then>
+							<tml:else>
+								<b><tml:script>return WORKFLOW ? WORKFLOW: "-"</tml:script></b>
+							</tml:else>
+						</tml:if>						
+					</td>
+				</tr>
+				
+			</tml:case>
+			
+			<tr><td colspan="2"><hr size="1">
+				<div style="color:gray;"><tml:label key="content-info.version-has-been"/><div>
+			</td></tr>
+						
+			<tr>
+				<td nowrap>{%label:created%}:</td>
+				<td><b><tml:meta name="created" format="{label('format.date.short-with-time')}"/></b></td>
+			</tr>
+			<tml:case condition="(STATUS==content().STATUS_RELEASE || STATUS==content().STATUS_ARCHIVE) && PUBLISHED">
+				<tr>
+					<td nowrap><tml:label key="published"/>:</td>
+					<td><b><tml:meta name="published" format="{label('format.date.short-with-time')}"/></b></td>
+				</tr>
+			</tml:case>
+			<tr>
+				<td nowrap>
+					<tml:if condition="STATUS==content().STATUS_ARCHIVE">
+						<tml:then>
+							<tml:label key="archived"/>:
+						</tml:then>
+						<tml:else>
+							<tml:label key="last-modified"/>:
+						</tml:else>
+					</tml:if>
+				</td>
+				<td><b>
+					<tml:meta name="modified" format="{label('format.date.short-with-time')}"/>
+				</b></td>
+			</tr>
+
+			<tml:case condition="PAGEPUBLISHED || _Content.isInTrashArea()">
+				<tr><td colspan="2">
+					<div style="color:gray;margin-top:10px"><tml:label key="content-info.page-has-been"/></div>
+				</td></tr>
+				<tml:case condition="PAGEPUBLISHED">
+					<tr>
+						<td><tml:label key="published"/>:</td>
+						<td><b><tml:meta name="PAGEPUBLISHED" format="{label('format.date.short-with-time')}"/></b></td>
+					</tr>
+				</tml:case>
+				<tml:case condition="_Content.isInTrashArea()">
+					<tr>
+						<td valign="top"><span style="color:red"><tml:label key="deleted"/>:</span></td>
+						<td>
+							<span style="color:red">
+							<tml:script expression="_Struct.WGObject.getLastModified()" format="{label('format.date.short-with-time')}"/>
+							<br>
+							<tml:label key="by"/> <tml:script expression="_Content.getDeletedBy()"/>
+							</span>
+						</td>
+					</tr>
+				</tml:case>
+			</tml:case>			
+			
+		</table>
+		</div>
+		
+		<div align="right" style="padding-top: 10px">
+			<a href="#" onclick="BI.propertiespanel.show()">{%label:more%} ...</a>
+		</div>
+	</tml:option>
+
+</tml:include>

@@ -1,0 +1,165 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="saveLinkcheckerConfig">
+
+	var config = getmaincontext().db().getContentByName("$linkchecker");
+	if(config==null){
+		var hdb = getmaincontext().hdb();
+		var system = hdb.getOrCreateStorage("system");
+		config = hdb.createContent(system, "linkchecker config");
+		config.setUniqueName("$linkchecker");
+	}
+	if(!isEmptyValue(tmlform.fieldlist('dbkeys')) && !tmlform.email)
+		return tmlform.addMessage(label("linkchecker-config.validationerror.no-mail-address"));
+	tmlform.storeInContent(config);
+	
+	event=createEvent("CMS_dialog_closed");
+	portlet.fireEvent(event);
+
+</tml:action>
+
+<tml:script>
+	var config = getmaincontext().db().getContentByName("$linkchecker");
+	if(config==null){
+		var hdb = getmaincontext().hdb();
+		var system = hdb.getOrCreateStorage("system");
+		config = hdb.createContent(system, "linkchecker config");
+		config.setUniqueName("$linkchecker");
+		config.save();
+	}
+</tml:script>
+
+<tml:form id="linkchecker-config-form" context="db:plugin-contentmanager/name:$linkchecker">
+	<script>
+		// submit function called from dialog handler
+		BI.dialog.submit=function(){
+			BI.util.callAction("<tml:action ref="saveLinkcheckerConfig"/>", 
+				"<tml:script>return portlet.portletkey</tml:script>",
+				"saving configuration");
+		}
+		WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", BI.dialog.autoHeight);		
+	</script>
+	
+	<tml:case condition="tmlform.hasMessages()">
+		<h3><tml:label key="linkchecker-config.validationerror.title"/>:</h3>
+		<ul style="list-style:disc;padding-left:20px">
+			<li style="color:red"><tml:formmessages divider="</li><li>"/></li>
+		</ul>
+		<hr size="1">
+	</tml:case>
+	
+	<table width="100%">
+
+		<tr><td colspan="2"><h1>{%label:linkchecker-config.proxy-settings%}:</h1></td></tr>
+		
+		<tr><td></td><td>
+			<tml:input name="useproxy" type="checkbox" options="{label('linkchecker-config.form.options.use-proxy')}" changeaction="$refresh" ajax="true"/>
+		</td></tr>
+
+		<tml:case condition="tmlform.useproxy=='true'">
+			
+			<tr>
+				<td valign="top">Host:Port</td>
+				<td>
+					<tml:input name="proxyhost">size="40"</tml:input>
+					:
+					<tml:input name="proxyport">size="5"</tml:input>
+				</td>
+			</tr>
+			
+			<tr>
+				<td valign="top">{%label:linkchecker-config.form.proxy-exceptions%}:</td>
+				<td>
+					<tml:input name="proxyexceptions" cssclass="textinput"/>
+				</td>
+			</tr>
+
+			<tr>
+				<td></td>
+				<td>
+					<tml:input name="useproxylogin" type="checkbox" options="{label('linkchecker-config.form.options.proxy-needs-password')}" changeaction="$refresh" ajax="true"/>
+				</td>
+			</tr>
+
+			<tml:case condition="tmlform.useproxylogin=='true'">
+				<tr>
+					<td><tml:label key="username"/>:</td>
+					<td><tml:input name="proxyusername"/></td>
+				</tr>
+				<tr>
+					<td><tml:label key="password"/>:</td>
+					<td><tml:input name="proxypassword" type="password"/></td>
+				</tr>
+			</tml:case>
+			
+		</tml:case>
+
+		<tr><td colspan="2"><hr size="1"></td></tr>
+		<tr><td colspan="2"><h1>{%label:linkchecker-config.publishing-settings%}:</h1></td></tr>
+
+		<tr>
+			<td></td>
+			<td>
+				<tml:input name="no_check_on_publish" type="checkbox" options="{label('linkchecker-config.form.no_check_on_publish.options')}"/>
+			</td>
+		</tr>
+
+		<tr><td colspan="2"><hr size="1"></td></tr>
+		<tr><td colspan="2"><h1>{%label:linkchecker-config.job-settings%}:</h1></td></tr>
+
+		<tr>
+			<td width="150">{%label:linkchecker-config.form.databases%}:</td>
+			<td><tml:input type="textarea" cssstyle="width:100%" name="dbkeys" multiple="true"/></td>
+		</tr>
+		<tr>
+			<td>{%label:linkchecker-config.form.mailserver%}:</td>
+			<td><tml:input name="mailserver" cssstyle="width:100%"/></td>
+		</tr>
+		<tr>
+			<td>{%label:linkchecker-config.form.mailserver_username%}:</td>
+			<td><tml:input name="mailserver_username" cssstyle="width:100%"/></td>
+		</tr>
+		<tr>
+			<td>{%label:linkchecker-config.form.mailserver_password%}:</td>
+			<td><tml:input name="mailserver_password" type="password" cssstyle="width:100%"/></td>
+		</tr>
+		<tr>
+			<td>{%label:linkchecker-config.form.root-url%}:</td>
+			<td><tml:input name="rooturl" cssstyle="width:100%" default="{meta('request', 'absolutewgaurl')}"/></td>
+		</tr>
+		<tr>
+			<td>{%label:linkchecker-config.form.mail-reports-to%}:</td>
+			<td><tml:input name="email" cssstyle="width:100%"/></td>
+		</tr>
+		<tr>
+			<td>{%label:linkchecker-config.form.options%}:</td>
+			<td><tml:input name="options" type="select" options="{label('linkchecker-config.form.options.options')}"/></td>
+		</tr>
+
+		
+
+	</table>
+</tml:form>

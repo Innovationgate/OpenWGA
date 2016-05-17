@@ -1,0 +1,241 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<script>
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "CM-itemSaved", function(ev){	
+		AFW.util.InfoWidget.msg("<tml:label key="actions.item-saved-title"/>", "<tml:label key="actions.item-saved-msg" param1="{tmlform.edititem}"/>");
+	})
+
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "CM-itemSaveError", function(ev){	
+		alert("Unable to save Item:\n" + ev.params.error + "\n\nSee log for more information ...");
+	})
+
+	BI.contenteditor={
+		
+		saveField: function(){
+		
+			if(BI.contenteditor.validate && !BI.contenteditor.validate()){
+				return;
+			}
+		
+			if(document.forms["<tml:script expression="tmlform.formid"/>"].contentkey.value!="<tml:metadata name="key"/>"){
+				return alert("Save in wrong context: <tml:metadata name="key"/>.")
+			}
+		
+			if(BI.contenteditor.getFieldData)
+				document.forms["<tml:script expression="tmlform.formid"/>"].fielddata.value=BI.contenteditor.getFieldData();
+			if(BI.contenteditor.closeEditor)
+				BI.contenteditor.closeEditor();
+
+			BI.sitepanel.iframe.window.onUnloadFunction=BI.util.emptyFN;
+			BI.sitepanel.iframe.window.onbeforeunload=null;			
+			WGA.ajax.callAction("<tml:action>
+						if(!tmlform.validate())
+							return;
+						try{
+							if(tmlform.contentkey!=content().getContentKey()){
+								// This should never happen - but just to avoid saving in wrong context:
+								throw {
+									message: "Save in wrong context: " + content().getContentKey()
+								}
+							}
+							if (tmlform.editor == 'rtf') {
+								tmlform.processRTF("fielddata");
+							}
+						
+							tmlform.storeField("fielddata", content(), tmlform.edititem);
+							if (tmlform.getfilenames().size() > 0) {
+								tmlform.attach(content());
+							}
+							content().save();
+							portlet.setMode("itemSaved");
+							_saveditem=tmlform.edititem;
+							
+							// remove tmlform attachments:
+							var files = tmlform.getfilenames().iterator();
+							while(files.hasNext())
+								tmlform.removefile(files.next())
+						}
+						catch(e){
+							var event = createEvent("CM-itemSaveError");
+							event.addParameter("error", e.message); 
+							portlet.fireEvent(event);
+						}
+				 </tml:action>", "<tml:script>return portlet.portletkey</tml:script>");
+		},
+	
+		saveFieldAndContinue: function(){
+			if(BI.contenteditor.validate && !BI.contenteditor.validate()){
+				return;
+			}
+		
+			if(BI.contenteditor.getFieldData)
+				document.forms["<tml:script expression="tmlform.formid"/>"].fielddata.value=BI.contenteditor.getFieldData();
+			WGA.ajax.action({
+				action: "<tml:action ajax="norefresh">
+						if(!tmlform.validate())
+							return;
+						try{
+							tmlform.storeField("fielddata", content(), tmlform.edititem)
+							content().save();
+							var event = createEvent("CM-itemSaved");
+							event.addParameter("itemname", tmlform.edititem);
+							portlet.fireEvent(event);
+						}
+						catch(e){
+							var event = createEvent("CM-itemSaveError");
+							event.addParameter("error", e.message); 
+							portlet.fireEvent(event);
+						}
+					 </tml:action>",
+				id: "<tml:script>return portlet.portletkey</tml:script>",
+				mode: "norefresh",
+				graydiv: false
+			});
+		},
+
+		removeField: function(){
+			var msgbox = Ext.Msg.confirm("{%label:query-delete-field.title%}", "<tml:label key="query-delete-field.msg" param1="{tmlform.edititem}"/>", function(button){
+				if(button=="yes"){
+					if(BI.contenteditor.closeEditor)
+						BI.contenteditor.closeEditor();
+					BI.sitepanel.iframe.window.onbeforeunload=null;
+					WGA.ajax.callAction("<tml:action>
+						try{
+							content().removeItem(tmlform.edititem);
+							content().save();
+							portlet.setMode("itemSaved");
+							_saveditem=tmlform.edititem;
+						}
+						catch(e){
+							var event = createEvent("CM-itemSaveError");
+							event.addParameter("error", e.message); 
+							portlet.fireEvent(event);
+						}
+					 </tml:action>", "<tml:script>return portlet.portletkey</tml:script>");
+				}
+			})
+			msgbox.getDialog().resizeTo(300, 100);
+		},
+		
+		cancelEdit: function(){
+			if(BI.contenteditor.closeEditor)
+				BI.contenteditor.closeEditor();
+			BI.sitepanel.iframe.window.onUnloadFunction=BI.util.emptyFN;
+			BI.sitepanel.iframe.window.onbeforeunload=null;
+			Ext.get("action-field-edit").update("<tml:label key="edit-canceled"/>")
+			BI.selectContent();
+		}
+	}
+
+	BI.sitepanel.iframe.window.onbeforeunload=function(){
+		return "<tml:label key="item-is-being-edited" param1="{tmlform.edititem}"/>";
+	}
+
+	// find save-and-continue-button and enable it as default:
+	for(var i in BI.toolbarbuttons.fieldedit) {
+		var item = BI.toolbarbuttons.fieldedit[i];
+		if (item.id == 'save-and-continue'){
+			BI.sitepanel.save_and_continue_button = item;
+			item.enable();
+			break;
+		}
+	}
+
+	BI.showToolbarButtons("fieldedit");	
+	
+</script>
+
+<div class="info">
+	<div class="x-layout-panel-hd x-layout-panel-hd-text">
+		<tml:script>
+			_item = tmlform.edititem;
+			if(_item.length>30)
+				_item = _item.substr(0, 27)+"...";
+		</tml:script>
+		<tml:label key="actions.edit-field" param1="{_item + ' (' + tmlform.editor + ')'}"/>
+	</div>
+	<div style="padding:5px" id="action-field-edit">
+		<h1 id="field-edit-label"></h1>
+		<script>
+			var el_edit = Ext.get(BI.sitepanel.iframe.window.document.getElementById("item_<tml:item name="edititem" type="tmlform"/>"))
+			var el_label = el_edit.findParentNode(".WGA-Item", 1, true).child(".WGA-Item-Label") 
+			Ext.get("field-edit-label").update(el_label.dom.innerHTML);
+		</script>		
+
+		<tml:case condition="tmlform.hasmessages()">
+			<ul>
+				<li class="warning"><tml:formmessages divider="</li><li>"/></li>
+			</ul>
+		</tml:case>	
+		
+		<tml:script>
+			var a = tmlform.editor.split(":");
+			_editor = a[0];
+			if(a.length>1){
+				a.shift();
+				setOption("params", a.join(":"));
+			}
+		</tml:script> 
+		<tml:include ref="{'::'+_editor}"/>
+		
+		<div style="margin-top:10px">
+			<hr size="1">
+			<tml:case condition="tmlform.editor!='custom'">
+				<div style="margin-bottom: 5px">
+					<a href="#" onclick="BI.contenteditor.removeField()">
+						<tml:label key="actions.remove-field" param1="{tmlform.edititem}"/> ...
+					</a>
+				</div>
+			</tml:case>
+			<table>
+				<tr>
+					<td id="editor-button-save"></td>
+					<td id="editor-button-cancel"></td>
+				</tr>
+			</table>
+			<script>
+				new Ext.Button("editor-button-save", {
+					text: "{%label:actions.save-field%}",
+					handler: BI.contenteditor.saveField
+				});
+				new Ext.Button("editor-button-cancel", {
+					text: "{%label:cancel%}",
+					handler: BI.contenteditor.cancelEdit
+				});
+			</script>
+			
+		</div>
+		
+	</div>
+	
+	<tml:case condition="_json_parse_error">	
+		<script>
+			 Ext.Msg.alert("Unable to parse Editor Options", 
+	 			"<tml:script expression="AFW.Util.encodeForScript(tmlform.editoroptions)"/><hr size='1'><b><tml:item name="_json_parse_error"/></b>");
+		</script>
+	</tml:case>
+	
+</div>
+

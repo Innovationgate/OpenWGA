@@ -1,0 +1,229 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="addToHistory">
+	var h = _session_cms_history;
+	if(!h)
+		h = []
+	
+	if(h.length && h[0].contentkey==tmlform.contentkey)
+		return;
+	h.unshift({
+		dbkey: tmlform.dbkey,
+		contentkey: tmlform.contentkey,
+		structkey: tmlform.structkey
+	})
+	if(h.length>10)
+		h.pop()
+	setSessionVar("_session_cms_history", h, false);
+</tml:action>
+
+<tml:action id="historyBack">
+	var h = _session_cms_history;
+	h.shift();
+	setSessionVar("_session_cms_history", h, false);
+	_new_content = h[0];
+	tmlform.dbkey=_new_content.dbkey;
+	tmlform.contentkey=_new_content.contentkey;
+</tml:action>
+
+<tml:case isdefined="_new_content">
+	<script>
+		BI.selectDb("<tml:script expression="_new_content.dbkey"/>", "<tml:script expression="_new_content.contentkey"/>");
+	</script>
+</tml:case>
+
+<div id="history-menu"></div>
+
+<tml:form id="form-history-panel" source="none" htmlinput="ignore">
+
+	<tml:input name="dbkey" type="hidden"/>
+	<tml:input name="contentkey" type="hidden"/>
+	<tml:input name="structkey" type="hidden"/>
+
+	<script>
+		WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "CMS_contentkey_changed", function(e){
+			if(!e.params.contentkey || !e.params.structkey)
+				return;
+			var form = document.forms['form-history-panel']
+			if(form.contentkey.value==String(e.params.contentkey))
+				return;
+			form.dbkey.value=e.params.dbkey;
+			form.contentkey.value=e.params.contentkey;
+			form.structkey.value=e.params.structkey;			
+			WGA.ajax.action({
+				action: "<tml:action ref="addToHistory"/>", 
+				id: "<tml:script expression="portlet.portletkey"/>",
+				graydiv: false
+			});
+		});
+
+		var history_menu = new Ext.menu.Menu({
+			items: [
+				<tml:case condition="_session_cms_history && _session_cms_history.length>1">
+					<tml:foreach item="_session_cms_history" currentvalue="_entry" offset="2">
+						<tml:case context="[db:{_entry.dbkey}/docid:{_entry.contentkey}]" iscontextvalid="true">
+							{
+								handler: function(m, ev){
+									BI.selectDb(m.dbkey, m.contentkey);
+								},
+								dbkey: "<tml:meta type="database" name="dbkey"/>",
+								contentkey: "<tml:meta name="key"/>",
+								text: "<tml:meta type="database" name="dbkey"/> - <tml:path role="none">/<tml:metadata name="title" encode="javascript,html"/></tml:path>"
+									+ " (<tml:metadata name="language"/> / <tml:meta name="version" format="000"/> / <tml:meta name="status"/>)"
+							}<tml:between>,</tml:between>
+						</tml:case>
+					</tml:foreach>
+				</tml:case>
+			]
+		})
+		history_menu.on("beforeshow", function(){
+			BI.sitepanel.mask();
+		})
+		history_menu.on("beforehide", function(){
+			BI.sitepanel.unmask();
+		})
+
+		BI.scale=BI.scale || (("<tml:item name="cm_scale_site_panel" type="profile"/>" || 100)+"%");
+		var scale_menu = new Ext.menu.Menu({
+			items: [
+				new Ext.menu.CheckItem(
+				{
+					text: "100%",
+					group: 'scale',
+					checked: BI.scale=="100%",
+					handler: function(m){
+						scaleButton.setText("100%");
+						BI.scale="100%";
+						var el = Ext.get("web-content-wrapper")
+						el.removeClass(["scale50","scale80"]);
+						WGA.ajax.action({
+							action: "<tml:action ajax="norefresh">
+									profile.cm_scale_site_panel="100"
+								</tml:action>",
+							mode: "norefresh",
+							graydiv: false
+						})
+					}
+				})
+				,new Ext.menu.CheckItem(
+				{
+					text: "80%",
+					checked: BI.scale=="80%",
+					group: 'scale',
+					handler: function(m){
+						scaleButton.setText("80%");
+						BI.scale="80%";
+						var el = Ext.get("web-content-wrapper")
+						el.removeClass("scale50").addClass("scale80");
+						WGA.ajax.action({
+							action: "<tml:action ajax="norefresh">
+									profile.cm_scale_site_panel="80"
+								</tml:action>",
+							mode: "norefresh",
+							graydiv: false
+						})
+					}
+				})
+				,new Ext.menu.CheckItem(
+				{
+					text: "50%",
+					checked: BI.scale=="50%",
+					group: 'scale',
+					handler: function(m){
+						scaleButton.setText("50%");
+						BI.scale="50%";
+						var el = Ext.get("web-content-wrapper")
+						el.addClass("scale50").removeClass("scale80");
+						WGA.ajax.action({
+							action: "<tml:action ajax="norefresh">
+									profile.cm_scale_site_panel="50"
+								</tml:action>",
+							mode: "norefresh",
+							graydiv: false
+						})
+					}
+				})
+			]
+		})
+		scale_menu.on("beforeshow", function(){
+			BI.sitepanel.mask();
+		})
+		scale_menu.on("beforehide", function(){
+			BI.sitepanel.unmask();
+		})
+	
+		var scaleButton = new Ext.Toolbar.Button({
+			text: BI.scale,
+			menu: scale_menu
+		})
+	
+		var tb = new Ext.Toolbar("history-menu", [
+			<tml:case condition="_session_cms_history && _session_cms_history.length>1">
+				new  Ext.Toolbar.SplitButton({
+		        	cls: "x-btn-text-icon",
+		        	icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="arrow_left.png"/>",
+					text: "<tml:script encode="javascript,html">
+							var entry = _session_cms_history[1];
+						 	var t = context("db:"+entry.dbkey+"/docid:"+entry.contentkey).TITLE
+						 	return t.length<20 ? t : t.substr(0,17)+"..."
+						</tml:script>",
+					handler: function(){
+						//WGA.ajax.callAction("<tml:action ref="historyBack"/>");
+						BI.selectDb('<tml:script expression="_session_cms_history[1].dbkey"/>','<tml:script expression="_session_cms_history[1].contentkey"/>')
+					},
+					menu: history_menu
+				}),
+				"-",
+			</tml:case>
+			<tml:case condition="_session_cms_history && _session_cms_history.length>0">
+				<tml:case context="[db:{_session_cms_history[0].dbkey}/docid:{_session_cms_history[0].contentkey}]" iscontextvalid="true">
+					"<tml:path role="none">/<tml:metadata name="title" encode="javascript,html"/></tml:path>",
+				</tml:case>
+			</tml:case>
+			"->"
+			<tml:case condition="!AFW.request().isIE || AFW.request().IEVersion()>=10">
+				,scaleButton
+			</tml:case>
+			<tml:case condition="_session_cms_history && _session_cms_history.length>0">
+				<tml:case context="[db:{_session_cms_history[0].dbkey}/docid:{_session_cms_history[0].contentkey}]" iscontextvalid="true">
+				,{
+		        	cls: "x-btn-icon",
+		        	icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="arrow_rotate_clockwise.png"/>",
+					handler: function(){
+						BI.selectDb('<tml:meta type="database" name="dbkey"/>','<tml:meta name="key"/>')
+					}
+				}
+				</tml:case>
+			</tml:case>
+			,{
+	        	cls: "x-btn-icon",
+	        	icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="arrow_turn_right.png"/>",
+				handler: BI.findDocument
+			}
+		])
+	</script>
+	
+</tml:form>

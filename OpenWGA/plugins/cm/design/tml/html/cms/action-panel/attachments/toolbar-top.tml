@@ -1,0 +1,163 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+var filefilter = "<tml:script expression="portlet.filter || ''"/>";
+
+var filterMenu = new Ext.menu.Menu({
+	items: [
+	    {
+	    	text: "<tml:label key="attachments.filter.all-files"/>",
+	    	handler : filterHandler
+	    }
+	    ,"-"
+	    ,{
+	    	text: "<tml:label key="attachments.filter.images"/>",
+	    	filter: "images",
+	    	handler : filterHandler
+	    }
+	    ,{
+	    	text: "<tml:label key="attachments.filter.videos"/>",
+	    	filter: "videos",
+	    	handler : filterHandler
+	    }
+	    ,{
+	    	text: "<tml:label key="attachments.filter.pdfs"/>",
+	    	filter: "pdfs",
+	    	handler : filterHandler
+	    }
+	    ,{
+	    	text: "<tml:label key="attachments.filter.office"/>",
+	    	filter: "office",
+	    	handler : filterHandler
+	    }
+	]
+})
+filterMenu.on("beforeshow", function(){
+	Ext.get("web-content-wrapper").mask();
+});
+filterMenu.on("beforehide", function(){
+	Ext.get("web-content-wrapper").unmask();
+});
+
+function filterHandler(m, ev){
+	filterButton.setText(m.text);
+	filefilter = m.filter;
+	grid.getDataSource().load({
+		params:{dbkey: BI.dbkey, key: BI.contentkey, type:'content', filter: m.filter}
+	})
+	thumbnail_store.load({
+		params:{dbkey: BI.dbkey, key: BI.contentkey, type:'content', sort:"filetype", filter: m.filter}
+	})
+	WGA.ajax.action({
+		id: "<tml:script expression="portlet.portletkey"/>",
+		action: "<tml:action ajax="norefresh">
+						portlet.filter=request.getParameter("filter")
+				</tml:action>",
+		mode: "norefresh",
+		graydiv: false,
+		params: {
+			filter: m.filter			
+		}
+	})
+}
+
+var filterButton = new Ext.Toolbar.Button({
+	text: "<tml:script>
+		switch(portlet.filter){
+			case "images":
+				return label("attachments.filter.images");
+			case "videos":
+				return label("attachments.filter.videos");
+			case "pdfs":
+				return label("attachments.filter.pdfs")
+			case "office":
+				return label("attachments.filter.office")
+			default:
+				return label("attachments.filter.all-files")
+		}
+	</tml:script>",
+	menu: filterMenu
+})
+
+var tb = new Ext.Toolbar("attachment-toolbar-top", [
+    {
+        icon: "<tml:url db="@afw" type="file" doc="icons" file="application_view_list.png"/>",
+        cls: "x-btn-icon",
+		enableToggle: true,
+		toggleGroup: "view",
+		pressed: <tml:script expression="!portlet.view || portlet.view=='list'"/>,					        
+        handler : function(m, ev){
+       		m.toggle(true);
+			Ext.get("attachment-image-view").addClass("x-hidden")
+			Ext.get("attachment-grid-view").removeClass("x-hidden");
+			grid.getView().refresh();			
+			setGridDragdropEvents();
+			WGA.ajax.action({
+				id: "<tml:script expression="portlet.portletkey"/>",
+				action: "<tml:action ajax="norefresh">
+								portlet.view="list";
+						</tml:action>",
+				mode: "norefresh",
+				graydiv: false
+			})			
+        }
+    }
+    ,{
+        icon: "<tml:url db="@afw" type="file" doc="icons" file="application_view_icons.png"/>",
+        cls: "x-btn-icon",
+		enableToggle: true,
+		toggleGroup: "view",
+		pressed: <tml:script expression="portlet.view=='thumbnail'"/>,
+        handler : function(m, ev){
+        	m.toggle(true);
+			Ext.get("attachment-grid-view").addClass("x-hidden");
+			Ext.get("attachment-image-view").removeClass("x-hidden");
+
+			WGA.ajax.action({
+				id: "<tml:script expression="portlet.portletkey"/>",
+				action: "<tml:action ajax="norefresh">
+								portlet.view="thumbnail";
+						</tml:action>",
+				mode: "norefresh",
+				graydiv: false
+			})			
+        }
+    }
+    ,"->"
+    ,filterButton
+    ,{
+        icon: "<tml:url db="@afw" type="file" doc="icons" file="arrow_rotate_clockwise.png"/>",
+        cls: "x-btn-icon",
+        handler: function(){
+			grid.getDataSource().load({
+				params:{dbkey: BI.dbkey, key: BI.contentkey, type:'content', filter: filefilter}
+			})
+			thumbnail_store.load({
+				params:{dbkey: BI.dbkey, key: BI.contentkey, type:'content', sort:"filetype", filter: filefilter}
+			})
+        }
+    }
+]);			
+

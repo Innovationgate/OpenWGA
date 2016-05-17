@@ -195,13 +195,18 @@ public class TestCore {
          
         assertion.setTime(new Date(System.currentTimeMillis()));
         
-        determineTmlModule(context, assertion);
+        try {
+			determineTmlModule(context, assertion);
+		} catch (WGAPIException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         assertion.setExecuted(true);
         addAssertion(assertion);
     }
 
-    protected void determineTmlModule(TMLContext context, Assertion assertion) {
+    protected void determineTmlModule(TMLContext context, Assertion assertion) throws WGAPIException {
         if (context != null) {
             if (context.getvar("$testmodule") != null) {
                 assertion.setTmlModule((String) context.getvar("$testmodule"));
@@ -328,7 +333,12 @@ public class TestCore {
             }
         }
         
-        determineTmlModule(context, assertion);
+        try {
+			determineTmlModule(context, assertion);
+		} catch (WGAPIException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         assertion.setExecuted(true);
         addAssertion(assertion);
@@ -383,7 +393,12 @@ public class TestCore {
             assertion.setResult(false);
         }
         
-        determineTmlModule(context, assertion);
+        try {
+			determineTmlModule(context, assertion);
+		} catch (WGAPIException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         assertion.setExecuted(true);
         addAssertion(assertion);
@@ -435,7 +450,12 @@ public class TestCore {
             }
         }
         
-        determineTmlModule(context, assertion);
+        try {
+			determineTmlModule(context, assertion);
+		} catch (WGAPIException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         assertion.setExecuted(true);
         addAssertion(assertion);

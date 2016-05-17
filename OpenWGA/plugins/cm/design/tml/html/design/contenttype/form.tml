@@ -1,0 +1,359 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="deletePosition">
+	var list = document.getAllowedPositions();
+	list.remove(tmlparam1);
+	document.setAllowedPositions(list);
+	document.save();
+</tml:action>
+
+<tml:script>
+	_Database=AFW.database(option("dbkey"));
+
+	_getMode = function(metaname){	
+		if(document.isMetaDeterminedInSchema && document.isMetaDeterminedInSchema(metaname)){
+			return "view"
+		}
+		else return tmlform.mode();
+	}
+	
+</tml:script>
+
+
+<tml:input type="hidden" name="dropkey" store="false"/>
+<tml:input type="hidden" name="close_flag" store="false"/>
+
+<div id="ct-panel">
+	<div id="ct-basics"  style="padding:5px;overflow:auto" class="x-layout-inactive-content">
+	
+		<tml:case condition="tmlform.hasmessages()">
+			<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+			<hr size="1">
+		</tml:case>		
+		
+		<table width="100%" cellspacing="5" id="form-contenttype" style="width:100%">
+		
+			<tr>
+				<td width="150"><tml:label key="design.contenttypes.form.name"/>:</td>
+				<td><b><tml:input name="name" meta="true" cssclass="textinput required" trim="true"
+						validation="$E_VALUE!=''"
+						message="Bitte geben Sie einen Namen ein"
+						mode="{option('mode')=='new'?'edit':'view'}"
+				/></b></td>
+			</tr>
+			<tr>
+				<td valign="top"><tml:label key="design.contenttypes.form.aliases"/>:</td>
+				<td><tml:input type="textarea" name="NAMEALIASES" mode="{_getMode('NAMEALIASES')}" meta="true" multiple="true" divider="<br>" cssstyle="width:100%"/></td>
+			</tr>
+			
+			<tr>
+				<td valign="top"><tml:label key="design.contenttypes.form.desc"/>:</td>
+				<td><tml:input type="textarea" name="description" mode="{_getMode('description')}" meta="true" cssclass="textinput"/></td>
+			</tr>
+			
+			<tr>
+				<td valign="top"><tml:label key="design.contenttypes.form.desc_aliases"/>:</td>
+				<td><tml:input type="textarea" multiple="true" divider="<br>" name="DESCRIPTIONALIASES" mode="{_getMode('DESCRIPTIONALIASES')}" meta="true" cssstyle="width:100%"/></td>
+			</tr>
+			
+			<tr>
+				<td valign="top">
+					<tml:if condition="tmlform.getMode()=='edit' && _Database.isUserQueryable()">
+						<tml:then>
+							<a href="#" title="{%label:properties.button.ldap-lookup%}" 
+									onclick="BI.dialog.show('ldap-lookup', this, {fieldid:'editors', textareadivid:'ct-panel'})">
+								{%label:design.contenttypes.form.auth%}</a>:
+						</tml:then>
+						<tml:else>
+							<tml:label key="design.contenttypes.form.auth"/>:
+						</tml:else>	
+					</tml:if>					
+				</td>			
+				<td>
+					<tml:input type="textarea" multiple="true" divider="<br>" name="editors" mode="{_getMode('editors')}" meta="true" cssstyle="width:100%">id="editors"</tml:input>
+				</td>
+			</tr>
+			
+			<tml:case condition="WGA.db(option('dbkey')).getContentStoreVersion()>=5">
+				<tr>
+					<td valign="top"><tml:label key="design.contenttypes.form.authoring"/>:</td>
+					<td>
+						<tml:script>
+							_mode = tmlform.mode();
+							if(document.isMetaDeterminedInSchema && document.isMetaDeterminedInSchema("authoring"))
+								_mode = "view"
+						</tml:script>
+						<tml:input mode="{_mode}" name="authoring" meta="true" type="boolean" default="true"/>
+					</td>
+				</tr>
+			</tml:case>
+			
+			<tr>
+				<td><tml:label key="design.contenttypes.form.outer_layout"/>:</td>
+				<td>
+					<tml:script>
+						_mode = tmlform.mode();
+						if(document.isMetaDeterminedInSchema && document.isMetaDeterminedInSchema("outerlayout"))
+							_mode = "view"
+						
+						if(option("mode")!="new"){
+							if(!tmlform.outerlayout)
+								tmlform.outerlayout = _Database.TMLName.toDisplayName(document.getOuterLayoutName())
+
+							if(!tmlform.innerlayout)
+								tmlform.innerlayout = _Database.TMLName.toDisplayName(document.getInnerLayoutName())
+						}
+					</tml:script>
+					<tml:input name="outerlayout" store="false" id="outer_layout" mode="{_getMode('outerlayout')}"/>
+					<tml:case condition="_getMode('outerlayout')=='edit'">
+						<script>
+								var store = new Ext.data.Store({
+								    proxy: new Ext.data.HttpProxy({
+								        url: "<tml:url type="tml" medium="html" layout="json:get-tmls"/>"	        
+							        }),    
+							        baseParams: { dbkey: "<tml:option name="dbkey"/>" },
+							        reader: new Ext.data.JsonReader({
+							            root: "data"               
+							        }, [ "tmlname" ])
+								});
+								
+								var combo =  new Ext.form.ComboBox({
+									store: store,
+									triggerClass: "x-form-search-trigger",
+									displayField: "tmlname",
+									width: 300,
+									mode: "remote",
+									editable: "true",
+									minChars: 1,
+									triggerAction: "all"
+								});
+								
+								combo.applyTo("outer_layout");
+							
+						</script>
+					</tml:case>
+					
+				</td>
+			</tr>
+			
+			<tr>
+				<td><tml:label key="design.contenttypes.form.inner_layout"/>:</td>
+				<td>
+					<tml:input name="innerlayout" store="false" id="inner_layout" mode="{_getMode('innerlayout')}"/>
+					<tml:case condition="_getMode('innerlayout')=='edit'">
+						<script>
+								var store = new Ext.data.Store({
+								    proxy: new Ext.data.HttpProxy({
+								        url: "<tml:url type="tml" medium="html" layout="json:get-tmls"/>"	        
+							        }),    
+							        baseParams: { dbkey: "<tml:option name="dbkey"/>" },
+							        reader: new Ext.data.JsonReader({
+								        id: "tmlname",
+							            root: "data"               
+							        }, [ "tmlname" ])
+								});
+								
+								var combo =  new Ext.form.ComboBox({
+									store: store,
+									triggerClass: "x-form-search-trigger",
+									displayField: "tmlname",
+									width: 300,
+									mode: "remote",
+									editable: "true",
+									minChars: 1,
+									triggerAction: "all"
+								});
+								
+								combo.applyTo("inner_layout");
+							
+						</script>
+					</tml:case>
+				</td>
+			</tr>
+
+			<tr>
+				<td><tml:label key="design.contenttypes.form.allowed_positions"/>:</td>
+				<td>
+					<tml:input type="select" name="positioning" meta="true" 
+						options="{label('design.contenttypes.form.allowed_positions.options')}"
+						changeaction="$refresh"
+						ajax="true"
+						mode="{_getMode('positioning')}"
+					/>
+					<tml:input type="hidden" meta="true" name="allowedpositions" mode="{_getMode('allowedpositions')}" multiple="true"/>
+					<tml:script>
+						if(!tmlform.submitted){
+							var value = tmlform.fieldlist("allowedpositions").toArray().join(",");
+							switch(tmlform.positioning){
+								case "fixParentDocs":
+									tmlform.ap_parents=value;
+									break;
+								case "fixDocTypes":
+									tmlform.ap_contenttypes=value;
+									break;
+							}
+						}
+					</tml:script>
+					<tml:input type="hidden" name="ap_parents" store="false"/>
+					<tml:input type="hidden" name="ap_contenttypes" store="false"/>
+				</td>
+			</tr>
+			
+			<tml:case condition="tmlform.positioning=='fixParentDocs'">
+				<tr>
+					<td valign="top"><tml:label key="design.contenttypes.form.allowed_parents"/>:</td>
+					<td><tml:include ref="::allowed-parents"/></td>
+				</tr>
+			</tml:case>
+			<tml:case condition="tmlform.positioning=='fixDocTypes'">
+				<tr>
+					<td valign="top"><tml:label key="design.contenttypes.form.allowed_contenttypes"/>:</td>
+					<td><tml:include ref="::allowed-contenttypes"/></td>
+				</tr>
+			</tml:case>
+			
+			<tml:case condition="WGA.db(option('dbkey')).getContentStoreVersion()>=5">
+				<tr>
+					<td valign="top">
+						<tml:label key="properties.contenttype.child-page-restrictions"/>
+					</td>
+					<td>
+						<span>
+							<tml:input name="childpagerestrictions"
+								mode="{_getMode('childpagerestrictions')}"
+								type="select"
+								options="{label:properties.contenttype.child-page-restrictions-options}"
+								ajax="true"
+								changeaction="$refresh"
+								meta="true"
+							/>
+						</span>
+						<tml:case condition="tmlform.field('childpagerestrictions')=='fixDocTypes'">
+							<tml:script>
+								_docTypes = WGA.createList();
+								for (ct in Iterator(document.getDatabase().getContentTypes())) {
+									_docTypes.add(ct.getName());
+								}
+							</tml:script>
+							<br><tml:input mode="{_getMode('allowedchildtypes')}" name="allowedchildtypes"
+								multiple="true" type="checkbox" optionsitem="_docTypes" meta="true"/>
+						</tml:case>
+					</td>
+				</tr>
+			</tml:case>
+			
+			<tr>
+				<td><tml:label key="design.contenttypes.form.preferred_parent"/>:</td>
+				<td><tml:include ref="::preferred-parent"/></td>
+			</tr>
+		
+			<tr>
+				<td><tml:label key="design.contenttypes.form.workflow"/>:</td>
+				<td><tml:include ref="::workflow"/></td>
+			</tr>
+			
+		</table>		
+	</div>
+	
+	<div id="ct-events" style="padding:5px;" class="x-layout-inactive-content">
+	
+		<tml:case condition="tmlform.hasmessages()">
+			<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+			<hr size="1">
+		</tml:case>		
+		
+		<tml:input type="hidden" meta="true" name="eventcreatecontent"/>
+		<tml:input type="hidden" meta="true" name="eventsavecontent"/>
+		<tml:input type="hidden" meta="true" name="eventworkflowmail"/>
+	
+		<tml:script>
+			fields = ["createcontent", "savecontent", "workflowmail"];
+			for(i in fields){
+				var value = tmlform.field("event"+fields[i]);
+				if(value==null)
+					continue;
+				var pos = value.indexOf("/");
+				if(pos>=0){
+					var ui_field = "ui_"+fields[i]
+					if(!tmlform.field(ui_field))
+						tmlform.setField(ui_field, value.substr(pos+1))
+				}
+			}
+		</tml:script>	
+		
+		<h1><tml:label key="design.contenttypes.form.events.whilecreating"/>:</h1>
+		<tml:if condition="_getMode('eventcreatecontent')=='edit'">
+			<tml:then>
+				<tml:input type="textarea" name="ui_createcontent" cssclass="textinput" store="false"/>
+			</tml:then>
+			<tml:else>
+				<textarea name="code_createcontent" class="jscript"><tml:script>return tmlform.ui_createcontent</tml:script></textarea>
+			</tml:else>
+		</tml:if>
+		
+		<br>
+		<h1><tml:label key="design.contenttypes.form.events.whilesaving"/>:</h1>
+		<tml:if condition="_getMode('eventsavecontent')=='edit'">
+			<tml:then>
+				<tml:input type="textarea" name="ui_savecontent" cssclass="textinput" store="false"/>
+			</tml:then>
+			<tml:else>
+				<textarea name="code_savecontent" class="jscript"><tml:script>return tmlform.ui_savecontent</tml:script></textarea>
+			</tml:else>
+		</tml:if>
+	
+		<br>	
+		<h1><tml:label key="design.contenttypes.form.events.whilesendingwfmail"/>:</h1>
+		<tml:if condition="_getMode('eventworkflowmail')=='edit'">
+			<tml:then>
+				<tml:input type="textarea" name="ui_workflowmail" cssclass="textinput" store="false"/>
+			</tml:then>
+			<tml:else>
+				<textarea name="code_workflowmail" class="jscript"><tml:script>return tmlform.ui_workflowmail</tml:script></textarea>
+			</tml:else>
+		</tml:if>
+		    
+	</div>
+</div>
+
+<script>
+
+	var layout=new Ext.BorderLayout("ct-panel", {
+		center:{
+			autoScroll:true
+		}
+	})
+
+	// shorthand
+	var CP = Ext.ContentPanel;
+	
+	layout.beginUpdate();
+	layout.add("center", new CP("ct-basics", {title: "<tml:label key="design.contenttypes.form.tabtitle.basics"/>", fitToFrame: true}));
+	layout.add("center", new CP("ct-events", {title: "<tml:label key="design.contenttypes.form.tabtitle.events"/>", fitToFrame: true}));
+	layout.getRegion("center").showPanel("ct-basics");
+	layout.endUpdate();
+	
+</script>

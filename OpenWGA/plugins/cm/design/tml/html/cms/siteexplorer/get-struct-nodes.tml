@@ -1,0 +1,158 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+
+	_node=request.getParameter("node")
+	_lang=request.getParameter("lang")
+	_dbkey=request.getParameter("dbkey");
+
+	//log.info("get-nodes " + _node + ", lang=" + _lang);
+
+	if(_dbkey==null){
+		log.info("No dbkey specified");
+	}
+	
+	if(_node!="root")
+		_node=_node.substr(5);
+	_nodes=createlist();
+</tml:script>
+
+[
+<tml:select>
+	<tml:case condition="_node=='root'">
+		<tml:script>
+			var database=db(_dbkey);
+			var Database = AFW.database(database);
+			var it=database.getAreas().iterator();
+			while(it.hasNext()){
+				var area = it.next();
+				if(area.systemArea)
+					continue;
+				var visiblefor = area.getExtensionData("CM_area_visible")
+				if(visiblefor && visiblefor.size() && !database.isMemberOfUserList(visiblefor))
+					continue;
+				_nodes.add(area);
+			}
+		</tml:script>
+		<tml:foreach type="itemvalue" item="_nodes" currentvalue="_node">
+			<tml:range context="{'db:'+_dbkey+'/$area:'+_node.getName()}">
+				{
+					text: "<tml:meta name="name"/>",
+					id: "node-area:<tml:meta name="name"/>",
+					disabled: true,
+					cls: "area light-panel-bg",
+	                icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="folder.png"/>",
+					leaf: <tml:script>return document.getRootEntries().isEmpty()</tml:script>
+				}
+				<tml:between>,</tml:between>
+			</tml:range>			
+		</tml:foreach>
+	</tml:case>
+
+	<tml:case condition="_node.substr(0,5)=='area:'">
+		<tml:script>
+			var database=db(_dbkey);
+			var area=_node.substr(5);
+			area=database.getArea(area);
+			var it=area.getRootEntries().iterator();
+			while(it.hasNext()){
+				var struct = it.next()
+				var Struct=AFW.structentry(struct, _dbkey)
+				if(!Struct.getBestContent(_lang))
+					continue;		// content read protected or only archived versions
+				_nodes.add(struct);
+			}
+		</tml:script>
+		<tml:foreach type="itemvalue" item="_nodes" currentvalue="_node">
+			<tml:range context="{'db:'+_dbkey+'/$struct:'+_node.getStructKey()}">
+				<tml:script>
+					_Struct=AFW.structentry(_node.getStructKey(), _dbkey)
+					var hasReaders = !document.getReaders().isEmpty();
+					if(!hasReaders){
+						try{
+							var doc = _Struct.getAllContentInStatus('p', _lang).get(0);
+							hasReaders = !doc.getReaders().isEmpty();
+						}
+						catch(e){}
+					}
+					_structIcon = hasReaders ? "page_error.png" : (doc?"page.png":"page_edit.png");
+				</tml:script>
+				{
+					text: "<tml:script>return _Struct.getContentTitle(true, _lang)</tml:script>",
+					icon: "<tml:url db="@afw" type="file" doc="icons" file="{_structIcon}"/>",
+       				id: "node-struct:<tml:meta name="key"/>",
+					leaf: <tml:script>return !_Struct.hasChildren()</tml:script>
+				}<tml:between>,</tml:between>
+			</tml:range>			
+		</tml:foreach>
+	</tml:case>
+
+	<tml:case condition="_node.substr(0,7)=='struct:'">
+		<tml:script>
+			var database=db(_dbkey);
+			var struct=_node.substr(7);
+			struct=database.getStructEntryByKey(struct);
+			var it=struct.getChildEntries().iterator();
+			while(it.hasNext()){
+				var struct = it.next()
+				var Struct=AFW.structentry(struct, _dbkey)
+				if(!Struct.getBestContent(_lang))
+					continue;		// content read protected or only archived versions
+				_nodes.add(struct);
+			}
+		</tml:script>
+		<tml:foreach type="itemvalue" item="_nodes" currentvalue="_node">
+			<tml:range context="{'db:'+_dbkey+'/$struct:'+_node.getStructKey()}">
+				<tml:script>
+					_Struct=AFW.structentry(_node.getStructKey(), _dbkey);					
+					var hasReaders = !document.getReaders().isEmpty();
+					if(!hasReaders){
+						try{
+							var doc = _Struct.getAllContentInStatus('p', _lang).get(0);
+							hasReaders = !doc.getReaders().isEmpty();
+						}catch(e){}
+					}
+					_structIcon = hasReaders ? "page_error.png" : (doc?"page.png":"page_edit.png");
+				</tml:script>
+				{
+					text: "<tml:script>return _Struct.getContentTitle(true, _lang)</tml:script>",
+					id: "node-struct:<tml:meta name="key"/>",
+					icon: "<tml:url db="@afw" type="file" doc="icons" file="{_structIcon}"/>",
+					allowDrop: true,
+					allowChildren: true,
+					leaf: <tml:script>return !_Struct.hasChildren()</tml:script>
+				}<tml:between>,</tml:between>				
+			</tml:range>			
+		</tml:foreach>
+	</tml:case>
+
+	<tml:caseelse>
+		<tml:script>
+			log.info("CM:stiteexplorer/get-struct-nodes Error:" + _node.substr(0,6));
+		</tml:script>
+	</tml:caseelse>
+
+</tml:select>	
+]

@@ -1,0 +1,110 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_contentkey=request.getParameter("contentkey");
+	_structkey=request.getParameter("structkey");
+	_dbkey=request.getParameter("dbkey");
+	_u=request.getParameter("u");
+</tml:script>
+
+<tml:range context="{'db:'+_dbkey+'/docid:'+_contentkey}">
+	<html>
+		<head>
+			<script>
+				WGA={};
+				WGA.contentinfo={
+					dbkey: "<tml:meta name="dbkey" type="db"/>",
+					contentkey: "<tml:meta name="key"/>",
+					structkey: "<tml:meta name="structkey"/>",
+					title: "<tml:script>return TITLE.replace(/"/g, "\\\"");</tml:script>",
+					language: "<tml:meta name="language"/>"
+				}
+				
+				BI={};
+				
+				BI.addEventListener=function(el, event, listener, useCapture){
+					if(el.addEventListener)
+						return el.addEventListener(event, listener, useCapture);
+					else if (el.attachEvent)
+						return el.attachEvent("on" + event, listener);			
+				}
+				
+								
+				BI.bindAsEventListener=function(object, fn){
+					return function(event){
+						fn.call(object, event || window.event)
+					}
+				}
+								
+				BI.iframeManager=function(iframe){
+
+					var iframe=iframe;
+					
+					function resize(e){
+							
+						var h=document.all? document.body.offsetHeight-document.body.offsetTop : window.innerHeight;
+						var el=iframe;
+						for(var tmp=el; tmp; tmp=tmp.offsetParent)
+						    h -= tmp.offsetTop;		    
+						h-=15;
+						if(el.height!=h)
+							el.height=h;
+					}	
+				
+					BI.addEventListener(window, "resize", BI.bindAsEventListener(this, resize));
+					resize();
+				}
+				
+				function init(){
+					new BI.iframeManager(document.body.getElementsByTagName("iframe")[0]);
+				}
+			</script>		
+		</head>
+		
+		<body onload="init()">
+			<p>
+				<b>{%label:virtual-document%}:</b>
+				<a href="<tml:script>return contenturl("html", null)</tml:script>"><tml:script expression="virtuallinktitle||contenturl('html', null)"/></a>
+			</p>
+			
+			<tml:comment>
+			contentkey: <tml:meta name="key"/>
+			<br>
+			title: <tml:meta name="title"/>
+			<br>
+			language=<tml:meta name="language"/>
+			<br>
+			Link to: <tml:meta name="virtuallink"/> / <tml:meta name="virtuallinktype"/>
+			<br>
+			URL: <tml:script>return contenturl("html", null)</tml:script>
+			<br>
+			u: <tml:item name="_u"/>
+			</tml:comment>
+			
+			<iframe width="100%" height="500" src="<tml:script>return contenturl("html", null)</tml:script>"></iframe>
+			
+		</body>
+	</html>
+</tml:range>

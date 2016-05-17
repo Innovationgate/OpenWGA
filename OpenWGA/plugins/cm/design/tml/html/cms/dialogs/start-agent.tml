@@ -1,0 +1,114 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_context = 'db:'+option('dbkey'); 
+	if(option("contentkey")!="undefined")
+		_context += '/docid:'+option('contentkey')
+	else if(option("structkey")!="undefined")
+		_context += '/$struct:'+option('structkey')
+</tml:script>
+
+<tml:action id="run-custom-agent">
+	if(!tmlform.validate())
+		return;
+	if(callAction("run-agent")!==false){
+		var event=createEvent("CMS_dialog_closed");
+		portlet.fireEvent(event);
+		//_actionDone=true;
+	}
+</tml:action>
+
+<tml:if istrue="_actionDone">
+	<tml:then>
+		<script>
+			BI.selectContent(BI.contentkey, BI.structkey);
+		</script>
+	</tml:then>
+	<tml:else>
+
+		<tml:form id="form-start-agent" context="{_context}" mode="{option('mode')||'edit'}">
+			<tml:case condition="tmlform.hasmessages()">
+				<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+				<hr size="1">
+			</tml:case>		
+		
+			<tml:include ref="{option('tml')}" designdb="{option('dbkey')}"/>
+
+			<script>
+				<tml:if condition="option('mode')=='view'">
+					<tml:then>
+						BI.dialog.submitButton.hide();
+					</tml:then>
+					<tml:else>
+						BI.dialog.submitButton.show();
+					</tml:else>
+				</tml:if>
+
+				<tml:if condition="option('title')">
+					<tml:then>BI.dialog.setTitle("<tml:option name="title"/>");</tml:then>
+					<tml:else>
+						<tml:script var="_ag_name">
+							var ag_name = option("tml").split(":").pop();
+							var title = label(db(option('dbkey')), null, null, "agent."+ag_name, null);
+							if(title.charAt(0)=="#"){
+								// check for overlay:
+								var title = label(db(option('dbkey')), "overlay:labels", null, "agent."+ag_name, null);
+								if(title.charAt(0)=="#")
+									return ag_name
+								else return title;
+							}
+							else return title;
+						</tml:script>
+						BI.dialog.setTitle("<tml:item name="_ag_name"/>");
+					</tml:else>
+				</tml:if>
+
+				<tml:case condition="option('submitbuttontext')">
+					BI.dialog.submitButton.setText("<tml:option name="submitbuttontext"/>");
+				</tml:case>				
+				
+				// submit function called from dialog handler and on RETURN
+				BI.dialog.submit=function(){					
+					BI.util.callAction("<tml:action ref="run-custom-agent"/>",
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"{%label:dialog.start-agent.running%}");
+				}
+				BI.dialog.onShow=function(){
+					try{
+						document.forms["form-userdefined-metas"].fields[0].focus();
+					}
+					catch(e){}					
+				}
+				WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+					BI.dialog.onShow();
+					BI.makeDateFields("form-userdefined-metas", "{%label:format.ext.date.short%}");
+					BI.dialog.autoHeight();					
+				})
+			</script>
+				
+		</tml:form>
+
+	</tml:else>
+</tml:if>

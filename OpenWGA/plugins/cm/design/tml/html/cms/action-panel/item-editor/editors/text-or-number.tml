@@ -1,0 +1,64 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<div style="display:none">
+	<tml:if condition="tmlform.editor=='number'">
+		<tml:then>
+			<tml:input name="fielddata" type="number"
+				format="decimal"
+				validation="$P_VALUE!=null"
+				message="{label('format.invalid-number')}"
+				default="{format(item(tmlform.edititem), 'decimal')}"
+			/>
+		</tml:then>
+		<tml:else>
+			<tml:input name="fielddata" type="text"
+				default="{item(tmlform.edititem)}"
+			/>
+		</tml:else>
+	</tml:if>
+</div>
+
+<script>
+
+	var el = BI.sitepanel.iframe.window.document.getElementById("item_<tml:item name="edititem" type="tmlform"/>")
+	el.style.display="inline";
+
+	var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+	Ext.DomHelper.overwrite(el, {
+		tag: "input",
+		style: "border: 3px solid #7eadd9;width:<tml:script expression="tmlform.editor=='text'?'400':'100'"/>px"
+	})
+	el.firstChild.value=form.fielddata.value;
+	el.firstChild.focus();
+
+	var inputel = Ext.get(el.firstChild);
+	inputel.addKeyListener(13, BI.contenteditor.saveField);
+	if(!Ext.isGecko)
+		inputel.addKeyListener(27, BI.contenteditor.cancelEdit);
+
+	BI.contenteditor.getFieldData=function(){
+		return el.firstChild.value;
+	}
+</script>

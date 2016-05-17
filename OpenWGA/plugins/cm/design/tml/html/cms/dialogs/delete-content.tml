@@ -1,0 +1,212 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="deleteContent">
+	var dbkey=option("dbkey");
+	var contentkey=option("contentkey");
+	var structkey=option("structkey");
+	
+	var database = db(dbkey);	
+	var cdoc = content();
+	var language = LANGUAGE;				
+	var sdoc=cdoc.getStructEntry();
+	
+	var Database = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/database", database)
+	
+	try{
+		if(tmlform.delete_page && tmlform.delete_page=="delete"){
+			callAction("cms:delete-page", dbkey, structkey, AFW.database(dbkey).getUserName());
+			_reload_parent=true;
+			_actionDone=true;
+			var event=createEvent("CMS_dialog_closed");
+			portlet.fireEvent(event);
+			return;
+		}
+		else if(cdoc.getStatus()==cdoc.STATUS_RELEASE){
+						
+			var remotelist={
+				remote_references: itemlist("remote_references"),
+				remote_infos: createlist()
+			}
+			if(remote_info){
+				remotelist.remote_infos.add(createlist([
+						"db:"+meta("db", "dbkey")+"/docid:"+STRUCTKEY+"."+LANGUAGE+".0",
+						remote_info
+					]))
+			}
+			if(remotelist.remote_references.size()>0 && !Database.isManager()){
+				tmlform.addMessage(label("dialog.delete-page.error-deleting-remote"))
+				return;
+			}
+			if(cdoc.remove())
+				callAction("cms:archive-remote-docs", remotelist);		// remove remote docs in separate thread
+			
+		}
+		else cdoc.remove();
+
+		_actionDone=true;
+		var event=createEvent("CMS_dialog_closed");
+		portlet.fireEvent(event);
+
+		var clist=createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/structentry", sdoc).getAllContent(language, false);
+		if(clist.isEmpty())
+			_new_contentkey="nothing";
+		else _new_contentkey=clist.get(0).getContentKey().toString();
+		
+		_new_structkey=structkey;
+	}
+	catch(e){
+		log.error(e);
+		tmlform.addMessage(e);
+	}
+</tml:action>
+
+<tml:script>
+	_dbkey=option("dbkey");
+	_contentkey=option("contentkey");
+	_structkey=option("structkey");
+	_Database = createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/database", _dbkey);
+	
+	// check if this is the last content and child:
+	var struct=db(_dbkey).getStructEntryByKey(_structkey);
+	if(struct && struct.getContentCount()==1 && !struct.hasChildren())
+		_lastContentAndChild=true;
+	else _lastContentAndChild=false;
+</tml:script>
+
+<script>
+	<tml:if istrue="_actionDone">
+		<tml:then>
+			<tml:if istrue="_se_reload">
+				<tml:then>
+					BI.se.reload("<tml:item name="_new_structkey"/>", function(){
+						BI.selectContent("<tml:item name="_new_structkey"/>");
+					});
+				</tml:then>
+				<tml:elseif istrue="_reload_parent">
+					BI.se.reloadParent("<tml:option name="structkey"/>", "<tml:item name="_new_structkey"/>", function(){
+						BI.selectContent("<tml:item name="_new_structkey"/>");
+					});
+				</tml:elseif>
+				<tml:else>
+					BI.selectContent("<tml:item name="_new_contentkey"/>", "<tml:item name="_new_structkey"/>");
+				</tml:else>
+			</tml:if>	
+		</tml:then>
+	</tml:if>
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", BI.dialog.autoHeight);		
+</script>
+
+<tml:if context="{'db:'+_dbkey+'/docid:'+_contentkey}" iscontextvalid="true">
+	<tml:then>
+
+		<tml:form id="delete-content-form">
+			
+			<tml:case condition="tmlform.hasmessages()">
+				<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+				<hr size="1">
+			</tml:case>		
+		
+			<script>
+				// submit function called from dialog handler and on RETURN
+				BI.dialog.submit=function(){
+					BI.util.callAction("<tml:action ref="deleteContent"/>", 
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"{%label:dialog.delete-content.deleting-content%}");
+				}
+			</script>
+			
+			<table width="100%" border="0" cellspacing="5" class="collection">
+				<tr>
+		     		<td width="100">{%label:title%}:</td>						
+		     		<td><b><tml:meta name="title"/></b></td>
+		     	</tr>
+		     	
+		     	<tr>
+		     		<td>{%label:status%}:</td>
+		     		<td><tml:label key="{'status.'+STATUS}"/></td>
+		     	</tr>
+		     			     	
+		     	<tr>
+		     		<td>{%label:language%}:</td>
+		     		<td><tml:meta name="languagetitle"/></td>
+		     	</tr>
+		
+		     	<tr>
+		     		<td>{%label:version%}:</td>
+		     		<td><tml:meta name="version"/></td>
+		     	</tr>
+				
+				<tml:case istrue="_lastContentAndChild">
+					<tr>
+						<td>{%label:delete-page%}:</td>
+						<td style="color:red">
+							{%label:dialog.delete-content.delete-last-content%}<br>
+							<tml:input type="checkbox" name="delete_page" options="{label('dialog.delete-content.options.delete-page')}" default="delete"/>
+						</td>
+					</tr>
+				</tml:case>				
+
+				<tml:script>
+	     			_remotelist=createObject(pluginDbKey("de.innovationgate.wga-app-framework")+"/structentry", option("structkey"), option("dbkey")).getRemoteList();
+	     		</tml:script>
+	     		<tml:case condition="!_remotelist.remote_references.isEmpty()">
+	     			<tr><td colspan="2">
+			   			<div class="warning">
+			   				<tml:label key="dialog.delete-page.info-deleting-remote" param1="{_remotelist.remote_references.size()}"/>
+						</div>
+					</td></tr>
+				</tml:case>
+				
+		   	</table>
+		   	
+     		<tml:case condition="_Database.isJdbc() && STATUS==content().STATUS_RELEASE">
+				<tml:collection id="links-to-me">
+					<tml:query>
+						content.items['_internallinks'].text like '%<tml:meta name="structkey"/>.<tml:meta name="language"/>%'
+					</tml:query>
+				</tml:collection>
+				<tml:case condition="taginfo('links-to-me', 'count')>0">
+					<div class="warning">
+						<h1>{%label:dialog.delete-page.info.link-references%}:</h1>
+						<ul style="list-style:disc;padding-left:25px">
+						<tml:foreach sourcetag="links-to-me">
+							<li><tml:path><tml:meta name="title"/><tml:between> / </tml:between></tml:path></li>
+						</tml:foreach>
+						</ul>
+					</div>
+				</tml:case>
+     		</tml:case>
+
+
+
+		</tml:form>
+
+	</tml:then>
+
+	<tml:else>
+		Context not valid.
+	</tml:else>
+	
+</tml:if>
