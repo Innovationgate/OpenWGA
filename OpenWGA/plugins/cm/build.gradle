@@ -19,7 +19,7 @@ sourceSets {
 task updatePluginVersion << {
 	def version = "${openwga_version_major}.${openwga_version_minor}.${openwga_version_maintenance}.${openwga_version_patch}"
 	def build = "${openwga_version_build}"
-	println "Update plugin to version ${version} Build ${openwga_version_build}"
+	println "Update ${project.name} to version ${version} Build ${openwga_version_build}"
 
     ant.taskdef(name:"UpdatePluginVersion", classname:"de.innovationgate.ant.UpdatePluginVersion", classpath: configurations.compileClasspath.asPath)
     ant.UpdatePluginVersion(designDir: "design", version: "${version}", build: "${build}")

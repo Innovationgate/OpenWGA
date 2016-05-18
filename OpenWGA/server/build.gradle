@@ -119,11 +119,14 @@ war {
 }
 
 task buildPlugins(type: Copy) {
-	//from (project(":plugins:cm").tasks.buildPlugin.archivePath)
-	from '../plugins/cm/build/distributions'
-   	into 'build/extra/WEB-INF/default-plugins' 	
+	from (project(":plugin-cm").tasks.buildPlugin.archivePath)
+	//from '../plugins/cm/build/distributions'
+	from (project(":plugin-additional-script-langs").tasks.buildPlugin.archivePath)
+   	into 'build/extra/WEB-INF/default-plugins'
 }
 buildPlugins.dependsOn project(":plugin-cm").tasks.buildPlugin
+buildPlugins.dependsOn project(":plugin-additional-script-langs").tasks.buildPlugin
+
 
 war.dependsOn writeVersion, buildPlugins
 testClasses.dependsOn war
