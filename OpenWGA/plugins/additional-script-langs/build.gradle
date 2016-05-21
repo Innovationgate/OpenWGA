@@ -14,7 +14,8 @@ sourceSets {
 	main {
 		java {
 			srcDir 'src'  
-		} 
+		}
+		output.classesDir = 'design/java'		
 	}
 } 
 
