@@ -3,6 +3,8 @@ package de.innovationgate.wga.additional_script_langs.sass;
 import java.util.List;
 import java.util.Map;
 
+import javax.json.JsonString;
+
 import ro.isdc.wro.model.group.processor.Injector;
 import de.innovationgate.utils.FormattingException;
 import de.innovationgate.utils.ObjectFormatter;
@@ -62,6 +64,9 @@ public class SassPostProcessor extends CssDialectsPostProcessor {
                     return formatValue(entry.getKey()) + ": " + entry.getValue();
                 }
             }, false) + ")";
+        }
+        else if (value instanceof JsonString) {
+        	return ((JsonString) value).getString();
         }
         
         return String.valueOf(value);
