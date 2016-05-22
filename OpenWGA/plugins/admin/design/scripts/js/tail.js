@@ -15,7 +15,10 @@ var TAIL = function(){
 				var msg = data.messages[i];
 				var info;
 				if(msg.details)
-					info = '<a class="text" onclick="TAIL.showDetails(this)">'+msg.msg+'</a>'
+					info = '<div class="text">' 
+						+ '<a onclick="TAIL.showDetails(this)">'+msg.msg+'</a>'
+						+ msg.details.split("\n")[0]
+						+ '</div>'
 				else info = '<div class="text">'+msg.msg+'</div>'
 				messages.push('<div class="clearfix message ' + msg.level.toLowerCase() + '"><div class="time">'+msg.time+'</div>'
 					+ '<div class="level">'+msg.level+'</div>'

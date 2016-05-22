@@ -202,12 +202,20 @@
 			"->",
 			{
 				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="application_put.png"/>',		                
+				text: "Tail",
+				handler: function(){
+					window.open("<tml:url type="tml" name="tail"/>")
+				}
+			},
+			{
+				cls:'x-btn-text-icon',						
 				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
 				text: "Clear Application Log",
 				handler: function(){
 					WGA.ajax.callAction("<tml:action>_query_clearlog=true</tml:action>","<tml:script expression="portlet.portletkey"/>");
 				}
-			}
+			},
 		]
 		,tools: [
 			{

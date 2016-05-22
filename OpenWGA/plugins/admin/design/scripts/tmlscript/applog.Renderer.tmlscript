@@ -2,7 +2,6 @@ function Renderer(){}
 
 Renderer.prototype.render = function($urlParam_index) {
 
-	//console.log("$urlParam_index", $urlParam_index);
 	var offset = Number($urlParam_index||0);
 	
 	var logService = WGA.service(Packages.de.innovationgate.wgpublisher.log.AppLog);
@@ -19,16 +18,6 @@ Renderer.prototype.render = function($urlParam_index) {
 
 	var loginfo = logService.getPage(offset, pagesize, Packages.de.innovationgate.wga.common.LogLevel.LEVEL_INFO)
 	
-	/*
-	console.log(Math.random());
-	if(Math.random()<0.2){
-		console.error("error");
-		throw{
-			message: "Fehler"
-		}
-	}
-	*/
-
 	var messages = []
 	for(let msg in Iterator(loginfo.messages)){
 		messages.push({
