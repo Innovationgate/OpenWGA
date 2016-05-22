@@ -184,7 +184,11 @@ public class TMLPortlet implements TMLObject, Portlet {
     @CodeCompletion
     public Object getvar(String name) throws WGAPIException {
         if (!isroot()) {
-            return this.tmlContext.getvar(getVarPrefix() + name);
+        	try {
+				return WGA.get(tmlContext).tmlPage().getVar(getVarPrefix() + name);
+			} catch (WGException e) {
+				return null;
+			}
         }
         else {
             return null;
