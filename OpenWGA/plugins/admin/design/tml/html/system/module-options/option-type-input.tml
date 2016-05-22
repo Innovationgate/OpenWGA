@@ -78,7 +78,7 @@
 				<tml:if condition="_inputoptions.isEmpty()">
 					<tml:then>
 						<div style="color:red">no values available</div>
-						<tml:input name="{_fieldName}" type="hidden" 
+						<tml:input name="{_fieldname}" type="hidden" 
 							validation="$E_VALUE!=''"
 							message="{'Field <b>' + _config_option.getTitle(DBM.locale) + '</b>: ' + _valueProviderEmptyListMessage}"
 						/>					
@@ -86,7 +86,7 @@
 					<tml:else>
 						<tml:if condition="_config_option.getOptionType().isMultiValue()">
 							<tml:then>
-								<tml:input name="{_fieldName}" type="checkbox" multiple="true" optionsitem="_inputoptions" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
+								<tml:input name="{_fieldname}" type="checkbox" multiple="true" optionsitem="_inputoptions" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
 								<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="checkbox"/>
 							</tml:then>
 							<tml:else>
@@ -105,7 +105,7 @@
 								<tml:case condition="_isDBKey && tmlform.getMode()!='edit' && _uid">
 									<a href="javascript:DBM.switchToObject('<tml:item name="_view"/>', '<tml:item name="_uid"/>')">
 								</tml:case>
-								<tml:input name="{_fieldName}" type="select" optionsitem="_inputoptions" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
+								<tml:input name="{_fieldname}" type="select" optionsitem="_inputoptions" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
 								<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="select"
 									o_forceselection="{_config_option.getOptionType().isRestricted()}"
 									o_editable= "{!_config_option.getOptionType().isRestricted()}"
@@ -123,12 +123,12 @@
 			</tml:then>
 		
 			<tml:elseif condition="!_config_option	// custom option">
-				<tml:input name="{_fieldName}" type="text" mode="{_mode}"/>
+				<tml:input name="{_fieldname}" type="text" mode="{_mode}"/>
 				<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="text" o_allowblank="true" o_emptytext="- empty -"/>
 			</tml:elseif>
 		
 			<tml:elseif condition="_config_option.getOptionType() instanceof Packages.de.innovationgate.wga.modules.options.PasswordOptionType">
-				<tml:input name="{_fieldName}" type="password" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
+				<tml:input name="{_fieldname}" type="password" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
 				<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="password"
 					o_allowblank="{_config_option.isEmptyAllowed()}"
 					o_emptytext="{_config_option.isEmptyAllowed() ? '- empty -':'Please enter a Value'}"
@@ -136,7 +136,7 @@
 			</tml:elseif>
 			
 			<tml:elseif condition="_config_option.getOptionType() instanceof Packages.de.innovationgate.wga.modules.options.IntegerOptionType">
-				<tml:input name="{_fieldName}" type="number" mode="{_mode}"
+				<tml:input name="{_fieldname}" type="number" mode="{_mode}"
 					validation="DBM.tmlform.validateOption()"
 					format="0"
 				/>
@@ -149,7 +149,7 @@
 			</tml:elseif>
 				
 			<tml:elseif condition="_config_option.getOptionType() instanceof Packages.de.innovationgate.wga.modules.options.MultilineStringOptionType">
-				<tml:input name="{_fieldName}" type="textarea" mode="{_mode}"
+				<tml:input name="{_fieldname}" type="textarea" mode="{_mode}"
 					validation="DBM.tmlform.validateOption()"
 				/>
 				<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="textarea" o_width="350"/>
@@ -158,13 +158,13 @@
 			<tml:elseif condition="_config_option.getOptionType() instanceof Packages.de.innovationgate.wga.modules.options.StringOptionType">
 				<tml:if condition="_config_option.getOptionType().isMultiValue()">
 					<tml:then>
-						<tml:input name="{_fieldName}" type="textarea" multiple="true" mode="{_mode}"
+						<tml:input name="{_fieldname}" type="textarea" multiple="true" mode="{_mode}"
 							validation="DBM.tmlform.validateOption()"
 						/>
 						<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="textarea" o_width="350"/>
 					</tml:then>
 					<tml:else>
-						<tml:input name="{_fieldName}" type="text" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
+						<tml:input name="{_fieldname}" type="text" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
 						<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="text" 
 							o_allowblank="{_config_option.isEmptyAllowed()}"
 							o_emptytext="{_config_option.isEmptyAllowed() ? '- empty -':'Please enter a Value'}"
@@ -174,7 +174,7 @@
 			</tml:elseif>
 		
 			<tml:else>
-				<span><tml:input name="{_fieldName}" type="text" mode="{_mode}" validation="DBM.tmlform.validateOption()"/></span>
+				<span><tml:input name="{_fieldname}" type="text" mode="{_mode}" validation="DBM.tmlform.validateOption()"/></span>
 				<br>(<tml:script expression="_config_option.getOptionType().getClass().getName()"/>)
 				<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="text" 
 					o_allowblank="{_config_option.isEmptyAllowed()}"
