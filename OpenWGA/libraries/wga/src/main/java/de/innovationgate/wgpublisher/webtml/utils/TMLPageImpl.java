@@ -358,11 +358,12 @@ public class TMLPageImpl implements TMLPage {
                     @SuppressWarnings("unchecked")
                     Map<Object, Object> vars = (Map<Object,Object>) scriptVars;
                     for (Map.Entry<Object,Object> var : vars.entrySet()) {
+                    	String name = TMLContext.getThreadMainContext().convertVarName((String)var.getKey());
                         if (includeTag != null) {
-                            includeTag.includedModuleLocalVars.put(String.valueOf(var.getKey()).toLowerCase(), var.getValue());
+                            includeTag.includedModuleLocalVars.put(String.valueOf(name), var.getValue());
                         }
                         else {
-                            cx.setvar(String.valueOf(var.getKey()), var.getValue());
+                            cx.setvar(String.valueOf(name), var.getValue());
                         }
                     }
                 }
@@ -594,20 +595,23 @@ public class TMLPageImpl implements TMLPage {
     @SuppressWarnings("unchecked")
     @Override
     public void setVar(String name, Object value) throws WGException {
-        if (value instanceof List<?>) {
+    	name = TMLContext.getThreadMainContext().convertVarName(name); 
+    	if (value instanceof List<?>) {
             value = new ListVarContainer((List<Object>) value);
-         }
-        TMLContext.getThreadMainContext().getEnvironment().getPageVars().put(name.toLowerCase(), value);
+        }
+        TMLContext.getThreadMainContext().getEnvironment().getPageVars().put(name, value);
     }
 
     @Override
     public boolean hasVar(String name) throws WGException {
-        return TMLContext.getThreadMainContext().getEnvironment().getPageVars().containsKey(name.toLowerCase());
+    	name = TMLContext.getThreadMainContext().convertVarName(name);
+        return TMLContext.getThreadMainContext().getEnvironment().getPageVars().containsKey(name);
     }
 
     @Override
     public Object getVar(String name) throws WGException {
-        return unwrapVar(TMLContext.getThreadMainContext().getEnvironment().getPageVars().get(name.toLowerCase()));
+    	name = TMLContext.getThreadMainContext().convertVarName(name);
+        return unwrapVar(TMLContext.getThreadMainContext().getEnvironment().getPageVars().get(name));
     }
 
     private Object unwrapVar(Object object) {
@@ -619,7 +623,8 @@ public class TMLPageImpl implements TMLPage {
 
     @Override
     public Object removeVar(String name) throws WGException {
-        return unwrapVar(TMLContext.getThreadMainContext().getEnvironment().getPageVars().remove(name.toLowerCase()));
+    	name = TMLContext.getThreadMainContext().convertVarName(name);    	
+        return unwrapVar(TMLContext.getThreadMainContext().getEnvironment().getPageVars().remove(name));
     }
 
 }
