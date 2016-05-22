@@ -1,0 +1,110 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="createDomain">
+	_config_bean = DBM.getConfigBean();
+	if(!tmlform.validate())
+		return;
+	if(tmlform.field("/name").indexOf("plugin-")==0)
+		return tmlform.addMessage("Domain Name should not begin with 'plugin-'");
+		
+	try{
+		var domain = _config_bean;
+		var config = DBM.wgaconfig.clone();
+		config.add(domain);
+
+		// Authentication:
+		if(tmlform.auth_enabled){
+			domain.authenticationSource = new Packages.de.innovationgate.wga.config.AuthenticationSource();
+		}
+		else domain.authenticationSource = null;
+
+		// Personalisation
+		if(tmlform.pers_enabled){
+			domain.personalisation = new Packages.de.innovationgate.wga.config.PersonalisationDatabase();
+		}
+		else domain.personalisation = null;
+
+		DBM.tmlform.setConfigProperties(domain);		
+
+		_errors = config.validate()
+		if(_errors.isEmpty()){
+			DBM.wgaconfig.save();
+			
+			var tabview=createObject("@ui/tabview", portlet.parentportlet);
+			tabview.setCurrentPageTitle(domain.name);
+			
+			portlet.fireEvent(createEvent("wga-config-changed"));
+			portlet.setMode("view");
+		}
+		else log.info(_errors);
+		
+	}
+	catch(e){
+		log.info(e);
+		
+	}	
+</tml:action>
+
+<tml:case condition="_errors && !_errors.isEmpty()">
+	<tml:include designdb="@ui" ref="message">
+		<tml:option name="title">Config validation errors</tml:option>
+		<tml:inline name="body">
+			<ul>
+			<tml:foreach type="itemvalue" item="_errors" currentvalue="_error">
+				<li><tml:script expression="_error.message"/></li>
+			</tml:foreach>
+			</ul>
+		</tml:inline>
+	</tml:include>
+</tml:case>
+
+
+<tml:form id="domain-new-form" source="none" mode="edit" htmlinput="ignore">
+	<script>
+		DBM.actions.save("<tml:script expression="portlet.portletkey"/>").setAction("<tml:action ref="createDomain"/>");
+	</script>
+	
+	<tml:include designdb="@ui" ref="windowview">
+	
+		<tml:option name="config" scope="local">
+			tbar:[<tml:[system:new-action-buttons]/>],
+			buttonAlign: "left",
+			buttons:[<tml:[system:new-action-buttons]/>]
+		</tml:option>
+	
+		<tml:option name="title">
+			New Domain
+		</tml:option>
+	
+		<tml:inline name="body">
+
+			<tml:include designdb="@ui" ref="formmessages"/>
+			<tml:include ref="::form"/>
+			
+		</tml:inline>
+		
+	</tml:include>
+	
+</tml:form>

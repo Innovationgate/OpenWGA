@@ -1,0 +1,142 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	if(portlet.getSessionVar("filter")){
+		_domains = createlist();
+		var current = DBM.wgaconfig.get().getDomain(portlet.getSessionVar("filter"))
+		if(current)
+			_domains.add(current);
+		else _domains = DBM.domains.get();
+	}
+	else _domains = DBM.domains.get();
+
+</tml:script>
+
+<tml:foreach type="itemvalue" item="_domains" currentvalue="_domain">
+	
+	<fieldset id="group-<tml:script expression="_domain.uid"/>">
+		<legend><tml:label key="{'databases.'+(option('dbtype')||'all')}"/> in Domain
+			<tml:if condition="_domains.size()<=1 || portlet.getSessionVar('filter')">
+				<tml:then><tml:script expression="_domain.name"/></tml:then>
+				<tml:else>
+					 <a href="<tml:url type="action" action="::setFilter" param1="{_domain.uid}" ajax="true"/>">
+						<tml:script expression="_domain.name"/>
+					</a>
+				 </tml:else>
+			</tml:if>					
+		</legend>
+		
+		<div id="buttons-<tml:script expression="_domain.uid"/>" class="legend-menu"></div>			
+		<tml:include ref="::menu-create-database" 
+				o_showDomainConfig="true"
+				o_domain="{_domain.uid}" 
+				o_group-id="{'group-'+_domain.uid}" 
+				o_button-id="{'buttons-'+_domain.uid}"/>
+	
+		<div class="domain-user">current domain login is<b>
+			<tml:if condition="_domain.authenticationSource==null">
+				<tml:then>
+					<tml:script>
+						var user = meta("domain:"+_domain.name, "username");
+						if(user.length>40)
+							return user.substr(0, 37) + " ..."
+						return user
+					</tml:script>
+				</tml:then>
+				<tml:else>
+					<a title="click to change user" href="javascript:login_<tml:script expression="_domain.uid"/>()">
+						<tml:script>
+							var user = meta("domain:"+_domain.name, "username");
+							if(user.length>40)
+								return user.substr(0, 37) + " ..."
+							return user
+						</tml:script>
+					</a>
+				</tml:else>
+			</tml:if>				
+		</b></div>
+		
+		<tml:include ref="::mod-domain-login"/>
+		
+		<tml:script>
+			_dbs = DBM.wgaconfig.getDatabases(option("dbserver"), _domain.uid, option("dbtype"))
+			_dbs = sortList(_dbs, function(a,b){
+				return Number(a.key > b.key)
+			})			
+		</tml:script>
+		
+		<tml:if condition="_dbs.isEmpty()">
+			<tml:then>
+				<div style="padding-left:5px">- none -</div>
+			</tml:then>
+			
+			<tml:else>
+				<tml:foreach type="itemvalue" item="_dbs" currentvalue="_db">
+					<tml:portlet name="{'portlet-database-'+_db.uid}" ref="::portlet-database" o_uid="{_db.uid}" ajax="true"/>
+				</tml:foreach>
+			</tml:else>
+			
+		</tml:if>
+							
+	</fieldset>
+
+	<tml:form id="{'drop-domain-'+_domain.uid}" source="none">
+		<tml:input name="domain_uid" type="hidden"/>
+		<tml:input name="db_uid" type="hidden"/>
+		<script>		
+			var dzone = new Ext.dd.DropTarget("group-<tml:script expression="_domain.uid"/>", {
+				overClass: "dragover",
+				domain: "<tml:script expression="_domain.uid"/>",
+				
+			    notifyEnter : function(dd, e, data){
+			        if(data.domain=="<tml:script expression="_domain.uid"/>")
+			        	return this.dropNotAllowed;
+		            this.el.addClass(this.overClass);
+			        return this.dropAllowed;
+			    },
+	
+				notifyOver: function(dd, e, data){
+			        if(data.domain=="<tml:script expression="_domain.uid"/>")
+			        	return Ext.dd.DropZone.prototype.dropNotAllowed
+			        return Ext.dd.DropZone.prototype.dropAllowed;
+			   	},
+	
+				notifyDrop: function(dd, e, data){
+					this.el.removeClass(this.overClass);
+					if(data.domain=="<tml:script expression="_domain.uid"/>")
+			        	return false
+					var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+					form.domain_uid.value=this.domain;
+					form.db_uid.value=data.uid;
+					WGA.ajax.callAction('<tml:action ref="::moveDbToDomain"/>', '<tml:script expression="portlet.portletkey"/>')
+			        return true;
+			   	}
+	
+			});
+		</script>
+	</tml:form>
+	
+</tml:foreach>
+ 

@@ -1,0 +1,33 @@
+
+<tml:script>
+	_dbs = DBM.wgaconfig.getDatabases(null, null, "ContentStore", true);
+</tml:script>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Databases by connection sequence</tml:option>	
+
+	<tml:option name="config" scope="local">
+		buttonAlign: "left",
+		tbar: [
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+				text: "<tml:label key="btn.edit"/>",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action ref="actions:setEditMode"/>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+
+		<ul id="cs-list" class="sortable">
+			<tml:foreach item="_dbs" currentvalue="_db">
+				<li class="ui-state-default"><tml:script expression="_db.title"/></li>
+			</tml:foreach>
+		</ul>
+		
+	</tml:inline>
+	
+</tml:include>

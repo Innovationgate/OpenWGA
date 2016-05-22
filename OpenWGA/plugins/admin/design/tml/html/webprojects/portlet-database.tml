@@ -1,0 +1,125 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_db = DBM.wgaconfig.get().getByUid(option('uid'))
+
+	_dbtype = "ContentDatabase";
+	if(_db instanceof Packages.de.innovationgate.wga.config.ContentStore){
+		_dbtype = "ContentStore";
+	}
+
+	// check for problems:
+	var scope = new Packages.de.innovationgate.wgpublisher.problems.DatabaseScope(_db.key);
+	var reg = WGA.Server.getProblemRegistry();
+	_problems = reg.getProblems(Packages.de.innovationgate.wgpublisher.problems.AdministrativeProblemType, scope);
+	// find max Severity
+	var problems = _problems.iterator();
+	_max_severity = Packages.de.innovationgate.wgpublisher.problems.ProblemSeverity.LOW
+	while(problems.hasNext()){
+		_max_serverity = Math.max(_max_serverity, problems.next().getSeverity())
+	}
+	
+</tml:script>
+
+<div class="icon-object <tml:item name="_dbtype"/>"
+	id="icon-<tml:script expression="_db.uid"/>"
+	onclick="DBM.switchToObject('<tml:script expression="_dbtype=='ContentStore'?'webprojects':'databases'"/>', '<tml:script expression="_db.uid"/>', '<tml:item name="_dbtype"/>')"
+>
+	<div id="buttons-<tml:script expression="_db.uid"/>" style="position:absolute"></div>
+	<tml:include ref="::menu-database" 
+			o_db="{_db.uid}" 
+			o_dbkey="{_db.key}"
+			o_dbtype="{_dbtype}"
+			o_enabled="{_db.enabled}"
+			o_group-id="{'icon-'+_db.uid}" 
+			o_button-id="{'buttons-'+_db.uid}"/>
+
+	<div class="header<tml:case condition="_problems.size()"> problems-<tml:item name="_max_severity"/></tml:case><tml:case condition="!DBM.database(_db.key).isReady"> not-available</tml:case>">
+		<h1>
+			<tml:script expression="_db.key"/>
+		</h1>						
+		<div class="db-title">
+			<tml:script expression="_db.title"/>&nbsp;
+		</div>
+		<div class="db-access">
+			<tml:case condition="_dbtype=='ContentStore' && DBM.database(_db.key).isReady">
+				Access: <tml:script expression="AFW.database(_db.key).getAccessLevelText()"/>
+			</tml:case>
+			&nbsp;
+		</div>
+	</div>
+	<div class="content">
+		<div>
+			<tml:if hasoption="server">
+				<tml:then>
+					Domain: <b><a href="#" onclick="Ext.lib.Event.stopEvent(event);switchToObject('domains', '<tml:script expression="_db.domain"/>')">					
+							<tml:script expression="DBM.wgaconfig.get().getDomain(_db.domain).name"/></a></b>
+				</tml:then>
+				<tml:else>
+					Server: <b><a href="#" onclick="Ext.lib.Event.stopEvent(event);switchToObject('dbservers', '<tml:script expression="_db.dbServer"/>')">
+						<tml:script expression="wgacore.getDatabaseServers().get(_db.dbServer).getTitle(DBM.locale)"/></a></b>
+				</tml:else>
+			</tml:if>
+		</div>		
+
+		<div>
+			<tml:comment><tml:include ref="::db-path-info" o_dbtype="{_dbtype}" o_implclass="{_db.implClassName}"/></tml:comment>
+			<tml:include ref="::db-path-info" o_dbServer="{_db.dbServer}" o_dbtype="{_dbtype}" o_implClassName="{_db.implClassName}"/>
+			&nbsp;
+		</div>
+
+		<div>
+			<tml:if condition="_dbtype=='ContentStore'">
+				<tml:then>
+					<tml:script>
+						if(_db.design){
+							_designsource = wgacore.getDesignManager().getDesignSources().get(_db.design.source);
+						}
+					</tml:script>
+					Design: <b><tml:script expression="_db.design ? (_designsource.name + ': ' + _db.design.name):label('designsource.local')"/></b><br>
+				</tml:then>
+				<tml:else>
+					Design: <b>-</b><br>
+				</tml:else>
+			</tml:if>
+		</div>
+	</div>
+	<div class="status">
+		<tml:script expression="DBM.getDbStatusText(_db)"/>
+	</div>
+</div>
+
+<tml:case condition="option('dd')!='false'">
+	<script>
+		Ext.onReady(function(){
+			new Ext.dd.DragSource("icon-<tml:script expression="_db.uid"/>", {
+				dragData: {
+					uid: "<tml:script expression="_db.uid"/>",
+					domain: "<tml:script expression="_db.domain"/>"
+				}
+			});
+		});
+	</script>
+</tml:case>

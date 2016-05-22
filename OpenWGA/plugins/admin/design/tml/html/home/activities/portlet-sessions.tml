@@ -1,0 +1,128 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_sessionStats = wgacore.getUsageStatistics().getRecentSessionStatistics()
+</tml:script>
+		
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Recent Session Info</tml:option>	
+	<tml:option name="config" scope="local">
+		tools: [
+			{
+				id: "refresh",
+				qtip: "refresh",
+				handler: function(){
+					WGA.ajax.callAction('<tml:action ref="$refresh"/>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+
+		<table width="100%" class="collection">
+			<tr class="collection-title">
+				<td>Session</td>
+				<td># Requests</td>
+				<td>Last access</td>
+				<td>Last app</td>
+				<td>Last used login</td>
+			</tr>
+			<tml:foreach type="itemvalue" item="_sessionStats" currentvalue="_s">
+				<tr _class="List">
+					<td>
+						<a href="#"
+								title = "Click to show more info" 
+								onclick="DBM.showHideElement('sinfo_<tml:script expression="_s.getSessionId()"/>')">
+							<tml:script expression="_s.getSessionId()"/>
+						</a>
+					</td>
+					<td><tml:script expression="_s.getRequests()"/></td>
+					<td><tml:script format="{label('format.date.with-exact-time')}" expression="_s.getLastAccess()"/></td>
+					<td><tml:script expression="_s.getLastApp()"/></td>
+					<td>
+						<tml:script>
+							if (_s.getLastLogin() != null) {
+								return '"' + _s.getLastLogin() + '"  on app ' + _s.getLastLoginApp();
+							}
+							else {
+							 	return '(none)';
+							}
+						</tml:script>
+					</td>
+					
+				</tr>
+				<tr>
+					<td colspan="5" style="border-bottom: solid silver 1px">					
+						<fieldset id="sinfo_<tml:script expression="_s.getSessionId()"/>" style="display:none">
+							
+							<label>IP:</label>
+							<div class="data"><tml:script expression="_s.getRemoteHost()"/></div>
+							<div class="clear"/></div>
+							
+							<label>User Agent:</label>
+							<div class="data"><tml:script expression="_s.getUserAgent()"/></div>
+							<div class="clear"/></div>
+							
+							<label>Session created:</label>
+							<div class="data"><tml:script expression="_s.getSessionCreated()" format="dd.MM.yyyy HH:mm:ss"/></div>
+							<div class="clear"/></div>
+								
+							<table class="collection">
+							
+								<tr class="collection-title">
+									<td>Accessed application</td>
+									<td>Login</td>
+									<td>User Profile</td>
+									<td>Last Access</td>
+									<td>Task</td>
+								</tr>
+									
+								<tml:script var="sessionDatas" expression="_s.getDatabaseAccess().values()"/>
+								<tml:foreach item="sessionDatas" currentvalue="sessionData">
+									<tml:include designdb="@ui" ref="tr"/>
+										<td><tml:item name="sessionData" xpath="app"/></td>
+										<td><tml:item name="sessionData" xpath="user"/></td>
+										<td><tml:item name="sessionData" xpath="profile"/></td>
+										<td><tml:item name="sessionData" xpath="lastAccess" format="dd.MM.yyyy HH:mm:ss"/></td>
+										<td><tml:item name="sessionData" xpath="task"/></td>
+									</tr>
+								</tml:foreach>
+							
+							</table>
+							
+							
+							<div class="clear"/></div>
+							
+						</fieldset>
+					</td>
+				</tr>
+				
+			</tml:foreach>
+		</table>
+
+	</tml:inline>
+</tml:include>

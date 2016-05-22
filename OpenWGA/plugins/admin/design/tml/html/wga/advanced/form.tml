@@ -1,0 +1,283 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="addDefaultAgExcl">
+	_config_bean = DBM.getConfigBean();
+	_config_bean.personalisationConfiguration.addDefaultAgentExclusions();
+</tml:action>
+
+<tml:action id="clearClusterServiceOptions">
+	_config_bean = DBM.getConfigBean();
+	_config_bean.getClusterConfiguration().options.clear();
+	DBM.tmlform.removeFields("/clusterConfiguration/options");
+</tml:action>
+
+<tml:action id="clearHttpSessionManagerOptions">
+	_config_bean = DBM.getConfigBean();
+	_config_bean.getHttpSessionManagerConfiguration().options.clear();
+	DBM.tmlform.removeFields("/httpSessionManagerConfiguration/options");
+</tml:action>
+
+<tml:include designdb="@ui" ref="tabview_js">
+	<tml:option name="tabnames">Port Restrictions|port-restrictions,Core Event Listener|event-listener,Lucene engine|lucene,Design directories|design,Bot Agents|pers,Cluster|cluster,HTTP Session Management|httpSessionManagement,File Derivates|fileDerivates</tml:option>
+	
+	<tml:inline name="body">
+
+		<div class="tab-body-topline" style="border-top: solid 1px #96A1B9;">	
+			<div class="x-hidden" id="port-restrictions">
+				<div id="port-restrictions-array-list" class="array-list-editor">
+					<fieldset>
+						<legend>Admin Tools Port Restrictions</legend>
+						<tml:include ref="system:array-list-editor" o_list="adminToolsPortRestrictions" o_type="number" o_id="port-restrictions-array-list"/>
+					</fieldset>
+				</div>
+				
+				<div id="design-port-restrictions-array-list" class="array-list-editor">
+					<fieldset>
+						<legend>Authoring Design Access Port Restrictions</legend>
+						<tml:include ref="system:array-list-editor" o_list="authoringDesignAccessPortRestrictions" o_type="number" o_id="design-port-restrictions-array-list"/>
+					</fieldset>				
+				</div>
+				
+			</div>
+			
+			<div class="x-hidden" id="event-listener">
+				<div id="coreEventListeners-array-list" class="array-list-editor">
+					<fieldset>
+						<legend>Core Event Listeners</legend>
+						<tml:include ref="system:array-list-editor" o_list="coreEventListeners" o_id="coreEventListeners-array-list"/>
+					</fieldset>
+				</div>
+			</div>
+			
+			<div class="x-hidden" id="lucene">
+				<fieldset>	
+					<tml:[system:fs-input] o_field="luceneManagerConfiguration/path"/>
+					<tml:[system:fs-input] o_field="luceneManagerConfiguration/optimizeIndexAutomatically" o_type="boolean"/>
+					<tml:[system:fs-input] o_field="luceneManagerConfiguration/maxBooleanClauseCount" o_type="number" o_format="0"/>
+					<tml:[system:fs-input] o_field="luceneManagerConfiguration/maxDocsPerDBSession" o_type="number" o_format="0"/>
+					<tml:[system:fs-input] o_field="luceneManagerConfiguration/indexInterval" o_type="number" o_format="0"/>
+				</fieldset>								
+			</div>
+			
+			<div class="x-hidden" id="design">
+				<fieldset>	
+					<legend>Design to Content Store Synchronisation - Global settings</legend>
+					<tml:[system:fs-input] o_field="designConfiguration/pollingInterval" o_format="0"/>
+					<tml:[system:fs-input] o_field="designConfiguration/throttlingEnabled" o_type="boolean"/>
+					<tml:[system:fs-input] o_field="designConfiguration/throttlingPeriodMinutes" o_type="number" o_format="0"/>
+				</fieldset>
+				
+				<div id="designConfiguration.fileExclusions-array-list" class="array-list-editor">
+					<fieldset>
+						<legend>Files to ignore on design directories</legend>
+						<tml:include ref="system:array-list-editor" o_list="designConfiguration.fileExclusions" o_id="designConfiguration.fileExclusions-array-list"/>
+					</fieldset>
+				</div>
+								
+			</div>
+			
+			<div class="x-hidden" style="width:100%" id="pers">
+				<tml:include designdb="@ui" ref="windowview">						
+					<tml:option name="title">Bot Agent Definitions</tml:option>							
+					<tml:option name="config" scope="local">
+							tbar: [						
+								<tml:case condition="tmlform.getMode()=='edit'">					
+								{						
+									cls:'x-btn-text-icon',												
+									icon: '<tml:url type="file" db="@afw" doc="icons" file="page_white_world.png"/>',		                						
+									text: "Add Default Bot Agent List",						
+									handler: function(){						
+										WGA.ajax.callAction("<tml:action ref="addDefaultAgExcl" portletmode="edit"/>","<tml:script expression="portlet.portletkey"/>");						
+									}						
+								}						
+								</tml:case>
+							]						
+					</tml:option>						
+				
+					<tml:option name="body">
+						<div id="personalisationConfiguration.personalisationAgentExclusions-array-list" class="array-list-editor">
+						<fieldset>
+							<tml:include ref="system:array-list-editor" o_list="personalisationConfiguration.personalisationAgentExclusions" 		
+									o_id="personalisationConfiguration.personalisationAgentExclusions-array-list"/>
+						</fieldset>
+						</div>				
+					</tml:option>				
+				</tml:include>						
+			</div>
+			
+			<div class="x-hidden" id="cluster">
+				<tml:script>
+					var clustertypes_map = DBM.getModReg().getModulesForType(Packages.de.innovationgate.wga.modules.types.ClusterServiceModuleType); 
+					var clustertypes = clustertypes_map.keySet().iterator();
+					
+					_classes = createlist();	
+					
+					var currentValue = DBM.getConfigBean().getClusterConfiguration().implClassName;
+					var match = false;
+					
+					while(clustertypes.hasNext()){
+						var clustertype = clustertypes.next();
+						if	(currentValue==clustertype) {
+							match=true;
+						}
+						_classes.add(clustertypes_map.get(clustertype).getTitle(DBM.locale) + "|" + clustertype);
+					}	
+					if(currentValue && !match) {
+						_classes.add(currentValue);
+					}
+									
+				</tml:script>
+			
+				<fieldset>					
+					<tml:[system:fs-input] o_field="clusterConfiguration/enabled" o_type="boolean"/>
+					<tml:[system:fs-input] o_field="clusterConfiguration/defaultMasterNode" o_type="boolean"/>
+					<tml:[system:fs-input] o_field="clusterConfiguration/lbRoute" o_type="text"/>	
+					<tml:[system:fs-input] o_field="clusterConfiguration/implClassName" o_type="select" o_options="{_classes}" o_changeaction="clearClusterServiceOptions"
+						o_validation="$E_VALUE!=''"
+						o_message="Please select a Cluster Service Implementation"/>										
+					<tml:script>
+						try{
+							setOption("module-definition", null);
+							var def = DBM.getModuleDefinition("ClusterService", tmlform.field('/clusterConfiguration/implClassName'));
+							if (def){	
+								def.testDependencies();	// throws exception on failure
+								if (def.getOptionDefinitions())					
+									setOption("module-definition", def);
+							}
+							else _msg = "This cluster manager implementation was not found in the OpenWGA module registry"
+						}
+						catch(e){
+							_msg = e.javaException ? e.javaException.message : e.message
+						}
+					</tml:script>
+					<tml:if condition="option('module-definition')">
+						<tml:then>
+							<tml:[system:module-options:form] o_title="Additional configuration options">
+								<tml:option name="ns">/clusterConfiguration/options</tml:option>
+							</tml:[system:module-options:form]>
+						</tml:then>
+						<tml:elseif condition="_msg">
+							<div class="data" style="color:red">
+								<tml:item name="_msg"/>
+								<br>
+								<tml:input name="not-valid" type="hidden"
+									validation="false"
+									message="The selected cluster manager is currently not available on this WGA system"
+								/>
+							</div>
+						</tml:elseif>
+					</tml:if>			
+				</fieldset>
+			</div>
+			
+			<div class="x-hidden" id="httpSessionManagement">
+				<tml:script>
+					var types_map = DBM.getModReg().getModulesForType(Packages.de.innovationgate.wga.modules.types.HttpSessionManagerModuleType); 
+					var types = types_map.keySet().iterator();
+					
+					_classes = createlist();	
+					
+					var currentValue = DBM.getConfigBean().getHttpSessionManagerConfiguration().implClassName;
+					var match = false;
+					
+					while(types.hasNext()){
+						var type = types.next();
+						if	(currentValue==type) {
+							match=true;
+						}
+						_classes.add(types_map.get(type).getTitle(DBM.locale) + "|" + type);
+					}	
+					
+					if(currentValue && !match) {
+						_classes.add(currentValue);
+					}
+				</tml:script>
+			
+				<fieldset>	
+					<tml:[system:fs-input] o_field="httpSessionManagerConfiguration/enabled" o_type="boolean"/>
+					<tml:[system:fs-input] o_field="httpSessionManagerConfiguration/implClassName" o_type="select" o_options="{_classes}" o_changeaction="clearHttpSessionManagerOptions"
+						o_validation="if (tmlform.field('/httpSessionManagerConfiguration/enabled')) {$E_VALUE!=''} else {true}"
+						o_message="Please select an HTTP session manager"/>																
+					<tml:script>
+						try{
+							setOption("module-definition", null);
+							if (tmlform.field('/httpSessionManagerConfiguration/implClassName')) {
+								var def = DBM.getModuleDefinition("HttpSessionManager", tmlform.field('/httpSessionManagerConfiguration/implClassName'));
+								if (def){	
+									def.testDependencies();	// throws exception on failure
+									if (def.getOptionDefinitions())	{				
+										setOption("module-definition", def);
+									}
+								}
+								else {
+									 _msg = "This HTTP session manager implementation was not found in the OpenWGA module registry";
+								}
+							}
+						}
+						catch(e){
+							_msg = e.javaException ? e.javaException.message : e.message
+						}
+					</tml:script>
+					<tml:if condition="option('module-definition')">
+						<tml:then>
+							<tml:[system:module-options:form] o_title="Additional configuration options">
+								<tml:option name="ns">/httpSessionManagerConfiguration/options</tml:option>
+							</tml:[system:module-options:form]>
+						</tml:then>
+						<tml:elseif condition="_msg">
+							<div class="data" style="color:red">
+								<tml:item name="_msg"/>
+								<br>
+								<tml:input name="not-valid" type="hidden"
+									validation="false"
+									message="The selected HTTP session manager is currently not available on this WGA system"
+								/>
+							</div>
+						</tml:elseif>
+					</tml:if>			
+				</fieldset>
+			</div>
+			
+			<div class="x-hidden" id="fileDerivates">
+				<fieldset>	
+					<tml:script>
+						var processOptions	= WGA.createList();
+						processOptions.add("Disabled|" + Packages.de.innovationgate.wga.config.FileDerivateManagerConfiguration.DISABLED);
+						processOptions.add("Enabled when single server or cluster master node|" + Packages.de.innovationgate.wga.config.FileDerivateManagerConfiguration.ONLY_MASTER_NODE);
+						processOptions.add("Enabled|" + Packages.de.innovationgate.wga.config.FileDerivateManagerConfiguration.ENABLED);
+						_processOptionsStr = WGA.Utils.serializeCollection(processOptions, ",");	
+					</tml:script>
+				
+					<tml:[system:fs-input] o_field="fileDerivateManagerConfiguration/updateProcessEnabled" o_type="select" o_options="{_processOptionsStr}"/>
+					<tml:[system:fs-input] o_field="fileDerivateManagerConfiguration/updateProcessInterval" o_type="number" o_format="0"/>
+				</fieldset>
+			</div>
+			
+			
+		</div>
+		
+	</tml:inline>
+	
+</tml:include>

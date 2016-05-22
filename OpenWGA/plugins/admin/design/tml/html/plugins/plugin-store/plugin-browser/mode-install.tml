@@ -1,0 +1,143 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_plugin = option('plugin') || {};
+</tml:script>
+
+<script type="text/javascript">
+	function showHideElement(el) {
+		DBM.showHideElement(el);
+	}
+</script>
+
+<tml:case condition="(_plugin.status == null || _plugin.status > 0) || (_plugin.status == 0 && _plugin.disabled == true)">
+	<div class="plugin plugin_install">
+		<fieldset id="fieldset-<tml:script expression="_plugin.uniquename"/>">
+			<legend>
+				<tml:script expression="_plugin.title"/>
+				<tml:case condition="_plugin.disabled == true">
+					- Disabled
+					<tml:script>
+						pluginStore.local.dependenciesValid = false;
+					</tml:script>
+				</tml:case>
+			</legend>
+			<tml:case condition="_plugin.qualifiedFileName == pluginStore.local.getActivePlugin()">
+				<div class="plugin-icon">
+					<tml:if condition="_plugin.iconUrl">
+						<tml:then>
+							<img src="<tml:script expression="_plugin.iconUrl"/>">
+						</tml:then>
+						<tml:else>
+							<tml:image doc="images" file="plugin-default-image.png"/>
+						</tml:else>
+					</tml:if>
+				</div>
+			</tml:case>
+			
+			<div style="margin-left: 70px;">		
+				<tml:case condition="_plugin.dependencyStatus < 0">
+					<div class="plugin_error">
+						<tml:script>
+							var _status = _plugin.dependencyStatus * -1;
+							errorMsg = "";
+							for (var i = 2; _status > 0 && i >= 0; i--) {
+								var tmp = Math.pow(2, i);
+								if ((_status % tmp) < _status) {
+									_status = _status % tmp;
+									errorMsg += "<li>";
+									errorMsg += label("pluginstore", "pluginstore.dependency-error." + tmp);
+									errorMsg += "</li>";
+								}
+							}
+						</tml:script>
+	
+						<tml:case condition="errorMsg">
+							<ul>
+								<tml:item name="errorMsg"/>
+							</ul>
+						</tml:case>
+					</div>
+					<tml:script>
+						pluginStore.local.dependenciesValid = false;
+					</tml:script>
+				</tml:case>
+			
+				<tml:script>
+					if (!pluginStore.local.getInstallPlugins().contains(_plugin.qualifiedFileName)) {
+						pluginStore.local.addInstallPlugin(_plugin.qualifiedFileName);
+					}
+				</tml:script>
+				
+				<label><tml:label file="pluginstore" key="pluginstore.install-version"/>:</label>
+				<div class="data"><tml:script expression="_plugin.version"/>&nbsp;</div>
+				<div class="clear"></div>
+		
+				<div id="<tml:script expression="'plugin-info-' + _plugin.uniquename"/>" class="<tml:script expression="_plugin.qualifiedFileName == pluginStore.local.getActivePlugin() ? '' : 'x-hidden'"/>">				
+					<label>Required WGA Version:</label>
+					<div class="data">
+						<tml:script expression="_plugin.wgaversion"/>&nbsp;
+					</div>
+					<div class="clear"></div>
+					<label>Description:</label>
+					<div class="data">
+						<tml:script expression="_plugin.description"/>&nbsp;
+					</div>
+					<div class="clear"></div>
+					<label>Vendor:</label>
+					<div class="data">
+						<tml:script expression="_plugin.vendor"/>&nbsp;
+					</div>
+					<div class="clear"></div>
+					<label>Homepage:</label>
+					<div class="data">
+						<a href="<tml:script expression="_plugin.homepage"/>"><tml:script expression="_plugin.homepage"/></a>&nbsp;
+					</div>
+					<div class="clear"></div>
+					<label>License:</label>
+					<div class="data">
+						<a href="javascript:showHideElement('licencetext_<tml:script expression="_plugin.uniquename"/>')"><tml:script expression="_plugin.licencetitle"/></a><br>
+						<div id="licencetext_<tml:script expression="_plugin.uniquename"/>" class="x-hidden licenceinfo">
+							<tml:script expression="_plugin.licencetext" encode="html"/>
+						</div>
+					</div>
+					<div class="clear"></div>
+				</div>
+			
+				<tml:case condition="_plugin.qualifiedFileName != pluginStore.local.getActivePlugin()">
+					<div class="more_infos">
+						<div class="data">
+							<a id="more-infos" href="javascript:showHideElement('<tml:script expression="'plugin-info-' + _plugin.uniquename"/>')">
+								<tml:label file="pluginstore" key="pluginstore.show-hide-info"/>
+							</a>
+						</div>
+					</div>
+				</tml:case>
+			</div>
+			
+		</fieldset>
+	</div>
+</tml:case>

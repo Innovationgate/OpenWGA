@@ -1,0 +1,102 @@
+<tml:comment>
+	Vars:
+	_plugin: plugin object
+	_config: plugin config bean
+</tml:comment>
+
+<label>Unique Name:</label>
+<div class="data"><tml:script expression="_plugin.pluginID.uniqueName"/></div>
+<div class="clear"></div>
+ 
+<tml:case condition="_config">
+
+	<tml:case condition="!isEmptyValue(_config.vendor)">
+		<label>Vendor:</label>
+		<div class="data">
+			<tml:if condition="isEmptyValue(_config.webHomepage)">
+				<tml:then>
+					<tml:item name="_config" xpath="vendor"/>
+				</tml:then>
+				<tml:else>
+					<a target="_blank" href="<tml:item name="_config" xpath="webHomepage"/>">
+						<tml:item name="_config" xpath="vendor"/>
+					</a>
+				</tml:else>
+			</tml:if>
+		</div>
+		<div class="clear"></div>
+	</tml:case>
+	
+	<label>Description:</label>
+	<div class="data">
+		<tml:item name="_config" xpath="description"/>
+	</div>
+	<div class="clear"></div>
+
+	<tml:case condition="!isEmptyValue(_config.authentication)">
+		<label>Authenticated against:</label>
+		<div class="data">
+			<tml:item name="_config" xpath="authentication" var="authenticationModule"/>
+			<tml:if condition="authenticationModule == '$DEFAULT'">
+				<tml:then>
+					Default domain
+				</tml:then>
+				<tml:else>
+					<tml:item name="authenticationModule"/>
+				</tml:else>
+			</tml:if>
+		</div>
+		<div class="clear"></div>
+	</tml:case>
+
+	<label>Usage as:</label>
+	<div class="data">
+		<tml:script>
+			usages = createList();
+			if (_config.isUsageAsDesignProvider()) {
+				usages.add("Design Provider");
+			}
+			if (_config.isUsageAsAuthSource()) {
+				usages.add("Authentication Source");
+			}
+			if (_config.isUsageAsContentStore()) {
+				usages.add("Content Store");
+			}
+			if (usages.size() == 0) {
+				usages.add("(no usage defined)");
+			}
+		</tml:script>
+		<tml:foreach type="itemvalue" item="usages" currentvalue="usage">
+			<tml:item name="usage"/>
+			<tml:between><br></tml:between>
+		</tml:foreach>
+		</ul>		
+	</div>
+	<div class="clear"></div>
+
+	<tml:case condition="_plugin.mandatoryPlugins.size() > 0">
+		<label>This plugins depends on:</label>
+		<div class="data">
+			<tml:script var="manPlugins" expression="_plugin.mandatoryPlugins.values()"/>
+			<tml:foreach type="itemvalue" item="manPlugins" currentvalue="manPlugin">
+				<tml:item name="manPlugin" xpath="pluginID"/>
+				<tml:between><br></tml:between>
+			</tml:foreach>
+		</div>
+		<div class="clear"></div>
+	</tml:case>
+
+	<tml:case condition="_plugin.dependentPlugins.size() > 0">
+		<label>Other plugins that depend on this plugin:</label>
+		<div class="data">
+			<tml:script var="depPlugins" expression="_plugin.dependentPlugins.values()"/>
+			<tml:foreach type="itemvalue" item="depPlugins" currentvalue="depPlugin">
+				<tml:item name="depPlugin" xpath="pluginID"/>
+				<tml:between><br></tml:between>
+			</tml:foreach>
+		</div>
+		<div class="clear"></div>
+	</tml:case> 
+	
+</tml:case>
+

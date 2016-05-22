@@ -1,0 +1,185 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:collection id="searchResult">	
+      <tml:query id="query" db="{tmlform.db}"
+      			 context="{isEmptyValue(tmlform.context) ? 'this' : 'db:'+tmlform.db+'/'+tmlform.context}"
+      		     includecurrent="true"
+      			 alllanguages="{tmlform.alllanguages}" 
+      			 onlypublished="{tmlform.onlypublished}"
+      			 role="{ tmlform.role }"
+      			 type="{ tmlform.type }"
+      			 options="{ tmlform.options }"
+      			 max="{ tmlform.max}"
+      			 cache="{ tmlform.cache}">
+      			 
+			<tml:script expression="tmlform.query" encode="none"/>
+      </tml:query> 		      
+</tml:collection>   
+			
+<tml:if condition="taginfo('query', 'error') != null">
+	<tml:then>
+		<fieldset>
+			<legend>An error happened while executing the query:</legend>
+			<div style="color:red;padding:10px">
+				<tml:taginfo name="error" sourcetag="query"/>
+			</div>
+	</tml:then>
+	<tml:else>
+		<fieldset>
+			<legend>Query results</legend>
+			
+			<label>Query as User:</label>
+			<div class="data">
+				<tml:script expression="AFW.database(tmlform.db).getUserName()"/>
+			</div>
+			<div class="clear"></div>				
+
+			<label>Database Access:</label>
+			<div class="data">
+				<tml:script expression="AFW.database(tmlform.db).getAccessLevelText()"/>
+			</div>
+			<div class="clear"></div>				
+		
+			<label>Result documents:</label>						
+			<div class="data">						
+				<tml:taginfo sourcetag="searchResult" name="count" format="#,##0"/>						
+			</div>						
+			<div class="clear"></div>
+
+			<table width="100%" class="collection">
+				<tml:if condition="tmlform != null && !isEmptyValue(tmlform.items)">
+					<tml:then>
+						<tml:script>
+							itemNames = Packages.de.innovationgate.utils.WGUtils.deserializeCollection(tmlform.items, ",", true);
+						</tml:script>
+						<tr class="collection-title">
+							<tml:foreach type="itemvalue" item="itemNames" currentvalue="itemName">
+								<TD><B><tml:item name="itemName"/></B></TD>
+							</tml:foreach>
+						</tr>      
+						<tml:foreach id="searchFE" sourcetag="searchResult" page="{pagecontrol_searchFEPage}" pagesize="{tmlform.pagesize}" filllastpage="false" linear="{tmlform.linear}" onlypublished="false">
+				    		<tml:if condition="DBM.database(tmlform.db).isHierarchical">
+				    			<tml:then>
+								    <tml:include designdb="@ui" ref="tr">
+								    	<tml:option name="ajaxaction">
+						    				DBM.switchToObject('tools.db-explorer', '<tml:item name="db" type="tmlform"/>', '<tml:script expression="'db:'+tmlform.db+'/docid:'+KEY"/>');
+								    	</tml:option>
+									</tml:include>								
+					    		</tml:then>
+					    		<tml:else>
+					    			<tr class="List">
+					    		</tml:else>
+				    		</tml:if>
+								<tml:foreach type="itemvalue" item="itemNames" currentvalue="itemName">
+									<TD>
+										<tml:if condition="java.lang.Character.isUpperCase(itemName.charAt(0))">
+											<tml:then>
+												<tml:meta name="{itemName}" divider=", " encode="html"/>
+											</tml:then>
+											<tml:else>
+												<tml:item name="{itemName}" divider=", " encode="html"/>
+											</tml:else>
+										</tml:if>
+									</TD>									
+								</tml:foreach>
+						    </TR>
+						</tml:foreach>
+					</tml:then>
+					<tml:else>
+						<tr class="collection-title">	
+							<TD>Key</TD>
+							<TD>Title</TD>
+							<TD>Created</TD>
+							<TD>Last Modified</TD>
+							<TD>Status</TD>
+							<TD>Lang</TD>
+							<tml:case condition="tmlform.type=='lucene'">
+								<TD>Score</TD>
+							</tml:case>
+						</tr>      
+						<tml:foreach id="searchFE" sourcetag="searchResult" page="{pagecontrol_searchFEPage}" pagesize="{tmlform.pagesize}" filllastpage="false">
+						    <tml:include designdb="@ui" ref="tr">
+						    	<tml:option name="ajaxaction">
+							    	DBM.switchToObject('tools.db-explorer', '<tml:item name="db" type="tmlform"/>', '<tml:script expression="'db:'+tmlform.db+'/docid:'+KEY"/>');
+							    </tml:option>
+						    </tml:include>
+						      <TD><tml:meta name="KEY"/></TD>		
+						      <TD><tml:meta name="title"/></TD>
+						      <td><tml:meta name="CREATED"/></td>		           
+						      <td><tml:meta name="LASTMODIFIED"/></td>		               
+						      <td><tml:meta name="STATUS"/></td>
+						      <td><tml:meta name="LANGUAGE"/></td>
+						      <tml:case condition="tmlform.type=='lucene'">
+						      	<td><tml:script expression="SEARCHSCORE * 100" format="##0"/>%</td>
+						      </tml:case>				      	          
+						    </tr>
+						</tml:foreach>
+					</tml:else>
+				</tml:if>
+			</table>
+						
+			<tml:include ref="system:pagecontrol">
+				<tml:option name="sourcetag">searchFE</tml:option>
+				<tml:option name="ajax">true</tml:option>
+			</tml:include>
+																			
+			<div class="clear"></div>
+
+			<div class="more-options">
+				<a href="#" onclick="DBM.showHideElement('result-info')">
+					 show/hide result infos ...
+				</a>
+			</div>
+			
+			<div id="result-info" style="display:none">
+				<label>Full query:</label>						
+				<div class="data">						
+					<tml:taginfo sourcetag="query" name="fullquery"/>						
+				</div>						
+				<div class="clear"></div>
+			
+				<tml:taginfo sourcetag="query" name="executiontime" var="executionTime"/>
+				<tml:case condition="executionTime != -1">
+					<label>Query execution time:</label>						
+					<div class="data">						
+						<tml:item name="executionTime" format="#,##0" /> Milliseconds						
+					</div>						
+					<div class="clear"></div>
+				</tml:case>
+			
+				<label>Used query cache:</label>						
+				<div class="data">						
+					<tml:taginfo sourcetag="query" name="cacheused"/>						
+				</div>						
+				<div class="clear"></div>
+			</div>
+
+			<tml:warnings autohide="true"/>
+
+		</fieldset>
+		
+	</tml:else>
+</tml:if>
+

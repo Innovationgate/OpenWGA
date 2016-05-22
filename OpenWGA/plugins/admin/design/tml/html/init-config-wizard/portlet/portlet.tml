@@ -1,0 +1,59 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="clearMessages">
+	tmlform.clearmessages();
+</tml:action>
+
+<tml:action id="copyFilesToConfigDir">
+	if (_config_files) {
+		var config_keys = getLookupKeys(_config_files);
+		var config_dir = new Packages.java.io.File(wgacore.retrieveConfigPath());
+		if (config_dir.canWrite()) {
+			for (var i = 0; i < config_keys.size(); i++) {
+				var configFile = _config_files.get(config_keys.get(i));
+				var newFile = new Packages.java.io.File(config_dir.getAbsolutePath(), configFile.getName());
+				
+				if (!configFile.renameTo(newFile)) {
+					log.error("Cannot write: " + newFile.getAbsolutePath());
+					return false;
+				}
+			}
+		} else log.info("Cannot write to wga-config directory");
+	}
+	return true;
+</tml:action>
+
+<tml:form id="{'form-wizard-' + portlet.mode}" htmlinput="ignore">
+	<fieldset class="<tml:script expression="portlet.mode"/>">		
+		<div class="info">
+			<tml:label key="{'step.' + portlet.mode + '.headline'}"/>
+			<tml:label key="{'step.' + portlet.mode + '.infotext'}" param1="{wgacore.configFile.parentFile.absolutePath}" param2="{ meta('request', 'absolutewgaurl') + '/admin' }"/>
+			
+		</div>
+		<div class="clear"></div>
+		<tml:include ref="{'::mode-' + portlet.mode}"/>
+	</fieldset>
+</tml:form>

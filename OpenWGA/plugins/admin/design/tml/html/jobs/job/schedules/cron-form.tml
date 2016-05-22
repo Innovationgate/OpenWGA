@@ -1,0 +1,122 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="createCronExpression">
+	var cron = createObject('cron');
+	tmlform.setField("/data",cron.createCronExpression());
+</tml:action>
+
+<tml:action id="parseCronExpression">
+	var cron = createObject('cron');
+	cron.fillForms(tmlform.cronExpression);
+</tml:action>
+
+<label>Job Execution:</label>
+<div class="data">
+
+	<tml:input name="executeOnEach" type="select" changeaction="$refresh" ajax="true" options="{label('wgaconfig','Shedule/cron/type.options')}" default="each"/>
+	<tml:comment><tml:script>
+		if(tmlform.field('/data')){
+			var descr = createObject('cron');
+			log.info(descr.createDescription(tmlform.field('/data')));
+		}
+	</tml:script></tml:comment>
+
+	<tml:select switch="tmlform.executeOnEach">
+		<tml:case value="each">
+			<tml:input name="subMode_each" type="select" changeaction="$refresh" ajax="true" options="{label('wgaconfig','Shedule/cron/executeOnEach/type.options')}" default="day_year"/>:		</tml:case>
+	</tml:select>
+</div>
+<div class="clear"></div>
+
+<tml:select>
+	<tml:case condition="tmlform.executeOnEach=='each'">
+		<tml:if condition="tmlform.subMode_each.indexOf('day_')!=-1">
+			<tml:then>				
+				<label>Day:</label>
+				<div class="data">
+					<tml:if condition="tmlform.subMode_each=='day_year'">
+						
+						<tml:then>
+							<tml:input name="day_year_date" type="date" format="dd.MM" default="1.1." validation="$E_VALUE!='' && $P_VALUE!=null" message="{label('wgaconfig','Shedule/cron/executeOnEach/dayInYear.dateValidationError')}"/>
+							<tml:script>return label('wgaconfig','Shedule/cron/executeOnEach/dayInYear.dateInfo');</tml:script>
+						</tml:then>
+						
+						<tml:else>
+							<tml:script>
+								options='';
+								switch(tmlform.subMode_each){
+									case "day_month":
+										for(var i=1;i<32;i++) options+=i+'|'+i+',';
+										options+='Last day of month|L';
+										break;
+									case "day_week":
+										options=label('wgaconfig','Shedule/cron/executeOnEach/dayInWeek.dateOptions');
+										break;
+								}
+							</tml:script>
+							<tml:input name="{tmlform.subMode_each+'_date'}" type="select" options="{options}"/>
+						</tml:else>
+						
+					</tml:if>
+				</div>
+				<div class="clear"></div>
+			</tml:then>
+		</tml:if>
+		
+		<label><tml:script expression="tmlform.subMode_each=='hour'?'Minute':'Time'"/>:</label>
+		<div class="data">
+			<tml:script>
+				if(tmlform.subMode_each=='hour')
+					timeFormat = 'mm';
+				else timeFormat = 'HH:mm';
+				params = createList();
+				params.add(timeFormat);
+			</tml:script>
+			<tml:input name="{tmlform.subMode_each+'_time'}" type="date" format="{timeFormat}"
+					validation="$E_VALUE!='' && $P_VALUE!=null" 
+					message="{label('wgaconfig','Shedule/cron/executeOnEach/general.timeValidationError',params)}" />
+			(<tml:item name="timeFormat"/>)
+		</div>
+		<div class="clear"></div>
+	</tml:case>
+	
+	<tml:case condition="tmlform.executeOnEach=='every'">
+		<label>Every:</label>
+		<div class="data">
+			<tml:input name="every_time" type="number" validation="$E_VALUE!='' && $P_VALUE!=null" message="{label('wgaconfig','Shedule/cron/executeEvery/general.validationError')}"/>
+			<tml:input name="subMode_every" type="select" options="{label('wgaconfig','Shedule/cron/executeEvery/type.options')}" default="minutes"/>
+		</div>
+		<div class="clear"></div>
+	</tml:case>
+	
+	<tml:case condition="tmlform.executeOnEach=='cron'">
+		<label>Cron Expression (beginning with seconds):</label>
+		<div class="data">
+			<tml:input name="/data" type="text" validation="$E_VALUE!='' && $P_VALUE!=null" message="{label('wgaconfig','Shedule/cron/specificCronExpression.validationError')}"/>
+		</div>
+		<div class="clear"></div>
+	</tml:case>
+	
+</tml:select>

@@ -1,0 +1,227 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="changeDb">
+	tmlform.store();
+	_dbChanged = true;	
+</tml:action>
+
+<tml:eventscript onevent="WGA-User-Changed">
+	_dbChanged = true;
+</tml:eventscript>
+
+<tml:script>
+	if(_uid){
+		// _uid is the dbkey 
+		// _where is a context expression
+
+		if(portlet.getSessionVar('dbkey')!=_uid)
+			_dbChanged=true;
+		portlet.setSessionVar("dbkey", _uid);
+
+		var path = [];
+		var c = context(_where, false)		
+		if(c){
+			// calculate path
+			var struct = c.content().getStructEntry();
+			if(struct){
+				var area = struct.getArea().getName();
+				while(struct){
+					path.unshift("structentry:"+struct.getStructKey());
+					struct = struct.getParentEntry()
+				}
+				path.unshift("area:"+area);
+			}
+		}
+		path.unshift("area");
+		path.unshift("/root");
+		_path = path.join("/");
+		//log.info("path = " + _path);
+	}
+</tml:script> 
+
+<tml:case istrue="_dbChanged">
+	<script>DBM.dbExplorer={}</script>
+</tml:case>
+
+<tml:case condition="_uid && _path">
+	<script>DBM.dbExplorer.currentPath="<tml:item name="_path"/>";</script>
+</tml:case>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title" scope="local">
+		Database Explorer for Database
+		<tml:form id="db-explorer-db" cssstyle="display:inline" source="portletsessionvars">
+			<tml:script>
+				_dbs = DBM.getDbSelectList(portlet.getSessionVar('dbkey'), function(db){
+					return db.hasFeature(db.FEATURE_HIERARCHICAL);
+				})
+				if(!portlet.getSessionVar('dbkey'))
+					_dbs.add(0, "Please Select Database");
+			</tml:script>
+			<tml:input name="dbkey" type="select" options="{_dbs}" changeaction="changeDb" ajax="true"/>
+		</tml:form>
+	</tml:option>	
+
+	<tml:option name="config" scope="local">
+		tools: [
+			{
+				id: "search",
+				handler: function(){
+					Ext.Msg.show({
+						title:'{%label:db-explorer.goto.title%}',
+						msg: "{%label:db-explorer.goto.msg%}:",
+						prompt:true,
+						buttons: Ext.MessageBox.OKCANCEL,
+						width: 600,
+						fn: function(button, text){
+							if(button=='ok' && text!="")
+		       					DBM.switchToObject("tools.db-explorer", "<tml:item name="dbkey"/>", "db:<tml:item name="dbkey"/>/"+text)
+		       			} 
+					})
+		       			
+				}
+			}
+		]
+
+		,tbar: [
+			<tml:case condition="DBM.database(portlet.getSessionVar('dbkey')).getConfig()">
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+				text: "open configuration",
+				handler: function(){
+					<tml:script>
+						_app = "databases";
+						var dbconfig = DBM.database(portlet.getSessionVar('dbkey')).getConfig();
+						if(dbconfig instanceof Packages.de.innovationgate.wga.config.ContentStore){
+							_app = "webprojects";
+						}
+						_uid = dbconfig.uid;
+					</tml:script>					
+					DBM.switchToObject("<tml:item name="_app"/>", "<tml:item name="_uid"/>");
+				}
+			}
+			,"->"
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="database_refresh.png"/>',		                
+				text: "Reconnect",
+				handler: function(){
+					DBM.callAction("<tml:action ref="actions:reconnect-databases" param1="{portlet.getSessionVar('dbkey')}"/>",
+						"<tml:script expression="portlet.portletkey"/>",
+						"reconnecting database"
+					);
+				}
+			}
+			</tml:case>
+		]
+
+	</tml:option>
+	
+	<tml:option name="body" scope="local">
+	
+		<tml:if condition="!portlet.getSessionVar('dbkey')">
+			<tml:then>No database selected</tml:then>
+			<tml:elseif condition="!DBM.database(portlet.getSessionVar('dbkey')).isReady">
+				<h1 style="color:red">The selected Database is not available</h1>
+			</tml:elseif>
+			<tml:else>
+				<table width="100%" border="0">
+					<tr>
+						<td width="200" valign="top">
+							
+							<tml:include ref="treeview" designdb="@ui">
+							
+								<tml:option name="root-title"><tml:item name="dbkey"/></tml:option>
+								<tml:option name="root-icon"><tml:url type="file" db="@afw" doc="icons" file="database.png"/></tml:option>						
+								<tml:option name="var">DBM.dbExplorer.tree</tml:option>
+	
+								<tml:option name="onload">
+									if(DBM.dbExplorer.currentPath){
+										DBM.progressbar.show("loading tree entries")
+										this.selectPath(DBM.dbExplorer.currentPath, null, DBM.progressbar.hide);
+									}
+								</tml:option>
+								
+								<tml:option name="onclick">
+									WGA.event.fireEvent("DBM-struct-selected", "<tml:script expression="portlet.portletkey"/>", {
+										key: node.id,
+										path: node.getPath()
+									})
+								</tml:option>
+							
+								<tml:option name="config">
+									title: "Database Structure",
+									border:true,
+									frame: false,
+									autoScroll: true,
+									height: 200,	//DBM.viewport.getSize().height-100,
+									autoHeight: false,
+									width: 300,
+									tools: [
+										{
+											id: "refresh",
+											handler: function(){
+												DBM.dbExplorer.tree.loader.load(DBM.dbExplorer.tree.getRootNode(), function(){
+													DBM.dbExplorer.tree.selectPath(DBM.dbExplorer.currentPath);
+												})
+											}
+										}
+									]
+								</tml:option>
+										
+								<tml:option name="loaderurl"><tml:url type="tml" medium="json" layout="site-structure"/></tml:option>	
+								<tml:option name="baseparams">{so:"<tml:script expression="AFW.Util.serializeJsObject({dbkey:portlet.getSessionVar('dbkey')})"/>"}</tml:option> 
+								
+
+							</tml:include>
+							<script>
+								WGA.portlet.registerObject("<tml:script expression="portlet.portletkey"/>", {
+									destroy: function(){
+										DBM.dbExplorer.tree.destroy();
+										DBM.dbExplorer.tree=null;
+									}
+								})
+							</script>
+						</td>
+						<td valign="top" width="*">							
+							<tml:include ref="::login-info"/>
+							<tml:portlet name="node-info-portlet" ref="::node-info:portlet" ajax="true" o_key="{portlet.getSessionVar('dbkey')}"/>
+						</td>
+					</tr>
+				</table>
+			</tml:else>
+		</tml:if>
+	</tml:option>
+</tml:include>
+
+<script>	
+	function resizeTree() {
+		if(DBM.centerpanel && DBM.dbExplorer.tree)
+			DBM.dbExplorer.tree.setHeight(DBM.centerpanel.getHeight()-80);
+	} 
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "Viewport-resize", resizeTree)
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", resizeTree) 
+</script>

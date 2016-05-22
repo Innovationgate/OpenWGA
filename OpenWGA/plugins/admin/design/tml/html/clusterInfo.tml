@@ -1,0 +1,143 @@
+<tml:action id="reconnectDB">
+	var membersForExecution = new Packages.java.util.HashSet();
+	var members = tmlform.fieldlist("members").iterator();
+	while (members.hasNext()) {
+		var uid = members.next();
+		log.info(uid);
+		var cMember = WGA.Core.getClusterService().getMember(uid);
+		if (cMember) {
+			membersForExecution.add(cMember);
+		}	
+	}
+	var task =  new Packages.de.innovationgate.wgpublisher.cluster.tasks.ReconnectDatabaseTask(tmlform.dbkey);
+	var futures = WGA.Core.getClusterService().submitTo(membersForExecution, task).values().iterator();
+/*	while (futures.hasNext()) {
+		var future = futures.next();
+		log.info(future.get(5, Packages.java.util.concurrent.TimeUnit.SECONDS));
+	}	*/
+</tml:action>
+
+
+<tml:action id="updateDBConfig">
+	var membersForExecution = new Packages.java.util.HashSet();
+	var members = tmlform.fieldlist("members").iterator();
+	while (members.hasNext()) {
+		var uid = members.next();
+		log.info(uid);
+		var cMember = WGA.Core.getClusterService().getMember(uid);
+		if (cMember) {
+			membersForExecution.add(cMember);
+		}	
+	}
+	var dbConfig = WGA.Core.getWgaConfiguration().getContentDatabase(tmlform.dbkey);
+	var task = new Packages.de.innovationgate.wgpublisher.cluster.tasks.UpdateConfigEntityTask(dbConfig);
+	var futures = WGA.Core.getClusterService().submitTo(membersForExecution, task).values().iterator();
+/*	while (futures.hasNext()) {
+		var future = futures.next();
+		log.info(future.get(5, Packages.java.util.concurrent.TimeUnit.SECONDS));
+	}	*/
+</tml:action>
+
+<tml:action id="readResource">
+	var clusterService = WGA.Core.getClusterService();
+	var member = clusterService.getMember(tmlform.fieldlist("members").get(0));
+	//log.info("Reading resource from: " + member.getUID());
+	var inputStream = clusterService.readResource(member, new Packages.java.net.URI(tmlform.uri));
+	var out = new Packages.java.io.FileOutputStream("/tmp/readResourceResult");
+	WGA.Utils.inToOut(inputStream, out, 1024);
+	out.close();
+	_message = "Resource: '" + tmlform.uri + "' from member '" + member.getUID() + "' written to '/tmp/readResourceResult'";
+</tml:action>
+
+<tml:action id="writeResource">
+	var clusterService = WGA.Core.getClusterService();
+	var member = clusterService.getMember(tmlform.fieldlist("members").get(0));
+	log.info(member.getUID());
+	var outputStream = clusterService.writeResource(member, new Packages.java.net.URI(tmlform.uri));
+	var inputStream = new Packages.java.io.ByteArrayInputStream(javaObject("Hallo Welt!").getBytes());
+	WGA.Utils.inToOut(inputStream, outputStream, 1024);
+	outputStream.close();
+	inputStream.close();
+	_message = "Result written to: '" + tmlform.uri + "' on member '" + member.getUID() + "'";
+</tml:action>
+
+<tml:action id="retrieveChecksum">
+	try {
+		var clusterService = WGA.Core.getClusterService();
+		var member = clusterService.getMember(tmlform.fieldlist("members").get(0));
+		var uri = new Packages.java.net.URI(tmlform.uri);
+		var future = WGA.Core.getClusterService().submitTo(member, new Packages.de.innovationgate.wgpublisher.cluster.tasks.ResourceMD5ChecksumTask(uri));
+		_message = "Checksum:" + future.get(5, Packages.java.util.concurrent.TimeUnit.SECONDS);
+	} catch (e) {
+		_message = e.message;
+	}
+</tml:action>
+
+<html>
+	<head><tml:htmlhead/></head>
+	<body>
+		<h2>Cluster Information</h2>		
+		<tml:if condition="WGA.Core.getClusterService() && WGA.Core.getClusterService().isInitialized()">
+			<tml:then>
+				Name: <tml:script>return WGA.Core.getClusterService().getName()</tml:script>
+				<tml:script>
+					_members = WGA.Core.getClusterService().getMembers();
+				</tml:script>	
+				<h3>Members</h3>			
+				<table border="1">	
+					<th>UID</th>
+					<th>Name</th>					
+				<tml:form id="memberActions"> 
+					<tml:foreach type="itemvalue" item="_members" currentvalue="member">
+						<tr>	
+							<td><tml:input type="checkbox" name="members" multiple="true" options="{member.getUID()}"/></td>
+							<td>
+								<tml:script>
+									var info = member.getMemberInformation();
+									if (info) {
+										return info.getName();
+									}
+									return "n.a.";
+								</tml:script>
+							</td>
+					
+						</tr>
+					</tml:foreach>
+				</table>
+					
+				<h3>Actions</h3>
+				<table border="1">	
+					<th>Name</th>	
+					<th>Input</th>
+					<tr>
+						<td>DB-Actions</td>
+						<td>
+							DBKey: <tml:input name="dbkey"/><br>
+							<tml:button clickaction="reconnectDB">Reconnect</tml:button>
+							<tml:button clickaction="updateDBConfig">Push config</tml:button>
+						</td>
+					</tr>
+					<tr>
+						<td>Resource-Actions</td>
+						<td>
+							URI: <tml:input name="uri"/><br>
+							<tml:button clickaction="readResource">read</tml:button>
+							<tml:button clickaction="writeResource">write</tml:button>
+							<tml:button clickaction="retrieveChecksum">checksum</tml:button>
+						</td>
+					</tr>					
+				</table>						
+				</tml:form>								
+			</tml:then>
+			<tml:else>
+				Cluster not initialized
+			</tml:else>
+		</tml:if>
+		
+	</body>
+	
+	<tml:case condition="_message">
+		<script>alert("<tml:item name="_message" encode="javascript"/>");</script>
+	</tml:case>
+</html>
+	

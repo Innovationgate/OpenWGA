@@ -1,0 +1,93 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="togglePersEnabled">
+	if(tmlform.pers_enabled)
+		_config_bean.personalisation = new Packages.de.innovationgate.wga.config.PersonalisationDatabase();
+	else _config_bean.personalisation = null;
+</tml:action>
+
+<tml:action id="toggleAuthEnabled">
+	if(tmlform.auth_enabled)
+		_config_bean.authenticationSource = new Packages.de.innovationgate.wga.config.AuthenticationSource();
+	else _config_bean.authenticationSource = null;
+</tml:action>
+
+<tml:script>
+	_config_bean = DBM.getConfigBean();
+</tml:script>
+
+<fieldset>
+	<tml:[system:fs-input] o_field="name" o_validation="$E_VALUE!=''" o_message="Please enter a domain name" o_mode="{_config_bean.isDefaultResource()?'view':'edit'}"/>
+	<tml:[system:fs-input] o_field="defaultManager" o_allowblank="true" o_emptytext="- none -"/>
+	<tml:[system:fs-input] o_field="maximumLoginAttempts" o_type="number" o_format="0"/>		
+</fieldset>
+
+<fieldset>
+	<legend>Domain Authentication</legend>
+
+	<label>This domain uses Authentication:</label>
+	<div class="data">
+		<div style="float:left;margin-top:3px">
+			<tml:input type="boolean" name="auth_enabled" default="{_config_bean.authenticationSource!=null}" 
+				cssstyle="margin-top:-3px"
+				changeaction="toggleAuthEnabled" ajax="true"
+			/>
+		</div>
+		<tml:include ref="system:convert-to-ext-field" o_fieldname="auth_enabled" o_type="boolean"/>
+	</div>
+	<div class="clear"></div>
+
+	<tml:case condition="tmlform.auth_enabled">
+		<tml:portlet name="domain-form-auth" ref="::form-auth:portlet" ajax="true">
+			<tml:option name="ns">/authenticationSource</tml:option>
+		</tml:portlet>
+		
+	</tml:case>
+</fieldset>
+
+<tml:case condition="tmlform.mode()=='edit' || _config_bean.personalisation">
+	<fieldset>
+		<legend>Domain wide User Profiles</legend>
+	
+		<label>Use Domain wide Profiles:</label>
+		<div class="data">
+			<div style="float:left;margin-top:3px">
+				<tml:input type="boolean" name="pers_enabled" default="{_config_bean.personalisation!=null}"
+					cssstyle="margin-top:-3px"
+					changeaction="togglePersEnabled" ajax="true"
+				/>
+			</div>
+			<tml:include ref="system:convert-to-ext-field" o_fieldname="pers_enabled" o_type="boolean"/>
+		</div>
+		<div class="clear"></div>
+	
+		<tml:case condition="tmlform.pers_enabled">
+			<tml:portlet name="domain-pers" ref="::form-pers:portlet" ajax="true">
+				<tml:option name="ns">/personalisation</tml:option>
+			</tml:portlet>
+		</tml:case>
+			
+	</fieldset>
+</tml:case>

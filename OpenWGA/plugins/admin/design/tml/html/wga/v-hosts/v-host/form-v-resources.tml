@@ -1,0 +1,168 @@
+<tml:action id="addEntry">
+	_config_bean = DBM.getConfigBean();
+	if(!tmlform.validate())
+		return;
+	var vr = new Packages.de.innovationgate.wga.config.VirtualResource()	
+	callAction("setValuesFromForm", vr)	
+	_config_bean.virtualResources.add(vr);
+</tml:action>
+
+<tml:action id="updateEntry">
+	_config_bean = DBM.getConfigBean();
+	if(!tmlform.validate())
+		return;
+	var vr = _config_bean.virtualResources.get(tmlform._idx)
+	callAction("setValuesFromForm", vr)
+</tml:action>
+
+<tml:action id="setValuesFromForm">
+	var vr = tmlparam1;
+	vr.name=tmlform.name;
+	vr.path=tmlform.path;
+
+	tmlform.removeField("name");
+	tmlform.removeField("path");
+	tmlform.removeField("_action");
+	tmlform.removeField("_idx");
+</tml:action>
+
+<tml:action id="removeEntry">
+	_config_bean = DBM.getConfigBean();
+	var idx = tmlparam1-1;
+	_config_bean.virtualResources.remove(idx)
+	tmlform.removeField("_idx");
+</tml:action>
+
+<tml:action id="editEntry">
+	_config_bean = DBM.getConfigBean();
+	var idx = tmlparam1-1;
+	var vr = _config_bean.virtualResources.get(idx)
+	
+	tmlform.name = vr.name;
+	tmlform.path = vr.path;
+	
+	tmlform._idx = idx;
+	tmlform._action = "edit"
+</tml:action>
+
+
+<tml:action id="newEntry">
+	tmlform._action = "new"
+</tml:action>
+
+<tml:action id="cancelEdit">
+	tmlform._action = ""
+	tmlform.removeField("_idx");
+</tml:action>
+
+<tml:comment><tml:input type="text" name="_action"/>
+<tml:input type="text" name="_idx"/></tml:comment>
+
+<tml:script>
+	_config_bean = DBM.getConfigBean();
+	_entry_list = _config_bean.virtualResources
+</tml:script>
+
+<tml:if condition="_entry_list.isEmpty()">
+	<tml:then>
+		<tml:case condition="tmlform.mode()=='view'">
+			<div style="padding: 5px">- none -</div>
+		</tml:case> 
+	</tml:then>
+	<tml:else>
+		<table class="collection" width="100%" style="margin-bottom:20px">
+			<tr class="collection-title">
+				<td>Name</td>
+				<td>Path</td>
+				<tml:case condition="tmlform.mode()=='edit'">
+					<td></td>
+				</tml:case>
+			</tr>
+		
+			<tml:foreach id="array-list-loop" type="itemvalue" item="_entry_list" currentvalue="_entry">
+				<tr class="List<tml:case condition="tmlform._idx==taginfo('array-list-loop', 'iteration')-1"> selected</tml:case>">
+					<td><tml:item name="_entry" xpath="name"/></td>
+					<td><tml:item name="_entry" xpath="path"/></td>
+					<tml:case condition="tmlform.mode()=='edit'">
+						<td nowrap align="right" width="1%">
+							<tml:button clickaction="editEntry" ajax="true" param1="{taginfo('array-list-loop', 'iteration')}">edit</tml:button>
+							<tml:button clickaction="removeEntry" ajax="true" param1="{taginfo('array-list-loop', 'iteration')}">delete</tml:button>
+						</td>
+					</tml:case>
+				</tr>
+			</tml:foreach>
+		</table>
+	</tml:else>
+</tml:if>
+
+<div class="entry-form">
+			
+	<tml:if condition="tmlform._action=='new' || tmlform._action=='edit'">
+		<tml:then>
+	
+			<tml:include designdb="@ui" ref="formmessages"/>		
+					
+			<div style="font-style:italic">		
+				<tml:if condition="tmlform._action=='new'">		
+					<tml:then>New</tml:then>		
+					<tml:else>Edit</tml:else>		
+				</tml:if>		
+				Virtual Resource		
+			</div>		
+					
+			<label>Name:</label>		
+			<div class="data">
+				<tml:input name="name" type="text" cssstyle="width:500px"
+					validation="$E_VALUE!=''"
+					message = "Please enter a name."
+					trim="true"
+				/>		
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="name" o_msgtarget="title"/>			
+			</div>		
+			<div class="clear"></div>		
+	
+			<label>Path:</label>		
+			<div class="data">
+				<tml:input name="path" type="text" cssstyle="width:500px"
+					validation="$E_VALUE!=''"
+					message = "Please enter a path."
+					trim="true"
+				/>		
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="path" o_msgtarget="title"/>			
+			</div>		
+			<div class="clear"></div>		
+
+			<div class="data" style="margin-top:5px">		
+				<tml:if condition="tmlform._action=='new'">		
+					<tml:then>		
+						<tml:button clickaction="addEntry" ajax="true">Add Entry</tml:button>		
+					</tml:then>		
+					<tml:else>		
+						<tml:button clickaction="updateEntry" ajax="true">Update Entry</tml:button>		
+					</tml:else>		
+				</tml:if>		
+				<tml:button clickaction="cancelEdit" ajax="true">Cancel</tml:button>		
+			</div>		
+			<div class="clear"></div>		
+					
+			<tml:case hasoption="id">
+				<script>
+					
+					Ext.get("$ajaxContentDiv_<tml:script expression="portlet.portletkey"/>").mask();
+					Ext.get("<tml:option name="id"/>").setStyle({
+						zIndex: 102,
+						position: "relative"
+					})
+						
+				</script>		
+			</tml:case>
+			
+		</tml:then>
+	
+		<tml:elseif condition="tmlform.mode()=='edit'">
+			<tml:button clickaction="newEntry" ajax="true">Add New Resource ...</tml:button>
+		</tml:elseif>
+		
+	</tml:if>
+	
+</div>

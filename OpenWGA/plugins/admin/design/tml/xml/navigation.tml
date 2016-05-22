@@ -1,0 +1,88 @@
+<navigator>
+<tml:comment>
+###########################################################################
+  Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+  
+  This file is part of the OpenWGA server platform.
+  
+  OpenWGA is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+  
+  In addition, a special exception is granted by the copyright holders
+  of OpenWGA called "OpenWGA plugin exception". You should have received
+  a copy of this exception along with OpenWGA in file COPYING.
+  If not, see <http://www.openwga.com/gpl-plugin-exception>.
+  
+  OpenWGA is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with OpenWGA in file COPYING.
+  If not, see <http://www.gnu.org/licenses/>.
+############################################################################ 
+</tml:comment>
+ 
+	<nav id="home" img="kchart.png" redirectto="runtime-status">
+		<nav id="runtime-status" tml="home:server-info:portlet"/>
+		<nav id="runtime-statistics" tml="home:statistics:portlet"/>
+		<nav id="runtime-activities" tml="home:activities:portlet"/>
+		<nav id="runtime-applog" tml="home:applog:portlet"/>
+		<nav id="runtime-problems" tml="home:problems:portlet"/>
+	</nav>
+
+	<nav id="wga" redirectto="wga-settings" img="krfb.png">
+		<nav id="wga-settings" tml="wga:config:portlet"/>
+		<nav id="wga-admins" tml="wga:admins:portlet"/>
+		<nav id="wga-mail" tml="wga:mail:portlet"/>
+		<nav id="wga-poptions" tml="wga:poptions:portlet" condition="DBM.isExpertMode()"/>
+		<nav id="wga-dboptions" tml="wga:db-options:portlet" condition="DBM.isExpertMode()"/>
+		<nav id="wga-accesslog" tml="wga:accesslog:portlet"/>
+		<nav id="wga-error-page" tml="wga:error-page:portlet"/>
+		<nav id="wga-filter" tml="wga:filters:portlet" condition="DBM.isExpertMode()"/>
+		<nav id="wga-advanced" tml="wga:advanced:portlet" condition="DBM.isExpertMode()"/>
+		<nav id="wga-v-hosts" tml="wga:v-hosts:portlet"/>
+		<nav id="wga-proxy" tml="wga:proxy:portlet"/>
+	</nav>
+	
+	<nav id="webprojects" redirectto="webprojects.by-domain" img="www.png">
+		<nav id="webprojects.by-domain" tml="webprojects:portlet-by-domain"/>
+		<nav id="webprojects.by-server" tml="webprojects:portlet-by-server"/>
+		<nav id="webprojects.by-sequence" tml="webprojects:by-sequence:portlet"/>
+	</nav>
+	
+	<nav id="databases" redirectto="databases.by-server" img="wordprocessing.png">
+		<nav id="databases.by-domain" tml="databases:portlet-by-domain"/>
+		<nav id="databases.by-server" tml="databases:portlet-by-server"/>
+	</nav>
+	
+	<nav id="dbservers" tml="dbservers:portlet" img="server.png"/>
+
+	<nav id="domains" tml="domains:portlet" img="folder_blue.png"/>
+
+	<nav id="shares" tml="shares:portlet" img="hdd_mount.png"/>
+	
+	<nav id="plugins" redirectto="plugins.plugin-management" img="kcmdf.png">
+		<nav id="plugins.plugin-management" tml="plugins:portlet"/>
+		<nav id="plugins.plugin-store" tml="plugins:plugin-store:portlet"/>
+	</nav>
+
+	<nav id="jobs" redirectto="jobs.all" img="karm.png">
+		<nav id="jobs.all" tml="jobs:portlet"/>
+	</nav>
+	
+	<nav id="tools" redirectto="tools.tmlscript-console" img="package_development.png">
+		<nav id="tools.tmlscript-console" tml="tools:tmlscript-console"/>
+		<nav id="tools.jsplookup" tml="tools:jsplookup"/>
+		<nav id="tools.db-query" tml="tools:db-query:portlet"/>
+		<nav id="tools.db-explorer" tml="tools:db-explorer:portlet"/>
+	</nav>
+
+	<nav id="licenses" img="password.png"/>
+
+</navigator>
+
+		

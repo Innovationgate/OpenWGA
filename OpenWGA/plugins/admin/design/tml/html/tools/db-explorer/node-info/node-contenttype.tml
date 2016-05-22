@@ -1,0 +1,210 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="showContent">
+	portlet.setSessionVar("_showContent", true);
+</tml:action>
+
+<tml:action id="deleteCT">
+	try{
+		
+		var ct = db(option("key")).getContentType(tmlparam1);
+		ct.remove();
+
+		log.info("deleted content type " + tmlparam1);
+
+		portlet.setSessionVar("key", "contenttype");
+		portlet.setSessionVar("path", "/root/contenttype");
+		
+		_treeChanged = true;
+	}
+	catch(e){
+		_msg = e.message;
+	}
+</tml:action>
+
+
+<tml:script>
+	var ct = option("documentkey");
+	_ct = db(option("key")).getContentType(ct);
+
+	// check deletion rights:
+	_mayDelete = true;
+	var DB = AFW.database(option("key"))
+	if(!DB.isDesigner() || !DB.mayDelete()) 
+		_mayDelete = false;
+	else {
+		// check for schema definition
+		var schema = _ct.getSchemaDefinition();
+		if(schema && schema.isAutoCreate())
+			_mayDelete = false;		
+	}
+</tml:script>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Contenttype <b><tml:script expression="_ct.name"/></b></tml:option>	
+
+	<tml:option name="config">
+		tbar:[
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_delete.png"/>',		                
+				text: "delete",
+				disabled: <tml:script expression="!_mayDelete"/>,
+				handler: function(){
+					WGA.ajax.callAction('<tml:action>
+						_query_delete_ct=true;
+					</tml:action>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+	
+		<tml:case istrue="_query_delete_ct">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Delete this Content Type?</tml:option>
+				<tml:option name="body">
+					<button onclick="DBM.ajaxAction({
+								action: '<tml:action ref="deleteCT" param1="{option('documentkey')}"/>',
+								id: '<tml:script expression="portlet.portletkey"/>'
+							}, 'deleting content type')">
+						Delete
+					</button>					
+				</tml:option>
+			</tml:include>			
+		</tml:case>
+
+		<tml:case isdefined="_msg">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Error.</tml:option>
+				<tml:option name="body">
+					<tml:item name="_msg"/>					
+				</tml:option>
+			</tml:include>			
+		</tml:case>
+
+		<fieldset>		
+					
+			<label>Name:</label>		
+			<div class="data"><tml:script expression="_ct.name"/></div>
+			<div class="clear"></div>
+					
+			<label>Aliases:</label>		
+			<div class="data"><tml:script expression="_ct.getNameAliases()" divider="<br>"/></div>
+			<div class="clear"></div>
+					
+			<label>Outer Layout:</label>		
+			<div class="data"><tml:script expression="_ct.getOuterLayout('html') ? _ct.getOuterLayout('html').name : '- none -'"/></div>
+			<div class="clear"></div>
+					
+			<label>Inner Layout:</label>		
+			<div class="data"><tml:script expression="_ct.getInnerLayout('html') ? _ct.getInnerLayout('html').name : '- none -'"/></div>
+			<div class="clear"></div>
+					
+			<label>Positioning:</label>		
+			<div class="data"><tml:script expression="_ct.getPositioning()"/></div>
+			<div class="clear"></div>
+			
+			<tml:case condition="_ct.getPositioning()=='fixParentDocs'">
+				<label>Allowed Positions:</label>		
+				<div class="data">
+					<tml:script>
+						var list = _ct.getAllowedPositions();
+						if(list.isEmpty() || (list.size()==1 && list.get(0)==""))
+							return "all";
+						else return list;
+					</tml:script>
+				</div>
+				<div class="clear"></div>
+			</tml:case>
+					
+			<label>Access Restricted for:</label>		
+			<div class="data"><tml:script expression="_ct.getContentCreators()" divider="<br>"/></div>
+			<div class="clear"></div>
+					
+			<label>Workflow:</label>		
+			<div class="data"><tml:script expression="_ct.getWorkflow()||'- none -'"/></div>
+			<div class="clear"></div>
+
+			<tml:case condition="AFW.database(option('key')).isJdbc()">
+				<label>Content Documents using this Contenttype:</label>		
+				<div class="data">
+					<a href="<tml:url type="action" action="showContent" ajax="true"/>">
+						<tml:script>
+							var opts = {};
+							opts[db().QUERYOPTION_ROLE]=""; 
+							return AFW.database(option("key")).hqlSearch("content.structentry.contenttype.name = '"+_ct.name+"'", opts).count
+						</tml:script>
+					</a>
+				</div>
+				<div class="clear"></div>
+			</tml:case>
+					
+		</fieldset>		
+		
+		<tml:case istrue="_showContent">
+			<fieldset>
+				<legend>Content Documents using this Contenttype</legend>
+				<tml:script>		
+					_metas = createlist(["title", "version", "created", "language", "status"]);		
+				</tml:script>		
+				<table width="100%" class="collection">		
+					<tr class="collection-title">		
+						<tml:foreach type="itemvalue" item="_metas" currentvalue="_meta">		
+							<td><tml:item name="_meta"/></td>		
+						</tml:foreach>		
+					</tr>
+					<tml:collection>
+						<tml:query type="hql" db="{option('key')}" alllanguages="true" role="none" onlypublished="false">
+							content.structentry.contenttype.name = '<tml:script expression="_ct.name"/>'
+						</tml:query>
+						<tml:foreach id="ct_content" pagesize="10" page="{pagecontrol_ct_contentPage}">		
+							<tml:include designdb="@ui" ref="tr">
+								<tml:option name="ajaxaction">
+							    	WGA.ajax.callAction('<tml:action param1="{'db:'+option('key')+'/docid:'+KEY}" param2="{(TITLE||KEY) + ' ('+VERSION+')'}">
+								    		var tabview=createObject("@ui/tabview", portlet);
+											tabview.addPage("tools:db-explorer:node-info:content:portlet", tmlparam1, tmlparam2);
+							    		</tml:action>', '<tml:script expression="portlet.portletkey"/>')
+								</tml:option>
+							</tml:include>		
+								<tml:foreach type="itemvalue" item="_metas" currentvalue="_meta">		
+									<td><tml:metadata name="{_meta}"/></td>		
+								</tml:foreach>		
+							</tr>		
+						</tml:foreach>
+						
+					</tml:collection>	
+				</table>					
+
+				<tml:include ref="system:pagecontrol">
+					<tml:option name="sourcetag">ct_content</tml:option>
+					<tml:option name="ajax">true</tml:option>
+				</tml:include>
+								
+			</fieldset>
+		</tml:case>
+	</tml:inline>
+</tml:include>

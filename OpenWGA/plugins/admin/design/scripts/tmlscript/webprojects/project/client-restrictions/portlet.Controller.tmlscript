@@ -1,0 +1,105 @@
+function Controller() {
+}
+
+Controller.prototype.ClientRestriction = Packages.de.innovationgate.wga.config.ClientRestriction;
+
+Controller.prototype.addCR = function(DBM, $form) {
+	var _config_bean = DBM.getConfigBean();
+	var cr = new Packages.de.innovationgate.wga.config.ClientRestriction()	
+	this.setCRValuesFromForm(cr, $form);	
+	_config_bean.clientRestrictions.add(cr);
+}.nonIsolated()
+
+Controller.prototype.updateCR = function(DBM, $form) {
+	var _config_bean = DBM.getConfigBean();
+	var cr = _config_bean.clientRestrictions.get($form.cr_idx)
+	this.setCRValuesFromForm(cr, $form);
+}.nonIsolated()
+
+Controller.prototype.setCRValuesFromForm = function(cr, tmlform) {
+
+	cr.type = tmlform.cr_type;
+	switch(cr.type){
+		case cr.TYPE_HOST:
+			cr.hostIP = tmlform.cr_value;
+			break;
+		case cr.TYPE_NETWORK:
+			cr.network = tmlform.cr_value;
+			cr.netmask = tmlform.cr_value2;
+			break;
+		case cr.TYPE_NETWORK_CIDR_PREFIX:
+			cr.network = tmlform.cr_value;
+			break;
+		case cr.TYPE_RANGE:
+			cr.startIP = tmlform.cr_value;
+			cr.endIP = tmlform.cr_value2;
+			break;
+	}
+	
+	tmlform.removeField("cr_value");
+	tmlform.removeField("cr_value2");
+	tmlform.removeField("_crAction");
+
+}.nonIsolated()
+
+Controller.prototype.removeCR = function(DBM, idx) {
+	idx--;
+	var bean = DBM.getConfigBean();
+	bean.clientRestrictions.remove(idx)
+}.nonIsolated()
+
+Controller.prototype.editCR = function(DBM, idx, $form) {
+	idx--;
+	var _config_bean = DBM.getConfigBean();
+	var cr = _config_bean.clientRestrictions.get(idx)
+	$form.cr_type = cr.type;
+	switch(cr.type){
+		case cr.TYPE_HOST:
+			$form.cr_value = cr.hostIP;
+			break;
+		case cr.TYPE_NETWORK:
+			$form.cr_value = cr.network;
+			$form.cr_value2 = cr.netmask;
+			break;
+		case cr.TYPE_NETWORK_CIDR_PREFIX:
+			$form.cr_value = cr.network;
+			break;
+		case cr.TYPE_RANGE:
+			$form.cr_value = cr.startIP; 
+			$form.cr_value2 = cr.endIP;
+			break;
+	}
+
+	$form.cr_idx = idx;
+	$form._crAction = "edit"
+}.nonIsolated()
+
+Controller.prototype.newCR = function($form) {
+	$form._crAction = "new"
+}
+
+Controller.prototype.cancelCRedit = function($form) {
+	$form._crAction = ""
+}
+
+Controller.prototype.crList = function(DBM) {
+	return DBM.getConfigBean().clientRestrictions;
+}.nonIsolated()
+
+
+Controller.prototype.hasRestrictions = function(DBM) {
+	return this.crList(DBM).size() > 0;
+}.nonIsolated()
+
+Controller.prototype.isRowSelected = function($form, $tagInfo_crsloop_iteration) {
+	return $form._crAction=='edit' && $form.cr_idx == $tagInfo_crsloop_iteration-1
+}
+
+Controller.prototype.newOrEdit = function($form) {
+	if ($form._crAction=='new') {
+		return "New";
+	}
+	else {
+		return "Edit"
+	};	
+}

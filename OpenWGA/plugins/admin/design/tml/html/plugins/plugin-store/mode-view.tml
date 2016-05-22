@@ -1,0 +1,101 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	if (pluginStore.server.pluginResult == null) {
+		callAction("getPlugins");
+	}
+</tml:script>
+
+<tml:case istrue="refresh">
+	<script type="text/javascript">
+		WGA.ajax.callAction("<tml:action ref="$refresh" portletmode="view"/>","<tml:script expression="portlet.portletkey"/>");
+	</script>
+</tml:case>
+
+<form id="plugin-store" onsubmit="return false">
+	<input name="query" id="query" autocomplete="off">
+	<script>
+		(function(){
+			var empty_string = "search ...";
+			var el = Ext.get("plugin-store").child("input");
+			var val = el.dom.value;
+			if(val==""){
+				el.dom.value=empty_string;
+				el.dom.className="empty";
+			}
+			
+			el.on("keyup", function(ev, el){
+				val = el.value;
+				WGA.event.fireEvent('pluginSearch');
+			})
+			el.on("focus", function(ev, el){
+				el.className="";
+				if(val=="")
+					el.value="";
+			})
+			el.on("blur", function(ev, el){
+				if(el.value==""){
+					el.value=empty_string;
+					el.className="empty";
+				}
+			})
+		})()
+	</script>
+</form>
+
+<tml:case condition="_success">
+	<tml:include designdb="@ui" ref="message">
+		<tml:option name="title">Successfully installed:</tml:option>
+		<tml:inline name="body">
+			<ul>
+				<tml:script>
+					installedPlugins = wgacore.getPluginSet().getActivePluginsByUniqueName() || WGA.createLookupTable();
+				</tml:script>
+				<tml:case condition="installedPlugins.size() > 0">
+					<tml:foreach type="itemvalue" item="_success" currentvalue="pluginUniqueFileName">
+					
+						<tml:script>
+							var pluginID = Packages.de.innovationgate.wga.common.beans.csconfig.v1.PluginID.parseQualifiedFileName(pluginUniqueFileName);
+							var pluginUniqueName = pluginID.getUniqueName();
+							if (installedPlugins.containsKey(pluginUniqueName)) {
+								var tmpPlugin = installedPlugins.get(pluginUniqueName);
+								pluginTitle = tmpPlugin.getCsConfig().getPluginConfig().getTitle();
+							} else pluginTitle = null;
+						</tml:script>
+						
+						<tml:case condition="pluginTitle">
+							<li><tml:item name="pluginTitle"/></li>
+						</tml:case>
+					</tml:foreach>
+				</tml:case>
+			</ul>
+		</tml:inline>
+	</tml:include>
+</tml:case>
+
+<tml:portlet name="plugin-browser" ajax="true" ref="::plugin-browser:portlet">
+	<tml:option name="plugins" expression="new Packages.java.util.HashMap(pluginStore.server.pluginResult || WGA.createLookupTable())"/>
+</tml:portlet>

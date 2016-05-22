@@ -1,0 +1,83 @@
+<tml:action id="truncate">
+
+	var dbkey = tmlparam1;
+	var code = tmlparam2;
+	var query_data = tmlparam3;
+
+	if(tmlform.code!=code){
+		tmlform.validate()
+		tmlform.setmessage("code", "code is not correct.")
+		_query_truncate_data=query_data;
+	}
+	else if(!tmlform.validate()){
+		_query_truncate_data=query_data;
+	}
+	else{
+		WGA.Master.runFunction(function(dbkey){
+			log.info("Truncating objects: " + tmlform.data);
+			_db = db(dbkey)
+			_db.callBackendService(tmlform.data, [])
+		}, dbkey)
+		callAction("actions:reconnect-databases", dbkey);
+	}
+	
+</tml:action>
+
+<tml:form id="truncate" source="none" htmlinput="ignore">
+
+	<tml:script>
+		_db = db(option('dbkey')||_config_bean.key)
+		_code = format(Math.random()*100, "000")
+		_opts = WGA.createList()
+		if(_db.isBackendServiceSupported(_db.BACKENDSERVICE_CLEAR_CONTENT))
+			_opts.add("Data Documents|"+_db.BACKENDSERVICE_CLEAR_CONTENT)
+		if(_db.isBackendServiceSupported(_db.BACKENDSERVICE_CLEAR_CONTENT_AND_SCHEMA))
+			_opts.add("Data Documents + Schema|"+_db.BACKENDSERVICE_CLEAR_CONTENT_AND_SCHEMA)
+		if(_db.isBackendServiceSupported(_db.BACKENDSERVICE_CLEAR_DATABASE))
+			_opts.add("Complete Database|"+_db.BACKENDSERVICE_CLEAR_DATABASE)
+	</tml:script>
+	
+	<fieldset>
+	
+		<tml:if condition="_query_truncate_data=='profiles'">
+			<tml:then>
+				<div class="data">
+					Truncate All User Profiles
+					<tml:input name="data" type="hidden" default="{_db.BACKENDSERVICE_CLEAR_USERPROFILES}"/>
+				</div>
+				<div class="clear"></div>
+			</tml:then>
+			<tml:else>
+				<label>Truncate:</label>
+				<div class="data">
+					<tml:input name="data" type="select" optionsitem="_opts"
+						validation="$P_VALUE!=''"
+						message="Please select"
+					/>
+					<tml:include ref="system:convert-to-ext-field" o_fieldname="data" o_type="select" o_forceselection="true"/>
+				</div>
+				<div class="clear"></div>
+			</tml:else>
+		</tml:if>
+
+		<label>Security Code:</label>
+		<div class="data">
+			Enter the following code to confirm your request:<br>
+			<tml:item name="_code"/>
+			<br> 
+			<tml:input name="code"/>			
+		</div>
+		<tml:include ref="system:convert-to-ext-field" o_fieldname="code" o_type="text"
+			o_emptytext="security code"
+		/>
+		<div class="clear"></div>
+
+		<div class="data">
+			<tml:button clickaction="truncate" ajax="true" param1="{option('dbkey')||_config_bean.key}" param2="{_code}" param3="{_query_truncate_data}">
+				Truncate
+			</tml:button>
+		</div>
+
+	</fieldset>
+	
+</tml:form>

@@ -1,0 +1,93 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_jobs = WGA.createList();
+	_jobs.addAll(DBM.jobs().getAll());
+	_jobs = WGA.sortList(_jobs, function(a,b){
+	
+		var sortA = (a.config ? 1 : a.transient ? 2 : 3);
+		var sortB = (b.config ? 1 : b.transient ? 2 : 3);
+		return (sortA - sortB);
+		
+	
+	})
+</tml:script>
+
+<table width="100%" class="collection">
+	<tr class="collection-title">
+		<td width="1%"></td>
+		<td>Name</td>
+		<td>Description</td>
+		<td>Last run</td>
+		<td>Next scheduled run</td>
+		<td>Running now</td>			
+	</tr>
+	
+	<tml:foreach type="itemvalue" item="_jobs" currentvalue="_job">
+		<tml:groupchange id="system-jobs" expression="String(_job.config!=undefined) + '/' + String(_job.transient)">
+			<tr>
+				<td colspan="6">
+					<h1><tml:script>
+						return _job.config ? "Custom Jobs" : _job.transient ? "Temporary Jobs" : "System Jobs";
+					</tml:script></h1>
+				</td>
+			</tr>
+		</tml:groupchange>
+		<tml:include designdb="@ui" ref="tr">
+			<tml:option name="class" expression="_job.config?'':'system'"/>
+			<tml:option name="ajaxaction" trim="true">
+				WGA.ajax.callAction('<tml:action ref="selectJob" param1="{_job.uid}" param2="{_job.name}"/>', '<tml:script expression="portlet.portletkey"/>')
+			</tml:option>
+		</tml:include>
+			<td>								
+				<tml:image doc="nuvola" file="karm.png">
+					align="left" width="28" height="28"
+ 				</tml:image>
+			</td>
+			<td><tml:script expression="_job.name"/></td>
+			<td>
+				<tml:script expression="_job.transient ? _job.runtime.getTasks().get(0).getTitle(java.util.Locale.getDefault()) : _job.description ? _job.description : '- no description -'"/>
+				<tml:script>				
+					_schedules = _job.schedules;
+				</tml:script>
+				<tml:foreach type="itemvalue" item="_schedules" currentvalue="_schedule">
+					<br>
+					<tml:item name="_schedule"/>
+				</tml:foreach>
+			</td>
+			<tml:if condition="_job.runtime">
+				<tml:then>
+					<td><tml:script expression="_job.runtime.getLastRun()||'- never -'"/></td>
+					<td><tml:script expression="_job.runtime.nextScheduledRun()||'- none -'"/></td>
+					<td><tml:script expression="_job.runtime.isRunning()?'Yes':'No'"/></td>
+				</tml:then>
+				<tml:else>
+					<td colspan="3"></td>
+				</tml:else>
+			</tml:if>
+		</tr>
+	</tml:foreach>
+	
+</table>

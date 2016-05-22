@@ -1,0 +1,192 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="deleteDomain">
+	_config_bean = DBM.getConfigBean();
+	// find databases in this domain:
+	var query = "domain='" + _config_bean.uid + "'"
+	var dbs = xpathList(DBM.wgaconfig.get(), "/contentDatabases[" + query + "]")						
+
+	var config = DBM.wgaconfig.clone();
+	if(!dbs.isEmpty()){
+		var it = dbs.iterator();
+		if(tmlform.handledbs=='move'){
+			while(it.hasNext()){
+				var db = it.next();
+				config.getContentDatabase(db.key).domain = tmlform.newdomain
+				wgacore.removeContentDB(db.key);
+			}
+		}
+		else if(tmlform.handledbs=='delete'){
+			while(it.hasNext())
+				config.removeContentDatabase(it.next().key);
+		}
+	}
+
+	config.domains.remove(config.getDomain(_config_bean.uid));
+	DBM.wgaconfig.save();
+	var tabview=createObject("@ui/tabview", portlet.parentportlet);
+	tabview.deleteCurrentPage();	
+	
+</tml:action>
+
+<tml:action id="queryDelete">
+	_querydeletedomain=true
+</tml:action>
+
+<tml:include designdb="@ui" ref="windowview">
+
+	<tml:option name="config" scope="local">
+		tbar: [
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+				text: "Edit",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action ref="actions:setEditMode"/>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			<tml:case condition="!_config_bean.isDefaultResource()">
+				,{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="page_delete.png"/>',		                
+					text: "<tml:label key="btn.delete"/>",
+					handler: function(){
+						WGA.ajax.callAction("<tml:action ref="queryDelete"/>",
+							"<tml:script expression="portlet.portletkey"/>");
+					}
+				}
+			</tml:case>
+			,"->"
+			<tml:case condition="DBM.wgaconfig.get().clusterConfiguration.enabled && DBM.getConfigBean() != null">
+				,{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="chart_organisation.png"/>',		                
+					text: "<tml:label key="btn.send-cluster"/>",
+					handler: function(){
+						WGA.ajax.callAction("<tml:action>_send_cluster=true</tml:action>");
+					}
+				}
+			</tml:case>
+		]
+	</tml:option>
+
+	<tml:option name="title">
+		Domain <tml:script expression="_config_bean.title"/>
+	</tml:option>
+
+	<tml:inline name="body">
+
+		<tml:case istrue="_querydeletedomain">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Delete this domain?</tml:option>
+				<tml:option name="body">
+					Are you sure?
+					<tml:form id="delete-domain" source="none">
+						<tml:script>
+							// find databases in this domain:
+							var query = "domain='" + _config_bean.uid + "'"
+							_dbs = xpathList(DBM.wgaconfig.get(), "/contentDatabases[" + query + "]")						
+						</tml:script>
+						<tml:case condition="!_dbs.isEmpty()">
+							Please specify how to handle existing database configurations.
+							<br>
+							<tml:input name="handledbs" type="select"
+									default="move" 
+									changeaction="queryDelete" ajax="true"
+									options="move databases to other domain|move, delete alle database configurations of this domain|delete"/>
+							<tml:case condition="tmlform.handledbs=='move'">
+								<br> => Move Databases to domain
+								<tml:script>
+									// read domains:
+									_domains=createlist();
+									var domains = DBM.wgaconfig.get().domains.iterator();
+									while(domains.hasNext()){
+										var domain = domains.next();
+										if(domain.uid != _config_bean.uid){
+											_domains.add(domain.name + "|" + domain.uid);
+										}
+									}
+								</tml:script>
+								<tml:input name="newdomain" type="select" options="{_domains}" default="default"/>
+							</tml:case>
+						</tml:case>
+						<div>
+							<button onclick="DBM.ajaxAction({
+										action: '<tml:action ref="deleteDomain" ajax="norefresh"/>',
+										id: '<tml:script expression="portlet.portletkey"/>',
+										graydiv: true,
+										mode: 'norefresh'
+									}, 'remove domain')">
+								OK
+							</button>									
+							<tml:button clickaction="$refresh" ajax="true">Cancel</tml:button>
+						</div>
+					</tml:form>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case istrue="_send_cluster">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:label key="send-cluster"/></tml:option>
+				<tml:option name="body">
+					<tml:portlet ref="::send-cluster:portlet" name="send-cluster" portletmode="view"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		
+
+		<tml:form id="view-domain" source="none" mode="view">
+			<tml:include ref="::form"/>
+		</tml:form>
+
+		<br>
+		<tml:include designdb="@ui" ref="windowview">
+			<tml:option name="title">
+				Datasources in Domain '<tml:script expression="_config_bean.name"/>' on
+				<tml:form id="filter-server" source="portletsessionvars" cssstyle="display:inline">
+					<tml:script>
+						_opts = createlist();
+						_opts.add("all Servers|");
+						var servers = DBM.dbservers.get(_config_bean.name).iterator();
+						while(servers.hasNext()){
+							var server = servers.next();
+							_opts.add("Server '"+server.getTitle(DBM.locale) + "'|" + server.uid);
+						}
+					</tml:script>
+					<tml:input name="filter" type="select" optionsitem="_opts" changeaction="$store" ajax="true"/>
+				</tml:form>
+			</tml:option>
+				
+			<tml:option name="body">
+				<tml:include ref="webprojects:projects-by-dbserver-listview">				
+					<tml:option name="domain"><tml:item name="key"/></tml:option>				
+				</tml:include>						
+			</tml:option>
+		</tml:include>
+
+	</tml:inline>
+	
+</tml:include>

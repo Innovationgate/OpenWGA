@@ -1,0 +1,212 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="createServer">
+	_config_bean = DBM.getConfigBean();
+	if(!tmlform.validate() || !tmlform.hasfield("/implClassName"))
+		return false;
+	var validationErrors = _config_bean.validate();
+	if(validationErrors.size() == 0) {
+		var wgaconfig = DBM.wgaconfig.get();
+		try{
+			if (wgaconfig.getDatabaseServer(_config_bean.uid)) {
+				wgaconfig.removeDatabaseServer(_config_bean.uid);
+			}
+			wgaconfig.add(_config_bean);
+			
+			DBM.tmlform.setConfigProperties(_config_bean);
+			_errors = wgaconfig.validate();
+			
+			if(!_errors.isEmpty()){
+				for (var i = 0; i < _errors.size(); i++) {
+					log.info(_errors.get(i).getMessage());
+				}
+				return false;
+			} else {
+				var infoTable = createlookuptable();
+				if (tmlform.hasfield("implClassTitle")) {
+					infoTable.put("Database Server Type", tmlform.field("implClassTitle"));
+				}
+				infoTable.put("Database Server Title", tmlform.field("/title"));
+				config_info.put(portlet.mode, infoTable);
+			}
+		}
+		catch(e){
+			log.info(e);
+			logException(e)
+		}
+	} else {
+		for (var i = 0; i < validationErrors.size(); i++) {
+			log.info(validationErrors.get(i).getMessage());
+		}
+		return false;
+	}
+</tml:action>
+
+<tml:action id="setField">
+	_config_bean = DBM.getConfigBean();
+	tmlform.clearmessages();
+	_config_bean.setImplClassName(tmlform.field("/implClassName"));
+	_config_bean.setOptions(new Packages.java.util.LinkedHashMap());
+</tml:action>
+
+<tml:script>
+	portlet.setsessionvar("activeMode", portlet.mode, false);
+	
+	//Check for existing DatabaseServer object in configuration-clone with an id who's saved in portlet
+	//If it not exists, create it
+	var wgaconfig = DBM.wgaconfig.get();
+	if (item("uid_" + portlet.mode)) {
+		var bean = wgaconfig.getDatabaseServer(item("uid_" + portlet.mode));
+		if (bean) {
+			portlet.setSessionVar("_config_bean", bean, false);
+		}
+	} 
+	
+	if (!_config_bean) {
+		var bean = new Packages.de.innovationgate.wga.config.DatabaseServer();
+		portlet.setSessionVar("_config_bean", bean, false)
+		portlet.setSessionVar("uid_" + portlet.mode, bean.uid, false);
+	}
+		
+	//Set default value of field "/implClassName" if there is already a DatabaseServer object 
+	if (_config_bean && _config_bean.getImplClassName() && !tmlform.field("/implClassName")) {
+		tmlform.setfield("/implClassName", _config_bean.getImplClassName());
+	}
+	
+	if (tmlform.field("/implClassName")) {
+		var modDef = DBM.getModuleDefinition("DatabaseServer", tmlform.field("/implClassName"));
+		if (modDef) {
+			setoption("module-definition", modDef);
+			tmlform.setfield("implClassTitle", modDef.getTitle(DBM.locale));
+		}
+	}
+	
+	//Fill option-fields if there is already a DatabaseServer object
+	if (option('module-definition')) {
+		var option_map = _config_bean.getOptions();
+		var option_keys = option_map.keySet().iterator();
+		
+		tmlform.setfield("title", _config_bean.getTitle());
+		while (option_keys.hasNext()) {
+			var key = option_keys.next();
+			var value = option_map.get(key);
+			
+			if (value && _config_bean.getImplClassName() == tmlform.field("/implClassName")) {
+				tmlform.setfield("/options/" + key, value);
+			} else tmlform.setfield("/options/" + key, "");
+		}
+	}
+	
+	//Create option item for "/implClassName"-field
+	var implClasses = DBM.getModReg().getModulesForType(Packages.de.innovationgate.wga.modules.types.DatabaseServerModuleType);
+	var cdTypes = Packages.de.innovationgate.webgate.api.WGFactory.getModuleRegistry().getModulesForType(Packages.de.innovationgate.wga.modules.types.ContentStoreModuleType).values().toArray();
+
+	var keys = getLookupKeys(implClasses);
+	_options = createlist();
+
+	for (var i = 0; i < keys.size(); i++) {
+		var available = false;
+		
+		var server = DBM.getModuleDefinition("DatabaseServer", keys.get(i));
+		var _option = createlookuptable();
+		_option.put("name", server.getTitle(DBM.locale));
+		_option.put("implClassName", keys.get(i));
+		try {
+			_option.put("desc", server.getDescription(DBM.locale));
+		}
+		catch (e) {
+			// Fail silently as this is not really neccessary 
+		}
+			
+		
+		if (server && server.properties && server.properties.availableInInitWizard) {
+			try {
+        		server.testDependencies();
+        	}
+        	catch (u) {
+        		_option.put("message", u.javaException ? u.javaException.message : u.message);
+        	}
+			_options.add(_option);
+		}
+	}
+</tml:script>
+
+<div style="margin: 15px; font-size: 11pt">
+	
+	<tml:foreach id="db-iterator" type="itemvalue" item="_options" currentvalue="_option" divider="<br>">
+		
+		<tml:input type="radio" name="/implClassName" changeaction="setField" ajax="true" options="{_option.get('name') + '|' + _option.get('implClassName')}" validation="$P_VALUE != null" message="{label('validation.empty-dbImplClassName')}">
+			<tml:case condition="_option.containsKey('message')">
+				disabled="true"
+			</tml:case>
+			<tml:case condition="tmlform.field('/implClassName') == _option.get('implClassName')">
+				checked="true"
+				<tml:case condition="_option.containsKey('desc')" var="desc">
+					<tml:script expression="_option.get('desc')"/>
+				</tml:case>
+			</tml:case>
+		</tml:input>
+		<tml:case condition="_option.containsKey('message')">
+			<font style="color: red">&nbsp;(<tml:script expression="_option.get('message')"/>)</font>
+		</tml:case>
+		
+		<!--<div>
+			<tml:script expression="_option.get('description')"/>
+		</div>-->	
+	
+	</tml:foreach>
+		
+</div>
+
+<tml:include designdb="@ui" ref="formmessages"/>
+
+<tml:if condition="tmlform.field('/implClassName')">
+	<tml:then>
+		<tml:case condition="desc">
+			<div style="margin: 15px; font-size: 9pt">
+				<b>Description:</b><br>
+				<tml:item name="desc"/>
+			</div>
+		</tml:case>
+		<div class="clear"></div>
+		<tml:range labelfile="general">
+			<tml:[system:fs-input] o_field="title" o_focus="true" o_validation="$E_VALUE!=''" o_message="Please enter a Title"/>
+			<tml:[system:module-options:form] o_title="more optional parameters ...">
+				<tml:option name="ns">/options</tml:option>
+			</tml:[system:module-options:form]>
+		</tml:range>
+	</tml:then>
+</tml:if>
+
+<div class="clear" style="height: 30px;">
+	<div class="buttons">
+		<tml:button id="prev" clickaction="clearMessages" ajax="true" portletmode="view"><tml:label key="previous"/></tml:button>
+		<tml:case condition="taginfo('db-iterator', 'count') > 0">
+			<tml:button id="next" clickaction="createServer" ajax="true" portletmode="admin"><tml:label key="next"/></tml:button>		
+		</tml:case>
+		<tml:button id="skip" clickaction="clearMessages" ajax="true" portletmode="admin"><tml:label key="skip"/></tml:button>	
+	</div>
+</div>

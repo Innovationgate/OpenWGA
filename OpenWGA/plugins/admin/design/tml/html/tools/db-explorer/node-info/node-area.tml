@@ -1,0 +1,115 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="deleteArea">
+	log.info("delete area " + tmlparam1);
+	
+	portlet.setSessionVar("key", "area");
+	portlet.setSessionVar("path", "/root/area");
+	
+	_treeChanged = true;
+	
+	var area = db(option("key")).getArea(tmlparam1);
+	area.remove();
+</tml:action>
+
+<tml:script>
+	_area = db(option("key")).getArea(option("documentkey"));
+	
+	// check deletion rights:
+	_mayDelete = true;
+	var DB = AFW.database(option("key"))
+	if(!DB.isDesigner() || !DB.mayDelete()) 
+		_mayDelete = false;
+	else {
+		// check for schema definition
+		var schema = _area.getSchemaDefinition();
+		if(schema && schema.isAutoCreate())
+			_mayDelete = false;		
+	}
+	
+</tml:script>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Area Information</tml:option>	
+
+	<tml:option name="config">
+		tbar:[
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_delete.png"/>',		                
+				text: "delete",
+				disabled: <tml:script expression="!_mayDelete"/>,
+				handler: function(){
+					WGA.ajax.callAction('<tml:action>
+						_query_delete_area=true;
+					</tml:action>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+
+		<tml:case istrue="_query_delete_area">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Delete this area?</tml:option>
+				<tml:option name="body">
+					Please confirm to delete
+					<br>
+					<button onclick="DBM.ajaxAction({
+								action: '<tml:action ref="deletearea" param1="{option('documentkey')}"/>',
+								id: '<tml:script expression="portlet.portletkey"/>'
+							}, 'deleting area')">
+						Delete Area
+					</button>					
+				</tml:option>
+			</tml:include>			
+		</tml:case>
+
+		<fieldset>		
+					
+			<label>Area Name:</label>		
+			<div class="data"><tml:script expression="_area.name"/></div>
+			<div class="clear"></div>
+					
+			<label>Readers:</label>		
+			<div class="data"><tml:script expression="_area.getReaders()" divider="<br>"/></div>
+			<div class="clear"></div>
+					
+			<label>Editors:</label>		
+			<div class="data"><tml:script expression="_area.getEditors()" divider="<br>"/></div>
+			<div class="clear"></div>
+					
+			<label>Rootentries:</label>		
+			<div class="data"><tml:script expression="_area.getRootEntries().size()"/></div>
+			<div class="clear"></div>
+					
+		</fieldset>		
+
+		<tml:include ref="::extension-data"/>
+
+	</tml:inline>
+</tml:include>

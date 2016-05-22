@@ -1,0 +1,191 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="addAdmin">
+	_config_bean = DBM.getConfigBean();
+	if(!tmlform.validate())
+		return;
+	var admin = new Packages.de.innovationgate.wga.config.Administrator	
+	callAction("setAdminValuesFromForm", admin)	
+	_config_bean.administrators.add(admin);
+	_config_bean.changed=true;
+</tml:action>
+
+<tml:action id="updateAdmin">
+	if(!tmlform.validate())
+		return;
+	var admin = _config_bean.administrators.get(tmlform.admin_idx)
+	callAction("setAdminValuesFromForm", admin)
+	_config_bean.changed=true;
+</tml:action>
+
+<tml:action id="setAdminValuesFromForm">
+	var admin = tmlparam1;
+	admin.username = tmlform.admin_username;
+	admin.password = tmlform.admin_password;
+	admin.encoding = admin.ENCODING_HASH;
+	
+	tmlform.removeField("_adminAction");
+	tmlform.removeField("admin_idx");
+</tml:action>
+
+<tml:action id="removeAdmin">
+	var idx = tmlparam1-1;
+	_config_bean.administrators.remove(idx)
+</tml:action>
+
+<tml:action id="editAdmin">
+	var idx = tmlparam1-1;
+	var admin = _config_bean.administrators.get(idx)
+	tmlform.admin_username = admin.username;
+	tmlform.admin_password = admin.password;
+	tmlform.admin_pwd2 = admin.password;
+	
+	tmlform.admin_idx = idx;
+	tmlform._adminAction = "edit"
+</tml:action>
+
+<tml:action id="newAdmin">
+	tmlform._adminAction = "new"
+</tml:action>
+
+<tml:action id="cancelAdminedit">
+	tmlform.removeField("_adminAction");
+	tmlform.removeField("admin_idx");
+</tml:action>
+
+<tml:input type="hidden" name="_adminAction"/>
+
+<div class="array-list-editor" id="admins-editor-fieldset">
+	<fieldset>
+		<legend>List of Admins</legend>
+	
+		<tml:script>
+			_admin_list = _config_bean.administrators
+		</tml:script>
+	
+		<table class="collection" width="100%" style="margin-bottom:20px">
+			<tr class="collection-title">
+				<td>Name</td>
+				<tml:case condition="tmlform.mode()=='edit'">
+					<td></td>
+				</tml:case>
+			</tr>
+		
+			<tml:foreach id="admins-loop" type="itemvalue" item="_admin_list" currentvalue="_admin">
+				<tr class="List<tml:case condition="tmlform.admin_idx==taginfo('admins-loop', 'iteration')-1"> selected</tml:case>">
+					<td><tml:script expression="_admin.username"/></td>
+					<tml:case condition="tmlform.mode()=='edit'">
+						<td nowrap align="right" width="1%">
+							<tml:button clickaction="editAdmin" ajax="true" param1="{taginfo('admins-loop', 'iteration')}">edit</tml:button>
+							<tml:case condition="!tmlform._adminAction">
+								<tml:button clickaction="removeAdmin" ajax="true" param1="{taginfo('admins-loop', 'iteration')}">delete</tml:button>
+							</tml:case>						
+						</td>
+					</tml:case>
+				</tr>
+			</tml:foreach>
+		</table>
+				
+		<div class="entry-form">
+			<tml:if condition="tmlform._adminAction=='new' || tmlform._adminAction=='edit'">
+				<tml:then>
+				
+					<script>		
+						Ext.get("$ajaxContentDiv_<tml:script expression="portlet.portletkey"/>").mask();
+						Ext.get("admins-editor-fieldset").setStyle({
+							zIndex: 102,
+							position: "relative"
+						})	
+					</script>		
+				
+				
+					<tml:include designdb="@ui" ref="formmessages"/>
+					
+					<div style="font-style:italic">
+						<tml:if condition="tmlform._adminAction=='new'">
+							<tml:then>New</tml:then>
+							<tml:else>Edit</tml:else>
+						</tml:if>
+						Administrator
+					</div>
+					
+					<label>Name:</label>
+					<div class="data">
+						<tml:input name="admin_username" focus="true" validation="$E_VALUE!=''" message="Please enter a value for 'name'"/>
+						<tml:include ref="system:convert-to-ext-field" o_fieldname="admin_username"/>
+					</div>
+					<div class="clear"></div>
+						
+					<label>Password:</label>
+					<div class="data">
+						<tml:input name="admin_password" type="hashedpassword"
+							validation="$E_VALUE!=''"
+							message="The password may not be empty"
+						/>
+						<tml:include ref="system:convert-to-ext-field" o_fieldname="admin_password" o_type="password"/>
+					</div>
+					<div class="clear"></div>
+		
+					<label>Password repeation:</label>
+					<div class="data">
+						<tml:input name="admin_pwd2" type="hashedpassword"/>
+						<tml:include ref="system:convert-to-ext-field" o_fieldname="admin_pwd2" 
+							o_type="password"
+							o_emptytext="Please repeate password ..."
+						/>
+					</div>
+					<div class="clear"></div>
+		
+					<tml:validate ifnoerror="admin_password" 
+					        condition="tmlform.parsedvalue('admin_password')==tmlform.parsedvalue('admin_pwd2')" 
+					        cleariferror="password,password2"
+					        output="false">
+					    	Passwords do not match
+					</tml:validate> 
+		
+		
+					<div class="data">
+						<tml:if condition="tmlform._adminAction=='new'">
+							<tml:then>
+								<tml:button clickaction="addAdmin" ajax="true">Add Administrator</tml:button>
+							</tml:then>
+							<tml:else>
+								<tml:button clickaction="updateAdmin" ajax="true">Update Administrator</tml:button>
+							</tml:else>
+						</tml:if>
+						<tml:button clickaction="cancelAdminedit" ajax="true">Cancel</tml:button>
+					</div>
+					<div class="clear"></div>
+				</tml:then>
+		
+				<tml:elseif condition="tmlform.mode()=='edit'">
+					<tml:button clickaction="newAdmin" ajax="true">Add New Administrator ...</tml:button>
+				</tml:elseif>
+				
+			</tml:if>
+		</div>
+				
+	</fieldset>
+</div>

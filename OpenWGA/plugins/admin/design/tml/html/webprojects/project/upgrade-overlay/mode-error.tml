@@ -1,0 +1,6 @@
+<div>
+An error occurred upgrading the customization directory:
+<ul>
+<li><tml:script expression="error.javaException ? WGA.Utils.extractMessages(error.javaException) : error.message" divider="<li>"/>
+</ul>
+</div>

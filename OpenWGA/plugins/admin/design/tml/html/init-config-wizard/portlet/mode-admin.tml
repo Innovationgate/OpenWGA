@@ -1,0 +1,79 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="setPassword">
+	if (!tmlform.validate()) {
+		return false;
+	}
+	
+	if (!tmlform.field("password").equals(tmlform.field("password2"))) {
+		tmlform.addmessage(label('step.admin.passwords-not-match'));
+		return false;
+	}
+	
+	var admin = new Packages.de.innovationgate.wga.config.Administrator();
+	admin.setUsername(tmlform.username);
+	admin.setPassword(tmlform.field("password"));
+	var wgaconfig = DBM.wgaconfig.get();
+	wgaconfig.administrators.clear();
+	wgaconfig.administrators.add(admin);
+	
+	var infoTable = createlookuptable();
+	infoTable.put("Administrative user", tmlform.username);
+	config_info.put(portlet.mode, infoTable);
+</tml:action>
+
+<tml:include designdb="@ui" ref="formmessages"/>
+
+<tml:script>
+	tmlform.reset();
+	portlet.setsessionvar("activeMode", portlet.mode, false);
+</tml:script>
+
+<label><tml:label key="step.admin.username"/>:</label>
+<div class="data">
+	<tml:input name="username" type="text" validation="$E_VALUE!=''" message="{label('validation.empty-username')}" default="admin"/>
+	<tml:include ref="system:convert-to-ext-field" o_fieldname="username" o_emptytext="{label('validation.empty-username')}"/>
+</div>
+
+<label><tml:label key="step.admin.password"/>:</label>
+<div class="data">
+	<tml:input name="password" type="hashedpassword" validation="$E_VALUE!=''" message="{label('validation.empty-password')}"/>
+	<tml:include ref="system:convert-to-ext-field" o_fieldname="password" o_type="password" o_emptytext="{label('validation.empty-password')}"/>
+</div>
+
+<label><tml:label key="step.admin.password2"/>:</label>
+<div class="data">
+	<tml:input name="password2" type="hashedpassword" validation="$E_VALUE!=''" message="{label('validation.empty-password2')}"/>
+	<tml:include ref="system:convert-to-ext-field" o_fieldname="password2" o_type="password" o_emptytext="{label('validation.empty-password2')}"/>
+</div>
+
+<div class="clear" style="height: 30px;">
+	<div class="buttons">
+		<tml:button id="prev" clickaction="clearMessages" ajax="true" portletmode="db-server"><tml:label key="previous"/></tml:button>
+		<tml:button id="next" clickaction="setPassword" ajax="true" portletmode="auth"><tml:label key="next"/></tml:button>
+		<tml:button id="skip" clickaction="clearMessages" ajax="true" portletmode="auth"><tml:label key="skip"/></tml:button>			
+	</div>
+</div>

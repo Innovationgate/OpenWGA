@@ -1,0 +1,71 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:if condition="WGA.Core.getFileDerivateManager().isProcessServer()">
+	<tml:then>
+		<tml:if isdefined="msg">
+			<tml:then>
+				<tml:item name="msg"/>
+			</tml:then>
+			<tml:else>
+				<div style="margin-bottom: 10px;">
+					This will iterate through all contents of this database and update the derivates of each attached file with the currently available file derivate creators. This may take a long time.
+				</div>
+				
+				<div style="margin-bottom: 10px;">
+				
+					<tml:form id="updateDerivatesForm" source="none">
+						<tml:script>
+							_availableCreators = WGA.createList();
+							for (var creatorDef in Iterator(WGA.Core.getModuleRegistry().getModulesForType(Packages.de.innovationgate.wga.modules.types.FileDerivateCreatorModuleType).values())) {
+								_availableCreators.add(creatorDef.getTitle(java.util.Locale.getDefault()) + "|" + creatorDef.getImplementationClass().getName());
+							}
+						</tml:script>
+						
+						<div style="margin-bottom: 10px;">		
+							Select derivate creators whose derivates should be updated:
+						</div>
+							
+						<div style="margin-bottom: 10px;">
+							<tml:input name="creators" type="checkbox" optionsitem="_availableCreators"/>
+						</div>
+				
+						<div style="margin-bottom: 10px;">
+							<tml:button clickaction="::executeUpdate" param1="{option('dbkey') || DBM.getConfigBean().key}">
+								Update derivates
+							</tml:button>
+						</div>
+					
+					</tml:form>
+					
+				</div>
+			</tml:else>
+		</tml:if>
+	</tml:then>
+	<tml:else>
+		This operation cannot be executed on this server as the derivate update process does not run here. In a cluster usually the default master node executes this process unless otherwise configured. See file derivate configuration on your cluster nodes (Enable "Expert mode" by the checkbox to the top right, Menu "Configuration &gt; Advanced Configuration &gt; File Derivates)").  		
+	</tml:else>
+</tml:if>		
+	

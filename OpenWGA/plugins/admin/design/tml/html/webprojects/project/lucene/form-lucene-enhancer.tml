@@ -1,0 +1,33 @@
+<tml:action id="update-enhancer">
+	var config_bean = DBM.getConfigBean();
+	config_bean.luceneIndexConfiguration.setIndexEnhancers(tmlform.fieldlist("enhancers"));
+	config_bean.changed=true;
+</tml:action>
+
+<tml:script>
+	var enhancers_map = DBM.getModReg().getModulesForType(Packages.de.innovationgate.wga.modules.types.LuceneIndexEnhancerModuleType); 
+
+	var enhancers = enhancers_map.keySet().iterator();
+	_classes = WGA.createList();	
+	
+	while(enhancers.hasNext()){
+		var enhancer = enhancers.next();
+		_classes.add(enhancers_map.get(enhancer).getTitle(DBM.locale) + "|" + enhancer);
+	}	
+
+	var config_bean = DBM.getConfigBean();
+	tmlform.enhancers = config_bean.luceneIndexConfiguration.indexEnhancers
+	
+</tml:script>
+
+<tml:case condition="_classes.size()">
+	<fieldset>
+		<legend>Lucene Enhancer</legend>
+		<label>
+			Enhancer:
+		</label>
+		<div class="data">
+			<tml:input name="enhancers" type="checkbox" optionsitem="_classes" multiple="true" changeaction="update-enhancer" ajax="true"/>
+		</div>
+	</fieldset>
+</tml:case>

@@ -1,0 +1,213 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="createDbOnServer">
+	var map = createlookuptable();
+	
+	prefix = "createDatabase/";
+	var fields = tmlform.fieldNames.iterator();
+	while(fields.hasNext()){
+		var field = fields.next();		
+		var idx = field.indexOf(prefix);
+		if(idx>=0){
+			var optionName = field.substr(idx+prefix.length, field.length-idx);
+			var value = tmlform.field(field); 			
+			map.put(optionName, value);
+		}
+	}
+	
+	try{
+		var dbserver = wgacore.getDatabaseServers().get(tmlparam1);
+		var dbinfo = dbserver.createDatabase(wgacore.getLibraryLoader().loadClass(tmlparam2), map);
+		log.info("created database " + map);
+		
+		// find created database to select it in list box:
+		try{
+			var dblist = dbserver.getAvailableDatabases(wgacore.getLibraryLoader().loadClass(tmlparam2))
+			setSessionVar("_dbinfolist", dblist, false);
+			var it = dblist.iterator();
+			for(var i=0; it.hasNext(); i++){
+				if(dbinfo.equals(it.next())){
+					tmlform.selectedDb = i;
+					break;
+				}
+			}
+		}
+		catch(e){
+			log.info("database could not be created: " + map);
+		}
+	}
+	catch(e){
+		tmlform.addMessage(e.message);
+		logException(e);
+	}
+</tml:action>
+
+<tml:action id="selectDbOnServer">
+	var map = createlookuptable();
+	prefix = "selectDatabase/";
+	var fields = tmlform.fieldNames.iterator();
+	while(fields.hasNext()){
+		var field = fields.next();		
+		var idx = field.indexOf(prefix);
+		if(idx>=0){
+			var optionName = field.substr(idx+prefix.length, field.length-idx);
+			var value = tmlform.field(field); 			
+			map.put(optionName, value);
+		}
+	}
+	//log.info("selectDbOnServer: " + map);
+	var dblist = createlookuptable();
+	dblist.put(1, {
+		options: map
+	})
+	setSessionVar("_dbinfolist", dblist, false);
+	tmlform.selectedDb=1;
+</tml:action>
+
+<div style="padding: 5px 5px">
+<tml:include designdb="@ui" ref="windowview">
+
+	<tml:option name="title">Select or Create Database on selected Server</tml:option>	
+
+	<tml:inline name="body">
+		<div id="create-db" style="display:none">		
+			<tml:include ref="::subform-path-options"  o_ns="modal.createDatabase"/>
+			<div class="data">		
+				<tml:button clickaction="createDbOnServer" param1="{option('dbServer')}" param2="{option('implClassName')}" ajax="true">Create database now</tml:button>		
+			</div>		
+			<div class="clear"></div>
+			
+			<label>Or:</label>
+			<div class="data">
+				<button type="button" onclick="DBM.showHideElement('create-db');DBM.showHideElement('select-db')">Select existing database ...</button>
+			</div>
+			<div class="clear"></div>
+		</div>		
+		
+		<tml:script>		
+			// read databases from db-server:		
+			_dblist = createlist();		
+			var dbserver = wgacore.getDatabaseServers().get(option('dbServer'));		
+			try{		
+				var dblist = dbserver.getAvailableDatabases(wgacore.getLibraryLoader().loadClass(option('implClassName')))
+				setSessionVar("_dbinfolist", dblist, false);
+				var it = _dbinfolist.iterator();		
+				for(var i=0; it.hasNext(); i++){		
+					var dbinfo = it.next();		
+					_dblist.add(dbinfo.location + (dbinfo.title ? " (" + dbinfo.title + ")" : "") + "|" + i);							
+				}		
+			}		
+			catch(e){
+				//logException(e);
+				log.info("select-or-crate-db: " + e);
+				_no_databases = e.javaException.message;		
+			}		
+			_isCreatable = dbserver.isDatabaseTypeCreatable(wgacore.getLibraryLoader().loadClass(option('implClassName')))
+			//_no_databases = "mal sehen ..."		
+		</tml:script>		
+				
+		<div id="select-db">		
+			<tml:if isdefined="_no_databases">		
+				<tml:then>		
+					<div class="data" style="color:red">		
+						<tml:item name="_no_databases"/>		
+					</div>		
+					<tml:include ref="::subform-path-options" o_ns="modal.selectDatabase"/>
+					<div class="data">		
+						<tml:button clickaction="selectDbOnServer" param1="{option('dbServer')}" param2="{option('implClassName')}" ajax="true">Select this database</tml:button>		
+					</div>		
+					<div class="clear"></div>
+
+				</tml:then>		
+				<tml:else>
+					<div id="select-from-list">		
+						<label>		
+							Select a database on this server:		
+							<tml:case condition="tmlform.getInvalidFields().contains('selectedDb')">		
+								<span style="color:red"><br><tml:script expression="tmlform.getMessage('selectedDb')"/></span>		
+							</tml:case>								
+						</label>		
+						<div class="data">		
+							<tml:input name="selectedDb" type="select"
+									changeaction="$refresh" ajax="true"
+									cssclass="{tmlform.hasMessage('dblist') ? 'x-form-invalid' : ''}"	
+									validation="$E_VALUE!=''"		
+									message="please select a database"		
+									options="{_dblist}">
+								size="10" style="width:300"
+								<tml:case condition="tmlform.hasMessage('selectedDb')">
+									title="Validation Error: <tml:script expression="tmlform.getMessage('selectedDb')"/>"
+								</tml:case>
+							</tml:input>
+						</div>		
+						<div class="clear"></div>
+						
+						<tml:case condition="DBM.isExpertMode()">
+							<label>Or:</label>
+							<div class="data">
+								<button type="button" onclick="DBM.showHideElement('select-from-list');DBM.showHideElement('manualy-enter-db')">
+									Manualy enter database path ...
+								</button>
+							</div>
+							<div class="clear"></div>
+						</tml:case>
+						
+					</div>
+					<div id="manualy-enter-db" style="display:none">
+						<tml:include ref="::subform-path-options" o_ns="modal.selectDatabase"/>
+						<div class="data">		
+							<tml:button clickaction="selectDbOnServer" param1="{option('dbServer')}" param2="{option('implClassName')}" ajax="true">
+								Use database above
+							</tml:button>		
+						</div>
+						<div class="clear"></div>
+						
+						<label>Or:</label>
+						<div class="data">
+							<button type="button" onclick="DBM.showHideElement('select-from-list');DBM.showHideElement('manualy-enter-db')">
+								Select database from list ...
+							</button>
+						</div>
+						<div class="clear"></div>
+
+					</div>
+					
+				</tml:else>		
+			</tml:if>		
+
+			<tml:case condition="_isCreatable && !_pathOptions.isEmpty()">		
+				<label>Or:</label>
+				<div class="data">		
+					<button type="button" onclick="DBM.showHideElement('create-db');DBM.showHideElement('select-db')">Create a new database on this server...</button>		
+				</div>		
+				<div class="clear"></div>
+			</tml:case>
+														
+		</div>		
+				
+	</tml:inline>
+</tml:include>
+	
+</div>

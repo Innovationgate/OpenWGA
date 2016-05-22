@@ -1,0 +1,6 @@
+<div>
+An error occurred creating downgrade files:
+<ul>
+<li><tml:script expression="error.javaException ? WGA.Utils.extractMessages(error.javaException) : error.message" divider="<li>"/>
+</ul>
+</div>

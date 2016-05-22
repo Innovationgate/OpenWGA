@@ -1,0 +1,136 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="selectTask">
+	portlet.setSessionVar("key", tmlparam1);
+	portlet.save();
+	portlet.setMode("edit");
+</tml:action>
+
+<tml:action id="createTask">
+	var jobuid = tmlparam1;
+	var task = new Packages.de.innovationgate.wga.config.Task;
+	DBM.wgaconfig.clone();
+	DBM.wgaconfig.getByUid(jobuid).tasks.add(task)
+	portlet.setSessionVar("key", task.uid);
+	portlet.save();
+	portlet.setMode("new");
+</tml:action>
+
+<tml:action id="moveTaskUp">
+	log.info("move up: " + tmlparam1);
+	var jobuid = tmlparam2;
+	var config = DBM.wgaconfig.clone();
+	var entries = DBM.wgaconfig.getByUid(jobuid).tasks;
+	var idx = tmlparam1-1;
+	var entrie = entries.get(idx)
+	entries.remove(idx)
+	entries.add(idx-1, entrie)
+	DBM.wgaconfig.save(config);
+</tml:action>
+
+<tml:action id="moveTaskDown">
+	log.info("move down: " + tmlparam1);
+	var jobuid = tmlparam2;
+	var config = DBM.wgaconfig.clone();
+	var entries = DBM.wgaconfig.getByUid(jobuid).tasks;
+	var idx = tmlparam1-1;
+	var entrie = entries.get(idx)
+	entries.remove(idx)
+	entries.add(idx+1, entrie)
+	DBM.wgaconfig.save(config);
+</tml:action>
+
+
+<div style="padding:5px">
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Tasks</tml:option>	
+	<tml:option name="config" scope="local">
+		<tml:case condition="_job.config">
+			tbar: [
+				{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+					text: "new Task",
+					handler: function(){
+						WGA.ajax.callAction("<tml:action ref="createTask" param1="{_job.uid}"/>","<tml:script expression="portlet.portletkey"/>");
+					}
+				}
+			]
+		</tml:case>
+	</tml:option>
+
+	<tml:inline name="body">
+		
+		<table width="100%" class="collection">
+			<tr class="collection-title">
+				<td></td>
+				<td width="1%"></td>
+				<td width="1%"></td>
+			</tr>
+
+			<tml:script>				
+				_tasks = _job.tasks;
+			</tml:script>
+
+			
+			<tml:foreach type="itemvalue" item="_tasks" currentvalue="_task" id="loop">
+				<tml:if condition="_job.config">
+					<tml:then>
+						<tml:include designdb="@ui" ref="tr">
+							<tml:option name="ajaxaction" trim="true">
+								WGA.ajax.callAction('<tml:action ref="selectTask" param1="{_task.uid}"/>', '<tml:script expression="portlet.portletkey"/>')
+							</tml:option>
+
+							<tml:option name="ajaxaction" trim="true">
+								var event=event||window.event;if(event.target.tagName!='BUTTON')WGA.ajax.callAction('<tml:action ref="selectTask" param1="{_task.uid}"/>', '<tml:script expression="portlet.portletkey"/>')
+							</tml:option>
+
+						</tml:include>
+					</tml:then>
+					<tml:else>
+						<tr class="List">
+					</tml:else>			
+				</tml:if>						
+					<td><tml:script expression="DBM.task(_task).getTitle()"/></td>
+
+					<td align="right">
+						<tml:case isfirstloop="false">
+							<tml:button cssstyle="white-space:nowrap" clickaction="moveTaskUp" ajax="true" param1="{taginfo('loop', 'iteration')}" param2="{_job.uid}">move up</tml:button>
+						</tml:case>
+					</td>
+					<td align="right">
+						<tml:case islastloop="false">
+							<tml:button cssstyle="white-space:nowrap" clickaction="moveTaskDown" ajax="true" param1="{taginfo('loop', 'iteration')}" param2="{_job.uid}">move down</tml:button>
+						</tml:case>
+					</td>									
+
+				</tr>
+			</tml:foreach>
+			
+		</table>
+		
+	</tml:inline>
+</tml:include>
+</div>

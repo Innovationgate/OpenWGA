@@ -1,0 +1,170 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="createDbOnServer">
+
+	_config_bean = DBM.getConfigBean();
+	var serveruid = tmlparam1;
+	var implClassName = tmlparam2;
+
+	var map = createlookuptable();
+	
+	var prefix = "createDatabase/";
+	var fields = tmlform.fieldNames.iterator();
+	while(fields.hasNext()){
+		var field = fields.next();		
+		var idx = field.indexOf(prefix);
+		if(idx>=0){
+			var optionName = field.substr(idx+prefix.length, field.length-idx);
+			var value = tmlform.field(field); 			
+			map.put(optionName, value);
+		}
+	}
+	
+	var types_map = DBM.getModReg().getModulesForType(Packages.de.innovationgate.wga.modules.types.AccessLoggerModuleType);
+	var accessLogManager = types_map.get(implClassName).getProperties();
+	var dbserver = wgacore.getDatabaseServers().get(serveruid);
+	
+	var dbinfo = accessLogManager.createAccesslog(dbserver, map);	
+
+	_config_bean.accessLog.options.putAll(dbinfo.options)
+
+</tml:action>
+
+<tml:action id="selectAccessLog">
+	_config_bean = DBM.getConfigBean();
+	var serveruid = tmlform.field("/accessLog/dbServer")
+	var implClassName = tmlform.field("/accessLog/implClassName")
+
+	var types_map = DBM.getModReg().getModulesForType(Packages.de.innovationgate.wga.modules.types.AccessLoggerModuleType);
+	var accessLogManager = types_map.get(implClassName).getProperties();
+	var dbserver = wgacore.getDatabaseServers().get(serveruid);
+	
+	var availableLogs = accessLogManager.getAvailableAccesslogs(dbserver);
+	var dbinfo = availableLogs.get(tmlform.selectedDb);
+	_config_bean.accessLog.options.putAll(dbinfo.options)
+</tml:action>
+
+<tml:include designdb="@ui" ref="windowview">
+
+	<tml:option name="title">Select or Create Access Log Database</tml:option>	
+
+	<tml:inline name="body">
+		<div id="create-db" style="display:none">		
+
+
+			<tml:script>		
+				var types_map = DBM.getModReg().getModulesForType(Packages.de.innovationgate.wga.modules.types.AccessLoggerModuleType);
+				_module = types_map.get(tmlform.field("/accessLog/implClassName"));
+
+				try{		
+					_pathOptions = _module.getProperties().getPathOptions();		
+				}		
+				catch(e){		
+					_pathOptions = createList();	// empty list		
+				}		
+			</tml:script>		
+					
+			<tml:foreach type="itemvalue" item="_pathOptions" currentvalue="_pathOption">		
+				<label>				
+					<tml:script>		
+						_config_option = _module.getOptionDefinitions().get(_pathOption);		
+						return _config_option.getTitle(DBM.locale);		
+					</tml:script>:		
+				</label>		
+				<div class="data">		
+					<tml:script>		
+						setOption("config-option", _config_option);		
+						setOption("value", null);		
+					</tml:script>		
+					<tml:[system:module-options:option-type-input] o_ns="modal.createDatabase"/>		
+					<div class="option-info"><tml:script expression="_config_option.getDescription(DBM.locale)"/></div>		
+				</div>		
+				<div class="clear"></div>		
+			</tml:foreach>
+
+			<div class="data">		
+				<tml:button clickaction="createDbOnServer" param1="{option('dbServer')}" param2="{option('implClassName')}" ajax="true">Create database now</tml:button>		
+			</div>		
+			<div class="clear"></div>
+			
+			<label>Or:</label>
+			<div class="data">
+				<button type="button" onclick="DBM.showHideElement('create-db');DBM.showHideElement('select-db')">Connect to existing database ...</button>
+			</div>
+			<div class="clear"></div>
+		</div>		
+		
+		<tml:script>		
+			// read databases from db-server:		
+			var types_map = DBM.getModReg().getModulesForType(Packages.de.innovationgate.wga.modules.types.AccessLoggerModuleType);
+			var accessLogManager = types_map.get(tmlform.field("/accessLog/implClassName")).getProperties();
+			var logInfo = null;
+			var dbserver = wgacore.getDatabaseServers().get(option('dbServer'));
+			var availableLogs = accessLogManager.getAvailableAccesslogs(dbserver);
+
+			_dblist = createlist();		
+			
+			var it = availableLogs.iterator();
+			for(var i=0; it.hasNext(); i++){		
+				var dbinfo = it.next();
+				_dblist.add(dbinfo.location + (dbinfo.title ? " (" + dbinfo.title + ")" : "") + "|" + i);
+			}
+
+		</tml:script>		
+				
+		<div id="select-db">
+					
+			<label>		
+				Select a database on this server:		
+				<tml:case condition="tmlform.getInvalidFields().contains('selectedDb')">		
+					<span style="color:red"><br><tml:script expression="tmlform.getMessage('selectedDb')"/></span>		
+				</tml:case>								
+			</label>		
+			<div class="data">		
+				<tml:input name="selectedDb" type="select"
+						changeaction="selectAccessLog" ajax="true"
+						cssclass="{tmlform.hasMessage('dblist') ? 'x-form-invalid' : ''}"	
+						validation="$E_VALUE!=''"		
+						message="please select a database"		
+						options="{_dblist}">
+					size="10" style="width:300"
+					<tml:case condition="tmlform.hasMessage('selectedDb')">
+						title="Validation Error: <tml:script expression="tmlform.getMessage('selectedDb')"/>"
+					</tml:case>
+				</tml:input>			
+			</div>		
+			<div class="clear"></div>
+			
+			<label>Or:</label>
+			<div class="data">		
+				<button type="button" onclick="DBM.showHideElement('create-db');DBM.showHideElement('select-db')">Create a new database on this server...</button>		
+			</div>		
+			<div class="clear"></div>
+	
+			
+		</div>		
+				
+	</tml:inline>
+</tml:include>

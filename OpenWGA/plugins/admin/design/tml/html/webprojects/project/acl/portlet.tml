@@ -1,0 +1,327 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	DBM.openDBSession(option('dbkey'));
+</tml:script>
+
+<tml:action id="changeAccessLevel">
+	var privilegesFieldName = "acl_privileges";
+	if (tmlparam1 == 'anonymous_acl_level') {
+		privilegesFieldName = "anonymous_privileges";
+		_editDefaultUser = 'true';
+	}
+	if (tmlparam1 == "default_acl_level") {
+		privilegesFieldName = "default_privileges";
+		_editDefaultUser = 'true';
+	}
+	tmlform.setfield(privilegesFieldName, DBM.acl.getPrivilegeDefaults(parseInt(tmlform.field(tmlparam1))));
+	callAction("refreshAclOptions");
+</tml:action>
+
+<tml:action id="refreshAclOptions">
+	// refreshed the user form if the accesslevel is changed 
+	DBM.openDBSession(option('dbkey'));
+	var dbKey = option('dbkey');
+	_acl = db(dbKey).getACL();
+	if (tmlform.acl_name_hidden) {
+		_entry = _acl.getEntry(tmlform.acl_name_hidden);
+		_aclName = tmlform.acl_name_hidden;
+		_aclLevel = tmlform.acl_level;
+	}
+	_refreshed = true;
+</tml:action>
+
+<tml:action id="editCustomEntries">
+	_editDefaultUser = 'true';
+</tml:action>
+
+<tml:action id="setEditMode" ajax="true">
+	// set the user or role to edit mode
+	var dbKey = option('dbkey');
+	DBM.openDBSession(dbKey);	
+	_acl = db(dbKey).getACL();
+	if (_acl) {
+		_entry = _acl.getEntry(tmlparam1);
+		_aclName = _entry.getName();
+		//portlet.removeSessionVar('_aclname');
+		_aclLevel = _entry.getLevel();
+		portlet.setMode(tmlparam2);
+	}
+	else {
+	
+	}
+</tml:action>
+
+<tml:action id="saveAclEntry">
+	if(tmlform.validate()){	
+		var dbKey = option('dbkey');
+		DBM.openDBSession(dbKey);
+		var acl = db(dbKey).getACL();
+		var oldName = tmlparam1;
+		var newName = tmlparam2 != null ? tmlparam2 : tmlform.acl_name;
+		var accessLevel = tmlparam3 != null ? tmlparam3 : tmlform.acl_level;				
+		var flagsClass = Packages.de.innovationgate.webgate.api.WGACLEntryFlags;
+		var aclFlags = new Packages.de.innovationgate.webgate.api.WGACLEntryFlags(db().accessLevel(parseInt(accessLevel)));
+		var privilegesFieldName = "acl_privileges";
+		if (oldName == 'anonymous') {
+			privilegesFieldName = "anonymous_privileges";
+		}
+		if (oldName == '*') {
+			privilegesFieldName = "default_privileges";
+		}
+		aclFlags.getRoles().addAll(tmlform.fieldList("acl_roles"));
+		aclFlags.setMayDeleteDocs(tmlform.fieldList(privilegesFieldName).contains(flagsClass.TYPE_DELETEDOCS));
+		aclFlags.setMayMoveStructs(tmlform.fieldList(privilegesFieldName).contains(flagsClass.TYPE_MOVESTRUCTS));
+		aclFlags.setMayAccessDirectly(tmlform.fieldList(privilegesFieldName).contains(flagsClass.TYPE_DIRECTACCESS));
+		aclFlags.setNoRoleInheritance(tmlform.fieldList("acl_flags").contains(flagsClass.TYPE_NOROLEINHERITANCE));
+		if (oldName == newName) {
+			var entry = acl.getEntry(oldName);
+		}
+		else {
+			// rename User//
+			try {
+				var oldEntry = acl.getEntry(oldName);
+				var entry = acl.createEntry(newName, oldEntry.getType(), oldEntry.getLevel());
+				entry.setFlags(oldEntry.getFlags());
+				acl.save(entry);
+				acl.remove(oldEntry);
+			}
+			catch(e){
+				logException(e);
+				msg = e.message;
+			}		
+		}
+		entry.setLevel(parseInt(accessLevel));
+		entry.setFlags(aclFlags.toString());
+		try {
+			acl.save(entry);
+			portlet.setMode('view');
+		}
+		catch(e){
+			logException(e);
+			msg = e.message;
+		}
+		tmlform.addMessage(msg);
+	}
+</tml:action>
+
+<tml:action id="saveAclRole">
+	var dbKey = option('dbkey');
+	DBM.openDBSession(dbKey);
+	var acl = db(dbKey).getACL();	
+	var roleName = tmlform.acl_name;
+	var rolememberList = tmlform.fieldList('acl_rolemembers').iterator() // rolememberList contains all selected usernames
+	while(rolememberList.hasNext()) {
+		// set the roles for the current user in loop.
+		// setze für den aktuellen User in Durchlauf die Rollen, wenn er sie nicht schon hat.
+		var member = rolememberList.next();
+		var entry = acl.getEntry(member);
+		if(entry) {
+			var flags = acl.parseFlags(entry);
+			var uRoles = flags.getRoles();
+			if (!uRoles.contains(roleName)) {
+				uRoles.add(roleName);
+			}
+			entry.setFlags(flags.toString());	
+		}
+		try {
+			acl.save(entry);
+		}
+		catch(e){
+			logException(e);
+			msg = e.message;
+		}
+	}
+	
+	// überrüfe ob den Usern Rollen zu entziehen sind.
+	var allEntries = acl.getAllEntries().iterator();	
+	while (allEntries.hasNext()) {
+		var userEntry = allEntries.next();
+		var userName = userEntry.getName();
+		var type = userEntry.getType();
+		var entryFlags = acl.parseFlags(userEntry);
+		var userRoles = entryFlags.getRoles();
+		if (type == 1) {
+			// wenn der user nicht übermittelt wurde, aber aktuell die Rolle hat, entferne sie.
+			if(!tmlform.fieldList('acl_rolemembers').contains(userName) && userRoles.contains(roleName)) {		
+				userRoles.remove(roleName);
+				userEntry.setFlags(entryFlags.toString());				
+			}			
+		}
+		try {
+			acl.save(userEntry);
+		}
+		catch(e){
+			logException(e);
+			msg = e.message;
+		}
+	}	
+	tmlform.addMessage(msg);
+	portlet.setMode('view');
+</tml:action>
+
+<tml:action id="createDefaultAclEntries">
+	var dbKey = option('dbkey');
+	DBM.openDBSession(dbKey);
+	var type = 1;
+	var acl = db(dbKey).getACL();
+		if (acl) {
+		var defaultEntry = acl.getEntry('*');
+		var anonymousEntry = acl.getEntry('anonymous');
+		if (defaultEntry) {
+			callAction('saveAclEntry','*','*',tmlform.default_acl_level);
+		}
+		else {
+			var accessLevel = parseInt(tmlform.default_acl_level);
+			callAction('createAclEntry','*',type,tmlform.default_acl_level);
+		}
+		if (anonymousEntry) {
+			callAction('saveAclEntry','anonymous','anonymous',tmlform.anonymous_acl_level);
+		}
+		else {
+			var accessLevel = parseInt(tmlform.anonymous_acl_level);
+			callAction('createAclEntry','anonymous',type,tmlform.anonymous_acl_level);
+		}
+		
+	}
+</tml:action>
+
+
+<tml:action id="createAclEntry">
+	
+	if(tmlform.validate()){
+		var dbKey = option('dbkey');
+		DBM.openDBSession(dbKey);
+		var acl = db(dbKey).getACL();	
+		var type = tmlparam2 != null ? tmlparam2 : parseInt(tmlform.acl_type);
+		var name = tmlparam1 != null ? tmlparam1 : tmlform.acl_name;
+		var accessLevel;
+		if (type == Packages.de.innovationgate.webgate.api.WGACLEntry.TYPE_ROLE) {
+			accessLevel = 0;
+			if (acl.isValidRoleName(tmlform.acl_name) == false) {
+				error = label('acl.role.validate');
+			}
+			try {
+				var entry = acl.createEntry(name, type, accessLevel);
+				acl.save(entry);
+				callAction("saveAclRole");
+				portlet.setMode('view');
+			}		
+			catch (e) {
+				logException(e);
+				msg = e.message;
+			}
+		}
+		else {
+			var privilegesFieldName = "acl_privileges";
+			if (name == 'anonymous') {
+				privilegesFieldName = "anonymous_privileges";
+			}
+			if (name == '*') {
+				privilegesFieldName = "default_privileges";
+			}
+			accessLevel = tmlparam3 != null ? parseInt(tmlparam3) : parseInt(tmlform.acl_level);			
+			var flagsClass = Packages.de.innovationgate.webgate.api.WGACLEntryFlags;
+			var aclFlags = new Packages.de.innovationgate.webgate.api.WGACLEntryFlags(db().accessLevel(accessLevel));
+			aclFlags.getRoles().addAll(tmlform.fieldList("acl_roles"));
+			aclFlags.setMayDeleteDocs(tmlform.fieldList(privilegesFieldName).contains(flagsClass.TYPE_DELETEDOCS));
+			aclFlags.setMayMoveStructs(tmlform.fieldList(privilegesFieldName).contains(flagsClass.TYPE_MOVESTRUCTS));
+			aclFlags.setMayAccessDirectly(tmlform.fieldList(privilegesFieldName).contains(flagsClass.TYPE_DIRECTACCESS));
+			aclFlags.setNoRoleInheritance(tmlform.fieldList("acl_flags").contains(flagsClass.TYPE_NOROLEINHERITANCE));
+			try {
+				var entry = acl.createEntry(name, type, accessLevel);
+				entry.flags = aclFlags.toString();
+				acl.save(entry);
+				portlet.setMode('view');
+			}		
+			catch (e) {
+				logException(e);
+				msg = e.message;
+			}
+		}
+	}
+	tmlform.addMessage(msg);
+</tml:action>
+
+<tml:action id="setMode">
+	if (tmlparam2 != null) {
+		_entryType = tmlparam2;
+	}
+	if (tmlparam3 != null) {
+		_aclName = tmlparam3;
+	}
+	portlet.setMode(tmlparam1);
+</tml:action>
+
+<tml:action id="queryDeleteAclUser">
+	_queryDeleteAClUser=true;
+	_delName = tmlparam1;
+</tml:action>
+
+<tml:action id="queryDeleteAclRole">
+	_queryDeleteAClRole=true;
+	_delName = tmlparam1;
+</tml:action>
+
+<tml:action id="deleteAclEntry">
+	var name = tmlparam1;
+	var dbKey = option('dbkey');
+	DBM.openDBSession(dbKey);
+	var acl = db(dbKey).getACL();
+	var entry = acl.getEntry(name);
+	if (entry) {
+		type = entry.getType();
+		try {
+			acl.remove(entry);
+			portlet.setMode('view');
+		}
+		catch (e) {
+			logException(e);
+			if (type == 1) {
+				_usermsg = e.javaException.message;
+			}
+			else {
+				_rolemsg = e.javaException.message;
+			}
+		}
+	}
+</tml:action>
+
+<div id="acl-management" class="x-hidden">
+	<tml:include designdb="@ui" ref="windowview">	
+		<tml:option name="title">Manage Access Control</tml:option>	
+		<tml:inline name="body">	
+			<tml:include ref="::manage-acl"/>	
+		</tml:inline>	
+	</tml:include>
+</div>
+
+<script type="text/javascript">
+	Ext.get("acl-management").removeClass("x-hidden");
+	var el = document.getElementById("roleform");
+	if (el) {
+		el.scrollIntoView(true)
+	}	
+</script>

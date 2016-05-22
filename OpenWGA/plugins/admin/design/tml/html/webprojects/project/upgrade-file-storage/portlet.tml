@@ -1,0 +1,59 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<div style="margin-bottom: 10px;">
+	This will iterate through all file attachments in this database and upgrade their storage to use the "distinct file contents" feature. This may take a long time.
+</div>
+
+<div id="upgradeStorageButton" style="color:red; margin-bottom: 10px;">
+
+	<tml:button clickaction="::executeUpgrade" ajax="norefresh" param1="{option('dbkey') || DBM.getConfigBean().key}">
+		Upgrade file storage
+	</tml:button>
+	
+</div>
+
+<div id="cs-dump-info">
+	<div id="job-log" style="display:none; padding: 3px;margin-top:5px">
+		<iframe style="height: 250px; width:100%"></iframe>
+	</div>
+</div>
+
+<script>
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "upgrade-started", function(ev){
+		if(ev.params.error=="true"){
+			Ext.Msg.minWidth=350;
+			Ext.Msg.alert("Error", "Unable to upgrade file storage. See Serverlog for more information.");
+		}
+		else{
+			DBM.currentjoblog = DBM.joblog('job-log', ev.params.job_name);
+			DBM.currentjoblog.toggleView();
+		}
+		Ext.get('upgradeStorageButton').hide();
+	});
+
+</script>
+		
+	

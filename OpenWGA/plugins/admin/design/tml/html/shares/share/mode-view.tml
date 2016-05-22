@@ -1,0 +1,140 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="deleteShare">
+	var config = DBM.wgaconfig.clone();
+	var share = DBM.wgaconfig.getByUid(portlet.getSessionVar('key'));
+	config.removeShare(share.name);
+	DBM.wgaconfig.save();
+	portlet.fireEvent(createEvent("wga-config-changed"));
+	
+	var tabview=createObject("@ui/tabview", portlet.parentportlet);
+	tabview.deleteCurrentPage();		
+</tml:action>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Share <tml:script expression="_config_bean.name"/></tml:option>	
+	<tml:option name="config" scope="local">
+		tbar: [
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+				text: "<tml:label key="btn.edit"/>",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action ref="actions:setEditMode"/>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="page_delete.png"/>',		                
+				text: "<tml:label key="btn.delete"/>",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>_querydeleteshare=true</tml:action>",
+						"<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			,"-"
+			<tml:if condition="_config_bean.enabled">
+				<tml:then>
+					,{
+						cls:'x-btn-text-icon',						
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="disconnect.png"/>',		                
+						text: "Disable",
+						handler: function(){
+							DBM.callAction("<tml:action ref="actions:setEnabled" param1="{_config_bean.uid}" param2="0"/>",
+								"<tml:script expression="portlet.portletkey"/>",
+								"disabling share"
+							);
+						}
+					}
+				</tml:then>
+				<tml:else>
+					,{
+						cls:'x-btn-text-icon',						
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="connect.png"/>',		                
+						text: "Enable",
+						handler: function(){
+							DBM.callAction("<tml:action ref="actions:setEnabled" param1="{_config_bean.uid}" param2="1"/>",
+								"<tml:script expression="portlet.portletkey"/>",
+								"enabling share"
+							);
+						}
+					}
+				</tml:else>
+			</tml:if>
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+	
+		<tml:case istrue="_querydeleteshare">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:label key="shares.delete-share"/>?</tml:option>'
+				<tml:option name="body">
+					<div>
+						<button onclick="DBM.ajaxAction({
+									action: '<tml:action ref="deleteShare" ajax="norefresh"/>',
+									id: '<tml:script expression="portlet.portletkey"/>',
+									graydiv: true,
+									mode: 'norefresh'
+								}, 'delete share configuration')">
+							<tml:label key="shares.delete-share"/>
+						</button>	
+						<tml:button clickaction="$refresh" ajax="true"><tml:label key="btn.cancel"/></tml:button>
+					</div>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+	
+		<tml:case condition="!_config_bean.enabled">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Share disabled</tml:option>
+				<tml:option name="body">
+					This share is currently disabled.
+				</tml:option>
+			</tml:include>
+		</tml:case>	
+
+		<tml:form id="view-share-form" mode="view" source="none">
+			<tml:include ref="::form"/>
+		</tml:form>
+		
+		<tml:script>
+			_share_runtime = wgacore.getShares().get(_config_bean.name);
+		</tml:script>
+		<tml:case condition="_share_runtime">
+			<fieldset>
+				<legend>Runtime Information</legend>
+				
+				<label>URL:</label>
+				<div class="data">
+					<tml:metadata name="absolutewgaurl" type="request"/><tml:script expression="_share_runtime.getShareURL()"/>
+				</div>
+				<div class="clear"></div>
+			</fieldset>
+		</tml:case>
+		
+	</tml:inline>
+	
+</tml:include>

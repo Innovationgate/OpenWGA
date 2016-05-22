@@ -1,0 +1,36 @@
+<tml:action id="createDowngradeFiles">
+	try {
+		_config_bean = DBM.getConfigBean();
+		log.info("Upgrade Design of " + _config_bean.key);
+		db(_config_bean.key).getDesignProvider().createOverlayDowngradeFiles();
+		portlet.setMode("done");
+	}
+	catch (e) {
+		logException(e);
+		portlet.setMode("error");
+		portlet.setVar("error", e);
+	}
+		
+</tml:action>
+
+<tml:script>
+_dprov = db(_config_bean.key).getDesignProvider()
+</tml:script>
+
+<div>
+	This functionality will restore the original versions of all modified or deleted overlay resources in the customization design directory of this app.
+	They will be restored as overlay conflict files without overwriting your modified versions. You can then use the overlay conflict resolution feature of OpenWGA developer studio to manually restore the parts of the original that you want to keep. 
+</div>
+
+<tml:case condition="!_dprov.getStatus().getCurrentBaseVersion().equals(_dprov.getStatus().getCompliantBaseVersion())">
+	<div>
+		You are currently using version <b><tml:script expression="_dprov.getStatus().getCurrentBaseVersion()"/></b> of the base design plugin <b><tml:script expression="_dprov.getOriginal().getPluginID().getUniqueName()"/></b>, from which the downgrade files will be retrieved.
+	</div>
+	<div>
+		<span style="color:darkred;font-weight:bold">WARNING: This is not the base design version <tml:script expression="_dprov.getStatus().getCompliantBaseVersion()"/> that this customization directory was once created from/is compliant to! The overlay resources from this base design may be different ones than the ones that the resources from this customization originate from.
+	</div>
+</tml:case>
+
+
+
+<tml:button clickaction="createDowngradeFiles" ajax="true">Create overlay files from base version <tml:script expression="_dprov.getStatus().getCurrentBaseVersion()"/></tml:button>

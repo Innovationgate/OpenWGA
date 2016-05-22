@@ -1,0 +1,240 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="deleteStructEntry">
+	var dbkey = option("key");
+	var structkey = tmlparam1;
+	var struct = db(dbkey).getStructEntryByKey(structkey)
+	if(struct){
+		log.info("deleting struct " + struct.getTitle());
+		var toDelete = struct;
+		
+		var area = struct.getArea().getName();
+		var struct = struct.getParentEntry();
+		if(struct)
+			portlet.setSessionVar("key", "structentry:"+struct.getStructKey());
+		else portlet.setSessionVar("key", "area:"+area);
+		portlet.setSessionVar("currentpage", -1);
+		
+		var path = [];
+		// calculate path
+		while(struct){
+			path.unshift("structentry:"+struct.getStructKey());
+			struct = struct.getParentEntry()
+		}
+		path.unshift("area:"+area);
+
+		path.unshift("area");
+		path.unshift("/root");
+		
+		portlet.setSessionVar("path", path.join("/"));
+
+		// now delete it
+		toDelete.remove();
+		_treeChanged = true;
+
+	}
+	else log.info("structentry not found: " + dbkey + "/" + structkey)
+</tml:action>
+
+<tml:script>
+	_Struct = AFW.structentry(option("documentkey"), option("key"));
+</tml:script>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Structentry Information</tml:option>	
+
+	<tml:option name="config">
+		tbar:[
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_delete.png"/>',		                
+				text: "delete",
+				disabled: <tml:script expression="!_Struct.mayDeletePage()"/>,
+				handler: function(){
+					WGA.ajax.callAction('<tml:action>
+						_query_delete_struct=true;
+					</tml:action>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+
+		<tml:case istrue="_query_delete_struct">
+			<tml:script>
+				// check, if we may delete this struct
+				_mayDelete=true;
+				try{
+					_Struct.WGObject.performRemoveCheck()
+				}
+				catch(e){
+					_msg = e.message;
+					_mayDelete=false;
+				}
+			</tml:script>
+			<tml:if istrue="_mayDelete">
+				<tml:then>
+					<tml:include designdb="@ui" ref="message">
+						<tml:option name="title">Delete Struct entry "<tml:meta context="[db:{option:key}/docid:{option:documentkey}]" name="title"/>" ?</tml:option>
+						<tml:option name="body">
+							Please confirm to delete
+							<br>
+							<button onclick="DBM.ajaxAction({
+										action: '<tml:action ref="deleteStructEntry" param1="{option('documentkey')}"/>',
+										id: '<tml:script expression="portlet.portletkey"/>'
+									}, 'deleting struct entry')">
+								Delete Structentry
+							</button>					
+						</tml:option>
+					</tml:include>
+				</tml:then>
+				<tml:else>
+					<tml:include designdb="@ui" ref="message">
+						<tml:option name="title">Unable to delete this struct entry</tml:option>
+						<tml:item name="_msg"/>
+					</tml:include>
+				</tml:else>
+			</tml:if>			
+		</tml:case>
+	
+		<fieldset>		
+		
+			<label>Key:</label>		
+			<div class="data"><tml:script expression="_Struct.getKey()"/></div>		
+			<div class="clear"></div>		
+			
+			<tml:case condition="_Struct.WGObject.getUniqueName()">
+				<label>Unique Name:</label>		
+				<div class="data"><tml:script expression="_Struct.WGObject.getUniqueName()"/></div>		
+				<div class="clear"></div>
+			</tml:case>
+
+			<tml:script>
+				_struct_with_read_protection = _Struct.WGObject.mayReadContent()
+			</tml:script>
+			<tml:if condition="!_Struct.WGObject.mayReadContent()">
+				<tml:then>
+					<label>Read protected by:</label>		
+					<div class="data"><tml:script expression="_Struct.WGObject.getReadProtectionCause().getNodeKey()"/></div>		
+					<div class="clear"></div>		
+				</tml:then>
+				<tml:else>
+					<label>Title:</label>		
+					<div class="data"><tml:script expression="_Struct.getTitle()"/></div>		
+					<div class="clear"></div>		
+				</tml:else>
+			</tml:if>
+					
+			<tml:case condition="_Struct.WGObject.getReaders().size()">
+				<label>Readers:</label>		
+				<div class="data"><tml:script expression="_Struct.WGObject.getReaders()" divider=", "/></div>		
+				<div class="clear"></div>
+			</tml:case>
+
+			<tml:case condition="_Struct.WGObject.getPageEditors().size()">
+				<label>Page Editors:</label>		
+				<div class="data"><tml:script expression="_Struct.WGObject.getPageEditors()" divider=", "/></div>		
+				<div class="clear"></div>
+			</tml:case>
+
+			<tml:case condition="_Struct.WGObject.getChildEditors().size()">
+				<label>Child Editors:</label>		
+				<div class="data"><tml:script expression="_Struct.WGObject.getChildEditors()" divider=", "/></div>		
+				<div class="clear"></div>
+			</tml:case>
+
+			<label>Contenttype:</label>		
+			<div class="data">
+				<a href="<tml:url type="action" action="setPath" ajax="true" 
+						param1="{'/root/contenttype/contenttype:'+_Struct.getContentTypeName()}"
+						param2="{'contenttype:'+_Struct.getContentTypeName()}"
+					/>"
+				><tml:script expression="_Struct.getContentTypeName()"/></a>
+			</div>		
+			<div class="clear"></div>		
+			
+			<label>Child Pages:</label>		
+			<div class="data"><tml:script expression="_Struct.WGObject.getChildEntries().size()"/></div>		
+			<div class="clear"></div>		
+					
+			<label>Content Versions:</label>		
+			<div class="data"><tml:script expression="_Struct.WGObject.getContentCount()"/></div>		
+			<div class="clear"></div>		
+					
+			<tml:script>
+				if(_Struct.WGObject.mayReadContent()){
+					_visibleVersions = _Struct.WGObject.getAllContent(true);
+					_versions = WGA.Master.runFunction(function(dbkey, structkey){
+						return db(dbkey).getStructEntryByKey(structkey).getAllContent(true);
+					}, option("key"), option("documentkey"))
+					_metas = createlist(["version", "created", "author", "readers", "language", "status"]);
+				}
+			</tml:script>		
+			
+			<tml:case condition="_versions">
+				<table width="100%" class="collection">		
+					<tr class="collection-title">
+						<td>title</td>
+						<tml:foreach type="itemvalue" item="_metas" currentvalue="_meta">		
+							<td><tml:item name="_meta"/></td>		
+						</tml:foreach>		
+					</tr>		
+					<tml:foreach type="itemvalue" item="_versions">
+						<tml:if condition="_visibleVersions.contains(content())">
+							<tml:then>
+								<tml:include designdb="@ui" ref="tr">
+									<tml:option name="ajaxaction">
+								    	WGA.ajax.callAction('<tml:action param1="{'db:'+option('key')+'/docid:'+KEY}" param2="{(TITLE||KEY) + ' ('+VERSION+')'}">
+									    		var tabview=createObject("@ui/tabview", portlet);
+												tabview.addPage("tools:db-explorer:node-info:content:portlet", tmlparam1, tmlparam2);
+								    		</tml:action>', '<tml:script expression="portlet.portletkey"/>')
+									</tml:option>
+								</tml:include>
+									<td><tml:meta name="title"/></td>
+									<tml:foreach type="itemvalue" item="_metas" currentvalue="_meta">		
+										<td><tml:metadata name="{_meta}" divider=","/></td>		
+									</tml:foreach>		
+								</tr>
+							</tml:then>
+							<tml:else>
+								<tr>
+									<td><i>Not visible for user <tml:meta type="db" name="username"/></i></td>
+									<tml:foreach type="itemvalue" item="_metas" currentvalue="_meta">		
+										<td><tml:metadata name="{_meta}" divider=","/></td>		
+									</tml:foreach>
+								</tr>
+							</tml:else>
+						</tml:if>
+					</tml:foreach>		
+				</table>		
+			</tml:case>
+		</fieldset>		
+
+		<tml:include ref="::extension-data"/>
+		
+	</tml:inline>
+</tml:include>

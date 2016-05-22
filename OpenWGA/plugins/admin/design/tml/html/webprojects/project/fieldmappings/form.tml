@@ -1,0 +1,184 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="addFM">
+	_config_bean = DBM.getConfigBean();
+	var fm = new Packages.de.innovationgate.wga.config.FieldMapping()	
+	callAction("setFMValuesFromForm", fm)	
+	_config_bean.fieldMappings.add(fm);
+	_config_bean.changed=true;
+</tml:action>
+
+<tml:action id="updateFM">
+	_config_bean = DBM.getConfigBean();
+	var fm = _config_bean.fieldMappings.get(tmlform.fm_idx)
+	callAction("setFMValuesFromForm", fm)
+	_config_bean.changed=true;
+</tml:action>
+
+<tml:action id="setFMValuesFromForm">
+	var fm = tmlparam1;
+	fm.type = tmlform.fm_type;
+	fm.name = tmlform.fm_name;
+	fm.expression = tmlform.fm_expression;
+
+	tmlform.removeField("_fmAction");
+</tml:action>
+
+<tml:action id="removeFM">
+	_config_bean = DBM.getConfigBean();
+	var idx = tmlparam1-1;
+	_config_bean.fieldMappings.remove(idx)
+	_config_bean.changed=true;
+</tml:action>
+
+<tml:action id="editFM">
+	_config_bean = DBM.getConfigBean();
+	var idx = tmlparam1-1;
+	var fm = _config_bean.fieldMappings.get(idx)
+	tmlform.fm_type = fm.type;
+	tmlform.fm_name = fm.name;
+	tmlform.fm_expression = fm.expression;
+
+	tmlform.fm_idx = idx;
+	tmlform._fmAction = "edit"
+</tml:action>
+
+<tml:action id="newFM">
+	tmlform._fmAction = "new"
+</tml:action>
+
+<tml:action id="cancelFMedit">
+	tmlform.removeField("_fmAction");
+</tml:action>
+
+<tml:input type="hidden" name="_fmAction"/>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Field Mappings ...</tml:option>	
+	<tml:inline name="body">
+	
+		<div id="fieldmappings-section" class="array-list-editor">
+		<fieldset>		
+			<legend>Fieldmappings</legend>		
+		
+			<tml:case condition="_config_bean.clientRestrictions">		
+				<tml:script>		
+					_fm_list = _config_bean.fieldMappings		
+				</tml:script>		
+		
+				<table class="collection" width="100%" style="margin-bottom:20px">		
+					<tr class="collection-title">		
+						<td>Type</td>		
+						<td>Name</td>		
+						<td>Expression</td>		
+						<tml:case condition="tmlform.mode()=='edit'">		
+							<td></td>		
+						</tml:case>		
+					</tr>		
+						
+					<tml:foreach id="fms-loop" type="itemvalue" item="_fm_list" currentvalue="_fm">		
+						<tr class="List<tml:case condition="tmlform._fmAction=='edit' && tmlform.fm_idx==taginfo('fms-loop', 'iteration')-1"> selected</tml:case>">	
+							<td><tml:script expression="_fm.type"/></td>		
+							<td><tml:script expression="_fm.name"/></td>		
+							<td><tml:script expression="_fm.expression" encode="html"/></td>		
+							<tml:case condition="tmlform.mode()=='edit'">		
+								<td nowrap align="right" width="1%">		
+									<tml:button clickaction="editFM" ajax="true" param1="{taginfo('fms-loop', 'iteration')}">edit</tml:button>		
+									<tml:case condition="tmlform._fmAction!='edit'">
+										<tml:button clickaction="removeFM" ajax="true" param1="{taginfo('fms-loop', 'iteration')}">delete</tml:button>
+									</tml:case>		
+								</td>		
+							</tml:case>		
+						</tr>		
+					</tml:foreach>		
+				</table>		
+								
+			</tml:case>		
+		
+			<div style="padding:5px">
+			<tml:if condition="tmlform._fmAction=='new' || tmlform._fmAction=='edit'">		
+				<tml:then>		
+					<div style="font-style:italic">		
+						<tml:if condition="tmlform._fmAction=='new'">		
+							<tml:then>New</tml:then>		
+							<tml:else>Edit</tml:else>		
+						</tml:if>		
+						Field Mapping		
+					</div>		
+							
+					<label>Type:</label>		
+					<div class="data">		
+						<tml:input name="fm_type" type="select" options="Item|item,Metadata|meta" default="item" changeaction="$refresh" ajax="true"/>		
+					</div>		
+					<div class="clear"></div>		
+		
+					<label>Name:</label>		
+					<div class="data">		
+						<tml:input name="fm_name"/>		
+					</div>		
+					<div class="clear"></div>		
+								
+					<label>Expression:</label>		
+					<div class="data">		
+						<tml:input name="fm_expression" type="textarea" cssstyle="width:100%;height:200px"/>		
+					</div>		
+					<div class="clear"></div>		
+		
+					<div class="data">		
+						<tml:if condition="tmlform._fmAction=='new'">		
+							<tml:then>		
+								<tml:button clickaction="addFM" ajax="true">Add Mapping</tml:button>		
+							</tml:then>		
+							<tml:else>		
+								<tml:button clickaction="updateFM" ajax="true">Update Mapping</tml:button>		
+							</tml:else>		
+						</tml:if>		
+						<tml:button clickaction="cancelFMedit" ajax="true">Cancel</tml:button>		
+					</div>		
+					<div class="clear"></div>
+					<script>
+						if(!Ext.isIE){
+							Ext.get("$ajaxContentDiv_<tml:script expression="portlet.portletkey"/>").mask();
+							Ext.get("fieldmappings-section").setStyle({
+								zIndex: 210,
+								position: "relative"
+							})
+						}
+					</script>		
+							
+				</tml:then>		
+		
+				<tml:elseif condition="tmlform.mode()=='edit'">		
+					<tml:button clickaction="newFM" ajax="true">Add New Field Mapping ...</tml:button>		
+				</tml:elseif>		
+						
+			</tml:if>	
+			</div>	
+		
+		</fieldset>		
+		</div>
+		
+	</tml:inline>
+</tml:include>

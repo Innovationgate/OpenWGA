@@ -1,0 +1,104 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:form id="frmACL" htmlinput="ignore">
+		
+	<tml:script>
+		if (portlet.getMode() == 'new-role') {
+			var dbKey = option('dbkey');
+			_acl = db(dbKey).getACL();
+			_legend = label('acl.new.role')
+			_mode = "edit";
+		}
+		else {
+			_mode = "readonly"
+		}
+		_userList = createList();
+		var roleList = createList();
+		var users = _acl.getUsers().values().iterator();
+		while (users.hasNext()) {
+			var user = users.next();
+			var flags = _acl.parseFlags(user);
+			var userName = user.getName();
+			var userValue = user.getName();
+			if (userName == "*") {
+				userName = label('acl.all.user');
+			}
+			if (userName == "anonymous") {
+				userName = label('acl.anonymous');
+			}
+			_userList.add(userName+"|"+userValue);
+			if (flags.getRoles().contains(_aclName)) {
+				roleList.add(userValue);
+			}
+		}
+		tmlform.setField('acl_rolemembers',roleList);
+		
+	</tml:script>
+
+	<tml:include designdb="@ui" ref="formmessages"/>
+
+	<b id="roleform"><tml:item name="_legend"/></b><br /><br />
+	<tml:input type="hidden" name="acl_type" default="{Packages.de.innovationgate.webgate.api.WGACLEntry.TYPE_ROLE}" format="0"/>
+	<tml:input name="acl_name_hidden" type="hidden" default="{_aclName}"/>
+	
+	<label for="name"><tml:label key="acl.name"/>:</label>
+	<div class="data">
+		<tml:if condition="portlet.getMode() == 'new-role'">
+			<tml:then>
+				<tml:input name="acl_name" type="text" default="{_aclName}"
+				mode="{_mode}" 
+				validation="$E_VALUE!=''" 
+				message="Name cannot be empty">id="name"</tml:input>
+				<tml:include ref="system:convert-to-ext-field" o_focus="true" o_fieldname="acl_name" o_type="text" o_vtype="aclrole" o_mode="{_mode}"/>
+			</tml:then>
+			<tml:else><tml:input name="acl_name" type="text" default="{_aclName}" mode="view"/></tml:else>
+		</tml:if>
+	</div>
+	<div class="clear"></div>
+
+	<label for="name">User:</label>
+	<div class="data">
+		<div style="width:100%">
+			<tml:input name="acl_rolemembers" type="checkbox" optionsitem="_userList"/>
+		</div>		
+	</div>
+	<div class="clear"></div>
+
+	<tml:button clickaction="setMode" ajax="true" param1="view"><tml:label key="btn.cancel"/></tml:button>&nbsp;
+	<tml:if condition="portlet.getMode() == 'edit-role'">
+		<tml:then><tml:button clickaction="saveAclRole" ajax="true"><tml:label key="btn.save"/></tml:button></tml:then>
+		<tml:else><tml:button clickaction="createAclEntry" ajax="true"><tml:label key="btn.save"/></tml:button></tml:else>
+	</tml:if>	
+	
+</tml:form>
+
+<script type="text/javascript">	
+	
+	Ext.get("$ajaxContentDiv_<tml:script expression="portlet.portletkey"/>").mask();
+	Ext.get("role_area").setStyle({
+		zIndex: 101,
+		position: "relative"
+	})	
+</script>	

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title><tml:meta name="title"/></title>
+		<tml:htmlhead/>
+		<tml:include designdb="@afw" ref="include:jquery" o_jquery-plugins="modal"/>
+
+		<script src="<tml:url type="file" doc="bootstrap-dist" file="js/bootstrap.js"/>"></script>
+		<script src="<tml:url type="js" name="::tail"/>"></script>
+		<link rel="stylesheet" href="<tml:url type="file" doc="bootstrap-dist" file="css/bootstrap.css"/>">
+		<style>
+			body{
+				font-family: courier;
+				font-size: 12px;
+			}
+			
+			#msg{			
+				position: absolute;
+				top: 0;
+				bottom: 41px;
+				width: 100%;
+				overflow: auto;
+			}
+			#toolbar{
+				position: absolute;
+				bottom: 0;
+				height: 41px;
+				width: 100%;
+				border-top: solid silver 1px;
+				padding: 5px; 
+			}
+			
+			#toolbar .hint{
+				float: right;
+				margin-right:5px;
+				font-size: 2em;
+				color: red;
+			}
+			
+			.time{
+				float: left;
+				width: 80px;
+			}
+			.level{
+				float: left;
+				width: 60px;
+			}
+			.text{
+				margin-left: 140px;
+			}
+			.message{
+				padding: 5px;
+				background: #efefef;
+			}
+			.message.error{
+				color: red;
+			}
+			.message:nth-child(odd){
+				background: white;
+			}
+			
+			.message a{
+				color: inherit;
+				display: block;
+				cursor: pointer;
+				text-decoration: underline;
+			}
+			
+		</style>
+	</head>
+	
+	<body onload="TAIL.start('<tml:url type="tml" medium="json" layout="applog"/>')">
+		<div id="msg"></div>
+		<div id="toolbar" class="btn-toolbar">
+			<div class="btn-group btn-group-sm">
+				<a class="btn btn-default" data-action="play-pause">
+					<span class="glyphicon"></span>
+				</a>
+			</div>
+			<div class="btn-group btn-group-sm">
+				<a class="btn btn-default" onclick="TAIL.scrollToBottom()">
+					<span class="glyphicon glyphicon-arrow-down"></span>
+				</a>
+			</div>
+			<div class="hint"></div>
+		</div>
+		<div id="details" class="modal-popup" style="width:80%;margin-left:-40%">
+			<div class="header">
+				Details ...
+				<a data-modal="hide">&times;</a>
+			</div>
+			<div class="content" style="overflow:auto;white-space:pre"></div>
+		</div> 
+	</body>
+	
+</html>

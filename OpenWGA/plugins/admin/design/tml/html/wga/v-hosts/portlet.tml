@@ -1,0 +1,192 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="selectVhost">
+	var tabview=createObject("@ui/tabview", portlet);
+	tabview.addPage("wga:v-hosts:v-host:portlet", tmlparam1, tmlparam2);			
+</tml:action>
+
+<tml:action id="newVhost">	
+	// create config bean:
+	var bean = new Packages.de.innovationgate.wga.config.VirtualHost();
+	// create tab
+	var tabview=createObject("@ui/tabview", portlet);
+	var p=tabview.addPage("wga:v-hosts:v-host:portlet", bean.uid, "New Virtual Host");
+	p.setmode("new");	
+	DBM.wgaconfig.clone(p).getVirtualHosts().add(bean);
+</tml:action>
+
+<tml:action id="moveHostUp">
+	log.info("move up: " + tmlparam1);
+	var config = DBM.wgaconfig.clone();
+	var entries = config.virtualHosts;
+	var idx = tmlparam1-1;
+	var entrie = entries.get(idx)
+	entries.remove(idx)
+	entries.add(idx-1, entrie)
+	DBM.wgaconfig.save();
+</tml:action>
+
+<tml:action id="moveHostDown">
+	log.info("move down: " + tmlparam1);
+	var config = DBM.wgaconfig.clone();
+	var entries = config.virtualHosts;
+	var idx = tmlparam1-1;
+	var entrie = entries.get(idx)
+	entries.remove(idx)
+	entries.add(idx+1, entrie)
+	DBM.wgaconfig.save();
+</tml:action>
+
+<tml:script>
+
+	// look for default selection in var _uid
+	if(_app=="v-hosts" && _uid){
+		var vhost = DBM.wgaconfig.getByUid(_uid);
+		if(vhost)
+			callAction("selectVhost", _uid, vhost.name);
+		else log.info("v-host not found: " + _uid);
+	}
+
+	DBM.tabview.cleanup();
+	
+</tml:script>
+
+<tml:include designdb="@ui" ref="tabview_dynamic">
+
+	<tml:option name="title">All Host Configurations</tml:option>	
+	
+	<tml:inline name="body">			
+		<tml:case condition="portlet.getSessionVar('currentpage')<=0">
+			<tml:include designdb="@ui" ref="windowview">
+
+				<tml:option name="config" scope="local">
+					tbar: [
+						{
+							cls:'x-btn-text-icon',						
+							icon: '<tml:url type="file" db="@afw" doc="icons" file="page_add.png"/>',		                
+							text: "New Virtual Host",
+							handler: function(){
+								WGA.ajax.callAction("<tml:action ref="newVhost"/>","<tml:script expression="portlet.portletkey"/>");
+							}
+						}
+					]
+				</tml:option>
+			
+				<tml:option name="title">
+					All Virtual Hosts
+				</tml:option>
+				
+				<tml:option name="body">
+
+					<tml:script>
+						_hosts = DBM.wgaconfig.get().virtualHosts
+					</tml:script>
+					
+					<table class="collection" width="100%">
+						<tr class="collection-title">
+							<td>Server Name</td>
+							<td>Allowed Databases</td>
+							<td>Default Database</td>
+							<td></td>
+							<td width="1%"></td>
+							<td width="1%"></td>
+						</tr>
+						<tml:foreach id="vhostloop" type="itemvalue" item="_hosts" currentvalue="_host">
+							<tml:include designdb="@ui" ref="tr">
+								<tml:option name="class"><tml:script expression="_host.enabled?'':'disabled'"/></tml:option>
+								<tml:option name="ajaxaction" trim="true">
+									var event=event||window.event;if(event.target.tagName!='BUTTON')WGA.ajax.callAction('<tml:action ref="selectVhost" param1="{_host.uid}" param2="{_host.servername}"/>', '<tml:script expression="portlet.portletkey"/>')
+								</tml:option>
+							</tml:include>									
+								<td><tml:script expression="_host.servername"/></td>
+								<td>
+									<tml:script>
+										if(_host.allowedDatabases.size()){
+											if(_host.allowedDatabases.get(0)=="$all")
+												return "- All -"
+											else {
+												var dbs = _host.allowedDatabases.iterator();
+												var ret=[];
+												while(dbs.hasNext()){
+													ret.push(DBM.wgaconfig.getByUid(dbs.next()).key)
+												} 
+												return ret.join(", ");
+											}
+										}
+										else{
+											if(_host.defaultDatabase)
+												return DBM.wgaconfig.getByUid(_host.defaultDatabase).key;
+											else return "- None -"
+										}
+									</tml:script>
+								</td>								
+								<td>
+									<tml:script>
+										if(_host.defaultDatabase)
+											return DBM.wgaconfig.getByUid(_host.defaultDatabase).key;
+										else return "- None -"
+									</tml:script>
+								</td>
+								<td align="right">
+									<tml:case condition="!_host.enabled">disabled</tml:case>
+								</td>
+
+								<td align="right">
+									<tml:case isfirstloop="false">
+										<tml:button cssstyle="white-space:nowrap" clickaction="moveHostUp" ajax="true" param1="{taginfo('vhostloop', 'iteration')}">move up</tml:button>
+									</tml:case>
+								</td>
+								<td align="right">
+									<tml:case islastloop="false">
+										<tml:button cssstyle="white-space:nowrap" clickaction="moveHostDown" ajax="true" param1="{taginfo('vhostloop', 'iteration')}">move down</tml:button>
+									</tml:case>
+								</td>									
+
+							</tr>
+						</tml:foreach>
+					</table>
+
+				</tml:option>
+				
+			</tml:include>
+		</tml:case>
+	</tml:inline>
+	
+	<tml:option name="pageaddon" scope="local">
+		<span id="pageaddon">
+			<a href="#" onclick="WGA.ajax.callAction('<tml:action ref="newVHost"/>', '<tml:script>return portlet.portletkey</tml:script>')">
+				<tml:img db="@afw" doc="icons" file="page_white_add.png">
+					border="0"
+					alt="Neu Vitual Host"
+					title="New Virtual Host"
+				</tml:img>
+				New Virtual Host
+			</a>
+		</span>		
+	</tml:option>
+	
+</tml:include>
+

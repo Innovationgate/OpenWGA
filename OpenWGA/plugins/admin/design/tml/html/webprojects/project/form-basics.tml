@@ -1,0 +1,55 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="toggleBasicsLiveView">
+	portlet.show_live_basics=!portlet.show_live_basics
+	portlet.save();
+</tml:action>
+
+<tml:[system:fs-input] o_field="enabled" o_type="boolean"/>
+<tml:case condition="DBM.isExpertMode()">
+	<tml:[system:fs-input] o_field="lazyConnecting" o_type="boolean"/>
+</tml:case>
+<tml:[system:fs-input] o_field="key"  o_emptytext="Please enter a key" o_vtype="url" o_validation="$E_VALUE!=''" o_message="Please enter a key for this application"/>
+<tml:[system:fs-input] o_field="title" o_focus="true" o_validation="$E_VALUE!=''" o_message="Please enter an title for this application"/>
+
+<tml:script>
+	// read domains
+	_domains=createList();
+	_default = "default"
+	var domains = DBM.wgaconfig.get().getDomains().iterator();
+	while(domains.hasNext()){
+		var domain = domains.next();
+		_domains.add(domain.name+ "|" + domain.uid);
+		_default = domain.uid;
+	}	
+	if(_domains.size()==1)
+		tmlform.setField("/domain", _default);
+</tml:script>
+<tml:[system:fs-input] o_field="domain" o_type="select" o_options="{_domains}" o_switchto="domains"
+	o_validation="$E_VALUE!=''"
+	o_message="Please select a Domain"
+	o_default="default"
+	o_mode="{_domains.size()==1?'view':'edit'}"
+/>

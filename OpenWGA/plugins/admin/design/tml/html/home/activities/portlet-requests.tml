@@ -1,0 +1,126 @@
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Currently Processed Requests</tml:option>	
+	<tml:option name="config" scope="local">
+		tools: [
+			{
+				id: "refresh",
+				qtip: "refresh",
+				handler: function(){
+					WGA.ajax.callAction('<tml:action ref="$refresh"/>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+	
+		<tml:case isdefined="_server_message">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:item name="_server_message"/></tml:option>
+			</tml:include>			
+		</tml:case>
+
+		<table width="100%" class="collection">	
+			<tr class="collection-title">
+				<td>Request URI</td>
+				<td>Status</td>
+				<td>HTTP method</td>
+				<td>Currently evaluating TML module</td>
+				<td align="right">Duration</td>
+			</tr>
+			
+			<tml:script>
+				_requests_map = WGA.createLookupTable()
+				
+				var wgaFilter = WGA.Core.getFilter();
+				if (wgaFilter) {
+					_requests_map.putAll(wgaFilter.getCurrentRequests());
+				}
+				
+				_requests = WGA.createList();
+				
+				// filter empty requests:
+				var rs = _requests_map.keySet().iterator();
+				while(rs.hasNext()){
+					var r = rs.next();
+					if(r.getMethod())
+						_requests.add(r);
+				}
+				
+				_now = WGA.createDate(true).time	
+			</tml:script>
+			<tml:foreach type="itemvalue" item="_requests" currentvalue="_request" id="request-loop">
+				<tml:script>
+					_info = _requests_map.get(_request);
+					_params = WGA.createList();
+					if(_request.getQueryString())
+						_params = WGA.createList(_request.getQueryString().split("&"));
+				</tml:script>
+				<tml:case condition="_info.getDatabase() != db()">
+					<tr class="List">
+						<td>
+							<a href="#"
+									title = "Click to show more info" 
+									onclick="DBM.showHideElement('sinfo_<tml:script expression="taginfo('request-loop', 'iteration')"/>')">
+								<tml:script expression="_request.getRequestURI()"/>
+							</a>
+							<tml:foreach type="itemvalue" item="_params" currentvalue="_param">
+								<br>
+								<tml:script expression="_param.substr(0,7)=='$action'?'$action...':_param"/>
+							</tml:foreach>
+						</td>
+						<td><tml:script expression="_info.isCommited() ? 'Commited' : 'Processing'"/></td>
+						<td><tml:script expression="_request.getMethod()"/></td>
+						<td>
+							<tml:case condition="_info.type == _info.TYPE_TML || _info.type == _info.TYPE_CONTENT">
+								<tml:script expression="_request.getAttribute(wgacore.ATTRIB_CURRENTTML)"/>
+								<br>
+								in database <tml:script expression="_request.getAttribute(wgacore.ATTRIB_CURRENTTMLDB)"/>
+							</tml:case>
+						</td>
+						<td align="right"><tml:script expression="_now - _info.getStartTime()" format="#"/> ms</td>
+					</tr>
+					<tr>
+						<td colspan="6" style="border-bottom: solid silver 1px">					
+							<fieldset id="sinfo_<tml:script expression="taginfo('request-loop', 'iteration')"/>" style="display:none">
+								
+								<label>Client IP:</label>
+								<div class="data"><tml:script expression="_request.getRemoteAddr()"/></div>
+								<div class="clear"/></div>
+								
+								<label>User Agent:</label>
+								<div class="data"><tml:script expression="_request.getHeader('USER-AGENT')"/></div>
+								<div class="clear"/></div>
+								
+								<tml:case condition="_info.getProfileId() != null">
+									<label>User Profile:</label>
+									<div class="data"><tml:script expression="_info.getProfileId()"/></div>
+									<div class="clear"/></div>
+								</tml:case>
+								
+								<label>Execution Stack:</label>
+									<div class="data">
+										<a href="javascript:DBM.showHideElement('stack_<tml:script expression="_request.hashCode()"/>')">Show/Hide ...</a>
+										<div id="stack_<tml:script expression="_request.hashCode()"/>" style="display:none">
+											<tml:script expression="_info.getThread() != null ? WGA.createList(_info.getThread().getStackTrace()) : '(not retrievable)'" divider="<br>"/>
+										</div>
+									</div>
+								<div class="clear"/></div>
+								
+								<label>Actions:</label>
+								<div class="data">
+									<tml:button clickaction="actions:cancelRequest" ajax="true" param1="{java.lang.System.identityHashCode(_request)}" confirm="Are you sure you want to cancel this request?">Cancel request</tml:button>
+								</div>
+								<div class="clear"/></div>
+	
+							</fieldset>
+						</td>
+					</tr>
+				</tml:case>
+			</tml:foreach>
+			
+		</table>
+	
+	</tml:inline>
+	
+</tml:include>

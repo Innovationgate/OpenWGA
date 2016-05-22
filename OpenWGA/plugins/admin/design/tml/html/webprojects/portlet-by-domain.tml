@@ -1,0 +1,134 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="setViewMode">
+	profile.viewmode=tmlparam1;
+	profile.save();
+</tml:action>
+
+<tml:script>
+	// look for default selection in var _uid
+	if(_app && _app.substr(0,11)=="webprojects"){
+		if(_uid=="$create"){
+			callAction("::newProject", _where, _implClass);
+			if(_where!=portlet.getSessionVar("filter")){
+				portlet.setSessionVar("filter", "");
+			}
+		}
+		else if(_uid){
+			var cs = DBM.wgaconfig.getByUid(_uid);
+			if(cs){
+				callAction("::selectProject", _uid, cs.key, _where);
+				if(cs.dbServer!=portlet.getSessionVar("filter")){
+					portlet.setSessionVar("filter", "");
+				}
+			}
+			else log.info("cs not found: " + _uid);
+		}
+	}
+
+	DBM.tabview.cleanup();
+	
+</tml:script>
+
+<tml:include designdb="@ui" ref="tabview_dynamic">
+
+	<tml:option name="title" scope="local">All Web Applications</tml:option>	
+	
+	<tml:option name="body" scope="local">			
+		<tml:case condition="portlet.getSessionVar('currentpage')<=0">
+			<tml:include designdb="@ui" ref="windowview">
+			
+				<tml:inline name="body" scope="local">
+					<tml:include ref="::mod-view-by-domain"/>
+				</tml:inline>
+
+				<tml:option name="config" scope="local">
+					tbar: [
+						{
+			        		icon: '<tml:url db="@afw" type="file" doc="icons" file="application_view_list.png"/>',
+			        		cls:'x-btn-text-icon',
+			        		text: '<tml:label key="listview"/>',
+			        		tooltip: '<tml:label key="listview"/>',
+			        		pressed: <tml:script expression="profile.viewmode=='list'"/>,
+							handler: function(){
+								WGA.ajax.callAction("<tml:action ref="setViewMode" param1="list"/>","<tml:script expression="portlet.portletkey"/>");
+							}
+						}
+						,{
+			        		icon: '<tml:url db="@afw" type="file" doc="icons" file="application_view_icons.png"/>',
+			        		cls:'x-btn-text-icon',
+			        		text: '<tml:label key="iconview"/>',
+			        		pressed: <tml:script expression="profile.viewmode==null || profile.viewmode=='icon'"/>,
+							tooltip: '<tml:label key="iconview"/>',
+							handler: function(){
+								WGA.ajax.callAction("<tml:action ref="setViewMode" param1="icon"/>","<tml:script expression="portlet.portletkey"/>");
+							}
+						}
+					]
+				</tml:option>
+			
+				<tml:option name="title" scope="local">
+					<tml:if condition="DBM.domains.get().size()>1">
+						<tml:then>
+							... in
+							<tml:form id="filter-server" source="portletsessionvars" cssstyle="display:inline">
+								<tml:script>
+									_opts = createlist();
+									_opts.add("all domains|");
+									var domains = DBM.domains.get().iterator();
+									while(domains.hasNext()){
+										var domain = domains.next();
+										_opts.add("domain '" + domain.name + "'|" + domain.uid);
+									}
+								</tml:script>
+								<tml:input name="filter" type="select" optionsitem="_opts" changeaction="$store" ajax="true"/>
+							</tml:form>
+						</tml:then>
+						<tml:else>
+							... by Domain
+						</tml:else>
+					</tml:if>
+				</tml:option>
+				
+
+				
+			</tml:include>
+		</tml:case>
+	</tml:option>
+	
+	<tml:option name="pageaddon" scope="local">
+		<span id="pageaddon">
+			<a href="#" onclick="WGA.ajax.callAction('<tml:action ref="::newProject"/>', '<tml:script>return portlet.portletkey</tml:script>')">
+				<tml:img db="@afw" doc="icons" file="world_add.png">
+					border="0"
+					alt="New Web Application"
+					title="New Web Application"
+				</tml:img>	
+				New Web Application			
+			</a>
+		</span>	
+	</tml:option>
+	
+</tml:include>

@@ -1,0 +1,105 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="saveNewSchedule">
+	_config_bean = DBM.getConfigBean();
+	if(!tmlform.validate())
+		return;
+		
+	try{
+		var config = DBM.wgaconfig.clone();
+		var job = DBM.wgaconfig.getByUid(tmlparam1)
+
+		switch(tmlform.executeOnEach){
+			case "each":
+				tmlform.setField("/type", "cron");
+				tmlform.setField("/data", createObject("cron").createCronExpression());
+				break;
+			case "every":
+				tmlform.setField("/type", "simple");
+				tmlform.setField("/data", tmlform.every_time+tmlform.subMode_every);
+				break;
+			case "cron":
+				tmlform.setField("/type", "cron");
+				break;
+		}
+
+		DBM.tmlform.setConfigProperties(_config_bean);
+		job.schedules.add(_config_bean)
+
+		_errors = config.validate()
+		if(_errors.isEmpty()){
+			DBM.wgaconfig.save();
+			
+			portlet.fireEvent(createEvent("wga-config-changed"));
+			portlet.setMode("view");
+		}
+		else log.info(_errors);
+	}
+	catch(e){
+		log.info(e);
+		logException(e)
+	}
+</tml:action>
+
+<tml:form id="jobs-new-schedule-form" source="none" mode="edit" htmlinput="ignore">
+	
+	<tml:include designdb="@ui" ref="windowview">
+	
+		<tml:option name="config" scope="local">
+			buttonAlign: "left"
+			,buttons:[
+				{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="cancel.png"/>',		                
+					text: "<tml:label key="btn.cancel"/>",
+					handler: function(){
+						WGA.ajax.callAction("<tml:action ref="actions:cancelEditMode"/>","<tml:script expression="portlet.portletkey"/>");
+					}
+				}
+				,{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="accept.png"/>',		                
+					text: "<tml:label key="btn.save"/>",
+					handler: function(){
+						WGA.ajax.callAction("<tml:action ref="saveNewSchedule" param1="{_job.config.uid}"/>","<tml:script expression="portlet.portletkey"/>");
+					}
+				}				
+			]
+		</tml:option>
+	
+		<tml:option name="title">
+			New Schedule
+		</tml:option>
+	
+		<tml:inline name="body">
+			<tml:include designdb="@ui" ref="formmessages"/>
+			<tml:include ref="system:config-errors"/>
+			<tml:include ref="::form"/>
+		</tml:inline>
+		
+	</tml:include>
+	
+</tml:form>
+

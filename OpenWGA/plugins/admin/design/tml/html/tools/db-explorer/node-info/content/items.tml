@@ -1,0 +1,61 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_items=sortList(content().getItemNames())	
+</tml:script>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title" mode="set"/>	
+	<tml:inline name="body">
+		<table width="100%" class="collection">
+			<tr class="collection-title">
+				<td>Name</td>
+				<td>Type</td>
+				<td>Value</td>
+			</tr>
+			<tml:foreach type="itemvalue" item="_items" currentvalue="_item">		
+				<tr style="border-bottom:solid silver 1px">
+					<tml:script>
+						_res = itemList(_item);		
+						_firstElement = (_res.size() >= 1 ? _res.get(0) : null);		
+						_type = (_firstElement == null ? "null" : javaObject(_firstElement).getClass().getName());		
+						_type = _type.split(".").pop();						
+						if (_res.size() > 1) {		
+							_type = "List of " + _type;		
+						}		
+					</tml:script>
+					<td><tml:item name="_item"/></td>
+					<td><tml:item name="_type"/></td>
+					<td>
+						<tml:script>
+							return _res.size()>1 ? _res.toString() : _firstElement==null ? "null" : _res
+						</tml:script>		
+					</td>
+				</tr>	
+			</tml:foreach>
+		</table>
+
+	</tml:inline>
+</tml:include>

@@ -1,0 +1,223 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="deleteDbServer">	
+	var query = "dbServer='" + portlet.getSessionVar('key') + "'"
+	var dbs = xpathList(DBM.wgaconfig.get(), "/contentDatabases[" + query + "]")
+
+	var config = DBM.wgaconfig.clone();	
+	var it = dbs.iterator();
+	while(it.hasNext())
+		config.removeContentDatabase(it.next().key);
+	config.removeDatabaseServer(portlet.getSessionVar('key'));
+	DBM.wgaconfig.save();
+	
+	var tabview=createObject("@ui/tabview", portlet.parentportlet);
+	tabview.deleteCurrentPage();	
+</tml:action>
+
+
+<tml:include designdb="@ui" ref="windowview">
+
+	<tml:option name="config" scope="local">
+		tbar: [
+			<tml:case condition="_config_bean">
+				{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+					text: "<tml:label key="btn.edit"/>",
+					handler: function(){
+						WGA.ajax.callAction("<tml:action ref="actions:setEditMode"/>","<tml:script expression="portlet.portletkey"/>");
+					}
+				}
+				,{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="page_delete.png"/>',		                
+					text: "<tml:label key="btn.delete"/>",
+					handler: function(){
+						WGA.ajax.callAction("<tml:action>_querydeleteserver=true</tml:action>",
+							"<tml:script expression="portlet.portletkey"/>");
+					}
+				}
+				,"-"
+				<tml:if condition="_config_bean.enabled">
+					<tml:then>
+						,{
+							cls:'x-btn-text-icon',						
+							icon: '<tml:url type="file" db="@afw" doc="icons" file="disconnect.png"/>',		                
+							text: "Disable",
+							handler: function(){
+								DBM.callAction("<tml:action ref="actions:setEnabled" param1="{_config_bean.uid}" param2="0"/>",
+									"<tml:script expression="portlet.portletkey"/>",
+									"disabling database server"
+								);
+							}
+						}
+					</tml:then>
+					<tml:else>
+						,{
+							cls:'x-btn-text-icon',						
+							icon: '<tml:url type="file" db="@afw" doc="icons" file="connect.png"/>',		                
+							text: "Enable",
+							handler: function(){
+								DBM.callAction("<tml:action ref="actions:setEnabled" param1="{_config_bean.uid}" param2="1"/>",
+									"<tml:script expression="portlet.portletkey"/>",
+									"enabling database server"
+								);
+							}
+						}
+					</tml:else>
+				</tml:if>
+				
+			</tml:case>
+			<tml:case condition="_server_runtime && _server_runtime.isConnectionTestable()">
+				<tml:case condition="_config_bean">,</tml:case>"->"
+				,{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="server_connect.png"/>',		                
+					text: "<tml:label key="btn.test-server-connection"/>",
+					handler: function(){
+						WGA.ajax.callAction("<tml:action ref="::testConnection" param1="{portlet.getSessionVar('key')}"/>",
+							"<tml:script expression="portlet.portletkey"/>");
+					}
+				}
+			</tml:case>
+			<tml:case condition="DBM.wgaconfig.get().clusterConfiguration.enabled && DBM.getConfigBean() != null">
+				,{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="chart_organisation.png"/>',		                
+					text: "<tml:label key="btn.send-cluster"/>",
+					handler: function(){
+						WGA.ajax.callAction("<tml:action>_send_cluster=true</tml:action>");
+					}
+				}
+			</tml:case>
+		]
+	</tml:option>
+
+	<tml:option name="title" scope="local">
+		<tml:label key="dbserver.view-server-title"/>
+	</tml:option>
+
+	<tml:inline name="body">
+
+		<tml:if condition="_config_bean && !_config_bean.enabled">
+			<tml:then>
+				<tml:include designdb="@ui" ref="message">
+					<tml:option name="title">Server disabled</tml:option>
+					<tml:option name="body">
+						This database server is currently disabled. None of the configured databases are avaliable.
+					</tml:option>
+				</tml:include>
+			</tml:then>
+			<tml:elseif condition="!_server_runtime">
+				<tml:include designdb="@ui" ref="message">
+					<tml:option name="title">Server not Avaliable</tml:option>
+					<tml:option name="body">
+						This database server is currently not available.
+					</tml:option>
+				</tml:include>
+			</tml:elseif>
+		</tml:if>
+		
+		<tml:case condition="_msg">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Connection Test:</tml:option>
+				<tml:option name="body"><tml:item name="_msg"/></tml:option>
+			</tml:include>
+		</tml:case>
+
+		<tml:case istrue="_querydeleteserver">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Delete this Server?</tml:option>'
+				<tml:option name="body">
+					<tml:script>
+						var query = "dbServer='" + (_config_bean?_config_bean.uid:_server_runtime.uid) + "'"
+						var dbs = xpathList(DBM.wgaconfig.get(), "/contentDatabases[" + query + "]")
+						_dbs = dbs.size();
+					</tml:script>
+					<tml:case condition="_dbs>0">
+						The are <tml:item name="_dbs"/> Databases configured for this server.
+						These database configurations will be removed.
+						<br>
+					</tml:case>
+					Are you sure you want to delete this server?
+					<div>
+						<button onclick="DBM.ajaxAction({
+									action: '<tml:action ref="deletedbServer" ajax="norefresh"/>',
+									id: '<tml:script expression="portlet.portletkey"/>',
+									graydiv: true,
+									mode: 'norefresh'
+								}, 'delete server configuration')">
+							Delete this Server
+						</button>	
+						<tml:button clickaction="$refresh" ajax="true"><tml:label key="btn.cancel"/></tml:button>
+					</div>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case istrue="_send_cluster">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:label key="send-cluster"/></tml:option>
+				<tml:option name="body">
+					<tml:portlet ref="::send-cluster:portlet" name="send-cluster" portletmode="view"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+
+		<tml:case condition="_config_bean">
+			<tml:form id="view-server" source="none" mode="view">
+				<tml:include ref="::form" o_portletmode="view"/>
+			</tml:form>
+		</tml:case>
+		
+		<br>
+		<tml:include designdb="@ui" ref="windowview">			
+			<tml:option name="title">
+				<tml:label key="{'databases.'+(option('dbtype')||'all')}"/> in
+				<tml:form id="filter-server" source="portletsessionvars" cssstyle="display:inline">
+					<tml:script>
+						_opts = createlist();
+						_opts.add("all Domains|");
+						var domains = DBM.domains.get().iterator();
+						while(domains.hasNext()){
+							var domain = domains.next();
+							_opts.add("Domain '" + domain.name + "'|" + domain.uid);
+						}
+					</tml:script>
+					<tml:input name="filter" type="select" optionsitem="_opts" changeaction="$store" ajax="true"/>
+				</tml:form>
+			</tml:option>				
+			<tml:option name="body">			
+				<tml:include ref="webprojects:projects-by-domain-listview">				
+					<tml:option name="dbserver"><tml:item name="key"/></tml:option>
+					<tml:option name="ignore-disabled-servers">true</tml:option>
+				</tml:include>	
+			</tml:option>			
+		</tml:include>			
+				
+	</tml:inline>
+	
+</tml:include>

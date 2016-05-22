@@ -1,0 +1,131 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:comment>
+
+	options:
+		dbServer:	uid, optional
+		domain:		uid, optional
+		dbtype:		type of database (ContentDatabase or ContentStore, optional)
+		group-id:	id of group fieldset, required
+		button-id:	id of button div, required
+		
+</tml:comment>
+
+<tml:script>
+
+	_domain_uid = option("domain");
+	_server_uid = option("dbserver");
+	
+	if(_server_uid){
+		var server = DBM.dbservers.getByUid(_server_uid).runtime;	
+		if(server){
+			_cstypes = DBM.dbservers.getDatabaseTypes(server, 'contentstore')
+			_dbtypes = DBM.dbservers.getDatabaseTypes(server, 'contentdatabase')
+		}
+		else{
+			_cstypes=createlist();
+			_dbtypes=createlist();
+		}
+	}
+	
+</tml:script>
+
+<script>
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(portletkey){
+		
+		var menu = new  Ext.menu.Menu();
+		WGA.portlet.registerObject(portletkey, menu);
+		
+		<tml:case condition="_server_uid && option('showServerConfig')">
+			menu.add({
+				text: "Show Server Configuration",
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="server_database.png"/>',		                
+				handler: function(){
+					DBM.switchToObject('dbservers', '<tml:script expression="_server.uid"/>')
+				}
+			});
+		</tml:case>
+		
+		<tml:case condition="_domain_uid && option('showDomainConfig')">
+			menu.add({
+				text: "Show Domain Configuration",
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="chart_organisation.png"/>',		                
+				handler: function(){
+					DBM.switchToObject('domains', '<tml:item name="_domain_uid"/>')
+				}
+			})
+			<tml:case condition="_domain_uid && DBM.wgaconfig.get().getDomain(_domain_uid).authenticationSource!=null">		
+				menu.add({
+					text: "Change User",
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="folder_user.png"/>',		                
+					handler: login_<tml:script expression="_domain.uid"/>
+				})
+			</tml:case>
+		</tml:case>
+		
+		menu.add([
+			"-"
+			<tml:case condition="option('dbtype')==null || option('dbtype')=='ContentStore'">
+				,{
+					text: "Create New Application",
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="world_add.png"/>',		                
+					handler: function(){
+						DBM.switchToObject('webprojects', '$create', '<tml:item name="_domain_uid"/>:<tml:item name="_server_uid"/>')
+					}
+				}
+			</tml:case>
+
+			<tml:case condition="option('dbtype')==null || option('dbtype')=='ContentDatabase'">
+				,{
+					text: "Create New Datasource",
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="database_add.png"/>',		                
+					handler: function(){
+						DBM.switchToObject('databases', '$create', '<tml:item name="_domain_uid"/>:<tml:item name="_server_uid"/>')
+					}
+				}
+			</tml:case>
+		])
+		
+		menu.on("show", function(){
+			Ext.get("<tml:option name="group-id"/>").addClass("menu-selected");
+		})
+		menu.on("hide", function(){
+			Ext.get("<tml:option name="group-id"/>").removeClass("menu-selected");
+		})
+		var button = new Ext.Button({
+			renderTo: "<tml:option name="button-id"/>",
+			cls:'x-btn-icon',						
+			icon: '<tml:url type="file" db="@afw" doc="icons" file="page_white_stack.png"/>',
+			menuAlign: "tr-br?",
+			menu: menu
+		})
+		WGA.portlet.registerObject(portletkey, button);
+	})
+</script>

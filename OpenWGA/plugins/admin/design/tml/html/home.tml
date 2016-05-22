@@ -1,0 +1,86 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:include ref="::build-navigation"/>	
+<html>
+
+	<head>
+		<meta http-equiv="x-ua-compatible" content="IE=8">
+		<title><tml:script expression="WGA.Brand.name" encode="html"/> Admin Client</title>
+		<link rel="icon" href="<tml:url type="static" file="images/brand/icon_32.png"/>"/>
+		
+		<tml:htmlhead/>
+		
+		<tml:include designdb="@ui" ref="include:all" o_theme="gray-extend" o_debug="true"/>
+		<script type="text/javascript" src="<tml:url type="js" name="dbm"/>"></script>		
+		
+		<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="wgadmin"/>"/>
+				
+		<tml:case condition="AFW.request().isIE">
+			<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="ie-hacks"/>"/>
+		</tml:case>
+		
+		<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="::pluginstore"/>"/>
+		
+		<link type="text/css" rel="stylesheet" href="<tml:url type="css" name="SyntaxHighlighter"/>"/>
+		<script src="<tml:url type="js" name="shCore"/>"></script>
+		<script src="<tml:url type="js" name="shBrushCss"/>"></script>
+		<script src="<tml:url type="js" name="shBrushJs"/>"></script>
+		<script src="<tml:url type="js" name="shBrushXml"/>"></script>
+		<script src="<tml:url type="js" name="::Chart.min"/>"></script>
+		
+		<tml:include designdb="@afw" ref="include:jquery-ui-all"/>
+		
+		<script>
+			DBM.baseurl = "<tml:metadata name="absolutewgaurl" type="request"/>";
+			DBM.handleSystemEvent = function(event) {
+					alert("Your session has been expired. Press OK to reload the page");
+					location.href = location.href;
+			}
+			WGA.event.register("wga-admin-client", "de.innovationgate.wga.events.SessionIsNew", DBM.handleSystemEvent);
+		</script>
+		
+	</head>
+
+	<body>
+		<tml:if hasurlparameter="module">
+			<tml:then>
+				<tml:include ref="{request.getParameter('module')}"/>
+			</tml:then>
+			<tml:else>
+				<tml:include ref="body"/>
+			</tml:else>
+		</tml:if>
+		<tml:if hasurlparameter="app">
+			<tml:then>
+				<script>
+					Ext.onReady(function(){
+						DBM.switchToObject("<tml:urlparameter name="app"/>", "<tml:urlparameter name="uid"/>")
+					})
+				</script>
+			</tml:then>
+		</tml:if>
+	</body>
+
+</html>

@@ -1,0 +1,103 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="deleteJob">
+	_config_bean = DBM.getConfigBean();
+	var config = DBM.wgaconfig.clone();
+	var jobs = DBM.wgaconfig.get().getSchedulerConfiguration().jobs
+	jobs.remove(config.getByUid(_config_bean.uid));
+	DBM.wgaconfig.save();
+	var tabview=createObject("@ui/tabview", portlet.parentportlet);
+	tabview.deleteCurrentPage();		
+</tml:action>
+
+<tml:include designdb="@ui" ref="windowview">
+
+	<tml:option name="config" scope="local">
+		tbar: [
+			<tml:case condition="_config_bean">
+				{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+					text: "<tml:label key="btn.edit"/>",
+					handler: function(){
+						WGA.ajax.callAction("<tml:action ref="actions:setEditMode"/>","<tml:script expression="portlet.portletkey"/>");
+					}
+				}
+				,{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="page_delete.png"/>',		                
+					text: "<tml:label key="btn.delete"/>",
+					handler: function(){
+						WGA.ajax.callAction("<tml:action>_querydelete=true</tml:action>",
+							"<tml:script expression="portlet.portletkey"/>");
+					}
+				},
+			</tml:case>
+		]
+	</tml:option>
+
+	<tml:option name="title" scope="local">
+		Job <b><tml:script expression="_job.name"/></b>
+	</tml:option>
+
+	<tml:option name="body" scope="local">
+	
+		<tml:case istrue="_querydelete">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Delete this Job?</tml:option>
+				<tml:inline name="body">
+					Please confirm ...
+					<div>
+						<button onclick="DBM.ajaxAction({
+									action: '<tml:action ref="deleteJob" ajax="norefresh"/>',
+									id: '<tml:script expression="portlet.portletkey"/>',
+									graydiv: true,
+									mode: 'norefresh'
+								}, 'remove job')">
+							OK
+						</button>									
+						<tml:button clickaction="$refresh" ajax="true">Cancel</tml:button>
+					</div>
+				</tml:inline>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case condition="_config_bean">
+			<tml:form id="jobs-view-form" source="none" mode="view">		
+				<tml:include ref="::form"/>
+			</tml:form>
+		</tml:case>
+		
+		<tml:portlet name="job-runtime" ref="::runtime:portlet" ajax="true" o_jobuid="{_job.uid}"/>
+		
+		<tml:portlet name="job-tasks" ref="::tasks:portlet" ajax="true" o_jobuid="{_job.uid}"/>				
+		
+		<tml:case condition="_config_bean">
+			<tml:portlet name="job-schedules" ref="::schedules:portlet" ajax="true" o_jobuid="{_job.uid}"/>
+		</tml:case>
+		
+	</tml:option>
+	
+</tml:include>

@@ -1,0 +1,166 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+
+
+<tml:case condition="_db != null && tmlform.mode() != 'edit' && (DBM.isExpertMode() || _dbPatcheable || _dbFileStorageUpgradeable)">
+
+	<div id="buttons-cs-<tml:script expression="_cs.uid"/>" class="legend-menu"></div>
+	<script>
+		WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(portletkey){
+			
+			var menu = new  Ext.menu.Menu();
+			WGA.portlet.registerObject(portletkey, menu);
+			
+			<tml:case condition="DBM.isExpertMode()">
+				<tml:script>
+					_mayTruncateData = _db.isBackendServiceSupported(_db.BACKENDSERVICE_CLEAR_CONTENT)
+						|| _db.isBackendServiceSupported(_db.BACKENDSERVICE_CLEAR_CONTENT_AND_SCHEMA)
+						|| _db.isBackendServiceSupported(_db.BACKENDSERVICE_CLEAR_DATABASE)
+				</tml:script>
+				<tml:case condition="_db.isBackendServiceSupported(_db.BACKENDSERVICE_CLEAR_USERPROFILES)">
+				menu.add({
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="group_delete.png"/>',		                
+					text: "Truncate User Profiles",
+					handler: function(){
+						DBM.callAction("<tml:action>_query_truncate_data='profiles'</tml:action>",
+							"<tml:script expression="portlet.portletkey"/>")
+					}
+				});
+				</tml:case>
+				<tml:case condition="_mayTruncateData">
+				menu.add({
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="database_delete.png"/>',		                
+					text: "Truncate Data",
+					handler: function(){
+						DBM.callAction("<tml:action>_query_truncate_data='docs'</tml:action>",
+							"<tml:script expression="portlet.portletkey"/>")
+					}
+				});
+				menu.add("-");
+				</tml:case>
+		
+				menu.add({
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="page_white_put.png"/>',		                
+					text: "Export Database Dump",
+					handler: function(){
+						DBM.callAction("<tml:action>_query_create_dump=true</tml:action>",
+							"<tml:script expression="portlet.portletkey"/>")
+					}
+				});
+				menu.add({
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="page_white_get.png"/>',		                
+					text: "Import Database Dump",
+					handler: function(){
+						DBM.callAction("<tml:action>_query_load_dump=true</tml:action>",
+							"<tml:script expression="portlet.portletkey"/>")
+		
+					}			
+				});
+				menu.add("-");
+				menu.add({
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="note_go.png"/>',		                
+					text: "Update file annotations",
+					handler: function(){
+						DBM.callAction("<tml:action>_query_update_annotations=true</tml:action>",
+							"<tml:script expression="portlet.portletkey"/>")
+		
+					}
+				});
+				<tml:case istrue="_derivatesUpdatable">
+					menu.add({
+						cls:'x-btn-text-icon',						
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="picture_go.png"/>',		                
+						text: "Update file derivates",
+						handler: function(){
+							DBM.callAction("<tml:action>_query_update_filederivates=true</tml:action>",
+								"<tml:script expression="portlet.portletkey"/>")
+		
+						}
+					});
+				</tml:case>
+				<tml:case istrue="_hdbModelReinitializable">
+					menu.add({
+						cls:'x-btn-text-icon',						
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="report_go.png"/>',		                
+						text: "<b>Enforce new HDBModel definition</b>",
+						handler: function(){
+							DBM.callAction("<tml:action>_query_reinit_hdbmodel=true</tml:action>",
+								"<tml:script expression="portlet.portletkey"/>")
+		
+						}
+					})
+				</tml:case>
+			</tml:case>
+			<tml:case istrue="_dbPatcheable">
+				menu.add("-");
+				menu.add({
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="database_go.png"/>',		                
+					text: "<b><tml:label key="upgrade-db"/></b>",
+					handler: function(){
+						DBM.callAction("<tml:action>_query_upgrade_dbschema=true</tml:action>",
+							"<tml:script expression="portlet.portletkey"/>")
+		
+					}
+				});
+			</tml:case>
+			<tml:case istrue="_dbFileStorageUpgradeable">
+				menu.add({
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="attach.png"/>',		                
+					text: "<b>Upgrade file storage<b>",
+					handler: function(){
+						DBM.callAction("<tml:action>_query_upgrade_filestorage=true</tml:action>",
+							"<tml:script expression="portlet.portletkey"/>")
+		
+					}
+				});
+			</tml:case>
+			
+			menu.on("show", function(){
+				Ext.get("<tml:option name="group-id"/>").addClass("menu-selected");
+			})
+			menu.on("hide", function(){
+				Ext.get("<tml:option name="group-id"/>").removeClass("menu-selected");
+			})
+			var button = new Ext.Button({
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="{_dbPatcheable ? 'database_go.png' : 'database.png'}"/>',		                
+				text: "Database",
+				renderTo: "buttons-cs-<tml:script expression="_cs.uid"/>",
+				menuAlign: "tr-br?",
+				menu: menu
+			})
+			WGA.portlet.registerObject(portletkey, button);
+		})
+	</script>
+	
+</tml:case>

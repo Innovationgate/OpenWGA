@@ -1,0 +1,103 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="updateWGAConfig">
+	//runtime.debug();
+	_config_bean = DBM.getConfigBean();
+	if(!tmlform.validate())
+		return;
+	
+	try{
+
+		var list_names = [
+			"adminToolsPortRestrictions",
+			"authoringDesignAccessPortRestrictions",
+			"coreEventListeners",
+			"designConfiguration.fileExclusions",
+			"personalisationConfiguration.personalisationAgentExclusions"
+		];
+		
+		// get configured list data
+		var lists=[];
+		for(var i=0; i<list_names.length; i++){
+			var values = createlist();
+			//values.addAll(xpath(_config_bean, list_names[i]));
+			var bean_list = eval("_config_bean."+list_names[i])
+			values.addAll(bean_list);
+			lists.push(values);
+		}
+				
+		var config = DBM.wgaconfig.clone();
+		config.changed=true;
+		
+		// write back list values
+		for(var i=0; i<list_names.length; i++){
+			var values = lists[i];
+			var bean_list = eval("config."+list_names[i])	// xpath(config, list_names[i]) 
+			bean_list.clear();
+			bean_list.addAll(values);
+		}
+		
+		config.getClusterConfiguration().getOptions().clear();
+		
+		DBM.tmlform.setConfigProperties(config);
+		
+		_errors = config.validate()
+		if(_errors.isEmpty()){
+			DBM.wgaconfig.save();
+			
+			portlet.fireEvent(createEvent("wga-config-changed"));
+			portlet.setMode("view");
+		}
+		else log.info(_errors);
+	}
+	catch(e){
+		log.info(e);
+		logException(e);
+	}	
+</tml:action>
+
+<tml:form id="edit-wga-advanced-config" source="none" htmlinput="ignore">
+	<script>
+		DBM.actions.save("<tml:script expression="portlet.portletkey"/>").setAction("<tml:action ref="updateWGAConfig"/>");
+	</script>
+		
+	<tml:include designdb="@ui" ref="windowview">
+		<tml:option name="title" scope="local">Advanced Configuration</tml:option>
+		
+		<tml:option name="config" scope="local">
+			buttonAlign: "left"
+			,buttons: [<tml:[system:edit-action-buttons]/>]
+		</tml:option>
+		
+		<tml:inline name="body">
+			<tml:include ref="system:config-errors"/>
+			<tml:include designdb="@ui" ref="formmessages"/>
+			<tml:include ref="::form"/>				
+		</tml:inline>
+		
+		<tml:option name="footer"><tml:include ref="system:config-changed"/></tml:option>		
+		
+	</tml:include>
+</tml:form>

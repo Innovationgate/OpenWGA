@@ -1,0 +1,50 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<fieldset>	
+	
+	<tml:[system:fs-input] o_field="server" o_allowblank="true" o_emptytext="- none -"/>
+	<tml:[system:fs-input] o_field="user" o_allowblank="true" o_emptytext="- none -"/>
+	<tml:[system:fs-input] o_field="password" o_type="password" o_allowblank="true" o_emptytext="- none -"/>
+	<tml:[system:fs-input] o_field="fromName" o_allowblank="true" o_emptytext="- none -"/>
+	<tml:[system:fs-input] o_field="fromAddress" o_allowblank="true" o_emptytext="- none -"/>
+
+	<tml:script>
+		var defs = DBM.getModuleDefinition("MailOptions", "de.innovationgate.wgpublisher.modules.mailoptions.MailOptionsCollector")
+		setOption("module-definition", defs);
+	</tml:script>
+	
+	<tml:[system:module-options:form] o_title="optional additional (JavaMail) Parameter">
+		<tml:option name="ns">/options</tml:option>
+	</tml:[system:module-options:form]>
+
+</fieldset>
+
+<fieldset>
+	<legend><tml:label key="mail-config.admin-notification.title"/></legend>
+	
+	<tml:[system:fs-input] o_field="enableAdminNotifications" o_type="boolean"/>
+	<tml:[system:fs-input] o_field="toAddress"/>
+	
+</fieldset>

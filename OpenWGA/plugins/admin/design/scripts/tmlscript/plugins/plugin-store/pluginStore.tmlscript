@@ -1,0 +1,186 @@
+var version = Packages.de.innovationgate.wgpublisher.WGAVersion.toCsConfigVersion();
+var WGA_VERSION = version.getMainVersionString();
+var JAVA_VERSION = version.getJavaVersion().getMainVersionString();
+
+var URI = Packages.java.lang.System.getProperty("de.innovationgate.wga.plugin-admin.pluginstore.url") || "http://pluginstore.openwga.com";
+var DOMAIN = Packages.java.lang.System.getProperty("de.innovationgate.wga.plugin-admin.pluginstore.domain") || "pluginstore";
+var USER = Packages.java.lang.System.getProperty("de.innovationgate.wga.plugin-admin.pluginstore.user") || "reader";
+var PASSWORD = Packages.java.lang.System.getProperty("de.innovationgate.wga.plugin-admin.pluginstore.password") || "reader";
+var CSKEY = Packages.java.lang.System.getProperty("de.innovationgate.wga.plugin-admin.pluginstore.cskey") || "pluginstore";
+var GETALLPLUGINS = "getPlugins";
+var GETPLUGINDEPENDENCIES = "getPluginDependencies";
+var GETPLUGIN = "GetPluginFiles";
+
+var XSTREAM = new Packages.com.thoughtworks.xstream.XStream(new Packages.com.thoughtworks.xstream.io.xml.Dom4JDriver());
+var properties = null;
+
+var serviceClientFactory = Packages.de.innovationgate.wgaservices.ClientFactory.findService(WGA.Core.getLibraryLoader());
+
+if (serviceClientFactory) {
+	try {
+		var coreServices = serviceClientFactory.createCoreServiceClient(URI, properties);
+		var session = coreServices.login(DOMAIN, USER, PASSWORD);
+		var actionCaller = Packages.de.innovationgate.wgaservices.ClientFactory.createActionCaller(coreServices, session, CSKEY);
+		var serviceAvailable = true;
+	} catch (e) {
+		var serviceAvailable = false;
+		var msg = "Service not available";
+		//log.error(e);
+	}
+
+} else {
+	var serviceAvailable = false;
+	log.error("No XFireClientFactory service was found");
+}
+
+var storePortlet = null;
+this.init = function(param1) {
+	storePortlet = param1;
+}
+
+var server = this.server = {
+	serviceAvailable: serviceAvailable || false,
+	errorMsg: msg || null,
+	pluginResult: null,
+	uri: URI,
+	getAllPlugins : function() {
+	    server.pluginResult = WGA.createLookupTable();
+	    var params = WGA.createList();
+	    params.add(WGA_VERSION);
+	    params.add(JAVA_VERSION);
+
+		var result = actionCaller.callAction(GETALLPLUGINS, params);
+				
+	    if (typeof(result) == "string") {
+	    	var resultMap = XSTREAM.fromXML(result) || WGA.createLookupTable();
+	    	if (resultMap.containsKey("msg")) {
+	    		server.serviceAvailable = false;
+	    		server.errorMsg = resultMap.get('msg');
+	    		return false;
+	    	}
+			server.pluginResult = resultMap;
+			return server.pluginResult;		
+		}
+		
+		
+		return null;
+	},
+	getPluginDependencies : function(qualifiedFileName) {
+		var params = WGA.createList();
+		params.add(qualifiedFileName.toString());
+		params.add(WGA_VERSION);
+		params.add(JAVA_VERSION);
+		
+		var result = actionCaller.callAction(GETPLUGINDEPENDENCIES, params);
+	    if (typeof(result) == "string") {
+	    	var resultMap = XSTREAM.fromXML(result) || WGA.createLookupTable();
+	    	if (resultMap.containsKey("msg")) {
+	    		server.serviceAvailable = false;
+	    		server.errorMsg = resultMap.get('msg');	    		
+	    		return false;
+	    	}
+	    	return XSTREAM.fromXML(result);	
+		}
+		return null;
+	},
+	getPlugins : function(qualifiedFileNames) {
+		var params = WGA.createList();
+	   	params.add(XSTREAM.toXML(qualifiedFileNames));
+	    
+		var result = actionCaller.callAction(GETPLUGIN, params);
+		
+		var pluginFiles = WGA.createList();
+
+	    if (typeof(result) != "string" && result.getClass().getName().equals("de.innovationgate.wgaservices.types.Form")) {
+	    	
+	    	var pluginFileNames = result.attachmentNames().toArray();
+	    	for (var i = 0; i < pluginFileNames.length; i++) {
+	    		var pluginFileName = pluginFileNames[i];
+	    		var pluginFileDS = result.attachmentData(pluginFileName);
+	    		var pluginFile = new Packages.de.innovationgate.utils.TemporaryFile(pluginFileName, pluginFileDS.getInputStream(), Packages.de.innovationgate.webgate.api.WGFactory.getTempDir());
+	    		pluginFiles.add(pluginFile.getFile());
+	    	}
+	    	return pluginFiles;
+	    } else {
+	    	var resultMap = XSTREAM.fromXML(result);
+	    	server.serviceAvailable = false;
+	    	server.errorMsg = resultMap.get('msg');
+	    	return false;
+	    }
+	   
+	}
+}
+
+var installPlugins = WGA.createList();
+var activePlugin = null;
+
+var local = this.local = {
+	dependenciesValid: true,
+	searchForPattern: function (plugins, pattern) {
+		var pluginKeys = WGA.getLookupKeys(plugins).iterator();
+		
+		while (pluginKeys.hasNext()) {
+			var match = false;
+			var pluginKey = pluginKeys.next();
+			
+			var pluginInfos = plugins.get(pluginKey);
+			var title = pluginInfos.get('title');
+			var description = pluginInfos.get('description');
+
+			if ((title && title.toLowerCase().indexOf(pattern.toLowerCase()) != -1) || (description && description.toLowerCase().indexOf(pattern.toLowerCase()) != -1)) {
+				match = true;
+			}
+			
+			if (!match) {
+				plugins.remove(pluginKey);
+			}
+			
+		}
+		return plugins;
+	},
+	install: function (pluginList) {
+		
+		setsessionvar("ops", new Packages.de.innovationgate.utils.TransientList(WGA.createList()));
+		var pluginSet = wgacore.getPluginSet();
+		var pluginFiles = server.getPlugins(pluginList || local.getInstallPlugins() || WGA.createList());
+		if (pluginFiles != false) {
+			for (var i = 0; i < pluginFiles.size(); i++) {
+				var operation = pluginSet.loadPluginToWorkspace(pluginFiles.get(i));
+				ops.add(operation);
+			}
+			
+			callAction("plugins:installWorkspace");
+			local.resetActivePlugin();
+			removesessionvar("ops");
+			return true;
+		} else {
+			local.resetActivePlugin();
+			removesessionvar("ops");
+			return false;
+		}
+	},
+	addInstallPlugins: function (pluginList) {
+		installPlugins.addAll(pluginList);
+	},
+	addInstallPlugin: function (plugin) {
+		installPlugins.add(plugin);
+	},
+	clearInstallPlugins: function () {
+		installPlugins.clear();
+	},
+	getInstallPlugins: function () {
+		return installPlugins;
+	},
+	setActivePlugin: function (plugin) {
+		local.resetActivePlugin();
+		activePlugin = plugin;
+		local.addInstallPlugin(activePlugin);
+	},
+	getActivePlugin: function () {
+		return activePlugin;
+	},
+	resetActivePlugin: function () {
+		activePlugin = null;
+		local.clearInstallPlugins();
+	}
+}

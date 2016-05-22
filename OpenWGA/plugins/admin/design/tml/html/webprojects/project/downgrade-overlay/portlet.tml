@@ -1,0 +1,4 @@
+<tml:script>
+	portlet.setSessionVar("_config_bean", portlet.parent().getSessionVar("_config_bean"));
+</tml:script>
+<tml:include ref="[::mode-{portlet.mode}]"/>

@@ -1,0 +1,97 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Java Information</tml:option>	
+	<tml:option name="body" scope="local">
+		<fieldset>		
+						
+			<label>Maximum heap size:</label>		
+			<div class="data"><tml:item name="_maxHeapString"/></div>		
+			<div class="clear"></div>		
+			<label>Current heap size:</label>		
+			<div class="data"><tml:item name="_currentHeapSize"/></div>		
+			<div class="clear"></div>		
+			<label>Unused memory in heap:</label>		
+			<div class="data"><tml:item name="_unusedMemory"/></div>		
+			<div class="clear"></div>		
+			<label>Java Runtime Vendor:</label>		
+			<div class="data"><tml:item name="_javaVendor"/></div>		
+			<div class="clear"></div>		
+			<label>Java Runtime Version:</label>		
+			<div class="data"><tml:item name="_javaVersion"/></div>		
+			<div class="clear"></div>		
+			<label>Java Virtual Machine:</label>		
+			<div class="data"><tml:item name="_javaVm"/></div>		
+			<div class="clear"></div>		
+			<label>Java File Encoding:</label>		
+			<div class="data"><tml:item name="_javaFileEncoding"/></div>		
+			<div class="clear"></div>		
+			<label>Java JIT Compiler:</label>		
+			<div class="data"><tml:item name="_javaJitCompiler"/></div>		
+			<div class="clear"></div>		
+					
+			<label>Class path from app server:</label>		
+			<div class="data" id="appserverpath" style="display:none">		
+				<ul><li><tml:item name="_javaClassPath" encode="none"/></li></ul><br/>		
+				<div style="text-align:right"><a href="Javascript:hide('appserverpath')">hide information...</a></div>		
+			</div>		
+			<div class="data" id="appserverpaths"> <a href="Javascript:show('appserverpath')">show information...</a></div>		
+			<div class="clear"></div>		
+					
+			<label>Libraries from configuration:</label>		
+			<div class="data" id="wgalibraries" style="display:none">		
+				<ul><li><tml:item name="_wgaLibraries" encode="none" divider="</li><li>"/></li></ul><br/>		
+				<div style="text-align:right"><a href="Javascript:hide('wgalibraries')">hide information...</a></div>		
+			</div>		
+			<div class="data" id="wgalibrariess"> <a href="Javascript:show('wgalibraries')">show information...</a></div>		
+			<div class="clear"></div>		
+					
+			<label>Libraries from Apps:</label>		
+			<div class="data" id="cslibraries" style="display:none">		
+				<ul><li><tml:item name="_cslibraries" encode="none" divider="</li><li>"/></li></ul><br/>		
+				<div style="text-align:right"><a href="Javascript:hide('cslibraries')">hide information...</a></div>		
+			</div>		
+			<div class="data" id="cslibrariess"> <a href="Javascript:show('cslibraries')">show information...</a></div>		
+			<div class="clear"></div>		
+					
+			<label>Native library path:</label>		
+			<div class="data" id="nativelibrariespath" style="display:none">		
+				<ul><li><tml:item name="_nativelibrariespath" encode="none"/></li></ul><br/>		
+				<div style="text-align:right"><a href="Javascript:hide('nativelibrariespath')">hide information...</a></div>		
+			</div>		
+			<div class="data" id="nativelibrariespaths"> <a href="Javascript:show('nativelibrariespath')">show information...</a></div>		
+			<div class="clear"></div>		
+					
+			<label>Server related system properties:</label>		
+			<div class="data" id="wgaproperties" style="display:none">		
+				<ul><li><tml:item name="_wgaproperties" encode="none" divider="</li><li>"/></li></ul><br/>		
+				<div style="text-align:right"><a href="Javascript:hide('wgaproperties')">hide information...</a></div>		
+			</div>		
+			<div class="data" id="wgapropertiess"> <a href="Javascript:show('wgaproperties')">show information...</a></div>		
+			<div class="clear"></div>		
+		</fieldset>		
+
+	</tml:option>
+</tml:include>

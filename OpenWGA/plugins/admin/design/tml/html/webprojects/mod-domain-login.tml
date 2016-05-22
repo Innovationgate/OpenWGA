@@ -1,0 +1,85 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<div id="domain-login-<tml:script expression="_domain.uid"/>" style="display:<tml:script expression="_loginerror==_domain.name?'block':'none'"/>">
+	<tml:include designdb="@ui" ref="message">
+		<tml:option name="title">Domain Login</tml:option>
+		<tml:option name="close">false</tml:option>
+		<tml:inline name="body">
+			
+			<tml:form id="{'login-domain-'+_domain.uid}" source="none">
+				<tml:case condition="_loginerror==_domain.name">
+					<div class="data" style="color:red">Login-Error. Please try again.</div>
+					<script>
+						document.forms['<tml:script expression="tmlform.formid"/>'].username.focus()
+					</script>
+				</tml:case>
+			
+				<tml:input name="domain" type="hidden" default="{_domain.name}"/>
+
+				<label>Domain Authentication Source:</label>
+				<div class="data"><tml:script expression="DBM.domain(_domain).getAuthenticationSourceTitle()"/></div>
+				<div class="clear"></div>
+
+				<label>Current User:</label>
+				<div class="data"><tml:meta type="[domain:{_domain.name}]" name="username"/></div>
+				<div class="clear"></div>
+				
+				<label>Username:</label>
+				<div class="data">
+					<tml:input name="username"/>
+				</div>
+				
+				<div class="clear"></div>
+
+				<label>Password:</label>
+				<div class="data"><tml:input name="password" type="password"/></div>
+				<div class="clear"></div>
+
+				<div class="data">
+					<button type="submit">Login</button>
+					<tml:case condition="meta('domain:'+_domain.name, 'username').toLowerCase()!='anonymous'">
+						<tml:button clickaction="system:domain-logout" param1="{_domain.name}" ajax="true">Logout</tml:button>
+					</tml:case>
+					<button type="button" onclick="DBM.showHideElement('domain-login-<tml:script expression="_domain.uid"/>')">Cancel (ESC)</button>
+				</div>
+				<script>
+					function login_<tml:script expression="_domain.uid"/>(){
+						DBM.element.show('domain-login-<tml:script expression="_domain.uid"/>', function(){
+							document.forms['<tml:script expression="tmlform.formid"/>'].username.focus()
+						})
+					}
+					var form = document.forms['<tml:script expression="tmlform.formid"/>'];
+					form.onsubmit=function(){
+						DBM.callAction("<tml:action ref="::domain-login"/>", "<tml:script expression="portlet.portletkey"/>", "login");
+					}
+					Ext.get(form).on("keyup", function(ev){
+						if(ev.keyCode==27)
+							DBM.element.hide('domain-login-<tml:script expression="_domain.uid"/>')
+					})
+				</script>
+			</tml:form>
+		</tml:inline>
+	</tml:include>
+</div>

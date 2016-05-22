@@ -1,0 +1,354 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+/*
+ * Helper functions
+ */
+
+function makeFix2(value){
+	return format(parseInt(value), "00")
+}
+
+function makeTime(a, b){
+	return makeFix2(a) + ':' + makeFix2(b) + " h";
+}
+
+function makeNumber(value){
+	switch(value){
+		case "1":
+			return "first"
+			break;
+		case "2":
+			return "second"
+			break;
+		case "3":
+			return "third"
+			break;
+		default:
+			return value+"th"
+	}
+}
+
+var weekday=["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+
+this.createCronExpression = function(){	
+	var seconds = "";
+	var minutes = "";
+	var hours = "";
+	var dayOfMonth = "";
+	var months = "";
+	var dayOfWeek = "";
+
+	if(tmlform.validate()){
+		if(tmlform.executeOnEach=='each'){
+			
+			//Type: Execute on each day in year
+			if(tmlform.subMode_each=='day_year'){
+				var calDate = createCalendar(tmlform.day_year_date);
+				var calTime = createCalendar(tmlform.day_year_time);
+				var datum = parseDate(calDate.get(calDate.DAY_OF_MONTH)+'.'+(calDate.get(calDate.MONTH)+1)+' '+calTime.get(calTime.HOUR_OF_DAY)+':'+calTime.get(calTime.MINUTE),'dd.MM HH:mm');
+				var cal = createCalendar(datum);
+				dayOfMonth = cal.get(cal.DAY_OF_MONTH);
+				months = cal.get(cal.MONTH)+1;
+				dayOfWeek = '?';
+				seconds = '0';
+				minutes = cal.get(cal.MINUTE);
+				hours = cal.get(cal.HOUR_OF_DAY);
+				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
+			}
+				
+			//Type: Execute on each day of month
+			if(tmlform.subMode_each=='day_month'){
+				var calTime = createCalendar(tmlform.day_month_time);
+				var datum = parseDate(calTime.get(calTime.HOUR_OF_DAY)+':'+calTime.get(calTime.MINUTE),'HH:mm');
+				var cal = createCalendar(datum);
+				dayOfMonth = tmlform.day_month_date;
+				months = '*';
+				dayOfWeek = '?';
+				seconds = '0';
+				minutes = cal.get(cal.MINUTE);
+				hours = cal.get(cal.HOUR_OF_DAY);
+				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
+			}
+			
+			//Type: Execute on each day in week
+			if(tmlform.subMode_each=='day_week'){
+				var cal = createCalendar(tmlform.day_week_time);
+				dayOfWeek = tmlform.day_week_date;
+				dayOfMonth= '?';
+				months = '*';
+				seconds = '0';
+				minutes = cal.get(cal.MINUTE);
+				hours = cal.get(cal.HOUR_OF_DAY);
+				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
+			}
+			
+			//Type: Execute on each day
+			if(tmlform.subMode_each=='day'){
+				var calTime = createCalendar(tmlform.day_time);
+				var datum = parseDate(calTime.get(calTime.HOUR_OF_DAY)+':'+calTime.get(calTime.MINUTE),'HH:mm');
+				var cal = createCalendar(datum);
+				dayOfMonth = '*';
+				months = '*';
+				dayOfWeek = '?';
+				seconds = '0';
+				minutes = cal.get(cal.MINUTE);
+				hours = cal.get(cal.HOUR_OF_DAY);
+				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
+			}
+			
+			//Type: Execute on each hour
+			if(tmlform.subMode_each=='hour'){
+				var calTime = createCalendar(tmlform.hour_time);
+				var datum = parseDate(calTime.get(calTime.MINUTE),'mm');
+				var cal = createCalendar(datum);
+				dayOfMonth = '*';
+				months = '*';
+				dayOfWeek = '?';
+				seconds = '0';
+				minutes = cal.get(cal.MINUTE);
+				hours = '*';
+				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
+			}
+		} 
+		/*else if(tmlform.executeOnEach=='every'){
+			
+			//Type: Execute every X hours
+			if(tmlform.subMode_every=='hours'){
+				dayOfMonth = '*';
+				months = '*';
+				dayOfWeek = '?';
+				seconds = '0';
+				minutes = '0';
+				hours = '0/'+tmlform.every_time;
+				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
+			}
+			
+			//Type: Execute every X minutes
+			if(tmlform.subMode_every=='minutes'){
+				dayOfMonth = '*';
+				months = '*';
+				dayOfWeek = '?';
+				seconds = '0';
+				minutes = '0/'+tmlform.every_time;
+				hours = '*';
+				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
+			}	
+		}*/
+		return seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek;
+	}
+	else log.info("form not valid");
+}
+
+this.fillForms = function(cronExpression,type){
+	if(type=='simple'){
+		if(cronExpression.substr(cronExpression.length-1)=='m'){
+			tmlform.executeOnEach = "every";
+			tmlform.subMode_every = "m";
+			tmlform.every_time = cronExpression.substring(0,cronExpression.length-1);
+		}
+		if(cronExpression.substr(cronExpression.length-1)=='h'){
+			tmlform.executeOnEach = "every";
+			tmlform.subMode_every = "h";
+			tmlform.every_time = cronExpression.substring(0,cronExpression.length-1);
+		}
+	}
+	else if(type=='cron'){	
+		var mode = this.getCronType(cronExpression);
+		var tmpCronElements = cronExpression.split(' ');
+		
+		if(mode){
+			//Type: Execute on each day in year
+			if(mode=='each_day_year'){
+				tmlform.executeOnEach = "each";
+				tmlform.subMode_each = "day_year";
+				tmlform.day_year_date = tmpCronElements[3]+'.'+tmpCronElements[4];
+				tmlform.day_year_time = makeFix2(tmpCronElements[2])+':'+makeFix2(tmpCronElements[1]);
+			}
+			
+			//Type: Execute on each day of month
+			if(mode=='each_day_month'){
+				tmlform.executeOnEach = "each";
+				tmlform.subMode_each = "day_month";
+				tmlform.day_month_date = tmpCronElements[3];
+				tmlform.day_month_time = makeFix2(tmpCronElements[2])+':'+makeFix2(tmpCronElements[1]);
+			}
+			
+			//Type: Execute on each day in week
+			if(mode=='each_day_week'){
+				tmlform.executeOnEach = "each";
+				tmlform.subMode_each = "day_week";				
+				tmlform.day_week_date = tmpCronElements[5];
+				tmlform.day_week_time = makeFix2(tmpCronElements[2])+':'+makeFix2(tmpCronElements[1]);
+			}
+			
+			//Type: Execute on each day
+			if(mode=='each_day'){
+				tmlform.executeOnEach = "each";
+				tmlform.subMode_each = "day";
+				tmlform.day_time = makeFix2(tmpCronElements[2])+':'+makeFix2(tmpCronElements[1]);	
+			}
+			
+			//Type: Execute on each hour
+			if(mode=='each_hour'){
+				tmlform.executeOnEach = "each";
+				tmlform.subMode_each = "hour";
+				tmlform.hour_time = tmpCronElements[1];
+			}
+			
+			//Type: Execute every X hours (cron)
+			if(mode=='every_hours'){
+				tmlform.executeOnEach = "every";
+				tmlform.subMode_every = "h";
+				tmlform.every_time = tmpCronElements[2].substring(tmpCronElements[2].indexOf('/')+1,tmpCronElements[2].length);
+			}
+			
+			//Type: Execute every X hours (simple)
+			if(mode=='every_hours_simple'){
+				tmlform.executeOnEach = "every";
+				tmlform.subMode_every = "h";
+				tmlform.every_time = cronExpression.substring(0,cronExpression.length-1);
+			}
+			
+			//Type: Execute every X minutes (cron)
+			if(mode=='every_minutes'){
+				tmlform.executeOnEach = "every";
+				tmlform.subMode_every = "m";
+				tmlform.every_time = tmpCronElements[1].substring(tmpCronElements[1].indexOf('/')+1,tmpCronElements[1].length);
+			}
+			
+			//Type: Execute every X hours (simple)
+			if(mode=='every_minutes_simple'){
+				tmlform.executeOnEach = "every";
+				tmlform.subMode_every = "m";
+				tmlform.every_time = cronExpression.substring(0,cronExpression.length-1);
+			}
+		} else{
+			tmlform.executeOnEach = "cron";
+			tmlform.setField('/data',cronExpression);
+		}
+	}
+}	
+
+this.createDescription = function(cronExpression,type){
+	var description = "custom cron expression: " + cronExpression;
+	
+	if(type=='simple'){
+		if(cronExpression.substr(cronExpression.length-1)=='m')
+			description = "Repeat every "+cronExpression.substring(0,cronExpression.length-1)+" Minutes";
+		else if(cronExpression.substr(cronExpression.length-1)=='h')
+			description = "Repeat every "+cronExpression.substring(0,cronExpression.length-1)+" Hours";
+	}
+
+	else if(type=='cron'){
+		var mode = this.getCronType(cronExpression);
+		var tmpCronElements = cronExpression.split(' ');
+		
+		if(mode){
+			//Type: Execute on each day in year
+			if(mode=='each_day_year')
+				description = "Execute yearly on date "+ tmpCronElements[3]+'.'+ tmpCronElements[4] + '. at time ' + makeTime(tmpCronElements[2], tmpCronElements[1]);
+			
+			//Type: Execute on each day of month
+			if(mode=='each_day_month'){
+				if(tmpCronElements[3]=='L')
+					description = "Execute on each last day of a month at time " + makeTime(tmpCronElements[2], tmpCronElements[1]);
+				else {
+					description = "Execute on each " + makeNumber(tmpCronElements[3]) + " day of a month at time " + makeTime(tmpCronElements[2], tmpCronElements[1]);
+				}
+			}
+			
+			//Type: Execute on each day in week
+			if(mode=='each_day_week'){
+				if(tmpCronElements[5]=='L') description = "Execute on each last day of week at time " + makeTime(tmpCronElements[2], tmpCronElements[1]);
+				else{
+					var day_week = tmpCronElements[5];
+					description = "Execute on each " + weekday[day_week-1] + " of a week at time " + makeTime(tmpCronElements[2], tmpCronElements[1]);
+				}
+			}
+			
+			//Type: Execute on each day
+			if(mode=='each_day')
+				description = "Execute each day at time " + makeTime(tmpCronElements[2], tmpCronElements[1]);
+			
+			//Type: Execute on each hour
+			if(mode=='each_hour')
+				description = "Execute each hour at " + makeNumber(tmpCronElements[1]) + " minute";
+			
+			//Type: Execute every X hours
+			if(mode=='every_hours')
+				description = "Repeat every "+tmpCronElements[2].substring(tmpCronElements[2].indexOf('/')+1,tmpCronElements[2].length)+" hours";
+			else if(mode=='every_hours_simple')
+				description = "Repeat every "+cronExpression.substring(0,cronExpression.length-1)+" hours";
+			
+			//Type: Execute every X minutes
+			if(mode=='every_minutes')
+				description = "Repeat every " + tmpCronElements[1].substring(tmpCronElements[1].indexOf('/')+1,tmpCronElements[1].length) + " minutes";
+			else if(mode=='every_minutes_simple')
+				description = "Repeat every " + cronExpression.substring(0,cronExpression.length-1) + " minutes";
+			
+		}
+	}
+	return description;
+}
+
+this.getCronType = function(cronExpression){
+	var tmpCronElements = cronExpression.split(' ');
+	
+	if(tmpCronElements.length==6 && tmpCronElements[0]==0 && tmpCronElements[1]!='*'){
+		
+		if(!isNaN(tmpCronElements[1])){
+			if(tmpCronElements[2]=='*'){
+				if(tmpCronElements[3]=='*' && tmpCronElements[4]=='*' && tmpCronElements[5]=='?')
+					return "each_hour";
+			}	
+			else if(!isNaN(tmpCronElements[2])) {
+				if(tmpCronElements[3]=='?' && tmpCronElements[4]=='*' && (!isNaN(tmpCronElements[5]) || tmpCronElements[5]=='L'))
+					return "each_day_week";
+					
+				else if(tmpCronElements[3]=='*' && tmpCronElements[4]=='*' && tmpCronElements[5]=='?')
+					return "each_day";
+				
+				else {
+					if(!isNaN(tmpCronElements[3]) && tmpCronElements[4]>0 && tmpCronElements[4]<=12 && tmpCronElements[5]=='?')
+						return "each_day_year";
+					if((!isNaN(tmpCronElements[3]) || tmpCronElements[3]=='L') && tmpCronElements[4]=='*' && tmpCronElements[5]=='?')
+						return "each_day_month";
+				}
+			}
+		}	
+
+		if(tmpCronElements[1].indexOf('0/')!=-1 && tmpCronElements[2]=='*' && tmpCronElements[3]=='*' && tmpCronElements[4]=='*' && tmpCronElements[5]=='?')
+			return "every_minutes";
+		
+		if(tmpCronElements[1]=='0' && tmpCronElements[2].indexOf('0/')!=-1 && tmpCronElements[3]=='*' && tmpCronElements[4]=='*' && tmpCronElements[5]=='?')
+			return "every_hours";
+	} else if(tmpCronElements.length==1){
+		if(cronExpression.substr(cronExpression.length-1)=='m' && !isNaN(cronExpression.substring(0,cronExpression.length-1))) 
+			return "every_minutes_simple";
+		else if(cronExpression.substr(cronExpression.length-1)=='h' && !isNaN(cronExpression.substring(0,cronExpression.length-1))) 
+			return "every_hours_simple";
+	}
+	else return null;
+}

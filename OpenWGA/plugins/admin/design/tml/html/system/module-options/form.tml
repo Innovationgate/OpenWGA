@@ -1,0 +1,383 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="addOption">
+	//runtime.debug();
+	var ns = tmlparam1;
+	var fieldname = tmlparam2;
+	var fieldname_option_name = "custom_" + fieldname;
+	var fieldname_option_value = "custom_value_" + fieldname;
+	
+	_config_bean = DBM.getConfigBean();
+	var config_bean_options = xpath(_config_bean, ns);
+
+	if(tmlform.field(fieldname)=="$custom"){
+		var option_name = tmlform.field(fieldname_option_name)
+		var option_value = tmlform.field(fieldname_option_value)
+	
+		if(!option_name){
+			_add_option_name_field_error = fieldname;
+			return tmlform.addMessage("please enter an option name");
+		}
+		if(config_bean_options.containsKey(option_name)){
+			_add_option_name_field_error = fieldname;
+			return tmlform.addMessage("A custom option of name " + option_name + " already exists");
+		}
+					
+		config_bean_options.put(option_name, option_value);
+		log.info("added custom option " + option_name + "=" + option_value);
+	}
+	else{
+		var defaultvalue = tmlform.field(fieldname+"_default");
+		if(defaultvalue == "null")
+			defaultvalue = null
+		config_bean_options.put(tmlform.field(fieldname), defaultvalue);
+	}
+
+	tmlform.removeField(fieldname);
+	tmlform.removeField(fieldname_option_name);
+	tmlform.removeField(fieldname_option_value);
+	tmlform.removeField(fieldname+"_default");
+	
+	_config_bean.changed=true;
+	_resortOptions=true;
+</tml:action>
+
+<tml:action id="removeOption">
+	_config_bean = DBM.getConfigBean(true);
+	var fieldname = tmlparam1;
+	
+	var a = fieldname.split("/");
+	var optionname = a.pop();		// last element 
+	var ns = a.join("/");			// all but the last element
+	
+	var config_bean_options = xpath(_config_bean, ns);
+	config_bean_options.remove(optionname);
+	tmlform.removeField(ns+"/"+optionname);
+	_config_bean.changed=true;
+</tml:action>
+
+<tml:script>
+	_config_bean = DBM.getConfigBean();
+	_locale = wgacore.languageCodeToLocale(getpreferredlanguage());
+	//_pathOptions = createList();
+	_config_bean_options = xpath(DBM.getConfigBean(), option("ns"));
+	if(!_config_bean_options) {
+		log.error("no bean for " + option("ns"));
+	}
+		
+	var config_options = createlist();	// default: empty list
+	if(option("module-definition")){
+		var config_options = option("module-definition").getOptionDefinitions().values();
+	}
+		
+	var optional_config_options_map = createlookuptable();
+
+	if(tmlform.getMode()=="edit"){
+		
+		/*
+		 * Loop through all options and
+		 *	- check dependent options. ignore them if dependent is not in config bean
+		 * 	- add required options to config bean
+		 *	- add other (optional) options to "optional_config_options" if not in config bean.
+		 * Because of dependent checks this loop must be repeated if config bean has been changed (new dependent options may be valid now) 
+		 */
+		var existing_config_changed;
+		do{
+			var existing_config_changed = false;	
+			var it = config_options.iterator();
+			while(it.hasNext()){
+				var opt = it.next();
+				
+				//log.info("option " + opt.name);
+				
+				// check depentents
+				if(!opt.dependentOptions.isEmpty()){
+					var ignoreOption=false
+					var depOpts =opt.dependentOptions.iterator();
+					while(depOpts.hasNext()){
+						var depOpt = depOpts.next(); 
+						if(!_config_bean_options.containsKey(depOpt.name)){
+							// dependent option not in config:
+							// ignore this and remove it if in config
+							ignoreOption=true;
+							if(_config_bean_options.containsKey(opt.name)){
+								_config_bean_options.remove(opt.name);
+								existing_config_changed = true;
+								_resortOptions = true;
+							}
+							break;
+						}
+						else if(depOpt.neededValue!=null){
+							// also check correct option value
+							var fieldname = option('ns') + "/" + depOpt.name
+							val = tmlform.field(fieldname);
+							if(val==null)
+								val = _config_bean_options.get(depOpt.name)
+							
+							//log.info("option " + opt.name + " depends on " + depOpt.name + " with value " + val);
+							//log.info("needs value: " + depOpt.neededValue);
+							if(val.toString() != depOpt.neededValue){
+								ignoreOption=true;
+								if(_config_bean_options.containsKey(opt.name)){
+									_config_bean_options.remove(opt.name);
+									existing_config_changed = true;
+									_resortOptions = true;
+								}
+								//log.info("option ignored bc. of wrong value");
+								break;
+							}
+						}
+					}
+					if(ignoreOption)
+						continue;
+				}
+				
+				// On path option defs we must test if they are contained in the currently allowed path options.
+				// If not we ignore them.				
+				if (opt.hasFlag("PathOption")) {
+					var pathOptions = option("pathOptions");
+					if (!pathOptions || !pathOptions.contains(opt.name)) {
+						if(_config_bean_options.containsKey(opt.name)){
+							_config_bean_options.remove(opt.name);
+							existing_config_changed = true;
+							_resortOptions = true;
+							break;
+						}
+						continue;
+					}
+				}
+				
+				if(_config_bean_options.containsKey(opt.name))
+					continue;	// we have this already
+				
+				if(!opt.isOptional() && (option("no-required")==null || !opt.dependentOptions.isEmpty())){
+					_config_bean_options.put(opt.name, opt.defaultValue);
+					existing_config_changed = true;
+					_resortOptions = true;
+				}
+				else if(opt.isExpert() && !DBM.isExpertMode())
+					continue;
+				else optional_config_options_map.put(opt.name, opt);
+			}	
+		} while(existing_config_changed)
+
+	}
+		
+	if (_resortOptions && option("module-definition")) {
+		option("module-definition").getOptionDefinitions().sort(_config_bean_options);		
+	}
+
+	_optional_config_options = optional_config_options_map.values();
+</tml:script>
+
+<tml:comment>Loop through existing options</tml:comment>
+<tml:script>
+	_config_options_map = createlookuptable();	// default: empty map
+	if(option("module-definition"))
+		_config_options_map = option("module-definition").getOptionDefinitions();
+	if(_config_bean_options){
+		_keys = createlist(_config_bean_options.keySet().toArray());
+	}
+</tml:script>
+
+<div class="<tml:option name="ns"/>-options" id="<tml:option name="ns"/>-options">
+
+<tml:foreach type="itemvalue" item="_keys" currentvalue="_key">
+	<tml:script>
+		_config_option = _config_options_map.get(_key);
+		setOption("config-option", _config_option);
+		setOption("value", _config_bean_options.get(_key));
+		if(_config_option && option("pathOptionsReadonly")=="true" && _config_option.hasFlag("PathOption")){				
+			_mode = "view";
+		}
+		else _mode = "edit";
+	</tml:script>
+	
+	<tml:if condition="_config_option==null">
+		<tml:then>
+			<tml:case condition="!option('no-custom-options')"> 
+				<label>
+					<tml:item name="_key"/>:	
+				</label>	
+				<div class="data">
+					<tml:[::option-type-input] o_fieldname="{option('ns')+'/'+_key}"/>
+				</div>
+				<div class="clear"></div>
+			</tml:case>		
+		</tml:then>
+	
+		<tml:else>
+			<label>
+				<tml:script expression="_config_option.getTitle(_locale)"/>:
+			</label>
+			<div class="data">
+				<tml:[::option-type-input] o_mode="{_mode}"/>
+			</div>
+			<div class="clear"></div>
+		</tml:else>
+
+	</tml:if>
+	
+</tml:foreach>
+
+<tml:case condition="tmlform.getMode()=='edit'">
+	<tml:script>
+		_ext_opts = ""
+		
+		var it = _optional_config_options.iterator();
+		while(it.hasNext()){
+			var opt = it.next();
+			try{
+				if(_ext_opts!="")
+					_ext_opts += ",\n";
+				_ext_opts += "['" + opt.getName() + "',\n'" 
+					+ AFW.Util.encodeForScript(opt.getDefaultValue()) + "',\n'"
+					+ AFW.Util.encodeForScript(opt.getTitle(DBM.locale))
+					+ (DBM.isExpertMode() ? " (" + opt.name + ")" : "")
+					+ "',\n'" 
+					+ AFW.Util.encodeForScript(encode("html", opt.getDescription(DBM.locale)))
+					+ "<br>Default: " + (opt.getDefaultValue()!=null ? AFW.Util.encodeForScript(opt.getDefaultValue()) : "- none -")
+					+ "']"
+			}
+			catch(e){
+				log.info(e);
+			}
+		}
+		
+		if(!option('no-custom-options') && DBM.isExpertMode())
+			_ext_opts += ',["$custom","","' + label("module-options.custom") +'","' + label("module-options.custom.description") +'"]'
+		
+		_fieldname = "add_option_" + (option("section")||option('ns'));
+		
+		/**
+		 * calculate browser dependent html hide-code:
+		 * 		IE does not like css class x-hidden here
+		 *		Safari does not like display:none here
+		 */
+		_hide_code = ""
+		if(_add_option_name_field_error!=_fieldname 
+				&& (option('no-required')==null || !_config_bean_options.values().isEmpty())){
+			if(AFW.request().isIE)
+				_hide_code = "style='display:none'"
+			else _hide_code = "class='x-hidden'"
+		}
+		
+	</tml:script>
+	
+	<tml:case condition="_ext_opts">
+	
+		<div class="more-options">
+			<a href="javascript:DBM.showHideElement('<tml:item name="_fieldname"/>_more')">
+				 show/hide more options ...
+			</a>
+		</div>
+	
+		<div id="<tml:item name="_fieldname"/>_more" <tml:item name="_hide_code"/>>
+			
+			<tml:case condition="!_optional_config_options.isEmpty()">			
+				<tml:input name="{_fieldname}" type="hidden"/>
+				<tml:input name="{_fieldname+'_default'}" type="hidden"/>
+
+				<label><i><tml:option name="title"/>:</i></label>
+				<div class="data">
+					
+					<div style="width:400px" id="<tml:item name="_fieldname"/>_myCombo"></div>
+					
+					<script>
+						
+						var opts = [<tml:item name="_ext_opts"/>];
+						var store = new Ext.data.SimpleStore({
+							fields: ['name', 'defaultvalue', 'title', 'descr'],
+							data: opts
+						})
+						var tpl = '<tpl for="."><div class="my-combo-list-item" style="padding:3px;border:solid #efefef 1px"><h3><i>{title}</i></h3><span style="color:#666666">{descr}</span></div></tpl>';
+							
+						var combo = new Ext.form.ComboBox({
+							tpl: tpl,
+							store: store,
+							displayField:'title',
+							itemSelector: "div.my-combo-list-item",
+							value: "<tml:script>
+										if(tmlform.field(_fieldname)){
+											if(tmlform.field(_fieldname)=="$custom")
+												return label("module-options.custom");
+											return option('module-definition').getOptionDefinitions().get(tmlform.field(_fieldname)).getTitle(_locale)
+										}
+										else return ""
+									</tml:script>",
+							editable: true,
+							typeAhead: true,
+							mode: 'local',
+							triggerAction: 'all',
+							emptyText:'Enter or select an option...',
+							width: 350,
+							listWidth: 700,
+							resizable: true,
+							renderTo: "<tml:item name="_fieldname"/>_myCombo"
+						});
+						WGA.portlet.registerObject("<tml:script expression="portlet.portletkey"/>" , combo);
+						combo.on("select", function(c,rec){
+							var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+							form.elements["<tml:item name="_fieldname"/>"].value = rec.data.name;
+							form.elements["<tml:item name="_fieldname"/>_default"].value = rec.data.defaultvalue;
+							if(rec.data.name=="$custom"){
+								DBM.showHideElement("custom-option-<tml:item name="_fieldname"/>");
+							}
+							else {
+								WGA.ajax.callAction("<tml:action ref="addOption" param1="{option('ns')}" param2="{_fieldname}"/>", "<tml:script expression="portlet.portletkey"/>");
+							}
+						})
+					</script>		
+				</div>
+				<div class="clear"></div>
+			</tml:case>
+			
+			<div id="custom-option-<tml:item name="_fieldname"/>" style="display:<tml:script expression="_add_option_name_field_error==_fieldname || _optional_config_options.isEmpty() ? 'block':'none'"/>">
+				<tml:script>
+					tmlform.setField(_fieldname, "$custom");
+				</tml:script>
+				<label>Option Name:</label>
+				<div class="data">
+					<tml:input name="{'custom_'+_fieldname}"/>
+					<tml:case condition="_add_option_name_field_error==_fieldname">
+						<div style="color:red">Please enter a valid option name</div>
+					</tml:case>
+				</div>
+				<div class="clear"></div>
+	
+				<label>Option Value:</label>
+				<div class="data">
+					<tml:input name="{'custom_value_'+_fieldname}"/>
+					<tml:button clickaction="addOption" param1="{option('ns')}" param2="{_fieldname}" ajax="true">add this option</tml:button>
+				</div>
+				<div class="clear"></div>
+			</div>
+			
+		</div>
+	
+	</tml:case>
+</tml:case>
+
+</div>

@@ -1,0 +1,7 @@
+<div id="wizard">
+	<h1 class="title">OpenWGA Initial Configuration Wizard</h1>
+	<tml:range labelfile="wizard">
+		<tml:portlet name="wizard-forms" ref="::portlet:portlet" ajax="true"/>
+	</tml:range>
+</div>
+<div id="progressbar" style="visibility: hidden"></div>

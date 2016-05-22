@@ -1,0 +1,109 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_Database = AFW.database(portlet.getSessionVar('dbkey'));
+</tml:script>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">DB Access as: <b><tml:script expression="_Database.getUserName() + ' / ' + _Database.getAccessLevelText()"/></b></tml:option>	
+	<tml:option name="config">
+		collapsible: true,
+		collapsed: false	//<tml:script expression="!_loginerror"/>
+	</tml:option>
+	
+	<tml:inline name="body">
+
+		<fieldset>
+				
+			<div id="login-info" style="display:<tml:script expression="_loginerror?'none':'block'"/>">
+				<label>Username:</label>
+				<div class="data"><tml:script expression="_Database.getUserName()"/></div>
+				<div class="clear"></div>
+				
+				<label>Access:</label>
+				<div class="data"><tml:script expression="_Database.getAccessLevelText()"/></div>
+				<div class="clear"></div>
+
+				<div class="data">
+					<tml:case condition="_Database.getUserName().toLowerCase()!='anonymous'">
+						<tml:button clickaction="system:db-logout" param1="{portlet.getSessionVar('dbkey')}" ajax="true">Logout</tml:button>
+					</tml:case>
+					<button onclick="show_login()">Change User</button>
+				</div>
+			</div>
+				
+			<div id="login-form" style="display:<tml:script expression="_loginerror?'block':'none'"/>">		
+				<tml:form id="domain-login">
+					<tml:case istrue="_loginerror"><div class="data" style="color:red">Login-Error</div></tml:case>
+					
+					<label>Domain:</label>
+					<div class="data"><tml:script expression="DBM.database(portlet.getSessionVar('dbkey')).getDomainName()"/></div>
+					<div class="clear"></div>
+					
+					<label>Authentication Source:</label>
+					<div class="data"><tml:script expression="DBM.database(portlet.getSessionVar('dbkey')).getAuthenticationSourceTitle()"/></div>
+					<div class="clear"></div>
+					
+					<label>Username:</label>
+					<div class="data"><tml:input name="username"/></div>
+					<div class="clear"></div>
+					
+					<label>Password:</label>
+					<div class="data"><tml:input name="password" type="password"/></div>
+					<div class="clear"></div>
+					
+					<div class="data">
+						<button type="submit">Login</button>
+						<button type="button" onclick="DBM.showHideElement('login-form');DBM.showHideElement('login-info')">Cancel</button>
+					</div>
+
+					<script>
+						function show_login(){
+							DBM.element.show('login-form', function(){
+								document.forms['<tml:script expression="tmlform.formid"/>'].username.focus()
+							})
+							DBM.element.hide('login-info');
+						}
+						var form = document.forms['<tml:script expression="tmlform.formid"/>'];
+						form.onsubmit=function(){
+							DBM.callAction("<tml:action ref="system:db-login" param1="{portlet.getSessionVar('dbkey')}"/>", "<tml:script expression="portlet.portletkey"/>", "login");
+						}
+						
+						Ext.get(form).on("keyup", function(ev){
+							if(ev.keyCode==27){
+								DBM.element.hide("login-form");
+								DBM.element.show("login-info");
+							}
+								
+						})
+						
+					</script>
+					
+				</tml:form>
+			</div>
+		</fieldset>
+				
+	</tml:inline>
+</tml:include>

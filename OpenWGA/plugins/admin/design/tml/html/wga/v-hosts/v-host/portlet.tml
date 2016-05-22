@@ -1,0 +1,6 @@
+<tml:script>
+	var config = DBM.wgaconfig.get();
+	portlet.setSessionVar("_config_bean", xpath(config, "/virtualHosts[uid='"+portlet.getSessionVar('key')+"']"), false);
+</tml:script>
+
+<tml:include ref="{'::mode-' + portlet.mode}"/>

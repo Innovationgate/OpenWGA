@@ -1,0 +1,10 @@
+try {
+	var theDb = WGA.db(tmlparam1);
+	theDb.openSession();
+	WGA.Core.getFileDerivateManager().updateDerivatesOfCreators(theDb, tmlform.fieldList("creators"));
+	msg = "Update was triggered. The derivate update process will now update the derivates of the chosen creators.";
+}
+catch (e) {
+	logException("Exception updating file derivates", e);
+	msg = "An error occurred updating the file derivates: " + e.message + ". More details may be available in the application log";
+}

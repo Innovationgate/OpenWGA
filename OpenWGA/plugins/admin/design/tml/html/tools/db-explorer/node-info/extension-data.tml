@@ -1,0 +1,25 @@
+<tml:script>
+	_document = db(option("key")).getDocumentByKey(option("wgakey"));
+	if(_document)
+		_extension_data_names=_document.getExtensionDataNames();	
+</tml:script>
+
+<tml:case isfilled="_extension_data_names">
+	<fieldset>		
+		<legend>Extension Data</legend>
+		
+		<tml:foreach type="itemvalue" item="_extension_data_names" currentvalue="_extension_data_name">		
+				
+			<label><tml:item name="_extension_data_name"/>:</label>			
+			<div class="data">			
+				<tml:script>		
+					return _document.getExtensionData(_extension_data_name)		
+				</tml:script>			
+			</div>			
+			<div class="clear"></div>		
+					
+		</tml:foreach>		
+				
+	</fieldset>		
+
+</tml:case>		

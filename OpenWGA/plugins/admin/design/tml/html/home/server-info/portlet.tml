@@ -1,0 +1,334 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="reloadConfig">
+	WGA.server().reloadConfig();
+	portlet.fireEvent(createEvent("wga-config-changed"));
+</tml:action>
+
+<tml:action id="rebuild-lucene-index">
+	try {
+		wgacore.getLuceneManager().rebuildIndex();
+		_server_message =  "Rebuilding lucene index, check application log for details";
+	}
+	catch (e) {
+		logException(e);
+	}				
+</tml:action>
+
+<tml:action id="clear-cache" master="true">
+	try{
+		_errors = WGA.Server.clearAllCaches();
+		
+		if (_errors.length > 0) {
+			_server_message = "Caches cleared. There have been errors clearing the following caches: <ul><li>" + _errors.join("<li>") +  "</ul>Details may be found in the application log.";
+		}
+		else {
+			_server_message = "Caches cleared";
+		}
+	}
+	catch (e) {
+		logException(e);
+	}					
+</tml:action>
+
+<tml:action id="create-tmlcache-dump">
+	try{
+		var fileName = wgacore.tmlCacheDump();
+		_server_message = "WebTML cache dump file written to: " + fileName;
+	}
+	catch (e) {
+		logException(e);
+	}					
+</tml:action>
+
+<tml:script>
+
+	if(!portlet.getSessionVar('currentpage')){
+		portlet.setSessionVar('currentpage', 1);
+	}
+
+	var core = WGACore;
+	var system = java.lang.System;
+	var expEngine = Packages.de.innovationgate.wgpublisher.expressions.ExpressionEngineFactory;
+	var wgfactory = Packages.de.innovationgate.webgate.api.WGFactory;
+	var maxHeap = Packages.de.innovationgate.utils.WGUtils.getMaxHeap();
+	var runtime = java.lang.Runtime.getRuntime();
+	var pathReplace = new RegExp(system.getProperty("path.separator"),"gi")
+	_wgaversion = core.getReleaseString();
+	_signature = core.getBuildSignature();
+	//_sid = 		core.getSID();
+	_server = request.getSession().getServletContext().getServerInfo()
+	_instanceActive = format(core.getInstanceActiveSince(),'fullDateTime');
+	_timeNow = format(createDate(),'fullDateTime');
+	_os = system.getProperty("os.name")+" Version "+system.getProperty("os.version")+ " (" + system.getProperty("os.arch") + ")";
+	_osUser = system.getProperty("user.name");
+	_locale = java.util.Locale.getDefault().toString();
+	_configFile = core.getConfigFilePath();
+	_logDirectory = core.getLoggingDir() != null ? core.getLoggingDir().getPath() : "(none)";
+	_tempFilesDirectory = core.getWgaTempDir().getPath();
+	_tmlRequests = core.getUsageStatistics().getAllRequests();	
+	_tmlCodeCache = expEngine.getTMLScriptEngine().getScriptCacheCurrentSize()+" cached scripts (Max size: "+ format(expEngine.getTMLScriptEngine().getScriptCacheMaxSize(),"#,##0")+")";
+	_webTMLCache = core.getWebTMLCache().getCache().getSize();
+	_webTMLCacheMax = core.getWebTMLCache().getCache().getMaxSize();
+	_webTMLCacheUtilisation = core.getWebTMLCache().getCache().getUtilisation();
+	_wgaDesignFileCache = core.getDesignFileCache().getSize();
+	_wgaDesignFileCacheMax = core.getDesignFileCache().getMaxSize();
+	_wgaDesignFileCacheUtilisation = core.getDesignFileCache().getUtilisation();	
+	
+	if (core.getLuceneManager() == null) {
+		_luceneIndex =  "Not activated";
+	}
+	else if (core.getLuceneManager().isIndexerRunning()) {
+		var luceneManager = core.getLuceneManager();
+		_luceneIndex = "Indexing content (DB updates: " + WGA.format(luceneManager.getRemainingDbUpdateRequests(), "#,##0")
+		 + ", doc additions: " + WGA.format(luceneManager.getRemainingAdditionRequests(), "#,##0")
+		  + ", doc deletions: " + WGA.format(luceneManager.getRemainingDeletionRequests(), "#,##0") + ")"; 
+	}
+	else {
+		_luceneIndex = "Idle";
+	}
+	
+	var process = core.getFileDerivateManager().getUpdateProcess();
+	if (process == null) {
+		_derivateUpdate = "Disabled";
+	}
+	else if (process.isRunning()) {
+		_derivateUpdate = "Running: " + process.getStatus();
+	}
+	else {
+		_derivateUpdate = "Idle";
+	}
+	
+	_maxHeapString = maxHeap != -1 ? (format(maxHeap / 1024,"#,##0")) + " KB" : "(Not determinable in this Java VM. Must be Version 1.4 or higher)";	
+	_currentHeapSize = format(runtime.totalMemory() / 1024,"#,##0")+ " KB";
+	_unusedMemory = format(runtime.freeMemory() / 1024,"#,##0")+ " KB";
+	_javaVendor = system.getProperty("java.vendor");
+	_javaVersion = system.getProperty("java.version");
+	_javaVm = system.getProperty("java.vm.name") + " Version " + system.getProperty("java.vm.version") + " (" + system.getProperty("java.vm.vendor") + ")";
+	_javaFileEncoding = system.getProperty("file.encoding") == null ? "(not set)" : system.getProperty("file.encoding");
+	_javaJitCompiler = system.getProperty("java.compiler") == null ? "(none)" : system.getProperty("java.compiler");
+	_javaClassPath = system.getProperty("java.class.path").replace(pathReplace, "</li><li>");
+	var wgaLibraries = createList(core.getBaseLibraryLoader().getURLs());	
+	var libsIt = wgaLibraries.iterator();
+   	while (libsIt.hasNext()) {
+   		var libURL = libsIt.next();
+   		if (libURL.toString().indexOf("/WEB-INF/isolated/") != -1) {
+   			libsIt.remove();
+   		}
+   	}
+   	if (wgaLibraries.size() == 0) {
+   		wgaLibraries.add('none');
+   	}
+   	_wgaLibraries = wgaLibraries;
+   	_cslibraries = core.getSystemContainerManager().getJARDescriptions();
+   	_nativelibrariespath = system.getProperty("java.library.path").replace(pathReplace, "</li><li>")
+   	_wgaproperties = createList();
+   	var propNames = system.getProperties().propertyNames();
+   	var count=0;
+	while (propNames.hasMoreElements()) {
+		propName = propNames.nextElement();
+		if (propName.indexOf("de.innovationgate.wga") != -1) {
+			_wgaproperties.add(propName + " := " + system.getProperty(propName));
+			count++;
+		}
+	}
+	if (count == 0) {
+		_wgaproperties.add('none');
+	}
+	
+	for (var theDb in Iterator(WGA.Core.getContentdbs().values())) {
+		if (theDb.getContentStoreVersion() >= 5) {
+			if (theDb.hasFeature(theDb.FEATURE_UNPATCHEABLE)) {
+				continue;
+			}
+			var level = theDb.getContentStorePatchLevel();
+			if (level < Packages.de.innovationgate.csmaintenance.CS5Patcher.CS5_PATCH_LEVEL) {
+				_dbsArePatcheable = true;
+			}
+		}
+	}
+	
+</tml:script>
+
+<script type="text/javascript">
+	function hide(o) { 	
+ 		var el=Ext.get(o);
+ 		var el2=Ext.get(o+'s');
+ 		el.setDisplayed('none');
+ 		el2.setDisplayed('block');;			
+	}
+	function show(o) { 	
+ 		var el=Ext.get(o);
+ 		var el2=Ext.get(o+'s');
+ 		el.setDisplayed('block');;
+ 		el2.setDisplayed('none');;
+			
+	}
+
+</script>
+
+<tml:include designdb="@ui" ref="windowview">
+
+	<tml:option name="title">Server Status</tml:option>
+	<tml:option name="config" scope="local">
+		tbar: [
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="script_save.png"/>',		                
+				text: "WebTML Cache Dump",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>_query_create_tmlcachedump=true</tml:action>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="arrow_rotate_anticlockwise.png"/>',		                
+				text: "Reload configuration",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>_query_reload_config=true</tml:action>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="book.png"/>',		                
+				text: "Rebuild Lucene Index",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>_query_rebuild_lucene=true</tml:action>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="database_refresh.png"/>',		                
+				text: "Clear all caches",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>_query_clear_cache=true</tml:action>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			<tml:case istrue="_dbsArePatcheable">
+			,"->"
+			,{
+				icon: '<tml:url db="@afw" type="file" doc="icons" file="database_go.png"/>',
+        		cls:'x-btn-text-icon',
+        		text: '<b><tml:label key="upgrade-dbs"/></b>',
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>_upgrade_dbs=true</tml:action>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			</tml:case>
+		]
+	</tml:option>
+	
+	<tml:inline name="body">
+
+	<tml:case isdefined="_upgrade_dbs">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:label key="upgrade-dbs"/></tml:option>
+				<tml:option name="body">
+					<tml:portlet ref="::upgrade-dbs:portlet" name="upgrade-dbs" portletmode="view"/>
+				</tml:option>
+			</tml:include>			
+		</tml:case>
+
+		<tml:case isdefined="_server_message">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:item name="_server_message"/></tml:option>
+			</tml:include>			
+		</tml:case>
+
+		<tml:case istrue="_query_create_tmlcachedump">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:label key="server-action.create-tmlcachedump.title"/></tml:option>
+				<tml:option name="body">
+					<tml:label key="server-action.create-tmlcachedump.help"/>
+					<div>
+						<tml:button clickaction="create-tmlcache-dump" ajax="true"><tml:label key="yes-please"/></tml:button>
+					</div>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		<tml:case istrue="_query_reload_config">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:label key="server-action.reload-config.title"/></tml:option>
+				<tml:option name="body">
+					<tml:label key="server-action.reload-config.help"/>
+					<div>
+						<tml:button clickaction="reloadConfig" ajax="true"><tml:label key="yes-please"/></tml:button>
+					</div>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		<tml:case istrue="_query_rebuild_lucene">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:label key="server-action.rebuild-lucene-index.title"/></tml:option>
+				<tml:option name="body">
+					<tml:label key="server-action.rebuild-lucene-index.help"/>
+					<div>
+						<tml:button clickaction="rebuild-lucene-index" ajax="true"><tml:label key="yes-please"/></tml:button>
+					</div>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		<tml:case istrue="_query_clear_cache">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:label key="server-action.clear-cache.title"/></tml:option>
+				<tml:option name="body">
+					<tml:label key="server-action.clear-cache.help"/>
+					<div>
+						<tml:button clickaction="clear-cache" ajax="true"><tml:label key="yes-please"/></tml:button>
+					</div>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+
+
+		<div id="infoblock">
+			<tml:include designdb="@ui" ref="tabview">
+				<tml:option name="pages">Server,Operating System,Java<tml:case condition="DBM.wgaconfig.get().clusterConfiguration.enabled">,Cluster</tml:case></tml:option>
+				<tml:option name="body">
+					<tml:select switch="portlet.getSessionVar('currentpage')">
+						<tml:case value="1">
+							<tml:include ref="::mod-server"/>
+						</tml:case>
+						
+						<tml:case value="2">
+							<tml:include ref="::mod-os"/>
+						</tml:case>
+						
+						<tml:case value="3">
+							<tml:include ref="::mod-java"/>
+						</tml:case>
+						
+						<tml:case value="4">
+							<tml:include ref="::mod-cluster"/>
+						</tml:case>
+						
+					</tml:select>
+				</tml:option>
+			</tml:include>
+		</div>
+
+	</tml:inline>
+</tml:include>

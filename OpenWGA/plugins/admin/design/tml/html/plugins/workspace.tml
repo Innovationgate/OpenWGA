@@ -1,0 +1,278 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	try {
+	
+		if (ops == null) {
+			setSessionVar("ops", new Packages.de.innovationgate.utils.TransientList(createList()));
+		}
+	
+		if (ops.size() == 0) {
+			showWorkspace=false;
+			return;
+		}
+	
+		pluginSet = wgacore.getPluginSet().createWorkspacePluginSet(ops);
+		workspacePlugins = pluginSet.getWorkspacePlugins();
+		plugins = new Packages.java.util.ArrayList(workspacePlugins);
+		wsChanges = pluginSet.getChanges(wgacore.getPluginSet());
+		showWorkspace=true;
+	}
+	catch (e) {
+		//logException(e);
+		log.info(e);
+		msg = e;
+		showWorkspace=false;
+	}
+</tml:script>
+
+<tml:case condition="isdefined('info')">
+	<tml:include designdb="@ui" ref="message">
+		<tml:option name="title">Info ...</tml:option>
+		<tml:inline name="body">
+			<tml:item name="info"/>
+		</tml:inline>
+	</tml:include>
+</tml:case>
+
+<tml:case condition="showWorkspace || isdefined('msg')">
+	<tml:include designdb="@ui" ref="message">
+		<tml:option name="title">Pending Changes ...</tml:option>
+		<tml:option name="close">false</tml:option>
+		<tml:inline name="body">
+
+			<tml:case isdefined="msg">
+				<div class="message">
+					<b>The following error occurred while evaluating pending changes:</b>
+					<p>
+					<tml:script>
+						if (msg.javaException) {
+							if (msg.javaException.cause != null) {
+								return  msg.javaException.cause.message;
+							}
+							else {
+								return  msg.javaException.message + " (" + msg.javaException.getClass().getName() + ")";
+							}
+						}
+						else if (msg.message) {
+							return msg.message;
+						}
+						else {
+							return msg;
+						}
+					</tml:script>
+					</p>
+				</div>
+			</tml:case>
+			
+			<tml:case istrue="showWorkspace">
+			
+				<tml:foreach type="itemvalue" item="plugins" currentvalue="plugin">
+				
+					<fieldset>
+						
+						<legend>
+							<tml:item name="plugin" xpath="csConfig/pluginConfig/title"/> <tml:item name="plugin" xpath="pluginID/version"/>
+						</legend>
+						
+						<label>
+							Operation:							
+						</label>
+						<div class="data">
+							<div style="margin-top: 2px">
+								<div style="float:left;color:red">
+									<tml:item name="plugin" xpath="operation/title"/>
+								</div>
+								<div style="float:right">
+									<tml:button cssstyle="font-weight:normal" clickaction="::cancelOperation" param1="{plugin.operation.hashCode()}" ajax="true">Cancel operation</tml:button>
+								</div>
+								<div style="clear:both"></div>
+							</div>
+							
+							<tml:case condition="plugin.installationFaults.size()>0">
+								<tml:script var="faults" expression="plugin.installationFaults"/>
+								<ul style="list-style-type:disc; padding-left: 20px">
+									<tml:foreach type="itemvalue" item="faults" currentvalue="fault">
+										<li style="color:red"><tml:script expression="fault.toErrorMessage()"/></li>
+									</tml:foreach>
+								</ul>
+							</tml:case>
+
+							<tml:case condition="plugin.valid == false">
+								You can install/activate this plugin but it will not be connected until the invalidity cause is resolved.
+							</tml:case>
+
+							<tml:case condition="plugin.updateStatus != plugin.UPDATESTATUS_NEW">
+								<div style="font-weight:normal">
+								<tml:select>
+									<tml:case condition="plugin.updateStatus == plugin.UPDATESTATUS_UPDATE">
+										This plugin will replace the previously installed version, which will be deactivated, and take over it's data.
+									</tml:case>
+									<tml:case condition="plugin.updateStatus == plugin.UPDATESTATUS_INSTALL_DEACTIVATED">
+										This plugin will be installed deactivated bc. of an already installed newer version.
+									</tml:case>
+									<tml:case condition="plugin.updateStatus == plugin.UPDATESTATUS_INSTALL_PARALLEL">
+										This plugin will be installed in parallel to the already installed version and have it's own data.
+									</tml:case>
+									<tml:case condition="plugin.updateStatus == plugin.UPDATESTATUS_UPDATE_IDENTICAL">
+										This plugin will replace the already installed identical version, which will be removed.
+									</tml:case>
+								</tml:select>
+								</div>
+								
+								<tml:case condition="plugin.updateStatus != plugin.UPDATESTATUS_UPDATE_IDENTICAL">
+									<tml:form id="{'plugin_' + infoID}" source="none">
+										<tml:script>
+											tmlform.updateStrategy = javaObject(plugin.operation.updateStrategy).toString();
+											tmlform.operationHash = plugin.operation.hashCode();
+										</tml:script>
+									
+										<div style="font-weight:normal; padding: 10px 0px">
+											<b>Update-Strategy:</b>
+											<br>
+											<tml:input cssstyle="margin:2px" name="updateStrategy" changeaction="::changeUpdateSettings" ajax="true" divider="<br/>" type="radio" options="Disable old version. New version continues to use data of old Version.|1,Install in parallel and keep old version|2" default="1"/><br/>
+										</div>
+										
+										<tml:case condition="tmlform.updateStrategy == '1'">
+											<div style="font-weight:normal">
+												<tml:script>
+													installkeys = createList();
+													prevPlugins = wgacore.getPluginSet().getPluginsByUniqueName(plugin.pluginID.uniqueName).iterator();
+													while (prevPlugins.hasNext()) {
+														prevPlugin = prevPlugins.next();
+														if (prevPlugin.active) {
+															//installkeys.add(prevPlugin.buildDatabaseKey() + " (" + prevPlugin.getPluginID().toString() + ")|" + prevPlugin.installationKey);
+															installkeys.add("Version " + prevPlugin.pluginID.version + "|" + prevPlugin.installationKey);
+														}
+													}
+												</tml:script>											
+												Replace plugin:
+												<br><tml:input cssstyle="font-weight:normal" type="select" changeaction="::changeUpdateSettings" ajax="true" name="replaceKey" optionsitem="installkeys" default="{plugin.installationKey}"/>
+											</div>
+										</tml:case>
+									</tml:form>
+								</tml:case>
+							</tml:case>
+							
+						</div>
+						<div class="clear"></div>
+						
+						<label>Installation Key:</label>
+						<div class="data">
+							<tml:script expression="plugin.installationKey || '- none -'"/>
+							<span style="float:right">
+								<a href="javascript:DBM.showHideElement('workspace-plugin-info-<tml:script expression="plugin.pluginID"/>')">show/hide more info</a>
+							</span>
+						</div>
+						<div class="clear"></div>
+						 
+						<div id="workspace-plugin-info-<tml:script expression="plugin.pluginID"/>" style="display:none">
+							<tml:script>
+								_config = null;
+								try{
+									_config = plugin.csConfig.pluginConfig;
+								}
+								catch(e){}
+								_plugin = plugin;
+							</tml:script>
+							<tml:case condition="_plugin && _plugin.isDirectory()">
+								<label>Designpath:</label>
+								<div class="data"><tml:script expression="_plugin.filePath"/></div>
+								<div class="clear"></div>
+							</tml:case>
+							<tml:if condition="_config">
+								<tml:then>
+									<tml:include ref="::plugin-info"/>
+								</tml:then>
+								<tml:else>
+									<div class="data" style="color:red">
+										No plugin configuration found
+									</div>
+								</tml:else>
+							</tml:if>				
+						</div>
+
+						<!-- License information -->
+						<tml:case condition="plugin.operation instanceof Packages.de.innovationgate.wgpublisher.plugins.InstallPluginOperation && plugin.licenseText != null">
+							<div style="padding:10px">
+								This plugin is distributed under the given license terms which must be accepted when installing it:<br>
+								<tml:comment><textarea readonly="readonly" wrap="off" style="width:100%;height:200px;background-color:white"><tml:script expression="plugin.licenseText" encode="xml"/></textarea><br></tml:comment>
+								<div style="border: inset 2px silver; height: 200px; background:white; overflow:auto">
+									<tml:script expression="plugin.licenseText" encode="html"/>
+								</div>
+								<input type="checkbox" name="acceptLicense"> I accept this license
+							</div>							
+						</tml:case>
+
+						<div class="clear"></div>
+
+					</fieldset>
+						
+				</tml:foreach>
+				
+				<tml:case condition="wsChanges.size() > 0">
+					<fieldset>
+						<legend>Performing pending changes will invoke the following consequences on active plugins:</legend>
+						<ul>
+						<tml:foreach type="itemvalue" item="wsChanges" currentvalue="change">
+							<li><tml:item name="change"/></li>
+						</tml:foreach>
+						</ul>
+					</fieldset>
+				</tml:case>
+				
+				<div style="margin-top: 10px">
+					<script>
+						function performChanges(){
+							var allAccepted = true;
+							var l_inputs = document.getElementsByName("acceptLicense");
+							for(var i=0; i<l_inputs.length; i++)
+								if(!l_inputs[i].checked)
+									allAccepted=false;
+							if(!allAccepted)
+								return alert("You must agree to the licenses of all pending plugins before continuing. Check the checkbox labeled with 'I accept this license' below each license text to do so.");
+							
+							var msg;
+							<tml:case condition="pluginSet.hasInvalidPlugins()">
+								msg = "Are you sure to commit all pending changes?\n\nNOTE: There will be invalid plugins in the committed plugin configuration!";
+							</tml:case>
+						
+							if (!msg || confirm(msg)) {
+								WGA.ajax.callAction('<tml:action ref="::installWorkspace"/>', '<tml:script expression="portlet.portletkey"/>')
+							}
+							
+						}
+					</script>
+				
+					<button onclick="performChanges()">Perform changes</button>
+					<tml:button clickaction="::clearWorkspace" ajax="true">Clear pending changes</tml:button>
+				</div>
+				
+			</tml:case>
+	
+		</tml:inline>
+	</tml:include>
+</tml:case>

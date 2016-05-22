@@ -1,0 +1,81 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	if(portlet.getSessionVar("filter")){
+		_servers = createlist();
+		var current = wgacore.getDatabaseServers().get(portlet.getSessionVar("filter"));
+		if(current)
+			_servers.add(current)
+		else _servers = DBM.dbservers.get(option("domain"), option("dbtype"));
+	}
+	else _servers = DBM.dbservers.get(option("domain"), option("dbtype"));
+
+</tml:script>
+
+<tml:foreach type="itemvalue" item="_servers" currentvalue="_server">
+
+	<fieldset id="group-<tml:script expression="_server.uid"/>">
+		<legend>
+			<tml:label key="{'databases.'+(option('dbtype')||'all')}"/> on
+			<tml:if condition="portlet.getSessionVar('filter')">
+				<tml:then>
+					<tml:script expression="_server.getTitle(DBM.locale)"/>
+				</tml:then>
+				<tml:else>
+					 <a href="<tml:url type="action" action="::setFilter" param1="{_server.uid}" ajax="true"/>">
+						<tml:script expression="_server.getTitle(DBM.locale)"/>
+					</a>
+				 </tml:else>
+			</tml:if>
+		</legend>
+
+		<div id="buttons-<tml:script expression="_server.uid"/>" class="legend-menu"></div>			
+		<tml:include ref="::menu-create-database" 
+				o_showServerConfig="true"
+				o_dbserver="{_server.uid}" 
+				o_group-id="{'group-'+_server.uid}" 
+				o_button-id="{'buttons-'+_server.uid}"/>
+		
+		<tml:script>
+			_dbs = DBM.wgaconfig.getDatabases(_server.uid, null, option("dbtype"))
+		</tml:script>
+
+		<tml:if condition="_dbs.isEmpty()">
+			<tml:then>
+				<div style="padding-left:5px">- none -</div>
+			</tml:then>
+			
+			<tml:else>
+				<tml:foreach type="itemvalue" item="_dbs" currentvalue="_db">
+					<tml:portlet name="{'portlet-database-'+_db.uid}" ref="::portlet-database" o_uid="{_db.uid}" ajax="true" o_server="{_server.uid}" o_dd="false"/>
+				</tml:foreach>
+			</tml:else>
+		</tml:if>
+		
+	</fieldset>
+		
+</tml:foreach>
+
+		

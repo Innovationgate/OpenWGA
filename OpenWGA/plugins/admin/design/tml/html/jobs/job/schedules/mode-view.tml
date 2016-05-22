@@ -1,0 +1,91 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="selectSchedule">
+	portlet.setSessionVar("key", tmlparam1);
+	portlet.save();
+	portlet.setMode("edit");
+</tml:action>
+
+<tml:action id="createSchedule">
+	var jobuid = tmlparam1;
+	var schedule = new Packages.de.innovationgate.wga.config.Schedule;
+	schedule.enabled=true;
+	DBM.wgaconfig.clone();
+	DBM.wgaconfig.getByUid(jobuid).schedules.add(schedule)
+	portlet.setSessionVar("key", schedule.uid);
+	portlet.save();
+	portlet.setMode("new");
+</tml:action>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Schedules</tml:option>	
+	<tml:option name="config" scope="local">
+		tbar: [
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+				text: "new Schedule",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action ref="createSchedule" param1="{_job.uid}"/>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+		
+		<table width="100%" class="collection">
+			<tr class="collection-title">
+				<td>Schedule</td>
+				<td>Startdate</td>
+				<td>Enddate</td>
+				<td></td>
+			</tr>
+
+			<tml:script>				
+				_schedules = _job.config.schedules;
+			</tml:script>
+
+			
+			<tml:foreach type="itemvalue" item="_schedules" currentvalue="_schedule">
+				<tml:include designdb="@ui" ref="tr">
+					<tml:option name="class" expression="_schedule.enabled?'':'disabled'"/>
+					<tml:option name="ajaxaction" trim="true">
+						WGA.ajax.callAction('<tml:action ref="selectSchedule" param1="{_schedule.uid}"/>', '<tml:script expression="portlet.portletkey"/>')
+					</tml:option>
+				</tml:include>									
+					<td><tml:script expression="createObject('cron').createDescription(_schedule.data, _schedule.type)"/></td>
+					<td><tml:script expression="_schedule.startDate || '- none -'"/></td>
+					<td><tml:script expression="_schedule.endDate || '- none -'"/></td>
+					<td align="right">
+						<tml:case condition="!_schedule.enabled">disabled</tml:case>
+					</td>
+				</tr>
+			</tml:foreach>
+			
+		</table>
+		
+	</tml:inline>
+</tml:include>

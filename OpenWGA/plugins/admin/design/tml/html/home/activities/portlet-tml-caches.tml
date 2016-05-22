@@ -1,0 +1,59 @@
+<tml:action id="clear_cachelocks">
+	Packages.de.innovationgate.wgpublisher.webtml.Range.clearCacheLocks();
+	log.info("cache lockes cleared.");	
+</tml:action>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Evaluated WebTML Caches</tml:option>	
+	<tml:option name="config" scope="local">
+		tools: [
+			{
+				id: "refresh",
+				qtip: "refresh",
+				handler: function(){
+					WGA.ajax.callAction('<tml:action ref="$refresh"/>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+		],
+		tbar: [
+			{
+				text: "Clear all locks",
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="lock_open.png"/>',
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>_query_clear_cachelocks=true</tml:action>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+
+		<tml:case isdefined="_query_clear_cachelocks">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Are you sure to clear all cache locks?</tml:option>
+				<div>
+					<tml:button clickaction="clear_cachelocks" ajax="true"><tml:label key="yes-please"/></tml:button>
+				</div>
+			</tml:include>			
+		</tml:case>
+	
+		<table width="100%" class="collection">	
+			<tr class="collection-title">
+				<td>Range ID / Cache key</td>
+				<td>Evaluating since</td>
+			</tr>
+			
+			<tml:script>
+				//var caches = Range.getCurrentlyEvaluatedCaches()
+				_caches = Packages.de.innovationgate.wgpublisher.webtml.Range.getCurrentlyEvaluatedCaches().entrySet();
+			</tml:script>
+			<tml:foreach type="itemvalue" item="_caches" currentvalue="_cacheEntry">
+				<tr class="List">
+					<td><tml:script expression="_cacheEntry.getKey()"/></td>
+					<td><tml:script expression="WGA.createDate(_cacheEntry.getValue().longValue())"/></td>
+				</tr>
+			</tml:foreach>
+		</table>
+	</tml:inline>
+	
+</tml:include>

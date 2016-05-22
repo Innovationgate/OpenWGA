@@ -1,0 +1,46 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="resetWizard">
+	var cfg = wgacore.getWgaConfiguration().clone();
+	cfg.setRunWizard(true);
+	WGA.server().updateConfig(cfg);
+	portlet.getportletforname("wizard-forms").setmode("view");
+</tml:action>
+
+<div id="wizard">
+	<h1 class="title">OpenWGA Initial Configuration Wizard</h1>
+	<fieldset>
+		<div class="info">
+			<h1>Configuration wizard already processed</h1>
+			The configuration wizard was already processed for this OpenWGA installation.
+			<br><br>
+			Running it again will change existing configurations and maybe destroy important configuration data. Are you sure you want to do this?
+			<br><br>
+			<tml:button clickaction="resetWizard">Yes, run configuration wizard again!</tml:button>
+		</div>
+	</fieldset>
+</div>
+<div id="progressbar" style="visibility: hidden"></div>
