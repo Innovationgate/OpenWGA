@@ -14,21 +14,20 @@ var TAIL = function(){
 			for(var i=0; i<data.messages.length; i++){
 				var msg = data.messages[i];
 				var info;
-				if(msg.details)
-					info = '<div class="text">' 
+				if(msg.details){
+					info = '<div class="text">'
 						+ '<a onclick="TAIL.showDetails(this)">'+msg.msg+'</a>'
 						+ msg.details.split("\n")[0]
 						+ '</div>'
+						var details = msg.details.split("\n");
+						info += '<div class="details" style="display:none">'+details.join('<br>')+'</div>'
+				}
 				else info = '<div class="text">'+msg.msg+'</div>'
 				messages.push('<div class="clearfix message ' + msg.level.toLowerCase() + '"><div class="time">'+msg.time+'</div>'
 					+ '<div class="level">'+msg.level+'</div>'
 					+ info + '</div>');
-				if(msg.details){
-					var details = msg.details.split("\n");
-					messages.push('<div style="display:none">'+details.join('<br>')+'</div>')
-				}
 			}
-			
+
 			$("#msg").append(messages.join(""));
 			if(autoscroll){
 
@@ -42,20 +41,20 @@ var TAIL = function(){
 			}
 		})
 	}
-	
+
 	$(function(){
-	
+
 		$("#toolbar [data-action='play-pause']").click(function(){
 			running ? pause() : play();
 		})
-	
+
 		$("#msg").scroll(function(){
 			if(!running)
 				return;
 			var height = $("#msg").height();
 			var scrollHeight = $("#msg")[0].scrollHeight
 			var scrollTop = $("#msg")[0].scrollTop
-			
+
 			if(scrollHeight != height+scrollTop){
 				autoscroll=false
 				$("#toolbar .hint").html("autoscroll stopped");
@@ -65,8 +64,8 @@ var TAIL = function(){
 				autoscroll=true
 			}
 		})
-		
-		
+
+
 	})
 
 	function play(){
@@ -80,7 +79,7 @@ var TAIL = function(){
 			.removeClass("glyphicon-play")
 			.addClass("glyphicon-pause")
 	}
-	
+
 	function pause(){
 		running=false;
 		if(timer){
@@ -102,18 +101,18 @@ var TAIL = function(){
 	return {
 
 		showDetails: function(el){
-			var details = $(el).parents(".message").next().html();
+			var details = $(el).parents(".message").find(".details").html();
 			$("#details .content").html(details);
 			$.wga_modal.show("#details")
 		},
 
-		scrollToBottom: scrollToBottom, 
+		scrollToBottom: scrollToBottom,
 
 		start: function(jsonurl){
 			url = jsonurl
 			play();
 		}
-		
+
 	}
-	
+
 }()
