@@ -86,8 +86,6 @@ dependencies {
     gretty 'org.glassfish.main.transaction:javax.transaction:3.1.2.2'
     gretty testProject.fileTree(dir: 'tomcat/lib', include: ['*.jar'])
 
-	compile project(":plugin-cm")
-
 }
 
 test {
