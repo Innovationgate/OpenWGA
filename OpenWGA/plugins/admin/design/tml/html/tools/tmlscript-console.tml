@@ -23,11 +23,11 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 <tml:action id="execute">
-	if (this.tmlform.type == 's') {
-		this.scriptToRun = this.tmlform.script;
+	if (tmlform.type == 's') {
+		scriptToRun = tmlform.script;
 	}
 	else {
-		this.exprToRun = this.tmlform.script;
+		exprToRun = tmlform.script;
 	}
 	
 	_scrcontext = tmlform.db ? "db:"+ tmlform.db : "this"
