@@ -1,0 +1,215 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+
+	// helper function:
+	function findDesignNode(database, type){
+		var nodes = database.getChildNodes().iterator();
+		while(nodes.hasNext()){
+			var node = nodes.next();
+			if(node.getNodeKey()==type)
+				return node;
+		}
+		return null;		
+	}
+
+	var node=request.getParameter("node")
+	//log.info("get-nodes " + node);
+
+	_nodes = createlist();	// default: empty list
+	
+
+	// deserialise url parameter
+	
+	var dbkey=AFW.Util.deserializeJsObject(request.getParameter("so")).dbkey;
+	if(!dbkey){
+		log.info("No dbkey specified");
+	}
+	else{
+		_database = db(dbkey);
+		if(_database.isSessionOpen()){
+
+			var parent;
+			var a = node.split(":")
+			if(a[0]=="root"){
+				parent = _database;
+			}
+			else{					
+				try{
+					if(a[1])
+						parent=_database.getDocumentByDocumentKey(node.replace(/:/g, "/"))
+					else parent=findDesignNode(_database, a[0]);
+				}
+				catch(e){}				
+			}
+			if(parent)
+				_nodes = parent.getChildNodes()
+		}
+		else log.info("database session is not open");
+	}
+	//log.info("get-nodes " + node + "=>" + _nodes);
+</tml:script>
+
+[
+	<tml:foreach type="itemvalue" item="_nodes" currentvalue="_node">
+		<tml:script>
+			var nodekey = _node.getNodeKey().split('/');
+			if(nodekey[1])
+				_type=nodekey[0]
+			else _type="designs";
+			//log.info("nodekey="+nodekey);
+		</tml:script>
+		{
+			text: "<tml:script expression="AFW.Util.encodeForScript(_node.getNodeTitle('')||'- read protected -')"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="{label('tree-icon.'+_type)}"/>",
+			cls: "<tml:script>
+				if(_type=="area" && _node.systemArea)
+					return "system-node"
+				return "";
+			</tml:script>",
+  			id: "<tml:script expression="_node.getNodeKey().replace(/\//, ':')"/>",
+			leaf: <tml:script expression="_node.getChildNodes()==null || _node.getChildNodes().isEmpty()"/>
+			<tml:select>
+				<tml:case condition="_node.getNodeKey()=='tml'">
+					, children: [
+					<tml:script>
+						
+						var root={
+							dirs: {},
+							files: []
+						};
+						var it=_database.getTMLModules().iterator();
+						while(it.hasNext()){
+							var tml = it.next();
+							var medium = tml.getMediaKey();
+							var n = tml.getName();
+							var a = n.split(":");
+							var node=root;
+							
+							// handle medium as first dir:
+							if(!node.dirs[medium]){
+								node.dirs[medium]={dirs:{}, files:[], id:medium};		// create new dir
+							}
+							node = node.dirs[medium];
+							
+							for(var i=0; i<a.length-1; i++){
+								var dir = a[i];
+								if(!node.dirs[dir]){
+									node.dirs[dir]={dirs:{}, files:[], id:node.id+"."+dir};		// create new dir
+								}
+								node = node.dirs[dir];
+							}
+							var tmlname=a[i];	// + ".tml";
+							node.files.push({name:tmlname,id:n, medium:medium});
+						}
+						var ret=outputDirs(root, "../../plugin-wga-app-framework/file/icons/monitor.png");
+						//log.info(ret);
+						return ret;
+						
+						function outputDirs(node, icon){
+							var ret = "";
+							for(d in node.dirs){
+								var dir = node.dirs[d];
+								if(ret!="")
+									ret += ",";
+								var ic = icon ? "icon:'"+icon+"'," : "icon:'../../plugin-wga-app-framework/file/icons/folder.png',";
+								ret += "{ text:'" + d + "',id:'tmlfolder."+dir.id+"'," + ic + "children:[" + outputDirs(dir) + "], leaf:false}"
+								
+							}
+							for(d in node.files){
+								var file = node.files[d];
+								if(ret!="")
+									ret += ",";
+								ret += "{ text:'" + file.name + "', id:'tml:" + file.medium + ":" + file.id + "',icon: '../../plugin-wga-app-framework/file/icons/page_white.png', leaf:true}"
+							}
+							return ret;
+						}
+					</tml:script>
+					]
+				</tml:case>
+				
+				<tml:case condition="_node.getNodeKey()=='cssjs'">
+					, children: [
+					<tml:script>
+						var root={
+							dirs: {},
+							files: []
+						};
+						var it=_database.getCSSJSModules().iterator();
+						while(it.hasNext()){
+							var module = it.next();
+							var type = module.getCodeType();
+							var n = module.getName();
+							var node=root;
+							
+							// handle type as first dir:
+							if(!node.dirs[type]){
+								node.dirs[type]={dirs:{}, files:[], id:type};		// create new dir
+							}
+							node = node.dirs[type];				
+
+							var a = n.split(":");
+							for(var i=0; i<a.length-1; i++){
+								var dir = a[i];
+								if(!node.dirs[dir]){
+									node.dirs[dir]={dirs:{}, files:[], id:node.id+"."+dir};		// create new dir
+								}
+								node = node.dirs[dir];
+							}
+							var scriptname=a[i];
+							node.files.push({name:scriptname, id:type+":"+n});
+						}
+						//var ret=outputDirs(root);
+						var ret=outputDirs(root, "../../plugin-wga-app-framework/file/icons/script.png");
+						return ret;
+						
+						
+						function outputDirs(node, icon){
+							var ret = "";
+							for(d in node.dirs){
+								var dir = node.dirs[d];
+								if(ret!="")
+									ret += ",";
+								var ic = icon ? "icon:'"+icon+"'," : "icon:'../../plugin-wga-app-framework/file/icons/folder.png',";
+								ret += "{ text:'" + d + "',id:'scriptfolder."+dir.id+"'," + ic + "children:[" + outputDirs(dir) + "]}"
+								
+							}
+							for(d in node.files){
+								var file = node.files[d];
+								if(ret!="")
+									ret += ",";
+								ret += "{ text:'" + file.name + "', id:'cssjs:" + file.id + "',icon: '../../plugin-wga-app-framework/file/icons/page_white.png', leaf:true}"
+							}
+							return ret;
+						}
+					</tml:script>
+					]
+				</tml:case>
+				
+			</tml:select>			
+		}
+		<tml:between>,</tml:between>
+	</tml:foreach>
+]

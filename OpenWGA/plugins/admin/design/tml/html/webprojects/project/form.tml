@@ -1,0 +1,84 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_tabs = WGA.createList(["Basic Settings|basics", "Fulltext Configuration|lucene"])
+	if(DBM.isExpertMode())
+		_tabs.addAll(WGA.createList(["Client Restrictions|client-restriction", "Fieldmappings|fieldmappings"]))
+	if(portlet.getMode()=='view'){
+		if(option('aclManageable')=='true')
+			_tabs.add("ACL|acl|alt-tab")
+		if(option('problems')=='true')
+			_tabs.add("Problems|problems|severity-" + option("severity"))
+		if(DBM.wgaconfig.get().clusterConfiguration.enabled)
+			_tabs.add("Cluster|cluster")
+	}
+</tml:script>
+
+<tml:include designdb="@ui" ref="tabview_js">
+	<tml:option name="tabnames" trim="true"><tml:item name="_tabs" divider=","/></tml:option>
+	
+	<tml:inline name="body">
+
+		<div class="tab-body-topline">	
+			<div class="x-hidden" id="basics">
+				<tml:include designdb="@ui" ref="windowview">				
+					<tml:option name="title">Basic Configuration</tml:option>					
+					<tml:option name="body">				
+						<fieldset>		
+							<tml:include ref="::form-basics"/>		
+						</fieldset>		
+						<fieldset>		
+							<legend>Contentstore Configuration</legend>
+							<tml:include ref="::menu-contentstore-configuration"/>
+							<tml:portlet name="repository-config" ref="::form-db:portlet" ajax="true"/>		
+						</fieldset>		
+						<fieldset>		
+							<legend>Design Configuration</legend>
+							<tml:include ref="::menu-design-configuration"/>		
+							<tml:portlet name="design-config" ref="::form-design:portlet" ajax="true"/>	
+						</fieldset>		
+						<fieldset>		
+							<legend>Publishing Settings</legend>		
+							<tml:portlet name="publusher-config" ref="::form-p-options:portlet" ajax="true"/>
+						</fieldset>				
+					</tml:option>				
+				</tml:include>				
+
+			</div>
+			<div class="x-hidden" id="lucene">
+				<tml:portlet name="lucene-config" ref="::lucene:portlet" ajax="true"/>
+			</div>
+			<div class="x-hidden" id="client-restriction">
+				<tml:portlet name="client-restr-config" ref="::client-restrictions:portlet" ajax="true"/>
+			</div>
+			<div class="x-hidden" id="fieldmappings">
+				<tml:portlet name="fieldmappings" ref="::fieldmappings:portlet" ajax="true"/>
+			</div>
+		</div>
+		
+	</tml:inline>
+	
+</tml:include>

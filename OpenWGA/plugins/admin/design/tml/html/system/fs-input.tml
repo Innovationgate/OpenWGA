@@ -1,0 +1,107 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_default="";
+	_mode=option("mode")||"edit";
+	_type=option("type")||"text";
+		
+	_fieldname = (option("ns")||"") + "/" + option('field');
+	
+	try{
+		_default = xpath(_config_bean, _fieldname)
+		if(option("format"))
+			_default = format(_default, option("format"))
+		if(_default==null)
+			_default=option("default");
+	}
+	catch(e){
+		log.info("can't get value for " + _fieldname);
+		logException(e);
+	}
+	_bean_type = _config_bean.getClass().getName().split(".").pop();
+	
+	_options = option("options")||"";
+	
+	/*
+	if(_type=="boolean" && tmlform.mode()=="view"){
+		_options="Enabled|true,Disabled|false"
+	}
+	*/
+</tml:script>
+
+<tml:range labelfile="wgaconfig">
+	
+	<label for="<tml:item name="_fieldname"/>">
+		<tml:label key="{_bean_type+_fieldname+(option('label')||'')}"/>:
+	</label>
+	<div class="data">
+		<table cellspacing="0" cellpadding="0"><tr>
+			<td width="360" nowrap style="padding:0">
+				<tml:case condition="tmlform.getMode()!='edit' && option('switchto')">
+					<a href="#" onclick="switchToObject('<tml:option name="switchto"/>', '<tml:item name="_default"/>')"> 
+				</tml:case>
+				
+				<span style="visibility:<tml:script expression="_mode=='view'||tmlform.mode()=='view'?'visible':'hidden'"/>"><tml:input cssclass="{'type-'+_type}" name="{_fieldname}" 
+					type="{_type}"
+					validation="{option('validation')||true}"
+					message="{option('message')||''}" 
+					options="{_options}" 
+					format="{option('format')}"
+					encode="{option('encode')||'html'}"
+					default="{_default}"
+					mode="{_mode}"
+					divider=" "
+				/></span>
+				
+				<tml:case condition="tmlform.getMode()!='edit' && option('switchto')">
+					</a>
+				</tml:case>
+			</td>			
+			<td valign="middle">
+				<tml:case condition="hasLabel(_bean_type+_fieldname+'.help')">
+					<img src="<tml:url type="file" db="@afw" doc="icons" file="help.png"/>" style="cursor:pointer"
+						Ext:qtip = "show/hide field help"
+						onclick="DBM.showHideElement('<tml:script expression="_fieldname+'help'"/>')">
+				</tml:case>
+			</td>
+		</tr></table>
+		
+		<tml:case condition="hasLabel(_bean_type+_fieldname+'.help')">
+			<tml:include ref="system:field-help" o_fieldname="{_fieldname}">
+				<tml:option name="title">
+					<tml:label key="{_bean_type+_fieldname}"/>
+				</tml:option>
+				<tml:inline name="body">
+					<tml:label key="{_bean_type+_fieldname+'.help'}"/>
+				</tml:inline>
+			</tml:include>
+		</tml:case>
+			
+	</div>
+	<div class="clear"></div>
+	
+	<tml:include ref="::convert-to-ext-field" o_fieldname="{_fieldname}" o_type="{option('renderAs')||_type}"/>
+
+</tml:range>

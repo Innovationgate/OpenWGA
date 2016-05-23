@@ -1,0 +1,127 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_patcheableDbs = WGA.createList();
+	_lowestPatch = Packages.de.innovationgate.csmaintenance.CS5Patcher.CS5_PATCH_LEVEL;
+	for (var theDb in Iterator(WGA.Core.getContentdbs().values())) {
+		if (theDb.getContentStoreVersion() >= 5) {
+			if (theDb.hasFeature(theDb.FEATURE_UNPATCHEABLE)) {
+				continue;
+			}
+			theDb.openSession();
+			var backendPatchlevel = theDb.getExtensionData(theDb.EXTDATA_PATCH_LEVEL);
+			if (backendPatchlevel == null || backendPatchlevel < Packages.de.innovationgate.csmaintenance.CS5Patcher.CS5_PATCH_LEVEL) {
+				_patcheableDbs.add(theDb);
+				if (backendPatchlevel < _lowestPatch) {
+					_lowestPatch = backendPatchlevel;  
+				}
+			}
+		}
+	}
+	
+	var _patcher = new Packages.de.innovationgate.csmaintenance.CS5Patcher(WGA.Core, log);
+	_patchesToApply = WGA.createList();
+	for (var idx=_lowestPatch+1; idx <= _patcher.CS5_PATCH_LEVEL; idx++) {
+		if (idx > _currentPatchLevel) {
+			_patchesToApply.add(_patcher.getPatch(idx));
+		}
+	}
+</tml:script>
+
+<tml:if condition="_patcheableDbs.size() > 0">
+	<tml:then>
+		<div style="margin-bottom: 10px;">
+			There are upgrade patches available for your content stores. Patches will modify the storage format of those content stores to enable new features and provide optimizations.
+			<div id="upgradeable_dbs_trigger">
+				<a href="javascript:$('#upgradeable_dbs_trigger').hide();$('#upgradeable_dbs').fadeIn(); void(0)">Click here to see the content stores that are patcheable.</a>
+			</div>
+			<div id="upgradeable_dbs" style="display:none">
+				<hr>
+				Patcheable content stores (by database key):
+				<ul> 
+					<tml:foreach item="_patcheableDbs" currentvalue="_db">
+						<li><tml:item name="_db" xpath="dbReference"/>
+					</tml:foreach>
+				</ul>
+				<a href="javascript:$('#upgradeable_dbs').fadeOut(300, function() {$('#upgradeable_dbs_trigger').show()}); void(0)">Click here to hide the database list again.</a>
+				<hr>
+			</div>
+		</div>
+		
+		<div style="margin-bottom: 10px;">
+			The following upgrade patches can be applied:
+			<ul>
+				<tml:foreach item="_patchesToApply" currentvalue="_patch">
+					<li>Patch level <tml:item name="_patch" xpath="level"/> introduced in OpenWGA version <tml:script expression="_patch.getWGAIntroductionVersion().getFeatureVersionString()"/>: <tml:item name="_patch" xpath="description"/> 
+				</tml:foreach>
+			</ul>
+		</div>
+		
+		<div style="color:red; margin-bottom: 10px; font-weight:bold">
+			IMPORTANT: CONSULT THE OPENWGA UPGRADE GUIDE OF THE VERSION THAT INTRODUCED A PATCH LEVEL TO KNOW PREREQUISITES AND IMPLICATIONS OF CONTENT STORE UPGRADES! 
+		</div>
+		
+		<div style="margin-bottom: 10px;">
+			
+			<div style="margin-bottom: 10px;">
+				<fieldset>
+					<legend>Upgrade settings</legend>
+					<tml:form id="patchForm" source="none">
+					
+						<label>What content stores to upgrade</label>
+						<div class="data">
+							<tml:input name="dbselection" type="radio" options="all,plugins" optionstitle="label('patchform.dbselection.' + $O_VALUE)" default="all"/><br>
+							<span class="note">OpenWGA will automatically skip databases whose format is already up-to-date.</span>
+						</div>
+						<div class="clear"></div>
+						
+						<tml:case condition="_lowestPatch < 4">
+							<label>Optional operations:</label>
+							<div class="data">
+								<tml:input name="upgradefiles" type="boolean" defaultexpression="true" options="Directly upgrade file storage after patching|true"/><br>
+								<span class="note">This converts all attached content files into the new "distinct file contents" format and may take a long time. You can also do this later from each web app configurations "database" menu.</span>  
+							</div>
+							<div class="clear"></div>
+						</tml:case>
+						
+						<div class="data">
+							<tml:button clickaction="::executePatch" portletmode="patch" confirm="This will upgrade the storage format on the selected content stores. Are you sure?">
+								<b>Start upgrade</b>
+							</tml:button>
+						</div>
+						<div class="clear"></div>
+					</tml:form>
+				</fieldset>
+			</div>
+			
+		</div>
+	</tml:then>
+	<tml:else>
+		<div style="margin-bottom: 10px;">
+			The storage format of all content stores is already up-to-date. If you still see the button "Upgrade content stores" this may be because of administrative applications that are not reconnected on the patch process. They will be connected with the current patch level on the next server restart.  
+		</div>
+	</tml:else>
+</tml:if>

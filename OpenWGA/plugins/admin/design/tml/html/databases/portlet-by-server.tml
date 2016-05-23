@@ -1,0 +1,137 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="setViewMode">
+	profile.viewmode=tmlparam1;
+	profile.save();
+</tml:action>
+
+<tml:script>
+
+	// look for default selection in var _uid
+	if(_app && _app.substr(0,11)=="databases"){
+		if(_uid=="$create"){
+			var action = _uid.split(":")[1];
+			callAction("::newDatabase", _where, _implClass);
+			if(_where!=portlet.filter){
+				portlet.filter="";
+				portlet.save();
+			}
+		}
+		else if(_uid){
+			var cs = DBM.wgaconfig.getByUid(_uid);
+			if(cs){
+				callAction("::selectDatabase", _uid, cs.key, _where);
+				if(cs.dbServer!=portlet.filter){
+					portlet.filter="";
+					portlet.save();
+				}
+			}
+			else log.info("cs not found: " + _uid);
+		}
+	}
+	
+	DBM.tabview.cleanup();
+	
+</tml:script>
+
+<tml:include designdb="@ui" ref="tabview_dynamic">
+
+	<tml:option name="title" scope="local">All Data Sources</tml:option>	
+	
+	<tml:option name="body" scope="local">			
+		<tml:case condition="portlet.getSessionVar('currentpage')<=0">
+			<tml:include designdb="@ui" ref="windowview">
+
+				<tml:option name="config" scope="local">
+					tbar: [
+						{
+			        		icon: '<tml:url db="@afw" type="file" doc="icons" file="application_view_list.png"/>',
+			        		cls:'x-btn-text-icon',
+			        		text: '<tml:label key="listview"/>',
+			        		pressed: <tml:script expression="profile.viewmode=='list'"/>,			        		
+			        		tooltip: '<tml:label key="listview"/>',
+							handler: function(){
+								WGA.ajax.callAction("<tml:action ref="setViewMode" param1="list"/>","<tml:script expression="portlet.portletkey"/>");
+							}
+						}
+						,{
+			        		icon: '<tml:url db="@afw" type="file" doc="icons" file="application_view_icons.png"/>',
+			        		cls:'x-btn-text-icon',
+			        		text: '<tml:label key="iconview"/>',
+			        		pressed: <tml:script expression="profile.viewmode=='icon'"/>,
+							tooltip: '<tml:label key="iconview"/>',
+							handler: function(){
+								WGA.ajax.callAction("<tml:action ref="setViewMode" param1="icon"/>","<tml:script expression="portlet.portletkey"/>");
+							}
+						}
+					]
+				</tml:option>
+			
+				<tml:option name="title" scope="local">
+					Show Datasources on
+					<tml:form id="filter-server" source="portletsessionvars" cssstyle="display:inline">
+						<tml:script>
+							_opts = createlist();
+							_opts.add("all Servers|");
+							var servers = DBM.dbservers.get(null, "ContentDatabase").iterator();
+							while(servers.hasNext()){
+								var server = servers.next();
+								_opts.add(server.getTitle(DBM.locale) + "|" + server.uid);
+							}
+						</tml:script>
+						<tml:input name="filter" type="select" optionsitem="_opts" changeaction="$store" ajax="true"/>
+					</tml:form>
+				</tml:option>
+
+				<tml:option name="body" scope="local">				
+					<tml:select switch="profile.viewmode">
+						<tml:case value="list">
+							<tml:include ref="webprojects:projects-by-dbserver-listview" o_dbtype="ContentDatabase"/>
+						</tml:case>
+						<tml:caseelse>
+							<tml:include ref="webprojects:projects-by-dbserver-iconview" o_dbtype="ContentDatabase"/>
+						</tml:caseelse>
+					</tml:select>
+				</tml:option>
+				
+			</tml:include>
+		</tml:case>
+	</tml:option>
+	
+	<tml:option name="pageaddon" scope="local">
+		<span id="pageaddon">
+			<a href="#" onclick="WGA.ajax.callAction('<tml:action ref="::newDatabase"/>', '<tml:script>return portlet.portletkey</tml:script>')">
+				<tml:img db="@afw" doc="icons" file="database_add.png">
+					border="0"
+					alt="New Data Source"
+					title="New Data Source"
+				</tml:img>	
+				New Data Source
+			</a>
+		</span>		
+	</tml:option>
+	
+</tml:include>
+

@@ -1,0 +1,324 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+
+	var dbkey = option("dbkey") || AFW.Util.deserializeJsObject(request.getParameter("so")).dbkey;
+	_wgadb = db(dbkey);
+	
+	if(_wgadb){
+		if(!_wgadb.isSessionOpen()) {
+			_wgadb.openSession();   
+		}
+
+		_info={
+			lastChanged : (_wgadb.hasFeature(_wgadb.FEATURE_LASTCHANGED) && _wgadb.getLastChanged() != null ? _wgadb.getLastChanged() : "(Not supported)"),
+			isCs: _wgadb.hasFeature(_wgadb.FEATURE_FULLCONTENTFEATURES),
+			title : _wgadb.getTitle(),
+			uuid : _wgadb.getUUID(),
+			server : _wgadb.getServerName(),
+			masterLoginName : _wgadb.getMasterLoginName(),
+			defaultLanguage : _wgadb.getDefaultLanguage() || "- none -",
+			
+			monitorLastChange : _wgadb.monitorLastChange(),
+			maxCores : _wgadb.getMaxCores(),
+			exceedingSessions : _wgadb.getSessionStatistics().size(),
+			
+			statistics : _wgadb.getStatistics(),
+			fileCache : _wgadb.getAttribute(wgacore.DBATTRIB_FILECACHE),
+			cache : _wgadb.getAttribute(wgacore.DBATTRIB_CACHE)
+		}
+		
+		try{
+			_info.ddl_patch_level = _wgadb.getExtensionData("DDLPatchLevel")
+		}
+		catch(e){}
+		
+		_info.exceedingSessionStr = (_info.exceedingSessions >= 100 ? "100 or more" : _info.exceedingSessions);
+
+		_info.designSource = "internal";
+		_dprov = _wgadb.getDesignProvider();
+		if (_dprov != null) {
+		    _info.designSource = _dprov.getName(); 
+		    if (_dprov instanceof Packages.de.innovationgate.wgpublisher.design.OverlayDesignProvider) {
+		    	_info.overlay = _dprov.getOverlay().getName();
+		    	_info.overlayBaseVersion = _dprov.getStatus().getCompliantBaseVersion();
+		    }
+		}
+		else {
+			var syncManager = _wgadb.getAttribute(wgacore.DBATTRIB_DESIGNSYNC);
+			if (syncManager != null) {
+			    _info.designSource = "Full Design synchronisation with folder \"" + syncManager.getDesignPath() + "\"";
+			}
+		}
+		
+		
+		_info.authSource = (_wgadb.getAuthenticationModule() != null ? _wgadb.getAuthenticationModule().getAuthenticationSource() : _wgadb.hasFeature(_wgadb.FEATURE_EXTERNAL_AUTHENTICATION) ? "none" : "internal");
+		_info.dbDomain = (_wgadb.getAttribute(wgacore.DBATTRIB_DOMAIN) == null ? "(none)" : _wgadb.getAttribute(wgacore.DBATTRIB_DOMAIN));
+		
+		_info.languageBehaviour = _wgadb.getAttribute(wgacore.DBATTRIB_LANGUAGEBEHAVIOUR);
+		if (_info.languageBehaviour == null) {
+		    _info.languageBehaviour = wgacore.LANGUAGEBEHAVIOUR_DEFAULT;
+		}
+		
+		var isMultiLanguageContent = _wgadb.getBooleanAttribute(wgacore.DBATTRIB_MULTILANGUAGE_CONTENT, true);
+		_info.multiLanguageContent = (isMultiLanguageContent ? "enabled" : "disabled");
+
+	    _info.designBehaviour = _wgadb.getComplianceVersion().getFeatureVersionString();
+		
+		_info.homePage = "(not set)";
+		var hpAttribute = _wgadb.getAttribute(wgacore.DBATTRIB_HOME_PAGE);
+		if (hpAttribute) {
+		    _info.homePage = hpAttribute;
+		}
+
+		_info.loginPage = "(not set)";
+		var lpAttribute = _wgadb.getAttribute(wgacore.DBATTRIB_LOGIN_PAGE);
+		if (lpAttribute) {
+		    _info.loginPage = lpAttribute;
+		}
+		
+		_info.projectMode = (_wgadb.isProjectMode() ? "enabled" : "disabled");
+		_info.csVersion = _wgadb.getContentStoreVersion();
+		_info.hdbModel = WGA.design(_wgadb).HDBModel;
+		
+		 try{
+		 	var contentKeys = _wgadb.getAllContentKeys(true);
+			_count={
+				contents: contentKeys.size(),
+			}
+		}
+		catch(e){}
+
+	}	
+
+</tml:script>
+
+<fieldset>
+
+	<tml:case condition="!isEmptyValue(_info.uuid)">
+		<label>UUID:</label>
+		<div class="data"><tml:script expression="_info.uuid"/></div>
+		<div class="clear"></div>		
+	</tml:case>
+
+	<label>Database Server:</label>
+	<div class="data"><tml:script expression="_info.server"/></div>
+	<div class="clear"></div>
+	
+	<label>Content Store Version:</label>
+	<div class="data">
+		<tml:script expression="_info.csVersion.toString().replace(/,/g, '.')"/>
+		<tml:case condition="_info.ddl_patch_level">
+			(Patch Level <tml:script expression="_info.ddl_patch_level"/>)
+		</tml:case>
+	</div>
+	<div class="clear"></div>
+		
+	<label>Last Updated:</label>
+	<div class="data"><tml:script expression="_info.lastChanged + ' (' + (_info.monitorLastChange ? 'monitored' : 'not monitored') + ')'"/></div>
+	<div class="clear"></div>
+	
+	<tml:case condition="_count">
+		<label>Content Documents:</label>
+		<div class="data"><tml:script expression="_count.contents"/></div>
+		<div class="clear"></div>
+	</tml:case>
+	
+	<tml:case condition="_info.hdbModel">
+		<label>HDB Model Status:</label>
+		<div class="data"><tml:script expression="_info.hdbModel.isModelReinitRunning() ? 'Reinitializing database for updated model' : _info.hdbModel.isModelVersionChanged() ? 'Model was updated, database not yet reinitialized' : 'Up to date'"/></div>
+		<div class="clear"></div>
+	</tml:case>
+</fieldset>
+
+<fieldset>
+	<legend>Resources and Caches</legend>
+	
+	<label>Max docs per session:</label>
+	<div class="data"><tml:script expression="_info.maxCores"/></div>
+	<div class="clear"></div>
+	
+	<label>Sessions Exceeding max docs:</label>
+	<div class="data"><tml:script expression="_info.exceedingSessionStr"/></div>
+	<div class="clear"></div>
+	
+	<label>Document Cache Size:</label>
+	<div class="data"><tml:script expression="_info.statistics.getDocumentCount()"/> Documents (Max: <tml:script expression="_info.statistics.getDocumentCacheMaxSize()"/>, Utilisation: <tml:script expression="_info.statistics.getDocumentCacheUtilisation()"/>%)</div>
+	<div class="clear"></div>
+	
+	<tml:case condition="_info.fileCache">
+		<label>File Cache Size:</label>
+		<div class="data">
+			<tml:script expression="_info.fileCache.getActualSize()"/> Files
+			(Max: <tml:script expression="_info.fileCache.getMaxSize()"/>, Utilisation: <tml:script expression="_info.fileCache.getUtilisation()"/>%, Threshold: <tml:script expression="Math.floor(_info.fileCache.getThreshold() / 1014)"/> KB) 
+		</div>
+		<div class="clear"></div>
+		
+		<label>File Cache Threshold:</label>
+		<div class="data"><tml:script expression="_info.fileCache.getThreshold() / 1024"/> KB</div>
+		<div class="clear"></div>
+	</tml:case>
+	
+	<label>User cache latency:</label>
+	<div class="data"><tml:script expression="_wgadb.getUserCacheLatency()"/> Minutes</div>
+	<div class="clear"></div>
+	
+</fieldset>
+
+<tml:case condition="_info.isCs">
+	<fieldset>
+		<legend>Languages</legend>
+		
+		<label>Default Language:</label>
+		<div class="data"><tml:script expression="_info.defaultLanguage"/></div>
+		<div class="clear"></div>
+		
+		<label>Language Behaviour:</label>
+		<div class="data"><tml:script expression="_info.languageBehaviour"/></div>
+		<div class="clear"></div>
+		
+		<label>Multi Language Support:</label>
+		<div class="data"><tml:script expression="_info.multiLanguageContent"/></div>
+		<div class="clear"></div>
+		
+	</fieldset>
+	
+	<fieldset>
+		<legend>Configuration</legend>
+		
+		<label>Home Page:</label>
+		<div class="data"><tml:script expression="_info.homePage"/></div>
+		<div class="clear"></div>
+		
+		<label>Login Page:</label>
+		<div class="data"><tml:script expression="_info.loginPage"/></div>
+		<div class="clear"></div>
+		
+		<label>Project Mode:</label>
+		<div class="data"><tml:script expression="_info.projectMode"/></div>
+		<div class="clear"></div>
+		
+	</fieldset>
+</tml:case>
+
+<fieldset>
+	<legend>Authentication</legend>
+	
+	<label>Master Login:</label>
+	<div class="data"><tml:script expression="_info.masterLoginName"/></div>
+	<div class="clear"></div>
+	
+	<label>Domain:</label>
+	<div class="data"><tml:script expression="_info.dbDomain"/></div>
+	<div class="clear"></div>
+	
+	<label>Authentication Source:</label>
+	<div class="data"><tml:script expression="_info.authSource"/></div>
+	<div class="clear"></div>
+
+</fieldset>
+
+<fieldset>
+	<legend>Current User</legend>
+
+	<label>Username:</label>
+	<div class="data"><tml:script expression="WGA.domain(_info.dbDomain).auth().getLoginName() || 'anonymous'"/></div>
+	<div class="clear"></div>
+
+	<label>Usergroups:</label>
+	<div class="data"><tml:script divider="<br>">
+		var sessionContext=_wgadb.getSessionContext();
+		var userDetails = sessionContext.getUserDetails();
+		return userDetails==null ? createlist() :  userDetails.getGroups()||createlist();		
+	</tml:script></div>
+	<div class="clear"></div>
+
+	<label>Userroles:</label>
+	<div class="data"><tml:script divider="<br>">
+		var sessionContext=_wgadb.getSessionContext();
+		var userDetails = sessionContext.getUserDetails();
+		return userDetails==null ? WGA.createList() : userDetails.getRoles() || WGA.createList();		
+	</tml:script></div>
+	<div class="clear"></div>
+
+	<label>Access Level:</label>
+	<div class="data"><tml:script divider="<br>">
+		var sessionContext=_wgadb.getSessionContext();
+		return _wgadb.accessLevelText(sessionContext.getAccessLevel());		
+	</tml:script></div>
+	<div class="clear"></div>
+	
+</fieldset>
+
+<tml:case condition="_info.isCs">
+	<fieldset>
+		<legend>Design</legend>
+		
+		<label>Design Source:</label>
+		<div class="data"><tml:script expression="_info.designSource"/></div>
+		<div class="clear"></div>
+		
+		<label>Design version compliance:</label>
+		<div class="data"><tml:script expression="_info.designBehaviour"/></div>
+		<div class="clear"></div>
+		
+		<tml:case condition="_info.overlay">
+			
+			<label>Overlay compliant to base version:</label>
+			<div class="data"><tml:script expression="_info.overlayBaseVersion"/></div>
+			<div class="clear"></div>
+		
+		</tml:case>
+		
+	</fieldset>
+</tml:case>
+
+<fieldset>
+	<legend>Effective Publisher Options</legend>
+
+	<tml:script>
+		_attributes = _wgadb.getAttributeNames();
+	</tml:script>	
+	<tml:foreach type="itemvalue" item="_attributes" currentvalue="_attribute">
+		<tml:script>
+			_value = _wgadb.getAttribute(_attribute)
+			_show = false;
+			if(typeof(_value) == "string")
+				_show = true;
+			else if(_value instanceof Packages.java.util.Collection)
+				_show = true
+			else if(_value instanceof Packages.java.util.Map)
+				_show = true;
+			_value = _value.toString();
+		</tml:script>
+		<tml:case istrue="_show">
+			<label><tml:item name="_attribute"/>:</label>
+			<div class="data">
+				<tml:item name="_value"/>
+			</div>
+			<div class="clear"></div>		
+		</tml:case>
+	</tml:foreach>
+</fieldset>

@@ -1,0 +1,43 @@
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Current operations using the database backend</tml:option>	
+	<tml:option name="config" scope="local">
+		tools: [
+			{
+				id: "refresh",
+				qtip: "refresh",
+				handler: function(){
+					WGA.ajax.callAction('<tml:action ref="$refresh"/>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+	
+		<table width="100%" class="collection">	
+			<tr class="collection-title">
+				<td>Database</td>
+				<td>Operation</td>
+				<td>Key</td>
+			</tr>
+			
+			<tml:script>
+				_dbs = wgacore.getContentdbs().values()
+			</tml:script>
+			<tml:foreach type="itemvalue" item="_dbs" currentvalue="_db">
+				<tml:script>
+					_ops = _db.getCurrentBackendOperations()
+				</tml:script>
+				<tml:foreach type="itemvalue" item="_ops" currentvalue="_op">
+					<tr class="List">
+						<td><tml:script expression="_db.getDbReference()"/></td>
+						<td><tml:script expression="Packages.de.innovationgate.webgate.api.WGOperationKey.getOperationName(_op.getOperation())"/></td>
+						<td><tml:script expression="_op.getKey()"/></td>
+					</tr>
+				</tml:foreach>
+			</tml:foreach>
+		</table>
+
+	</tml:inline>
+	
+</tml:include>

@@ -1,0 +1,113 @@
+<tml:action id="submitToMembers">
+	var task;
+	switch(tmlparam1){
+		case "update-config":
+			task = new Packages.de.innovationgate.wgpublisher.cluster.tasks.UpdateConfigEntityTask(DBM.getConfigBean());
+			log.info("update config on " + tmlform.fieldlist("members"));
+			_clusterMsgTitle = "Submitted config update to " + tmlform.fieldlist("members").size() + " members"
+			break;
+		case "reconnect":
+			var dbkey = DBM.getConfigBean().key;
+			task =  new Packages.de.innovationgate.wgpublisher.cluster.tasks.ReconnectDatabaseTask(dbkey);
+			log.info("reconnect '" + dbkey + "' on " + tmlform.fieldlist("members") + " members");
+			_clusterMsgTitle = "Submitted reconnect request for '" + dbkey + "' to " + tmlform.fieldlist("members").size() + " members"
+			break;
+	}
+	
+	if(task){
+		_results = DBM.cluster.submitTask(tmlform.fieldlist("members"), task).values();
+	}
+	tmlform.reset();
+</tml:action>
+
+<tml:form id="submit-to-members" source="none">
+
+	<tml:include designdb="@ui" ref="windowview">
+	
+		<tml:option name="title">Cluster Name: <b><tml:script>return WGA.Core.getClusterService().getName()</tml:script></b></tml:option>	
+
+		<tml:inline name="body">
+	
+			<tml:case condition="_clusterMsgTitle">
+				<tml:include designdb="@ui" ref="message">
+					<tml:option name="title"><tml:item name="_clusterMsgTitle"/></tml:option>
+					<tml:option name="body">
+						<ul>
+						<tml:foreach item="_results" currentvalue="_result">
+							<li><tml:script expression="_result.msg"/></li>
+						</tml:foreach>
+						</ul>
+					</tml:option>
+				</tml:include>
+			</tml:case>
+	
+			<fieldset>
+				<legend>Other Members</legend>
+			
+				<tml:script>
+					_me = WGA.Core.getClusterService().getLocalMember();
+					_members = WGA.Core.getClusterService().getMembers();
+				</tml:script>
+				
+				<table class="collection" width="100%">
+					<tr class="collection-title">	
+						<td>Name</td>
+						<td>Active Since</td>
+						<td width="50%">Registered Problems</td>
+					</tr>
+
+					<tml:foreach item="_members" currentvalue="_member" filter="_member.getUID()!=_me.getUID()">
+						<tml:script>
+							_info = _member.getMemberInformation();
+							try{
+								var task =  new Packages.de.innovationgate.wgpublisher.cluster.tasks.RetrieveProblemsTask(Packages.de.innovationgate.wgpublisher.problems.AdministrativeProblemType);
+								var problemScope = new Packages.de.innovationgate.wgpublisher.problems.DatabaseScope(DBM.getConfigBean().key);
+								task.setScope(problemScope);
+								var results = DBM.cluster.submitTask(WGA.createList([_member.getUID()]), task);
+								_problems = results.get(_info.getName()).result		// list of problem objects
+							}
+							catch(e){
+								_problems = WGA.createList();
+							}
+						</tml:script>
+						<tr class="List">
+							<td>
+								<tml:script>
+									_name = (_info && _info.getName()) || 'unknown'
+									if(_member.getUID()==_me.getUID())
+										_name += " (self)"
+								</tml:script>
+								<tml:input name="members" type="checkbox" 
+									changeaction="$refresh"
+									options="{_name + '|' + _member.getUID()}"/>
+							</td>
+							<td>
+								<tml:script expression="(_info && _info.getActiveSince()) || 'unknown'"/>
+							</td>
+							<td>
+								<tml:foreach item="_problems" currentvalue="_problem">
+									<b><tml:script expression="_problem.getSeverity() + ': ' + _problem.getTitle()"/></b>
+									<br><tml:script expression="_problem.getDescription()"/>
+									<tml:between><br></tml:between>
+								</tml:foreach>
+							</td>
+						</tr>
+					</tml:foreach>
+				</table>
+
+				<tml:case condition="tmlform.members">
+					<div class="button-bar" style="margin:10px">
+						<button onclick="DBM.callAction('<tml:action ref="submitToMembers" param1="update-config"/>', '<tml:script expression="portlet.portletkey"/>', 'Submitting to cluster members')">
+							Send Configuration
+						</button>
+						<button onclick="DBM.callAction('<tml:action ref="submitToMembers" param1="reconnect"/>', '<tml:script expression="portlet.portletkey"/>', 'Submitting to cluster members')">
+							Reconnect App
+						</button>
+					</div>
+				</tml:case>
+				
+			</fieldset>
+			
+		</tml:inline>
+	</tml:include>
+</tml:form>

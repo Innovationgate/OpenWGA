@@ -1,0 +1,21 @@
+var dbkey = tmlparam1;	//_config_bean.key
+var error="false";
+var options = createLookupTable();
+
+try {
+	options.put("dbkey", dbkey);
+	_job_name = WGA.Jobs.runTask(Packages.de.innovationgate.wgpublisher.scheduler.UpgradeFileStorageTask, options);
+}
+catch (e) {
+	logException(e);
+	_errormsg = "An error occured: " + e.message;
+	if (e.javaException && e.javaException.cause != null) {
+		_errormsg += ". Cause: " + e.javaException.cause.message;
+	}
+	error="true";
+}
+
+var ev = createEvent("upgrade-started");
+ev.addParameter("job_name", _job_name);
+ev.addParameter("error", error);
+portlet.fireEvent(ev);

@@ -1,0 +1,10 @@
+try {
+	var dbKey = tmlparam1;
+	var model = Packages.de.innovationgate.wgpublisher.hdb.HDBModel.getModel(WGA.db(dbKey));
+	model.reinitModel();
+	msg = 'HDBModel reinitialisation process to enforce new definition was started. You can see if it is still running by clicking "Runtime Info" and watching "HDB Model Status" in the appearing dialog.';
+}
+catch (e) {
+	logException(e);
+	msg = '<span color="red">Error starting reinitialisation process: ' + e.message;
+}

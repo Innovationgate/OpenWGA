@@ -1,0 +1,38 @@
+
+dependencies {
+    
+    compile project(":wga");
+    compileClasspath project(":wgaBuildTools");
+    
+    compileClasspath 'ro.isdc.wro4j:wro4j-core:1.7.8'
+	compileClasspath 'ro.isdc.wro4j:wro4j-extensions:1.7.8'
+	compileClasspath 'org.jruby:jruby-complete:1.7.20'
+	compileClasspath 'com.darrinholst:sass-java-gems:3.4.4.3'
+    
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src'  
+			output.classesDir = 'design/java'		
+		}
+	}
+} 
+
+task updatePluginVersion << {
+	def version = "${openwga_version_major}.${openwga_version_minor}.${openwga_version_maintenance}.${openwga_version_patch}"
+	def build = "${openwga_version_build}"
+	println "Update ${project.name} to version ${version} Build ${openwga_version_build}"
+
+    ant.taskdef(name:"UpdatePluginVersion", classname:"de.innovationgate.ant.UpdatePluginVersion", classpath: configurations.compileClasspath.asPath)
+    ant.UpdatePluginVersion(designDir: "design", version: "${version}", build: "${build}")
+
+}
+
+task buildPlugin(type: Zip, dependsOn: [build, updatePluginVersion]){
+    archiveName = "de.innovationgate.additional-script-langs-${project.version}.wgaplugin"    
+    from('design') {
+        into '/'
+    }
+}

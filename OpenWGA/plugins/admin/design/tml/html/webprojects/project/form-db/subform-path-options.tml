@@ -1,0 +1,52 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	try{
+		var dbserver = wgacore.getDatabaseServers().get(option('dbServer'));		
+		_dbtype = DBM.getModuleDefinition(option("type"), option('implClassName'))		
+		_pathOptions = dbserver.getDatabasePathOptions(_dbtype.getImplementationClass());		
+	}		
+	catch(e){		
+		_pathOptions = createList();	// empty list		
+	}		
+</tml:script>		
+		
+<tml:foreach type="itemvalue" item="_pathOptions" currentvalue="_pathOption">		
+	<label>				
+		<tml:script>		
+			_config_option = _dbtype.getOptionDefinitions().get(_pathOption);		
+			return _config_option.getTitle(DBM.locale);		
+		</tml:script>:		
+	</label>		
+	<div class="data">		
+		<tml:script>		
+			setOption("config-option", _config_option);		
+			setOption("value", null);		
+		</tml:script>		
+		<tml:[system:module-options:option-type-input]/>		
+		<div class="option-info"><tml:script expression="_config_option.getDescription(DBM.locale)"/></div>		
+	</div>		
+	<div class="clear"></div>		
+</tml:foreach>

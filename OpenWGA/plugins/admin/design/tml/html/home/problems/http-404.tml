@@ -1,0 +1,112 @@
+<tml:include designdb="@ui" ref="windowview" o_title="There have been dispatching errors calling the following URLs">
+
+	<tml:option name="config" scope="local">
+		tools: [
+			{
+				id: "refresh",
+				qtip: "refresh",
+				handler: function(){
+					WGA.ajax.callAction('<tml:action ref="$refresh"/>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+		],
+		tbar: [
+			{
+				text: "Clear requests",
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="lock_open.png"/>',
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>WGA.Server.getProblemRegistry().clearProblemType(new Packages.de.innovationgate.wgpublisher.problems.HTTPProblemType());</tml:action>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+		]
+	</tml:option>
+	
+	<tml:inline name="body">
+	
+		<tml:script>
+			var reg = WGA.Server.getProblemRegistry();
+			reg.updateRegistry();
+			problems = reg.getProblems(Packages.de.innovationgate.wgpublisher.problems.HTTPProblemType);
+			
+			if (sortBy == "uri") {
+				WGA.sortList(problems, function(a,b) {
+					return javaObject(a.getUri()).compareTo(b.getUri());
+				});		
+			}
+			else if (sortBy == "times") {
+				WGA.sortList(problems, function(a,b) {
+					return javaObject(b.getCalls()).compareTo(a.getCalls());
+				});
+			}
+			else if (sortBy == "errorType") {
+				WGA.sortList(problems, function(a,b) {
+					var labelA = label('httpProblemType.' + a.getClass().getSimpleName())
+					var labelB = label('httpProblemType.' + b.getClass().getSimpleName())
+					return javaObject(labelA).compareTo(labelB);
+				});
+			}
+			else if (sortBy == "lastCall") {
+				WGA.sortList(problems, function(a,b) {
+					return javaObject(b.getLastCall()).compareTo(a.getLastCall());
+				});
+			}
+		</tml:script>
+		
+		<table class="collection" width="100%">
+			<tr class="collection-title">	
+				<td>
+					<a title="Sort by URI" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="uri"/>">URI</a>
+				</td>
+				<td>
+					<a title="Sort by error type" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="errorType"/>">Error type</a>
+				</td>
+				<td>
+					<a title="Sort by last call (descending)" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="lastCall"/>">Last call</a>
+				</td>
+				<td>
+					<a title="Sort by called times (descending)" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="times"/>">Called times</a>
+				</td>
+				<td>
+					<a title="Sort by scope" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="scope"/>">Scope</a></a>
+				</td>
+			</tr>
+		
+			<tml:foreach item="problems" currentvalue="problem">
+				<tml:comment><tr>
+					<td colspan="4">
+						<tml:item name="problem" xpath="path/key"/>
+					</td>
+				</tr></tml:comment>
+				<tr class="List">
+					<td>
+						<span title="<tml:script expression="problem.getUri()"/>">
+							<tml:script>
+							  var uri = problem.getUri();
+							  if (uri.length > 80) {
+							  	return uri.substring(0, 80) + "...";
+							  }
+							  else {
+							  	return uri; 
+							  }
+							</tml:script>
+						</span>
+					</td>
+					<td><tml:script expression="label('httpProblemType.' + problem.getClass().getSimpleName())"/></td>
+					<td><tml:script expression="problem.getLastCall()" format="dd.MM.yyyy HH:mm:ss"/></td>
+					<td><tml:script expression="problem.getCalls()" format="#,##0"/></td>
+					<td><tml:script expression="problem.getPath().getScope().toString()"/></td>
+				</tr>
+				<tml:comment><tr>
+					<td colspan="4">
+						<tml:case condition="!problem.occasion.clearedAutomatically">
+							<tml:button clickaction="::clearProblem" param1="{WGA.serializeObject(problem.path)}">Dismiss</tml:button>
+						</tml:case>
+						<tml:button clickaction="::confirmProblem" param1="{WGA.serializeObject(problem.path)}">Confirm and never show again</tml:button>
+					</td>
+				</tr></tml:comment>
+			</tml:foreach>
+		</table>
+	
+	</tml:inline>
+
+</tml:include>

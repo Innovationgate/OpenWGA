@@ -1,0 +1,216 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="addEntry">
+	_config_bean = DBM.getConfigBean();
+	if(!tmlform.validate())
+		return;
+	var vtype = tmlparam2;
+	var fieldname = 'entry/'+tmlparam1;
+	var value = tmlform.field(fieldname);
+	
+	if(vtype=="number")
+		value = new Packages.java.lang.Integer(value);
+	
+	var entry_list = eval("_config_bean." + tmlparam1);
+	entry_list.add(value);
+	
+	tmlform.removeField(fieldname);
+	tmlform.removeField("action/"+tmlparam1);
+	_config_bean.changed=true;
+</tml:action>
+
+<tml:action id="updateEntry">
+	_config_bean = DBM.getConfigBean();
+	if(!tmlform.validate())
+		return;
+
+	var fieldname = 'entry/'+tmlparam1;
+	var value = tmlform.field(fieldname);
+	var vtype = tmlparam2;
+	if(vtype=="number")
+		value = new Packages.java.lang.Integer(value);
+	
+	var entry_list = eval("_config_bean." + tmlparam1);
+	entry_list.set(tmlform.field("idx/"+tmlparam1), value)
+	tmlform.removeField("action/"+tmlparam1);
+	_config_bean.changed=true;
+	tmlform.removeField("idx/"+tmlparam1);
+</tml:action>
+
+<tml:action id="removeEntry">
+	_config_bean = DBM.getConfigBean();
+	var idx = tmlparam2-1;
+	var entry_list = eval("_config_bean." + tmlparam1);
+	entry_list.remove(idx)
+	_config_bean.changed=true;
+	tmlform.removeField("action/"+tmlparam1);
+</tml:action>
+
+<tml:action id="removeAllEntries">
+	_config_bean = DBM.getConfigBean();
+	var entry_list = eval("_config_bean." + tmlparam1);
+	entry_list.clear()
+	_config_bean.changed=true;
+</tml:action>
+
+<tml:action id="editEntry">
+	_config_bean = DBM.getConfigBean();
+	var idx = tmlparam2-1;
+	var entry_list = eval("_config_bean." + tmlparam1);
+	var fieldname = 'entry/'+tmlparam1;
+	
+	var value = entry_list.get(idx);
+	
+	tmlform.setField(fieldname, value);
+	tmlform.setField("idx/"+tmlparam1, idx);
+	tmlform.setField("action/"+tmlparam1, "edit");
+</tml:action>
+
+<tml:action id="newEntry">
+	tmlform.setField("action/"+tmlparam1, "new");
+</tml:action>
+
+<tml:action id="cancelEdit">
+	tmlform.removeField("action/"+tmlparam1);
+	tmlform.removeField("idx/"+tmlparam1);
+</tml:action>
+
+<tml:script>
+	_config_bean = DBM.getConfigBean();
+	_entry_list = eval("_config_bean." + option("list"))
+</tml:script>
+
+<tml:if condition="_entry_list.isEmpty()">
+	<tml:then>
+		<tml:case condition="tmlform.mode()=='view'">
+			<div style="padding: 5px">- none -</div>
+		</tml:case> 
+	</tml:then>
+	<tml:else>
+		<table class="collection" style="margin-bottom:20px">
+			<tr class="collection-title">
+				<td>Entry</td>
+				<tml:case condition="tmlform.mode()=='edit'">
+					<td></td>
+				</tml:case>
+			</tr>
+		
+			<tml:foreach id="array-list-loop" type="itemvalue" item="_entry_list" currentvalue="_entry">
+				<tr class="List<tml:case condition="tmlform.field('idx/'+option('list'))==taginfo('array-list-loop', 'iteration')-1"> selected</tml:case>">
+					<td>
+						<tml:script encode="html">
+							return option("type")=="number" ? format(_entry, "0") : _entry;
+						</tml:script>
+					</td>
+					<tml:case condition="tmlform.mode()=='edit'">
+						<td nowrap align="right" width="1%">
+							<tml:button clickaction="editEntry" ajax="true" param1="{option('list')}" param2="{taginfo('array-list-loop', 'iteration')}">edit</tml:button>
+							<tml:button clickaction="removeEntry" ajax="true" param1="{option('list')}" param2="{taginfo('array-list-loop', 'iteration')}">delete</tml:button>
+						</td>
+					</tml:case>
+				</tr>
+			</tml:foreach>
+		</table>
+	</tml:else>
+</tml:if>
+
+<div class="entry-form">
+			
+	<tml:if condition="tmlform.field('action/'+option('list'))=='new' || tmlform.field('action/'+option('list'))=='edit'">
+		<tml:then>
+	
+			<tml:script>
+				_fieldname = 'entry/'+option('list')
+			</tml:script>
+	
+			<tml:include designdb="@ui" ref="formmessages"/>		
+					
+			<div style="font-style:italic">		
+				<tml:if condition="tmlform._action=='new'">		
+					<tml:then>New</tml:then>		
+					<tml:else>Edit</tml:else>		
+				</tml:if>		
+				Entry		
+			</div>		
+					
+			<label>Value:</label>		
+			<div class="data">
+				<tml:if condition="option('type')=='number'">
+					<tml:then>
+						<tml:input name="{_fieldname}" type="number" cssstyle="width:500px"
+							validation="$P_VALUE!=null"
+							format="0"
+							message = "Value can't be interpreted as number."
+						/>		
+					</tml:then>
+					<tml:else>
+						<tml:input name="{_fieldname}" type="{option('type')||'text'}" cssstyle="width:500px"
+							validation="$E_VALUE!=''"
+							message = "Empty values are not allowed. Please enter a value."
+						/>		
+					</tml:else>
+				</tml:if>		
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_msgtarget="title"/>			
+			</div>		
+			<div class="clear"></div>		
+	
+			<div class="data" style="margin-top:5px">		
+				<tml:if condition="tmlform.field('action/'+option('list'))=='new'">		
+					<tml:then>		
+						<tml:button clickaction="addEntry" param1="{option('list')}" param2="{option('type')}" ajax="true">Add Entry</tml:button>		
+					</tml:then>		
+					<tml:else>		
+						<tml:button clickaction="updateEntry" param1="{option('list')}" param2="{option('type')}" ajax="true">Update Entry</tml:button>		
+					</tml:else>		
+				</tml:if>		
+				<tml:button clickaction="cancelEdit" param1="{option('list')}" ajax="true">Cancel</tml:button>		
+			</div>		
+			<div class="clear"></div>		
+					
+			<tml:case hasoption="id">
+				<script>
+					
+					Ext.get("$ajaxContentDiv_<tml:script expression="portlet.portletkey"/>").mask();
+					Ext.get("<tml:option name="id"/>").setStyle({
+						zIndex: 102,
+						position: "relative"
+					})
+						
+				</script>		
+			</tml:case>
+			
+		</tml:then>
+	
+		<tml:elseif condition="tmlform.mode()=='edit'">
+			<tml:button clickaction="newEntry" param1="{option('list')}" ajax="true">Add New Entry ...</tml:button>
+			<tml:case condition="!_entry_list.isEmpty()"> 
+				<tml:button clickaction="removeAllEntries" param1="{option('list')}" ajax="true">Remove All Entries</tml:button>
+			</tml:case>	
+		</tml:elseif>
+		
+	</tml:if>
+	
+</div>

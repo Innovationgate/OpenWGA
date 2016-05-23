@@ -1,0 +1,95 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="selectJob">
+	var tabview=createObject("@ui/tabview", portlet);
+	tabview.addPage("jobs:job:portlet", tmlparam1, tmlparam2);			
+</tml:action>
+
+<tml:script>
+
+	// look for default selection in var _uid
+	if(_app && _uid){
+		var job = DBM.wgaconfig.getByUid(_uid);
+		if(job){
+			callAction("selectJob", _uid, job.name);
+		}
+		else log.info("job not found: " + _uid);
+	}
+	
+	DBM.tabview.cleanup(function(p){
+		return p.getMode()=='new' || DBM.jobs().getByUid(p.getSessionVar("key"))
+	});
+	
+</tml:script>
+
+
+<tml:include designdb="@ui" ref="tabview_dynamic">
+
+	<tml:option name="title" scope="local">All Jobs</tml:option>	
+	
+	<tml:inline name="body" scope="local">			
+		<tml:case condition="portlet.getSessionVar('currentpage')<=0">
+			<tml:include designdb="@ui" ref="windowview">
+			
+				<tml:option name="title" scope="local">
+					All Jobs ...
+				</tml:option>
+				
+				<tml:option name="config" scope="local">
+					tbar: [
+						{
+							cls:'x-btn-text-icon',						
+							icon: '<tml:url type="file" db="@afw" doc="icons" file="page_add.png"/>',		                
+							text: "<tml:label key="new-job"/>",
+							handler: function(){
+								WGA.ajax.callAction("<tml:action ref="::create"/>","<tml:script expression="portlet.portletkey"/>");
+							}
+						}
+					]
+				</tml:option>
+			
+				<tml:option name="body" scope="local">
+					<tml:include ref="::mod-joblist"/>
+				</tml:option>
+				
+			</tml:include>
+		</tml:case>
+	</tml:inline>
+	
+	<tml:option name="pageaddon" scope="local">
+		<span id="pageaddon">
+			<a href="#" onclick="WGA.ajax.callAction('<tml:action ref="::create"/>', '<tml:script>return portlet.portletkey</tml:script>')">
+				<tml:img db="@afw" doc="icons" file="page_add.png">
+					border="0"
+					alt="<tml:label key="new-job"/>"
+					title="<tml:label key="new-job"/>"
+				</tml:img>	
+				<tml:label key="new-job"/>
+			</a>
+		</span>	
+	</tml:option>
+	
+</tml:include>
+

@@ -1,0 +1,95 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="create-cs-dump">
+
+	var dbkey = tmlparam1;	//_config_bean.key
+
+	var error="false";
+	var options = createLookupTable();
+	try {
+		
+		var tempFile = new Packages.de.innovationgate.utils.TemporaryFile("dump.wgacs", null, Packages.de.innovationgate.webgate.api.WGFactory.getTempDir());
+		var name = wgacore.getDispatcher().addTemporaryDownload(httpSession, tempFile);
+		options.put("endmessage", 'You can download the Dump File using the following Link:<br/> <a href="' + meta("request", "absolutewgaurl") + '/tempdwn/' + name + '">Download WGA Content Store Dump</a>');
+		var file = tempFile.getFile();
+		
+		// Perform update
+		
+		options.put("dbkey", dbkey);
+		options.put("filename", file.getAbsolutePath());
+		
+		_job_name = wgacore.runTransientTask("de.innovationgate.wgpublisher.scheduler.DumpContentStoreTask", "dumpContentStore", options); 
+		
+	}
+	catch (e) {
+		logException(e);
+		_errormsg = "An error occured: " + e.message;
+		if (e.javaException && e.javaException.cause != null) {
+			_errormsg += ". Cause: " + e.javaException.cause.message;
+		}
+		error="true";
+	}
+	
+	var ev = createEvent("cs-dump-started");
+	ev.addParameter("job_name", _job_name);
+	ev.addParameter("error", error);
+	portlet.fireEvent(ev);
+	
+</tml:action>
+
+<div id="cs-dump-info">
+	<div style="color:red; margin-bottom: 10px;">
+		NOTE: The WGA Content Store Dump functionality should NOT be used as a backup tool, especially not for large databases.
+		It is intended to create dumps that can be used as initial data set for new databases. For that cause it should be deposited as file "init.wgacs" in the file container "system" of WGA Content Store Designs and WGA Plugins.  
+	</div>
+	<button onclick="DBM.ajaxAction({
+				action: '<tml:action ref="create-cs-dump" ajax="norefresh" param1="{option('dbkey')||DBM.getConfigBean().key}"/>',
+				id: '<tml:script expression="portlet.portletkey"/>',
+				graydiv: true,
+				mode: 'norefresh'
+			}, 'create CS Dump')">
+		Create Dump
+	</button>					
+
+</div>
+
+<div id="job-log" style="display:none; padding: 3px;margin-top:5px">
+	<iframe style="height: 250px; width:100%"></iframe>
+</div>
+
+<script>
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "cs-dump-started", function(ev){
+		if(ev.params.error=="true"){
+			Ext.Msg.minWidth=350;
+			Ext.Msg.alert("Error", "Unable to create dump. See Serverlog for more information.");
+		}
+		else{
+			DBM.showHideElement("cs-dump-info");
+			DBM.currentjoblog = DBM.joblog('job-log', ev.params.job_name);
+			DBM.currentjoblog.toggleView();
+		}
+	});
+
+</script>

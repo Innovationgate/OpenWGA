@@ -1,0 +1,151 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="setMode">	
+	portlet.parentportlet.setmode(tmlparam1);
+	if (tmlparam2) {
+		pluginStore.local.resetActivePlugin();
+		pluginStore.local.setActivePlugin(tmlparam2);
+	}
+	var e = createEvent('ps-mode-changed');	
+	portlet.fireevent(e);
+</tml:action>
+
+<tml:form id="plugin-browser">	
+	<tml:input name="keyword" type="hidden"/>
+	
+	<tml:script>	
+		function sortLookupKeys(map, keys) {
+			
+			var sorted = false;
+			for (var i = 0; i + 1 < keys.size(); i++) {
+				if (map.get(keys.get(i)).get('status') == -8 || map.get(keys.get(i + 1)).get('status') == -8) continue;
+
+				var el = map.get(keys.get(i));
+				var tmpTitle1 = el.get("category").toLowerCase();
+				tmpTitle1 += el.get("title").toLowerCase()
+				var el = map.get(keys.get(i+1));
+				var tmpTitle2 = el.get("category").toLowerCase();
+				tmpTitle2 += el.get("title").toLowerCase()
+
+				if (tmpTitle1 > tmpTitle2) {
+					var tmpValue = keys.get(i + 1);
+					keys.set(i + 1, keys.get(i));
+					keys.set(i, tmpValue);
+					sorted = true;
+				}
+			}
+			
+			if (sorted == true) {
+				sortLookupKeys(map, keys);
+			}
+			
+			return keys;
+		}
+		
+		pluginMap = option('plugins') || WGA.createLookupTable();
+		
+		var pluginSet = wgacore.getPluginSet();
+		installedPlugins = WGA.createLookupTable();
+		var iPlugins = pluginSet.getPlugins();
+		
+		for (var i = 0; i < iPlugins.size(); i++) {
+				
+			var plugin = iPlugins.get(i);
+			var prevPlugin = installedPlugins.get(plugin.getPluginID().getUniqueName());
+			if (prevPlugin != null && prevPlugin.getPluginID().getVersion() >= plugin.getPluginID().getVersion()) {
+				continue;
+			}
+		
+			installedPlugins.put(plugin.getPluginID().getUniqueName(), plugin);
+		}
+		
+		plugins = WGA.getLookupKeys(pluginMap);
+		
+		if (tmlform.keyword) {
+			plugins = WGA.getLookupKeys(pluginStore.local.searchForPattern(pluginMap, tmlform.keyword));
+		}
+		
+		plugins = sortLookupKeys(pluginMap, plugins);
+		
+	</tml:script>
+	
+	<tml:foreach id="plugin-iterator" type="itemvalue" item="plugins" currentvalue="currentPlugin">
+		<tml:script>
+			_plugin = pluginMap.get(currentPlugin) || WGA.createLookupTable();
+		</tml:script>
+		<tml:case condition="_plugin.get('title')">
+			<tml:groupchange expression="_plugin.get('category')" id="plugn-cat">
+				<h1 style="clear:left;padding-left:10px;padding-top:20px"><tml:script expression="_plugin.get('category')"/></h1>
+			</tml:groupchange>
+		
+			<tml:script>
+				var plugin = pluginMap.get(currentPlugin) || WGA.createLookupTable();
+				var pluginID = Packages.de.innovationgate.wga.common.beans.csconfig.v1.PluginID.parseQualifiedFileName(currentPlugin);
+				
+				_plugin = {
+					ID: pluginID,
+					version: pluginID.getVersion().getMainVersionString(),
+					uniquename: pluginID.getUniqueName(),
+					qualifiedFileName: pluginID.buildQualifiedFileName(),
+					title: plugin.get('title'),
+					category: plugin.get('category'),
+					description: plugin.get('description'),
+					vendor: plugin.get('vendor'),
+					homepage: plugin.get('homepage'),
+					licencetitle: plugin.get('licensetitle'),
+					licencetext: plugin.get('licensetext'),
+					wgaversion: plugin.get('wgaversion'),
+					iconUrl: plugin.get('iconurl') ? pluginStore.server.uri + plugin.get('iconurl') : null,
+					status: null,
+					dependencyStatus: plugin.get('status'),
+					installedVersion: 'none'
+				}
+				
+				if (_plugin.uniquename && installedPlugins.containsKey(_plugin.uniquename)) {
+					var tmpPlugin = installedPlugins.get(_plugin.uniquename);
+					var tmpPluginID = tmpPlugin.pluginID;
+					_plugin.installedVersion = tmpPluginID.getVersion().getMainVersionString();
+					_plugin.status = _plugin.ID.getVersion().compareTo(tmpPluginID.getVersion());
+					if (_plugin.status == 0 && !tmpPlugin.isActive()) {
+						_plugin.disabled = true;
+					}
+				}
+			</tml:script>
+	
+			<tml:include ref="{'::mode-' + portlet.parentportlet.mode}">
+				<tml:option name="plugin" expression="_plugin"/>
+			</tml:include>
+		</tml:case>
+	</tml:foreach>
+	
+	<script type="text/javascript">
+		var pKey = '<tml:script expression="portlet.portletkey"/>';
+		WGA.event.addListener(pKey, 'pluginSearch', function() {
+			document.forms['plugin-browser']['keyword'].value = document.forms['plugin-store']['query'].value;
+			WGA.ajax.callAction('<tml:action ref="$refresh"/>', '<tml:script expression="portlet.portletkey"/>');
+		});
+	</script>
+</tml:form>

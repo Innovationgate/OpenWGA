@@ -1,0 +1,124 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_design_may_be_updated=false;
+	_is_overlay_writeable=false;
+	if(_config_bean.key && db(_config_bean.key)){
+		_dbEnabled = true;
+		_dprov = db(_config_bean.key).getDesignProvider()
+		if(_dprov instanceof Packages.de.innovationgate.wgpublisher.design.OverlayDesignProvider) {
+			_is_overlay_active = true;
+			_is_overlay_writeable = _dprov.isOverlayWriteable();
+			_design_may_be_upgraded = _dprov.isUpgradeable()
+		}
+	}
+</tml:script>
+
+<tml:case condition="tmlform.mode() != 'edit'">
+
+	<div id="buttons-design-<tml:script expression="_cs.uid"/>" class="legend-menu"></div>
+	<script>
+		WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(portletkey){
+			
+			var menu = new  Ext.menu.Menu();
+			WGA.portlet.registerObject(portletkey, menu);
+			
+			menu.add({
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="arrow_refresh.png"/>',		                
+					text: "Clear design cache",
+					handler: function(){
+						DBM.callAction("<tml:action>
+							try {
+								var dprov = db(_config_bean.key).getDesignProvider();
+								if (dprov.clearCache) {
+									dprov.clearCache();
+									_server_message = "Design cache cleared.";
+								}
+								else {
+									_server_message = "This design provider uses no caches.";
+								}
+							}
+							catch (e) {
+								logException(e);
+								_server_message = "Error clearing design cache: <br>";
+								if (e.javaException) {
+									_server_message += "<ul><li>" + WGA.Utils.serializeCollection(WGA.Utils.extractMessages(e.javaException), "<li>") + "<ul>"
+								}
+								else {
+									_server_message += e.message;
+								}
+							}
+						</tml:action>",
+							"<tml:script expression="portlet.portletkey"/>")
+		
+					}
+			});
+			
+			<tml:case istrue="_design_may_be_upgraded">
+				menu.add({
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="layout_add.png"/>',		                
+					text: "<b>Upgrade compliance of customization<b>",
+					handler: function(){
+						DBM.callAction("<tml:action>_query_upgrade_overlay=true</tml:action>",
+							"<tml:script expression="portlet.portletkey"/>")
+		
+					}
+				});
+			</tml:case>
+			
+			<tml:case istrue="_is_overlay_writeable">
+				menu.add({
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="layout_edit.png"/>',		                
+					text: "Recreate original overlay files",
+					handler: function(){
+						DBM.callAction("<tml:action>_query_create_downgrades=true</tml:action>",
+							"<tml:script expression="portlet.portletkey"/>")
+					}
+				});
+			</tml:case>
+			
+			menu.on("show", function(){
+				Ext.get("<tml:option name="group-id"/>").addClass("menu-selected");
+			})
+			menu.on("hide", function(){
+				Ext.get("<tml:option name="group-id"/>").removeClass("menu-selected");
+			})
+			var button = new Ext.Button({
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="{_design_may_be_upgraded ? 'layout_add.png' : 'layout.png'}"/>',          
+				text: "Design",
+				renderTo: "buttons-design-<tml:script expression="_cs.uid"/>",
+				menuAlign: "tr-br?",
+				menu: menu
+			})
+			WGA.portlet.registerObject(portletkey, button);
+		})
+	</script>
+	
+</tml:case>

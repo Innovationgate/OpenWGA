@@ -1,0 +1,85 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_plugin = option('plugin') || {};
+</tml:script>
+
+<div class="plugin plugin_view">
+	<a href="<tml:url type="action" action="setMode" param1="install" param2="{_plugin.qualifiedFileName}" ajax="norefresh"/>">
+		<fieldset id="fieldset-<tml:script expression="_plugin.uniquename"/>">
+			<tml:if condition="_plugin.disabled == true">
+				<tml:then>
+					<tml:image db="@afw" doc="icons" file="plugin_disabled.png">class="status_icon"</tml:image>
+				</tml:then>
+				<tml:elseif condition="_plugin.status != null && _plugin.status <= 0">
+					<tml:image db="@afw" doc="icons" file="accept.png">class="status_icon"</tml:image>
+				</tml:elseif>
+			</tml:if>
+			<div class="plugin-icon">
+				<tml:if condition="_plugin.iconUrl">
+					<tml:then>
+						<img src="<tml:script expression="_plugin.iconUrl"/>">
+					</tml:then>
+					<tml:else>
+						<tml:image doc="images" file="plugin-default-image.png"/>
+					</tml:else>
+				</tml:if>
+			</div>
+			
+			<div class="plugin-contents">
+				<h2>
+					<tml:script expression="_plugin.title"/>
+					<tml:case condition="_plugin.disabled == true">
+						- Disabled
+					</tml:case>
+				</h2>
+				
+				<div class="versions">
+					<tml:label file="pluginstore" key="pluginstore.installed-version"/>:
+					<tml:script expression="_plugin.status!=null ? _plugin.installedVersion : '-'"/>
+					<br>
+					<tml:label file="pluginstore" key="pluginstore.available-version"/>:
+					<tml:script expression="_plugin.version"/>
+				</div>
+	
+				<div class="install_btn">
+					<tml:if condition="_plugin.status == null || _plugin.status > 0">
+						<tml:then>
+							<tml:button id="install" clickaction="setMode" param1="install" param2="{_plugin.qualifiedFileName}" ajax="norefresh">
+								<tml:label file="pluginstore" key="{'pluginstore.' + (!_plugin.status ? 'install' : 'update')}"/> ...
+							</tml:button>
+						</tml:then>
+						<tml:else>
+							Installed.
+						</tml:else>
+					</tml:if>
+				</div>
+				
+			</div>
+			<div style="clear:both"></div>
+		</fieldset>
+	</a>
+</div>

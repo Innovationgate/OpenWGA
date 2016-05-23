@@ -1,0 +1,129 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="deleteLang">
+	try{
+		
+		var lang = db(option("key")).getLanguage(tmlparam1);
+		lang.remove();
+
+		log.info("deleted language " + tmlparam1);
+
+		portlet.setSessionVar("key", "language");
+		portlet.setSessionVar("path", "/root/language");
+		
+		_treeChanged = true;
+	}
+	catch(e){
+		_msg = e.message;
+	}
+</tml:action>
+
+<tml:script>
+	var lang = option("documentkey");
+	_lang = db(option("key")).getLanguage(lang)
+
+	// check deletion rights:
+	_mayDelete = true;
+	var DB = AFW.database(option("key"))
+	if(!DB.isDesigner() || !DB.mayDelete()) 
+		_mayDelete = false;
+	else {
+		// check for schema definition
+		var schema = _lang.getSchemaDefinition();
+		if(schema && schema.isAutoCreate())
+			_mayDelete = false;		
+	}
+</tml:script>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Language Definition</tml:option>	
+	<tml:option name="config">
+		tbar:[
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_delete.png"/>',		                
+				text: "Delete",
+				disabled: <tml:script expression="!_mayDelete"/>,
+				handler: function(){
+					WGA.ajax.callAction('<tml:action>
+						_query_delete_lang=true;
+					</tml:action>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+		]
+	</tml:option>
+	<tml:inline name="body">
+
+		<tml:case istrue="_query_delete_lang">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Delete this Language Definition?</tml:option>
+				<tml:option name="body">
+					<button onclick="DBM.ajaxAction({
+								action: '<tml:action ref="deleteLang" param1="{option('documentkey')}"/>',
+								id: '<tml:script expression="portlet.portletkey"/>'
+							}, 'deleting language')">
+						Delete
+					</button>					
+				</tml:option>
+			</tml:include>			
+		</tml:case>
+
+		<tml:case isdefined="_msg">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Error.</tml:option>
+				<tml:option name="body">
+					<tml:item name="_msg"/>					
+				</tml:option>
+			</tml:include>			
+		</tml:case>
+
+		<fieldset>		
+					
+			<label>Name:</label>		
+			<div class="data"><tml:script expression="_lang.name"/></div>
+			<div class="clear"></div>
+
+			<label>Title:</label>		
+			<div class="data"><tml:script expression="_lang.title"/></div>
+			<div class="clear"></div>
+
+			<label>Access Restricted for:</label>		
+			<div class="data"><tml:script expression="_lang.getContentCreators()" divider="<br>"/></div>
+			<div class="clear"></div>
+			
+			<tml:case condition="AFW.database(option('key')).isJdbc()">
+				<label>Content Documents in this Language:</label>		
+				<div class="data">
+					<tml:script>
+						return AFW.database(option("key")).hqlSearch("content.language.name = '"+_lang.name+"'").count
+					</tml:script>
+				</div>
+				<div class="clear"></div>
+			</tml:case>
+			
+		</fieldset>		
+	</tml:inline>
+</tml:include>

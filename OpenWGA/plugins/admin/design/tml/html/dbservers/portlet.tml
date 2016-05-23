@@ -1,0 +1,163 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="selectdbServer">
+	var tabview=createObject("@ui/tabview", portlet);
+	tabview.addPage("dbservers:server:portlet", tmlparam1, tmlparam2);			
+</tml:action>
+
+<tml:action id="newDbServer">
+	// create database server bean:
+	var bean = new Packages.de.innovationgate.wga.config.DatabaseServer();
+	// create tab
+	var tabview=createObject("@ui/tabview", portlet);
+	var p=tabview.addPage("dbservers:server:portlet", bean.uid, "New DB-Server");
+	p.setmode("new");	
+	DBM.wgaconfig.clone(p).add(bean);
+</tml:action>
+
+<tml:script>
+	// look for default selection in var _uid
+	if(_app=="dbservers" && _uid){
+		var server = DBM.dbservers.getByUid(_uid);
+		if(server)
+			callAction("selectDbServer", _uid, server.title);
+	}
+
+	DBM.tabview.cleanup(function(p){
+		return p.getMode()=='new' || wgacore.getDatabaseServers().get(p.getSessionVar("key")) || DBM.wgaconfig.getByUid(p.getSessionVar("key"))
+	});
+	
+</tml:script>
+
+<tml:include designdb="@ui" ref="tabview_dynamic">
+
+	<tml:option name="title">All Database Servers</tml:option>	
+	
+	<tml:inline name="body">			
+		<tml:case condition="portlet.getSessionVar('currentpage')<=0">
+			<tml:include designdb="@ui" ref="windowview">
+
+				<tml:option name="config" scope="local">
+					tbar: [
+						{
+							cls:'x-btn-text-icon',						
+							icon: '<tml:url type="file" db="@afw" doc="icons" file="page_add.png"/>',		                
+							text: "<tml:label key="dbserver.create-dbserver"/>",
+							handler: function(){
+								WGA.ajax.callAction("<tml:action ref="newDbServer"/>","<tml:script expression="portlet.portletkey"/>");
+							}
+						}
+					]
+				</tml:option>
+			
+				<tml:option name="title">
+					Alle Datenbankserver
+				</tml:option>
+				
+				<tml:option name="body">
+
+					<tml:script>
+						_servers = DBM.dbservers.getAll().values();
+					</tml:script>
+					
+					<table class="collection" width="100%">
+						<tr class="collection-title">
+							<td width="1%"></td>
+							<td>Titel</td>
+							<td>Typ</td>
+							<td></td>
+						</tr>
+						<tml:foreach type="itemvalue" item="_servers" currentvalue="_server">
+							<tml:script>
+								// is server config enabled?
+								_enabled = true;
+								if(_server.config && !_server.config.enabled){
+									_enabled = false;
+								}
+							</tml:script>
+
+							<tml:include designdb="@ui" ref="tr">
+								<tml:option name="class" expression="_enabled?'':'disabled'"/>
+								<tml:option name="ajaxaction" trim="true">
+									WGA.ajax.callAction('<tml:action ref="selectDbServer" param1="{_server.uid}" param2="{_server.title}"/>', '<tml:script expression="portlet.portletkey"/>')
+								</tml:option>
+							</tml:include>									
+								<td>								
+									<tml:image doc="nuvola" file="server.png">
+										align="left" width="28" height="28"
+					 				</tml:image>
+								</td>
+
+								<td><tml:script expression="_server.title"/></td>
+								<td>
+									<tml:script>
+										try{
+											var mod = DBM.getModuleDefinition("DatabaseServer", _server.implClassName);
+											if(mod)
+												return mod.getTitle(DBM.locale);
+											else return "<span style='color:red'>Server implementation not found:</span><br>" + _server.implClassName
+										}
+										catch(e){
+											return _server.implClassName + "<br><span style='color:red'>" + e.message + "</span>";
+										}
+									</tml:script>
+								</td>
+								<td align="right">
+									<tml:case condition="!_enabled">
+										disabled
+									</tml:case>
+									<tml:case condition="!_server.runtime">
+										<div style="color:red">not avaliable</div>
+									</tml:case>
+								</td>
+								
+							</tr>
+
+						</tml:foreach>					
+					</table>
+
+				</tml:option>
+				
+			</tml:include>
+		</tml:case>
+
+	</tml:inline>
+
+	<tml:option name="pageaddon" scope="local">
+		<span id="pageaddon">
+			<a href="#" onclick="WGA.ajax.callAction('<tml:action ref="newDbServer"/>', '<tml:script>return portlet.portletkey</tml:script>')">
+				<tml:img db="@afw" doc="icons" file="page_white_add.png">
+					border="0"
+					alt="<tml:label key="dbserver.create-dbserver"/>"
+					title="<tml:label key="dbserver.create-dbserver"/>"
+				</tml:img>
+				<tml:label key="dbserver.create-dbserver"/>				
+			</a>
+		</span>		
+	</tml:option>
+	
+</tml:include>
+

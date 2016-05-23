@@ -1,0 +1,68 @@
+<tml:action id="saveVhost">
+	_config_bean = DBM.getConfigBean();
+	if(!tmlform.validate())
+		return;
+
+	try{
+
+		var vr = _config_bean.virtualResources;
+
+		var config = DBM.wgaconfig.clone();
+		var host = DBM.wgaconfig.getByUid(portlet.getSessionVar('key'));
+		DBM.tmlform.setConfigProperties(host);
+
+		host.serverAliases.clear();
+		host.serverAliases.addAll(tmlform.fieldlist("serverAliases"));
+
+		host.allowedDatabases.clear();
+		if(tmlform.allowedDbsOption=="all")
+			host.allowedDatabases = createlist(["$all"]);
+		else if(tmlform.allowedDbsOption=="select")
+			host.allowedDatabases.addAll(tmlform.fieldlist("allowedDatabases"));		
+		else if(tmlform.allowedDbsOption=="none")
+			host.defaultDatabase="";
+						
+		host.virtualResources.clear();
+		host.virtualResources.addAll(vr);
+
+		_errors = config.validate()
+		if(_errors.isEmpty()){
+			DBM.wgaconfig.save();
+			
+			var tabview=createObject("@ui/tabview", portlet.parentportlet);
+			tabview.setCurrentPageTitle(host.servername);
+			
+			portlet.fireEvent(createEvent("wga-config-changed"));
+			portlet.setMode("view");
+		}
+		else log.info(_errors);
+	}
+	catch(e){
+		log.info(e);
+	}	
+</tml:action>
+
+<tml:form id="vhost-edit-form" source="none" mode="edit" htmlinput="ignore">
+	<script>
+		DBM.actions.save("<tml:script expression="portlet.portletkey"/>").setAction("<tml:action ref="saveVhost"/>");
+	</script>
+	<tml:include designdb="@ui" ref="windowview">
+	
+	
+		<tml:option name="config" scope="local">
+			tbar:[<tml:[system:edit-action-buttons]/>],
+			buttonAlign: "left",
+			buttons:[<tml:[system:edit-action-buttons]/>]
+		</tml:option>
+	
+		<tml:option name="title">
+			Virtual host configuration for host '<tml:script expression="_config_bean.servername"/>'
+		</tml:option>
+	
+		<tml:inline name="body">
+			<tml:include designdb="@ui" ref="formmessages"/>
+			<tml:include ref="::form"/>
+		</tml:inline>
+		
+	</tml:include>
+</tml:form>

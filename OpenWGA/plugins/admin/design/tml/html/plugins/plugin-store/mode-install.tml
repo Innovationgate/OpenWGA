@@ -1,0 +1,133 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="doInstall">
+	_success = WGA.createList();
+	_success.addAll(pluginStore.local.getInstallPlugins());
+    if (!pluginStore.local.install()) {
+    	_success = null;
+    }
+    
+</tml:action>
+
+<tml:action id="cancel">
+	pluginStore.local.resetActivePlugin();
+</tml:action>
+
+<tml:script>	
+	var activePlugin = pluginStore.server.pluginResult.get(pluginStore.local.getActivePlugin());
+	var pluginID = Packages.de.innovationgate.wga.common.beans.csconfig.v1.PluginID.parseQualifiedFileName(pluginStore.local.getActivePlugin());
+	
+	_plugin = {
+		ID: pluginID,
+		version: pluginID.getVersion().getMainVersionString(),
+		uniquename: pluginID.getUniqueName(),
+		title: activePlugin.get('title'),
+		description: activePlugin.get('description'),
+		vendor: activePlugin.get('vendor'),
+		homepage: activePlugin.get('homepage'),
+		licencetitle: activePlugin.get('licensetitle'),
+		licencetext: activePlugin.get('licensetext'),
+		iconUrl: activePlugin.get('iconurl') ? pluginStore.server.uri + activePlugin.get('iconurl') : null,
+		wgaversion: activePlugin.get('wgaversion'),
+		qualifiedFileName: pluginStore.local.getActivePlugin(),
+		status: null
+	}
+
+	plugins = pluginStore.server.getPluginDependencies(pluginStore.local.getActivePlugin());
+	if (plugins == false) {
+		cancel = true;
+	}
+	
+	if (!plugins) plugins = WGA.createLookupTable();
+	
+	if (plugins.containsKey(_plugin.qualifiedFileName)) plugins.remove(_plugin.qualifiedFileName);
+	
+	var pluginSet = wgacore.getPluginSet();
+	var installedPlugins = WGA.createLookupTable();
+	var iPlugins = pluginSet.getPlugins();
+	for (var i = 0; i < iPlugins.size(); i++) {
+		installedPlugins.put(iPlugins.get(i).getPluginID().getUniqueName(), iPlugins.get(i));
+	}
+	installed = false;
+	status = null;
+	if (_plugin.uniquename && installedPlugins.containsKey(_plugin.uniquename)) {
+		
+		var tmpPlugin = installedPlugins.get(_plugin.uniquename);
+		var tmpPluginID = tmpPlugin.pluginID;
+				
+		status = _plugin.ID.getVersion().compareTo(tmpPluginID.getVersion());
+		if (status <= 0) {	
+			installed = true;
+		} 
+		if (status == 0 && !tmpPlugin.isActive()) {
+			_plugin.disabled = true;
+		}
+	}
+	
+	pluginStore.local.dependenciesValid = true;
+	
+</tml:script>
+
+<tml:if istrue="cancel">
+	<tml:then>
+	<script type="text/javascript">
+		WGA.ajax.callAction("<tml:action ref="cancel" portletmode="view"/>","<tml:script expression="portlet.portletkey"/>");
+	</script>
+	</tml:then>
+	<tml:else>
+		<tml:include ref="::plugin-browser:mode-install">
+			<tml:option name="plugin" expression="_plugin"/>
+		</tml:include>
+		
+		<tml:portlet name="plugin-browser" ajax="true" ref="::plugin-browser:portlet" var="dependencies">
+			<tml:option name="plugins" expression="plugins"/>
+		</tml:portlet>
+		
+		<tml:case condition="pluginStore.local.getInstallPlugins().size() > 1">
+			<h1 style="margin-top:20px;padding-left:10px;color:red"><tml:label file="pluginstore" key="pluginstore.install-dependent-plugins"/>:</h1>
+			<tml:item name="dependencies"/>
+		</tml:case>
+		
+		<div id="install_buttons">
+			<tml:case condition="pluginStore.local.dependenciesValid == true && installed == false">
+				<input type="checkbox" id="licence_agreement" name="licence_agreement" onclick="document.getElementById('install').disabled = !this.checked"><b>&nbsp;I accept all licenses listed above</b><br><br>
+				<script type="text/javascript">
+					function install() {
+						document.getElementById('install').disabled = true;
+						document.getElementById('cancel').disabled = true;
+						WGA.ajax.callAction('<tml:action ref="doInstall" portletmode="view"/>', '<tml:script expression="portlet.portletkey"/>');
+					}
+				</script>
+			</tml:case>
+			<tml:button id="cancel" clickaction="cancel" portletmode="view" ajax="true"><tml:label file="pluginstore" key="pluginstore.cancel"/></tml:button>
+			<tml:case condition="pluginStore.local.dependenciesValid == true && installed == false">
+				<button type="button" name="install" id="install" onclick="install()" disabled="true">
+					<tml:label file="pluginstore" key="{'pluginstore.' + (!status ? 'install' : 'update')}"/>
+				</button>
+			</tml:case>
+		</div>
+	</tml:else>
+</tml:if>

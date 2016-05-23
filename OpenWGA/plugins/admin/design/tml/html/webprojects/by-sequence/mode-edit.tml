@@ -1,0 +1,76 @@
+<tml:action id="saveConfig">
+	var uids = tmlform.uids.split(",")
+	
+	var dbs = WGA.createList();
+	dbs.addAll(DBM.wgaconfig.getDatabases(null, null, "ContentDatabase", true));
+	for(var i=0; i<uids.length; i++){
+		dbs.add(DBM.wgaconfig.getByUid(uids[i]))
+	}
+	DBM.wgaconfig.get().setContentDatabases(dbs);
+	DBM.wgaconfig.save();
+	portlet.setMode("view");
+</tml:action>
+
+<tml:script>
+	_dbs = DBM.wgaconfig.getDatabases(null, null, "ContentStore", true);
+</tml:script>
+
+<tml:form id="cs-edit-form" source="none" mode="edit" htmlinput="ignore">
+
+	<tml:input name="uids" type="hidden" cssstyle="width:100%"/>
+
+	<tml:include designdb="@ui" ref="windowview">
+		<tml:option name="title">Databases by connection sequence</tml:option>	
+	
+		<tml:option name="config" scope="local">
+			buttonAlign: "left"
+			,buttons: [
+				{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="cancel.png"/>',		                
+					text: "<tml:label key="btn.cancel-edit"/>",
+					handler: function(){
+						DBM.callAction("<tml:action ref="actions:cancelEditMode"/>", "<tml:script expression="portlet.portletkey"/>", "cancel editing");
+					}
+				}
+				,{
+					cls:'x-btn-text-icon',	
+					iconCls: 'action-save-icon',					
+					text: "<tml:label key="btn.save"/>",
+					handler: function(){
+						var dbs = []
+						$("#cs-list li").each(function(el){
+							dbs.push($(this).data("uid"))
+						})
+						document.forms["<tml:script expression="tmlform.formid"/>"].uids.value = dbs.join(",")
+						DBM.callAction("<tml:action ref="saveConfig"/>", "<tml:script expression="portlet.portletkey"/>", "updating config");
+					}
+				}		
+			]
+		</tml:option>
+	
+		<tml:inline name="body">
+	
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Reorder sequence</tml:option>
+				<tml:option name="body">
+					Reorder sequence by dragging ...
+				</tml:option>
+			</tml:include>
+	
+			<ul id="cs-list" class="sortable">
+				<tml:foreach item="_dbs" currentvalue="_db">
+					<li data-uid="<tml:script expression="_db.uid"/>" class="ui-state-default"><tml:script expression="_db.title"/></li>
+				</tml:foreach>
+			</ul>
+			
+			<script>
+				$("#cs-list").sortable({ 
+					axis: "y"
+				});
+			</script>
+			
+		</tml:inline>
+		
+	</tml:include>
+</tml:form>

@@ -476,7 +476,9 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
                 getlog().warn("Could not store WebTML variable as item on document bc. of exception. It will not be available in native expressions.", e);
             }
         } 
-         
+        
+        name = convertVarName(name);
+        
         if (value instanceof List && keepList) {
             value = new ListVarContainer((List<Object>) value);
         }
@@ -486,11 +488,19 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         }
         else {
             _environment.getPageVars().put(name, value);
-        }
-		
+        }	
 		
 	}
 	
+    public String convertVarName(String name){
+        if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
+        	return name;
+        }
+        else{
+        	return name.toLowerCase();
+        }
+    }
+    
 	/* (non-Javadoc)
      * @see de.innovationgate.wgpublisher.webtml.utils.Context#getvar(java.lang.String)
      */
@@ -499,6 +509,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		if (name == null) {
 	        return null;
 	    }	    
+		
+		name = convertVarName(name);
 		
         if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
             Object value = getDesignContext().retrieveLocalVar(name);
@@ -522,8 +534,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	    if (name == null) {
 	        return null;
 	    }	    
-		name = name.toLowerCase();
-		
+	    name = convertVarName(name);
 		Map<String,TransientObjectWrapper<Object>> sessionVars = _environment.getSessionVars();
 		if (sessionVars.containsKey(name)) {
 			TransientObjectWrapper<Object> wrapper = sessionVars.get(name);
@@ -551,15 +562,16 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	 */
 	public void updateOrSetVar(String name, Object value) throws WGException {
 		
-	    
+		String cname = convertVarName(name);
+		
 	    // Look for portlet vars and portlet session vars of that name (B00005E12)
         String portletNameSpace = (String) option(Base.OPTION_PORTLET_NAMESPACE);
             if (portletNameSpace != null) {
                 TMLPortlet portlet = getportlet();
                 if (portlet != null) {
     
-                String pItemName = portlet.getVarPrefix() + name;
-                if (_environment.getPageVars().containsKey(pItemName.toLowerCase())) {
+                String pItemName = portlet.getVarPrefix() + cname;
+                if (_environment.getPageVars().containsKey(pItemName)) {
                     portlet.setvar(name, value);
                     return;
                 }
@@ -573,8 +585,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         }
 	    
 	    // Look for session var of that name
-		if (_environment.getSessionVars().containsKey(name.toLowerCase())) {
-		    this.setsessionvar(name, value);
+		if (_environment.getSessionVars().containsKey(cname)) {
+		    this.setsessionvar(cname, value);
 		    return;
 		}
 		
@@ -582,21 +594,21 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		// Important to have this priority order for updating vars
 		if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
 		    
-		    Object localVarValue = getDesignContext().retrieveLocalVar(name.toLowerCase());
+		    Object localVarValue = getDesignContext().retrieveLocalVar(cname);
 		    if (!(localVarValue instanceof NullPlaceHolder)) {
-		        setvar(name, value);
+		        setvar(cname, value);
 		        return;
 		    }
 		    
 		    TMLPage page = WGA.get(this).tmlPage();
-		    if (page.hasVar(name)) {
-		        page.setVar(name, value);
+		    if (page.hasVar(cname)) {
+		        page.setVar(cname, value);
 		        return;
 		    }
 		}
 
         // So we just set - (or maybe update, if compliance < 7.2) - a normal var
-        this.setvar(name, value);
+        this.setvar(cname, value);
 		
 	}
 
@@ -801,8 +813,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	}
     
     public boolean hasVariable(String name) {
-        name = name.toLowerCase();
-        
+    	name = convertVarName(name);
         try {
             if (_environment.getPageVars().containsKey(name)) {
                 return true;
@@ -822,8 +833,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     }
     
     public boolean hasMappedItemValue(String name) {
-        name = name.toLowerCase();
-        
+    	name = convertVarName(name);
         if (this.getMappedItemValue(name) == null) {
             return false;
         } else {
@@ -843,13 +853,13 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         }
 	}
 
-    protected Object retrieveVar(String name) throws WGAPIException {
+	protected Object retrieveVar(String name) throws WGAPIException {
         
         if (name == null) {
             return null;
         }
         
-        String lcName = name.toLowerCase();
+        String cname = convertVarName(name);
         
 		Map<String,Object> pageVars = _environment.getPageVars();
         
@@ -860,12 +870,12 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
             if (portlet != null) {
             
                 // Portlet variables. Stored along with regular WebTML variables plus prefix
-                String pName = portlet.getVarPrefix() + lcName;
+                String pName = portlet.getVarPrefix() + cname;
                 if (pageVars.containsKey(pName)) {
                     return pageVars.get(pName);
                 }
     
-                // Portlet session variables. Stored on the portlet session context, thererfor retrieved via portlet object
+                // Portlet session variables. Stored on the portlet session context, therefore retrieved via portlet object
                 Object value = portlet.retrieveSessionVar(name);
                 if (value != null) {
                     return value;
@@ -876,21 +886,21 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 
         // Local variables (since 7.2)
         if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
-            Object value = getDesignContext().retrieveLocalVar(name);
+            Object value = getDesignContext().retrieveLocalVar(cname);
             if (!(value instanceof NullPlaceHolder)) {
                 return value;
             }
         }
         
 		// Regular page (request) variables
-		if (pageVars.containsKey(name)) {
-			return pageVars.get(name);
+		if (pageVars.containsKey(cname)) {
+			return pageVars.get(cname);
 		}
 
 		// Session variables
 		Map<String,TransientObjectWrapper<Object>> sessionVars = _environment.getSessionVars();
-		if (sessionVars.containsKey(name)) {			
-			return sessionVars.get(name).get();
+		if (sessionVars.containsKey(cname)) {			
+			return sessionVars.get(cname).get();
 		}
         
 		return new NullPlaceHolder();
@@ -1545,7 +1555,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	private String getItemMappingExpression(String name) {
 		@SuppressWarnings("unchecked")
         Map<String,String> mappings = (Map<String,String>) this.getdocument().getDatabase().getAttribute(WGACore.DBATTRIB_ITEM_MAPPINGS);
-		return mappings.get(name.toLowerCase());
+		name = convertVarName(name);
+		return mappings.get(name);
 	}
 
 	/* (non-Javadoc)
@@ -1553,8 +1564,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      */
     public void setSessionVar(String name, Object value, boolean allowSerialization, boolean keepList) {
         
-	    name = name.toLowerCase();
-	    
+    	name = convertVarName(name);
+    	
         if (value instanceof List && keepList) {
             value = new ListVarContainer((List) value);
         }
@@ -1596,11 +1607,10 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      */
 	@Override
     public void removesessionvar(String name) {
-		_environment.getSessionVars().remove(name.toLowerCase());
+		name = convertVarName(name);
+		_environment.getSessionVars().remove(name);
 	}
 	
-
-
 	/* (non-Javadoc)
      * @see de.innovationgate.wgpublisher.webtml.utils.Context#content()
      */
@@ -2790,16 +2800,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	@Override
     public boolean isdefined(String name) throws WGAPIException {
 		
-		name = name.toLowerCase();
+		name = convertVarName(name);
         TMLPortlet portlet = getportlet();
-        
-        // Local variables (since 7.2)
-        if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
-            Object value = getDesignContext().retrieveLocalVar(name);
-            if (!(value instanceof NullPlaceHolder)) {
-                return true;
-            }
-        }
         
         Map<String,Object> vars = _environment.getPageVars();
         
@@ -2820,6 +2822,14 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
             
         }
 
+        // Local variables (since 7.2)
+        if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
+            Object value = getDesignContext().retrieveLocalVar(name);
+            if (!(value instanceof NullPlaceHolder)) {
+                return true;
+            }
+        }
+        
         // Request variables
 		if (vars.containsKey(name)) {
 			return true;
@@ -3340,17 +3350,17 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      */
 	@Override
     public void removevar(String name) throws WGAPIException {
-	    
-	 // Local variables (since 7.2)
+		String lcName = convertVarName(name);
+		// Local variables (since 7.2)
         if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
-            Object value = getDesignContext().retrieveLocalVar(name.toLowerCase());
+            Object value = getDesignContext().retrieveLocalVar(lcName);
             if (!(value instanceof NullPlaceHolder)) {
-                getDesignContext().removeLocalVar(name.toLowerCase());
+                getDesignContext().removeLocalVar(lcName);
                 return;
             }
         }
 	    
-		_environment.getPageVars().remove(name.toLowerCase());
+		_environment.getPageVars().remove(lcName);
 		
 		if (this.document.getDatabase().hasFeature(WGDatabase.FEATURE_STORESVARS)) {
 			this.document.removeItem(name);
@@ -5333,6 +5343,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     }
     
     public void setLocalVar(String name, Object value) throws WGException {
+    	name = convertVarName(name);
         getDesignContext().setLocalVar(name, value);
     }
     

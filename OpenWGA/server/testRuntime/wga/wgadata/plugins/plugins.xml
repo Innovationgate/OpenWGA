@@ -16,7 +16,7 @@
           <minorVersion>2</minorVersion>
           <maintenanceVersion>0</maintenanceVersion>
           <patchVersion>0</patchVersion>
-          <buildVersion>190</buildVersion>
+          <buildVersion>193</buildVersion>
         </version>
       </__pluginID>
     </WGAPlugin>
@@ -61,7 +61,7 @@
       <__active>true</__active>
       <__defaultPlugin>true</__defaultPlugin>
       <__reconnectDatabase>false</__reconnectDatabase>
-      <__filePath>${wga.defaultpluginsdir}/de.innovationgate.admin-7.2.0.wgaplugin</__filePath>
+      <__filePath>/Users/ws/workspace-openwga-dev.git/OpenWGAServer/OpenWGA/server/build/extra/WEB-INF/default-plugins/de.innovationgate.admin-7.2.0.0.b644.wgaplugin</__filePath>
       <__installationKey>admin</__installationKey>
       <__pluginID>
         <uniqueName>de.innovationgate.admin</uniqueName>
@@ -70,7 +70,7 @@
           <minorVersion>2</minorVersion>
           <maintenanceVersion>0</maintenanceVersion>
           <patchVersion>0</patchVersion>
-          <buildVersion>84</buildVersion>
+          <buildVersion>644</buildVersion>
         </version>
       </__pluginID>
     </WGAPlugin>
@@ -124,7 +124,7 @@
           <minorVersion>2</minorVersion>
           <maintenanceVersion>0</maintenanceVersion>
           <patchVersion>0</patchVersion>
-          <buildVersion>81</buildVersion>
+          <buildVersion>83</buildVersion>
         </version>
       </__pluginID>
     </WGAPlugin>
@@ -259,16 +259,16 @@
       <__active>true</__active>
       <__defaultPlugin>true</__defaultPlugin>
       <__reconnectDatabase>false</__reconnectDatabase>
-      <__filePath>${wga.defaultpluginsdir}/de.innovationgate.additional-script-langs-1.0.0.wgaplugin</__filePath>
+      <__filePath>/Users/ws/workspace-openwga-dev.git/OpenWGAServer/OpenWGA/server/build/extra/WEB-INF/default-plugins/de.innovationgate.additional-script-langs-7.2.0.0.b644.wgaplugin</__filePath>
       <__installationKey>additional-script-langs</__installationKey>
       <__pluginID>
         <uniqueName>de.innovationgate.additional-script-langs</uniqueName>
         <version>
-          <majorVersion>1</majorVersion>
-          <minorVersion>0</minorVersion>
+          <majorVersion>7</majorVersion>
+          <minorVersion>2</minorVersion>
           <maintenanceVersion>0</maintenanceVersion>
           <patchVersion>0</patchVersion>
-          <buildVersion>2</buildVersion>
+          <buildVersion>644</buildVersion>
         </version>
       </__pluginID>
     </WGAPlugin>

@@ -1,0 +1,112 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="load-cs-dump">
+	_config_bean = DBM.getConfigBean();
+	var dbkey = _config_bean.key
+
+	var error="false";
+	var options = createLookupTable();
+	try {
+	
+		// Store dump file to disk
+		var tempFile = java.io.File.createTempFile("dmp", ".tmp");
+		var inStr = new java.io.FileInputStream(tmlform.getfile(tmlform.dump));
+		var outStr = new java.io.FileOutputStream(tempFile);
+		Packages.de.innovationgate.utils.WGUtils.inToOut(inStr, outStr, 2048);
+		inStr.close();
+		outStr.close();
+		
+		// Perform update
+		
+		options.put("dbkey", dbkey);
+		options.put("filename", tempFile.getAbsolutePath());
+		options.put("deletefile", "true");
+		
+		var name = wgacore.runTransientTask("de.innovationgate.wgpublisher.scheduler.LoadDumpTask", "loadContentStoreDump", options); 
+
+	}
+	catch (e) {
+		logException(e);
+		_errormsg = "An error occured: " + e.message;
+		if (e.javaException && e.javaException.cause != null) {
+			_errormsg += ". Cause: " + e.javaException.cause.message;
+		}
+		error="true";
+	}
+
+	var ev = createEvent("cs-dump-import-started");
+	ev.addParameter("job_name", name);
+	ev.addParameter("error", error);
+	portlet.fireEvent(ev);
+
+</tml:action>
+
+<div id="cs-dump-info">
+
+<tml:form id="load-dump-form" source="none" maxuploadsize="-1">
+	<div id="load-dump-select"> 
+		<div style="color:red">
+			NOTE: Loading a dump will delete all content data and schema from this content store! 
+		</div>
+		Dump file: <tml:input name="dump" type="file">
+			onchange="if(this.value)document.getElementById('load-dump-button').disabled=false"
+		</tml:input>
+		<button id="load-dump-button" disabled="disabled" onclick="loadDump()">
+			Import Dump
+		</button>
+	</div>
+	<div id="load-dump-button-info"></div>
+	<script>
+		function loadDump(){
+			document.getElementById('load-dump-select').style.display="none";
+			document.getElementById('load-dump-button-info').innerHTML='uploading dump file ...';
+			DBM.ajaxAction({
+				action: '<tml:action ref="load-cs-dump" ajax="norefresh" debounce="false"/>',
+				id: '<tml:script expression="portlet.portletkey"/>',
+				graydiv: true,
+				mode: 'norefresh'
+			}, 'import CS Dump');
+		}				
+	</script>	
+</tml:form>
+
+<div id="job-log" style="display:none; padding: 3px;margin-top:5px">
+	<iframe style="height: 250px; width:100%"></iframe>
+</div>
+
+<script>
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "cs-dump-import-started", function(ev){
+		if(ev.params.error=="true"){
+			Ext.Msg.minWidth=350;
+			Ext.Msg.alert("Error", "Unable to import dump. See Serverlog for more information.");
+		}
+		else{
+			DBM.showHideElement("load-dump-form");
+			DBM.currentjoblog = DBM.joblog('job-log', ev.params.job_name);
+			DBM.currentjoblog.toggleView();
+		}
+	});
+
+</script>

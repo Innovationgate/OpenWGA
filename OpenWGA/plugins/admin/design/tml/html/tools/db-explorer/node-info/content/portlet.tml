@@ -1,0 +1,111 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Document Context: <b><tml:item name="key"/></b></tml:option>	
+	<tml:option name="config" scope="local">
+		tbar: [
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="database_table.png"/>',		                
+				text: "Show all Meta Data ...",
+				handler: function(){
+					DBM.dialog("Meta Data ...",
+						"<tml:url type="tml" medium="html" layout="::all-metas"/>",
+						{ so: "<tml:script expression="AFW.Util.serializeJsObject({key:portlet.getSessionVar('key')})"/>"},
+						this.el
+					)
+				}
+			}
+			<tml:case context="{portlet.getSessionVar('key')}" iscontextvalid="true">
+				,"->"				
+				,{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="application_osx_terminal.png"/>',		                
+					text: "open in TMLScript Console",
+					handler: function(){
+						DBM.switchToObject('tools.tmlscript-console', '<tml:option name="key"/>', '<tml:item name="key"/>');
+					}
+				}
+				<tml:case condition="DBM.database(option('key')).isFullFeature">
+					,{
+						cls:'x-btn-text-icon',						
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="application_double.png"/>',		                
+						text: "open in new window",
+						handler: function(){
+							window.open('<tml:url/>')
+						}
+					}
+					<tml:case condition="AFW.database(option('key')).isAuthoringAllowed()">
+						,{
+							cls:'x-btn-text-icon',						
+							icon: '<tml:url type="file" db="@afw" doc="icons" file="application_form_edit.png"/>',		                
+							text: "open in Content Manager",
+							handler: function(){
+								window.open('<tml:meta type="request" name="absolutewgaurl"/>/plugin-contentmanager/html/contentstore?dbkey=<tml:meta name="dbkey" type="db"/>&contentkey=<tml:meta name="key"/>#<tml:meta type="db" name="dbkey"/>/<tml:meta name="key"/>')
+							}
+						}
+					</tml:case>
+				</tml:case>	
+			</tml:case>
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+		<tml:if context="{portlet.getSessionVar('key')}" iscontextvalid="true">
+			<tml:then>
+
+				<tml:include designdb="@ui" ref="tabview_js">
+					<tml:option name="tabnames">Meta Data|meta,Items|items,Attachments|attachments,Relations|relations</tml:option>
+					
+					<tml:option name="body">
+				
+						<div class="tab-body-topline">	
+							<div class="x-hidden" id="meta">
+								<tml:include ref="::metas"/>
+							</div>
+							<div class="x-hidden" id="items">
+								<tml:include ref="::items"/>
+							</div>
+							<div class="x-hidden" id="attachments">
+								<tml:include ref="::attachments"/>
+							</div>
+							<div class="x-hidden" id="relations">
+								<tml:include ref="::relations"/>
+							</div>
+						</div>
+						
+					</tml:option>
+					
+				</tml:include>
+
+							
+			</tml:then>
+			<tml:else>
+				Context not valid
+				<tml:button clickaction="system:closeTab" ajax="true">Close this Document</tml:button>
+			</tml:else>
+		</tml:if>
+	</tml:inline>
+</tml:include>

@@ -1,0 +1,36 @@
+function Renderer(){}
+
+Renderer.prototype.render = function($urlParam_index) {
+
+	var offset = Number($urlParam_index||0);
+	
+	var logService = WGA.service(Packages.de.innovationgate.wgpublisher.log.AppLog);
+	
+	var pagesize = 10
+
+	if(!offset){	
+		var lines = logService.getLinesCount();
+		if (lines > pagesize) {
+			offset = lines - pagesize + 1;
+		}
+		else offset=1
+	}
+
+	var loginfo = logService.getPage(offset, pagesize, Packages.de.innovationgate.wga.common.LogLevel.LEVEL_INFO)
+	
+	var messages = []
+	for(let msg in Iterator(loginfo.messages)){
+		messages.push({
+			time: WGA.format(msg.time, "HH:mm:ss"),
+			level: msg.level.toString(),
+			msg: msg.mainMessage,
+			details: msg.details
+		})
+	}
+	
+	WGA.TMLPage.write(JSON.stringify({
+		messages: messages,
+		endIndex: loginfo.getEndIndex()+1
+	}));
+
+}

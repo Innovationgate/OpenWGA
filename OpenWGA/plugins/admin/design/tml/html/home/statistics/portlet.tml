@@ -1,0 +1,62 @@
+<tml:script>
+	var MAX = 12;	
+	_data = WGA.createList();
+	_labels = WGA.createList();
+	
+	var stats = wgacore.getUsageStatistics();
+	var days = stats.getAvailableDays();
+	
+	var now = createcalendar(createdate());
+	now.add(now.HOUR_OF_DAY, -(MAX-1));
+	
+	for (var i=0; i < MAX; i++){
+		
+		var requests = 0;		
+		var hourstats = stats.getHoursMapForDay(now.time);
+		var h = new Packages.java.lang.Integer(now.get(now.HOUR_OF_DAY));			
+		var h_stats = hourstats.get(h);
+
+		_data.add(h_stats && h_stats.getRequests()||0)
+		_labels.add(h+":00")
+
+		now.add(now.HOUR_OF_DAY, 1);
+	}	
+</tml:script>
+
+<tml:include designdb="@ui" ref="windowview">
+
+	<tml:option name="title">Server Statistics</tml:option>
+
+	<div  style="margin:10px">
+		<canvas id="canvas"></canvas>
+	</div>
+
+	<script>
+		var lineChartData = {
+			labels: [
+				<tml:foreach item="_labels" currentvalue="_label">
+					"<tml:item name="_label"/>"<tml:between>,</tml:between>
+				</tml:foreach>
+			],
+			datasets : [
+				{
+					fillColor : "rgba(220,220,220,0.5)",
+					strokeColor : "#666b75",
+					data : [
+						<tml:foreach item="_data" currentvalue="_requests">
+							<tml:item name="_requests" format="0"/><tml:between>,</tml:between>
+						</tml:foreach>					
+					]
+				}
+			]
+		}
+
+		var ctx = document.getElementById("canvas").getContext("2d");
+		new Chart(ctx).Line(lineChartData, {
+			responsive: true,
+			animationSteps: 10
+		});
+
+	</script>			
+		
+</tml:include>

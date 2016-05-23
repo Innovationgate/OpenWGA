@@ -1,0 +1,260 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="DesignSourceChanged">
+	_config_bean = DBM.getConfigBean();
+	tmlform.removeField("/design/name");
+	// ensure, alls current designdata and options are removed
+	_config_bean.design = new Packages.de.innovationgate.wga.config.Design()
+</tml:action>
+
+<tml:comment><tml:action id="OverlayNameChanged">
+	if(tmlform.field("overlay/name")){
+		_config_bean.overlay = new Packages.de.innovationgate.wga.config.Design()
+		_config_bean.overlay.source = "fs-designs";
+	}
+	else _config_bean.overlay = null;						
+</tml:action></tml:comment>
+
+<tml:action id="DesignChanged">
+		var event = createEvent("cs-design-changed");
+		portlet.fireEvent(event);
+</tml:action>
+
+<tml:action id="createDesign">
+	var designsource = wgacore.getDesignManager().getDesignSources().get(tmlform.field("/design/source"));
+	designsource.createDesign(tmlform.newdesign)
+	tmlform.setField("/design/name", tmlform.newdesign);
+	tmlform.removeField("newdesign");
+</tml:action>
+
+<tml:script>
+	// read designsources:
+	_designsources=createlist();
+	_defaultDesignSource = "fs-designs"
+	if(!_config_bean.design)
+		_defaultDesignSource = "local"
+	_designsources.add(label("designsource.local")+"|local");
+	_fileSystemDesignSource = null;
+	var ds = wgacore.getDesignManager().getDesignSources().values().iterator();
+	while(ds.hasNext()){
+		var designsource = ds.next()
+		_designsources.add(designsource.getTitle(DBM.locale) + "|" + designsource.name);
+		if (designsource instanceof Packages.de.innovationgate.wgpublisher.design.fs.FileSystemDesignSource)
+			_fileSystemDesignSource = designsource; 
+	}
+</tml:script>
+
+<tml:[system:fs-input] o_field="design/source" o_type="select" o_options="{_designsources}" o_changeaction="DesignSourceChanged"
+	o_default="{_defaultDesignSource}"
+	o_validation="$E_VALUE!=''"
+	o_message="Please select a design source"
+/>
+
+<tml:case condition="tmlform.field('/design/source') && tmlform.field('/design/source')!='local'">	
+	<tml:script>
+		var designsource = wgacore.getDesignManager().getDesignSources().get(tmlform.field("/design/source"));
+		_designSourceTitle = designsource.getDescription(DBM.locale); 
+		_isDesignCreatable = designsource.isDesignCreatable()
+
+		_designs=createlist();
+	
+		var modDef = DBM.getModuleDefinition("DesignProvider", designsource.getDesignProviderClass().getName());
+		try{
+			if(modDef.testAvailability){
+				modDef.testAvailability(DBM.getModReg())
+			}
+			setOption("base-module-definition", modDef);
+
+			var designOptions = designsource.getDesignNames().toArray().map(
+				function(designName) {
+					var option = this.getDesign(designName).getTitle();
+					if (designName != option) {
+						option += " (" + designName + ") |" + designName;
+					}
+					return option;
+				},
+				designsource
+			);
+
+			_designs.addAll(createList(designOptions));
+		}
+		catch(e){
+			_msg = e.javaException ? e.javaException.message : e.message
+		}
+	</tml:script>
+	
+	<label>Design Info:</label>
+	<div class="data">
+		<tml:item name="_designSourceTitle"/>
+	</div>
+	<div class="clear"></div>
+	
+	<tml:if condition="_msg">
+		<tml:then>
+			<label><tml:label key="webprojects.design.source-not-available"/>:</label>
+			<div class="data" style="color:red">
+				<tml:item name="_msg"/>
+				<tml:input name="not-valid" type="hidden"
+					validation="false"
+					message="The selected design source type is currently not available on this WGA system"
+				/>
+			</div>
+			<div class="clear"></div>					
+		</tml:then>
+		
+		<tml:else>
+			<div id="select-design">
+				
+				<tml:[system:fs-input] o_field="design/name" o_type="select" o_options="{_designs}"
+					o_validation="$E_VALUE!=''"
+					o_message="Please select a design"
+					o_label = "{'/'+tmlform.field('/design/source')}"
+					o_changeaction="DesignChanged"
+				/>
+				
+				<tml:case condition="_isDesignCreatable && tmlform.mode()=='edit'">
+					<label>Or:</label>
+					<div class="data">
+						<button type="button" onclick="DBM.showHideElement('create-design');DBM.showHideElement('select-design')">
+							Create new <tml:label file="wgaconfig" key="{'ContentStore/design/name/'+tmlform.field('/design/source')}"/> ...
+						</button>
+					</div>
+					<div class="clear"></div>
+				</tml:case>
+				
+				<tml:[system:module-options:form] o_title="optionale weitere Design Parameter">
+					<tml:option name="ns">/design/options</tml:option>
+					<tml:option name="module-definition" expression="option('base-module-definition')"/>
+				</tml:[system:module-options:form]>
+				
+				<tml:script>
+					// check overlay support
+					_overlay_support=null;
+					if(!_fileSystemDesignSource)
+						return;		// we don't have a fileSystem design source: no overlays in this case.
+					var designsource = wgacore.getDesignManager().getDesignSources().get(tmlform.field("/design/source"));
+					if (designsource instanceof Packages.de.innovationgate.wgpublisher.design.db.PluginDesignSource) {
+						// overlays are only supported for plugin design source
+						var design = designsource.getDesign(tmlform.field("/design/name"));
+						if(design && design.getOverlaySupport){
+							_overlay_support = design.getOverlaySupport();
+							// get all file system designs:
+							_fileSystemDesigns = _fileSystemDesignSource.getDesignNames();
+							if(_overlay_support=="optional")
+								_fileSystemDesigns.add(0, "none|");
+							tmlform.setField("/overlay/source", _fileSystemDesignSource.name);
+							
+							var modDef = DBM.getModuleDefinition("DesignProvider", _fileSystemDesignSource.getDesignProviderClass().getName());
+							try{
+								if(modDef.testAvailability){
+									modDef.testAvailability(DBM.getModReg())
+								}
+								setOption("overlay-module-definition", modDef);
+							}
+							catch (e) {
+								_msg = e.javaException ? e.javaException.message : e.message
+							}
+						}
+					}
+				</tml:script>
+				<tml:case condition="_overlay_support && _overlay_support != 'none'">					
+					<tml:[system:fs-input] o_field="overlay/name" o_type="select" o_options="{_fileSystemDesigns}"/>
+					
+					<tml:comment>Is this actually helpful?
+					<tml:case condition="tmlform.mode()=='view' && _is_overlay_active">
+						<label>Customization compliance:</label>
+						<div class="data">
+							Compliant to version <tml:script expression="_dprov.getStatus().getCompliantBaseVersion()"/> of base design plugin
+							<tml:script>
+								_design_may_be_updated=false;
+								if(db(_config_bean.key)){
+									_dprov = db(_config_bean.key).getDesignProvider()
+									if(_dprov instanceof Packages.de.innovationgate.wgpublisher.design.OverlayDesignProvider)
+										_design_may_be_updated=_dprov.isUpgradeable()
+								}
+							</tml:script>
+							<tml:case istrue="_design_may_be_updated">
+								(Upgradeable to <tml:script expression="_dprov.getStatus().getCurrentBaseVersion()"/>) 
+							</tml:case>
+							
+						</div>
+					</tml:case></tml:comment>
+					
+					<tml:case condition="!tmlform.isEmpty('/overlay/name')">
+					
+						<tml:[system:module-options:form] o_title="optionale weitere Design Parameter">
+							<tml:option name="ns">/overlay/options</tml:option>
+							<tml:option name="module-definition" expression="option('overlay-module-definition')"/>
+						</tml:[system:module-options:form]>
+					
+					</tml:case>
+					
+				</tml:case>
+				
+			</div>
+			
+			<div id="create-design" style="display:none">
+				<label>New <tml:label file="wgaconfig" key="{'ContentStore/design/name/'+tmlform.field('/design/source')}"/>:</label>
+				<div class="data">
+					<div style="float:left">
+						<tml:input name="newdesign"/>
+						<tml:include ref="system:convert-to-ext-field" o_fieldname="newdesign">
+							<tml:option name="onvalid">
+								var button = Ext.getCmp("ext-create-design-button");
+								if(valid){
+									button.enable();
+									Ext.get("create-design-button").highlight("#004080");
+								}
+								else button.disable();
+							</tml:option>
+						</tml:include>
+					</div>
+					<span id="create-design-button"></span>
+					<script>
+						new Ext.Button({
+							text: "Create <tml:label file="wgaconfig" key="{'ContentStore/design/name/'+tmlform.field('/design/source')}"/>",
+							cls:'x-btn-text-icon',						
+							icon: '<tml:url type="file" db="@afw" doc="icons" file="folder_add.png"/>',		                
+							id: "ext-create-design-button",
+							renderTo: "create-design-button", 
+							disabled: true,
+							handler: function(){
+								WGA.ajax.callAction('<tml:action ref="createDesign"/>', '<tml:script expression="portlet.portletkey"/>')
+							}
+						})
+					</script>
+				</div>
+				<div class="clear"></div>
+				
+				<label>Or:</label>
+				<div class="data">
+					<button type="button" onclick="DBM.showHideElement('create-design');DBM.showHideElement('select-design')">Select existing <tml:label file="wgaconfig" key="{'ContentStore/design/name/'+tmlform.field('/design/source')}"/> ...</button>
+				</div>
+				<div class="clear"></div>	
+			</div>
+		</tml:else>
+	</tml:if>
+		
+</tml:case>

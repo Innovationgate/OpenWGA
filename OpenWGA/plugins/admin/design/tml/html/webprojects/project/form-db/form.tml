@@ -1,0 +1,137 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="clearDbOptions">
+	_config_bean = DBM.getConfigBean();
+	_config_bean.databaseOptions.clear();
+	DBM.tmlform.removeFields("/databaseOptions");
+	tmlform.removeField("selectedDb");
+	_config_bean.changed=true;
+</tml:action>
+
+<tml:action id="createDbOptions">	
+	_config_bean = DBM.getConfigBean();
+	_config_bean.databaseOptions.putAll(_dbinfolist.get(tmlform.dblist).options);
+	_config_bean.changed=true;
+</tml:action>
+
+<tml:action id="removeDbImplClassName">
+	_config_bean = DBM.getConfigBean();
+	_config_bean.implClassName = "";
+	tmlform.removeField("/implClassName");
+	tmlform.removeField("connection");
+	callAction("clearDbOptions");
+</tml:action>
+
+
+<tml:script>
+	if(option("dbserver")){
+		tmlform.setField("/dbServer", option("dbserver"));
+		_dbservers = createlist();
+		_dbservers.add(wgacore.getDatabaseServers().get(option("dbserver")).getTitle(DBM.locale) + "|" + option("dbserver"));
+	}
+	else _dbservers = DBM.dbservers.getServerList(option("dbtype"));
+</tml:script>
+
+<tml:[system:fs-input] o_field="dbServer" o_type="select" o_options="{_dbservers}" o_switchto="dbservers" o_changeaction="removeDbImplClassName"
+	o_validation="$E_VALUE!=''"
+	o_message = "Please select a database server"
+	o_mode="{(option('dbserver') && portlet.getMode()=='new') ? 'view': _dbservers.size()==1?'view':'edit'}"
+/>	
+<tml:case condition="tmlform.field('/dbServer') && !wgacore.getDatabaseServers().get(tmlform.field('/dbServer'))">
+	<label>Server Status:</label>
+	<div class="data" style="color:red">This database server is currently not available</div>
+	<div class="clear"></div>
+</tml:case>
+
+<tml:case condition="tmlform.field('/dbServer')">
+	<tml:script>			
+		_implClasses = DBM.dbservers.getImplClassNameList(tmlform.field('/dbServer'), option("dbtype"));
+	</tml:script>
+
+	<tml:[system:fs-input] o_field="implClassName" o_type="select" o_options="{_implClasses}" o_changeaction="clearDbOptions" 
+		o_validation="$E_VALUE!=''"
+		o_message = "Please select a database type"
+		o_mode="{_implClasses.size()==1?'view':'edit'}"
+	/>
+
+	<tml:case condition="tmlform.field('/implClassName')">
+	
+		<tml:script>
+			if(tmlform.selectedDb){
+				var pathOptions = _dbinfolist.get(tmlform.selectedDb).options;
+				DBM.getConfigBean().databaseOptions.putAll(pathOptions)
+			}
+			try{
+				var dbserver = wgacore.getDatabaseServers().get(tmlform.field('/dbServer'));
+				if(dbserver)
+					_isAvailableDatabasesRetrievable = dbserver.isAvailableDatabasesRetrievable(wgacore.getLibraryLoader().loadClass(tmlform.field('/implClassName')));
+				else _isAvailableDatabasesRetrievable=false;
+
+				var dbtype = DBM.getModuleDefinition(option("dbtype"), tmlform.field('/implClassName'))
+				setOption("module-definition", dbtype);
+				
+				_pathOptions = DBM.dbservers.getPathOptions(tmlform.field('/dbServer'), dbtype);
+		        _hasPathOptions = !_pathOptions.isEmpty();
+			}
+			catch(e){
+				_errormsg = e.javaException ? e.javaException.message : e.message
+			}
+		</tml:script>
+		
+		<tml:if condition="option('module-definition')">
+			<tml:then>
+				<tml:if condition="_isAvailableDatabasesRetrievable && (!_config_bean.databaseOptions || _config_bean.databaseOptions.isEmpty())">
+					<tml:then>
+						<tml:case condition="tmlform.mode()=='edit'">
+							<tml:include ref="::form-select-or-create-db">
+								<tml:option name="implClassName"><tml:item name="/implClassName" type="tmlform"/></tml:option>
+								<tml:option name="dbServer"><tml:item name="/dbServer" type="tmlform"/></tml:option>
+								<tml:option name="type"><tml:option name="dbtype"/></tml:option>
+							</tml:include>
+						</tml:case>
+					</tml:then>
+					<tml:else>
+						<tml:[system:module-options:form] o_title="optional Database Parameter">
+							<tml:option name="ns">/databaseOptions</tml:option>
+							<tml:option name="changeDbAction">clearDbOptions</tml:option>
+							<tml:option name="pathOptionsReadonly"><tml:item name="_isAvailableDatabasesRetrievable"/></tml:option>
+							<tml:option name="pathOptions" expression="_pathOptions"/>
+						</tml:[system:module-options:form]>
+					</tml:else>
+				</tml:if>
+			</tml:then>
+
+			<tml:else>
+				<div class="data" style="color:red">
+					The selected module is currently not installed on this server
+					<tml:case isdefined="_errormsg">
+						<br>Reason: <tml:item name="_errormsg"/>
+					</tml:case>
+				</div>					
+			</tml:else>
+		</tml:if>		
+	</tml:case>
+
+</tml:case>

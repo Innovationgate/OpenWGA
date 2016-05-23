@@ -1,0 +1,124 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:eventscript onevent="expert-mode-changed"/>
+
+<tml:form id="app-changed-handler-form">
+	<tml:input name="key" type="hidden"/>
+	<script>
+		WGA.event.register("<tml:script expression="portlet.portletkey"/>", "PS-app-changed", function(e){
+			document.forms['app-changed-handler-form'].key.value=e.params.appkey;
+			WGA.ajax.callAction("<tml:action>portlet.setSessionVar("key", tmlform.key);</tml:action>", "<tml:script expression="portlet.portletkey"/>")
+		})		
+	</script>
+</tml:form>
+
+<tml:range var="_navigation"><tml:include medium="xml" ref="navigation"/></tml:range>
+
+<tml:script>	
+	var xml=_navigation_modules;	// parseXML(_navigation);
+								
+	_root=createlist(xml.getElementsByTagName("nav"));
+	_requestedpage=portlet.getSessionVar("key");
+	if(_requestedpage=="" || !xml.getElementById(_requestedpage))
+		_requestedpage="home";
+	try{
+		_parentpage=xml.getElementById(_requestedpage).getParent().attributes.id;
+	}catch(e){
+		_parentpage="";
+	}	
+</tml:script>
+
+<tml:foreach type="itemvalue" item="_root" currentvalue="_nav">	
+
+	<tml:script>
+		_page=_nav.attributes.id;
+		_condition=_nav.attributes.condition;
+		if(!_nav.attributes.tml && !_nav.attributes.redirectto && !_nav.getElementsByTagName("nav").length)
+			_condition = false;		// dont show this
+		else if(!_condition)
+			_condition=true;
+		else _condition=eval(_condition);
+		_selected= (_page==_requestedpage || _page==_parentpage);
+		_title = _nav.attributes.title || label("navigation", _page);
+	</tml:script>
+	
+	<tml:case istrue="_condition">
+	
+		<div class="nav-button<tml:case condition="_selected"> selected</tml:case>"
+		 		onclick="DBM.switchToObject('<tml:item name="_page"/>')" 
+		 		onmouseover= "Ext.fly(this).addClass('over')"
+		 		onmouseout = "Ext.fly(this).removeClass('over')"		 		
+		>
+		 	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+		 		<tr>
+		 			<td>
+		 				<tml:image doc="nuvola" file="{_nav.attributes.img}">
+		 					align="left" width="28" height="28"
+		 				</tml:image>
+		 			</td>
+		 			<td width="100%" class="title">
+						<tml:item name="_title"/>
+					</td>
+				</tr>
+			</table>
+		</div>
+		
+		<tml:case istrue="_selected" condition="_nav.getElementsByTagName('nav').length>0">	
+			<div class="nav_child_box">
+				<ul>				
+					<tml:script>	
+						_children=createlist(_nav.getElementsByTagName("nav"));
+					</tml:script>
+					<tml:foreach type="itemvalue" item="_children" currentvalue="_child">					
+						<tml:script>
+							_childpage=_child.attributes.id
+							_condition=_child.attributes.condition;
+							if(!_condition)
+								_condition=true
+							else _condition=eval(_condition);
+							_childselected = (_childpage==_requestedpage);
+							_title = _child.attributes.title || label("navigation", _childpage);
+						</tml:script>
+						<tml:case istrue="_condition">
+							<li>
+								<a href="javascript:DBM.switchToObject('<tml:item name="_childpage"/>')" <tml:case condition="_childselected">class="selected"</tml:case>>
+									<tml:item name="_title"/>
+								</a>																			
+							</li>
+						</tml:case>
+					</tml:foreach>	
+					
+				</ul>
+			</div>
+		</tml:case>		
+		
+	</tml:case>
+</tml:foreach>
+
+<div style="text-align:center; margin:10px">
+	<tml:include ref="::releasestring"/>
+	<br>
+	&copy; Innovation Gate GmbH
+</div>

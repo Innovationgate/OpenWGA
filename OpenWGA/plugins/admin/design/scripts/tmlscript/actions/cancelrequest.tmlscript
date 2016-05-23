@@ -1,0 +1,18 @@
+var requestHash = parseInt(tmlparam1);
+
+reqToCancel = null;
+
+for (req in Iterator(WGA.Core.filter.currentRequests.keySet())) {
+	if (java.lang.System.identityHashCode(req) == requestHash) {
+		reqToCancel = req;
+		break;
+	}
+}
+
+if (reqToCancel != null) {
+	reqToCancel.setAttribute(WGA.Core.ATTRIB_REQUEST_CANCELLED, true);
+	_server_message = "Request is marked for cancellation. Will cancel on next processed WebTML tag.";
+}
+else {
+	_server_message = "Request to cancel could not be found. Maybe has just been finished.";
+}

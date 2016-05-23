@@ -22,6 +22,9 @@
 	
 	
 	<tml:script>
+	
+		
+	
 		function findCookie(name) {
 			for each (c in request.getCookies()) {
 				if (c.name==name) return c.value;
@@ -32,9 +35,10 @@
 		var cat = findCookie("testId");
 		
 		try {
-			assertEquals("WebTML Variable is available on same module", cat, _outerVar, "x");
+			console.log("test _outerVar", _outerVar, assertEquals.toString()); 
+			assertEquals("WebTML Variable _outerVar is available on same module as x - was " + _outerVar, cat, _outerVar, "x");
 			assertEquals("WebTML Variable is available on same module: Definition check", cat, isDefined("_outerVar"), true);
-			assertEquals("WebTML Page Variable is available on same module", cat, _pageVar, "o");
+			assertEquals("WebTML Page Variable is available on same module - " + _pageVar, cat, _pageVar, "o");
 			assertEquals("WebTML Page Variable is available on same module: Definition check", cat, isDefined("_pageVar"), true);
 			assertEquals("Deeper nested WebTML Variable is available on same module", cat, _deeperVar, "This is deep");  
 		}

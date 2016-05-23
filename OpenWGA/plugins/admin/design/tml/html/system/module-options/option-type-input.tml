@@ -1,0 +1,223 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_config_option = option("config-option");
+	
+	_fieldname = option("fieldname");
+	if(!_fieldname && _config_option)
+		_fieldname = option('ns') + "/" + _config_option.getName()
+
+	var value;
+	if(!_config_option)
+		value = option("value") || "";
+	else{
+		value = option("value") || _config_option.getDefaultValue();
+		if(option("value") && _config_option.getOptionType().unconvert){
+			value = _config_option.getOptionType().unconvert(value)
+		}
+	}
+	//_default = value;
+	if(tmlform.field(_fieldname)==null){
+		tmlform.setField(_fieldname, value);
+	}
+
+	_mode = option("mode")||"edit"	
+
+	_inputoptions = createlist();
+	_isPathOption=false;
+	_hasValueProvider=false;
+	
+	if(_config_option){
+		tmlform.processContext.put(_fieldname, _config_option);
+	
+		var valueProvider = _config_option.getOptionType().getValueProvider(DBM.wgaconfig.get());	
+		if(valueProvider){
+			_hasValueProvider=true;
+			_valueProviderEmptyListMessage = valueProvider.getEmptyListMessage(DBM.locale)
+			var values = valueProvider.getProvidedValues().iterator();
+			//log.info(_config_option.getOptionType() + ": " + valueProvider.getProvidedValues());
+			while(values.hasNext()){
+				var value = values.next();
+				_inputoptions.add(valueProvider.getValueTitle(value, DBM.locale)+"|"+value)
+			}
+		}
+
+		_isPathOption = _config_option.hasFlag("PathOption");		
+	}
+	else tmlform.processContext.put(_fieldname, "$custom");
+</tml:script>
+
+<table cellspacing="0" cellpadding="0"><tr>
+	<td width="360" nowrap style="padding:0">
+		<span style="visibility:<tml:script expression="_mode=='view'||tmlform.mode()=='view'?'visible':'hidden'"/>">
+		<tml:if istrue="_hasValueProvider">	
+			<tml:then>
+				<tml:if condition="_inputoptions.isEmpty()">
+					<tml:then>
+						<div style="color:red">no values available</div>
+						<tml:input name="{_fieldname}" type="hidden" 
+							validation="$E_VALUE!=''"
+							message="{'Field <b>' + _config_option.getTitle(DBM.locale) + '</b>: ' + _valueProviderEmptyListMessage}"
+						/>					
+					</tml:then>
+					<tml:else>
+						<tml:if condition="_config_option.getOptionType().isMultiValue()">
+							<tml:then>
+								<tml:input name="{_fieldname}" type="checkbox" multiple="true" optionsitem="_inputoptions" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
+								<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="checkbox"/>
+							</tml:then>
+							<tml:else>
+								<tml:script>
+									_isDBKey = (_config_option.referenceType == Packages.de.innovationgate.wgpublisher.modules.reftypes.DatabaseKeyReferenceType)
+									if(_isDBKey){
+										var db = DBM.wgaconfig.get().getContentStore(tmlform.field(_fieldname));
+										if(db){
+											_uid = db.uid;
+											if(db instanceof Packages.de.innovationgate.wga.config.ContentStore)
+												_view = "webprojects"
+											else _view = "databases"
+										}
+									}
+								</tml:script>
+								<tml:case condition="_isDBKey && tmlform.getMode()!='edit' && _uid">
+									<a href="javascript:DBM.switchToObject('<tml:item name="_view"/>', '<tml:item name="_uid"/>')">
+								</tml:case>
+								<tml:input name="{_fieldname}" type="select" optionsitem="_inputoptions" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
+								<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="select"
+									o_forceselection="{_config_option.getOptionType().isRestricted()}"
+									o_editable= "{!_config_option.getOptionType().isRestricted()}"
+									o_emptytext="{_config_option.isEmptyAllowed() ? '- none -':'Please select a value'}"
+									o_changeaction="$refresh"
+									o_allowblank="{!_config_option.getOptionType().isRestricted() && _config_option.isEmptyAllowed()}"
+								/>
+								<tml:case condition="_isDBKey && tmlform.getMode()!='edit' && _uid">
+									</a>
+								</tml:case>
+							</tml:else>
+						</tml:if>
+					</tml:else>
+				</tml:if>
+			</tml:then>
+		
+			<tml:elseif condition="!_config_option	// custom option">
+				<tml:input name="{_fieldname}" type="text" mode="{_mode}"/>
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="text" o_allowblank="true" o_emptytext="- empty -"/>
+			</tml:elseif>
+		
+			<tml:elseif condition="_config_option.getOptionType() instanceof Packages.de.innovationgate.wga.modules.options.PasswordOptionType">
+				<tml:input name="{_fieldname}" type="password" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="password"
+					o_allowblank="{_config_option.isEmptyAllowed()}"
+					o_emptytext="{_config_option.isEmptyAllowed() ? '- empty -':'Please enter a Value'}"
+				/>
+			</tml:elseif>
+			
+			<tml:elseif condition="_config_option.getOptionType() instanceof Packages.de.innovationgate.wga.modules.options.IntegerOptionType">
+				<tml:input name="{_fieldname}" type="number" mode="{_mode}"
+					validation="DBM.tmlform.validateOption()"
+					format="0"
+				/>
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="number"/>
+			</tml:elseif>
+		
+			<tml:elseif condition="_config_option.getOptionType() instanceof Packages.de.innovationgate.wga.modules.options.BooleanOptionType">
+				<tml:input name="{_fieldname}" type="boolean" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="boolean" o_changeaction="$refresh"/>					
+			</tml:elseif>
+				
+			<tml:elseif condition="_config_option.getOptionType() instanceof Packages.de.innovationgate.wga.modules.options.MultilineStringOptionType">
+				<tml:input name="{_fieldname}" type="textarea" mode="{_mode}"
+					validation="DBM.tmlform.validateOption()"
+				/>
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="textarea" o_width="350"/>
+			</tml:elseif>
+				
+			<tml:elseif condition="_config_option.getOptionType() instanceof Packages.de.innovationgate.wga.modules.options.StringOptionType">
+				<tml:if condition="_config_option.getOptionType().isMultiValue()">
+					<tml:then>
+						<tml:input name="{_fieldname}" type="textarea" multiple="true" mode="{_mode}"
+							validation="DBM.tmlform.validateOption()"
+						/>
+						<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="textarea" o_width="350"/>
+					</tml:then>
+					<tml:else>
+						<tml:input name="{_fieldname}" type="text" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
+						<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="text" 
+							o_allowblank="{_config_option.isEmptyAllowed()}"
+							o_emptytext="{_config_option.isEmptyAllowed() ? '- empty -':'Please enter a Value'}"
+						/>
+					</tml:else>
+				</tml:if>
+			</tml:elseif>
+		
+			<tml:else>
+				<span><tml:input name="{_fieldname}" type="text" mode="{_mode}" validation="DBM.tmlform.validateOption()"/></span>
+				<br>(<tml:script expression="_config_option.getOptionType().getClass().getName()"/>)
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="text" 
+					o_allowblank="{_config_option.isEmptyAllowed()}"
+					o_emptytext="{_config_option.isEmptyAllowed() ? '- empty -':'Please enter a Value'}"
+				/>
+			</tml:else>
+			
+		</tml:if>		
+		</span>
+		
+	</td>
+	
+	<td valign="middle">
+		<tml:case condition="_config_option">
+			<img src="<tml:url type="file" db="@afw" doc="icons" file="help.png"/>" style="cursor:pointer"
+				ext:qtip = "show/hide option help"
+				ext:qwidth = "120"
+				onclick="DBM.showHideElement('<tml:script expression="_fieldname+'help'"/>')">
+		</tml:case>
+		<tml:case condition="tmlform.getMode()=='edit' && (!_config_option || _config_option.isOptional() || (option('no-required')=='true' && _config_option.dependentOptions.isEmpty()))">
+			<img src="<tml:url type="file" db="@afw" doc="icons" file="table_row_delete.png"/>" style="cursor:pointer"
+				ext:qtip = "Delete this option from configuration"
+				onclick="WGA.ajax.callAction('<tml:action ref="removeOption" param1="{_fieldname}"/>', '<tml:script expression="portlet.portletkey"/>')">
+		</tml:case>
+		<tml:case condition="tmlform.getMode()=='edit' && option('pathOptionsReadonly')=='true' && _isPathOption && option('changeDbAction')">
+			<img src="<tml:url type="file" db="@afw" doc="icons" file="table_edit.png"/>" style="cursor:pointer"
+				ext:qtip = "Click here to change database"
+				onclick="WGA.ajax.callAction('<tml:action ref="{option('changeDbAction')}" param1="{option('ns')}"/>', '<tml:script expression="portlet.portletkey"/>')">
+		</tml:case>
+	</td>
+</tr></table>
+
+<tml:case condition="_config_option">
+	<tml:include ref="system:field-help" o_fieldname="{_fieldname}">
+		<tml:option name="title">
+			<tml:script expression="_config_option.getTitle(DBM.locale) + (DBM.isExpertMode() ? ' (' + _config_option.name + ')' : '')"/>
+		</tml:option>
+		<tml:inline name="body">
+			<tml:script>
+				var defaultValue = _config_option.getDefaultValue()
+				return encode("html", _config_option.getDescription(DBM.locale))
+					+ (defaultValue ? '<br>Default Value: ' + _config_option.getDefaultValue() : '');
+			</tml:script> 
+		</tml:inline>
+	</tml:include>
+</tml:case>

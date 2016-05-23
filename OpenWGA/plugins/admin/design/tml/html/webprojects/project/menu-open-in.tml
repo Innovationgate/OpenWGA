@@ -1,0 +1,83 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+{
+	cls:'x-btn-text-icon',						
+	icon: '<tml:url type="file" db="@afw" doc="icons" file="application_go.png"/>',		                
+	text: "Open in ...",
+	menu: [
+		{
+			cls:'x-btn-text-icon',						
+			icon: '<tml:url type="file" db="@afw" doc="icons" file="application_osx_terminal.png"/>',		                
+			text: "TMLScript Console",
+			handler: function(){
+				DBM.switchToObject("tools.tmlscript-console", "<tml:option name="dbkey"/>");
+			}	
+		}
+		
+		<tml:case condition="DBM.database(option('dbkey')).isQueryable">
+		,{
+			cls:'x-btn-text-icon',						
+			icon: '<tml:url type="file" db="@afw" doc="icons" file="application_view_list.png"/>',		                
+			text: "Query Browser",
+			handler: function(){
+				DBM.switchToObject("tools.db-query", "<tml:option name="dbkey"/>");
+			}	
+		}
+		</tml:case>
+		
+		<tml:case condition="DBM.database(option('dbkey')).isHierarchical">
+		,{
+			cls:'x-btn-text-icon',						
+			icon: '<tml:url type="file" db="@afw" doc="icons" file="application_side_tree.png"/>',		                
+			text: "DB Explorer",
+			handler: function(){
+				DBM.switchToObject("tools.db-explorer", "<tml:option name="dbkey"/>");
+			}	
+		}
+		</tml:case>
+		
+		<tml:case condition="DBM.database(option('dbkey')).isFullFeature">
+			,"-"
+			<tml:case condition="AFW.Util.hasPlugin('de.innovationgate.contentmanager') && AFW.database(option('dbkey')).isAuthoringAllowed()">
+				,{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="application_form_edit.png"/>',		                
+					text: "WGA Content Manager",
+					handler: function(){
+						window.open('<tml:meta type="request" name="absolutewgaurl"/>/plugin-contentmanager/html/contentstore?dbkey=<tml:option name="dbkey"/>')
+					}	
+				}
+			</tml:case>
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="application_double.png"/>',		                
+				text: "New Browser Window",
+				handler: function(){
+					window.open('<tml:meta type="request" name="absolutewgaurl"/>/<tml:option name="dbkey"/>')
+				}	
+			}
+		</tml:case>
+	]
+}

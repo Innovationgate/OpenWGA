@@ -1,0 +1,88 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title" mode="set"/>	
+	<tml:inline name="body">
+		<fieldset>		
+			<legend>Outgoing</legend>
+			<tml:script>
+				try{
+					_relation_names=content().getRelationNames();
+				}
+				catch(e){
+					_relation_names = WGA.createList();
+				}	
+			</tml:script>
+
+			<tml:foreach type="itemvalue" item="_relation_names" currentvalue="_relation_name">		
+					
+				<label><tml:item name="_relation_name"/>:</label>			
+				<div class="data">
+					<tml:script expression="content().getRelationData(_relation_name)" var="_data"/>
+					<tml:if context="[relation:{_relation_name}]" iscontextvalid="true">
+						<tml:then>
+							<a href="javascript:DBM.switchToObject('tools.db-explorer', '<tml:meta type="db" name="dbkey"/>', 'db:<tml:meta type="db" name="dbkey"/>/docid:<tml:meta name="key"/>')"
+								title="<tml:metadata name="title"/>"
+							>
+								<tml:metadata name="key"/>
+							</a>
+						</tml:then>
+						<tml:else>
+							<tml:script expression="_data.getTargetStructkey()"/> (invalid)
+						</tml:else>
+					</tml:if>
+					<tml:case condition="_data.getType()==content().RELATIONTYPE_PROTECTED">
+						&nbsp;(protected)
+					</tml:case>
+				</div>			
+				<div class="clear"></div>		
+						
+			</tml:foreach>		
+					
+		</fieldset>		
+		<fieldset>		
+			<legend>Incoming</legend>
+			<tml:script>
+				_relations = content().getIncomingRelations();
+			</tml:script>
+			<tml:foreach type="itemvalue" item="_relations" currentvalue="_relation">
+				<label><tml:script expression="_relation.name"/>:</label>
+				<div class="data">
+					<a href="javascript:DBM.switchToObject('tools.db-explorer', '<tml:meta type="db" name="dbkey"/>', 'db:<tml:meta type="db" name="dbkey"/>/docid:<tml:script expression="_relation.getParentContentKey()"/>')"
+						title="<tml:metadata name="title" context="[docid:{_relation.getParentContentKey()}]"/>"
+					>
+						<tml:script expression="_relation.getParentContentKey()"/>						
+					</a>
+					<tml:case condition="_relation.getType()==content().RELATIONTYPE_PROTECTED">
+						&nbsp;(protected)
+					</tml:case>					
+				</div>
+				<div class="clear"></div>
+			</tml:foreach>
+		</fieldset>
+		
+	</tml:inline>
+</tml:include>

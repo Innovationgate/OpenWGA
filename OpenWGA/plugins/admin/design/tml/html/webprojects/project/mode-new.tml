@@ -1,0 +1,112 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="createProject">
+	if(!tmlform.validate())
+		return;
+		
+	try{
+		var db = xpath(DBM.wgaconfig.get(), "/contentDatabases[uid='"+portlet.getSessionVar('key')+"']")
+		var config = DBM.wgaconfig.clone();
+		config.add(db);
+
+		// special handling for design source == local:
+		if(tmlform.field("/design/source")=="local"){
+			tmlform.removeField("/design/source");	
+			db.design=null;
+		}		
+		else db.design = new Packages.de.innovationgate.wga.config.Design()
+
+		// handle overlay support:
+		if(tmlform.field("/overlay/name")){
+			db.overlay=new Packages.de.innovationgate.wga.config.Design()
+		}
+		else {
+			tmlform.removeField("/overlay/source");
+			tmlform.removeField("/overlay/name");
+			db.overlay = null;
+		}
+
+		DBM.tmlform.setConfigProperties(db);
+		
+		_errors = config.validate()
+		if(_errors.isEmpty()){
+			DBM.wgaconfig.save();
+			
+			var tabview=createObject("@ui/tabview", portlet.parentportlet);
+			tabview.setCurrentPageTitle(db.key);
+			
+			portlet.fireEvent(createEvent("wga-config-changed"));
+			portlet.setMode("view");
+			
+			tmlform.processContext.kill()
+		}
+		else log.info(_errors);
+	}
+	catch(e){
+		log.info(e);
+		
+	}	
+</tml:action>
+
+<tml:case condition="_errors && !_errors.isEmpty()">
+	<tml:include designdb="@ui" ref="message">
+		<tml:option name="title">Config validation errors</tml:option>
+		<tml:inline name="body">
+			<ul>
+			<tml:foreach type="itemvalue" item="_errors" currentvalue="_error">
+				<li><tml:script expression="_error.message"/></li>
+			</tml:foreach>
+			</ul>
+		</tml:inline>
+	</tml:include>
+</tml:case>
+
+
+<tml:form id="cs-new-form" source="none" mode="edit" htmlinput="ignore">
+
+	<script>
+		DBM.actions.save("<tml:script expression="portlet.portletkey"/>").setAction("<tml:action ref="createProject"/>");
+	</script>
+	
+	<tml:include designdb="@ui" ref="windowview">
+	
+		<tml:option name="config" scope="local">
+			tbar: [<tml:[system:new-action-buttons]/>],
+			buttonAlign: "left",
+			buttons:[<tml:[system:new-action-buttons]/>]
+		</tml:option>
+	
+		<tml:option name="title">
+			New Web Application
+		</tml:option>
+	
+		<tml:inline name="body">
+			<tml:include designdb="@ui" ref="formmessages"/>
+			<tml:include ref="::form"/>
+		</tml:inline>
+		
+	</tml:include>
+	
+</tml:form>

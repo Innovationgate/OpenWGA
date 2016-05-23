@@ -1,0 +1,955 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+this.locale = wgacore.languageCodeToLocale(getpreferredlanguage());
+
+this.getModReg = function(){
+	return wgacore.getModuleRegistry();
+}
+
+this.isExpertMode = function(){
+	return profile.expert_mode||false;
+}
+
+this.database=function(dbobj){
+
+	var wgadb;
+	var dbkey;
+	
+	if(!dbobj){
+		wgadb = db();
+		if(wgadb)
+			dbkey = wgadb.getDbReference();
+	}
+	else if(dbobj instanceof Packages.de.innovationgate.webgate.api.WGDatabase){
+		wgadb=dbobj;
+		if(wgadb)
+			dbkey = wgadb.getDbReference();
+	}
+	else {
+		dbkey = dbobj;
+		wgadb = wgacore.getContentdbs().get(dbkey);	// must be a dbkey otherwise		 
+	}
+
+	return{
+
+		isFullFeature: wgadb && wgadb.hasFeature(wgadb.FEATURE_FULLCONTENTFEATURES),
+		isHierarchical: wgadb && wgadb.hasFeature(wgadb.FEATURE_HIERARCHICAL),
+		isQueryable: wgadb && wgadb.hasFeature(wgadb.FEATURE_QUERYABLE),
+		isAllContentKeysRetrievable: wgadb && wgadb.hasFeature(wgadb.FEATURE_RETRIEVE_ALL_CONTENTKEYS), 
+		isReady: wgadb && wgadb.isReady(),
+		isConnected: wgadb && wgadb.isConnected(),
+		isAclManageable: wgadb && wgadb.hasFeature(wgadb.FEATURE_ACL_MANAGEABLE),
+		
+		version: wgadb ? wgadb.getContentStoreVersion() : "unknown",
+		
+		getPatchLevel: function(){
+			if(wgadb && wgadb.isConnected()){
+				if(!wgadb.isSessionOpen()) {
+					wgadb.openSession();   
+				}				
+				return wgadb.getExtensionData("DDLPatchLevel");
+			}
+			else return 0;
+		},
+
+		getConfig: function(){
+			return xpath(DBM.wgaconfig.get(), "/contentDatabases[key='"+dbkey+"']")
+		},
+
+		openSession: function(){
+			if (!wgadb.isSessionOpen()) {
+				wgadb.openSession();
+			}
+		},
+		
+		getDomainName: function(){
+			if(!wgadb)
+				return null;		
+			return WGA.database(wgadb).domain().name;
+		},
+		
+		login: function(user, pwd){
+			if(!wgadb)
+				return false;
+			var domain = WGA.database(wgadb).domain().name;
+			return login(user, pwd, domain);
+		},
+		
+		logout: function(){
+			if(!wgadb)
+				return false;
+			var domain = WGA.database(wgadb).domain().name
+			return logout(domain);
+		},
+		
+		getAuthenticationSourceTitle: function(){
+			if(!wgadb)
+				return "Database not found";
+			var domain = WGA.database(wgadb).domain();
+			if (domain == null) {
+				var authModule = wgadb.getAuthenticationModule();
+				if (authModule != null) {
+					return authModule.getAuthenticationSource();
+				}
+				else {
+					return "No authentication";
+				}
+			}
+			var domainCore = domain.core;
+			return DBM.domain(domainCore).getAuthenticationSourceTitle();
+		}
+	} 
+}
+
+this.domain=function(obj){
+	var wgadomain;
+	if(obj instanceof Packages.de.innovationgate.wga.config.Domain)
+		wgadomain=obj;
+	else if(obj instanceof Packages.de.innovationgate.wgpublisher.WGADomain)
+		wgadomain=obj;
+	else wgadomain = WGA.domain(obj).core;	// must be a string otherwise
+
+	return{
+		getAuthenticationSourceTitle: function(){
+			if(wgadomain.authenticationSource){
+				var modDef = DBM.getModuleDefinition("AuthenticationSource", wgadomain.authenticationSource.implClassName)
+				if(modDef)
+					return modDef.getTitle(DBM.locale);
+				else return "Authentication Module Definition not found: " + wgadomain.authenticationSource.implClassName
+			}
+			else return "- none -"			
+		}
+	}
+}
+
+this.domains={
+	get: function(server){
+	 	var config = DBM.wgaconfig.get(); 
+		var domains = config.getDomains();
+		return sortList(java.util.ArrayList(domains), function(a,b){
+			var query = "domain='" + a.uid + "'"
+			if(server)
+				query += "and dbServer='" + server + "'"
+			var dbs_a = xpathList(DBM.wgaconfig.get(), "/contentDatabases[" + query + "]")
+			
+			var query = "domain='" + b.uid + "'"
+			if(server)
+				query += "and dbServer='" + server + "'"
+			var dbs_b = xpathList(DBM.wgaconfig.get(), "/contentDatabases[" + query + "]")
+			
+			if(dbs_a.size() < dbs_b.size())
+				return 1;
+			else if(dbs_a.size() == dbs_b.size())
+				return a.name < b.name ? 1 : -1
+			return -1;
+		})	
+		
+		
+	}
+};
+		
+
+/*
+ * db: db config object
+ */
+this.getDbStatusText=function(db){
+	if(!db.enabled)
+		return "<span style='color:red'>" + label("status.disabled") + "</span>";
+	if(this.database(db.key).isReady)
+		return "<span style='color:green'>" + label("status.available") + "</span>";
+	else return "<span style='color:red'>" + label("status.not-available") + "</span>"	
+}
+
+// DEPRECATED:
+this.openDBSession = function(dbkey){
+	this.database(dbkey).openSession();
+}
+
+this.getDbSelectList=function(current, filterFn){
+	var dbs = createlist();
+	var plugins = createlist();
+	var dbs_map = wgacore.getContentdbs();
+	var dbkeys = dbs_map.keySet().iterator();
+	var match=false;
+	while(dbkeys.hasNext()){
+		var dbkey = dbkeys.next()
+		var wgadb = dbs_map.get(dbkey);
+		if(!wgadb || !DBM.database(wgadb).isReady)
+			continue;
+		if(filterFn && !filterFn(wgadb))
+			continue;
+		if(dbkey.indexOf("plugin-")>=0)
+			plugins.add(dbkey)
+		else dbs.add(dbkey);
+		if(dbkey==current)
+			match=true;
+	}
+	if(!match && current){
+		if(current.indexOf("plugin-")>=0)
+			plugins.add(current)
+		else dbs.add(current);
+	}
+	dbs = sortList(dbs);
+	dbs.addAll(sortList(plugins));
+	return dbs;
+}
+
+this.getConfigBean = function() {
+
+	var p = portlet;
+	var bean = null;
+	while (true) {
+		bean = p.getSessionVar("_config_bean");
+		if (bean != null || p.isRoot()) {
+			break;
+		}
+		p = p.parentPortlet;
+	}
+
+
+	return bean;
+}
+
+this.removeConfigBean = function(willBeModified) {
+
+	var p = portlet;
+	var bean = null;
+	while (true) {
+		bean = p.getSessionVar("_config_bean");
+		if (bean != null) {
+			p.removeSessionVar("_config_bean");
+		}
+		if (p.isRoot()) {
+			break;
+		}
+		p = p.parentPortlet;
+	}
+
+
+	return bean;		// stored in portlet session var, somewhere up the stack
+	//return xpath(this.wgaconfig.get(), _xpath||option("xpath-to-config-element"));
+}
+
+this.wgaconfig={
+	
+	get: function(){
+	
+		if (portlet) {
+			var clone = portlet.getSessionVar("configclone");
+			if (clone != null) {
+				return clone;
+			}
+		}
+		
+		return WGA.Core.getWgaConfiguration();
+		
+	}
+	
+	,getByUid: function(uid){
+		return this.get().getByUid(uid);
+	}
+	
+	,clone: function(thePortlet){
+		var theclone =  WGA.Core.cloneWgaConfiguration();
+		if (!thePortlet) {
+			thePortlet = portlet;
+		}
+		thePortlet.setSessionVar("configclone", theclone, false);
+		return theclone;
+	}
+
+	,discardClone: function(){
+		portlet.removeSessionVar("configclone");
+	}
+	
+	,save: function(uidsToReconnect){
+		var wgaconfig = portlet.getSessionVar("configclone");
+		if(!wgaconfig)
+			throw({
+				message: "not wga config clone created"
+			})
+		wgaconfig.runWizard=false;
+		wgaconfig.sortOptions(DBM.getModReg());
+		try{
+			WGA.server().updateConfig(wgaconfig, (uidsToReconnect || null));
+			portlet.removeSessionVar("configclone");
+			DBM.removeConfigBean();
+		}
+		catch(e){
+			logException(e);
+		}
+	}
+	
+	,getDatabases: function(server_uid, domain, dbtype_only, include_disabled_server){
+		var query = [];
+		if(server_uid)
+			query.push("dbServer='" + server_uid + "'")
+		if(domain)
+			query.push("domain='" + domain + "'")
+		var dbs = xpathList(this.get(), "/contentDatabases" + (query.length ? "["+query.join(" and ")+"]" : ""));
+
+		// filter dbtype and disabled servers:
+		var result = createlist();
+		var it=dbs.iterator();
+		while(it.hasNext()){
+			var db = it.next();
+			var server = DBM.wgaconfig.getByUid(db.dbServer)
+			if(server && !server.enabled && !include_disabled_server)
+				continue;
+			var dbtype = "ContentDatabase";
+			if(db instanceof Packages.de.innovationgate.wga.config.ContentStore)
+				dbtype = "ContentStore";
+			if(!dbtype_only || dbtype==dbtype_only)
+				result.add(db);
+		}
+		return result;
+	}
+	
+}
+
+this.tabview={
+	cleanup: function(fn){
+		var tabview=createObject("@ui/tabview");
+		tabview.cleanup(fn || function(p){
+			return p.isProvisionalState() || p.getMode()=='new' || DBM.wgaconfig.getByUid(p.getSessionVar("key"))
+		})
+	}
+}
+
+this.getModuleDefinition = function(type, implClassName){
+	return this.getModReg().getModuleDefinition("de.innovationgate.wga.modules.types." + type + "ModuleType", implClassName)
+}
+
+this.tmlform=function(self){
+	return {
+		
+		getMessage: function(fieldname){
+			return AFW.Util.encodeForScript(tmlform.getMessage(fieldname));
+		}
+		
+		,getRenderedFields: function(){
+			return javaObject(tmlform).getFormInfo().getLastRenderedFormFields();
+		}
+	
+		,forEachField: function(callback){
+			//var fields = this.getRenderedFields().iterator()
+			var fields = tmlform.fieldnames.iterator()
+			while(fields.hasNext()){
+				var field = fields.next();
+				if(field.charAt(0)=="/"){
+					try{
+						var value = tmlform.field(field);
+						var optionDef = tmlform.processContext.get(field);
+						if (optionDef && optionDef!="$custom" && value!=null) {
+							var optionType = optionDef.getOptionType();
+							if(optionType.isMultiValue())
+								value = tmlform.fieldList(field);
+							if(optionType.convert){
+								//log.info("field " + field + " value=" + value + " converted to " + optionType.convert(value));
+								value = optionType.convert(value);	// returns a String.
+							}
+							else value = value.toString();	// only strings allowed in options							
+						}
+						callback(field, value)
+					}					
+					catch(e){
+						log.info("Problems with field " + field + " of value " + value + ": " + e.message);
+					}					
+				}
+			}
+		}
+
+		,setConfigProperties: function(bean){	
+		
+			var JXPathContext = Packages.org.apache.commons.jxpath.JXPathContext.newContext(bean);
+			runtime.debug();			
+			this.forEachField(function(field, value){
+				try{
+					JXPathContext.setValue(field, value);
+				}
+				catch(e){
+					log.info("unable to set field " + field + " to value " + value);
+					log.info(e.message);
+				}
+			})
+		}
+		
+		,removeFields: function(prefix){
+			var fields = tmlform.fieldNames.iterator();
+			while(fields.hasNext()){
+				var field = fields.next();		
+				if(field.substr(0, prefix.length)==prefix){
+					tmlform.removeField(field);
+				}
+			}
+		}
+
+
+		,validateOption: function() {
+		
+			var optName = item("$FIELDNAME");
+			var optValue = item("$E_VALUE");
+			var optionDef = tmlform.processContext.get(optName);
+		
+			// Fallback for options without definition - Cannot be tested
+			if (optionDef == null || optionDef == "$custom") {
+				return true;
+			}
+			
+			// Validation
+			var fieldTitle = optionDef.getTitle(self.locale);
+			try {
+				var value = optValue;
+				var optionType = optionDef.getOptionType();
+				if(optionType.convert){
+					//log.info("option-validation: field " + fieldTitle + " value=" + value + " converted to " + optionType.convert(value));
+					value = optionType.convert(value);	// returns a String.
+				}
+				optionDef.validate(value, self.locale, wgacore.getModuleRegistry().createValidationContext(self.wgaconfig.get()));
+			}
+			catch (e) {
+				if (e.javaException && e.javaException instanceof Packages.de.innovationgate.wga.modules.options.OptionValueValidationException) {
+					throw new Packages.de.innovationgate.wgpublisher.webtml.form.TMLFormValidationException(fieldTitle + ": " + e.javaException.message, e.javaException.cause);
+				}
+				else {
+					throw e;
+				}
+			}
+			
+			return true;
+		}
+
+	}
+}(this)
+
+this.dbservers = function(self){
+
+	return {	
+		
+		getAll: function(){
+			var allServers = createlookuptable();
+		
+			var servers = DBM.wgaconfig.get().getDatabaseServers().iterator();
+			while(servers.hasNext()){
+				var server = servers.next();
+				allServers.put(server.uid, {
+					uid: server.uid,
+					title: server.title,
+					implClassName: server.implClassName, 
+					config:server,
+					runtime:null
+				});
+			}
+			servers = wgacore.getDatabaseServers().values().iterator();
+			while(servers.hasNext()){
+				var server = servers.next();
+				if(allServers.containsKey(server.uid))
+					allServers.get(server.uid).runtime=server;
+				else allServers.put(server.uid, {
+					uid: server.uid,
+					title: server.getTitle(DBM.locale),
+					implClassName: server.getClass().getName(),
+					config:null,
+					runtime:server
+				});
+			}
+			return allServers;
+		}
+		
+		,get: function(domain, dbtype){
+			var core_servers = wgacore.getDatabaseServers().values().iterator();
+			// make a copy bekause we geht the original list that we do not want to change!			
+			var servers = createlist();
+			while(core_servers.hasNext()){
+				var server = core_servers.next();
+				var config = DBM.wgaconfig.getByUid(server.uid)
+				if(config && !config.enabled)
+					continue;
+				
+				if(dbtype && DBM.dbservers.getDatabaseTypes(server, dbtype).isEmpty())
+					continue;
+				
+				servers.add(server);
+			}
+
+			return sortList(java.util.ArrayList(servers), function(a,b){
+				var query = "dbServer='" + a.uid + "'"
+				if(domain)
+					query += "and domain='" + domain + "'"
+				var dbs_a = xpathList(DBM.wgaconfig.get(), "/contentDatabases[" + query + "]")
+				
+				query = "dbServer='" + b.uid + "'"
+				if(domain)
+					query += "and domain='" + domain + "'"
+				var dbs_b = xpathList(DBM.wgaconfig.get(), "/contentDatabases[" + query + "]")
+				if(dbs_a.size() < dbs_b.size())
+					return 1;
+				return -1;
+			})	
+		}
+		
+		,getByUid: function(uid){
+			return this.getAll().get(uid);	// wgacore.getDatabaseServers().get(uid)
+		}
+				
+		,getDatabaseTypes: function(server, type){
+			switch(type.toLowerCase()){
+				case "contentstore":
+					return server.getContentStoreTypes();
+				case "contentdatabase":
+					return server.getContentDatabaseTypes();
+				case "personalisationdatabase":
+					return server.getPersonalisationDatabaseTypes();
+			}
+			return null;
+		}
+		
+		,getServerList: function(type, fieldname){
+			fieldname = fieldname||"/dbServer";
+			var dbservers=createList();
+			var match=false;
+			if(DBM.getConfigBean())
+				var currentValue = tmlform.field(fieldname) || DBM.getConfigBean().dbServer;
+		
+			var servers = wgacore.getDatabaseServers().values().iterator();			
+			while(servers.hasNext()){
+				var server = servers.next();
+				try{			
+					if(this.getDatabaseTypes(server, type).isEmpty())
+						continue;
+					var server_config = DBM.wgaconfig.getByUid(server.uid);
+					if(server_config && !server_config.enabled)
+						continue;
+					var default_value = server.uid
+					if(currentValue==server.uid)
+						match=true; 				
+					dbservers.add(server.getTitle(self.locale) + "|" + server.uid);
+				}
+				catch(e){
+					log.info("DBM.getServerList: " + e.message);
+				}
+				
+			}
+		
+			if(currentValue && !match){
+				var currentServer = DBM.wgaconfig.getByUid(currentValue);
+				dbservers.add(currentServer.title + "|" + currentValue);
+			}
+			
+			if(dbservers.isEmpty())
+				dbservers.add("Es sind keine Datenbankserver registriert|");
+			else if(dbservers.size()==1)
+				tmlform.setField(fieldname, default_value)
+
+			return dbservers
+		}
+
+		,getImplClassNameList: function(dbserver, type, fieldname){
+			fieldname = fieldname||"/implClassName";
+			// get DB-Implementations List		
+			var implClasses = createlist();	
+			var match=false;
+			
+			if(DBM.getConfigBean())
+				var currentValue = DBM.getConfigBean().implClassName;
+			var _default = currentValue || null;
+			
+			var dbserver = wgacore.getDatabaseServers().get(dbserver);
+			if(dbserver){
+				var classes = this.getDatabaseTypes(dbserver, type).iterator();			
+				while(classes.hasNext()){
+					var mod_def = classes.next();
+					try{
+						mod_def.testDependencies();
+						_default = mod_def.getImplementationClass().getName()
+						if(currentValue==mod_def.getImplementationClass().getName())
+							match=true; 
+						implClasses.add(mod_def.getTitle(self.locale) + "|" + mod_def.getImplementationClass().getName())
+					}
+					catch(e){
+						log.info("Unresolved ModuleDependencyDefinition: " + e.message);
+					}
+				}
+			}
+			
+			if(currentValue && !match){
+				var mod_def = DBM.getModuleDefinition(type, currentValue)  
+				implClasses.add(mod_def.getTitle(self.locale) + "|" + currentValue);
+			}
+			
+			if(implClasses.isEmpty())
+				implClasses.add("There are no database types registered for this server.|");
+			else if(implClasses.size()==1)
+				tmlform.setField(fieldname, _default)
+
+			return implClasses;
+		}
+		
+		,getPathOptions: function(server_uid, db_modDef){
+
+			var dbserver = wgacore.getDatabaseServers().get(server_uid);
+			if(dbserver)
+				return dbserver.getDatabasePathOptions(db_modDef.getImplementationClass());
+			else{
+				// Find the database retriever for this server
+				var server_config = DBM.wgaconfig.getByUid(server_uid);
+				var server_implClass = wgacore.getLibraryLoader().loadClass(server_config.implClassName);
+
+		        var props = db_modDef.getProperties();
+		        var retrievers = props.getServerDatabaseRetrievers().iterator();
+		        while (retrievers.hasNext()) {
+		            var serverDatabaseRetriever = retrievers.next();
+		            if (serverDatabaseRetriever.getDatabaseServerType().isAssignableFrom(server_implClass))
+		                return serverDatabaseRetriever.getDatabasePathOptions();
+		        }
+		        return createlist();
+			}
+		}
+		
+	}
+}(this);
+
+
+this.jobs = function(){
+
+	var allJobs = createlookuptable();
+	var Cron = createObject("cron");
+
+
+	var jobs = xpathList(DBM.wgaconfig.get(), "/schedulerConfiguration/jobs").iterator();
+	while(jobs.hasNext()){
+		var job = jobs.next();
+		var schedules = createlist();
+		var jobschedule = job.schedules
+		if(job.schedules){
+			var it = job.schedules.iterator();
+			while(it.hasNext()){
+				var schedule = it.next();
+				schedules.add(Cron.createDescription(schedule.data, schedule.type))
+			}
+		}
+		allJobs.put(job.uid, {
+			name: job.name,
+			uid: job.uid,
+			tasks: job.tasks,
+			description: job.description,
+			config:job,
+			schedules: schedules,
+			runtime:null
+		});
+	}
+	jobs = wgacore.getScheduler().getJobNames().iterator();
+	while(jobs.hasNext()){
+		var job = wgacore.getScheduler().getJob(jobs.next());
+		if(allJobs.containsKey(job.uid))
+			allJobs.get(job.uid).runtime=job;
+		else {
+			var schedules = createlist();
+			var triggers = wgacore.getQuartzScheduler().getTriggersOfJob(job.name, "WGAScheduler");
+			for(var i=0; i<triggers.length; i++){
+				var trigger = triggers[i];
+				if(trigger instanceof Packages.org.quartz.CronTrigger)
+					schedules.add(Cron.createDescription(trigger.getCronExpression(), "cron"));
+			} 
+			allJobs.put(job.uid, {
+				name: job.name,
+				uid: job.uid,
+				tasks: job.tasks,
+				description: job.description,
+				config:null,
+				schedules: schedules,
+				runtime:job,
+				transient:job.isTransient()
+			});
+		}
+	}
+
+	return {
+		getAll: function(){
+			return allJobs.values();
+		},
+		getByUid: function(uid){
+			return allJobs.get(uid);
+		}
+	}
+
+}
+
+this.task = function(task){
+
+	return{
+		getTitle: function(){
+			if(task instanceof Packages.de.innovationgate.wga.config.Task){
+				var modDef = DBM.getModuleDefinition("SchedulerTask", task.implClassName)
+				return modDef.getProperties().createTitle(task, DBM.locale) 
+			}
+			else if(task instanceof Packages.de.innovationgate.wgpublisher.scheduler.Task)
+				return task.getTitle(DBM.locale);
+			else return "unknown task type: " + task.toString();
+		}
+	}
+
+}
+
+this.shares = function(){
+
+	var allShares = createlookuptable();
+
+	var shares = DBM.wgaconfig.get().shares.iterator();
+	while(shares.hasNext()){
+		var share = shares.next();
+		allShares.put(share.uid, {
+			name: share.name,
+			uid: share.uid,
+			origin: 1,
+			config: share,
+			runtime:null
+		});
+	}
+	shares = wgacore.getShares().values().iterator();
+	while(shares.hasNext()){
+		var share = shares.next();
+		if(allShares.containsKey(share.uid))
+			allShares.get(share.uid).runtime=share;
+		else allShares.put(share.uid, {
+			name: share.name,
+			uid: share.uid,
+			origin: share.origin,
+			config: null,
+			runtime: share
+		});
+	}
+
+	return {
+		getAll: function(){
+			return allShares.values();
+		},
+		getByUid: function(uid){
+			return allShares.get(uid);
+		}
+	}
+
+}
+
+this.applog = function(p){
+
+	var logService = WGA.service(Packages.de.innovationgate.wgpublisher.log.AppLog);
+	var isEndReached = false;
+	var endIndex = null;
+	var lines = logService.getLinesCount();
+	var offset=1;
+	var pagesize=p||50;
+	
+	return{
+	
+		readPage: function(level){
+			var ll;
+			switch(level){
+				case "INFO":
+					ll = Packages.de.innovationgate.wga.common.LogLevel.LEVEL_INFO;
+					break;
+				case "WARN":
+					ll = Packages.de.innovationgate.wga.common.LogLevel.LEVEL_WARN;
+					break;
+				case "ERROR":
+					ll = Packages.de.innovationgate.wga.common.LogLevel.LEVEL_ERROR;
+					break;
+				default:
+					ll = Packages.de.innovationgate.wga.common.LogLevel.LEVEL_ALL;
+			}
+			var loginfo = logService.getPage(offset, pagesize, ll)	
+			isEndReached = loginfo.isEndReached();
+			endIndex = loginfo.getEndIndex();
+			return loginfo;
+		}
+		
+		,logService: logService
+		
+		,search: function(query, forward){
+			var line = logService.search(offset + (forward?1:-1), query, logService.SEARCHTYPE_PLAINTEXT, forward)
+			if(line>0)
+				offset=line;
+			return line;
+		}
+		,searchDate: function(date){
+			var line = logService.searchTime(date)
+			if(line>0)
+				offset=line;
+			else offset=1
+			return line;
+		}
+		
+		,pagesize: pagesize
+
+		,getOffset: function(){return offset}
+		,getEndIndex: function(){return endIndex}
+		,isEndReached: function(){return isEndReached}
+		
+		,getLines : function(){
+			return logService.getLinesCount();
+		}
+		
+		,gotoFirstPage: function(){
+			offset=1;
+		}
+		,gotoPrevPage: function(){
+			if(offset>pagesize) {
+				offset-=pagesize;
+			}
+			else {
+				offset=1;
+			}
+		}
+		,hasPrevPage: function(){
+			return offset>1
+		}
+		,gotoNextPage: function(){
+			if (endIndex != null) {
+				offset = endIndex + 1;
+			}
+			else {
+				offset=offset+pagesize;
+			}
+		}
+		,hasNextPage: function(){
+			return !isEndReached
+		}
+		,gotoLastPage: function(){
+			lines = logService.getLinesCount();
+			if (lines > pagesize) {
+				offset = lines - pagesize + 1;
+			}
+			else {
+				offset = 1;
+			}
+		}
+	}
+}
+
+this.acl = {
+
+	WGACLEntryFlags: Packages.de.innovationgate.webgate.api.WGACLEntryFlags,
+	
+	getPrivilegesList: function(aclFlags) {
+	
+		var privileges = WGA.createList();
+		if (aclFlags) {
+			if (aclFlags.isMayDeleteDocs()) {
+				privileges.add(this.WGACLEntryFlags.TYPE_DELETEDOCS);
+			}
+			if (aclFlags.isMayMoveStructs()) {
+				privileges.add(this.WGACLEntryFlags.TYPE_MOVESTRUCTS);
+			}
+			if (aclFlags.isMayAccessDirectly()) {
+			    privileges.add(this.WGACLEntryFlags.TYPE_DIRECTACCESS);
+			}
+		}
+		return privileges;	
+	
+	},
+	
+	getPrivilegeOptions: function(accessLevelCode) {
+	
+		var privOptions = WGA.createList();
+		if (accessLevelCode) {
+			var accessLevel = db().accessLevel(accessLevelCode);
+			if (accessLevel.isAllowDeletingDocumentsAvailable()) {
+				privOptions.add("May delete documents|" + this.WGACLEntryFlags.TYPE_DELETEDOCS);
+			}
+			if (accessLevel.isAllowMovingStructEntriesAvailable()) {
+				privOptions.add("May move pages|" + this.WGACLEntryFlags.TYPE_MOVESTRUCTS);
+			}
+			if (accessLevel.isAllowDirectAccessAvailable()) {
+				privOptions.add("Use application directly|" + this.WGACLEntryFlags.TYPE_DIRECTACCESS);
+			}
+		}
+		
+		return privOptions;
+	
+	},
+	
+	getPrivilegeDefaults: function(accessLevelCode) {
+		var accessLevel = db().accessLevel(accessLevelCode);
+		var aclFlags = new this.WGACLEntryFlags(accessLevel);	
+		return this.getPrivilegesList(aclFlags);
+	}
+}
+
+this.cluster = function(){
+
+	return {
+		submitTask: function(member_uids, task, timeout){
+
+			var timeout = timeout || 10;
+			var clusterService = WGA.Core.getClusterService();
+			var membersForExecution = new Packages.java.util.HashSet();
+			var members = member_uids.iterator();
+			while (members.hasNext()) {
+				var uid = members.next();
+				var cMember = clusterService.getMember(uid);
+				if (cMember) {
+					membersForExecution.add(cMember);
+				}
+				else log.info("uid " + uid + " is not a cluster member");
+			}
+
+			var futures = clusterService.submitTo(membersForExecution, task)
+			var members = futures.keySet().iterator();
+			var results = WGA.createLookupTable();
+			while(members.hasNext()){
+				var member = members.next();
+				var info = member.getMemberInformation();
+				var name = (info && info.getName()) || "unknown"
+				var future = futures.get(member)
+				try{
+					var result = future.get(timeout, Packages.java.util.concurrent.TimeUnit.SECONDS)
+					results.put(name, {
+						result: result,
+						msg: name + ": " + (future.isDone() ? "finished" : "not finished")
+					})
+				}
+				catch(e){
+					if(e.javaException instanceof Packages.java.util.concurrent.TimeoutException){
+						results.put(name, {
+							result: null,
+							msg: name + ": Timeout of " + timeout + " Seconds exceeded"
+						})
+					}
+					else{
+						results.put(name, {
+							result: null,
+							msg: name + ": " + (e.javaException ? e.javaException.message : e.message),
+							exception: e
+						})
+						logException(e);
+					}				
+				}
+			}
+			
+			return results;
+
+		}
+	}
+}()

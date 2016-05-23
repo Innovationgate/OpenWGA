@@ -1,0 +1,125 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="runJob">
+	var jobname = tmlparam1;
+	log.info("starting job " + jobname); 
+	wgacore.getScheduler().run(jobname, "wga admin client", null, null);
+	_show_log = true; 	
+</tml:action>
+
+<tml:action id="stopJob">
+	var jobname = tmlparam1;
+	log.info("stopping job " + jobname);
+	wgacore.getScheduler().getJob(jobname).cancel();
+	_show_log = true;
+</tml:action>
+
+<tml:eventscript onevent="wga-config-changed"/>
+
+<tml:script>
+	_job = DBM.jobs().getByUid(option("jobuid"));
+</tml:script>
+
+<tml:if condition="!_job.runtime">
+	<tml:then>
+		<tml:include designdb="@ui" ref="message">
+			<tml:option name="title">No runtime Object found</tml:option>
+			<tml:inline name="body">
+				This Job does not have any runtime information. Misconfigured?
+			</tml:inline>
+		</tml:include>
+	</tml:then>
+	
+	<tml:else>
+		<fieldset>
+			<legend>Runtime Status</legend>
+			
+			<label>Last Run:</label>
+			<div class="data">
+				<tml:if condition="_job.runtime.isRunning()">
+					<tml:then>
+						<tml:if condition="_job.runtime.isCancelled()">
+							<tml:then>
+								<tml:if condition="_job.runtime.isCancelable()">
+									<tml:then>
+										Cancellation requested, job will stop on the next occasion in the current task ...
+									</tml:then>
+									<tml:else>
+										Cancellation requested, but current task does not seem cancelable. Job will stop at the end of the current task ...
+									</tml:else>
+								</tml:if>
+							</tml:then>
+							<tml:else>
+								Running now ...
+								<button onclick="WGA.ajax.action({
+									action: '<tml:action ref="stopJob" param1="{_job.name}" ajax="norefresh"/>',
+									mode: 'norefresh',
+									graydiv: false
+								})">Cancel job</button>
+							</tml:else>
+						</tml:if>
+					</tml:then>
+					<tml:else>
+						<tml:script expression="_job.runtime.getLastRun()||'- never -'"/>
+						<tml:case condition="!_job.transient">
+							<tml:button clickaction="runJob" param1="{_job.name}" ajax="true">start job now</tml:button>
+						</tml:case>
+					</tml:else>
+				</tml:if>
+			</div>
+			<div class="clear"></div>
+			
+			<label>Next Schedule:</label>
+			<div class="data"><tml:script expression="_job.runtime.nextScheduledRun()||'- none -'"/></div>
+			<div class="clear"></div>
+			
+			<tml:comment><label>Running now:</label>
+			<div class="data"><tml:script expression="_job.runtime.isRunning()?'Yes':'No'"/></div>
+			<div class="clear"/></div></tml:comment>
+
+			<div class="more-options">
+				<a href="#" onclick="DBM.currentjoblog.toggleView()">
+					 Show/Hide Job Log ...
+				</a>
+			</div>
+
+			<div id="job-log" style="display:none;margin:0 13px 0 3px">
+				<iframe style="margin:3px;height: 200px; width:100%"></iframe>
+				<button onclick="DBM.currentjoblog.refresh()">refresh</button>	
+				<input type="checkbox" id="autoUpdate" CHECKED> Automatic update
+			</div>
+			<script>
+				DBM.currentjoblog = DBM.joblog('job-log', '<tml:script expression="_job.name"/>');
+				WGA.portlet.registerObject("<tml:script expression="portlet.portletkey"/>", {
+					destroy: DBM.currentjoblog.stopTimer
+				});				
+				<tml:case istrue="_show_log">
+					DBM.currentjoblog.toggleView()
+				</tml:case>
+			</script>
+			
+		</fieldset>
+	</tml:else>
+</tml:if>

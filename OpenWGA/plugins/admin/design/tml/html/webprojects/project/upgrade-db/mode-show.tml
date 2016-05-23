@@ -1,0 +1,16 @@
+<tml:script>
+	var _db = db(option('dbkey') || DBM.getConfigBean().key);
+	_db.openSession();
+	
+	var _patcher = new Packages.de.innovationgate.csmaintenance.CS5Patcher(WGA.Core, log);
+	_patchCode = _patcher.getManualPatchCode(_db);
+</tml:script>
+
+<div style="margin-bottom: 10px;">
+	Execute this DDL code on the backend database to patch it manually. After that reconnect the corresponding app on any OpenWGA server accessing this database:
+</div>
+
+<div class="textfield">
+	<tml:item name="_patchCode" encode="html"/>
+</div>
+

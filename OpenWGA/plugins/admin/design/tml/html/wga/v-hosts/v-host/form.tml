@@ -1,0 +1,83 @@
+<fieldset>
+	<tml:[system:fs-input] o_field="enabled" o_type="boolean"/>
+	<tml:[system:fs-input] o_field="servername" o_validation="$E_VALUE!=''" o_message="Please enter a server name"/>
+	
+	<label>Host Aliases:</label>
+	<div class="data">
+		<tml:script>
+			if(!tmlform.serverAliases)
+				tmlform.setfield("serverAliases", _config_bean.serverAliases)
+		</tml:script>
+		<tml:input name="serverAliases" type="textarea" multiple="true" cssstyle="width:350px;overflow:hidden">
+			rows = "<tml:script expression="_config_bean.serverAliases.size()"/>"
+			onkeyup="this.rows=this.value.split('\n').length"
+		</tml:input>
+	</div>
+	<div class="clear"></div>
+
+</fieldset>
+
+<fieldset>
+	<legend>Databases</legend>
+
+	<label>Allowed Databases:</label>
+	<div class="data">
+		<tml:script>
+			if(!tmlform.allowedDbsOption){
+				if(_config_bean.allowedDatabases.size()){
+					if(_config_bean.allowedDatabases.get(0)=="$all")
+						tmlform.allowedDbsOption="all"
+					else tmlform.allowedDbsOption="select"
+				}
+				else{
+					if(_config_bean.defaultDatabase)
+						tmlform.allowedDbsOption="select"
+					else tmlform.allowedDbsOption="none"
+				}
+			}	
+		</tml:script>
+		<tml:input name="allowedDbsOption" type="select" options="All|all,None|none,Specified Databases|select" default="all"/>
+		<tml:include ref="system:convert-to-ext-field" o_fieldname="allowedDbsOption" o_type="select" o_changeaction="$refresh"/>
+		
+	</div>
+	<div class="clear"></div>
+
+	<tml:script>
+		var dbs = DBM.wgaconfig.getDatabases(null, null, "ContentStore").iterator()
+		_dbs = []
+		while(dbs.hasNext()){
+			var db = dbs.next();
+			_dbs.push(db.key + "|" + db.uid);
+		}
+		_dbs.sort();
+		_dbs = _dbs.join(",");
+
+		if(!tmlform.allowedDatabases)
+			tmlform.setfield("allowedDatabases", _config_bean.allowedDatabases)
+
+	</tml:script>
+
+	<tml:case condition="tmlform.allowedDbsOption=='select'">
+		<label>Databases allowed for this host:</label>
+		<div class="data">
+			<tml:input name="allowedDatabases" options="{_dbs}" type="checkbox" multiple="true"/>
+		</div>
+		<div class="clear"></div>
+	</tml:case>
+	
+	<tml:case condition="tmlform.allowedDbsOption && tmlform.allowedDbsOption!='none'">
+		<tml:[system:fs-input] o_field="defaultDatabase" o_type="select" o_options="{'- None -|,'+_dbs}" o_changeaction="$refresh"/>
+		<tml:case condition="tmlform.field('/defaultDatabase')">
+			<tml:[system:fs-input] o_field="hideDefaultDatabaseInURL" o_type="boolean"/>
+		</tml:case>
+	</tml:case>
+
+</fieldset>
+	
+<div id="v-resources-array-list" class="array-list-editor">			
+	<fieldset>
+		<legend>Virtual Resources</legend>
+		<tml:include ref="::form-v-resources" o_list="virtualResources" o_id="v-resources-array-list"/>
+	</fieldset>
+</div>
+

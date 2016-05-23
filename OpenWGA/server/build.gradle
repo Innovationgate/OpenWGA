@@ -86,8 +86,6 @@ dependencies {
     gretty 'org.glassfish.main.transaction:javax.transaction:3.1.2.2'
     gretty testProject.fileTree(dir: 'tomcat/lib', include: ['*.jar'])
 
-	compile project(":plugin-cm")
-
 }
 
 test {
@@ -119,11 +117,15 @@ war {
 }
 
 task buildPlugins(type: Copy) {
-	//from (project(":plugins:cm").tasks.buildPlugin.archivePath)
-	from '../plugins/cm/build/distributions'
-   	into 'build/extra/WEB-INF/default-plugins' 	
+	from (project(":plugin-admin").tasks.buildPlugin.archivePath)
+	from (project(":plugin-cm").tasks.buildPlugin.archivePath)
+	from (project(":plugin-additional-script-langs").tasks.buildPlugin.archivePath)
+   	into 'build/extra/WEB-INF/default-plugins'
 }
 buildPlugins.dependsOn project(":plugin-cm").tasks.buildPlugin
+buildPlugins.dependsOn project(":plugin-admin").tasks.buildPlugin
+buildPlugins.dependsOn project(":plugin-additional-script-langs").tasks.buildPlugin
+
 
 war.dependsOn writeVersion, buildPlugins
 testClasses.dependsOn war

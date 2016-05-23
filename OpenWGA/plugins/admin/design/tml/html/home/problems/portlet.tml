@@ -1,0 +1,16 @@
+<tml:include designdb="@ui" ref="tabview_js">
+	<tml:option name="tabnames">Problems|problems,URL Dispatching|http,Long requests|longrequests</tml:option>
+	
+	<tml:inline name="body">
+		<div class="x-hidden" id="problems">
+			<tml:include ref="::critical-problems"/>
+		</div>
+		<div class="x-hidden" id="http">
+			<tml:include ref="::http-404"/>
+		</div>
+		<div class="x-hidden" id="longrequests">
+			<tml:include ref="::longrequests"/>
+		</div>
+	</tml:inline>
+</tml:include>
+

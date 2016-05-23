@@ -1,0 +1,430 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="toggleShowDisabled">
+	portlet.showDisabled = !portlet.showDisabled;
+	portlet.save();
+</tml:action>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Plugin Management</tml:option>	
+	<tml:option name="config" scope="local">
+		tbar: [
+			{				
+        		icon: '<tml:url db="@afw" type="file" doc="icons" file="plugin_disabled.png"/>',
+        		cls:'x-btn-text-icon',
+				text: "<tml:script expression="portlet.showDisabled ? 'Hide disabled Plugins' : 'Show disabled Plugins'"/>",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action ref="toggleShowDisabled"/>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			,"->"
+			,{
+        		icon: '<tml:url db="@afw" type="file" doc="icons" file="plugin_add.png"/>',
+        		cls:'x-btn-text-icon',
+				text: "Install new Plugin",
+				menu: [
+					{
+						text: "Upload Plugin",
+						handler: function(){
+							WGA.ajax.callAction('<tml:action>_uploadPlugin=true</tml:action>', '<tml:script expression="portlet.portletkey"/>')
+						}
+					},
+					{
+						text: "Install from Servers Filesystem",
+						handler: function(){
+							WGA.ajax.callAction('<tml:action>_installDevPlugin=true</tml:action>', '<tml:script expression="portlet.portletkey"/>')
+						}
+					}
+				]
+			}
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+
+		<tml:case istrue="_uploadPlugin">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Upload Plugin ...</tml:option>
+				<tml:option name="body">
+					<tml:form id="plugin-upload" maxuploadsize="-1">
+						<tml:input type="file" name="pluginFile">size="60"</tml:input>
+						<tml:button clickaction="::uploadPlugin" ajax="true">Upload</tml:button>
+					</tml:form>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+
+		<tml:case istrue="_installDevPlugin">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Install from Server Location ...</tml:option>
+				<tml:option name="body">
+					<tml:form id="dirDialog" source="none"> 
+						Path: <tml:input name="dirpath" type="text">size="60"</tml:input>
+						<br>
+						<tml:button clickaction="::installDesignDir" ajax="true">Install</tml:button>						
+					</tml:form> 
+				</tml:option>
+			</tml:include>
+		</tml:case>
+
+		<tml:case isdefined="_create_plugin_dump">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Create Plugin Dump of <tml:item name="_create_plugin_dump"/> ...</tml:option>
+				<tml:option name="body">
+					<tml:include ref="webprojects:project:cs-dump:export" o_dbkey="{_create_plugin_dump}"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+
+		<tml:case isdefined="_manage_acl">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Manage ACL of <tml:item name="_manage_acl"/> ...</tml:option>
+				<tml:option name="body">
+					<tml:portlet name="plugin-acl" ajax="true" ref="webprojects:project:acl:portlet" o_dbkey="{_manage_acl}"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+
+		<tml:include ref="::workspace"/>
+
+		<tml:script>
+			var pluginSet = wgacore.getPluginSet();
+			var plugins = pluginSet.getPlugins();
+			
+			var ps = createlookuptable();
+			var it = plugins.iterator();
+			while(it.hasNext()){
+				var p = it.next();
+				var csConfig=null;
+				try{
+					csConfig = p.csConfig
+				}
+				catch(e){
+					log.info("unable to read configuration for plugin " + p.pluginID.uniqueName);
+					//logException(e);
+					log.info(e.message);
+				}
+				var config = {
+					plugin: p,
+					uname: p.pluginID.uniqueName,
+					version: p.pluginID.version,
+					config: null,
+					title: "unknown",
+					description: "",
+					homepage: "",
+					id: p.pluginID,
+					path: p.isDirectory() ? p.filePath : "",
+					isDefaultPlugin: p.isDefaultPlugin()
+				}
+				if(csConfig){
+					config.config = csConfig.pluginConfig;
+					config.title = csConfig.pluginConfig.title;
+					config.description = csConfig.pluginConfig.description;
+					config.homepage = p.pluginHomepage;		
+				}
+				
+				var cp = ps.get(config.uname)
+				if(!cp){
+					cp = {
+						uname: config.uname,
+						id: config.id,
+						title: config.title,
+						description: config.description,
+						activeVersion: {},
+						disabledVersions: createlist(),
+						installationFaults: createlist()
+					}
+					ps.put(config.uname, cp)
+				}
+				if(p.isDefaultPlugin())
+					cp.isDefaultPlugin=true;
+				if(p.active){
+					cp.activeVersion = config
+					cp.title = config.title
+					cp.description = config.description,
+					cp.installationFaults = p.installationFaults;
+					cp.valid = p.valid;
+				}
+				else cp.disabledVersions.add(config);
+				
+				if(isDefined('workspacePlugins') && workspacePlugins.contains(p)){
+					cp.pendingChanges=true;
+					cp.pendingVersion=p;
+				}
+			}
+			
+			_plugins = new Packages.java.util.ArrayList(ps.values())
+			sortList(_plugins, function(a,b){
+				return (a.title < b.title) ? -1 : 1;
+			})
+			
+		</tml:script>
+		
+		<tml:foreach type="itemvalue" item="_plugins" currentvalue="plugin">
+			<tml:script>
+				_protectedPlugin = (plugin.uname=='de.innovationgate.Management')
+			</tml:script>
+			<tml:case condition="portlet.showDisabled || plugin.activeVersion.version">
+	
+				<fieldset id="fieldset-<tml:script expression="plugin.uname"/>" 
+					style="<tml:case condition="plugin.installationFaults.size()">border:2px solid red;</tml:case>
+						<tml:case condition="plugin.pendingChanges">border:2px solid blue;</tml:case>
+						<tml:case condition="!plugin.valid">background:white;</tml:case>">
+					<legend>
+
+						<tml:if condition="plugin.activeVersion.version && !isEmptyValue(plugin.activeVersion.homepage)">
+							<tml:then>
+								<a target="_blank" title="Open Plugin Homepage in new window" href="<tml:meta type="request" name="wgaurl"/>/<tml:script expression="plugin.activeVersion.plugin.buildDatabaseKey()"/>">
+									<tml:script expression="plugin.title"/></a>
+							</tml:then>
+							<tml:else>
+								<tml:script expression="plugin.title"/>
+							</tml:else>
+						</tml:if>
+
+						<tml:select>
+							<tml:case condition="!plugin.activeVersion.version">
+								- disabled -
+							</tml:case>
+							<tml:case condition="!plugin.valid">
+								<span style="color:red">- invalid -</span>
+							</tml:case>
+						</tml:select>
+						
+						<tml:case condition="plugin.isDefaultPlugin">
+							<span style="color:green">- Default Plugin -</span>
+						</tml:case>
+						
+						<tml:case condition="plugin.pendingChanges">
+							<span style="color:red">
+							(pending changes ...)
+							</span>
+						</tml:case>
+					</legend>
+					<div id="buttons-<tml:script expression="plugin.uname"/>" class="legend-menu"></div>
+					<tml:case condition="!plugin.pendingChanges">
+						<script>
+							WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(portletkey){
+								
+								var menu_items = [];
+								<tml:case condition="plugin.disabledVersions.size()">
+									menu_items.push({
+										cls:'x-btn-icon',						
+										icon: '<tml:url type="file" db="@afw" doc="icons" file="plugin_delete.png"/>',
+										text: "Uninstall all disabled Versions",
+										handler: function(){
+											DBM.callAction("<tml:action ref="::uninstallAllVersions" param1="{plugin.id}"/>",
+													"<tml:script expression="portlet.portletkey"/>",
+													"Uninstalling Plugin ..."
+											)
+										}
+									})
+								</tml:case>
+								<tml:case condition="plugin.activeVersion.version">
+									menu_items.push({
+										cls:'x-btn-icon',						
+										icon: '<tml:url type="file" db="@afw" doc="icons" file="plugin_disabled.png"/>',
+										text: "Deactivate Plugin",
+										disabled: <tml:script expression="_protectedPlugin==true"/>,
+										handler: function(){
+											DBM.callAction("<tml:action ref="::deactivatePlugin" param1="{plugin.activeVersion.id}"/>",
+													"<tml:script expression="portlet.portletkey"/>",
+													"Deactivating Plugin ..."
+											)
+										}
+									})
+									<tml:case condition="plugin.valid">
+										if(menu_items.length)
+											menu_items.push("-");
+										menu_items.push({
+											text: "Reconnect Plugin",
+											cls:'x-btn-text-icon',						
+											icon: '<tml:url type="file" db="@afw" doc="icons" file="database_connect.png"/>',		                
+											handler: function(){
+												DBM.callAction("<tml:action ref="::reconnectPlugin" param1="{plugin.activeVersion.plugin.buildDatabaseKey()}"/>",
+														"<tml:script expression="portlet.portletkey"/>",
+														"Reconnecting Plugin ..."
+												)
+											}
+										})
+										menu_items.push({
+											text: "Manage ACL",
+											cls:'x-btn-text-icon',						
+											icon: '<tml:url type="file" db="@afw" doc="icons" file="group.png"/>',		                
+											handler: function(){
+												WGA.ajax.callAction('<tml:action param1="{plugin.activeVersion.plugin.buildDatabaseKey()}">_manage_acl=tmlparam1</tml:action>', '<tml:script expression="portlet.portletkey"/>')
+											}
+										})
+										menu_items.push("-");							
+										menu_items.push({
+											text: "Reset Plugin Database",
+											icon: '<tml:url type="file" db="@afw" doc="icons" file="database_refresh.png"/>',		                
+											cls:'x-btn-text-icon',						
+											handler: function(){
+												DBM.callAction("<tml:action ref="::resetDB" param1="{plugin.activeVersion.id}"/>",
+														"<tml:script expression="portlet.portletkey"/>",
+														"Reset Plugin ..."
+												)
+											}
+										})
+										menu_items.push({
+											text: "Create Database Dump",
+											cls:'x-btn-text-icon',						
+											icon: '<tml:url type="file" db="@afw" doc="icons" file="database_save.png"/>',		                
+											handler: function(){
+												WGA.ajax.callAction('<tml:action param1="{plugin.activeVersion.plugin.buildDatabaseKey()}">_create_plugin_dump=tmlparam1</tml:action>', '<tml:script expression="portlet.portletkey"/>')
+											}
+										})
+										<tml:case condition="!plugin.activeVersion.path">
+											menu_items.push({
+												text: "Download Plugin File",
+												cls:'x-btn-text-icon',						
+												icon: '<tml:url type="file" db="@afw" doc="icons" file="plugin_go.png"/>',		                
+												handler: function(){
+													WGA.callAction("<tml:action ref="::downloadPluginFile" param1="{plugin.activeVersion.id}"/>")													
+												}
+											})										
+										</tml:case>
+										
+										menu_items.push("-");
+										menu_items.push(<tml:include ref="webprojects:project:menu-open-in" o_dbkey="{plugin.activeVersion.plugin.buildDatabaseKey()}"/>)
+									</tml:case>
+								</tml:case>
+								
+								if(menu_items.length){
+									var menu = new  Ext.menu.Menu(menu_items);
+									WGA.portlet.registerObject(portletkey, menu);
+									menu.on("show", function(){
+										Ext.get("fieldset-<tml:script expression="plugin.uname"/>").addClass("menu-selected");
+									})
+									menu.on("hide", function(){
+										Ext.get("fieldset-<tml:script expression="plugin.uname"/>").removeClass("menu-selected");
+									})
+									var button = new Ext.Button({
+										renderTo: "buttons-<tml:script expression="plugin.uname"/>",
+										cls:'x-btn-icon',						
+										icon: '<tml:url type="file" db="@afw" doc="icons" file="plugin_edit.png"/>',
+										menuAlign: "tr-br?",
+										menu: menu
+									})
+									WGA.portlet.registerObject(portletkey, button);
+								}
+							})
+						</script>							
+					</tml:case>
+					
+					<label>Active Version:</label>
+					<div class="data">
+						<tml:script expression="plugin.activeVersion.version || '- none -'"/>
+						<tml:case condition="plugin.activeVersion.path">
+							<span style="font-weight:normal;margin-left:10px">
+								(<tml:script expression="plugin.activeVersion.path"/>)
+							</span>
+						</tml:case>
+						<tml:case condition="plugin.activeVersion.isDefaultPlugin">
+							<span style="font-weight:normal;margin-left:10px">(Default Plugin)</span>
+						</tml:case>
+							
+						<!-- Installation faults -->
+						<tml:case condition="plugin.installationFaults && plugin.installationFaults.size()>0">
+							<tml:script var="faults" expression="plugin.installationFaults"/>
+							<ul style="list-style-type:disc; padding-left: 20px">
+								<tml:foreach type="itemvalue" item="faults" currentvalue="fault">
+									<li style="color:red"><tml:script expression="fault.toErrorMessage()"/></li>
+								</tml:foreach>
+							</ul>
+						</tml:case>
+					</div>
+					<div class="clear"></div>
+					
+					<label>Installation Key:</label>
+					<div class="data">
+						<tml:script var="_key">
+							if(plugin.activeVersion.plugin){
+								return plugin.activeVersion.plugin.installationKey
+							}
+							else return "- none -"
+						</tml:script>
+						<tml:item name="_key"/>
+						
+						<tml:case condition="!plugin.pendingChanges">
+							<span style="float:right">
+								<a href="javascript:DBM.showHideElement('plugin-info-<tml:script expression="plugin.uname"/>')">show/hide more info</a>
+							</span>
+						</tml:case>
+					</div>
+					<div class="clear"></div>
+
+					<tml:case condition="portlet.showDisabled && plugin.disabledVersions.size()>0 && !plugin.pendingChanges">
+						<tml:include ref="::disabled-plugin-versions"/>						
+					</tml:case>
+	
+					<div id="plugin-info-<tml:script expression="plugin.uname"/>" style="display:none">
+
+						<tml:case condition="!portlet.showDisabled && plugin.disabledVersions.size()>0 && !plugin.pendingChanges">
+							<tml:include ref="::disabled-plugin-versions"/>						
+						</tml:case>
+					
+						<tml:script>
+							_config = null;
+							try{
+								_config = plugin.activeVersion.config || plugin.disabledVersions.get(0).config;
+							}
+							catch(e){}
+							_plugin = plugin.activeVersion.plugin || plugin.disabledVersions.get(0).plugin;
+						</tml:script>
+
+						<tml:if condition="_config">
+							<tml:then>
+								<tml:include ref="::plugin-info"/>
+		
+								<tml:case condition="_plugin && _plugin.licenseText">
+									<label>License:</label>
+									<div class="data">					
+										<a href="javascript:DBM.showHideElement('plugin-license-<tml:script expression="plugin.uname"/>')">show/hide license info</a>
+									</div>
+									<div class="clear"></div>
+									
+									<div id="plugin-license-<tml:script expression="plugin.uname"/>" style="display:none;padding:10px;background:white">
+										<tml:script expression="_plugin.licenseText"  encode="html"/>
+									</div>
+								</tml:case>
+							</tml:then>
+							<tml:else>
+								<div class="data" style="color:red">
+									No plugin configuration found
+								</div>
+							</tml:else>
+						</tml:if>				
+					</div>
+					
+				</fieldset>
+			</tml:case>
+			
+		</tml:foreach>
+		
+	</tml:inline>
+</tml:include>

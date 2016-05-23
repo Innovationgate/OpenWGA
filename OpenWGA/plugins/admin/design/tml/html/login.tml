@@ -1,0 +1,86 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="login">
+	if(!wgacore.doAdminLogin(tmlform.username, tmlform.password, request)){
+		//if(!AFW.Util.wga.adminLogin(tmlform.username, tmlform.password))
+		tmlform.addMessage(label("login-error.unable-to-login"));
+		log.info("OpenWGA admin client: failed login for user '" + tmlform.username + "' from IP " + request.getRemoteAddr())
+	}
+	else log.info("OpenWGA admin client: user '" + tmlform.username + "' logged in from IP " + request.getRemoteAddr()) 
+</tml:action>
+
+<style>
+	.login{
+		width: 400px;
+		margin: 50px;
+		text-align: left;
+	}
+	.login *{
+		font-weight: normal;
+	}
+</style>
+
+<tml:form id="login" source="none" onsubmit="window.login()">
+	
+	<script>
+		window.login=function(){
+			WGA.callAction("<tml:action ref="login"/>");
+		}
+	</script>
+	
+	<div align="center">
+		<div class="login">
+			<tml:include designdb="@ui" ref="x-box">
+				<tml:inline name="body">
+					<div align="center">
+						<tml:img doc="images" file="dragon2.png"/>
+						<div style="margin-top: 10px">
+							<tml:include ref="releasestring"/>
+						</div>
+					</div>
+					<hr size="1">
+					
+					<div style="text-align:center; margin-bottom: 10px">
+						Login to Server:
+						<div style="font-weight:bold"><tml:script expression="DBM.wgaconfig.get().getServerName()"/></div>
+					</div>
+					
+					<tml:include ref="system:formmessages" o_title="{label('login-error.title')}"/>
+					
+					<div style="width:100%">
+						<label>Username:</label>
+						<div><tml:input name="username" focus="true" cssstyle="width:100%"/></div>
+						 
+						<label>Password:</label>
+						<div><tml:input name="password" type="password" cssstyle="width:100%"/></div>
+					</div>
+					<button type="submit">Login</button>
+					
+				</tml:inline>
+			</tml:include>
+		</div>
+	</div>
+	
+</tml:form>

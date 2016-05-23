@@ -1,0 +1,156 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="selectShare">
+	var tabview=createObject("@ui/tabview", portlet);
+	tabview.addPage("shares:share:portlet", tmlparam1, tmlparam2);			
+</tml:action>
+
+<tml:action id="newShare">
+
+	// create database server bean:
+	var bean = new Packages.de.innovationgate.wga.config.Share();
+
+	// create tab
+	var tabview=createObject("@ui/tabview", portlet);
+	var p=tabview.addPage("shares:share:portlet", bean.uid, "New Share");
+	p.setmode("new");	
+	DBM.wgaconfig.clone(p).shares.add(bean);
+</tml:action>
+
+<tml:include designdb="@ui" ref="tabview_dynamic">
+
+	<tml:option name="title">All Shares</tml:option>	
+	
+	<tml:inline name="body">			
+		<tml:case condition="portlet.getSessionVar('currentpage')<=0">
+			<tml:include designdb="@ui" ref="windowview">
+
+				<tml:option name="config" scope="local">
+					tbar: [
+						{
+							cls:'x-btn-text-icon',						
+							icon: '<tml:url type="file" db="@afw" doc="icons" file="page_add.png"/>',		                
+							text: "<tml:label key="shares.create"/>",
+							handler: function(){
+								WGA.ajax.callAction("<tml:action ref="newShare"/>","<tml:script expression="portlet.portletkey"/>");
+							}
+						}
+					]
+				</tml:option>
+			
+				<tml:option name="title">
+					All Shares
+				</tml:option>
+				
+				<tml:option name="body">
+
+					<tml:script>
+						//_shares = DBM.wgaconfig.get().shares
+						_shares = DBM.shares().getAll();
+					</tml:script>
+					
+					<table class="collection" width="100%">
+						<tr class="collection-title">
+							<td width="1%"></td>
+							<td>Name</td>
+							<td>Type</td>
+							<td>Origin</td>
+							<td>URL</td>
+							<td></td>
+						</tr>
+						<tml:foreach type="itemvalue" item="_shares" currentvalue="_share">
+							<tml:if condition="_share.config">
+								<tml:then>
+									<tml:include designdb="@ui" ref="tr">
+										<tml:option name="class" expression="(_share.config && _share.config.enabled)?'':'disabled'"/>
+										<tml:option name="ajaxaction" trim="true">
+											WGA.ajax.callAction('<tml:action ref="selectShare" param1="{_share.uid}" param2="{_share.name}"/>', '<tml:script expression="portlet.portletkey"/>')
+										</tml:option>
+									</tml:include>
+								</tml:then>
+								<tml:else>
+									<tr class="List">
+								</tml:else>									
+							</tml:if>
+								<td>								
+									<tml:image doc="nuvola" file="hdd_mount.png">
+											align="left" width="28" height="28"
+					 				</tml:image>
+								</td>
+								
+								<td>
+									<tml:script expression="_share.name"/>
+								</td>
+								<td>
+									<tml:case condition="_share.config">
+										<tml:script>
+											var mod_def = DBM.getModuleDefinition("Share", _share.config.implClassName) 
+											if(mod_def)
+												return mod_def.getTitle(DBM.locale)
+											return _share.config.implClassName + "<br><span style='color:red'>- currently not available - </span>"
+										</tml:script>
+									</tml:case>
+								</td>
+								<td>
+									<tml:label key="{'share.origin.'+_share.origin}"/>
+								</td>
+								<td>
+									<tml:case condition="_share.runtime">
+										<tml:script>
+											return meta("request", "absolutewgaurl")+_share.runtime.getShareURL()
+										</tml:script>
+									</tml:case>
+								</td>
+								<td>
+									<tml:case condition="_share.config && !_share.config.enabled">
+										disabled
+									</tml:case>
+								</td>
+							</tr>
+
+						</tml:foreach>					
+					</table>
+
+				</tml:option>
+				
+			</tml:include>
+		</tml:case>
+
+	</tml:inline>
+
+	<tml:option name="pageaddon" scope="local">
+		<span id="pageaddon">
+			<a href="#" onclick="WGA.ajax.callAction('<tml:action ref="newShare"/>', '<tml:script>return portlet.portletkey</tml:script>')">
+				<tml:img db="@afw" doc="icons" file="page_white_add.png">
+					border="0"
+					alt="<tml:label key="shares.create"/>"
+					title="<tml:label key="shares.create"/>"
+				</tml:img>
+				<tml:label key="shares.create"/>				
+			</a>
+		</span>		
+	</tml:option>
+	
+</tml:include>

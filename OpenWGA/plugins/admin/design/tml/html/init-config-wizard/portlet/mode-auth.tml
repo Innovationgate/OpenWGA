@@ -1,0 +1,119 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="createXMLAuthSource">
+	if (!tmlform.validate()) {
+		return false;
+	}
+	
+	if (!tmlform.field("password").equals(tmlform.field("password2"))) {
+		tmlform.addmessage(label('step.admin.passwords-not-match'));
+		return false;
+	}
+	
+	var config_dir = new Packages.java.io.File(wgacore.retrieveConfigPath());
+			
+	if (config_dir.isDirectory() && config_dir.canWrite()) {
+	
+		var tempAuthXML = new Packages.de.innovationgate.utils.TemporaryFile("auth.xml", null, Packages.de.innovationgate.webgate.api.WGFactory.getTempDir());
+		tempAuthXML.deleteOnEviction(this.httpSession);
+		var auth = Packages.org.dom4j.DocumentHelper.createDocument();
+		var root = auth.addElement("users");
+		root.addAttribute("allowanonymous", "true");
+		
+		var user = root.addElement("user");
+		user.addAttribute("name", tmlform.username);
+		user.addAttribute("password", tmlform.parsedvalue("password"));
+		user.addAttribute("mail", "");
+		user.addAttribute("aliases", "");
+		
+		var managers = root.addElement("group");
+		managers.addAttribute("name", "managers");
+		managers.addAttribute("members", user.attributeValue("name"));
+		
+		var fOut = new Packages.java.io.FileOutputStream(tempAuthXML.getFile());
+		var format = Packages.org.dom4j.io.OutputFormat.createPrettyPrint();
+		var domWriter = new Packages.org.dom4j.io.XMLWriter(fOut, format);
+		
+		domWriter.write(auth);
+		domWriter.close();
+		fOut.close();
+		
+		var wgaconfig = DBM.wgaconfig.get();
+		var defaultDomain = wgaconfig.getDefaultDomain();
+		if (defaultDomain) {
+			defaultDomain.createFileBasedAuthentication(tempAuthXML.getFile().getName());
+			
+			var config_files = _config_files;
+			if (!config_files) {
+				config_files = createlookuptable();
+			}
+			config_files.put(portlet.mode, tempAuthXML.getFile());
+			
+			portlet.setsessionvar("_config_files", config_files, false);
+			
+			var infoTable = createlookuptable();
+			infoTable.put('Username', tmlform.username);
+			config_info.put(portlet.mode, infoTable);
+		}
+	} else {
+		log.info(label("step.auth.creation-failed"));
+	}
+</tml:action>
+
+<tml:script>
+	if (_config_files && _config_files.containsKey(portlet.mode)) {
+		_config_files.remove(portlet.mode);
+	}
+	if (config_info && config_info.containsKey(portlet.mode)) {
+		config_info.remove(portlet.mode);
+	}
+	portlet.setsessionvar("activeMode", portlet.mode, false);
+</tml:script>
+
+<tml:include designdb="@ui" ref="formmessages"/>
+
+<label><tml:label key="step.admin.username"/></label>
+<div class="data">
+	<tml:input name="username" type="text" validation="$E_VALUE!=''" message="{label('validation.empty-username')}"/>
+	<tml:include ref="system:convert-to-ext-field" o_fieldname="username" o_emptytext="{label('validation.empty-username')}"/>
+</div>
+<label><tml:label key="step.admin.password"/></label>
+<div class="data">
+	<tml:input name="password" type="password" validation="$E_VALUE!=''" message="{label('validation.empty-password')}"/>
+	<tml:include ref="system:convert-to-ext-field" o_type="password" o_fieldname="password" o_emptytext="{label('validation.empty-password')}"/>
+</div>
+<label><tml:label key="step.admin.password2"/></label>
+<div class="data">
+	<tml:input name="password2" type="password" validation="$E_VALUE!=''" message="{label('validation.empty-password2')}"/>
+	<tml:include ref="system:convert-to-ext-field" o_type="password" o_fieldname="password2" o_emptytext="{label('validation.empty-password2')}"/>
+</div>
+<div class="clear" style="height: 30px;">
+	<div class="buttons">
+		<tml:button id="prev" clickaction="clearMessages" ajax="true" portletmode="admin"><tml:label key="previous"/></tml:button>
+		<tml:button id="next" clickaction="createXMLAuthSource" ajax="true" portletmode="finish"><tml:label key="next"/></tml:button>
+		<tml:button id="skip" clickaction="clearMessages" ajax="true" portletmode="finish"><tml:label key="skip"/></tml:button>				
+	</div>
+</div>

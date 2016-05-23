@@ -1,0 +1,112 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_filenames = content().getFileNames();
+</tml:script>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title" mode="set"/>	
+	<tml:inline name="body">
+		
+		<table width="100%" class="collection">
+			<tr class="collection-title">
+				<td>Filename</td>
+				<td>MimeType</td>
+				<td align="right">Size</td>
+				<td align="right">Width/Height</td>
+				<td align="right">Last modified (Revision)</td>
+				<td align="right">Derivates</td>
+			</tr>
+			<tml:foreach type="itemvalue" item="_filenames" currentvalue="_filename" sortexpression="_filename" sortorder="ascending">		
+				<tr>
+					<td>
+						<a title="Open in new window ..." href="<tml:url type="file" file="{_filename}"/>" target="_blank"><tml:item name="_filename"/></a>
+					</td>
+					<td>
+						<tml:script expression="content().getFileMetaData(_filename).mimeType"/>
+					</td>
+					<td align="right">
+						<tml:script format="0.0" expression="content().getFileSize(_filename)/1000"/> KB
+					</td>
+					<td align="right">
+						<tml:script>
+							var metas = content().getFileMetaData(_filename);
+							if(metas.getDisplayWidth()<0)
+								return ""
+							return metas.getDisplayWidth() + " x " + metas.getDisplayHeight();
+						</tml:script>					
+					</td>
+					<td align="right">
+						<tml:script expression="content().getFileMetaData(_filename).lastmodified"/> <tml:script expression="var rev=content().getFileMetaData(_filename).updateRevision; rev ? '(' + rev + ')' : ''"/>
+					</td>
+					<td align="right">
+						<tml:script>
+							_derivates = content().getFileDerivates(_filename)
+						</tml:script>
+						<tml:case condition="_derivates && _derivates.size()">
+							<a href="#"
+								title = "Click to show more info" 
+								onclick="DBM.showHideElement('<tml:meta name="key"/>_<tml:item name="_filename"/>')"
+							><tml:script expression="_derivates.size()"/> Derivates ...</a>
+						</tml:case>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="6" style="border-bottom: solid silver 1px">					
+						<tml:case condition="_derivates && _derivates.size()">
+							<fieldset id="<tml:meta name="key"/>_<tml:item name="_filename"/>" style="display:none">
+								<tml:foreach item="_derivates" currentvalue="_derivate" sortexpression="_derivate.size" sortorder="ascending">
+									<label>
+										<a target="_blank" href="<tml:script>
+											var url = WGA.urlBuilder(fileurl(_filename))
+											url.setParameter("derivate", "id="+_derivate.id)
+											return url.build(true);
+										</tml:script>">
+											<tml:script expression="_derivate.name"/></a>:
+									</label>
+									<div class="data">
+										<tml:script expression="_derivate.displayWidth + ' x ' + _derivate.displayHeight"/> Pixel,
+										<tml:script expression="_derivate.size/1000" format="0"/> KB
+										<br>
+										ID=<tml:script expression="_derivate.id"/>
+										<br>
+										Usage=<tml:script expression="_derivate.usage"/>
+										<br>
+										MimeType=<tml:script expression="_derivate.mimeType"/>
+										<br>
+										Original Revision=<tml:script expression="_derivate.originalRevision"/>
+									</div>
+									<div class="clear"/></div>
+								</tml:foreach>
+							</fieldset>
+						</tml:case>
+					</td>
+				</tr>
+			
+			</tml:foreach>
+		</table>
+		
+	</tml:inline>
+</tml:include>

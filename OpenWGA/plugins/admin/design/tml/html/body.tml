@@ -1,0 +1,98 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<div class="x-hidden">
+	<div id="north">
+		<tml:portlet name="main-header" ref="::header" ajax="true"/>	
+	</div>
+	
+	<div id="south">
+		<tml:include ref="::footer"/>		
+	</div>
+	
+	<div id="west">
+		<tml:portlet ref="::nav-portlet" name="nav-portlet" ajax="true"/>
+	</div>
+	
+	<div id="main" class="main-content">
+		<tml:portlet ref="::main-portlet" name="main-portlet" ajax="true"/>
+	</div>
+	
+</div>
+
+<script>
+
+	WGA.event.register("body", "wga-config-changed", function(e){
+		Ext.ux.InfoWidget.msg("WGA Admin Client", "Configuration updated");
+	})
+
+	Ext.onReady(function(){
+
+		var navpanel = new Ext.Panel({
+			region: "west",
+			baseCls: "nav",
+			autoShow: true,
+			autoScroll: true,
+			width: 200,
+			border: false,
+			contentEl: "west"
+		});
+		
+		DBM.centerpanel = new Ext.Panel({
+			region: "center",
+			border: false,
+			autoScroll: true,
+			contentEl: "main",
+			border: false
+		});
+		
+		DBM.viewport = new Ext.Viewport({
+			layout:'border',
+			items:[
+                new Ext.BoxComponent({ // raw
+                    region:'north',
+                    autoShow: true,
+            		el: 'north',
+                    height:40
+				})						
+				,navpanel
+				,DBM.centerpanel,
+                new Ext.BoxComponent({ // raw
+                    region: 'south',
+                    autoShow: true,
+            		el: 'south',
+                    height:22
+				})
+			]
+		});
+				
+		Ext.QuickTips.init();
+
+		DBM.viewport.on("resize", function(){
+			WGA.event.fireEvent("Viewport-resize", "*", {}) 
+		})
+		WGA.event.fireEvent("Viewport-resize", "*", {})
+	});
+
+</script>

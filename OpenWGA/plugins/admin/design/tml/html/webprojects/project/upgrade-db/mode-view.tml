@@ -1,0 +1,80 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_db = db(option('dbkey') || DBM.getConfigBean().key);
+	_db.openSession();
+	var _patcher = new Packages.de.innovationgate.csmaintenance.CS5Patcher(WGA.Core, log);
+	var _currentPatchLevel = _db.getExtensionData("ddlpatchlevel");
+	_patchesToApply = WGA.createList();
+	for (var idx=1; idx <= _patcher.CS5_PATCH_LEVEL; idx++) {
+		if (idx > _currentPatchLevel) {
+			_patchesToApply.add(_patcher.getPatch(idx));
+		}
+	}
+</tml:script>
+
+<tml:if condition="_patchesToApply.size() > 0">
+	<tml:then>
+		<div style="margin-bottom: 10px;">
+			There are upgrade patches available for this content store. Patches will modify the storage format of this content store to enable new features and provide optimizations. The following upgrade patches can be applied:
+			<ul>
+				<tml:foreach item="_patchesToApply" currentvalue="_patch">
+					<li>Patch level <tml:item name="_patch" xpath="level"/> introduced in OpenWGA version <tml:script expression="_patch.getWGAIntroductionVersion().getFeatureVersionString()"/>: <tml:item name="_patch" xpath="description"/> 
+				</tml:foreach>
+			</ul>
+		</div>
+
+		<div style="color:red; margin-bottom: 10px; font-weight:bold">
+			IMPORTANT: CONSULT THE OPENWGA 6.3 UPGRADE GUIDE TO KNOW PREREQUISITES AND IMPLICATIONS OF CONTENT STORE UPGRADES! 
+		</div>
+		
+		<div style="margin-bottom: 10px;">
+			
+			<div style="margin-bottom: 10px;">
+				<tml:button clickaction="::executePatch" param1="{_db.getDbReference()}" portletmode="patch" confirm="This will execute the patch on this content store. Are you sure?">
+					Apply the patches
+				</tml:button>
+				<div>
+					OpenWGA will execute the patch(es) automatically and reconnect the database. For this to work the user by which OpenWGA connects to the database server must have the neccessary rights to perform storage format updates (for example: schema modifications on relational database systems).
+				</div>
+			</div>
+			
+			
+			<div style="margin-bottom: 10px;">
+				<tml:button portletmode="show">
+					Show the DDL code of the patches
+				</tml:button>
+				
+				<div>
+					Using this you can execute the patch code yourself via any database interface of your choice. After execution of the patch code you must manually reconnect the patched app in OpenWGA.
+				</div>
+			</div>					
+			
+		</div>
+	</tml:then>
+	<tml:else>
+		The storage format of this content store is already up-to-date.
+	</tml:else>
+</tml:if>

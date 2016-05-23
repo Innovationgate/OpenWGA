@@ -1,0 +1,53 @@
+<label>Disabled Versions:</label>
+<div class="data">
+	<tml:script>
+		_versions = plugin.disabledVersions
+	</tml:script>
+	
+	<tml:foreach type="itemvalue" item="_versions" currentvalue="_version">
+		<div id="version-<tml:script expression="_version.id"/>" style="float:left"></div>								
+		<tml:case condition="_version.path">
+			<div style="float:left;margin-left:10px;font-weight:normal">(<tml:script expression="_version.path"/>)</div>
+		</tml:case>
+		<tml:case condition="_version.isDefaultPlugin">
+			<div style="float:left;margin-left:10px;font-weight:normal">(Default Plugin)</div>
+		</tml:case>
+		<div style="clear:both"></div>
+		<script>
+			new Ext.Button({
+				renderTo: "version-<tml:script expression="_version.id"/>",
+				text: "<tml:script expression="_version.version"/>",
+				cls: 'x-btn-text-icon',					
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="plugin_disabled.png"/>',
+				menu: {
+					items:[
+						{
+							text: "Activate this Version",
+							cls:'x-btn-icon',						
+							icon: '<tml:url type="file" db="@afw" doc="icons" file="plugin_go.png"/>',
+							handler: function(){
+								DBM.callAction("<tml:action ref="::activatePlugin" param1="{_version.id}"/>",
+										"<tml:script expression="portlet.portletkey"/>",
+										"Activating Plugin ..."
+								)
+							}
+						}
+						,{
+							text: "Uninstall this Version",
+							cls:'x-btn-icon',						
+							icon: '<tml:url type="file" db="@afw" doc="icons" file="plugin_delete.png"/>',
+							handler: function(){
+								DBM.callAction("<tml:action ref="::uninstallPlugin" param1="{_version.id}"/>",
+										"<tml:script expression="portlet.portletkey"/>",
+										"Uninstalling Plugin ..."
+								)
+							}
+						}
+					]
+				}
+			})
+		</script>
+	</tml:foreach>
+	
+</div>
+<div class="clear"></div>

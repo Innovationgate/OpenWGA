@@ -1,0 +1,61 @@
+<tml:include designdb="@ui" ref="windowview" o_title="The following problems occured">
+
+	<tml:option name="config" scope="local">
+		tbar: [
+			<tml:if istrue="showConfirmed">
+				<tml:then>
+					{
+						text: "Hide confirmed problems",
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="lightbulb_off.png"/>',
+						handler: function(){
+							WGA.ajax.callAction("<tml:action ref="$setpsessionvar" param1="showConfirmed" param2="false"/>","<tml:script expression="portlet.portletkey"/>");
+						}
+					}
+				</tml:then>
+				<tml:else>
+					{
+						text: "Show confirmed problems",
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="lightbulb.png"/>',
+						handler: function(){
+							WGA.ajax.callAction("<tml:action ref="$setpsessionvar" param1="showConfirmed" param2="true"/>","<tml:script expression="portlet.portletkey"/>");
+						}
+					}
+				</tml:else>
+			</tml:if>
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+
+		<tml:script>
+			runtime.debug();
+			_reg = WGA.Server.getProblemRegistry();
+			_reg.updateRegistry();
+			_scopes = _reg.getProblemScopes(Packages.de.innovationgate.wgpublisher.problems.AdministrativeProblemType);
+		</tml:script>
+		
+		<table class="collection" width="100%">
+			<tr class="collection-title">
+				<td class="indent">Problem</td>
+				<td>Last Occurance</td>
+				<td>Severity</td>
+			</tr>
+			<tml:foreach item="_scopes" currentvalue="_scope" filter="!_reg.getProblems(Packages.de.innovationgate.wgpublisher.problems.AdministrativeProblemType, _scope, showConfirmed == 'true').isEmpty()">
+			
+				<tr class="List"><td colspan="3">
+					<h1 style="margin-top:20px"><tml:script expression="_scope"/></h1>
+				</td></tr>
+				<tml:script>
+					_problems = _reg.getProblems(Packages.de.innovationgate.wgpublisher.problems.AdministrativeProblemType, _scope, showConfirmed == "true");
+				</tml:script>
+	
+				<tml:include ref="::scoped-critical-problems">
+					<tml:option name="problems" expression="_problems"/>
+				</tml:include>
+			
+			</tml:foreach>
+		</table>
+	
+	</tml:inline>
+
+</tml:include>

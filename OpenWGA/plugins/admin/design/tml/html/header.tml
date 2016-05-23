@@ -1,0 +1,65 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="change-expert-mode">
+	tmlform.storeInProfile();
+	portlet.fireEvent(createEvent("expert-mode-changed"));
+</tml:action>
+
+<tml:action id="admin-logout">
+	wgacore.doAdminLogout(request)
+	WGA.redirectTo(contenturl())
+</tml:action>
+
+<tml:script>
+	_skip_local_admin_logins = (java.lang.System.getProperty(wgacore.SYSPROP_SKIP_LOCAL_ADMIN_LOGINS)!="true")
+</tml:script>
+
+<div style="float:right; margin: 10px 8px;">
+	<tml:case condition="!(_skip_local_admin_logins && wgacore.isLocalRequest(request))">
+		<tml:button clickaction="admin-logout">Logout</tml:button>
+	</tml:case>
+	<tml:form id="expert-setting" source="profile" cssstyle="display:inline">
+		<tml:input name="expert_mode" type="boolean"
+			changeaction="change-expert-mode"
+			ajax="norefresh"
+		/>
+		expert mode
+	</tml:form>
+</div>
+
+<img src="<tml:url type="static" file="images/brand/logo_85.png"/>" align="left" height="38">
+
+<h1>
+	Logged in to <tml:script expression="WGA.Brand.product"/> '<tml:script expression="DBM.wgaconfig.get().getServerName()"/>'
+</h1>
+
+<script>
+	DBM.serverName="<tml:script expression="DBM.wgaconfig.get().getServerName()"/>";
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "wga-config-changed", function(ev){
+		var sn = ev.params.serverName;
+		if(DBM.serverName!=sn)
+			WGA.ajax.callAction('<tml:action ref="$refresh"/>', '<tml:script expression="portlet.portletkey"/>')
+	})
+</script>

@@ -1,0 +1,262 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="execute">
+	if (tmlform.type == 's') {
+		scriptToRun = tmlform.script;
+	}
+	else {
+		exprToRun = tmlform.script;
+	}
+	
+	_scrcontext = tmlform.db ? "db:"+ tmlform.db : "this"
+	if (tmlform.context) {
+		_scrcontext += "/"+tmlform.context;
+	}
+
+	tmlform.store();
+</tml:action>
+
+<tml:form id="tmlscript" source="portletsessionvars" htmlinput="ignore">		
+
+	<tml:case condition="(scriptToRun||exprToRun) && tmlform.run_as_master">
+		<tml:script>
+			if (tmlform.isEmpty('db')) {
+				db().reopenSession(null, null);
+			}
+			else {
+				var targetDB = wgacore.getContentdbs().get(WGA.design().resolveDbKey(tmlform.db));
+				targetDB.openSession();
+			}
+		</tml:script>
+	</tml:case>
+
+	<tml:case isdefined="_scrcontext">
+	
+		<tml:if context="{_scrcontext}" iscontextvalid="true">
+			<tml:then>
+
+
+				<tml:case isdefined="scriptToRun">			
+					<tml:script var="_result">
+						try{
+							eval("function $f(){"+scriptToRun+"}")
+							return $f();
+						}
+						catch(e){
+							_exception=e;
+						}
+					</tml:script>
+				</tml:case>
+				
+				<tml:case isdefined="exprToRun">
+					<tml:script var="_result">
+						try{
+							return eval(exprToRun)
+						}
+						catch(e){
+							_exception=e;
+						}
+					</tml:script>
+				</tml:case>
+		
+			</tml:then>
+			
+			<tml:else>
+				<tml:script var="_result" expression="'Context not valid'"/>
+			</tml:else>
+		</tml:if>
+	</tml:case>
+
+	<tml:script>
+		if(_uid){
+			tmlform.db = _uid;
+		}
+		if(_where){
+			tmlform.context = _where;
+		}
+	</tml:script>
+
+	<tml:include designdb="@ui" ref="windowview">
+		<tml:option name="title">TMLScript Console</tml:option>	
+		<tml:option name="config" scope="local">
+			buttonAlign: "left",
+			buttons: [
+				{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+					text: "Execute",
+					handler: function(){
+						WGA.ajax.callAction("<tml:action ref="execute" portletmode="edit"/>","<tml:script expression="portlet.portletkey"/>");
+					}
+				}
+			]
+		</tml:option>
+	
+		<tml:inline name="body">
+			
+			<fieldset>
+
+				<tml:script>
+					_dbs = createlist();
+					var dbs = DBM.wgaconfig.get().getContentDatabases().iterator();
+					while(dbs.hasNext()){
+						var db = dbs.next()
+						if(DBM.database(db.key).isReady)
+							_dbs.add(db.key);
+					}
+				</tml:script>
+			
+				<label>Database:</label>
+				<div class="data">
+					<div style="width:100%">
+						<tml:input type="select" name="db" options="{_dbs}"/>
+					</div>
+					<tml:include ref="system:convert-to-ext-field" o_fieldname="db" o_type="select"
+						o_forceselection="false"
+						o_editable="true"
+						o_emptytext="- none -"
+					/>					
+				</div>
+				<div class="clear"></div>
+				
+				<label>Context:</label>
+				<div class="data">
+					<div style="width:100%">
+				 		<tml:input name="context" type="text" encode="none"/>
+				 	</div>
+				 	<tml:include ref="system:convert-to-ext-field" o_fieldname="context" o_type="text" 
+				 		o_width="500"
+				 		o_allowblank="true" 
+				 		o_emptytext="- none -"/>					 	
+				</div>
+				<div class="clear"></div>
+				
+				<label>TMLScript-Code to execute:</label>
+				<div>
+					<div style="width:100%">
+						<tml:input name="script" type="textarea" encode="none"/>
+					</div>
+					<tml:include ref="system:convert-to-ext-field" o_fieldname="script" o_type="textarea"/>					
+				</div>		
+				<div class="clear"></div>
+				
+				<label>Script-Type:</label>
+				<div class="data">
+					<tml:input name="type" type="radio" encode="none"
+						default="e" 
+						options="Expression - Like in WebTML conditions. No multiple commands allowed.|e,Script - Like in &lt;tml:script&gt;-Tags. You need to explicitly return your results.|s"/>
+				</div>			
+				<div class="clear"></div>
+				
+				<label>Handle Exceptions:</label>
+				<div class="data">
+					<tml:input name="exception" type="checkbox"
+						options="Write Java Exceptions to application log"/>
+				</div>			
+				<div class="clear"></div>
+
+				<label>Run in Master Session:</label>
+				<div class="data">
+					<tml:input name="run_as_master" type="boolean" default="true"/>
+				</div>			
+				<div class="clear"></div>
+				
+			</fieldset>
+
+			<tml:case isdefined="_result">
+				<fieldset>
+					<legend>Result of execution:</legend>
+
+					<tml:if isdefined="_exception">
+						<tml:then>							
+							<label>Exception:</label>
+							<div class="data">						
+								<tml:item name="_exception"/>
+							</div>
+							<div class="clear"></div>
+							
+							<tml:case condition="_exception.javaException">
+								<tml:script>
+									var trace = _exception.javaException.getStackTrace();
+									_cause = _exception.javaException.getCause();
+									_trace = createlist()
+									for(var i=0; i<trace.length; i++){
+										_trace.add(trace[i].toString());
+									}
+									if(tmlform.exception)
+										logException(_exception);
+								</tml:script>
+								<label>Stack Trace:</label>
+								<div _class="data" style="max-height:300px;overflow:auto">
+									<tml:item name="_trace" divider="<br>"/>
+								</div>
+								<div class="clear"></div>
+								
+								<tml:case condition="_cause">
+									<label>Cause:</label>
+									<div class="data">
+										<tml:item name="_cause"/>
+									</div>
+									<div class="clear"></div>								
+								</tml:case>
+								
+							</tml:case>
+							
+						</tml:then>
+						
+						<tml:else>
+							<label>Result:</label>
+							<div class="data">						
+								<tml:item name="_result" divider="<br>"/>
+							</div>
+							<div class="clear"></div>
+							
+							<label>Data type of result:</label>
+							<div class="data">
+								<tml:script>		
+									var res = itemList("_result");		
+									var firstElement = (res.size() >= 1 ? res.get(0) : null);		
+									var firstElementType = (firstElement == null ? "null" : javaObject(firstElement).getClass().getName());		
+											
+									if (res.size() > 1) {		
+										return "List with first element of type " + firstElementType;		
+									}		
+									else {		
+										return firstElementType;		
+									}		
+								</tml:script>		
+							</div>
+							<div class="clear"></div>
+						</tml:else>
+					</tml:if>
+					
+					<tml:warnings autohide="true"/>
+				</fieldset>
+			</tml:case>		
+
+		</tml:inline>
+	</tml:include>
+
+</tml:form>

@@ -1,0 +1,30 @@
+<tml:script>
+	if(!portlet.getSessionVar('currentpage')){
+		portlet.setSessionVar('currentpage', 1);
+	}
+</tml:script>
+
+<tml:include designdb="@ui" ref="tabview">
+	<tml:option name="pages">User Sessions, Processed Requests, Evaluated WebTML Caches, Backend Operations</tml:option>
+	<tml:inline name="body">
+		<tml:select switch="portlet.getSessionVar('currentpage')">
+			<tml:case value="1">
+				<tml:portlet name="sessions" ref="::portlet-sessions" ajax="true"/>
+			</tml:case>
+			
+			<tml:case value="2">
+				<tml:portlet name="requests" ref="::portlet-requests" ajax="true"/>
+			</tml:case>
+			
+			<tml:case value="3">
+				<tml:portlet name="tml-caches" ref="::portlet-tml-caches" ajax="true"/>
+			</tml:case>
+			
+			<tml:case value="4">
+				<tml:portlet name="backand-ops" ref="::portlet-backend-ops" ajax="true"/>
+			</tml:case>
+		</tml:select>
+		
+		
+	</tml:inline>
+</tml:include>

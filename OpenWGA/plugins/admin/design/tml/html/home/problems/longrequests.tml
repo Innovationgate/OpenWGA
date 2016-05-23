@@ -1,0 +1,106 @@
+<tml:include designdb="@ui" ref="windowview" o_title="[The following URLs took longer than {WGA.format(Packages.de.innovationgate.wgpublisher.filter.WGAFilter.REQUEST_LENGTH_NOTIFICATION_THRESHOLD / 1000, '#,##0')} seconds to finish rendering (without needing to deploy and compile new WebTML modules)]">
+	
+	<tml:option name="config" scope="local">
+		tools: [
+			{
+				id: "refresh",
+				qtip: "refresh",
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="arrow_rotate_clockwise.png"/>',
+				handler: function(){
+					WGA.ajax.callAction('<tml:action ref="$refresh"/>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+		],
+		tbar: [
+			{
+				text: "Clear requests",
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="lock_open.png"/>',
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>WGA.Server.getProblemRegistry().clearProblemType(new Packages.de.innovationgate.wgpublisher.problems.LongRequestProblemType());</tml:action>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+		]
+	</tml:option>
+	
+	<tml:inline name="body">
+	
+		<tml:script>
+			var reg = WGA.Server.getProblemRegistry();
+			reg.updateRegistry();
+			problems = reg.getProblems(Packages.de.innovationgate.wgpublisher.problems.LongRequestProblemType);
+			
+			if (sortBy == "uri") {
+				WGA.sortList(problems, function(a,b) {
+					return javaObject(a.getUri()).compareTo(b.getUri());
+				});		
+			}
+			else if (sortBy == "times") {
+				WGA.sortList(problems, function(a,b) {
+					return javaObject(b.getTimesExceedingDuration()).compareTo(a.getTimesExceedingDuration());
+				});
+			}
+			else if (sortBy == "lastExceeding") {
+				WGA.sortList(problems, function(a,b) {
+					return javaObject(b.getLastExceeding()).compareTo(a.getLastExceeding());
+				});
+			}
+			else if (sortBy == "duration") {
+				WGA.sortList(problems, function(a,b) {
+					return javaObject(b.getLongestDuration()).compareTo(a.getLongestDuration());
+				});
+			}
+		</tml:script>
+		
+		<table class="collection" width="100%">
+			<tr class="collection-title">	
+				<td>
+					<a title="Sort by URI (descending)" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="uri"/>">URI</a>
+				</td>
+				<td>
+					<a title="Sort by times (descending)" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="times"/>">Times exceeding duration</a>
+				</td>
+				<td>
+					<a title="Sort by last exceeding (descending)" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="lastExceeding"/>">Last exceeding</a>
+				</td>
+				<td>
+					<a title="Sort by longest duration (descending)" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="duration"/>">Longest duration (seconds)</a>
+				</td>
+				<td>
+					<a title="Sort by scope (descending)" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="duration"/>">Scope</a>
+				</td>
+			</tr>
+		
+			<tml:foreach item="problems" currentvalue="problem">
+				<tr class="List">
+					<td>
+						<span title="<tml:script expression="problem.getUri()"/>">
+							<tml:script>
+							  var uri = problem.getUri();
+							  if (uri.length > 80) {
+							  	return uri.substring(0, 80) + "...";
+							  }
+							  else {
+							  	return uri; 
+							  }
+							</tml:script>
+						</span>
+					</td>
+					<td>
+						<tml:script expression="problem.getTimesExceedingDuration()" format="#,##0"/>
+					</td>
+					<td>
+						<tml:script expression="problem.getLastExceeding()" format="dd.MM.yyyy HH:mm:ss"/>
+					</td>
+					<td>
+						<tml:script expression="problem.getLongestDuration() / 1000" format="#,##0"/>
+					</td>
+					<td>
+						<tml:script expression="problem.getPath().getScope().toString()"/>
+					</td>
+				</tr>
+			</tml:foreach>
+		</table>
+	
+	</tml:inline>
+
+</tml:include>

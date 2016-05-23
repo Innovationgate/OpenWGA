@@ -1,0 +1,85 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:eventscript onevent="ps-mode-changed"/>
+
+<tml:action id="getPlugins">
+	if (pluginStore.server.getAllPlugins() == false) {
+		refresh = true;
+	}
+</tml:action>
+
+<tml:action id="reconnect">
+	removesessionvar("pluginStore");
+</tml:action>
+
+<tml:script>
+	//log.info("plugin-store:" + portlet.portletkey + "/" + portlet.mode);
+	if (!pluginStore) {
+		setsessionvar("pluginStore", WGA.createObject("::pluginStore", portlet), false);
+	}
+</tml:script>
+
+<div id="openwga-plugin-store">
+
+	<tml:include designdb="@ui" ref="windowview">
+		<tml:option name="title"><tml:label file="pluginstore" key="pluginstore.title"/></tml:option>
+		<tml:option name="config">
+			<tml:case condition="pluginStore && pluginStore.server.serviceAvailable == true && portlet.mode == 'view'">
+				tbar: [
+					"->",
+					{
+		        		icon: '<tml:url db="@afw" type="file" doc="icons" file="arrow_refresh.png"/>',
+		        		cls:'x-btn-text-icon',
+						text: "refresh",
+						handler: function(){
+							WGA.ajax.callAction("<tml:action ref="getPlugins"/>","<tml:script expression="portlet.portletkey"/>");
+						}
+					}
+				]
+			</tml:case>
+		</tml:option>
+		<tml:inline name="body">
+			<tml:if condition="pluginStore && pluginStore.server.serviceAvailable == true">
+				<tml:then>	
+					<tml:include ref="{'::mode-' + portlet.mode}"/>
+				</tml:then>
+				<tml:else>
+					<div class="store-not-available">
+						<tml:label key="plugin-store.store-not-available"/>
+						<tml:case condition="pluginStore">
+							<tml:script expression="pluginStore.server.errorMsg"/>
+						</tml:case>
+						<div class="button-bar">
+							<tml:button clickaction="reconnect"	ajax="true">Retry</tml:button>
+						</div>
+					</div>
+						
+				</tml:else>
+			</tml:if>
+		</tml:inline>
+	</tml:include>
+	
+</div>

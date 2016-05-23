@@ -1,0 +1,414 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="setEditMode">
+	DBM.wgaconfig.clone();
+	portlet.setMode("edit");	
+</tml:action>
+
+<tml:action id="cloneProject">
+	var db = xpath(DBM.wgaconfig.get(), "/contentDatabases[uid='"+portlet.getSessionVar('key')+"']")
+	
+	// create database bean:
+	var db_bean = new Packages.de.innovationgate.wga.config.ContentStore();
+
+	db_bean.dbServer=db.dbServer
+	db_bean.domain=db.domain
+	db_bean.implClassName=db.implClassName
+	db_bean.title=db.title + " (clone)";
+	db_bean.defaultLanguage="de"
+	
+	// copy db- and publisher options:
+	db_bean.databaseOptions.putAll(db.databaseOptions)
+	db_bean.publisherOptions.putAll(db.publisherOptions)
+	
+	// copy client restrictions config:
+	var cr = db.clientRestrictions;
+	db_bean.clientRestrictionsEnabled=db.clientRestrictionsEnabled
+	db_bean.clientRestrictions.addAll(cr);
+
+	// copy lucene config:
+	var lucene_itemrules = db.luceneIndexConfiguration.itemRules
+	var lucene_filerules = db.luceneIndexConfiguration.fileRules
+	db_bean.luceneIndexConfiguration.itemRules = lucene_itemrules;
+	db_bean.luceneIndexConfiguration.fileRules = lucene_filerules;
+	db_bean.luceneIndexConfiguration.enabled = db.luceneIndexConfiguration.enabled;
+	
+	// copy field mapings:
+	var fm = db.fieldMappings;
+	db_bean.fieldMappings.addAll(fm);
+	
+	// copy design:
+	db_bean.design = db.design;
+	
+	var tabview=createObject("@ui/tabview", portlet.parentportlet);
+	var p=tabview.addPage("webprojects:project:portlet", db_bean.uid, db_bean.key);
+	p.setmode("new");
+	
+	DBM.wgaconfig.clone(p).add(db_bean);
+	
+	tabview.refresh();
+</tml:action>
+
+<tml:action id="deleteProject">
+	_config_bean = DBM.getConfigBean();	
+	var config = DBM.wgaconfig.clone();	
+	config.removeContentDatabase(_config_bean.key);
+	DBM.wgaconfig.save();
+	
+	var tabview=createObject("@ui/tabview", portlet.parentportlet);
+	tabview.deleteCurrentPage();	
+</tml:action>
+
+<tml:eventscript onevent="wga-server-message" ajax="true">
+_server_message = portletEvent.getParameter("msg");
+</tml:eventscript>
+
+<tml:script>
+	_dbPatcheable = false;
+	if (_config_bean.enabled) {
+		_db = db(_config_bean.key)
+		if (_db) {
+			_db.openSession();
+			
+			if (_db.getContentStoreVersion() >= db().CSVERSION_WGA5) {
+				var patchLevel = _db.getContentStorePatchLevel();
+				if (patchLevel < Packages.de.innovationgate.csmaintenance.CS5Patcher.CS5_PATCH_LEVEL) {
+					_dbPatcheable = true;		
+				}
+				if (patchLevel >= 4) {
+					_derivatesUpdatable = true;
+					if (!Packages.de.innovationgate.wgpublisher.scheduler.UpgradeFileStorageTask.isRunning()) {
+						var result = WGA.app(_db).query("fullhql", "select count(*) as cnt from ContentFileMeta as cfm where cfm.checksumSha512 is null").getFirstResultContent();
+						if (result.getItemNumber("cnt") > 0) {
+							_dbFileStorageUpgradeable = true;
+						}
+					}
+				}
+			}
+			
+			var model = Packages.de.innovationgate.wgpublisher.hdb.HDBModel.getModel(_db);
+			if (model != null && model.isModelVersionChanged() && !model.isModelReinitRunning()) {
+				_hdbModelReinitializable = true;
+			}
+		}
+	}
+</tml:script>
+
+<tml:include designdb="@ui" ref="windowview">
+
+	<tml:option name="config" scope="local">
+		buttonAlign: "left",
+		tbar: [
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+				text: "<tml:label key="btn.edit"/>",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action ref="setEditMode"/>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="page_delete.png"/>',		                
+				text: "Delete",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>_querydelete=true</tml:action>",
+						"<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			<tml:case condition="portlet.parentportlet">
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="page_copy.png"/>',		                
+				text: "Clone Configuration",
+				handler: function(){
+					WGA.ajax.action({
+						action: "<tml:action ref="cloneProject" ajax="norefresh"/>",
+						id: "<tml:script expression="portlet.portletkey"/>",
+						mode: "norefresh",
+						graydiv: false						
+					});
+				}
+			}
+			</tml:case>
+			,"-"
+			<tml:if condition="_config_bean.enabled">
+				<tml:then>
+					,{
+						cls:'x-btn-text-icon',						
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="disconnect.png"/>',		                
+						text: "Disable",
+						handler: function(){
+							DBM.callAction("<tml:action ref="actions:setEnabled" param1="{_config_bean.uid}" param2="0"/>",
+								"<tml:script expression="portlet.portletkey"/>",
+								"disabling database"
+							);
+						}
+					}
+				</tml:then>
+				<tml:else>
+					,{
+						cls:'x-btn-text-icon',						
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="connect.png"/>',		                
+						text: "Enable",
+						handler: function(){
+							DBM.callAction("<tml:action ref="actions:setEnabled" param1="{_config_bean.uid}" param2="1"/>",
+								"<tml:script expression="portlet.portletkey"/>",
+								"enabling database"
+							);
+						}
+					}
+				</tml:else>
+			</tml:if>
+			
+			,"->"
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="database_refresh.png"/>',		                
+				text: "Reconnect",
+				handler: function(){
+					DBM.callAction("<tml:action ref="actions:reconnect-databases" param1="{_config_bean.key}"/>",
+						"<tml:script expression="portlet.portletkey"/>",
+						"reconnecting database"
+					);
+				}
+			}
+			<tml:case condition="DBM.database(_config_bean.key).isReady">
+				,{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="database_lightning.png"/>',		                
+					text: "Clear Caches",
+					handler: function(){
+						DBM.query_clear_chaches();
+					}
+				}
+				,"-"
+				,{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="database_table.png"/>',		                
+					text: "Runtime Info",
+					handler: function(){
+						DBM.dialog("Database Infos for '<tml:script expression="_config_bean.key"/>'",
+							"<tml:url type="tml" medium="html" layout="::db-info"/>",
+							{ so: "<tml:script expression="AFW.Util.serializeJsObject({dbkey:_config_bean.key})"/>"},
+							this.el
+						);
+					}
+				}
+				,<tml:include ref="::menu-open-in" o_dbkey="{_config_bean.key}"/>
+			</tml:case>		
+			
+		]
+	</tml:option>
+
+	<tml:option name="title" scope="local">
+		<tml:label key="contentstore.view-config" param1="{_config_bean.title}"/>
+	</tml:option>
+
+	<tml:inline name="body" scope="local">
+	
+
+		<tml:case istrue="_querydelete">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Delete this Web Application?</tml:option>
+				<tml:option name="body">
+					Please confirm to delete this web application
+					<br>
+					<button onclick="DBM.ajaxAction({
+								action: '<tml:action ref="deleteProject" ajax="norefresh"/>',
+								id: '<tml:script expression="portlet.portletkey"/>',
+								graydiv: true,
+								mode: 'norefresh'
+							}, 'delete database configuration')">
+						Delete Application
+					</button>					
+				</tml:option>
+			</tml:include>
+		</tml:case>
+
+		<tml:case isdefined="_query_truncate_data">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Truncate Database Data ...</tml:option>
+				<tml:option name="body">
+					<tml:include ref="::truncate:render"/> 
+				</tml:option>
+			</tml:include>
+		</tml:case>
+
+		<tml:case istrue="_query_truncate_profiles">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Truncate User Profiles ...</tml:option>
+				<tml:option name="body">
+					<tml:include ref="::truncate:render" o_data="profiles"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case istrue="_query_upgrade_overlay">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Upgrade customization design</tml:option>
+				<tml:option name="body">
+					<tml:portlet ref="::upgrade-overlay:portlet" name="upgrade-overlay" portletmode="view"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case istrue="_query_create_downgrades">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Recreate original overlay files</tml:option>
+				<tml:option name="body">
+					<tml:portlet ref="::downgrade-overlay:portlet" name="downgrade-overlay" portletmode="view"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+
+		<tml:case istrue="_query_create_dump">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Create ContentStore dump ...</tml:option>
+				<tml:option name="body">
+					<tml:include ref="::cs-dump:export"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case istrue="_query_load_dump">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Load ContentStore dump ...</tml:option>
+				<tml:option name="body">
+					<tml:include ref="::cs-dump:import"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case istrue="_query_upgrade_dbschema">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:label key="upgrade-db"/> ...</tml:option>
+				<tml:option name="body">
+					<tml:portlet ref="::upgrade-db:portlet" name="upgrade-db" portletmode="view"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case istrue="_query_update_annotations">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:label key="update-annotations"/></tml:option>
+				<tml:option name="body">
+					<tml:portlet ref="::update-annotations:portlet" name="update-annotations" portletmode="view"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case istrue="_query_upgrade_filestorage">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:label key="upgrade-file-storage"/></tml:option>
+				<tml:option name="body">
+					<tml:portlet ref="::upgrade-file-storage:portlet" name="upgrade-file-storage" portletmode="view"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case istrue="_query_update_filederivates">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:label key="update-file-derivates"/></tml:option>
+				<tml:option name="body">
+					<tml:portlet ref="::update-filederivates:portlet" name="update-filederivates" portletmode="view"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case istrue="_query_reinit_hdbmodel">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:label key="reinit-hdbmodel"/></tml:option>
+				<tml:option name="body">
+					<tml:portlet ref="::reinit-hdbmodel:portlet" name="reinit-hdbmodel" portletmode="view"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case condition="!db(_cs.key)">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Status</tml:option>
+				<tml:option name="body">
+					This database is currently not connected
+				</tml:option>
+			</tml:include>
+		</tml:case>	
+		
+		<tml:case isdefined="_server_message">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title"><tml:item name="_server_message"/></tml:option>
+			</tml:include>			
+		</tml:case>	
+		
+		<tml:script>
+			_aclManageable = db(_config_bean.key) && db(_config_bean.key).hasFeature(Packages.de.innovationgate.webgate.api.WGDatabase.FEATURE_ACL_MANAGEABLE)
+			
+			// problems:
+			var scope = new Packages.de.innovationgate.wgpublisher.problems.DatabaseScope(_cs.key);
+			var reg = WGA.Server.getProblemRegistry();
+			_problems = reg.getProblems(Packages.de.innovationgate.wgpublisher.problems.AdministrativeProblemType, scope);
+			// find max Severity
+			var problems = _problems.iterator();
+			_max_severity = Packages.de.innovationgate.wgpublisher.problems.ProblemSeverity.LOW
+			while(problems.hasNext()){
+				_max_serverity = Math.max(_max_serverity, problems.next().getSeverity())
+			}
+		</tml:script>
+				
+		<tml:form id="cs-view-form" source="none" mode="view">		
+			<tml:include ref="::form" o_aclManageable="{_aclManageable}" o_problems="{_problems.size()>0}" o_severity="{_max_severity}"/>
+		</tml:form>
+		
+		<div class="x-hidden" id="acl">
+			<tml:case condition="_aclManageable">		
+				<tml:portlet ref="::acl:portlet" name="acl-portlet" ajax="true" portletmode="view">
+					<tml:option name="dbkey"><tml:script expression="_config_bean.key"/></tml:option>
+				</tml:portlet>
+			</tml:case>
+		</div>
+		
+		<div class="x-hidden" id="problems">
+			<tml:case condition="_problems.size()">
+				<tml:include designdb="@ui" ref="windowview" o_title="The following problems have been detected regarding this app">
+					<table class="collection" width="100%">
+						<tml:include ref="home:problems:scoped-critical-problems">
+							<tml:option name="problems" expression="_problems"/>
+						</tml:include>
+					</table>
+				</tml:include>
+			</tml:case>
+		</div>
+		
+		<div class="x-hidden" id="cluster">
+			<tml:portlet name="cluster" ref="::cluster:portlet" ajax="true"/>
+		</div>
+		
+		<tml:case condition="DBM.database(_config_bean.key).isReady">
+			<tml:include ref="::dialog-clear-caches"/>
+		</tml:case>				
+		
+	</tml:inline>
+	
+</tml:include>

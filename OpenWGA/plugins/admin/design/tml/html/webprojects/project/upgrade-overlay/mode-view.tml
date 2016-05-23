@@ -1,0 +1,38 @@
+<tml:action id="upgradeDesign">
+	try {
+		_config_bean = DBM.getConfigBean();
+		log.info("Upgrade Design of " + _config_bean.key);
+		db(_config_bean.key).getDesignProvider().upgradeOverlay();
+		portlet.setMode("done");
+		portlet.setVar("conflicts", true);
+	}
+	catch (e) {
+		logException(e);
+		portlet.setMode("error");
+		portlet.setVar("error", e);
+	}
+		
+</tml:action>
+
+<tml:script>
+_dprov = db(_config_bean.key).getDesignProvider()
+</tml:script>
+
+<div>
+Your design customization directory is currently compliant to version <b><tml:script expression="_dprov.getStatus().getCompliantBaseVersion()"/></b> of the base design plugin 
+<b><tml:script expression="_dprov.getOriginal().getPluginID().getUniqueName()"/></b>.
+</div>
+
+<div>
+	You are currently using version <b><tml:script expression="_dprov.getStatus().getCurrentBaseVersion()"/></b> of this plugin.
+	By upgrading your customization directory to be compliant to this new version the following will happen:
+	<ul>
+		<li>All overlay resources that were changed in the base design between version <tml:script expression="_dprov.getStatus().getCompliantBaseVersion().getMainVersionString()"/> and <tml:script expression="_dprov.getStatus().getCurrentBaseVersion().getMainVersionString()"/> are written to your customization directory in their up-to-date state.
+		<li>If some of those changed resources are also modified in the customization directory then we have a conflict and they will not be overwritten. Instead their current state from the base design is then written to a separate conflict file. 
+		You can manually migrate any changes from there into the real file using the overlay conflict resolution feature in OpenWGA developer studio.
+		<li>After the upgrade your customization directory will be compliant to base plugin version <tml:script expression="_dprov.getStatus().getCurrentBaseVersion()"/>. It then <b>cannot be used with earlier versions of the base plugin any more</b>.
+	</ul>
+
+</div>
+
+<tml:button clickaction="upgradeDesign" ajax="true">Upgrade compliance to base version <tml:script expression="_dprov.getStatus().getCurrentBaseVersion()"/></tml:button>

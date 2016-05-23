@@ -1,0 +1,372 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="clearLog">
+	wgacore.initLoggingFile();
+	portlet.setSessionVar("_applog", new DBM.applog(portlet.linesperpage || 50), false);
+</tml:action>
+
+<tml:action id="changeLogSettings">
+	tmlform.store();
+	portlet.setSessionVar("_applog", new DBM.applog(portlet.linesperpage || 50), false);
+	_applog.gotoFirstPage();
+</tml:action>
+
+<tml:action id="setLinesPerPage">
+	try {
+		var lines = parseInt(request.getParameter("lines"));
+	}
+	catch (e) {
+		errormsg = "Cannot parse line number: " + request.getParameter("lines");
+		return;
+	}
+	
+	if (isNaN(lines)) {
+		errormsg = "Cannot parse line number: " + request.getParameter("lines");
+		return;
+	}
+	
+	if (lines < 5) {
+		portlet.linesperpage = 5;
+	}
+	else {
+		portlet.linesperpage = lines;
+	}
+	portlet.setSessionVar("_applog", new DBM.applog(portlet.linesperpage || 50), false);
+</tml:action>
+
+<tml:action id="firstPage">
+	_applog.gotoFirstPage()
+</tml:action>
+
+<tml:action id="nextPage">
+	_applog.gotoNextPage()
+</tml:action>
+
+<tml:action id="previousPage">
+	_applog.gotoPrevPage()
+	_scroll_to_bottom=true;
+</tml:action>
+
+<tml:action id="lastPage">
+	_applog.gotoLastPage()
+	_scroll_to_bottom=true;
+</tml:action>
+
+<tml:action id="searchLog">
+	var forward = request.getParameter("forward")
+	var line = _applog.search(request.getParameter("term"), forward=="true" ? true : false);
+	if(line<0)
+		_search_term_not_found = request.getParameter("term")
+</tml:action>
+
+<tml:action id="searchLogByDate">
+	var date = WGA.parseDate(request.getParameter("date"), label("format.date.short-with-time"))
+	if(date)
+		_applog.searchDate(date);
+</tml:action>
+
+
+<tml:script>
+	if(!_applog)
+		portlet.setSessionVar("_applog", new DBM.applog(), false);
+	_loginfo = _applog.readPage(portlet.getSessionVar("filter")); 
+	_messages = _loginfo.messages;
+</tml:script>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Messages from Application Log Line
+		<tml:script expression="_applog.getOffset()"/>
+		to 
+		<tml:script expression="_applog.getEndIndex()"/>
+		of
+		<tml:script expression="_applog.getLines()"/>
+		
+		<tml:form id="log-filter" source="portletsessionvars" cssstyle="display:inline">
+			- Filter: <tml:input name="filter" type="select" 
+					options="All|ALL,Infos + Warnings + Errors|INFO,Warnings + Errors|WARN,Errors only|ERROR" changeaction="changeLogSettings" ajax="true"/>
+					
+			- Lines per page: 	<tml:script expression="WGA.format(portlet.linesPerPage || 50, '###0')"/>
+								<button onclick="var lines=prompt('Lines per page:', '<tml:script expression="WGA.format(portlet.linesPerPage || 50, '###0')"/>'); if (lines) {WGA.ajax.action({action:'<tml:action ref="setLinesPerPage"/>', params: {lines: lines}});} else {return false};">change</button>					
+		</tml:form>	
+	</tml:option>	
+	<tml:option name="config" scope="local">
+		buttonAlign: "left",
+		tbar: [
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="magnifier.png"/>',		                
+				text: "Search",
+				menu: [
+					{
+						text: "Search for date",			
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="date.png"/>',
+						handler: function(){
+							Ext.Msg.show({
+								title:'Search for Date',
+							   	msg: 'Please enter a date',
+							   	prompt: true,
+							   	buttons: Ext.Msg.OKCANCEL,
+							   	value: "<tml:script format="">
+									var date = (_loginfo.messages && _loginfo.messages.size()) ? _loginfo.messages.get(0).time : WGA.createDate();
+									return WGA.format(date, label('format.date.short-with-time'))								   	
+							   	</tml:script>",
+							   	fn: function(btn, text){
+							   		if(btn=="ok")
+								   		WGA.ajax.action({
+								   			action: "<tml:action ref="searchLogByDate"/>",
+								   			params: {
+								   				date: text
+								   			}
+								   		})
+							   	}
+							});
+						}
+					},
+					{
+						text: "Search for term",
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="font.png"/>',
+						handler: function(){
+							Ext.Msg.show({
+								title:'Search for Term',
+							   	msg: 'Please enter a term',
+							   	prompt: true,
+							   	buttons: Ext.Msg.OKCANCEL,
+							   	value: "<tml:urlparameter name="term"/>",
+							   	fn: function(btn, text){
+							   		if(btn=="ok")
+								   		WGA.ajax.action({
+								   			action: "<tml:action ref="searchLog"/>",
+								   			params: {
+								   				term: text,
+								   				forward: true
+								   			}
+								   		})
+							   	}
+							});
+						}
+					}			
+				]
+			},
+			<tml:case hasurlparameter="term">
+				{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="control_rewind.png"/>',		                
+					text: "previous '<tml:urlparameter name="term"/>' ...",
+					handler: function(){
+				   		WGA.ajax.action({
+				   			action: "<tml:action ref="searchLog"/>",
+				   			params: {
+				   				term: "<tml:urlparameter name="term"/>",
+				   				forward: false
+				   			}
+				   		})
+					}
+				},
+				{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="control_fastforward.png"/>',		                
+					text: "next '<tml:urlparameter name="term"/>' ...",
+					handler: function(){
+				   		WGA.ajax.action({
+				   			action: "<tml:action ref="searchLog"/>",
+				   			params: {
+				   				term: "<tml:urlparameter name="term"/>",
+				   				forward: true
+				   			}
+				   		})
+					}
+				},
+			</tml:case>
+			"->",
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="application_put.png"/>',		                
+				text: "Tail",
+				handler: function(){
+					window.open("<tml:url type="tml" name="tail"/>")
+				}
+			},
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+				text: "Clear Application Log",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>_query_clearlog=true</tml:action>","<tml:script expression="portlet.portletkey"/>");
+				}
+			},
+		]
+		,tools: [
+			{
+				id: "refresh",
+				qtip: "refresh and goto last page",
+				handler: function(){
+					WGA.ajax.callAction('<tml:action ref="lastPage"/>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+		]
+		,buttons: 
+		[
+			{
+				text: "First Page",
+				disabled: <tml:script expression="_applog.getOffset()<=1"/>,
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="control_start.png"/>',		                
+				handler: function(){
+					WGA.ajax.callAction('<tml:action ref="firstPage"/>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+			,{
+				text: "Previous Page",
+				disabled: <tml:script expression="!_applog.hasPrevPage()"/>,
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="control_rewind.png"/>',		                
+				handler: function(){
+					WGA.ajax.callAction('<tml:action ref="previousPage"/>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+			,{
+				text: "Next Page",
+				disabled: <tml:script expression="!_applog.hasNextPage()"/>,
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="control_fastforward.png"/>',		                
+				handler: function(){
+					WGA.ajax.callAction('<tml:action ref="nextPage"/>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+			,{
+				text: "Last Page",
+				disabled: <tml:script expression="_applog.isEndReached()"/>,
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="control_end.png"/>',		                
+				handler: function(){
+					WGA.ajax.callAction('<tml:action ref="lastPage"/>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="arrow_up.png"/>',		                
+				text: "Scroll To Start",
+				handler: function(){
+					Ext.get("app-log-view").scroll("up", 10000, true);
+				}
+			}
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="arrow_down.png"/>',		                
+				text: "Scroll To End",
+				handler: function(){
+					Ext.get("app-log-view").scroll("down", 10000, true);
+				}
+			}		
+		
+		]
+	</tml:option>
+
+	<tml:inline name="body">
+
+		<tml:case istrue="_query_clearlog">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Clear Application Log?</tml:option>
+				<tml:option name="body">
+					<tml:button clickaction="clearLog" ajax="true">Yes Please ...</tml:button>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case isdefined="errormsg">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">An error occured</tml:option>
+				<tml:option name="body">
+					<tml:item name="errormsg" encode="html"/>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+
+		<tml:case isdefined="_search_term_not_found">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Term not found</tml:option>
+				<tml:option name="body">
+					The term '<tml:item name="_search_term_not_found"/>' could not be found. 
+				</tml:option>
+			</tml:include>
+		</tml:case>
+
+		<div id="app-log-view">
+			<div id="start-of-log" align="center">
+				<tml:case condition="_log_startindex==1">
+					### begin of log ###
+				</tml:case>
+			</div>
+			<tml:foreach type="itemvalue" item="_messages" currentvalue="_message">
+				<div class="log-entry level-<tml:script expression="_message.level.name.toLowerCase()"/>">
+					<div style="float:left"><tml:script expression="_message.time" format="{label('format.date.short-with-time')}"/></div>
+					<div style="float:left; margin-left:15px"><tml:script expression="_message.level" encode="html"/></div>
+					<div style="margin-left:220px">
+						<tml:script expression="_message.mainMessage" encode="html"/>
+						<tml:case condition="_message.details">
+							<blockquote style="margin-left: 10px;border-left: solid silver 2px;padding-left: 10px;">
+								<tml:script encode="html">
+									var a = _message.details.split('\n');
+									var first_line = a.shift();
+									_rest_message = a.join("\n");
+									return first_line;
+								</tml:script>
+								<br>		
+								<a href="#" onclick="showError(this)">show/hide additional info ...</a>
+								<div style="display:none;color:red;">
+									<tml:script expression="_rest_message" encode="html"/>
+								</div>
+							</blockquote>
+						</tml:case>
+					</div>
+				</div>
+			</tml:foreach>
+			<div id="end-of-log" align="center">
+				<tml:case condition="_loginfo.isEndReached()">
+					### end of log ###
+				</tml:case>
+			</div>
+		</div>		
+		<script>
+		
+			function showError(el){
+				var eel = Ext.get(el).next();
+				DBM.showHideElement(eel);
+			}
+			
+			function resizeAppLog() {
+				if(DBM.centerpanel)
+					Ext.get("app-log-view").setHeight(DBM.centerpanel.getHeight()-110);
+				<tml:case istrue="_scroll_to_bottom">
+					Ext.get("app-log-view").scroll("down", 10000, true);
+				</tml:case>
+			} 
+			WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "Viewport-resize", resizeAppLog)
+			WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", resizeAppLog) 
+		</script>
+
+	</tml:inline>
+</tml:include>

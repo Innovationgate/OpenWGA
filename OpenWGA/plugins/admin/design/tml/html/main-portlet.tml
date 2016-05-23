@@ -1,0 +1,147 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:eventscript onevent="expert-mode-changed"/>
+
+<div class="x-hidden">
+	<tml:form id="app-select-handler-form" source="none" cssstyle="display:inline">
+		<tml:input name="key" type="hidden"/>
+		<tml:input name="uid" type="hidden"/>
+		<tml:input name="where" type="hidden"/>
+		<tml:input name="implClass" type="hidden"/>
+		<script>
+			WGA.event.register("<tml:script expression="portlet.portletkey"/>", "PS-app-selected", function(e){
+				var form = document.forms['app-select-handler-form']; 
+				form.key.value=e.params.appkey;
+				form.uid.value=e.params.uid||"";
+				form.where.value=e.params.where||"";
+				form.implClass.value=e.params.implClass||"";
+				WGA.ajax.callAction("<tml:action>
+						portlet.setSessionVar("key",tmlform.key);
+						portlet.setMode("view");
+						_uid = tmlform.uid;
+						_app = tmlform.key;
+						_where = tmlform.where ;
+						_implClass = tmlform.implClass;
+						//log.info("app selected " + _app + "/" + _uid + "/" + _where + "/" + _implClass)
+					</tml:action>", "<tml:script expression="portlet.portletkey"/>")
+			})
+	
+		</script>
+	</tml:form>
+
+</div>
+
+<tml:range var="_navigation"><tml:include medium="xml" ref="navigation"/></tml:range>
+
+<tml:script>
+	_portletname = portlet.getSessionVar("key");
+
+	var xml=_navigation_modules;	// parseXML(_navigation);
+
+	if(isEmptyValue(_portletname) || !xml.getElementById(_portletname))
+		_portletname="home";
+	try{
+		var el = xml.getElementById(_portletname);
+		var redirect = el.attributes.redirectto;
+		var parentnode=el.getParent();
+		if(parentnode){
+			try{
+				var parentid = parentnode.attributes.id 
+				portlet.setSessionVar("default-"+parentid, _portletname)
+				portlet.save();
+			}
+			catch(e){}
+		}
+
+		if(!redirect && !el.attributes.tml){
+			// try to navigate to first child
+			var child = el.getElementsByTagName("nav");
+			if(child.length){
+				redirect = child[0].attributes.id
+				//log.info("redirect to first child: " + redirect + " in db " + child[0].attributes.db);
+			}
+			else {
+				// should not happen!
+				log.info("nav element " + el.attributes.id + " has no child");
+			}
+		}
+		
+
+		if(redirect){
+			// try to find best module ...
+			var new_portletname = portlet.getSessionVar("default-"+_portletname) || redirect;
+			var new_el = xml.getElementById(new_portletname);
+			if(new_el){
+				el = new_el;
+				_portletname = new_portletname;
+			}
+			else {
+				_portletname = redirect;
+				el = xml.getElementById(redirect);
+			}
+		}
+		_portlettml=el.attributes.tml;
+		_portletdb = el.attributes.db;
+		_may_see_doc=true;										
+		var condition=el.attributes.condition;
+		
+		if(condition)
+			_may_see_doc=eval(condition);
+		else{
+			// check parent module also:
+			if(parentnode){
+				condition=parentnode.attributes.condition;
+				if(condition)
+					_may_see_doc=eval(condition);
+			}
+		}
+		
+	}catch(e){
+		_portlettml=_portletname="";
+		logException(e);
+	}
+</tml:script>
+
+<script>
+	WGA.event.dispatch({
+		name: "PS-app-changed",
+		source: "<tml:script expression="portlet.portletkey"/>",
+		params: {
+			appkey: "<tml:item name="_portletname"/>"
+		}
+	})
+</script>				
+
+<tml:if condition="_portletname && _may_see_doc">
+	<tml:then>				
+		<tml:portlet name="{item:_portletname}" designdb="{_portletdb||db().getDbReference()}" ref="{item:_portlettml}" ajax="true"/>
+	</tml:then>
+	<tml:else>
+		<div style="padding:20px">
+			<h1>Modul "<tml:label file="navigation" key="{_portletname}"/>"</h1>
+			<tml:label key="main-portlet.module-not-avaliable"/>
+		</div>
+	</tml:else>
+</tml:if>

@@ -1,0 +1,151 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="resetLoginBlock">
+	var user = tmlparam1;
+	var domain = tmlparam2; 
+	WGACore.getBruteForceLoginBlocker().clearFailedLoginAttempts(domain, user);
+</tml:action>
+
+<tml:action id="resetAllLoginBlocks">
+	var b = WGACore.getBruteForceLoginBlocker();
+	var users = b.getBlockedLogins().iterator();
+	while(users.hasNext()){
+		var user = users.next();
+		log.info("clear blocked login for [" + user.name+"/"+user.domain + "]");
+		b.clearFailedLoginAttempts(user.domain, user.name)
+	}
+</tml:action>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Server Information</tml:option>	
+	<tml:inline name="body">
+		<fieldset>		
+					
+			<label>Server Version:</label>		
+			<div class="data"><tml:item name="_wgaversion"/></div>		
+			<div class="clear"></div>		
+			<label>Build signature:</label>		
+			<div class="data"><tml:item name="_signature"/></div>		
+			<div class="clear"></div>		
+					
+			<tml:comment><label>SID:</label>		
+			<div class="data"><tml:item name="_sid"/></div>		
+			<div class="clear"></div></tml:comment>		
+					
+			<label>Application Server:</label>		
+			<div class="data"><tml:item name="_server"/></div>		
+			<div class="clear"></div>		
+			<label>Instance active since:</label>		
+			<div class="data"><tml:item name="_instanceActive"/></div>		
+			<div class="clear"></div>		
+			<label>Time now on server:</label>		
+			<div class="data"><tml:item name="_timeNow"/></div>		
+			<div class="clear"></div>		
+			<label>WebTML requests served:</label>		
+			<div class="data"><tml:item name="_tmlRequests"/></div>		
+			<div class="clear"></div>		
+			<label>TMLScript code cache:</label>		
+			<div class="data"><tml:item name="_tmlCodeCache"/></div>		
+			<div class="clear"></div>		
+			<label>Design file cache:</label>		
+			<div class="data">		
+				<tml:item name="_wgaDesignFileCache"/> Entries (Max: <tml:item name="_wgaDesignFileCacheMax"/>) <tml:item name="_wgaDesignFileCacheUtilisation"/> % Utilisation		
+			</div>		
+			<div class="clear"></div>		
+			<label>WebTML cache:</label>		
+			<div class="data">		
+				<tml:item name="_webTMLCache"/> Entries (Max: <tml:item name="_webTMLCacheMax"/>) <tml:item name="_webTMLCacheUtilisation"/> % Utilisation		
+			</div>		
+			<div class="clear"></div>		
+			<label>Lucene indexer status:</label>		
+			<div class="data"><tml:item name="_luceneIndex"/></div>		
+			<div class="clear"></div>
+			<label>File derivate update process status:</label>		
+			<div class="data"><tml:item name="_derivateUpdate"/></div>
+			<div class="clear"></div>
+			<label>Problems:</label>
+			<div class="data">
+				
+				<tml:script>
+					var numHigh = 0;
+					var numLow = 0;
+					for (p in Iterator(WGA.server().getProblemRegistry().getProblems(Packages.de.innovationgate.wgpublisher.problems.AdministrativeProblemType))) {
+						if (p.getSeverity() == Packages.de.innovationgate.wgpublisher.problems.ProblemSeverity.HIGH) {
+							numHigh++;
+						}
+						else if (p.getSeverity() == Packages.de.innovationgate.wgpublisher.problems.ProblemSeverity.LOW) {
+							numLow++;
+						}
+					}
+					
+					if (numHigh > 0) {
+						_problems = '<div style="color:red">' + WGA.format(numHigh, "#,##0") + " problem(s) of high severity";
+						if (numLow > 0) {
+							_problems += ", " + WGA.format(numLow, "#,##0") + " problem(s) of low severity";
+						}
+						_problems+= " detected.</div>";
+					}
+					else if (numLow > 0) {
+						_problems = WGA.format(numLow, "#,##0") + " problem(s) of low severity detected.";
+					}
+					else {
+						_problems = "No problems detected.";
+					}
+					
+					if (numHigh > 0 || numLow > 0) {
+						_problems = '<a href="javascript:DBM.switchToObject(\'runtime-problems\')">' + _problems + '</a>';
+					}
+					
+					return _problems;
+				</tml:script>
+				
+			</div>		
+			<div class="clear"></div>					
+			<label>Brute force login blocker status:</label>		
+			<div class="data">		
+			<tml:if condition="(_blockedUser=WGACore.getBruteForceLoginBlocker().getBlockedLogins()).size() > 0">		
+				<tml:then>		
+					<div style="color:red"><tml:script expression="_blockedUser.size()"/> login(s) are blocked:</div>
+					<tml:button clickaction="resetAllLoginBlocks" ajax="true">reset All</tml:button>
+					<ul style="list-style:disc; margin-left: 15px">
+						<tml:foreach type="itemvalue" item="_blockedUser" currentvalue="_user">
+							<li>
+								Login <tml:script expression="_user.name"/>
+								, Domain <tml:script expression="_user.domain"/>
+								, blocked since <tml:script format="{label('format.date.short-with-time')}" expression="_user.blockedDate"/>
+								<tml:button clickaction="resetLoginBlock" param1="{_user.name}" param2="{_user.domain}" ajax="true">reset</tml:button>
+							</li>
+						</tml:foreach>
+					</ul>
+				</tml:then>		
+				<tml:else>		
+					All logins are available		
+				</tml:else>		
+			</tml:if>			
+			</div>		
+		</fieldset>		
+
+	</tml:inline>
+</tml:include>

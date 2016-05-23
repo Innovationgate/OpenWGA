@@ -1,0 +1,123 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="setPath">
+	portlet.setSessionVar("path", tmlparam1);
+	portlet.setSessionVar("key", tmlparam2);
+</tml:action>
+
+<tml:script>
+	if(_dbChanged){
+		portlet.setSessionVar("key", "root");
+		portlet.setSessionVar("path", "/root");
+		createObject("@ui/tabview").deleteAllPages();
+	}
+	if(_uid && _path){
+		// uid is dbkey
+		// _where is a context expression
+		var c = context(_where, false)
+		if(c){
+			if(!c.content().isDummy()){
+				portlet.setSessionVar("key", "structentry:"+c.STRUCTKEY);
+				// create tab:
+				var tabview=createObject("@ui/tabview");
+				tabview.addPage("tools:db-explorer:node-info:content:portlet", _where, c.TITLE + " ("+c.VERSION+")");
+			}
+		}
+		portlet.setSessionVar("path",_path);
+		//portlet.save();
+	}
+</tml:script>
+
+<tml:form id="node-info-form" source="portletsessionvars">
+
+	<tml:input type="hidden" name="key"/>
+	<tml:input type="hidden" name="path"/>
+	
+	<script>
+		WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "DBM-struct-selected",
+			function(e){
+				document.forms["node-info-form"].key.value=e.params.key;
+				document.forms["node-info-form"].path.value=e.params.path;
+				DBM.callAction("<tml:action>
+							portlet.setSessionVar("currentpage", -1);
+							tmlform.store();
+							portlet.removeSessionVar("_showContent");
+					</tml:action>", "<tml:script expression="portlet.portletkey"/>")
+			}
+		)
+		<tml:case condition="portlet.getSessionVar('path')">
+			DBM.dbExplorer.currentPath="<tml:item name="path"/>";
+			if(DBM.dbExplorer.tree){
+				DBM.progressbar.show("loading tree entries")
+				DBM.dbExplorer.tree.selectPath(DBM.dbExplorer.currentPath, null, function(){
+					<tml:case istrue="_treeChanged">
+						var node = DBM.dbExplorer.tree.getSelectionModel().getSelectedNode(); 
+						DBM.dbExplorer.tree.loader.load(node, node.expand)
+					</tml:case>
+					DBM.progressbar.hide();
+				});
+			}
+		</tml:case>
+
+	</script>	
+
+</tml:form>
+
+<tml:script>
+	if (!portlet.getSessionVar("currentpage")){
+		portlet.setSessionVar("currentpage", -1);
+	}		
+	var a = (portlet.getSessionVar('key')||"root").split(":");
+	_type = a.shift();
+	_key = a.join(":");
+	_wgakey = _type + "/" + a.join("/");
+	
+	// check if document still exists
+	_exists = false;
+	if(_type=='root' || _type=="cssjs" || _type=="tml" || _type=="filecontainer")
+		_exists = true;
+	else if(_key){	
+		if(db(option("key")).getDocumentByKey(_wgakey))
+			_exists = true;
+		else log.info("db-explorer: document with key " + _wgakey + " not found"); 
+	}
+</tml:script>
+
+<tml:case condition="_exists">
+	
+	<tml:include designdb="@ui" ref="tabview_dynamic">
+	
+		<tml:option name="title"><tml:label key="{'db-explorer.node.'+_type}"/></tml:option>	
+		
+		<tml:inline name="body">			
+	
+			<tml:case condition="portlet.getSessionVar('currentpage')<0">
+				<tml:include ref="{'::node-'+_type}" o_documentkey="{_key}" o_wgakey="{_wgakey}"/>
+			</tml:case>
+		</tml:inline>
+			
+	</tml:include>
+
+</tml:case>

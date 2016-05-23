@@ -30,7 +30,7 @@
 	</tml:script>
 		
 	<tml:script>
-		thatvar = 1;
+		thatVar = 1;
 	</tml:script>
 	
 	<tml:script>
@@ -55,7 +55,7 @@
 	<tml:include designdb="test1" ref="v7_2_M2:webtml:varpriority"/>
 	
 	<tml:script>
-		thatvar = 3;
+		thatVar = 3;
 	</tml:script>
 	
 	<tml:script>

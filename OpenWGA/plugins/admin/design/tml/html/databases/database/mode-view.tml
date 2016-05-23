@@ -1,0 +1,148 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="setEditMode">
+	DBM.wgaconfig.clone();
+	portlet.setMode("edit");	
+</tml:action>
+
+<tml:action id="setEnabled">
+	var config = DBM.wgaconfig.clone();
+	var db = xpath(config, "/contentDatabases[uid='"+portlet.getSessionVar('key')+"']")
+	db.enabled = (tmlparam1=="1")
+	DBM.wgaconfig.save();
+			
+	portlet.fireEvent(createEvent("wga-config-changed"));
+
+</tml:action>
+
+<tml:action id="deleteProject">
+	_config_bean = DBM.getConfigBean();	
+	var config = DBM.wgaconfig.clone();	
+	config.removeContentDatabase(_config_bean.key);
+	DBM.wgaconfig.save();
+	
+	var tabview=createObject("@ui/tabview", portlet.parentportlet);
+	tabview.deleteCurrentPage();	
+</tml:action>
+
+<tml:include designdb="@ui" ref="windowview">
+
+	<tml:option name="config" scope="local">
+		tbar: [
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+				text: "<tml:label key="btn.edit"/>",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action ref="setEditMode"/>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="page_delete.png"/>',		                
+				text: "Delete",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>_querydelete=true</tml:action>",
+						"<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			,"-"		
+			<tml:if condition="_config_bean.enabled">
+				<tml:then>
+					,{
+						cls:'x-btn-text-icon',						
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="disconnect.png"/>',		                
+						text: "disable",
+						handler: function(){
+							WGA.ajax.callAction("<tml:action ref="setEnabled" param1="0"/>","<tml:script expression="portlet.portletkey"/>");
+						}
+					}
+				</tml:then>
+				<tml:else>
+					,{
+						cls:'x-btn-text-icon',						
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="connect.png"/>',		                
+						text: "enable",
+						handler: function(){
+							WGA.ajax.callAction("<tml:action ref="setEnabled" param1="1"/>","<tml:script expression="portlet.portletkey"/>");
+						}
+					}
+				</tml:else>
+			</tml:if>
+			,"->"
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="database_refresh.png"/>',		                
+				text: "reconnect",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action ref="actions:reconnect-databases" param1="{_config_bean.key}"/>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			<tml:case condition="DBM.database(_config_bean.key).isReady">
+				,<tml:include ref="webprojects:project:menu-open-in" o_dbkey="{_config_bean.key}"/>
+			</tml:case>
+		]
+	</tml:option>
+
+	<tml:option name="title" scope="local">
+		Datenbank <b><tml:script expression="_config_bean.title"/></b>
+	</tml:option>
+
+	<tml:option name="body" scope="local">
+	
+		<tml:case istrue="_querydelete">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Delete this Database?</tml:option>
+				<tml:inline name="body">
+					Please confirm to delete this database configuration
+					<br>
+					<button onclick="DBM.ajaxAction({
+								action: '<tml:action ref="deleteProject" ajax="norefresh"/>',
+								id: '<tml:script expression="portlet.portletkey"/>',
+								graydiv: true,
+								mode: 'norefresh'
+							}, 'Deleting Database Configuration')">
+						Delete
+					</button>					
+				</tml:inline>
+			</tml:include>
+		</tml:case>
+		
+		<tml:case condition="!db(_config_bean.key)">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Status</tml:option>
+				<tml:inline name="body">
+					Diese Datenbank ist momentan nicht verbunden
+				</tml:inline>
+			</tml:include>
+		</tml:case>	
+				
+		<tml:form id="db-view-form" source="none" mode="view">		
+			<tml:include ref="::form"/>
+		</tml:form>
+		
+	</tml:option>
+	
+</tml:include>

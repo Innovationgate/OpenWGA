@@ -1,0 +1,16 @@
+<tml:script>
+	_params = AFW.Util.deserializeJsObject(request.getParameter("so"));
+</tml:script>
+
+<tml:range context="{_params.key}">
+	<tml:script>
+		_metas = document.getMetaNames()
+	</tml:script>	
+	<fieldset>
+		<tml:foreach type="itemvalue" item="_metas" currentvalue="_meta">
+			<label><tml:item name="_meta"/>:</label>
+			<div class="data"><tml:script expression="document.getMetaDataList(_meta)" divider="<br>"/></div>
+			<div class="clear"></div>
+		</tml:foreach>
+	</fieldset>	
+</tml:range>

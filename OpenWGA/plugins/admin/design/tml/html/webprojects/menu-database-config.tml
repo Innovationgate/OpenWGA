@@ -1,0 +1,91 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+[
+	<tml:case condition="DBM.database(option('dbkey')).isReady">
+		{
+			cls:'x-btn-text-icon',						
+			icon: '<tml:url type="file" db="@afw" doc="icons" file="database_table.png"/>',		                
+			text: "Runtime Info",
+			handler: function(){
+				DBM.dialog("Runtime Info for '<tml:option name="dbkey"/>'",
+					"<tml:url type="tml" medium="html" layout="::project:db-info"/>",
+					{ so: "<tml:script expression="AFW.Util.serializeJsObject({dbkey:option('dbkey')})"/>"},
+					this.el
+				);
+			}
+		},
+	</tml:case>
+	{
+		cls:'x-btn-text-icon',						
+		icon: '<tml:url type="file" db="@afw" doc="icons" file="database_edit.png"/>',		                
+		text: "Open Configuration",
+		handler: function(){
+			DBM.switchToObject("<tml:script expression="option('dbtype')=='ContentStore'?'webprojects':'databases'"/>", "<tml:option name="db"/>", "<tml:option name="dbtype"/>");
+		}
+	}
+	
+	<tml:if condition="option('enabled')=='true'">
+		<tml:then>
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="disconnect.png"/>',		                
+				text: "Disable Database",
+				handler: function(){
+					DBM.callAction("<tml:action ref="actions:setEnabled" param1="{option('db')}" param2="0"/>","<tml:script expression="portlet.portletkey"/>", "Disabling Database");
+				}
+			}
+		</tml:then>
+		<tml:else>
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="connect.png"/>',		                
+				text: "Enable Database",
+				handler: function(){
+					DBM.callAction("<tml:action ref="actions:setEnabled" param1="{option('db')}" param2="1"/>","<tml:script expression="portlet.portletkey"/>", "Enabling Database");
+				}
+			}
+		</tml:else>
+	</tml:if>
+	
+	<tml:case condition="option('enabled')=='true'">
+		,"-"
+		,{
+			cls:'x-btn-text-icon',						
+			icon: '<tml:url type="file" db="@afw" doc="icons" file="database_refresh.png"/>',		                
+			text: "Reconnect Database",
+			handler: function(){
+				DBM.callAction('<tml:action ref="actions:reconnect-databases" param1="{option('dbkey')}"/>', 
+					'<tml:script expression="portlet.portletkey"/>',
+					'reconnecting database'
+				)
+			}
+		}
+	</tml:case>
+	
+	<tml:case condition="DBM.database(option('dbkey')).isReady">
+		,"-"
+		,<tml:include ref="::project:menu-open-in"/>
+	</tml:case>		
+]

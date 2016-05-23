@@ -1,0 +1,73 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="updateWGAConfig">
+	if(!tmlform.validate())
+		return;
+	
+	try{
+	
+		var config = DBM.wgaconfig.clone();
+		config.globalDatabaseOptions.clear();
+		DBM.tmlform.setConfigProperties(config);		
+				
+		_errors = config.validate()
+		if(_errors.isEmpty()){
+			DBM.wgaconfig.save();
+			
+			portlet.fireEvent(createEvent("wga-config-changed"));
+			portlet.setMode("view");
+		}
+		else log.info(_errors);
+	}
+	catch(e){
+		log.info(e);
+		logException(e);
+	}	
+</tml:action>
+
+<tml:include ref="system:config-errors"/>
+
+<tml:form id="edit-wga-dboptions-config" source="none" htmlinput="ignore">
+	<script>
+		DBM.actions.save("<tml:script expression="portlet.portletkey"/>").setAction("<tml:action ref="updateWGAConfig"/>");
+	</script>
+		
+	<tml:include designdb="@ui" ref="windowview">
+		<tml:option name="title" scope="local">Global database options</tml:option>
+		
+		<tml:option name="config" scope="local">
+			buttonAlign: "left"
+			,buttons: [<tml:[system:edit-action-buttons]/>]
+		</tml:option>
+		
+		<tml:inline name="body">
+			<tml:include designdb="@ui" ref="formmessages"/>
+			<tml:include ref="::form"/>	
+		</tml:inline>
+		
+		<tml:option name="footer"><tml:include ref="system:config-changed"/></tml:option>
+		
+	</tml:include>
+</tml:form>

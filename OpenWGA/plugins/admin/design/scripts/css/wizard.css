@@ -1,0 +1,96 @@
+body {
+	background: #BBBAB9;
+	text-align: left;
+}
+
+body * {
+	
+}
+
+body *, .x-form-field{
+	font-size: 14px;	
+	color: #526377;
+}
+
+#wizard{
+	position: relative;
+	padding: 10px;
+}
+#wizard h1.title{
+	font-size: 24px;
+	color: silver;
+	position: absolute;
+	top: -35px;
+	right: 0;
+}
+
+#wizard ul{
+	list-style-type: disc;
+	padding: 10px 10px 10px 25px;
+}
+
+fieldset {
+	position: relative;
+	min-height: 300px;
+}
+
+form > fieldset {
+	-moz-box-shadow: 1px 1px 10px gray;
+	-webkit-box-shadow: 1px 1px 10px gray;
+}
+
+fieldset h1 {
+	margin-bottom: 15px;
+	padding-bottom: 10px;
+	font-size: 24px;
+	text-shadow: 2px 2px 5px white;
+	border-bottom: solid gray 1px;
+}
+
+fieldset.finish {
+	min-height: 0px;
+}
+
+fieldset.view div.clear, fieldset.finish div.clear {
+	border: none;
+	padding: 0;
+}
+
+fieldset.overview {
+	min-height: 0px;
+	background: none;
+	border: 1px solid #526377;
+	margin: 10px 15px;
+}
+
+fieldset.overview legend{
+	font-size: 10pt;
+}
+
+div.content-box.rounded-box {
+	background: none;
+}
+
+div.info, div#infotext {
+	margin: 15px;
+}
+
+div#infotext {
+	visibility: hidden;
+	display: none;
+}
+
+div.buttons {
+	position: absolute;
+	bottom: 5px;
+	right: 10px;
+}
+
+div.message {
+	margin: 10px;
+}
+
+input[type=radio]{
+	margin: 5px 10px 5px 0px;
+}
+

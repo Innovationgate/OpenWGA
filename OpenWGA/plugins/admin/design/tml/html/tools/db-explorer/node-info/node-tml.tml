@@ -1,0 +1,57 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	var dk = option("documentkey").split(":");
+	var med = dk.shift();
+	var tmlname = dk.join(":");
+	_tml = db(option("key")).getTMLModule(tmlname, med)
+	
+	//log.info(option("key") + ", tmlname=" + tmlname + ", medium=" + med + ", result: " + _tml);
+	
+</tml:script>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">TML Module <b><tml:script expression="_tml.name"/></b> for medium <b><tml:script expression="_tml.mediaKey"/></b></tml:option>	
+	<tml:inline name="body">
+		
+		<fieldset>		
+					
+			<label>Direct Access:</label>		
+			<div class="data"><tml:script expression="_tml.isDirectAccessAllowed()"/></div>
+			<div class="clear"></div>
+
+			<label>Cachable:</label>		
+			<div class="data"><tml:script expression="_tml.isCacheable()"/></div>
+			<div class="clear"></div>
+
+			<textarea style="display:none" id="tml-code" name="code" class="xml"><tml:script expression="_tml.code" encode="xml"/></textarea>
+			<script>
+				dp.SyntaxHighlighter.HighlightAll('code');
+			</script>
+
+		</fieldset>
+		
+	</tml:inline>
+</tml:include>

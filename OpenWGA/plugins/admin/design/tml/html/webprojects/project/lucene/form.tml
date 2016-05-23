@@ -1,0 +1,70 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="rebuildLuceneIndex">
+	_config_bean = DBM.getConfigBean();
+	var db = xpath(config, "/contentDatabases[uid='"+portlet.getSessionVar('key')+"']")
+	log.info("rebuilding lucene index for db " + _config_bean.key);
+	wgacore.getLuceneManager().rebuildIndex(_config_bean.key);
+</tml:action>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">Lucene Configuration</tml:option>	
+
+	<tml:option name="config" scope="local">
+		buttonAlign: "left"
+		<tml:case condition="tmlform.mode()=='view'">
+			,buttons: [
+				{
+					text: "Rebuild Index",
+					disabled: <tml:script expression="!_config_bean.luceneIndexConfiguration.enabled"/>,
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="database_refresh.png"/>',
+					handler: function(){
+						DBM.callAction("<tml:action ref="rebuildLuceneIndex"/>", "<tml:script expression="portlet.portletkey"/>", "rebuilding index");
+					}
+				}
+			]
+		</tml:case>
+	</tml:option>
+
+	<tml:inline name="body">
+
+		<fieldset>		
+			<tml:[system:fs-input] o_field="luceneIndexConfiguration/enabled" o_type="boolean"/>
+			<tml:case condition="DBM.database(_config_bean.key).isReady && DBM.database(_config_bean.key).version>=5 && DBM.database(_config_bean.key).getPatchLevel()>=5">
+				<tml:[system:fs-input] o_field="luceneIndexConfiguration/indexFileContentOnDocuments" o_type="boolean"/>		
+			</tml:case>
+		</fieldset>		
+		
+		<tml:include ref="::form-itemrules"/>
+
+		<tml:case condition="DBM.database(_config_bean.key).isReady && !(DBM.database(_config_bean.key).version>=5 && DBM.database(_config_bean.key).getPatchLevel()>=5)">
+			<tml:include ref="::form-filerules"/>
+		</tml:case>
+		
+		<tml:include ref="::form-lucene-enhancer"/>
+
+	</tml:inline>
+</tml:include>

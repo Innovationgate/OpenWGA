@@ -1,0 +1,97 @@
+<tml:action id="deleteVhost">
+	var config = DBM.wgaconfig.clone();
+	var host = DBM.wgaconfig.getByUid(portlet.getSessionVar('key'));
+	config.virtualHosts.remove(host)
+	DBM.wgaconfig.save();
+	portlet.fireEvent(createEvent("wga-config-changed"));
+	
+	var tabview=createObject("@ui/tabview", portlet.parentportlet);
+	tabview.deleteCurrentPage();		
+</tml:action>
+
+<tml:include designdb="@ui" ref="windowview">
+
+	<tml:option name="config" scope="local">
+		tbar: [
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+				text: "Edit",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action ref="actions:setEditMode"/>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="page_delete.png"/>',		                
+				text: "<tml:label key="btn.delete"/>",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>_querydeletevhost=true</tml:action>",
+						"<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			,"-"
+			<tml:if condition="_config_bean.enabled">
+				<tml:then>
+					,{
+						cls:'x-btn-text-icon',						
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="disconnect.png"/>',		                
+						text: "Disable",
+						handler: function(){
+							DBM.callAction("<tml:action ref="actions:setEnabled" param1="{_config_bean.uid}" param2="0"/>",
+								"<tml:script expression="portlet.portletkey"/>",
+								"disabling database"
+							);
+						}
+					}
+				</tml:then>
+				<tml:else>
+					,{
+						cls:'x-btn-text-icon',						
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="connect.png"/>',		                
+						text: "Enable",
+						handler: function(){
+							DBM.callAction("<tml:action ref="actions:setEnabled" param1="{_config_bean.uid}" param2="1"/>",
+								"<tml:script expression="portlet.portletkey"/>",
+								"enabling database"
+							);
+						}
+					}
+				</tml:else>
+			</tml:if>
+		]
+	</tml:option>
+
+	<tml:option name="title">
+		Virtual host configuration for host '<tml:script expression="_config_bean.servername"/>'
+	</tml:option>
+
+	<tml:inline name="body">
+	
+		<tml:case istrue="_querydeletevhost">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Delete this virtual host?</tml:option>
+				<tml:option name="body">
+					Are you sure?
+					<div>
+						<button onclick="DBM.ajaxAction({
+									action: '<tml:action ref="deleteVhost" ajax="norefresh"/>',
+									id: '<tml:script expression="portlet.portletkey"/>',
+									graydiv: true,
+									mode: 'norefresh'
+								}, 'remove domain')">
+							OK
+						</button>									
+						<tml:button clickaction="$refresh" ajax="true">Cancel</tml:button>
+					</div>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+
+		<tml:form id="view-vhost-form" source="none" mode="view">
+			<tml:include ref="::form"/>
+		</tml:form>
+
+	</tml:inline>
+	
+</tml:include>

@@ -1,0 +1,84 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="clearOptions">
+	_config_bean = DBM.getConfigBean();
+	_config_bean.options.clear();
+	DBM.tmlform.removeFields("/options");
+</tml:action>
+
+<tml:script>
+	var sharetypes_map = DBM.getModReg().getModulesForType(Packages.de.innovationgate.wga.modules.types.ShareModuleType);  
+	
+	var types = sharetypes_map.keySet().iterator();
+	_classes = createlist();	
+	
+	var default_type;
+	var match=false;
+	if(DBM.getConfigBean())
+		var currentValue = DBM.getConfigBean().implClassName;
+	while(types.hasNext()){
+		var type = types.next();
+		default_type = type;
+		if(currentValue==type)
+			match=true; 
+		_classes.add(sharetypes_map.get(type).getTitle(DBM.locale) + "|" + type);
+	}	
+	if(currentValue && !match)
+		_classes.add(currentValue);
+	if(_classes.size()==1)
+		tmlform.setField("/implClassName", currentValue||default_type);
+	if(_classes.size()==0)
+		_classes.add("No share implementations available|");	
+</tml:script>
+
+<fieldset>
+
+	<tml:[system:fs-input] o_field="enabled" o_type="boolean"/>
+	<tml:[system:fs-input] o_field="name" o_focus="true" o_vtype="url" o_validation="$E_VALUE!=''" o_message="Please enter a Name"/>
+	<tml:[system:fs-input] o_field="implClassName" o_type="select" o_options="{_classes}" o_mode="{_classes.size()>1?'edit':'view'}" o_changeaction="clearOptions"/>
+	
+	<tml:case condition="tmlform.field('/implClassName')">
+		<tml:script>
+			try{
+				var server = DBM.getModuleDefinition("Share", tmlform.field('/implClassName'))
+				setOption("module-definition", server);
+			}
+			catch(e){
+				log.info(e.message);
+			}		
+		</tml:script>
+		<tml:if condition="option('module-definition')">
+			<tml:then>
+				<tml:[system:module-options:form] o_title="more optional parameters ...">
+					<tml:option name="ns">/options</tml:option>
+				</tml:[system:module-options:form]>
+			</tml:then>
+			<tml:else>
+				<div class="data" style="color:red">The selected module is currently not installed on this server</div>					
+			</tml:else>		
+		</tml:if>
+	</tml:case>
+
+</fieldset>

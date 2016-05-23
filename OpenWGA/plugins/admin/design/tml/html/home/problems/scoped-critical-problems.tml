@@ -1,0 +1,81 @@
+<tml:action id="clearProblem">
+	var path = WGA.deserializeObject(tmlparam1);
+	if (!WGA.Server.problemRegistry.dismissProblem(path)) {
+		msg = "No, that didn't work!";
+	}	
+</tml:action>
+
+<tml:action id="confirmProblem">
+	var path = WGA.deserializeObject(tmlparam1);
+	WGA.Server.problemRegistry.confirmProblem(path);
+</tml:action>
+
+<tml:action id="unconfirmProblem">
+	var path = WGA.deserializeObject(tmlparam1);
+	WGA.Server.problemRegistry.clearConfirmation(path);
+</tml:action>
+
+<tml:script>
+	_problems = option("problems");
+</tml:script>
+
+<tml:foreach item="_problems" currentvalue="problem">
+	<tml:script var="isConfirmed" expression="WGA.Server.getProblemRegistry().isConfirmedProblem(problem.getPath())"/>
+
+	<tr>
+		<td class="indent">
+			<a href="#" style="display:block;font-weight:bold; <tml:script expression="isTrue('isConfirmed') ? 'color:darkred; font-style:italic;' : 'color:red;'"/>"
+					title = "Click to show more info" 
+					onclick="DBM.showHideElement('sinfo_<tml:item name="problem" xpath="path"/>')">
+				<tml:script encode="html" expression="problem.getTitle(java.util.Locale.getDefault())"/>
+				<tml:case istrue="isConfirmed"> (Confirmed)</tml:case>
+			</a>
+			<tml:script encode="html" expression="problem.getMessage(java.util.Locale.getDefault())"/>					
+		</td>
+		<td><tml:script encode="html" expression="problem.getOccuranceTime()"/></td>
+		<td><tml:script expression="problem.getSeverity()"/></td>
+	</tr>
+	<tr>
+		<td colspan="3" style="border-bottom: solid silver 1px">					
+			<fieldset id="sinfo_<tml:item name="problem" xpath="path"/>" style="display:none;padding:20px">
+
+				<div><tml:script encode="html" expression="problem.getDescription(java.util.Locale.getDefault())"/></div>
+
+				<tml:script expression="problem.getSolution(java.util.Locale.getDefault())" var="_solution"/>
+				<tml:case condition="_solution">
+					<h2 style="margin-top:10px">Solution:</h2>
+					<div><tml:item name="_solution" encode="html"/></div>
+				</tml:case>
+				
+				<tml:case condition="problem.getThrowable()">
+					<h2 style="margin-top:10px">Exception</h2>
+					<tml:script expression="WGA.Utils.extractMessages(problem.getThrowable())"  divider="<br>"/>
+				</tml:case>
+
+				<div style="margin-top:10px; margin-right:200px;">
+					<tml:if condition="!problem.occasion.clearedAutomatically">
+						<tml:then>
+							<tml:button clickaction="clearProblem" param1="{WGA.serializeObject(problem.path)}">Dismiss</tml:button>
+						</tml:then>
+						<tml:else>
+							This problem entry will be removed automatically once the problem is solved.
+							<a href="<tml:url action="clearProblem" param1="{WGA.serializeObject(problem.path)}"/>">Click here to dismiss anyway</a>
+						</tml:else>
+					</tml:if>
+				</div>
+				
+				<div style="text-align:right;">
+				<tml:if isfalse="isConfirmed">
+					<tml:then>
+						<tml:button confirm="This will hide the problem persistently. Do this if the problem is to be assumed normal and unproblematic. Sure to confirm?" clickaction="confirmProblem" param1="{WGA.serializeObject(problem.path)}">Confirm problem</tml:button>
+					</tml:then>
+					<tml:else>
+						<tml:button clickaction="unconfirmProblem" param1="{WGA.serializeObject(problem.path)}">Remove confirmation</tml:button>
+					</tml:else>
+				</tml:if>
+				</div>
+
+			</fieldset>
+		</td>
+	</tr>
+</tml:foreach>
