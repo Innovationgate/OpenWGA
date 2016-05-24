@@ -126,6 +126,7 @@ public class DesignLocator implements Scriptable, Wrapper {
                         return c;
                     }
                     else {
+                    	_wga.getLog().warn("DesignLocator: Constructor '" + name + "' not found in " + _design + " file " + name + ".tmlscript");
                         return Scriptable.NOT_FOUND;
                     }
                 }
