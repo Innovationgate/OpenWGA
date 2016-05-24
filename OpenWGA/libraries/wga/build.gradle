@@ -8,6 +8,7 @@ dependencies {
     compile project(":wgapiJdbc");
     compile project(":wgutils");
     compile project(":servicesClient");
+    
     compile fileTree(dir: '../../customLibs/datedFileAppender', include: ['*.jar'])
     compile 'xerces:xercesImpl:2.11.0'
     compile 'org.apache.lucene:lucene-core:3.5.0'

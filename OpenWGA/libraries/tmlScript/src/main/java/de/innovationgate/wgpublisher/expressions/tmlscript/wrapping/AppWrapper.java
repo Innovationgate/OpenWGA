@@ -25,6 +25,8 @@
 
 package de.innovationgate.wgpublisher.expressions.tmlscript.wrapping;
 
+import java.io.IOException;
+
 import de.innovationgate.ext.org.mozilla.javascript.Context;
 import de.innovationgate.ext.org.mozilla.javascript.Function;
 import de.innovationgate.ext.org.mozilla.javascript.JavaScriptException;
@@ -38,11 +40,14 @@ import de.innovationgate.wga.server.api.App;
 import de.innovationgate.wga.server.api.ManagedGlobalConfig;
 import de.innovationgate.wga.server.api.ObjectScope;
 import de.innovationgate.wga.server.api.WGA;
+import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wgpublisher.expressions.tmlscript.VarArgParser;
 import de.innovationgate.wgpublisher.expressions.tmlscript.VarArgParser.Arguments;
 import de.innovationgate.wgpublisher.expressions.tmlscript.wgaglobal.WGAGlobal;
 import de.innovationgate.wgpublisher.webtml.actions.TMLAction;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
+import de.innovationgate.wgpublisher.WGAServerException;
+import de.innovationgate.wgpublisher.expressions.tmlscript.DesignLocator;
 
 public class AppWrapper extends ScriptableObject implements Wrapper {
     
@@ -77,16 +82,19 @@ public class AppWrapper extends ScriptableObject implements Wrapper {
         return _app;
     }
     
-    public static void managedGlobal(Context cx, Scriptable thisObj, java.lang.Object[] args, Function funObj) throws JavaScriptException, WGException {
+    public static void managedGlobal(Context cx, Scriptable thisObj, java.lang.Object[] args, Function funObj) throws JavaScriptException, WGException, ClassNotFoundException, IllegalArgumentException, IOException {
         ((AppWrapper) thisObj).instanceGetGlobal(WGAGlobal.fetchInitialContext(cx), _managedGlobalVarargs.parse(args));
     }
 
-    private void instanceGetGlobal(TMLContext cx, Arguments args) throws WGException {
+    private void instanceGetGlobal(TMLContext cx, Arguments args) throws WGException, ClassNotFoundException, IOException {
 
         Object ref = args.get("ref");
-        de.innovationgate.wga.server.api.Design targetDesign;
-        if (ref instanceof de.innovationgate.wga.server.api.Design) {
-            targetDesign = (de.innovationgate.wga.server.api.Design) ref;
+        Design targetDesign;
+        if (ref instanceof Design) {
+            targetDesign = (Design) ref;
+            if(DesignLocator.getConstructor(WGA.get(), targetDesign)==null){
+        		throw new WGException("Constructor " + targetDesign.getResourceName() + "() not found in TMLScript module " + targetDesign.getBaseReference().toString());
+        	}        
         }
         else {
             TMLAction objectDefinition = WGAGlobal.getObjectDefinition((Function) ref);
