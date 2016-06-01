@@ -1,0 +1,98 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="attachFile">
+	if(tmlform.filenames.isEmpty())
+		return tmlform.addMessage(label('dialog.upload.please-select-a-file-to-upload'));
+	var filename=tmlform.filenames.get(0);
+	var a=filename.split(".");
+	if(a.length>1)
+		var ext="." + a[a.length-1];
+	else var ext="";
+	tmlform.attach(document, isEmptyValue(tmlform.filename) ? filename : tmlform.filename+ext);
+	document.save();
+	tmlform.reset();
+	
+	event=createEvent("CMS_attachments_changed");
+	portlet.fireEvent(event);
+</tml:action>
+
+<tml:script>	
+	_type=option("type");
+	if(!_type)
+		_type="content";
+		
+	_context='db:'+option('dbkey');
+	switch (_type){
+		case "content":
+			_context += '/docid:'+option('key')
+			break;
+		case "file":
+			_context += '/$filecontainer:'+option('key')
+			break;
+	}
+	
+</tml:script>
+
+<tml:if context="{_context}" iscontextvalid="true">
+	<tml:then>
+		
+		<tml:case condition="tmlform.hasmessages">
+			<div style="color:red;font-weight:bold">
+				<tml:formmessages divider="<br>"/>
+			</div>
+		</tml:case>
+		
+		<div id="upload-attachments-view" style="width:100%;height:200;margin-bottom:5px"></div>
+		<script>
+			var grid=AFW.util.createAttachmentGrid("upload-attachments-view", "<tml:item name="_type"/>", "<tml:meta name="dbkey" type="db"/>", "<tml:option name="key"/>")
+
+			AFW.util.updateSaveAs=function(el, save_as_fieldname){
+				var f = el.value;
+				f = f.replace(/\//g, "\\");		// replace / (used on unix systems) with \ (used on windows) 
+				var filepath=f.split("\\");
+				var filename=filepath[filepath.length-1].split(".");
+				filename.pop();		// remove file extension
+				el.form[save_as_fieldname].value=filename.join(".");
+			}
+			
+		</script>
+		
+		<tml:input type="file" name="file">
+			size="45"
+			onchange="AFW.util.updateSaveAs(this, 'filename')"
+		</tml:input>
+		<table width="100%">
+			<tr>
+				<td width="1%" nowrap>Speichern als:</td>
+				<td><tml:input name="filename" cssclass="textinput"/></td>
+			</tr>
+		</table>
+	</tml:then>
+	
+	<tml:else>
+		invalid context: <tml:item name="_context"/>
+	</tml:else>
+</tml:if>
+

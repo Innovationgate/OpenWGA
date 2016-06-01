@@ -1,0 +1,89 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:comment><tml:script>
+	var Database = createObject("database", option("dbkey"));
+	return Database.getJsCss(option("files").split("\n"));
+</tml:script></tml:comment>
+
+<tml:script>
+	_files = createlist(option("files").split("\n"));
+</tml:script>
+
+<tml:range var="_jscode">
+	<tml:foreach type="itemvalue" item="_files" currentvalue="_file">
+		<tml:script>
+			_type = "js";
+			_file = javaObject(_file).trim();
+			
+			var parts = _file.split(":");
+			if(parts.length>1){
+				_type = parts[0];
+				_file = parts[1];
+			}
+			
+			if(_type=="tml"){
+				_medium = "javascript";
+				var tml_def = _file.split("/")
+				if(tml_def.length>1){
+					_medium = tml_def[0];
+					_file = tml_def[1];
+				}
+			}
+		</tml:script>
+		
+		<tml:case condition="_file">
+		
+			<tml:select switch="_type">
+				<tml:case value="js">
+					<tml:script>
+						var mod = db(option("dbkey")||meta('db', 'dbkey')).getCSSJSModule(_file);
+						if(mod)
+							return mod.getCode();
+						else {
+							log.info("js file " + _file + " not found.");
+							return "";
+						}
+					</tml:script>
+				</tml:case>
+				<tml:case value="tml">
+					<tml:include designdb="{option('dbkey')||meta('db', 'dbkey')}" medium="{_medium}" ref="{_file}"/>
+				</tml:case>
+			</tml:select>
+			
+		</tml:case>
+		
+	</tml:foreach>
+	
+	<tml:option name="body"/>
+	
+</tml:range>
+
+<tml:script>
+	if(option("jsmin")=="true"){
+		return Packages.de.innovationgate.igutils.JSMin.compress(_jscode, wgacore.getCharacterEncoding());
+	}
+	else return _jscode;
+</tml:script>

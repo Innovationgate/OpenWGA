@@ -1,0 +1,429 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+// java "imports"
+var InputStream = java.io.InputStream;
+var InputStreamReader = java.io.InputStreamReader;
+var BufferedReader = java.io.BufferedReader;
+var BufferedOutputStream = java.io.BufferedOutputStream;
+var FileOutputStream = java.io.FileOutputStream;
+var File = java.io.File; 
+
+var Properties = java.util.Properties;
+var String = java.lang.String;
+
+var MimeMessage = Packages.javax.mail.internet.MimeMessage;
+var MimeMultipart = Packages.javax.mail.internet.MimeMultipart;
+var MimeUtility = Packages.javax.mail.internet.MimeUtility;
+var Session = Packages.javax.mail.Session;
+var Part = Packages.javax.mail.Part;
+
+var WGUtils = Packages.de.innovationgate.utils.WGUtils;
+ 
+
+// mail data/properties
+var sender;
+var recipients;
+var recipients_cc;
+var recipients_bcc;
+var subject;
+var body;
+var attachments;
+var sent;
+var received;
+var encoding;
+var isHtml = false;
+var messageId;
+
+
+var mailInpStream = null;
+var level = -1;
+var attachmentCounter = 0;
+var inline = null;
+
+// mailparser status
+var isReady = false;
+
+
+function decodeMailAddress(address) {
+	var str = javaObject(address);
+	
+	if (str.contains("<") && str.contains(">")) {
+		
+		return str.substring(str.indexOf("<")+1, str.indexOf(">"));
+		
+	}
+	
+	return address;
+}
+
+
+
+
+function addressBufferToString(buffer) {
+
+	if (!buffer)
+		return;
+
+	var addresses = "";	
+	
+	for (i=0; i<buffer.length; i++)	{	
+		if (i > 0)
+			addresses += ";";
+		addresses += decodeMailAddress(buffer[i].toString());
+	}
+
+	return addresses;
+}
+
+
+
+function createAttachment(part) {
+		 	 
+	var disp = part.getDisposition();
+			 		
+	if (disp == null || disp.equalsIgnoreCase(Part.ATTACHMENT) || disp.equalsIgnoreCase(Part.INLINE)) {
+						 
+		var filename = javaObject(part.getFileName());
+			
+		if (filename == null || filename == "") {
+			filename = "attachment" + attachmentCounter;
+			var ct = part.getContentType();
+			if (ct != null && ct.split("/").pop() != null && ct.split("/").pop() != "") {
+				filename += "." + ct.split("/").pop();
+			}
+			attachmentCounter++;
+		}
+		else if (filename.startsWith("=?")) {		
+			filename = MimeUtility.decodeWord(filename);
+		}
+				
+		filename = javaObject(filename).replaceAll(" ", "_");
+		var f = new File("/tmp/" + filename);
+				
+		log.info("creating attachment..." + filename); 
+		
+		var os = new BufferedOutputStream(new FileOutputStream(f));
+	    var is = part.getInputStream();
+    	var c;
+    	while ((c = is.read()) != -1) {
+			os.write(c);
+		}
+	    os.close();		    
+		attachments.add(f);
+		
+		if (part.getContentID()) {
+	   		inline.add({
+	   			id: part.getContentID(),
+	   			file: filename 
+	   		});
+			log.info("inline resource " + part.getContentID() + " --> " + filename);
+		}
+	}
+	
+	return filename;
+}
+
+
+
+function getText(part) {
+
+	level++;
+
+	if (part.isMimeType("text/*")) {
+		var s = "";
+		isHtml = part.isMimeType("text/html");
+		if (isHtml) 
+			s = part.getContent();
+		else {
+			var reader = new BufferedReader(new InputStreamReader(part.getInputStream()));
+			while (reader.ready()) {
+				s += WGUtils.encodeHTML(reader.readLine()) + "<br>";
+			}
+		}			
+		return s;
+	}
+
+	if (part.isMimeType("multipart/alternative")) {
+		// prefer html text over plain text
+		var mp = part.getContent();
+		var text = null;
+		for (i=0; i<mp.getCount(); i++) {
+		    var bp = mp.getBodyPart(i);
+		    if (bp.isMimeType("text/plain")) {
+		        if (text == null)
+		            text = getText(bp);
+		        continue;
+		    } else if (bp.isMimeType("text/html")) {
+		        var s = getText(bp);
+		        if (s != null)
+		            return s;
+		    } else {			    	
+		        return getText(bp);
+		    }
+		}
+		return text;
+	} else if (part.isMimeType("multipart/related")) {
+		// multipart/related might have embedded image -> we save them as attachments
+		var mp = part.getContent();
+		// look for inline attachments
+		for (i=0; i < mp.getCount(); i++) {
+		    var bp = mp.getBodyPart(i)		  
+		   	var cid = bp.getContentID();
+		   	if (cid != null) {
+		   		bp.setDisposition(Part.INLINE);
+		   		var filename = createAttachment(bp);
+		   	} 
+		}
+		// look for message body
+		for (i=0; i < mp.getCount(); i++) {
+		    var bp = mp.getBodyPart(i)		  
+		   	var s = getText(bp);
+		    if (s != null) {
+		       return s;
+		    }
+		}	
+	}
+	else {
+
+	}
+	
+	return null;
+}
+
+
+
+function createMessageId() {
+	return WGUtils.UIDGenerator.generateUID() + "@afw-mail-parser";
+}
+
+
+
+function parse() {
+	try {
+		if (!mailInpStream)
+			return;
+		
+		var props = new Properties();
+		var session = Session.getDefaultInstance(props);
+
+		var mimeMessage = new MimeMessage(session, mailInpStream);
+		
+		messageId = mimeMessage.getMessageID() || createMessageId();
+		
+		// get sender
+		sender = decodeMailAddress(mimeMessage.getFrom()[0].toString());
+	
+		// get Recipients
+		recipients     = addressBufferToString(mimeMessage.getRecipients(MimeMessage.RecipientType.TO));
+		recipients_cc  = addressBufferToString(mimeMessage.getRecipients(MimeMessage.RecipientType.CC));
+		recipients_bcc = addressBufferToString(mimeMessage.getRecipients(MimeMessage.RecipientType.BCC));
+		
+		// get subject
+		subject = mimeMessage.getSubject();
+		
+		// sent & received
+		sent = mimeMessage.getSentDate();
+		received = mimeMessage.getReceivedDate();
+
+		// parse mail body
+		var mimeMessageContent = mimeMessage.getContent();
+		
+		if (mimeMessageContent instanceof MimeMultipart) {		
+			// 1st part is message		
+			body = getText(mimeMessageContent.getBodyPart(0));				
+			// other parts are attachments
+			for (i=1; i<mimeMessageContent.getCount(); i++) {
+				createAttachment(mimeMessageContent.getBodyPart(i));
+			}	
+			var elements = inline.iterator();
+			while (elements.hasNext()) {
+				var el = elements.next();
+				body = body.replace("cid:"+decodeMailAddress(el.id), "{%!imgurl:"+el.file+"%}");
+			}
+		}
+		else if (mimeMessageContent instanceof String || typeof mimeMessageContent == "string") {
+			var lines = mimeMessageContent.split("\n");
+			body = lines.join("<br>");
+		}
+		else if (mimeMessageContent instanceof InputStream) {
+			var reader = new BufferedReader(new InputStreamReader(mimeMessageContent));
+			while (reader.ready()) {
+				body += WGUtils.encodeHTML(reader.readLine()) + "<br>";
+			}
+			reader.close();
+		}
+		else {
+			log.error("unknown body type:" + mimeMessageContent.getClass().getName());
+			return false;
+		}
+	} catch (e) {
+		log.error(e);
+	}		
+	
+	return true;
+}
+
+
+
+this.init = function(mailObj) {
+	
+	// java.io.InputStream, e.g. via WGDocument.getFileData
+	if (mailObj instanceof InputStream) {
+		attachments = createList();
+		inline = createList();
+		mailInpStream = mailObj;
+		isReady = parse();		
+		mailInpStream.close();
+	}
+	
+	// context expression OR dbkey+contentKey
+	else if (typeof mailObj == "string") {
+		
+		// dbkey+contentKey
+		if (typeof dbObj == "string") {
+			
+		}
+		// contextexpression
+		else {
+				
+			var doc = context(mailObj, null);
+			
+			if (doc) {
+				doc = doc.content();
+		
+				var filenames = doc.getFileNames();
+			
+				if (filenames.isEmpty()) {
+					return null;
+				}
+				
+				this.init(doc.getFileData(filenames.get(0)));
+			}
+		}
+	}
+	
+}
+
+
+
+this.getSender = function() {
+	return sender;	
+}
+
+
+
+this.getRecipients = function() {
+	return recipients;
+}
+
+
+
+this.getCC = function() {
+	return recipients_cc;
+}
+
+
+
+this.getBCC = function() {
+	return recipients_bcc;
+}
+
+
+
+this.addressesToList = function(str) {
+	if (str)
+		return createList(str.split(";"));
+	return createList();
+}
+
+
+
+this.getSubject = function() {
+	return subject;
+}
+
+
+
+this.getBody = function() {
+	return body;
+}
+
+
+
+this.getSentDate = function() {
+	return sent;
+}
+
+
+
+this.getReceivedDate = function() {
+	return received;
+}
+
+
+
+this.getDate = function() {
+	return sent || received;
+}
+
+
+
+this.getBodyEncoding = function() {
+	return encoding;
+}
+
+
+
+this.getAttachmentCount = function() {
+	return attachments.size();
+}
+
+
+
+this.hasAttachments = function() {
+	return (attachments.isEmpty() == false);
+}
+
+
+
+this.getAttachments = function() {
+	return attachments;
+}
+
+
+
+this.isHtml = function() {
+	return isHtml;
+}
+
+
+this.getId = function() {
+	return messageId;
+}
+
+
+this.isReady = function() {
+	return isReady;
+}

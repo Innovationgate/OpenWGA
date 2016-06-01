@@ -1,0 +1,321 @@
+/*******************************************************************************
+  *Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+  *
+  *This file is part of the OpenWGA server platform.
+  *
+  *OpenWGA is free software: you can redistribute it and/or modify
+  *it under the terms of the GNU General Public License as published by
+  *the Free Software Foundation, either version 3 of the License, or
+  *(at your option) any later version.
+  *
+  *In addition, a special exception is granted by the copyright holders
+  *of OpenWGA called "OpenWGA plugin exception". You should have received
+  *a copy of this exception along with OpenWGA in file COPYING.
+  *If not, see <http://www.openwga.com/gpl-plugin-exception>.
+  *
+  *OpenWGA is distributed in the hope that it will be useful,
+  *but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *GNU General Public License for more details.
+  *
+  *You should have received a copy of the GNU General Public License
+  *along with OpenWGA in file COPYING.
+  *If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+/* Action logger div  - test */
+.actionlog{
+	border:solid black 1px;
+	/*padding:10px;*/
+	background-color:#efefef;
+	display:none;
+	position: absolute;
+	z-index: 21000;
+}
+.actionlog h1{
+	background-color:gray;
+	color:#efefef;
+	margin: 0px;
+	padding: 3px;
+	font-weight: bold;
+	border: solid silver 1px;
+}
+.actionlog .message{
+	padding:10px;
+}
+
+/**
+ *	system:tabview
+ */
+
+.tabview *{
+	font-size: 12px;
+}
+
+.tab_header {
+  width:100%;
+  background:#DAE0D2 url(../file/tabs/bg.gif) repeat-x bottom;
+  font-size:93%;
+  line-height:normal; 
+  }
+.tab_header table.tabs{
+  margin:0;
+  padding:2px 5px 0;
+  list-style:none;
+  width:100%;
+ 
+  }
+
+.tab_normal{
+  background:url(../file/tabs/left.gif) no-repeat left top; 
+  margin:0;
+  border-bottom:1px solid #736552;
+  padding:0 0 0 9px;
+}
+.tab_header span.tab_r {
+  display:block;
+  background:url(../file/tabs/right.gif) no-repeat right top;
+  padding:5px 10px 4px 1px;
+  }
+/* Commented Backslash Hack
+   hides rule from IE5-Mac \*/
+.tab_header span {float:none;}
+/* End IE5-Mac hack */
+
+.tab_header a{
+  text-decoration:none;
+  cursor:pointer;
+  font-weight:bold;
+  color:#765;
+}
+.tab_header a:hover {
+  color:red;  
+  }
+.tab_selected a{
+  color:black;
+  }
+.tab_header .tab_selected {
+  background:url(../file/tabs/left_on.gif) no-repeat left top;
+  margin:0;
+  padding:0 0 0 9px;
+  }
+.tab_header .tab_selected span.tab_r {
+  background-image:url(../file/tabs/right_on.gif);
+  color:#333;
+  padding-bottom:5px;
+  }
+
+.tab_addon{
+  text-align:right;
+  cursor:default;
+  width:100%;
+  padding:0 5px 0 0;  
+}
+.tab_space{
+  padding:0 0 0 0;  
+  margin:0;
+  height:20px;
+  width:4px;
+  cursor:default;
+}
+.tab_body{ 
+  padding:0px;  
+  clear:left;
+}
+
+.tab_body>.window{
+  border-top:0px;	
+}
+
+/**
+ *	system:windowview
+ */
+
+.windowview *{
+	font-size: 12px;
+}
+
+.window_view {
+	border-left:solid #CCCCCC 1px;	
+	border-right:solid #CCCCCC 1px;	
+	margin-bottom:0px;
+	padding:0 2px 0 2px;
+}
+.windowbody{
+	background-color:white;
+}
+.windowtitle{
+	background-color:#C6CBD6;
+	background:url(../file/window/window_header_bg_left.gif) no-repeat left top;
+	height:25px;
+}
+.windowtitle td{
+	padding:0px 8px 0px 8px;
+	vertical-align: middle;
+}
+.portlet .windowtitle img{
+	vertical-align: bottom;
+}
+
+.windowtitle_back{
+  background:url(../file/window/window_header_bg.gif) top right no-repeat;
+}
+.window_footer{
+	/* White space under the window (space to the next element under this window): */
+	margin-bottom:4px;	
+}
+.window_footer td{
+	padding: 0px;
+}
+.window_footer .window_footer_cells{	
+	width:5px;
+	height:5px;
+}
+.window_footer .window_footer_middle{	
+	border-bottom:1px solid #CCCCCC;
+	font-size:1px;
+	color:white;
+	height:5px;
+	text-align:center;
+}
+.window_footer .window_footer_rounded{	
+	font-size:1px;
+	background-color:#CCCCCC;	
+	display:block;
+	line-height:1px;
+}
+
+.windowview .actionlink{
+	text-decoration: none;  
+	color:gray; 
+}
+.windowview .actionlink:hover{
+	color:black;
+}
+
+
+/**
+ * system:tr
+ */
+tr.List1{
+	background-color:#ECE9DE;
+	border-bottom:solid 1px white;
+	cursor:pointer;
+}
+tr.List1 td{
+	border-bottom:solid 1px white;
+	-moz-user-select:none
+}
+tr.List2{
+	background-color:#E6DFD5;	
+	border-bottom:solid 1px white;	
+	cursor:pointer;
+}
+tr.List2 td{
+	border-bottom:solid 1px white;
+	-moz-user-select:none;
+}
+.mouseOverRow td{
+	cursor:pointer;	
+	color:white; 
+	background-color:#96A1B9;
+	border-bottom:1px solid white;	
+}
+
+ui .selected{
+	background-color:#666B75;
+	color:white;
+}
+
+/**
+ * system:message
+ */
+
+.message{	
+	padding:2px;	
+}
+
+.message_top div{
+	text-align:center;
+}
+.message_top1{
+	background-color:#FFC300;	
+	color:#FFC300;
+	margin:0px 5px 0px 5px;	
+	font-size:1px;
+	line-height:1px;
+}
+.message_top2{
+	background-color:white;
+	border-left:2px solid #FFC300;
+	border-right:2px solid #FFC300;
+	margin:0px 3px 0px 3px;
+	color:white;
+	font-size:1px;
+	line-height:1px;
+}
+.message_top3{
+	background-color:white;
+	border-left:1px solid #FFC300;
+	border-right:1px solid #FFC300;
+	margin:0px 2px 0px 2px;
+	color:white;
+	font-size:1px;
+	line-height:1px;
+}
+.message_top4{
+	background-color:white;
+	border-left:1px solid #FFC300;
+	border-right:1px solid #FFC300;
+	margin:0px 1px 0px 1px;
+	height:2px;
+	color:white;	
+	font-size:1px;
+	line-height:1px;	
+}
+
+.message_bottom{
+	background-color:#FFC300;	
+	background:url(../file/window/message_apex_bg.gif);
+	color:#FFC300;
+	margin:0px 5px 0px 5px;		
+	padding:0px;	
+}
+.message_body {
+	border-left:solid #FFC300 1px;	
+	border-right:solid #FFC300 1px;	
+	background-color:white;	
+	padding:0 4px 0 4px;
+	margin:0px;
+	display:block;	
+	
+}
+.message_body ul{
+	clear:left;
+	margin:4px 0px 0px 10px;
+	padding-left:10px;
+
+}
+
+/* table collection */
+table.collection{
+	border-collapse:collapse;
+	empty-cells:show;
+	cursor:default;	
+}
+table .collection-title td{
+	border-bottom:solid black 1px;
+}
+table .collection-total td{
+	border-top:solid gray 2px;
+	font-weight:bold;
+}
+table .collection-sum td{
+	border-top:double black 3px;
+	font-weight:bold;
+}
+table .collection td{
+	vertical-align:top;	
+	padding-left:4px;
+	padding-right:4px;
+}
+

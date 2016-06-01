@@ -1,0 +1,7 @@
+<tml:case condition="!_bootstrap_included && !_bootstrap_base_included">
+	<link rel="stylesheet" href="<tml:url type="file" doc="bootstrap:base" file="css/bootstrap.min.css"/>">
+	<script type="text/javascript" src="<tml:url type="file" doc="bootstrap:base" file="js/bootstrap.min.js"/>"></script>
+	<tml:script>
+		_bootstrap_base_included=true
+	</tml:script>
+</tml:case>

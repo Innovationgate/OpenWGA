@@ -1,0 +1,126 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+this.init=function(theportlet){
+	if(theportlet)		
+		this.portlet=theportlet;	
+	else this.portlet=portlet;
+	this.currentpage=this.portlet.currentpage;	
+}
+
+this.setCurrentPage=function(index){
+	if(this.currentpage!=index){
+		this.currentpage=this.portlet.currentpage=index;
+		this.portlet.save();	
+	}
+}
+
+this.addPage=function(tml, key, title, newpage){
+	
+	if(key && !newpage){
+		// check if page with given key already exist
+		var portletkeys=this.portlet.itemList("portlets");		
+		for (var i=0; i<portletkeys.size(); i++){
+			var p=this.portlet.getPortlet(portletkeys.get(i));
+			if (p && p.key==key){
+				this.setCurrentPage(i+1);
+				return;
+			}
+		}
+	}
+	
+	var pkey=this.portlet.registerPortlet(tml, tml);
+	var list=this.portlet.itemList("portlets");			
+	list.add(pkey);
+	this.portlet.portlets=list;
+	
+	var p=this.portlet.getPortlet(pkey);
+	if(key && key!=""){
+		p.key=key;
+		p.save();
+		var pagetitle=title || context("docid:"+key).TITLE;
+	}
+	else pagetitle=title;
+	
+	// add new page
+	var list=this.portlet.itemList("pages");
+	list.add(pagetitle);		
+	this.portlet.pages=list;	
+	
+	this.setCurrentPage(list.size());
+
+	if(list.size()>3)
+		this.deletePage(0);
+
+	return p;
+}
+
+this.deletePage=function(index){		
+	var list=this.portlet.itemList("pages");
+	log.info(list + "/" + index + "/" + this.portlet.descendantKeys);
+	list.remove(index);
+	this.portlet.pages=list;
+	if(this.currentpage>index)
+		this.setCurrentPage(this.currentpage-1);
+		
+	list=this.portlet.itemList("portlets");
+	var portlet_to_delete=this.portlet.getPortlet(list.get(index));
+	log.info("portlets: " + list + "/" + list.get(index) + "/" + portlet_to_delete);
+	/*
+	if(portlet_to_delete!=null){
+		var event=createEvent("BE_portletUnregistered");
+		event.addParameter("portletkey", list.get(index));
+		portlet_to_delete.fireEvent(event);
+		//log.info("fired event BE_portletUnregistered, key=" + list.get(index));
+		this.portlet.unregisterPortlet(list.get(index));
+	}
+	else addwarning("tried to unregister not registered portlet", false);
+	*/
+	this.portlet.unregisterPortlet(list.get(index));
+	
+	list.remove(index);
+	this.portlet.portlets=list;
+
+	if(list.isEmpty()){
+		//this.portlet.currentpage=-1;
+		this.setCurrentPage(0);		
+		this.portlet.removeItem("pages");
+		this.portlet.removeItem("portlets");
+		//log.info("all pages removed");
+	}		
+	this.portlet.save();		
+	log.info("DynTab-Page " + index + " deleted");
+}
+
+this.deleteCurrentPage=function(){
+	this.deletePage(this.currentpage-1);
+}
+
+this.setCurrentPageTitle=function(title){
+	var list=this.portlet.itemList("pages");
+	list.set(this.currentpage-1, title);
+	this.portlet.pages=list;
+	this.portlet.save();
+}
+

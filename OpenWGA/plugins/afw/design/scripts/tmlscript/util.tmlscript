@@ -1,0 +1,608 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+this.validate={
+	mailAddress : function(address) {
+		// der User-Part besteht aus dem String vor dem @ Zeichen
+		var user_part = '[a-zA-Z0-9][a-zA-Z0-9_.-]*';
+		
+		// Der Domain-Teil
+		var dom_mainpart  = '[a-zA-Z0-9][a-zA-Z0-9._-]*\\.';       
+		
+		// Der Subdomain-Teil, 0-n Subdomains
+		var dom_subpart   = '(?:[a-zA-Z0-9][a-zA-Z0-9._-]*\\.)*'; 
+		
+		// Die Toplevel-Domain (zZt. min. 2 und max. 5 Chars)
+		var dom_tldpart   = '[a-zA-Z]{2,5}';
+		
+		var domain_part   = dom_subpart+dom_mainpart+dom_tldpart;
+		
+		var expr = new RegExp('^'+user_part+"@"+domain_part+'$');
+		if(address != '' && expr.test(address)) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	},
+	password: function(pwd, len){
+		if(!pwd || pwd.length<len)
+			return false;
+		if(pwd.replace(/\w/g, "")=="")
+			return false;
+		return true;
+	}
+}
+
+this.list=function(theList){
+	var list = theList;
+	return {
+		each: function(f){
+			var it = list.iterator()
+			while(it.hasNext())
+				f(it.next())
+		}
+		,trim: function(){
+			var it = list.iterator()
+			var result = createlist();
+			while(it.hasNext()){
+				var entry = it.next();
+				if(entry)
+					result.add(entry);
+			}
+			return result;
+		}
+	}
+}
+
+this.encodeForScript=function(text, quote){
+	if(!text)
+		return text;
+
+	/*** 
+	 * replace " with \"
+	 * replace ' with \'
+	 * remove \n and \r and \u2028 (unicode line feed)
+	 * remove HTML comments
+	 * replace </script> with "</sc"+"ript>"
+	 */	
+	var t = text.replace(/\"/g, '\\\"')				// replace quotes
+				.replace(/\'/g, '\\\'')				// replace single quotes
+				.replace(/[\n\r\u2028]/g, "")		// replace line feeds
+				.replace(/<!--(.|\s)*?-->/g, "")	// remove HTML comments
+				
+	if(quote=="single")
+		return t.replace(/script>/g, "sc'+'ript>");
+	else return t.replace(/script>/g, 'sc"+"ript>');
+}
+
+this.hasPlugin=function(name, checkforversion){
+	var plugin = pluginDB(name);
+	if(!plugin)
+		return false;
+
+	if(!checkforversion)
+		return true;
+
+	var version = plugin.getAttribute("PluginVersion");	
+	return isCorrectVersion(checkforversion, [version.getMajorVersion(), version.getMinorVersion(), version.getMaintenanceVersion()])
+	
+	function isCorrectVersion(check, version){
+		for(var i=0; i<check.length; i++){
+			if(check[i]!=version[i])
+				return check[i] < version[i]
+		}
+		return true;
+	}	
+}
+
+this.createContents=function(parent, childconfig, language){
+	var default_lang = db().getDefaultLanguage();
+	
+	var uniqueNamesOnContents = (db().getAttribute("UniqueNamesOnContents")=='true' || db().getContentStoreVersion()<5);
+	 
+	if (language) {
+		default_lang = language;
+	}	
+	var lang = db().getLanguage(default_lang);
+	if(lang.isDummy()){
+		lang = db().createLanguage(default_lang, default_lang);
+		lang.save();
+		log.info("created language " + default_lang)
+	}
+	
+	if(typeof parent == "string"){
+		// interpreted as area to be created:
+		var area = db().getArea(parent);
+		if(area){
+			area.remove()
+			log.info("removed existing area " + parent)
+		}
+		area = db().createArea(parent);
+		area.save();
+		log.info("created area " + parent)
+		parent = area;
+	}
+	
+	for (var c=0; c<childconfig.length; c++){
+		var config = childconfig[c];
+		if(config.do_not_create_when)
+			continue;	// do not create 
+		var ct_name = config.ct || "standard";
+		var ct = db().getContentType(ct_name);
+		if(ct==null){
+			var ct = db().createContentType(ct_name);
+			ct.setOuterLayoutName("outer:standard");
+			ct.setInnerLayoutName("inner:"+ct_name);
+			ct.save();
+			log.info("created contenttype " + ct_name)
+		}
+		var struct;
+		if(parent instanceof Packages.de.innovationgate.webgate.api.WGArea)
+			struct = parent.createRootEntry(ct, config.title);
+		else if(parent instanceof Packages.de.innovationgate.webgate.api.WGStructEntry)
+			struct = parent.createChildEntry(ct, config.title);
+		else if(parent instanceof Packages.de.innovationgate.webgate.api.WGContent)
+			struct = parent.getStructEntry().createChildEntry(ct, config.title);
+		else {
+			log.info("Parameter 'parent' can't be interpreted: " + parent);
+			return;
+		}
+		struct.setPosition(c*10);
+		if(config.name && !uniqueNamesOnContents)
+			struct.setUniqueName(config.name);
+		struct.save();
+
+		var content = struct.createContent(lang, config.title);
+		if(config.name && uniqueNamesOnContents)
+			content.setUniqueName(config.name);
+		if(config.hiddenfrom)
+			content.setHiddenFrom(createlist(config.hiddenfrom));
+		if(config.items){
+			for(var i in config.items)
+				content.setItemValue(i, config.items[i]);
+		}
+		content.publish("");
+		log.info("created content " + config.title)
+		// child documents
+		if(config.children)
+			this.createContents(struct, config.children, language)
+	}
+}
+
+this.getCommonName=function(username, make_html){
+	var commonName = /cn=([^,]+)/i.exec(username);
+	if (commonName != null) {
+	    return make_html ? '<span title="' + username + '">' + commonName[1] + '</span>' : commonName[1]; 
+	}
+	else {
+	    return username;
+	}
+}
+
+
+this.wga={
+
+	isAdmin: function(){	
+		return wgacore.isAdminLoggedIn(request);
+	},
+	
+	adminLogin: function(adminName, adminPassword){
+		return wgacore.doAdminLogin(adminName, adminPassword, request)
+	}
+
+}
+
+this.xpath={
+	getText: function(node, xpath){
+		var n = node.selectSingleNode(xpath);
+		return n ? n.getText() : ""
+	}
+}
+
+this.sendMail=function(config){
+	var mail = createMail();
+	if(!mail){
+		log.info("Mailserver not configured");
+		return;
+	}
+	mail.to = config.to;
+	mail.from = config.from||"wga";
+	mail.subject = config.subject||"Info Mail";
+	mail.body = config.body||"";
+	mail.send();
+}
+
+this.generateUID=function(){
+	return Packages.de.innovationgate.utils.UIDGenerator.generateUID();
+}
+
+this.parseXML=function(xml){
+
+	function XMLElement(dom4j_element){
+		this.dom = dom4j_element;
+		
+		// copy all attributes:
+		this.attributes={}
+		var it = dom4j_element.attributeIterator();
+		while(it.hasNext()){
+			var at = it.next();
+			this.attributes[at.name] = at.value;
+		}
+		
+		this.text = (this.dom ? this.dom.text : "");
+		this.name = (this.dom ? this.dom.name : "unknown");
+		this.toString=function(){
+			return this.text;
+		}
+
+		this.setText = function(text){
+			this.dom.add(new Packages.org.dom4j.tree.FlyweightText(text));
+		}
+		
+		this.setAttribute = function(name, value){
+			this.attributes[name]=value;
+			this.dom.addAttribute(name, value); 
+		}
+
+		this.getParent=function(){
+			var parent = this.dom.getParent()
+			return parent ? new XMLElement(parent) : null;
+		}
+
+		this.getElementsByTagName=function (tagname){
+			return makeElementArray(this.dom.selectNodes(tagname));
+		}
+		
+		this.getElementsByAttribute = function (name, value){
+			var xpath = "//*[@" + name + "='"+value+"']"
+			var nodes = this.dom.selectNodes(xpath);
+			return makeElementArray(nodes);
+		}
+		
+		this.getElementById = function (id){
+			return this.getElementsByAttribute("id", id)[0];
+		}
+		
+		this.forEachElement = function(tagname, f){
+			var els = this.getElementsByTagName(tagname)
+			for(var i=0; i<els.length; i++)
+				f(els[i])
+		}
+		
+		this.addElement = function(tagname, attributes){
+			var el = this.dom.addElement(tagname);
+			for(i in attributes||{})
+				el.addAttribute(i, attributes[i])
+			return new XMLElement(el);
+		}
+		
+		this.asXML = function(){
+			return this.dom.asXML();
+		}
+		 
+	}
+
+	if(typeof(xml) == "string")
+		return new XMLElement(parseXML(xml).rootElement);
+	else return new XMLElement(xml.rootElement);
+
+	/* helper function */
+	function makeElementArray(nodes){
+		var a = [];			
+		if(nodes){
+			var nodes = nodes.iterator();
+			while(nodes.hasNext())
+				a.push(new XMLElement(nodes.next()))
+		}			
+		return a;
+	}
+
+}
+
+this.serializeJsObject=function(o){
+	var map = createLookupTable();
+	for(i in o)
+		map.put(i, o[i]);
+	return serializeObject(map)
+}
+
+this.deserializeJsObject=function(so){
+	var o={}
+	try{
+		var map = deserializeObject(so)
+		var keys = map.keySet().iterator();
+		while(keys.hasNext()){
+			var key = keys.next();
+			o[key] = map.get(key)
+		}
+	}
+	catch(e){
+		log.info("Unable to deserialize Object: " + e.message);
+	}
+	return o;
+}
+
+this.dateGroup = function(date){
+
+	var d = createcalendar(dateonly(createdate()))
+	if(!date.before(d.time)){
+		return {
+			text: WGA.design(this).label("today"),
+			format: "HH:mm"
+		};
+	}
+
+	d.add(d.DAY_OF_YEAR, -1)
+	if(!date.before(d.time)){
+		return {
+			text: WGA.design(this).label("yesterday"),
+			format: "HH:mm"		
+		};
+	}
+
+	d.add(d.DAY_OF_YEAR, -7)
+	if(!date.before(d.time)){
+		return {
+			text: WGA.design(this).label("last-7-days"),
+			format: WGA.design(this).label("date-group.format.last-7-days")
+		}
+	}
+
+	d.add(d.DAY_OF_YEAR, -22)
+	if(!date.before(d.time)){
+		return {
+			text: WGA.design(this).label("last-30-days"),
+			format: WGA.design(this).label("date-group.format.last-30-days")
+		}
+	}
+
+	return {
+		text: format(date, "MMMMM yyyy"),
+		format: WGA.design(this).label("date-group.format.default")
+	}
+
+}
+
+this.timeElapsed = function(d){
+	var ms = createdate().time - d.time;
+	var minutes = ms/(1000*60);
+	if(minutes<1)
+		return WGA.design(this).label("time.less-then-one-minute-ago");
+	if(minutes<2)
+		return WGA.design(this).label("time.one-minute-ago");
+	if(minutes<60)
+		return WGA.design(this).label("time.minutes-ago", createlist([format(minutes, "0")]));
+	else{
+		var houres = minutes/60;
+		if(houres<1)
+			return WGA.design(this).label("time.less-then-one-hour-ago");
+		if(houres<2)
+			return WGA.design(this).label("time.one-hour-ago");
+		if(houres<24)
+			return WGA.design(this).label("time.hours-ago", createlist([format(houres, "0")]));
+		else {
+			var days = houres/24
+			if(days<2)
+				return WGA.design(this).label("time.one-day-ago");
+			return WGA.design(this).label("time.days-ago", createlist([format(days, "0")]));
+		}
+	}
+}
+
+
+this.renderFileSize = function(value) {
+	// start with GB and work way down to kB
+	var kb = 1000;
+	var mb = kb*kb;
+	var gb = mb*kb;				
+	if (value >= gb)
+		return '<span style="color:red">'+ Math.round(value/gb) + ' GB</span>';
+	else if (value >= mb)
+		return '<span style="color:red">'+ Math.round(value/mb) + ' MB</span>';
+	else if (value >= kb)
+		return Math.round(value/kb) + ' KB';
+	else
+		return value + ' bytes';		
+}
+
+this.fileSizeText = function(value) {
+	// start with GB and work way down to kB
+	var kb = 1000;
+	var mb = kb*kb;
+	var gb = mb*kb;				
+	if (value >= gb)
+		return Math.round(value/gb) + " GB";
+	else if (value >= mb)
+		return Math.round(value/mb) + ' MB';
+	else if (value >= kb)
+		return Math.round(value/kb) + ' KB';
+	else
+		return value + ' bytes';		
+}
+
+this.csvExporter = function(divider, encoding){
+
+  	var out = new Packages.java.io.PrintWriter(new Packages.java.io.OutputStreamWriter(response.getOutputStream(), encoding||"UTF-8"));
+	var line = "";
+	var div = divider || ",";
+	
+	return {
+	
+		addValue: function(value){
+			if(line)
+				line += div
+			line += '"' + encode("html", value||"").replace(/[\r\n"]/g, "") + '"';
+		},
+	
+		flush: function(){
+			out.println(line);
+			out.flush();
+			line = "";		
+		}
+	
+	}
+
+}
+
+this.getAppKeysBasedOnPlugin=function(plugin_name){
+	var appKeys = WGA.createList();
+	var dbkeys = WGA.server().getAppKeys().iterator();
+	while(dbkeys.hasNext()){
+		var dbkey = dbkeys.next();
+		try{
+			// Open the database, if possible
+			var database = db(dbkey);
+			if (!database.isSessionOpen()) {
+				continue;
+			}
+
+			var plugins = WGA.app(database).design().plugins().iterator();
+			while(plugins.hasNext()){
+				var plugin = plugins.next();
+				if(plugin.name == plugin_name && database.getAttribute(WGA.Core.DBATTRIB_ALLOW_PUBLISHING)!="false")
+					appKeys.add(dbkey)
+			}			
+		}
+		catch(e){
+			//log.info(e);
+		} 
+	}
+	return appKeys;
+}
+
+/*
+ *	CSV Writer (Exporter)
+ *	Config options:
+ *		columns:		Array or List of item (column) definitions. Required.
+ *		contentlist:	List of WGContent-s or TMLContext-s. Optional. If empty, option "query" is used.
+ *		query:			A HQL query defining the contentlist. Optional. If empty, all child-Contents are used.
+ *		dateFormat:		optional date format. If Empty yyyy-MM-dd HH:mm:SS ist used.
+ *		divider:		Column divider. Default is Semicolon
+ *
+ *	Item Definition (config.items):
+ *		Each item is either a Sting or Object.
+ *		If String, the itemvalue or metavalue is written (meta if String is all uppercase)
+ *		If Object it must have the format {label:<String>, value: <Function(TMLContext)>}
+ *
+ *	Sampe usages:
+ *		AFW.Util.csvWriter({
+ *			columns: ["TITLE", "CREATED", "ean", "price"],
+ *			query: "content.structentry.contenttype.name='product'"
+ *		}).write()
+ *		Exports all "products" to the browser
+ */
+this.csvWriter = function(config){
+
+	var line = "";
+	var div = config.divider || ";";
+
+	function addValue(value){
+		if(line)
+			line += div
+		if(value instanceof Packages.java.util.Date)
+			line += WGA.format(value, config.dateFormat || "yyyy-MM-dd HH:mm:ss")
+		else if(typeof(value)=="string")
+			line += '"' + (value||"").replace(/\"/g, "'").replace(/[\r\n]/g, "") + '"';
+		else line += (value==null ? "" : value)
+	}
+
+	function flush(out){
+		out.println(line);
+		out.flush();
+		line = "";		
+	};
+
+	return {
+		write: function(stream_or_file, encoding){
+			
+		  	var out;
+		  	if(stream_or_file){
+		  		if(stream_or_file instanceof java.io.OutputStream || stream_or_file instanceof java.io.Writer)
+		  			out = new java.io.PrintWriter(stream_or_file);
+		  		else {
+		  			// java.io.File or filename
+		  			out = new java.io.PrintWriter(stream_or_file, encoding||"UTF-8");
+		  		}
+		  	}
+		  	else out = new java.io.PrintWriter(new java.io.OutputStreamWriter(response.getOutputStream(), encoding||"UTF-8"));
+		  	
+			var itemlist = config.columns;
+			if(itemlist instanceof Array)
+				itemlist = WGA.createList(itemlist);
+			
+			var contentlist = config.contentlist
+			if(!contentlist){
+				if(config.query)
+					contentlist = WGA.database().query("hql", config.query, {max:0})
+				else contentlist = WGA.database().query("hql", "content.structentry.parententry.key=:structkey", {max:0}, {structkey:STRUCTKEY})
+			}
+			
+			// headline:
+			if(config.header!==false){
+				var items = itemlist.iterator();
+				var line = "";
+				while(items.hasNext()){
+					var item = items.next();
+					var label = (typeof(item)=="string" ? item : item.label)
+					addValue(label);
+				}
+				flush(out);
+			}
+
+			// data
+			var docs = contentlist.iterator();
+			while(docs.hasNext()){
+				var doc = docs.next();
+				if(doc instanceof Packages.de.innovationgate.webgate.api.WGContent)
+					doc=context(doc);
+				var items = itemlist.iterator();
+				while(items.hasNext()){
+					var item = items.next();
+					var value="";
+					try{
+						if(typeof(item)=="string"){
+							if(item==item.toUpperCase())
+								value = doc.meta(item);
+							else value = doc.item(item);
+						}
+						else {
+							value = item.value(doc)
+						}
+					}
+					catch(e){
+						value = e.message;
+						log.info(e.message);
+					}
+					addValue(value);
+				}
+				flush(out);
+			}
+			
+			out.close();
+
+		}
+	}
+}

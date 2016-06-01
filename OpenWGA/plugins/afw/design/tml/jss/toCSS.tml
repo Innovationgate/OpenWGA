@@ -1,0 +1,23 @@
+<tml:script>
+
+	var jss = createObject("jss");
+	
+	var vars = option("vars");
+	var body = option("body");
+	var scope = option("scope");
+
+	if(vars){
+		try{
+			var JSS = jss.vars;		// now you can use JSS utility functions inside the var defs.
+			eval("var vars = {" + vars +"}");
+			jss.addVars(vars);
+		}
+		catch(e){		
+			log.info(scope + ": " + e);
+			return "/*\nUnable to parse option 'vars' as JS object:\n" + e + "\n*/"
+		}
+	}
+		
+	return jss.toCSS(body, scope);
+	
+</tml:script>

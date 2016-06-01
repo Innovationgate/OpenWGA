@@ -1,0 +1,77 @@
+/*
+
+ SCSS for jquery-plugin columnslider
+
+ This file is part of the OpenWGA server platform.
+ (c) Innovation Gate
+
+*/ 
+
+.column-slider{
+
+	overflow: hidden;		
+
+	.columns {
+		
+		width: 20000px;
+		position: relative;
+		left: 0;
+		
+		.column {
+			float: left;
+			margin: "0 10px 0 0";
+		}
+
+		&:after {
+		    clear: both;
+		    content: ".";
+		    display: block;
+		    height: 0;
+		    visibility: hidden;
+		}
+		
+	}
+	
+	.nav{
+	
+		margin-top: 10px;
+		
+		.prev, .next{
+			cursor: pointer;
+			font-size: 40px;
+			text-decoration: none;
+			line-height: 12px;
+			height: 20px;
+			width: 50px;
+			&.disabled {
+				color: #efefef !important;
+				cursor: default;
+			}
+		}
+		.prev{
+			float: left;
+		}
+		.next{
+			float: right;
+			text-align: right;
+		}
+		.control {
+			text-align: center;
+			height: 23px;
+			a {
+				cursor: pointer;
+				display: inline-block;
+				text-indent: -9999px;
+				width: 15px;
+				height: 15px;
+				margin: 3px 3px 0 0;
+				border: solid #004080 1px;
+				transition: background .5s;
+				&.active {
+					background: #004080;
+				}
+			}
+		}
+	}
+
+}

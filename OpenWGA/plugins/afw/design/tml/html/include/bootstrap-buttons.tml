@@ -1,0 +1,7 @@
+<tml:case condition="!_bootstrap_included && !_bootstrap_buttons_included">
+	<link rel="stylesheet" href="<tml:url type="file" doc="bootstrap:buttons" file="css/bootstrap.min.css"/>">
+	<script type="text/javascript" src="<tml:url type="file" doc="bootstrap:buttons" file="js/bootstrap.min.js"/>"></script>
+	<tml:script>
+		_bootstrap_buttons_included=true
+	</tml:script>
+</tml:case>

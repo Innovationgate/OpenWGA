@@ -1,0 +1,68 @@
+/*
+
+ CSS for jquery-plugin lookup_surgestions
+
+ This file is part of the OpenWGA server platform.
+ (c) Innovation Gate
+
+*/ 
+
+<tml:include medium="jss" ref="toCSS" o_scope=".lookup-wrapper">
+	
+	position: "relative",
+	display: "inline-block",
+
+	".lookup": {	
+		position: "absolute",
+		top: 0,
+		
+		".lookup-wrapper": {
+			position: "relative",
+			display: "inline"
+		},
+		
+		".lookup-input": {
+			position: "absolute",
+			top:0,
+			left:0,
+			background: "transparent"
+		},
+		".lookup-surgestion": {
+			position: "absolute",
+			top:0,
+			left:0,
+			color: "silver !important",
+			background: "white",
+			"&.no-match":{
+				text_align: "right"
+			}
+		},
+		".lookup-popup": {
+			list_style_type: "none",
+			display: "none",
+			position: "absolute",
+			margin: "4px 0",
+			padding: "5px 0",
+			background: "white",
+			border: "solid silver 1px",
+			border_radius: 4,
+			box_shadow: "0px 5px 10px gray",
+			a: {
+				display: "block",
+				text_decoration: "none",
+				padding: "2px 15px",
+				white_space: "nowrap",
+				"&:hover":{
+					background: "#efefef"
+				}
+			},
+			li: {
+				"&.active a": {
+					background: "gray",
+					color: "white"
+				}
+			}
+		}
+	}
+	
+</tml:include>

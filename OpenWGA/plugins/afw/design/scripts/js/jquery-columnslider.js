@@ -1,0 +1,231 @@
+/*
+ *	jquery-plugin columnslider
+ *
+ *	This script is part of the OpenWGA CMS plattform.
+ *	(c) Innovation Gate
+ */
+ 
+!function(root, factory) {
+  	if(typeof define === 'function' && define.amd)
+    	define([
+    		"jquery",
+    		"css!/plugin-wga-app-framework/css/jquery-columnslider"
+    	], factory);
+  	else factory(root.jQuery);
+}(window, function($){
+
+	function addSlider(el, config){
+
+		var $cols = $(el);
+		var $wrapper = $cols.find(".columns");
+		var cols_total = $wrapper.find("> .column").length;
+		var cols;
+		var col=0;
+		var columnWidth;
+		var margin = config.margin || 10;
+
+		var supportsTransition = ("transition" in document.createElement("p").style)
+
+		if(typeof(config.cols)=="object")
+			cols = config.cols.large
+		else cols = config.cols || 1
+
+		// set margins
+		$wrapper.find("> .column").css("margin-right", margin+"px")
+
+		// generate nav controls
+		if(!config.hide_nav){
+			$cols.append('<div class="nav"></div>')
+			var nav = $cols.find(".nav")
+			nav.append('<a class="prev">&lsaquo;</a>')
+			nav.append('<a class="next">&rsaquo;</a>')
+			nav.append('<div class="control"></div>')
+			var control = $cols.find(".nav .control")
+			
+			var i=1;
+			$wrapper.find("> .column").each(function(){
+				var title = $(this).data("title")||"";
+				control.append('<a data-col="' + i++ + '" title="' + title + '"></a>')
+			})
+		}
+		
+		var left;
+		if($wrapper.swipehandler){
+			$wrapper.swipehandler({
+				touchStart: function(){
+					left=Number($wrapper.css("left").split("px")[0]);
+					$wrapper.css("transition", "none");
+				},
+				touchMove: function(dx){
+					$wrapper.css("left", left+dx);
+				},
+				touchEnd: function(dx){
+					$wrapper.css("transition", "");
+					if(dx>60)
+						prev();
+					else if(dx<-60)
+						next();
+					else scroll();
+				}
+			})
+		}
+		
+		function prev(){
+			col-=cols;
+			if(col<0)
+				col=0;
+			scroll();
+		}
+		
+		function next(){
+			col+=cols;
+			if(col>=cols_total){
+				col=parseInt((cols_total-1)/cols)*cols;
+			}
+			scroll();
+		}
+		
+		$cols.find(".nav .prev").click(function(e){
+			e.preventDefault();
+			prev();
+		})
+		$cols.find(".nav .next").click(function(e){
+			e.preventDefault();
+			next();
+		})
+		
+		$cols.find(".control a").click(function(e){
+			e.preventDefault();
+			var index = $(this).data("col")-1
+			col = parseInt(index/cols)*cols;
+			scroll();
+		})
+		
+		function scrollToCol(index){
+			col = parseInt(index/cols)*cols;
+			scroll();
+		}
+		
+		function setWidth(){
+			var width = $cols.outerWidth();
+			if(typeof(config.cols)=="object" && WGA.responsive && WGA.responsive.getMediaWidth){
+				var mediaWidth = WGA.responsive.getMediaWidth();
+				var new_cols = mediaWidth=="large" ? config.cols.large||3
+					: mediaWidth=="medium" ? config.cols.medium||2
+					: config.cols.small||1;
+				if(new_cols != cols)
+					col=0;
+				cols=new_cols;
+			}
+
+			if(cols>=cols_total)
+				$cols.find(".nav").hide()
+			else $cols.find(".nav").show()
+			
+			columnWidth = parseInt(width/cols - ((cols-1)*margin)/cols);	// width without right margin
+			$wrapper.find("> .column").outerWidth(columnWidth);
+			scroll();
+		}
+		function scroll(){
+			var new_left = -col*(columnWidth+margin);
+			
+			if(config.effect=="fade"){
+				effect_fade(new_left);
+			}
+			else {
+				effect_slide(new_left);
+			}
+			
+			$cols.find(".control a").removeClass("active").each(function(i){
+				if(i>=col && i<col+cols)
+					$(this).addClass("active");
+			})
+			if(col==0)
+				$cols.find(".prev").addClass("disabled").attr("title", "");
+			else {
+				var prev_col = $wrapper.find("> .column").eq(col-cols)
+				$cols.find(".prev").removeClass("disabled").attr("title", prev_col.data("title"));
+			}
+			if(col==parseInt((cols_total-1)/cols)*cols)
+				$cols.find(".next").addClass("disabled").attr("title", "");
+			else {
+				var next_col = $wrapper.find("> .column").eq(col+cols)
+				$cols.find(".next").removeClass("disabled").attr("title", next_col.data("title"));
+			}
+			$cols.trigger("slide", col);
+		}
+		
+		$(window).on("resize mediawidthchanged", setWidth)
+		setWidth();
+
+		// scroll to selected
+		var selected = $cols.find(".column.selected")
+		var index = $cols.find(".column.selected").index()
+		if(index>=0){
+			$wrapper.css("transition", "none");
+			scrollToCol(index);
+			setTimeout(function(){
+				$wrapper.css("transition", "");
+			}, 250);
+			
+		}
+
+		if(config.autoslide){
+			var timer;
+			function startTimer(){
+				timer = window.setInterval(function(){
+					col+=cols;
+					if(col>=cols_total){
+						col=0
+					}
+					scroll();
+				}, config.autoslide||3000)
+			}
+			function stopTimer(){
+				if(timer)
+					window.clearInterval(timer);
+			}
+			startTimer();
+			$cols.on("click", stopTimer); 
+		}
+
+		function effect_fade(new_left){
+			if(supportsTransition){
+				$wrapper.css("transition", "opacity .2s ease");
+				$wrapper.on("transitionend", function(){
+					$wrapper.css({
+						left: new_left,
+						opacity: 1
+					});
+				})
+				$wrapper.css("opacity", 0);
+			}
+			else {
+				$wrapper.animate({opacity:0}, {
+					complete: function(){
+						$wrapper.css("left", new_left);
+						$wrapper.animate({opacity:1});
+					}
+				});
+			}
+		}
+	
+		function effect_slide(new_left){
+			if(supportsTransition){
+				$wrapper.css("transition", "left .4s ease");
+				$wrapper.css("left", new_left);
+			}
+			else $wrapper.animate({left:new_left});
+		}
+
+	}
+
+	// jquery plugin interface:
+	$.fn.columnslider = function(config){
+		var config = config||{}
+		return this.each(function(){
+			addSlider(this, config);
+		})
+	}
+
+})

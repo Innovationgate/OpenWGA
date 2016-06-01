@@ -1,0 +1,35 @@
+<tml:case isfalse="_jquery_ui_all_included">
+
+	<tml:include ref="::jquery"/>
+
+	<tml:if condition="option('jquery-ui-js-url')">
+		<tml:then>
+			<script type="text/javascript" src="<tml:option name="jquery-ui-js-url" trim="true"/>"></script>
+			<script type="text/javascript" src="<tml:option name="jquery-ui-js-i18n-url" trim="true"/>"></script>
+			<link rel="stylesheet" href="<tml:option name="jquery-ui-css-url" trim="true"/>">
+		</tml:then>
+		<tml:else>
+			<link rel="stylesheet" href="<tml:url type="file" doc="jquery-ui-1.11:build" file="jquery-ui.css"/>">
+			<script type="text/javascript" src="<tml:url type="file" doc="jquery-ui-1.11:build" file="jquery-ui.min.js"/>"></script>
+			<tml:case condition="LANGUAGE!='en'">
+				<tml:comment>
+					We don't have a language file for "en". And we don't need one because "en" is integrated.
+				</tml:comment>
+				<script type="text/javascript" src="<tml:url type="file" doc="jquery-ui-1.11:source:i18n" file="[datepicker-{LANGUAGE}.js]"/>"></script>
+			</tml:case>
+		</tml:else>
+	</tml:if>
+	
+	<tml:case condition="LANGUAGE!='en'">
+		<script>
+			$(function(){
+				$.datepicker.setDefaults($.datepicker.regional['<tml:meta name="language"/>']);
+			});
+		</script>
+	</tml:case>
+	
+	<tml:script>
+		_jquery_ui_all_included=true
+	</tml:script>
+	
+</tml:case>

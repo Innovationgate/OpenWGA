@@ -1,0 +1,560 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+var Util;
+var database;		// WGDatabase object
+var sessionContext=null;
+
+this.init=function(dbobj){
+
+	try{
+		if(!dbobj)
+			database=this.WGObject=db();
+		else if(typeof dbobj == "string")
+			database=this.WGObject=db(dbobj);
+		else if(dbobj instanceof Packages.de.innovationgate.webgate.api.WGDatabase)
+			database=this.WGObject=dbobj;
+		else database=this.WGObject=dbobj.WGObject;
+	}
+	catch(e){
+		log.info(e);
+		this.initError = e.javaException.message;
+	}
+	if(database){
+		sessionContext=database.getSessionContext();
+	}
+	else log.info("Database.init: undefined database. Called with " + dbobj);
+	
+	Util = createObject(this, "util");
+			
+}
+
+/*
+ * System areas:
+ */
+this.createTemplateArea=function(){
+	var area = database.createArea("$templates");
+	area.systemArea = true;
+	area.save();
+	return area;
+}
+this.createTrashArea=function(){
+	var area = database.createArea("$trash");
+	area.systemArea = true;
+	area.save();
+	return area;
+}
+this.getTemplateArea=function(){
+	return database.getArea("$templates");
+}
+this.getTrashArea=function(){
+	return database.getArea("$trash");
+}
+/****/
+
+this.getContentStoreVersion = function(){
+	return database.getContentStoreVersion()
+}
+
+this.isAuthoringAllowed=function(){
+	var bs = wgacore.dispatcher.getBrowsingSecurity(database)
+	return bs>Packages.de.innovationgate.wga.model.BrowsingSecurity.NO_AUTHORING;
+}
+
+this.isBrowsingAllowed=function(){
+	var bs = wgacore.dispatcher.getBrowsingSecurity(database)
+	return bs>Packages.de.innovationgate.wga.model.BrowsingSecurity.NO_BROWSING;
+}
+
+this.isPublishingAllowed=function(){
+	return database.getAttribute(WGA.Core.DBATTRIB_ALLOW_PUBLISHING)!="false"
+}
+
+this.hasDesign = function(){
+	// check for non-system-areas:
+	var areas = database.getAreas().iterator();
+	var hasAreas=false;
+	while(areas.hasNext()){
+		if(!areas.next().systemArea){
+			hasAreas=true;
+			break;
+		}
+	}
+	if(!hasAreas)
+		return false;
+
+	if(database.getContentTypes().size()==0)
+		return false;
+	if(database.getLanguages().size()==0)
+		return false;
+	return true;
+}
+
+this.query=function(type, query, options){
+	
+	var resultset;
+	
+	if(type=="lucene"){
+		resultset = luceneSearch(query);
+	}
+	else{
+		var queryoptions=createLookupTable();
+		for(o in options)
+			queryoptions.put(o, options[o])
+	
+		resultset=database.query(type, query, queryoptions);
+	}
+	
+	return{
+		each: function(f){
+			for (doc in Iterator(resultset))
+				f(doc)
+		}
+		,count: resultset.getContentList().size()
+		,result: resultset.getContentList()
+		,resultset: resultset
+	}
+}
+
+this.count = function(where){
+	var res = this.query("fullhql", "select count(*) as count from Content as content where " + where).result;
+	return res.size() ? res.get(0).getItemValue("count") : 0
+}
+
+this.luceneSearch=function(query){
+	return this.query("lucene", query);
+}
+
+this.hqlSearch=function(query, options){
+	return this.query("hql", query, options);
+}
+
+this.getPluginVersion=function(include_build){
+
+	var pluginConfig = database.getAttribute("CSConfig").pluginConfig;
+	if(!pluginConfig){
+		// No plugin - may be we have a plugin design provider?
+		var p =  database.getDesignProvider();
+		if(p && p instanceof Packages.de.innovationgate.wgpublisher.designsync.DBDesignProvider){
+			var design_db = db(p.getDesignDBKey());
+			pluginConfig = design_db.getAttribute("CSConfig").pluginConfig;
+		}
+	}
+	if(!pluginConfig)
+		return "unknown";
+		
+	var version = pluginConfig.id.version;	
+	return version.majorVersion
+		+ "." + version.minorVersion
+		+ (version.maintenanceVersion!="0" ? "." + version.maintenanceVersion : "")
+		+ (version.patchVersion!="0" ? "." + version.patchVersion : "")
+		+ (include_build ? " Build " + version.buildVersion : "") 
+}
+
+this.mayEditDesign=function(designtype){
+	if(!this.isDesigner())
+		return false;
+
+	return database.isDoctypeModifiable(designtype);
+}
+
+this.hasValidLicense=function(){
+	var lm = this.getLicenseManager();
+	if(lm)
+		return lm.hasValidLicense() && lm.hasValidClientLicense(this.getUserName());
+	else return true;
+}
+
+this.getLicenseManager=function(){
+	var lname = getmaincontext().db().getAttribute("licenseName")
+	if(lname)
+		return createObject(this, "licensemanager", lname);
+	else return null;
+}
+
+this.setLicenseName=function(lname){
+	getmaincontext().db().setAttribute("licenseName", lname)	
+}
+
+this.getBasePath=function(includeContext){
+	var s_sec = request.isSecure();
+	var s_name = request.getServerName();
+	var s_port = request.getServerPort();
+	
+	return (s_sec?"https://":"http://") + s_name + (s_port!="" && s_port!="80" ? ":"+s_port : "") + (includeContext ? request.getContextPath() : "");
+}
+
+this.isValid=function(){
+	return database!=null;
+}
+
+this.getKey=function(){
+	return database.getDbReference(); 
+}
+
+this.isReader=function(){
+	return sessionContext!=null && sessionContext.getAccessLevel()>=database.ACCESSLEVEL_READER;
+}
+
+this.isAuthor=function(){
+	return sessionContext!=null && sessionContext.getAccessLevel()>=database.ACCESSLEVEL_AUTHOR;
+}
+
+this.isEditor=function(){
+	return sessionContext!=null && sessionContext.getAccessLevel()>=database.ACCESSLEVEL_EDITOR;
+}
+
+this.isChiefEditor=function(){
+	return sessionContext!=null && sessionContext.getAccessLevel()>=database.ACCESSLEVEL_CHIEF_EDITOR;
+}
+
+this.isDesigner=function(){
+	if(sessionContext==null)
+		return false;
+	return this.isManager() 
+		|| sessionContext.getAccessLevel()==database.ACCESSLEVEL_AUTHOR_DESIGNER
+		|| sessionContext.getAccessLevel()==database.ACCESSLEVEL_EDITOR_DESIGNER
+}
+
+this.isManager=function(){
+	return sessionContext!=null && sessionContext.getAccessLevel()==database.ACCESSLEVEL_MANAGER;
+}
+
+this.isAdmin=function(){
+	return wgacore.isAdminLoggedIn(request);
+}
+this.adminLogin=function(adminName, adminPassword){
+	return wgacore.doAdminLogin(adminName, adminPassword, request)
+}
+
+this.mayDelete=function(){
+	return database.getSessionContext().getUserAccess().mayDeleteDocuments();
+}
+
+this.mayMoveStructEntries=function(){
+	return database.getSessionContext().getUserAccess().mayMoveStructEntries()
+}
+
+this.mayCreateRootEntries=function(){
+	if(!this.hasAllowedLanguages())
+		return false;	// no languages avaliable
+	
+	// check, if the user may create rootentries in at last one area:
+	var areas=database.getAreas().iterator();
+	while(areas.hasNext()){
+		var Area=createObject(this, "area", areas.next(), database)
+		if(Area.mayCreatePage()){
+			return true;
+		}
+	}
+	return false;
+}
+
+this.hasAllowedLanguages=function(){
+	var langs = database.getLanguages().values().iterator();
+	while(langs.hasNext()){
+		var lang=langs.next();
+		if(lang.mayCreateContent())
+			return true;
+	}
+	return false;	
+}
+
+this.getPreferedLanguage=function(){
+	
+	var lang_attr_name = "AFW."+this.getKey()+".PreferredLanguage";
+	var lang=request.getSession().getAttribute(lang_attr_name);
+	if(!lang || !database.getLanguage(lang))
+		lang=database.getDefaultLanguage();
+	return lang;
+}
+
+this.getPreferedLanguageTitle=function(){
+	var lang=database.getLanguage(this.getPreferedLanguage())
+	return lang.getTitle();	
+}
+
+this.setPreferedLanguage=function(lang){
+	request.getSession().setAttribute("PreferredLanguage", lang);	
+}
+
+this.getLanguageOptions=function(all){
+	var opts="";
+	var langs = database.getLanguages().values().iterator();;
+	while(langs.hasNext()){
+		var lang=langs.next();
+		if(!all && !lang.mayCreateContent())
+			continue;
+		if(opts!="")
+			opts += ","
+		opts += lang.getTitle() + "|" + lang.getName();
+	}	
+	return opts;
+}
+
+this.getTitle=function(){
+	return database.getTitle();
+}
+
+this.getFixParents=function(){
+	// get all contenttypes that have a "word-client-parent" set:
+	var fixparents=createlist();
+	var pagetypes=database.getContentTypes().iterator();
+	while(pagetypes.hasNext()){
+		var pagetype=pagetypes.next();
+		var preferedParent=pagetype.getPreferredParent();
+		if(preferedParent && pagetype.mayCreateContent()){
+			//log.info(pagetype.getName())
+			var ParentStruct=createObject(this, "structentry", preferedParent, database)
+			if(ParentStruct.mayCreatePage())
+				fixparents.add(pagetype.getName() + "|" + ParentStruct.getStructKey());
+		}
+	}
+	return fixparents;
+}
+
+this.getUserName=function(){
+	var sessionContext=database.getSessionContext();
+	return sessionContext ? sessionContext.getUser() : "Unknown";
+}
+
+this.getCommonUserName=function(make_html){
+	return Util.getCommonName(this.getUserName(), make_html);
+}
+
+this.getUserEmail=function(){
+	var sessionContext=database.getSessionContext();	
+	return database.getAuthenticationModule().getEMailAddress(this.getUserName());
+}
+
+this.getAccessLevel=function(){
+	var sessionContext=database.getSessionContext();
+	return sessionContext ? sessionContext.getAccessLevel() : 0;
+}
+
+this.getAccessLevelText=function(){
+	if(!this.isReader())
+		return "No Access";
+	return database.accessLevelText(this.getAccessLevel());	
+}
+
+this.getUserAccess=function(){
+	var sessionContext=database.getSessionContext();
+	return sessionContext.getUserAccess();
+}
+
+this.getUserAliases=function(){
+	var sessionContext=database.getSessionContext();
+	var userDetails = sessionContext.getUserDetails();
+	return userDetails==null ? "" :  userDetails.getAliases();
+}
+
+this.getShortestUserAlias=function(){
+	var list = this.getUserAliases();
+	if(!list || list.isEmpty())
+		return this.getUserName();
+	var shortest=list.get(0);
+	var aliases=list.iterator();
+	while(aliases.hasNext()){
+		var alias=aliases.next();
+		if(alias.length<shortest.length)
+			shortest=alias
+	}	
+	return shortest || this.getUserName();
+}
+
+this.getUserGroups=function(){
+	var sessionContext=database.getSessionContext();
+	var userDetails = sessionContext.getUserDetails();
+	return userDetails==null ? createlist() :  userDetails.getGroups()||createlist();
+}
+
+this.getUserRoles=function(){
+	var sessionContext=database.getSessionContext();
+	var userDetails = sessionContext.getUserDetails();
+	return userDetails==null ? createlist() :  userDetails.getRoles() || createlist();
+}
+
+this.getAllowedContentTypeOptions=function(parentdoc){
+	var opts=createlist();
+	// get page types:
+	var pagetypes=database.getContentTypes();
+	for(var i=0; i<pagetypes.size(); i++){
+		var pagetype=pagetypes.get(i);
+		if(pagetype.mayCreateContent() && pagetype.mayCreateChildEntry(parentdoc)){
+			// look for aliases:
+			var alias=createObject(this, "contenttype", pagetype, database).getAlias();
+			if(alias != "")
+				opts.add(alias + "|" + pagetype.getName());	
+			else opts.add(pagetype.getName());					 
+		}
+	}
+	return Packages.de.innovationgate.utils.WGUtils.serializeCollection(sortList(opts), ",");
+}
+
+this.getWorkflows=function(){
+	var result = createlist();	
+	try{
+		var wfEngine = database.getWorkflowEngine();
+		var wfDefinitions = wfEngine.getWorkflowDefinitions().keySet().iterator();
+		while (wfDefinitions.hasNext())
+			result.add(wfDefinitions.next());
+	}
+	catch(e){
+		log.error("Unable to retrieve workflow definitions for workflow engine '" + wfEngine.name + "'");
+	}
+	return result;
+}
+
+this.isUserQueryable=function(){
+	var authModule = database.getAuthenticationModule();
+	var queryType = Packages.de.innovationgate.webgate.api.auth.AuthenticationModule.QUERY_USERS_AND_GROUPS;
+	return authModule.isQueryable(queryType)
+}
+
+this.isDnQueryable=function(){
+	var authModule = database.getAuthenticationModule();
+	var queryType = Packages.de.innovationgate.webgate.api.auth.AuthenticationModule.QUERY_USER_DN;
+	return authModule.isQueryable(queryType)
+}
+
+this.hasMailHost=function(){
+	return wgacore.getWgaConfiguration().mailConfiguration.server!=null
+}
+
+
+this.getDatabasePlatform=function() {
+	var descriptor = database.getTypeName().split('/');
+	return descriptor[0];
+}
+
+
+this.getDatabaseType=function() {
+	var descriptor = database.getTypeName().split('/');
+	return descriptor[1];
+}
+
+
+this.getAccessType=function() {
+	var descriptor = database.getTypeName().split('/');
+	if (descriptor.length >= 3)
+		return descriptor[2];
+	return null;
+}
+
+
+this.isDomino=function() {
+	return (this.getDatabasePlatform() == "domino");
+}
+
+
+this.isJdbc=function() {
+	return (this.getDatabasePlatform() == "jdbc");
+}
+
+
+this.isContentstore=function() {
+	return (this.getDatabaseType() == "wgacontentstore");
+}
+
+
+this.isCustomDb=function() {
+	return (this.getDatabaseType() == "custom");
+}
+
+this.isRemoteDb=function(){
+	var att=database.getAttribute(wgacore.DBATTRIB_ISREMOTECS);
+	return (att!=null && att.equalsIgnoreCase('true'))
+}
+
+this.useRemoteDbs=function(){
+	var att=database.getAttribute(wgacore.DBATTRIB_USEREMOTECS);
+	return (att!=null && att.equalsIgnoreCase('true'))
+}
+
+this.hasLuceneIndex=function(){
+	var luceneManager = wgacore.getLuceneManager();
+	if(luceneManager && luceneManager.indexIsEnabled(this.getKey()))
+		return true;
+	return false;
+}
+
+/*
+ * create one big string of all given JS/CSS Files
+ * @files: array of filenames
+ */
+this.getJsCss=function(files){
+	var code = "";
+	for(var i=0; i<files.length; i++){
+		var file = javaObject(files[i]).trim();
+		if(file=="")
+			continue;
+		var js = database.getCSSJSModule(file)
+		if(js)
+			code += "\n"+js.getCode();
+		else {
+			log.error("unable to read code '" + file + "' from database " + database.getDbReference());
+		}
+	}
+
+	return code;
+}
+
+/*
+ * utility functions to translate TML names
+ */
+this.TMLName = {
+
+	toDisplayName: function(tmlname){
+		if(tmlname && WGA.design(database).isCustomized()){
+			if(tmlname.indexOf("overlay:")==0)
+				return tmlname.substr(8);
+			else return tmlname+"@base"
+		}
+		else return tmlname;
+	},
+
+	fromDisplayName: function(tmlname){
+		if(tmlname && WGA.design(database).isCustomized()){
+			if(tmlname.indexOf("@base")>0){
+				return tmlname.replace(/@base/, "");
+			}
+			else return "overlay:"+tmlname
+		}
+		else return tmlname;
+	}
+	
+}
+
+this.checkforTML = function(check_tmls){
+	// check_tmls is a list of TML names.
+	var tmls = check_tmls.iterator();
+	while(tmls.hasNext()){
+		var tml = tmls.next();
+		if(database.getTMLModule(tml, "html")!=null){
+			return tml;
+		}
+	}
+	return null;
+}

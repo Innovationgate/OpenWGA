@@ -1,0 +1,108 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+/*
+ * try to get user agent in the following sequence
+ * - urlparameter "ua"
+ * - CGIv ariable http_user_agent
+ * - sessionvar _http_user_agent
+ * set to "unknown" if nothing else helps.
+ */
+ 
+var ua = request.getParameter("ua");
+
+if(ua==null)
+	ua = meta("request", "http_user_agent")
+
+if(ua==null)
+	ua = _http_user_agent;
+
+if(ua==null)
+	ua = "unknown";
+
+// Bots must be testet before lowercasing the ua string:
+this.isBotAgent = !wgacore.getUserAgentVerifier().isValidUserAgent(ua)
+
+ua = this.userAgent = ua.toLowerCase();
+
+this.isOpera = ua.indexOf("opera") > -1;
+this.isWebkit = (/webkit|khtml/).test(ua);
+this.isSafari = (/safari/).test(ua);
+this.isChrome = (/chrome/).test(ua);
+this.isGecko = !this.isSafari && ua.indexOf("gecko") > -1;
+
+this.isIE = ua.indexOf("msie") > -1;
+this.isIE6 = ua.indexOf("msie 6") > -1;
+this.isIE7 = ua.indexOf("msie 7") > -1;
+this.isIE8 = ua.indexOf("msie 8") > -1;
+this.isIE9 = ua.indexOf("msie 9") > -1;
+this.isIE10 = ua.indexOf("msie 10") > -1;
+this.isTrident = ua.indexOf("trident")>-1;
+
+this.isFirefox = ua.indexOf("firefox") > -1;
+this.isFirefox3 = ua.indexOf("firefox/3") > -1;
+this.isFirefox4 = ua.indexOf("firefox/4") > -1;
+this.isFirefox5 = ua.indexOf("firefox/5") > -1;
+this.isFirefox6 = ua.indexOf("firefox/6") > -1;
+this.isFirefox7 = ua.indexOf("firefox/7") > -1;
+
+this.fireFoxVersion = function(){
+	if(!this.isFirefox)
+		return 0;
+		
+	var e = /firefox\/(\d+)/g
+	var v = e.exec(ua);
+	if(v && v.length && v.length>1)
+		return v[1];
+	else return 0;
+}
+
+this.IEVersion = function(){
+	if(this.isIE){
+		var e = /msie (\d+)/g
+		var v = e.exec(ua);
+		if(v && v.length && v.length>1)
+			return Number(v[1]);
+		else return 0;
+	}
+	else if(this.isTrident){
+		var e = /rv:(\d+)/g
+		var v = e.exec(ua);
+		if(v && v.length && v.length>1)
+			return Number(v[1]);
+		else return 0;
+	}
+	else return 0;
+}
+
+this.isIPhone = ua.indexOf("iphone") > -1;
+this.isIPad = ua.indexOf("ipad") > -1;
+this.isAndroid = ua.indexOf('android') > -1;
+
+this.isMobile = (this.isIPhone||this.isIPad||this.isAndroid);
+
+this.HTML5FileUploadsSupported = (ua.indexOf("firefox/3.6")>=0 || this.fireFoxVersion()>=4 || (this.isWebkit&&!this.isMobile) || this.IEVersion()>=10)
+
+this.HTML5DragDropSupported = (this.fireFoxVersion()>16 || this.isWebkit)
+
