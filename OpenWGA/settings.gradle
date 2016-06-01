@@ -36,6 +36,10 @@ project(":plugin-admin").projectDir = file("plugins/admin")
 include ":plugin-cm"
 project(":plugin-cm").projectDir = file("plugins/cm")
 
+include ":plugin-cmm"
+project(":plugin-cmm").projectDir = file("plugins/cm-modules")
+
+
 include ":plugin-additional-script-langs"
 project(":plugin-additional-script-langs").projectDir = file("plugins/additional-script-langs")
 

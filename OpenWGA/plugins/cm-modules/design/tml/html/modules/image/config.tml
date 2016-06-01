@@ -1,0 +1,12 @@
+{
+	id:				'cm_image',
+	category:		'<tml:label key="module.category.media"/>',
+	title:			'<tml:label key="image-poster"/>',
+	tml:			'modules:image:render',
+	settingstml: 	'modules:image:setting',
+	icon:			'<tml:url db="plugin-wga-app-framework" type="file" doc="icons@base" file="picture.png"/>',
+	includes: {
+		jquery_plugins: ["lightbox"],
+		css: 			'modules:image:css'
+	}
+}

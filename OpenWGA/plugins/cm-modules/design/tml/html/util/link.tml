@@ -1,0 +1,9 @@
+<a href="<tml:url/>" 
+	<tml:case isfilled="$mc.wgakey">data-wgakey="<tml:item name="$mc.wgakey"/>"</tml:case> 
+	<tml:case isfilled="$mc.linkTitle">
+		title="<tml:item name="$mc.linkTitle"/>"
+	</tml:case>
+	<tml:case isfilled="$mc.linkTarget">
+		target="<tml:item name="$mc.linkTarget"/>"
+	</tml:case>
+><tml:item name="$mc.linkBody" encode="none"/></a>

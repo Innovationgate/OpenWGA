@@ -1,0 +1,138 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+/*
+ * Must be called in context of the document that wants to render cm-modules
+ */
+
+var modules = [];
+
+this.init = function(){
+	
+	//console.log("modules.init", TITLE);
+	var s = CMM.getExtensionData(CMM.getModulesSource(), "content-modules")||"{}";
+	
+	eval("var json="+s);
+	
+	var xml = AFW.Util.parseXML("<modules/>");
+	
+	function addModules(xml, mods){
+		for(var i=0; i<mods.length; i++){
+			var mod = mods[i];
+			var children = mod.children;
+			mod.children = null;
+			var el = xml.addElement("mod", mod);
+			if(children)
+				addModules(el, children);
+		}		
+	}
+
+	for(var section in json){
+		var s = xml.addElement("section", {id:section});
+		addModules(s, json[section]);
+	}
+	
+	this.module_structure_xml = xml;
+	
+	modules = CMM.getModuleDefs();
+}
+
+this.getModuleDefs = function(){
+	return modules;
+}
+
+this.getModuleIdList = function(){
+	var ids = WGA.createList();
+	for (var i=0; i < modules.length; i++) {
+		ids.add(modules[i].id) 
+	}
+	return ids;
+}
+
+this.findModuleConfig = function(id_or_node){
+	var id;
+	if(typeof(id_or_node) == "string")
+		id = id_or_node;
+	else {
+		// No String, must be a DOM4J Node
+		id = id_or_node.selectSingleNode("@module_id").getText();
+	}
+
+	for (var i=0; i < modules.length; i++) {
+		if (modules[i].id==id || modules[i].id_alias==id) 
+			return modules[i];	
+	}
+	return null;
+}
+
+this.getIncludes = function(type){
+	var includes = createlookuptable();
+	var findModuleConfig = this.findModuleConfig;	// used inside callback
+	
+	function addInclude(id){
+		var config = findModuleConfig(id);
+		if(!config)
+			return log.info("module " + id + " not found used in " + path);
+		if(config && config.includes && config.includes[type]){
+			var tmls=config.includes[type]
+			if(!(tmls instanceof Array))
+				tmls = [tmls]
+			for(var i=0; i<tmls.length; i++){			
+				var tml=tmls[i];
+				var a = tml.split("/");
+				var key, designdb;
+				if(a[1]){	// complete path
+					key = tml;
+					designdb = a[0];
+					tml = a[1];
+				}
+				else {
+					key = config.designdb + "/" + tml;
+					designdb = config.designdb;
+				}
+				
+				includes.put(key, {
+					tml: tml,
+					designdb: designdb
+				});
+			}			
+		}
+	}
+	
+	this.module_structure_xml.forEachElement("//mod", function(mod){
+		if(mod.attributes.id){
+			addInclude(mod.attributes.module_id)
+		}
+	})
+	
+	if(cm_static_modules /* stored in session var */){
+		var mods = cm_static_modules.iterator();
+		while(mods.hasNext())
+			addInclude(mods.next())
+	}
+	
+	return includes.values();
+}
+

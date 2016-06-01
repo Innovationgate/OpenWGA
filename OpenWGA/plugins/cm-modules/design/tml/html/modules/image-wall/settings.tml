@@ -1,0 +1,18 @@
+<label><tml:label key="module.image-wall.images-per-line"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:images_per_row}" default="4" type="number" mode="{option:mode}"/>
+</div>
+
+<label><tml:label key="module.image-wall.settings.show-images-in-lightbox"/></label>
+<div style="margin:10px">
+	<tml:input name="{scoped:lightbox}" type="boolean" default="true" mode="{option:mode}"
+		changeaction="$refresh"
+	/>
+</div>
+
+<label><tml:label key="module.image-wall.settings.lightbox.show-download"/></label>
+<tml:case condition="tmlform.field(WGA.scoped('lightbox'))">
+	<div style="margin:10px">
+		<tml:input name="{scoped:download}" type="boolean" default="false" mode="{option:mode}"/>
+	</div>
+</tml:case>

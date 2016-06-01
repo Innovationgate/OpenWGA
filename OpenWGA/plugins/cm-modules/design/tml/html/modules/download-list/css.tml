@@ -1,0 +1,63 @@
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_download-list">
+
+	".download": {
+	
+		padding: "5px 0 5px 25px",
+	
+		"&.caption": {
+			border_bottom: "solid silver 1px"
+		},
+				
+		".filename": {
+			"float": "left"
+		},
+		
+		".filesize": {
+			"float": "right",
+			text_align: "right"
+		}
+
+	},
+	
+	".module-cm_download-list-file":{
+		border_bottom: "dotted silver 1px",
+		a: {
+			display: "block",
+			text_decoration: "none",
+	
+			"&:hover":{
+				background_color: "#efefef"
+			},
+
+			background: "url(<tml:url type="file" db="@afw" doc="icons" file="page_white.png"/>) no-repeat left center",
+			"&.doc": {
+				background_image: "url(<tml:url type="file" db="@afw" doc="icons" file="page_white_word.png"/>)"
+			},
+			"&.ppt": {
+				background_image: "url(<tml:url type="file" db="@afw" doc="icons" file="page_white_word.powerpoint"/>)"
+			},
+			"&.xls": {
+				background_image: "url(<tml:url type="file" db="@afw" doc="icons" file="page_white_excel.png"/>)"
+			},
+			"&.pdf": {
+				background_image: "url(<tml:url type="file" db="@afw" doc="icons" file="page_white_acrobat.png"/>)"
+			},
+			"&.zip": {
+				background_image: "url(<tml:url type="file" db="@afw" doc="icons" file="page_white_zip.png"/>)"
+			},
+			"&.webm,&.mp4,&.mov,&.mv4": {
+				background_image: "url(<tml:url type="file" db="@afw" doc="icons" file="film.png"/>)"
+			},
+			"&.jpg,&.gif,&.png": {
+				background_image: "url(<tml:url type="file" db="@afw" doc="icons" file="page_white_picture.png"/>)"
+			},
+			"&.no-file": {
+				background_image: "url(<tml:url type="file" db="@afw" doc="icons" file="error.png"/>)"
+			}
+
+		}
+
+	}
+
+
+</tml:include>

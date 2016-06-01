@@ -1,0 +1,68 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="vote" ajax="true" master="true">
+	function vote() {
+		var ns = tmlparam2;
+		var rate = Number(tmlparam1);
+		var savedVotes = content().getItemValue('votes') || 0;
+		var newVote = savedVotes + rate;
+		var listVoter = content().getItemValueList('voter');
+		listVoter.add(profile.meta("name"));
+		content().setItemValue('voter', listVoter);
+		content().setItemValue('votes', newVote);
+		content().save();
+	}
+	synchronizedFunction(vote)();
+</tml:action>
+
+<tml:case condition="itemList('voter').size()">
+	<tml:include ref="::mode-view"/>
+</tml:case>
+
+<div>
+	<div class="headline"><tml:label key="vote.your-vote"/>:</div>
+	<div class="voting_bar_vote">
+		<ul>
+			<tml:foreach type="loop" count="5" currentvalue="c">
+			  	<li><a href="<tml:url type="action" action="vote" ajax="true" param1="{c}" param2="{_ns}"/>"></a></li>
+		  	</tml:foreach>
+		</ul>		
+	</div>
+</div>
+
+<script>
+	require(["jquery"], function(){
+		
+		$("#module-<tml:option name="ns"/> .voting_bar_vote li").on({
+			"mouseover": function(){
+				$(this).prevAll().andSelf().find("a").addClass("vote_active");
+			},
+			mouseout: function(){
+				$(this).prevAll().andSelf().find("a").removeClass("vote_active");
+			}
+		})
+		
+	})
+</script>

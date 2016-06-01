@@ -1,0 +1,57 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<div class="modal-popup <tml:script expression="CMM.setting('layout')||'overlay'"/>" id="<tml:[setting] o_name="id"/>">
+	<tml:if condition="CMM.setting('layout')=='dialog'">
+		<tml:then>
+			<div class="header">
+				<tml:option name="title"/>
+				<a data-modal="hide" title="<tml:label key="close"/>">&times;</a>
+			</div>
+		</tml:then>
+		<tml:else>
+			<a class="close" title="<tml:label key="close"/>"></a>
+		</tml:else>
+	</tml:if>
+	<div class="content inner-overlay">
+		<tml:include ref="system:include-child-modules">
+			<tml:option name="margins" expression="true" scope="local"/>
+		</tml:include>		
+	</div>
+	
+	<tml:case condition="CMM.setting('layout')=='dialog'">
+		<div class="footer">
+			<button class="btn" data-modal="hide"><tml:label key="close"/>
+		</div>
+	</tml:case>
+	
+</div>
+<script>
+	require(["jquery", "jquery-modal"], function(){
+		$("a[href='#<tml:[setting] o_name="id"/>']").not(".WGA-Item-Value-Unencoded a").wga_modal({
+			width: <tml:[setting] o_name="width" o_default="600"/>
+		});
+	})
+</script>

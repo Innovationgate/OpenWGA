@@ -1,0 +1,2 @@
+
+<tml:portlet name="cm-modules-comments" ref="::portlet-comments" ajax="true"/>

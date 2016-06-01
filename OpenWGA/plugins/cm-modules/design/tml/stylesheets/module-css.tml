@@ -1,0 +1,40 @@
+<tml:script>
+	_css_tml = option("tml")
+	_css_tml_designdb = option("designdb")
+	var parts = _css_tml.split("/");
+	if(parts.length>1){
+		_css_tml_designdb = parts[0];
+		_css_tml = parts[1];
+	}
+	_responsive = WGA.design(db()).getGlobal("RESPONSIVE")
+	//console.log("include-module-css _responsive", _responsive);
+</tml:script>
+
+<tml:include designdb="{_css_tml_designdb}" ref="{_css_tml}" medium="html"/>
+
+<tml:case condition="_responsive">
+	<tml:script>
+		_small_css = db(_css_tml_designdb).getTMLModule(_css_tml+"-small", "html");
+	</tml:script>
+	<tml:case condition="_small_css">
+		@media screen and (max-width: <tml:script format="0" expression="_responsive.medium.width-1"/>px) {
+			<tml:include designdb="{_css_tml_designdb}" ref="{_small_css.getName()}" medium="html"/>
+		}
+	</tml:case>
+	<tml:script>
+		_medium_css = db(_css_tml_designdb).getTMLModule(_css_tml+"-medium", "html");
+	</tml:script>
+	<tml:case condition="_medium_css">
+		@media screen and (max-width: <tml:script format="0" expression="_responsive.large.width-1"/>px) {
+			<tml:include designdb="{_css_tml_designdb}" ref="{_medium_css.getName()}" medium="html"/>
+		}
+	</tml:case>
+	<tml:comment><tml:script>
+		_large_css = db(_css_tml_designdb).getTMLModule(_css_tml+"-large", "html");
+	</tml:script>
+	<tml:case condition="_large_css">
+		@media screen and (min-width: <tml:script format="0" expression="_responsive.large.width"/>px) {
+			<tml:include designdb="{_css_tml_designdb}" ref="{_large_css.getName()}" medium="html"/>
+		}
+	</tml:case></tml:comment>
+</tml:case>

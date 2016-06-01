@@ -1,0 +1,3 @@
+<div style="margin:10px">
+	<tml:input name="{scoped:expand_first}" type="boolean" options="Ersten Abschnitt anzeigen|true" default="false" mode="{option('mode')}"/>
+</div>

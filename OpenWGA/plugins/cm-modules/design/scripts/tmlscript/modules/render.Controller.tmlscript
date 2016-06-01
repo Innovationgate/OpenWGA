@@ -1,0 +1,83 @@
+function Controller(){
+	//console.log("render.Controller");
+}
+
+Controller.prototype.prepare = function($option_section, $cx, CMM){
+	this.section = $option_section || "content";
+	this.mods = CMM.getContentModulesAsXML($cx.content()).selectNodes("/modules/section[@id='"+this.section+"']/mod");
+}.nonIsolated();
+
+Controller.prototype.allowedModulesString = function($cx, CMM){
+	var mods = false;
+	if($cx.option("modules")){
+		var mods = $cx.option("modules").split(/\s*,\s*/);
+		return JSON.stringify(mods)
+	}
+	else if($cx.option("exclude-modules")){
+		var mods = [];
+		var exclude = $cx.option("exclude-modules").split(/\s*,\s*/);		
+		var modules = CMM.getModuleDefs()
+		for (var i=0; i < modules.length; i++) {
+			var id = modules[i].id
+			if(exclude.indexOf(id)<0)
+				mods.push(id)
+		}
+		
+		return JSON.stringify(mods)
+	}
+	else return "true"
+}.nonIsolated();
+
+Controller.prototype.mayEdit = function(AFW) {
+	var Content = AFW.content();
+	return Content.isDraft() && Content.isMine()
+}.nonIsolated();
+
+Controller.prototype.cssCode = function(css){
+	var ret = css || "";
+	return ret.replace(/\n/g, "").replace(/"/g, "'");
+}
+
+
+Controller.prototype.addImageModule = function(
+		$urlParam_section, 
+		$urlParam_filename, 
+		$urlParam_dbkey,
+		$urlParam_container,
+		$cx,
+		CMM
+	){
+	
+	var section = $urlParam_section;
+	
+	var scope = WGA.scoped("cm_image", String(new Date().getTime()));
+	var mods = CMM.getContentModulesAsJson($cx.content())
+	
+	mods[section] = [{
+		id: scope,
+		title: "Image",
+		module_id: "cm_image",
+		children: []
+	}]
+	CMM.writeContentModulesData(JSON.stringify(mods), $cx.content());
+
+	var filename = $urlParam_filename;
+	var dbkey = $urlParam_dbkey
+	var container = $urlParam_container
+
+	var map = CMM.getModulesSettingsMap("document")
+
+	map.put(WGA.scoped("image", scope), filename);
+	map.put(WGA.scoped("image_mo", scope), "");
+	map.put(WGA.scoped("lightbox_image", scope), "");
+	map.put(WGA.scoped("dbkey", scope), dbkey);
+	map.put(WGA.scoped("sourcedoc", scope), container);
+	map.put(WGA.scoped("source", scope), (dbkey||container) ? "container" : "");
+	map.put(WGA.scoped("setting_source", scope), "document");
+
+	CMM.writeContentModulesSettingsData(map, $cx.content());
+	
+	$cx.content().save();
+	console.log("add image module", section, filename);
+	
+}.nonIsolated();

@@ -1,0 +1,73 @@
+<tml:action id="moveElement">
+	//log.info("moved " + tmlform.mod_id + "/" + tmlform.left);
+	var settings = CMM.getExtensionData(content(), "content-modules-settings")
+	var key = "top_"+tmlform.mod_id;
+	settings.put(key, WGA.createList([tmlform.top]));
+	var key = "left_"+tmlform.mod_id;
+	settings.put(key, WGA.createList([tmlform.left]));
+
+	CMM.writeExtensionData(content(), "content-modules-settings", settings)
+	content().save();
+</tml:action>
+
+<tml:action id="resizeElement">
+	//log.info("resized " + tmlform.mod_id);
+	var settings = CMM.getExtensionData(content(), "content-modules-settings")
+	var key = "width_"+tmlform.mod_id;
+	settings.put(key, WGA.createList([tmlform.width]));
+	var key = "height_"+tmlform.mod_id;
+	settings.put(key, WGA.createList([tmlform.height]));
+
+	CMM.writeExtensionData(content(), "content-modules-settings", settings)
+	content().save();
+</tml:action>
+
+<tml:form id="form-drag-drop">
+
+	<tml:input name="mod_id" type="hidden"/>
+	<tml:input name="top" type="hidden"/>
+	<tml:input name="left" type="hidden"/>
+	<tml:input name="width" type="hidden"/>
+	<tml:input name="height" type="hidden"/>
+
+	<script>
+		require(["jquery", "jquery-ui-js/resizable", "jquery-ui-js/draggable", "css!jquery-ui-css"], function(){ 
+			$(".content-modules .drag-drop-box.resizeable").resizable({
+				autoHide: true,
+				handles: "e",
+				
+				stop: function(event, ui){				
+					//console.log("resize", ui);
+					$(this).height("auto");
+					var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+					form.width.value = ui.size.width;
+					form.height.value = ui.size.height;
+					form.mod_id.value = $(this).parent().attr("id").substr(7)
+					WGA.ajax.action({
+						action: "<tml:action ajax="norefresh" ref="resizeElement"/>",
+						id: "<tml:script expression="portlet.portletkey"/>",
+						mode: "norefresh",
+						graydiv: false
+					})
+				}
+			});
+			$(".content-modules .drag-drop-box.draggable").draggable({
+				delay: 100,
+				stop: function(event, ui) {
+					var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+					form.top.value = ui.position.top;
+					form.left.value = ui.position.left
+					form.mod_id.value = $(this).parent().attr("id").substr(7);
+					//console.log("drop", form.mod_id.value, ui);
+					
+					WGA.ajax.action({
+						action: "<tml:action ajax="norefresh" ref="moveElement"/>",
+						id: "<tml:script expression="portlet.portletkey"/>",
+						mode: "norefresh",
+						graydiv: false
+					})
+				}
+			})
+		})
+	</script>
+</tml:form>

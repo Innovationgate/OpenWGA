@@ -1,0 +1,57 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_mods = option("child-modules");
+</tml:script>
+
+<div style="margin-bottom: 10px">
+	<ul class="tabs <tml:[setting] o_name="layout"/> clearfix">
+		<tml:foreach type="itemvalue" item="_mods" currentvalue="_mod">
+			<li>
+				<a href="#"><tml:item name="_mod" xpath="@title"/></a>
+			</li>	
+		</tml:foreach>
+	</ul>	
+	<div class="panes">
+		<tml:include ref="system:include-child-modules">
+			<tml:option name="margins" expression="false" scope="local"/>
+			<tml:option name="module-class" expression="'pane'" scope="local"/>
+		</tml:include>
+	</div>
+</div>
+
+<script>
+	require(["jquery"], function() {
+		$("#module-<tml:option name="ns"/> .tabs a").click(function(ev){
+			ev.preventDefault();
+			$("#module-<tml:option name="ns"/> .tabs a").removeClass("current");
+			$(this).addClass("current");
+			var index = $("#module-<tml:option name="ns"/> .tabs li a").index(this);
+			$("#module-<tml:option name="ns"/> .pane").hide().eq(index).show();
+		})
+		$("#module-<tml:option name="ns"/> .tabs a").first().addClass("current");
+		$("#module-<tml:option name="ns"/> .pane").first().show();
+	});
+</script>

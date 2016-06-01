@@ -1,0 +1,106 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="submitSurvey">
+
+	if(!tmlform.answer)
+		return tmlform.addMessage(label('survey.validation.please-select-value'))
+
+	var id = CMM.setting("id")||WGA.scoped("survey");
+	
+	WGA.Master.runFunction(function(id, dbkey, profile_id){
+		log.info("saving answer " + tmlform.fieldList("answer") + " to survey '" + id + "' in db '" + dbkey + "' for profile " + profile_id);
+		var hdb = WGA.hdb(dbkey);
+		var root = hdb.getOrCreateStorage("surveys");
+		var survey = hdb.getOrCreateStorage(root, id)
+		var answers = survey.getItemValue("answers")||WGA.createLookupTable();
+		var s_answers = tmlform.fieldlist("answer").iterator();
+		while(s_answers.hasNext()){
+			var s_a = s_answers.next();
+			var value = answers.get(s_a)||0;
+			answers.put(s_a, value+1);		
+		}
+		survey.setItemValue("answers", answers);
+
+		var users = survey.getItemValueList("users");
+		users.add(profile_id);
+		survey.setItemValue("users", users);
+
+		var votes = survey.getItemValue("votes")||0;
+		votes += tmlform.fieldlist("answer").size();
+		survey.setItemValue("votes", votes);
+
+		survey.save();
+	}, id, CMM.setting('dbkey') || db().getDbReference(), profile.meta("name"))
+
+</tml:action>
+
+<tml:action id="removeSurvey">
+	var id = CMM.setting("id")||WGA.scoped("survey");
+	WGA.Master.runFunction(function(id, dbkey){
+		var hdb = WGA.hdb(dbkey);
+		var survey = hdb.getStorage("surveys."+id)
+		if(survey){
+			survey.getStructEntry().remove();
+			log.info("survey removed from db " + dbkey);
+		}
+		else log.info("unable to find survey '" + id + "' in db " + dbkey);
+	}, id, CMM.setting('dbkey') || db().getDbReference());
+</tml:action>
+
+<tml:form id="{scoped:survey-form}" source="none">
+	<div class="answers">
+		<tml:input type="{CMM.setting('multiple')?'checkbox':'radio'}" name="answer" labeled="true" options="{CMM.settingList('answers')}"/>
+	</div>
+	<tml:case condition="tmlform.hasmessages()">
+		<div class="messages">
+			<tml:formmessages divider="<br>"/>
+		</div>
+	</tml:case>
+	<div class="buttons">
+		<tml:button clickaction="submitSurvey" ajax="true" cssclass="btn">
+			<tml:[setting] o_name="submit-button-text"/>
+		</tml:button>
+	</div>	
+</tml:form>
+
+<tml:script>
+	var dbkey = CMM.setting('dbkey') || db().getDbReference();
+	var id = CMM.setting("id")||WGA.scoped("survey");
+	_hasAnswers = context("db:"+dbkey+"/name:surveys."+id, false);
+</tml:script>
+
+<tml:case condition="STATUS==content().STATUS_DRAFT && _hasAnswers">
+
+	<hr size="1">
+	<tml:label key="survey.settings.current-result"/>:
+	<br>
+	<tml:include ref="::mode-result"/>
+	<br>
+	<tml:button clickaction="removeSurvey" ajax="true" cssclass="btn">
+		<tml:label key="survey.remove"/>
+	</tml:button>
+
+</tml:case>

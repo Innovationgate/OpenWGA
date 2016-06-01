@@ -1,0 +1,31 @@
+<tml:action id="resetPosition">
+	tmlform.setField(WGA.scoped("top"), 0)
+	tmlform.setField(WGA.scoped("left"), 0)
+	tmlform.setField(WGA.scoped("width"), 300);
+</tml:action>
+
+<label><tml:label key="drag-drop-box.settings.options"/>:</label>
+<div style="margin:10px">
+	<tml:script>
+		var fieldname = WGA.scoped("options");
+		if(!tmlform.field(fieldname))
+			tmlform.setfield(fieldname, WGA.createList(["draggable", "resizeable"]))
+	</tml:script>
+	<tml:input name="{scoped:options}" type="checkbox" options="{label('drag-drop-box.settings.options.options')}" mode="{option('mode')}"/>
+</div>
+
+<label><tml:label key="drag-drop-box.settings.z-index"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:zindex}" type="number" default="1" mode="{option('mode')}"/>
+</div>
+
+
+<tml:input name="{scoped:top}" type="hidden"/>
+<tml:input name="{scoped:left}" type="hidden"/>
+<tml:input name="{scoped:width}" type="hidden"/>
+
+<tml:case condition="STATUS==content().STATUS_DRAFT">
+	<div style="margin:10px">
+		<tml:button clickaction="resetPosition" ajax="true"><tml:label key="drag-drop-box.settings.reset-position"/></tml:button>
+	</div>
+</tml:case>

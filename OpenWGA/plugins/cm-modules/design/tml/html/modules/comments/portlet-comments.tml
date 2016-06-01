@@ -1,0 +1,173 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="createComment" master="true">
+	if(!tmlform.validate())
+		return;
+	var root = hdb().getOrCreateStorage("comments")
+	var s = hdb().getOrCreateStorage(root, tmlparam1)
+	var doc = hdb().createContent(s, tmlform.email)
+	tmlform.storeincontent(doc);
+	tmlform.reset();
+	log.info("comment created for document '" + tmlparam2 + "'.");
+</tml:action>
+
+<tml:action id="deleteComment" master="true">
+	content().getStructEntry().remove();
+</tml:action>
+
+<tml:script>
+	_structkey=STRUCTKEY;
+	_title=TITLE;
+	_isDraft = STATUS==content().STATUS_DRAFT;
+	_dbkey = CMM.setting("dbkey") || meta("db", "dbkey");
+</tml:script>
+
+<tml:if context="[db:{_dbkey}]" iscontextvalid="true">
+	<tml:then>
+		<div class="comments">
+			<div class="headline"><tml:label key="comments.title"/>:</div>
+			<tml:if context="[name:comments.{_structkey}]" iscontextvalid="true" haschildren="true">
+				<tml:then>
+					<tml:children sortexpression="CREATED" sortorder="ascending">
+						<div class="box comment">
+							<tml:case istrue="_isDraft">
+								<div align="right">
+									<tml:button clickaction="deleteComment" ajax="true"><tml:label key="comments.delete"/></tml:button>
+								</div>
+							</tml:case>
+							<div class="what">
+								<quote><tml:item name="body" encode="html"/></quote>
+							</div>
+							<div class="who">
+								<tml:item name="username" encode="html"/>
+								<tml:case condition="_isDraft">
+									(<tml:item name="email" encode="html"/>)
+								</tml:case>
+								-
+								<tml:script>
+									var ms = createdate().time - CREATED.time;
+									var minutes = ms/(1000*60);
+									if(minutes<1)
+										return label("time.less-then-one-minute-ago");
+									if(minutes<2)
+										return label("time.one-minute-ago");
+									if(minutes<60)
+										return label("time.minutes-ago", createlist([format(minutes, "0")]));
+									else{
+										var houres = minutes/60;
+										if(houres<1)
+											return label("time.less-then-one-hour-ago");
+										if(houres<2)
+											return label("time.one-hour-ago");
+										if(houres<24)
+											return label("time.hours-ago", createlist([format(houres, "0")]));
+										else {
+											var days = houres/24; 
+											if(days<2)
+												return label("time.one-day-ago");
+											return label("time.days-ago", createlist([format(days, "0")]));
+										}
+									}
+								</tml:script>
+							</div>
+						</div>
+					</tml:children>
+				</tml:then>
+				<tml:else>
+					<tml:label key="comments.no-comments"/>
+				</tml:else>
+			</tml:if>
+		</div>
+		
+		<div class="headline comment-form-headline"><tml:label key="comments.your-comment"/>:</div>
+		<div class="box form">
+			<tml:form id="comments-form" source="none">
+				<tml:case condition="tmlform.hasmessages()">
+					<div class="formmessages">
+						<div class="headline"><tml:label key="comments.validation-error-title"/>:</div>
+						<ul>
+							<li><tml:formmessages divider="</li><li>"/></li>
+						</ul>
+					</div>
+				</tml:case>
+				
+				<tml:if condition="meta('db', 'username')=='anonymous'">
+					<tml:then>
+						<label><tml:label key="comments.label.name"/>:</label>
+						<tml:input name="username" type="text" cssstyle="width:100%;"
+							validation="$E_VALUE!=''"
+							message="{label('comments.validation.please-enter-name')}"
+						/>
+						<label><tml:label key="comments.label.mail"/>:</label>
+						<tml:input name="email" type="text" cssstyle="width:100%;"
+							validation="AFW.Util.validate.mailAddress($E_VALUE)"
+							message="{label('comments.validation.please-enter-mail-address')}"
+						/>
+						<label><tml:label key="comments.label.comment"/>:</label>
+					</tml:then>
+					<tml:else>
+						<tml:input name="username" type="hidden" default="{meta('db', 'username')}"/>
+						<tml:input name="email" type="hidden" default="{meta('db', 'useremail')}"/>
+					</tml:else>
+				</tml:if>
+				
+				<div style="margin-right:13px">
+					<tml:comment><tml:input name="body" type="textarea" cssstyle="width:100%;overflow:hidden"
+						validation="$E_VALUE.replace(/[\n\r]/g, '')!=''"
+						message="{label('comments.validation.please-enter-comment')}"
+					>
+						rows="<tml:script expression="tmlform.body ? tmlform.body.split('\n').length+1 : 2"/>"
+						onkeyup="this.rows=this.value.split('\n').length+1"
+					</tml:input></tml:comment>
+					
+					<tml:input name="body" type="textarea" cssstyle="width:100%;overflow:hidden"
+						validation="$E_VALUE.replace(/[\n\r]/g, '')!=''"
+						message="{label('comments.validation.please-enter-comment')}"
+					/>
+					
+					<script>
+						require(["jquery", "jquery-textarea-autogrow"], function(){
+							$("#module-<tml:option name="ns"/> textarea").autogrow()
+						})						
+					</script>
+					
+					
+				</div>
+				<div class="buttons">
+					<tml:button cssclass="btn" clickaction="createComment" param1="{_structkey}" param2="{_title}" ajax="true"><tml:label key="submit"/></tml:button>
+				</div>
+				<tml:case condition="tmlform.hasmessages()">
+					<script>document.getElementById("comments-form").scrollIntoView(true)</script>
+				</tml:case>
+			</tml:form>
+		</div>
+		
+	</tml:then>
+	
+	<tml:else>
+		<h1 style="color:red">Unable to find comments database with key '<tml:[setting] o_name="dbkey"/>'</h1>
+	</tml:else>
+	
+</tml:if>

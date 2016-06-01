@@ -1,0 +1,110 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="resetPage">
+	tmlform.processcontext.put('page', 1)
+</tml:action>
+
+<tml:form id="searchresult-query-form" onsubmit="CMM_search();return false">
+
+	<tml:script>
+		tmlform.query = request.getParameter("query");
+		_search_opts_default = CMM.setting('search_attachments')===true ? "all" : "content"
+	</tml:script>
+
+	<tml:case condition="tmlform.query">
+		<tml:collection id="lucene-search">
+			<tml:query type="lucene" highlight="true" options="[doctype:{portlet.doctypefilter || _search_opts_default}]" id="lucene-query">
+				(<tml:item name="query" type="tmlform" encode="none"/>)
+				<tml:case condition="CMM.setting('restrict_to_area')" context="[docid:{CMM.setting('rootcontext')}]" iscontextvalid="true">
+					AND AREA:"<tml:metadata name="area"/>"
+				</tml:case>
+				<tml:case condition="CMM.setting('condition')">
+					AND (<tml:script expression="CMM.setting('condition')"/>)
+				</tml:case>
+			</tml:query>
+		</tml:collection>
+	</tml:case>
+	
+	<script>
+		function CMM_search(){
+			WGA.ajax.callAction('<tml:action ref="resetPage"/>', '<tml:script expression="portlet.portletkey"/>')
+		}
+	</script>
+	<div class="clearfix">
+
+		<div class="col-right">
+			<div class="filter">
+				<tml:include ref="::filter"/>
+			</div>
+		</div>
+
+		<div class="col-left">
+			<div class="inner">
+				<div class="search-input search-header input-append">
+					<tml:input type="text" name="query"/>
+					<tml:comment><tml:button clickaction="resetPage" ajax="true" cssclass="btn">
+						<i class="icon icon-search"></i>
+						<tml:label key="search.find"/>
+					</tml:button></tml:comment>
+					<button class="btn" id="search-button">
+						<i class="icon icon-search"></i>
+						<tml:label key="search.find"/>
+					</button>
+					<tml:script>
+						var info = request.getAttribute(Packages.de.innovationgate.wgpublisher.log.WGARequestInformation.REQUEST_ATTRIBUTENAME);
+						if(tmlform.query && info)
+							info.setClassID("Search for: " + tmlform.query);
+					</tml:script>
+					<script>
+						require(["jquery"], function(){
+							$(function(){
+								var el = document.forms['searchresult-query-form'].elements['query'];
+								el.focus();
+								el.selectionStart = el.selectionEnd = el.value.length;
+								$("#search-button").click(function(){
+									window.history.pushState && window.history.pushState(el.value, null, "<tml:url/>?query="+el.value);
+									WGA.ajax.callAction("<tml:action ref="resetPage"/>");
+								})
+								if(window.history.pushState){				
+									window.onpopstate = function(event){
+										el.value = history.state||event.state;
+										WGA.ajax.callAction("<tml:action ref="resetPage"/>");
+									}
+								}
+							})
+						})
+					</script>
+				</div>
+				<div class="search-collection">
+					<div class="results">
+						<tml:comment><div class="error"><tml:taginfo name="error" sourcetag="lucene-query"/></div></tml:comment>
+						<tml:include ref="::results"/>
+					</div>
+				</div>					
+			</div>
+		</div>
+	</div>
+	
+</tml:form>

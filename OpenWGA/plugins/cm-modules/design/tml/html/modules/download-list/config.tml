@@ -1,0 +1,23 @@
+{
+	id:				'cm_download-list',
+	title:			'<tml:label key="module.download-list"/>',
+	category:		'<tml:label key="module.category.collections"/>',
+	type:			'container',
+	tml:			'modules:download-list:render',
+	allowedchildren: ["cm_download-list-file"],
+	icon:			'<tml:url db="@afw" type="file" doc="icons" file="page_white_copy.png"/>',
+	includes: {
+		css:		"modules:download-list:css"
+	}	
+},
+{
+	id:				'cm_download-list-file',
+	title:			'<tml:label key="module.download-list-file"/>',
+	icon:			'<tml:url db="@afw" type="file" doc="icons" file="attach.png"/>',
+	tml:			'modules:download-list:render-file',
+	settingstml: 	'modules:download-list:settings-file',
+	allowedparents: ["cm_download-list"],
+	includes: {
+		jquery_plugins: ["wga-drophandler"]
+	}
+}

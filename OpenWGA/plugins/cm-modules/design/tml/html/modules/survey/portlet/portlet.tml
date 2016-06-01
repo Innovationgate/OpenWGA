@@ -1,0 +1,52 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script output="false">
+
+	var dbkey = CMM.setting('dbkey') || db().getDbReference();
+	if(!db(dbkey)){
+		log.info("invalid dbkey: " + CMM.setting('dbkey')); 
+		return _dberror=true;
+	}
+	var id = CMM.setting("id")||WGA.scoped("survey");
+	var survey = context("db:"+dbkey+"/name:surveys."+id, false)
+	var users = survey ? survey.itemlist("users") : WGA.createList();
+
+	if(users.contains(profile.meta("name")) && STATUS!=content().STATUS_DRAFT)
+		portlet.setmode("result")		
+	else portlet.setmode("view")
+</tml:script>
+
+<tml:if istrue="_dberror">
+	<tml:then>
+		<h1 style="color:red">Unable to find survey database with key '<tml:[setting] o_name="dbkey"/>'</h1>
+	</tml:then>
+	<tml:else>
+		<div class="question">
+			<tml:[setting] o_name="question"/>
+		</div>
+		<tml:include ref="{'::mode-' + portlet.mode}"/>
+	</tml:else>
+</tml:if>

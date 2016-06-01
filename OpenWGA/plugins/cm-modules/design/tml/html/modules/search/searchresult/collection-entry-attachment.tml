@@ -1,0 +1,79 @@
+<tml:script>
+	_filename = content().getSearchDetails().getFilename()
+	_file_md = content().getFileMetaData(_filename)
+	_title = _file_md.title;
+</tml:script>
+
+<div class="entry attachment">
+
+	<h1 class="headline">
+		<a href="<tml:url type="file" file="{_filename}"/>" target="_blank" title="Datei in neuem Fenster öffnen ..."><tml:script expression="_filename"/></a>
+	</h1>
+	
+	<tml:script>
+		_pages=0;
+		if(WGA.selectDerivate(_filename, 'usage=preview')){
+			var pages = content().getFileMetaData(_filename).getCustomFieldValue("pageCount");
+			_pages = Math.min(pages, 10);
+		}
+	</tml:script>
+	<tml:case condition="_pages">
+		<div class="preview-popup"
+			data-page="1"
+			<tml:foreach count="{_pages}" currentvalue="_page">			
+				data-pageurl<tml:item name="_page"/>="<tml:url type="file" file="{_filename}" derivate="[usage=preview,page={_page},width~200]"/>"
+			</tml:foreach>
+		>
+			<div class="arrow"></div>
+			<a class="open-doc" href="<tml:url type="file" file="{_filename}"/>#page=1" target="_blank" title="<tml:label key="search.attachments.open-in-new-window"/>">
+				<img>
+			</a>
+			<div class="preview-nav clearfix">
+				<a href="#" title="<tml:label key="search.attachments.preview.prev-page"/>" class="prev">&larr;</a>
+				<a href="#" title="<tml:label key="search.attachments.preview.next-page"/>" class="next">&rarr;</a>
+				<div class="info"><span class="page">1</span>/<tml:item name="_pages"/></div>
+			</div>
+		</div>
+	</tml:case>
+	
+	<div class="clearfix">
+		<div class="attachment-poster">
+			<tml:if condition="WGA.selectDerivate(_filename, 'usage=poster')">
+				<tml:then>
+					<tml:if condition="_pages">
+						<tml:then>
+							<a class="preview-button" href="#" title="click to preview">
+								<tml:image file="{_filename}" derivate="usage=poster,width~100"/>
+							</a>
+						</tml:then>
+						<tml:else>
+							<tml:image file="{_filename}" derivate="usage=poster,width~100">
+								data-image-url="<tml:url type="file" file="{_filename}"/>"
+								data-image-title="<tml:script expression="_file_md.title || _filename"/>"
+							</tml:image>
+						</tml:else>
+					</tml:if>
+				</tml:then>
+				<tml:else>
+					<img src="<tml:script expression="AFW.content().attachment(_filename).getThumbnailURL()"/>">
+				</tml:else>
+			</tml:if>
+		</div>
+		<div class="attachment-body">
+			<tml:include ref="::attachment-result-body" o_preview="{_pages || VOID}" o-filemd="_file_md"/>
+		</div>
+	</div>
+	
+	<div class="path">
+		 <tml:navigator type="path"> &rsaquo; <tml:link html_data-wgakey="{KEY}"/></tml:navigator>
+	</div>
+
+	<tml:case if="$option_showmetas">
+		<div class="metas">
+			<div class="published"><tml:label key="search.published"/>: <tml:metadata name="published" format="{label('format.date.long-with-time')}"/></div>
+			<div class="author"><tml:label key="search.author"/>: <tml:metadata name="author"/></div>
+			<div class="relevance"><tml:label key="search.relevance"/>: <tml:script expression="Searchscore*100" format="0"/>%</div>
+		</div>
+	</tml:case>
+
+</div>

@@ -1,0 +1,156 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="refresh">
+	var ev = createevent("file-selected")
+	ev.addParameter("field", tmlparam1)
+	portlet.fireevent(ev)
+</tml:action>
+
+<tml:script>
+	_fieldname = WGA.scoped(option("fieldname")||"image");
+</tml:script>
+
+<tml:script>
+	var derivate = option("derivate");
+	var extensions=option("file-extensions");
+	var mimetype=option("mimetype");
+	var filenames = content().getFileNames();
+
+	if(derivate || extensions || mimetype){
+		_filenames = WGA.createList();
+		if(derivate && db().hasFeature(db().FEATURE_CONTENT_FILE_DERIVATES)){
+			for(var filename in Iterator(filenames)){
+				if(WGA.selectDerivate(filename, derivate))
+					_filenames.add(filename);
+			}
+		}
+		if(mimetype){
+			for(var filename in Iterator(filenames)){
+				var file_md = content().getFileMetaData(filename);
+				if(file_md.mimeType.indexOf(mimetype)==0 && !_filenames.contains(filename))
+					_filenames.add(filename);
+			}
+		}
+		if(extensions){
+			extensions += ",";
+			for(var filename in Iterator(filenames)){
+				var ext = filename.split(".").pop().toLowerCase() + ",";
+				if(extensions.indexOf(ext)>=0 && !_filenames.contains(filename))
+					_filenames.add(filename);
+			}
+		}
+	}
+	else _filenames = filenames;	// take it all
+	_filenames = WGA.sortList(_filenames);
+	_filenames.add(0, "");
+</tml:script>
+
+<div style="margin:10px">
+	<tml:input name="{_fieldname}" type="select" optionsitem="_filenames" mode="{option:mode}" cssstyle="width:265px"
+		
+	/>
+</div>
+
+<script>
+	require(["select2"], function(Select2){
+		var urls={
+			<tml:foreach item="_filenames" currentvalue="_image" filter="_image!=''">
+				<tml:script>
+					_fileurl = WGA.urlBuilder(tmlform.fileurl(_image))
+						.setParameter("maxwidth", 100)
+						.build();
+				</tml:script>
+				"<tml:item name="_image"/>": "<tml:item name="_fileurl"/>"<tml:between>,</tml:between>
+			</tml:foreach>
+		}
+		function format(state) {
+			if (!state.id)
+				return state.text;
+			return $('<div class="select2-img clearfix"><img src="' + urls[state.id] + '"><div class="title">' + state.text + '</div>');
+		}
+		$("#<tml:script expression="tmlform.formid"/> select[name=<tml:item name="_fieldname"/>]").select2({
+			placeholder: "<tml:script expression="option('placeholder') || label('none')"/>",
+			allowClear: true,
+			templateResult: format,
+			//templateSelection: format
+		}).on("change", function(){
+			console.log("change", this);
+			$(this).select2("destroy");
+			WGA.ajax.callAction('<tml:action ref="refresh" param1="{_fieldname}"/>')
+		})
+
+		<tml:comment>WGA.portlet.registerObject("<tml:script expression="portlet.portletkey"/>", {
+			destroy: function(){
+				console.log("select2 destroy");
+				$("#<tml:script expression="tmlform.formid"/> select[name=<tml:item name="_fieldname"/>]").select2("destroy");
+			}
+		})</tml:comment>
+
+	})
+</script>	
+
+<tml:script>
+	_filename = tmlform.field(_fieldname);
+	console.log("_filename", _filename, _fieldname);
+</tml:script>
+<tml:case condition="_filename">
+	<div style="margin:10px">
+	
+		<tml:if condition="content().hasFile(_filename)">
+			<tml:then>
+				<div style="float:left;width:40px">
+					<tml:script>
+						var attachment = AFW.content().attachment(_filename)
+						if(attachment.getType()=="others" && option("icon"))
+							_url = option("icon")
+						else _url = attachment.getThumbnailURL()
+					</tml:script>
+					<tml:case condition="_url">
+						<img src="<tml:item name="_url"/>" style="max-width:40px;max-height:30px">
+					</tml:case>
+				</div>
+				<div style="margin-left:50px">
+					<tml:script>
+						var file = content().getFileMetaData(_filename);
+						_size = file.getSize();
+						_date = file.getLastmodified()
+						_mimetype = file.getMimeType()
+					</tml:script>
+					<tml:item name="_mimetype"/> - <tml:script expression="AFW.Util.renderFileSize(_size)"/>
+					<br>
+					<tml:label key="file-date"/>: <tml:item name="_date"/>
+				</div>
+				<div style="clear:left"></div>
+			</tml:then>
+			<tml:else>
+				<h1 class="error">
+					File not found
+				</h1>
+			</tml:else>
+		</tml:if>
+	</div>
+</tml:case>
+
