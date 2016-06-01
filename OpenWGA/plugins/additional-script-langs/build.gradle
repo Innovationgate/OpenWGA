@@ -17,6 +17,10 @@ sourceSets {
 			srcDir 'src'  
 			output.classesDir = 'design/java'		
 		}
+		resources {
+			srcDir 'src'
+			output.resourcesDir = 'design/java'
+		}
 	}
 } 
 
@@ -30,9 +34,16 @@ task updatePluginVersion << {
 
 }
 
-task buildPlugin(type: Zip, dependsOn: [build, updatePluginVersion]){
+task buildPluginJars(type: Copy, dependsOn: build) {
+    from (tasks.jar.archivePath)
+   	into 'design/files/system'
+   	rename {'plugin-classes.jar'}
+}
+
+task buildPlugin(type: Zip, dependsOn: [buildPluginJars, updatePluginVersion]){
     archiveName = "de.innovationgate.additional-script-langs-${project.version}.wgaplugin"    
     from('design') {
         into '/'
+        exclude 'java'
     }
 }
