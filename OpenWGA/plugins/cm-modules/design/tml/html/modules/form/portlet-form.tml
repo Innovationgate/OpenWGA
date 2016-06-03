@@ -98,6 +98,12 @@
 				mailbody += (encode("html", values.next()) +"<br>");
 			mailbody += "<br>";
 		}
+		if(tmlform.getfilenames().size()){
+			mailbody += "<hr>"
+			for(let filename in Iterator(tmlform.getfilenames())){
+				mail.addAttachment(tmlform.getfile(filename))
+			} 
+		}
 		mail.body = mailbody;
 		mail.send();
 	}
@@ -151,6 +157,7 @@
 		s.setTitle(title);
 		s.save();
 		var doc = hdb.createContent(s, createdate())
+		tmlform.attach(doc)
 		tmlform.storeincontent(doc);
 		log.info("form " + id + " stored in db " + dbkey);
 	}, id, title, dbkey);

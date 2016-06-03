@@ -32,6 +32,10 @@
 			border_bottom: "solid silver 1px"	
 		}
 	},
+
+	".buttons": {
+		margin_top: 10
+	},
 	
 	fieldset: {
 		border: "solid silver 1px",
@@ -52,6 +56,11 @@
 			font: "inherit"
 		},
 		
+		"input[type=file]":{
+			margin_bottom: 5,
+			height: "auto"
+		},
+
 		"&.error input": {
 			background: "#ffe2e2"
 		},
