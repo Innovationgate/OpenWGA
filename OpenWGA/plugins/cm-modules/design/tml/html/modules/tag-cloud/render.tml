@@ -1,0 +1,74 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_cloud={};
+	_tags=[];
+	_total=0;
+</tml:script>
+
+<tml:collection>
+	<tml:query includecurrent="true" alllanguages="true" max="{CMM.setting('max')||50}">
+		content.keywords[0]!=''
+		order by content.lastmodified DESC
+	</tml:query>
+	<tml:foreach>
+		<tml:script>
+			var it = metalist("keywords").iterator();
+			while(it.hasNext()){
+				var tag = it.next().toLowerCase();
+				if(!_cloud[tag]){
+					_cloud[tag]=0;
+					_tags.push(tag);
+				}
+				_cloud[tag]++;
+				_total++;
+			}
+		</tml:script>
+	</tml:foreach>
+</tml:collection> 
+
+<tml:case condition="_tags.length">
+	<div class="tag-cloud">
+		<tml:script>
+			var url = WGA.urlBuilder(context("docid:"+CMM.setting("searchresult")).contenturl());
+			var ret = "";
+			_tags.sort()
+			for(var i=0; i<_tags.length; i++){
+				var tag=_tags[i];
+				if(_cloud[tag]){
+					url.setParameter("query", 'KEYWORDS:"' + tag + '"');
+					var rat = (_cloud[tag]-1)/_total;	// 0<= rat <= 1					
+					var size = 100*(1+8* Math.log((Math.E-1)*rat+1));
+					if(size>250)
+						size=250;
+					ret += '<span style="overflow:hidden">'
+					ret += '<a style="font-size:' + size + '%" title="'+_cloud[tag]+' Artikel" href="' + url + '">' + tag + '</a>';
+					ret += '</span> ';
+				}
+			} 
+			return ret;
+		</tml:script>
+	</div>
+</tml:case>

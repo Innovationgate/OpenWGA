@@ -1,0 +1,47 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_id = format(createdate().getTime(), "0");
+</tml:script>
+
+<div class="info" id="<tml:item name="_id"/>">
+	<div <tml:case condition="option('id')!=null">id="<tml:option name="id"/>"</tml:case> class="x-layout-panel-hd" style="cursor:pointer" onclick="AFW.infoView.toggle(this)">
+		<div class="x-layout-panel-hd-text header <tml:script>return option("collapsed")==null ? "x-layout-expand-north":"x-layout-expand-west"</tml:script>">
+			<tml:option name="title"/>
+		</div>
+		
+	</div>
+	<div style="display:<tml:script>return option("collapsed")==null ? "block":"none"</tml:script>">
+		<div class="toolbar"></div>
+		<div class="body"><tml:option name="body"/></div>
+	</div>
+</div>
+
+<script>
+	<tml:case condition="option('toolbar')!=null">
+		var el=Ext.get("<tml:item name="_id"/>").child(".toolbar");
+		new Ext.Toolbar(el, <tml:option name="toolbar"/>);
+	</tml:case>	
+</script>

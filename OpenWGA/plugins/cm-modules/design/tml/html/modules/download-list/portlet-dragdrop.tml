@@ -1,0 +1,88 @@
+<tml:action id="setFile">
+	var filename = request.getParameter("filename")
+	var container = request.getParameter("container")
+
+	var map = CMM.getModulesSettingsMap("document")
+	var module_settings_map = CMM.getModulesSettingsMap(null, option("ns"))
+	map.putAll(module_settings_map);
+
+	map.put(WGA.scoped("filename"), filename);
+	map.put(WGA.scoped("parent"), container);
+	map.put(WGA.scoped("source"), container ? "any" : "");
+	map.put(WGA.scoped("setting_source"), "document");
+
+	CMM.writeContentModulesSettingsData(map);
+
+	content().save();
+</tml:action>
+
+<tml:script>
+	_so=AFW.Util.serializeJsObject({
+		dbkey: meta("database", "dbkey"),
+		contentkey: KEY
+	})
+</tml:script>
+
+<script>
+	require(["jquery", "jquery-wga-drophandler"], function(){
+		$(function(){
+		
+			function onFilesDrop(data){
+				var file = data[0];
+				var ext = file.name.split(".").pop();
+				this.className="clearfix download " + ext;
+				this.href=file.url + "?forcedownload=true"
+				this.title = "download " + file.name
+				$(this).find(".filesize").html(Math.round(file.size/1000) + " KB");
+				WGA.ajax.action({
+					action: "<tml:action ref="setFile" ajax="norefresh"/>",
+					mode: "norefresh",
+					graydiv: false,
+					params: {
+						filename: file.name,
+						dbkey: file.dbkey,
+						container: file.container
+					}
+				})
+			}
+		
+			function onDesktopDrop(files){
+				var BI = window.parent.BI
+				var el = this;
+				if(!BI)
+					return;	// No Content Manager
+				
+			    var file = files[0];
+			    var ext = file.name.split(".").pop();
+				BI.UploadManager.upload(file, {
+					url: "<tml:url db="plugin-contentmanager" type="tml" name="cms:action-panel:attachments:html5-upload-processor"/>",
+					params: {
+						so: "<tml:item name="_so"/>",
+						filename: file.name
+					},
+					callback: function(filename, filesize){
+						window.parent.WGA.event.fireEvent("CMS_attachments_changed");
+						el.className="clearfix download " + ext;
+						el.href="../../file/<tml:meta name="key"/>/"+filename.replace(/\+/g, "%2B") + "?forcedownload=true"
+						el.title = "download " + filename;
+						$(el).find(".filesize").html((filesize ? Math.round(filesize/1000) : "?") + " KB");
+						WGA.ajax.action({
+							action: "<tml:action ref="setFile" ajax="norefresh"/>",
+							mode: "norefresh",
+							graydiv: false,
+							params: {
+								filename: filename
+							}
+						})
+					}
+				})
+			}
+		
+			$("#module-<tml:option name="ns"/> a").wga_drophandler({
+				onDesktopDrop: !window.parent.BI ? false : onDesktopDrop,			
+				onFilesDrop: onFilesDrop
+			})
+	
+		})
+	})
+</script>

@@ -1,0 +1,103 @@
+/*******************************************************************************
+  *Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+  *
+  *This file is part of the OpenWGA server platform.
+  *
+  *OpenWGA is free software: you can redistribute it and/or modify
+  *it under the terms of the GNU General Public License as published by
+  *the Free Software Foundation, either version 3 of the License, or
+  *(at your option) any later version.
+  *
+  *In addition, a special exception is granted by the copyright holders
+  *of OpenWGA called "OpenWGA plugin exception". You should have received
+  *a copy of this exception along with OpenWGA in file COPYING.
+  *If not, see <http://www.openwga.com/gpl-plugin-exception>.
+  *
+  *OpenWGA is distributed in the hope that it will be useful,
+  *but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *GNU General Public License for more details.
+  *
+  *You should have received a copy of the GNU General Public License
+  *along with OpenWGA in file COPYING.
+  *If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+/* Fix for Firefox 3 */
+.x-date-middle {
+    width: 160px;
+}
+
+.x-date-left, .x-date-right {
+    width:20px !important;
+} 
+
+#afw-ext-dialog{
+	visibility:hidden;
+	position:absolute;
+	background-color: transparent;
+}
+#afw-ext-dialog .dialog{
+	padding: 5px;
+}
+#afw-ext-dialog .dialog *{
+	font-size: 12px;
+}
+
+.info{
+	border-top:solid gray 1px;
+	border-left:solid gray 1px;
+	border-right:solid #555555 2px;
+	border-bottom:solid #555555 2px;
+	padding:0px;
+	margin:3px;
+	background-color:white;
+	color: #555555;
+}
+.info .x-layout-panel-hd{
+	border-style: none;
+}
+.info .body{
+	padding: 5px;
+	font-size: 11px;
+}
+.info .header{
+	background-repeat: no-repeat;
+	background-position: right;
+	padding-right: 16px;
+	margin-right: 3px;
+	overflow: hidden;
+}
+
+#splash{
+	position:absolute;
+	left:35%;
+	top:10%;
+	padding-top:50px;
+	padding-left: 10px;
+	padding-right: 10px;
+	width:30%;
+	z-index:11000;	
+}
+#splash *{
+    font: normal 10pt verdana,tahoma,helvetica;
+}
+
+/*
+ * for AFW.util.InfoWidget
+ */
+#msg-div {
+    position:absolute;
+    top:10px;
+    width:250px;
+    z-index:20000;
+}
+
+.afw-info-msg{
+	padding: 10px;
+	border: solid white 1px;
+	background-color: black;
+	color: white;
+	-webkit-border-radius: 5px;		 /* Round each corner of the created rectangle */
+	-moz-border-radius: 5px;
+	-moz-background-clip:padding;	
+}

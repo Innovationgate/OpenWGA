@@ -1,0 +1,65 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_type=request.getParameter("type");
+	var key=request.getParameter("key");
+	if(!_type)
+		_type="content";
+		
+	_context='db:'+request.getParameter('dbkey');
+	switch (_type){
+		case "content":
+			_context += '/docid:'+key;
+			break;
+		case "file":
+			_context += '/$filecontainer:'+key;
+			break;
+	}
+	//log.info("get-attachments (" + request.getParameter("who") + "): " + _context);	
+</tml:script>
+
+<tml:case context="{_context}" iscontextvalid="true">
+	<tml:script>
+		_attachments=document.getFileNames();
+		//log.info("get-attachments: files found: " + _attachments);
+	</tml:script>
+	{
+		data:[
+			<tml:foreach type="itemvalue" item="_attachments" currentvalue="_filename">
+				{
+					id: "<tml:item name="_filename"/>",
+					name: "<tml:item name="_filename"/>",
+					<tml:if condition="_type=='content'">
+						<tml:then>url: "<tml:url type="file" file="{_filename}"/>",</tml:then>
+						<tml:else>url: "<tml:url type="file" doc="{request.getParameter('key')}" file="{_filename}"/>",</tml:else>
+					</tml:if>
+					size: <tml:script format="0">return document.getFileSize(_filename)</tml:script>
+				}
+				<tml:between>,</tml:between>
+			</tml:foreach>
+		],
+		context: "<tml:item name="_context"/>/<tml:item name="_type"/>"
+	}
+</tml:case>		

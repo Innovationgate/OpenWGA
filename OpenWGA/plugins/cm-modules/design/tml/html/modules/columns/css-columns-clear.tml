@@ -1,0 +1,15 @@
+margin: 0,
+
+"> .module-cm_column > div": {
+	width: "100% !important",
+	float: "none",
+	"> .inner-column": {
+		padding: 0,
+		margin_bottom: 10,
+		border_color: "transparent"			
+	}
+},
+
+"&.layout-lines > .module-cm_column > div > .inner-column:after": {
+	border: "none"
+}

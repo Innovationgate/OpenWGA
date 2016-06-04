@@ -1,0 +1,133 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_mp3 = CMM.setting("mp3");
+	if(_mp3 && !content().hasFile(_mp3))
+		_mp3 = "";
+
+	_ogg = CMM.setting("ogg");
+	if(_ogg && !content().hasFile(_ogg))
+		_ogg = "";
+
+	var opts = CMM.settingList("opts");
+	_autoplay = opts.contains("autoplay");
+	_loop = opts.contains("loop");
+	_controls = opts.contains("controls");
+</tml:script>
+
+<div class="playlist-entry<tml:case condition="_controls"> controls</tml:case>">
+	<a class="song-title">
+		<div class="info">-:-</div>
+		<tml:option name="title"/>
+	</a>
+	<audio preload="metadata"
+		<tml:case condition="_autoplay">
+			autoplay 
+		</tml:case>
+		<tml:case condition="_controls">
+			controls
+		</tml:case>
+		<tml:case condition="_loop">
+			loops
+		</tml:case>
+	>
+		<tml:case condition="_mp3">
+			<source src="<tml:url type="file" file="{_mp3}"/>" type="audio/mpeg"></source>
+		</tml:case>
+		<tml:case condition="_ogg">
+			<source src="<tml:url type="file" file="{_ogg}"/>" type="audio/ogg"></source>
+		</tml:case>
+	</audio>
+</div>
+
+<script>
+	require(["jquery"], function(){
+		$("#module-<tml:option name="ns"/> source").each(function(index, el){
+			el.src = el.src.split(";").slice(0)[0];
+		})
+
+		var entry = $("#module-<tml:option name="ns"/> .playlist-entry")
+		var player = entry.find("audio").get(0);
+		var t = parseInt(player.duration)
+		if(t){
+			var min = parseInt(t/60)
+			var sec = t%60+100
+			entry.find(".info").html(min + ":" + String(sec).substr(1));
+		}
+
+		// check if we can play
+		var canPlay=false;
+		var hasFile=false;
+		entry.find("audio source").each(function(){
+			hasFile=true;
+			var type = $(this).attr("type");
+			if(player.canPlayType(type))
+				canPlay=true;
+		})
+		if(!hasFile){
+			entry.addClass("error");
+			entry.append('<div class="can-not-play"><tml:label key="html5media.no-file"/>.</div>');
+		}
+		else if(!canPlay){
+			entry.addClass("error");
+			<tml:case condition="_controls">
+				entry.append('<div class="can-not-play"><tml:label key="html5media.unable-to-play"/>.</div>');	//.find("audio").remove();
+			</tml:case>
+		}
+		
+		entry.find("audio").on({
+			play: function(){
+				$("audio").not(this).trigger("pause")
+					.parents(".playlist-entry").removeClass("playing");
+				$(this).parents(".playlist-entry").addClass("playing");
+			},
+			pause: function(){
+				$(this).parents(".playlist-entry").removeClass("playing");
+			},
+			"loadedmetadata": function(){
+				var t = parseInt(player.duration)
+				var min = parseInt(t/60)
+				var sec = t%60+100
+				entry.find(".info").html(min + ":" + String(sec).substr(1));
+			}
+		})
+		
+		$("#module-<tml:option name="ns"/> .playlist-entry a").click(function(ev){
+			ev.preventDefault();
+			if(!hasFile)
+				return;
+			if(!canPlay){
+				alert("<tml:label key="html5media.unable-to-play"/>.");
+				return;
+			}		
+			if(player.paused){
+				player.play();
+			}
+			else player.pause();
+		})
+		
+	})
+</script>

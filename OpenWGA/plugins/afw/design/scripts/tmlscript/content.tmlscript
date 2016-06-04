@@ -1,0 +1,672 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+var Util;
+var Database;
+var Struct;
+var Area;
+
+var database;		// WGDatabase object
+var struct;			// WGStructEntry object
+var content;		// WGContent object
+
+var reason;			// reason message for may-functions
+function _false(msg){
+	reason=msg;
+	return false;
+}
+
+this.init=function(contentobj, dbobj){
+
+	Database=createObject(this, "database", dbobj);
+	database=Database.WGObject;
+	
+	if(!contentobj)
+		content=this.WGObject=document;
+	else{
+		if(typeof contentobj == "string"){
+			var contentkeyObject = Packages.de.innovationgate.webgate.api.WGContentKey.parse(contentobj, database);
+			if(contentkeyObject)
+				content=this.WGObject=database.getContentByKey(contentkeyObject);
+			else content=this.WGObject=database.getContentByName(contentobj);
+		}
+		else{
+			if(contentobj instanceof Packages.de.innovationgate.webgate.api.WGContent)
+				content=this.WGObject=contentobj;
+			else if(contentobj instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)
+				content=this.WGObject=contentobj.content();
+			else content=this.WGObject=contentobj.WGObject;
+			Database=createObject(this, "database", content.getDatabase());
+			database=Database.WGObject;
+		}
+	}	
+	
+	Struct=createObject(this, "structentry", content.getStructEntry());
+	struct=Struct.WGObject;
+	Area = createObject(this, "area", struct.getArea());
+	Util = createObject(this, "util");
+}
+
+this.isInTrashArea=function(){
+	return Area.isTrashArea();
+}
+
+this.getDeletedBy=function(){
+	if(!this.isInTrashArea())
+		return null;
+	return struct.getRootEntry().getExtensionData("deletedBy");
+}
+this.getDeletedFrom=function(){
+	if(!this.isInTrashArea())
+		return null;
+	return struct.getRootEntry().getExtensionData("deletedFrom");
+}
+
+this.isValid=function(){
+	return content!=null;
+}
+
+this.getStruct=function(){
+	return Struct;
+}
+
+this.getDatabase=function(){
+	return Database;
+}
+
+this.getReason=function(){
+	return reason;
+}
+
+this.getStructKey=function(){
+	return content.getStructKey().toString();
+}
+
+this.getContentTypeName=function(){
+	return Struct.getContentTypeName();
+}
+
+this.getContentKey=function(){
+	return content.getContentKey().toString();
+}
+
+this.getTitle=function(encode){
+	var t = content.getTitle();
+	return encode ? t.replace(/"/g, "'").replace(/[\n\r]/g, "") : t;
+}
+
+this.getTitleJsEncoded=function(quote){
+	return Util.encodeForScript(content.getTitle(), quote);
+}
+
+this.getLanguageTitle=function(){
+	return content.getLanguage().getTitle();
+}
+
+this.getLanguageName=function(){
+	return content.getLanguage().getName();
+}
+
+this.hasPublishedVersion=function(lang){
+	return struct.getReleasedContent(lang)!=null
+}
+
+this.getItemNames=function(){
+
+	var exclude=[
+		"wfwriteaccess", "wflevelhatgenehmigt", "wfinitiator", "wfcurrentlevel", "wflevelnr", "wfname", "wfreleasedate", "wflevelrevieweranzahl", "wfpublishingdate", "wfreviewer","wfarchivingdate",
+		"virtuallinktitle", "comment", "contentkey"
+		];
+
+	function isExcluded(name){
+		for(e in exclude)
+			if(name.toLowerCase() == exclude[e])
+				return true;
+		return false;
+	}
+
+
+	var allItems = content.getItemNames().iterator();
+	var list = WGA.createList();
+	while(allItems.hasNext()){
+		var name = allItems.next();
+		if(!isExcluded(name))	// check exclude list for lowercased item name
+			list.add(name);
+	}
+
+	return list;
+}
+
+this.hasOtherVersions=function(){
+	return Struct.getAllContent(this.getLanguageName(), true).size()>1
+}
+
+this.mayApprove=function(){
+	return this.isApprover() && (Database.isEditor() || this.isMine())	
+}
+
+this.mayEditContent=function(){
+
+	reason="";
+	if(!Struct.mayEditContent())
+		return _false(Struct.getReason());
+	
+	if(!content.getLanguage().mayCreateContent())
+		return _false(label("reason.language-settings-denies-edit"));
+	
+	// look for content in status review:
+	var contList=struct.getAllContent();
+	if(contList!=null && contList.size()>0){
+		for (var i=0; i<contList.size(); i++){
+			var doc=contList.get(i);
+			if(doc.getStatus()==content.STATUS_REVIEW && doc.getLanguage().getName()==content.getLanguage().getName()){
+				if(doc.getVersion() == content.getVersion()){
+					if(doc.isPendingRelease())
+						return _false(label("reason.document-pending"));
+					else return _false(label("reason.document-is-in-workflow"));
+				}
+				else {
+					if(doc.isPendingRelease())
+						return _false(label("reason.doucument-pending-exists"));
+					else return _false(label("reason.doucument-in-workflow-exists"));
+				}
+			}
+		}
+	}
+	
+	if(this.isMine() || this.isAuthorOrOwner())
+		return true;
+	if(Database.isEditor())
+		return true;
+		
+	return _false(label("reason.you-are-no-author"))
+}
+
+this.mayCreateContent=function(){
+	reason="";
+	if(!Struct.mayCreateContent())		// check if struct allowes creation (database and contenttype allows edit)
+		return _false(Struct.getReason());
+	return true;		
+}
+
+this.mayCreatePage=function(){
+	reason="";
+	if(!Struct.mayCreatePage())		// check if struct allowes creation
+		return _false(Struct.getReason());
+
+	return true;	
+}
+
+this.mayCreateRootPage=function(){
+	return Struct.mayCreateRootPage()		// check if struct allowes creation
+}
+
+this.mayDeleteContent=function(){
+	reason="";
+
+	if(Area.isTrashArea())
+		return _false(label("reason.no-edit-in-trash"))
+
+	try{
+		content.performRemoveCheck()
+		return true;
+	}
+	catch(e){
+		var errorCode = e.javaException.getErrorCode ? e.javaException.getErrorCode() : "unknown";
+		var cause;
+		if(e.javaException.getCauseDocument)
+			cause = e.javaException.getCauseDocument();
+		if(cause){
+			var causeTitle = cause.getTitle ? cause.getTitle() : cause.getName ? cause.getName() : "unknown";
+			return _false(label("reason."+errorCode, [causeTitle]))
+		}
+		else return _false(label("reason."+errorCode))
+	}
+
+}
+
+this.mayArchiveContent=function(){
+	return this.mayEditContent() && content.getStatus()==content.STATUS_RELEASE;
+}
+
+this.mayDeletePage=function(){
+	reason="";
+
+	if(!Struct.mayDeletePage())
+		return _false(Struct.getReason());
+		
+	return true;
+}
+
+this.isMine=function(){
+	if(Area.isTrashArea())
+		return false;
+	var userNameList = createlist();
+	userNameList.add(content.getAuthor());
+	return database.isMemberOfUserList(userNameList)
+}
+
+this.isAuthorOrOwner=function(){
+	if(content.isAuthorOrOwner)
+		return content.isAuthorOrOwner();
+	else return this.isMine();
+}
+
+this.isDraft=function(){
+	return content.getStatus()==content.STATUS_DRAFT;
+}
+
+this.getFixParents=function(){
+	// get all contenttypes that have a "word-client-parent" set:
+	var _fixparents=createlist();
+	var pagetypes=database.getContentTypes().iterator();
+	while(pagetypes.hasNext()){
+		var pagetype=pagetypes.next();
+		var preferedParent=pagetype.getPreferredParent();
+		if(preferedParent && pagetype.mayCreateContent()){
+			var ParentStruct=createObject(this, "structentry", preferedParent, Database)
+			if(ParentStruct.mayCreatePage())
+				_fixparents.add(pagetype.getName() + "|" + ParentStruct.getStructKey());
+		}
+	}
+	return _fixparents;
+}
+
+this.isApprover=function(){
+	var wf = content.getWorkflow();
+	return wf.isApprovableByUser(); 
+}
+
+this.isAdminApprover=function(){
+	var wfRole = content.getWorkflowRole();
+	return (wfRole == Packages.de.innovationgate.webgate.api.workflow.WGWorkflow.ROLE_ADMINISTRATOR);	
+}
+
+this.checkforTML = function(check_tmls){
+	return Database.checkforTML(check_tmls);
+}
+
+this.hasUserdefinedMetas=function(){
+	return this.getUserdefinedMetasTML()!=null;
+}
+
+this.getUserdefinedMetasTML=function(){
+	var tmls = WGA.createList([
+		"wga:content-manager:settings:"+this.getContentTypeName(),
+		"content-manager:settings:"+this.getContentTypeName(),
+		"settings:"+this.getContentTypeName(),
+		"wga:content-manager:settings:default",
+		"content-manager:settings:default",
+		"settings:default"		
+	])
+	if(WGA.design(database).isCustomized()){
+		tmls.addAll(0, WGA.createList([
+			"overlay:wga:content-manager:settings:"+this.getContentTypeName(),
+			"overlay:content-manager:settings:"+this.getContentTypeName(),
+			"overlay:settings:"+this.getContentTypeName(),
+			"overlay:wga:content-manager:settings:default",
+			"overlay:content-manager:settings:default",
+			"overlay:settings:default"		
+		]))
+	}
+	return this.checkforTML(tmls)
+}
+
+this.hasContentModules=function(){
+	/*
+	 * This function ist deprecated since WGA 5.4
+	 * So we return false just in case some one uses it.
+	 */
+	return false
+}
+
+this.getContentModulesTML=function(){
+	/*
+	 * This function ist deprecated since WGA 5.4
+	 * So we return null just in case some one uses it.
+	 */
+	return null;
+}
+
+this.isContentConsumer=function(){
+	var ri = content.getItemValue("remote_info");
+	return !isEmptyValue(ri);
+}
+this.isContentProvider=function(){
+	var ri = content.getItemValue("remote_references");
+	return !isEmptyValue(ri);
+}
+
+/*
+ * Remote data handling
+ */
+this.copyRemoteData=function(sourcedoc, include_metas, no_attachments, no_modules) {
+
+	this.copyItems(sourcedoc);
+
+	if(include_metas)
+		this.copyMetas(sourcedoc);
+
+	if(!no_modules)
+		this.copyModules(sourcedoc);
+		
+	content.save();
+	
+	if(no_attachments)
+		return;
+		
+	// File attachments
+	this.copyAttachments(sourcedoc)
+	content.save();
+}
+
+this.copyElements = function(els, source){
+	//this.copyRemoteData(source, els.contains("metas"), !els.contains("attachments"), !els.contains("modules"));
+	if(els.contains("items"))
+		this.copyItems(source)
+	if(els.contains("metas"))
+		this.copyMetas(source)
+	if(els.contains("attachments"))
+		this.copyAttachments(source)
+	if(els.contains("modules"))
+		this.copyModules(source)
+	if(!els.isEmpty())
+		content.save();
+}
+
+this.copyItems = function(sourcedoc){
+	var items=createObject(this, "content", sourcedoc).getItemNames().iterator();		// sourcedoc.getItemNames();
+	while(items.hasNext()){
+		var item=items.next();
+		if(item!="remote_references")	// don't copy this reference-item!
+			content.setItemValue(item, sourcedoc.getItemValue(item));
+	}
+}
+
+this.copyMetas = function(sourcedoc){
+	// check if we should/can copy unique name from master doc
+	var uname = sourcedoc.getUniqueName(); 
+	if(context("db:" + Database.getKey() + "/name:"+uname, false))
+		log.warn("could not copy unique name from remote document because the name is already used in this contentstore");
+	else content.setUniqueName(uname);
+
+	var metas = [content.META_DESCRIPTION, content.META_KEYWORDS, content.META_BROWSERTITLE, content.META_READERS, content.META_VALID_FROM, content.META_VALID_TO, content.META_IS_HIDDEN_FROM];
+	for(var i=0; i<metas.length; i++){
+		content.setMetaData(metas[i], sourcedoc.getMetaData(metas[i]));
+	}
+}
+
+this.copyAttachments = function(sourcedoc){
+	content.removeAllFiles();
+	content.attachAllFiles(sourcedoc);
+}
+
+this.copyModules = function(sourcedoc){
+	var template = sourcedoc.getRelation("created-from-template");
+	var lang = content.getLanguage().getName();
+	if(template && template.getStructEntry().hasReleasedContent(lang))
+		template = template.getStructEntry().getReleasedContent(lang);
+	
+	if(template){
+		// test if we copy to template area:
+		if(content.getStructEntry().getArea().name=="$templates"){
+			log.info("copy a template to the template area: removed template relation.")
+			var content_modules = template.getExtensionData("content-modules")
+			if(content_modules)
+				content.writeExtensionData("content-modules", content_modules);
+			var content_modules_settings = template.getExtensionData("content-modules-settings")
+			if(content_modules_settings)
+				content.writeExtensionData("content-modules-settings", content_modules_settings);
+		}			
+		else if(template.getDatabase() == database){ 
+			content.setRelation("created-from-template", template, content.RELATIONTYPE_PROTECTED);
+			content.removeExtensionData("content-modules");
+			content.removeExtensionData("content-modules-settings");
+		}
+		else{
+			log.info("Remote document is derived from a template of another database. We are unable to copy modules. Sorry.");
+		}
+	}
+	else{
+		var content_modules = sourcedoc.getExtensionData("content-modules")
+		if(content_modules)
+			content.writeExtensionData("content-modules", content_modules);
+	}
+	// copy content-modules-settings even if derived from template:
+	var content_modules_settings = sourcedoc.getExtensionData("content-modules-settings")
+	if(content_modules_settings)
+		content.writeExtensionData("content-modules-settings", content_modules_settings);
+}
+
+this.handleRemoteActions=function(published_content){
+	if (content.hasItem("remote_info") && Database.useRemoteDbs()){									// get fresh items from remote document
+		var remote_info=content.getItemText("remote_info");
+		var sourcecontext=context(remote_info, false);
+		if(sourcecontext){
+			var sourcedoc=sourcecontext.content();
+			// copy all items from source document:
+			this.copyRemoteData(sourcedoc);
+			log.info("copied items from " + remote_info);
+			
+			// add reference into remote document as master action:
+			callAction("cms:update-remote-reference", 
+					remote_info,
+					"db:"+database.getDbReference()+"/docid:"+this.getStructKey()+"."+this.getLanguageName()+".0"
+				);				
+		}
+		else {
+			addwarning("denied to publich a document bc. remote document " + remote_info + " not found", false);
+			return tmlform.addmessage("Dokument kann nicht veröffentlich werden, weil das verbundene Dokument nicht gefunden wurde. \
+				Möglicherweise wurde es inzwischen gelöscht?\
+				Bitte löschen Sie die ungültige Verbindung.");
+		}
+	}
+	else{
+		// check, if published version has remote_info and remove this from remote document
+		if(published_content && published_content.hasItem("remote_info") && Database.useRemoteDbs()){
+			// remove reference from remote document as master action:
+			callAction("cms:remove-remote-reference", 
+					published_content.getItemText("remote_info"),
+					"db:"+database.getDbReference()+"/docid:"+content.getStructKey()+"."+this.getLanguageName()+".0"
+				);								
+		}
+	}
+	
+	if (content.hasItem("remote_references") && Database.isRemoteDb())
+		callAction("cms:update-remote-items", content);
+}
+
+this.attachment = function(filename){
+
+	var file_md = content.getFileMetaData(filename);
+	var ctx = context(content);
+	
+	if(!file_md){
+		throw "AFW.content().attachment(): File attachment '" + filename + "' not found in content"
+		return null;
+	}
+	
+	return{
+	
+		fileSize: content.getFileSize(filename)
+		,mimeType: file_md.mimeType || Packages.de.innovationgate.webgate.api.WGFactory.getMimetypeDeterminationService().determineByFilename(filename)
+	
+		,isImage: function(){
+			return ["image/png","image/gif","image/jpeg"].indexOf(this.mimeType)>=0
+		}
+		,isVideo: function(){
+			return this.mimeType.indexOf("video")==0
+		}
+		,isPDF: function(){
+			return this.mimeType=="application/pdf";
+		}
+		
+		,isOfficeDoc: function(){
+			var officeMimeTypes = [
+		
+		    	// MS Office
+		        "application/msword",
+		        "application/vnd.ms-word",
+		        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+		        "application/vnd.ms-excel",
+		        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		        "application/vnd.ms-powerpoint",
+		        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+			
+				// LibreOffice / OpenOffice
+				"application/vnd.oasis.opendocument.text",
+		        "application/vnd.oasis.opendocument.spreadsheet",
+		        "application/vnd.oasis.opendocument.presentation",
+		        "application/vnd.oasis.opendocument.chart",
+		        "application/vnd.oasis.opendocument.graphics",
+		        "application/vnd.oasis.opendocument.formula",
+				
+		    	"text/plain",
+		    	"text/csv",
+		    	"application/csv"
+			]
+			
+			return officeMimeTypes.indexOf(this.mimeType) >= 0
+		}	
+	
+		,getType: function(){
+			if(this.isImage())
+				return {
+					name: "images",
+					pos: 1,
+					icon: "image.png"
+				}
+			else if(this.isVideo())
+				return {
+					name: "videos",
+					pos: 2,
+					icon: "video.png"
+				}
+			else if(this.isPDF())
+				return {
+					name: "pdf-docs",
+					pos: 3,
+					icon: "pdf.png"
+				}
+			else if(this.isOfficeDoc())
+				return {
+					name: "office-docs",
+					pos: 4,
+					icon: "wordprocessing.png"
+				}
+
+			return {
+				name: "others",
+				icon: this.mimeType.indexOf("audio")==0 ? "sound.png"
+						: this.mimeType=="application/zip" ? "tar.png"
+						: this.mimeType=="text/javascript" || this.mimeType=="text/css" ? "source.png"
+						: this.mimeType=="text/html" ? "html.png"
+						: "",
+				pos: 999
+			}
+		}
+		
+		,getPosterURL: function(config){
+			var d = WGA.selectDerivate(ctx, filename, "usage=poster");
+			if(d){
+				var url = WGA.urlBuilder(ctx.fileurl(filename))
+				url.setParameter("derivate", "usage=poster" + (config && config.width ? ",width~" + config.width : ""))
+				if(config && config.checksum)
+					url.setParameter("cs", d.getSha512Checksum());
+				return url.build();
+			}
+			else {
+				if (this.isImage())
+					return ctx.fileurl(filename);
+				else return ""
+			}
+		}
+		
+		,waitingForDerivates: function(){
+
+			if(!content.hasFile(filename)){
+				console.log("file not found", filename);
+				return false;
+			}
+		
+			try{
+				var d_rev = WGA.Core.getFileDerivateManager().getDerivateUpdateRevision(database)
+				var file_rev = file_md.getUpdateRevision()
+				//console.log("check waining for derivates", filename, d_rev, file_rev)
+				if(file_rev){
+					return file_rev.compareTo(d_rev) > 0
+				}
+				else return false;
+			}
+			catch(e){
+				log.info(e);
+			}
+			return false;
+		}
+		
+		,waitingForPoster: function(){
+	
+			if (this.isImage())
+				return false;	// don't wait for images
+
+			var file_rev = file_md.getUpdateRevision()
+			if(file_rev){
+				var d = WGA.selectDerivate(ctx, filename, "usage=poster");
+				if(d){
+					var org_rev = d.getOriginalRevision();				
+					if(org_rev){
+						return (file_rev.compareTo(org_rev)!=0)
+					}
+					else return false;
+				}
+				else return this.waitingForDerivates();
+			}
+			else return false;
+		}
+		
+		,getThumbnailURL: function(config){
+			var d = WGA.selectDerivate(ctx, filename, "usage=poster");
+			if(d){
+				var url = WGA.urlBuilder(ctx.fileurl(filename))
+				url.setParameter("derivate", "usage=poster,width~" + (config && config.width || 100))
+					.setParameter("maxwidth", (config && config.width) || 100)
+					.setParameter("maxheight", (config && config.width) || 100)
+				if(config && config.checksum)
+					url.setParameter("cs", d.getSha512Checksum());
+				return url.build();
+			}
+			else {
+				var type = this.getType()
+				if(type.name=="images")
+					return WGA.urlBuilder(ctx.fileurl(filename))
+						.setParameter("maxwidth", (config && config.width) || 100)
+						.setParameter("maxheight", (config && config.width) || 100)
+						.build();
+				else return type.icon ? fileurl("plugin-wga-app-framework", "images", type.icon) : ""
+			}	
+		}
+	
+	}
+	
+}

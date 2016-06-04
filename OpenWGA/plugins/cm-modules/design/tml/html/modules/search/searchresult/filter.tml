@@ -1,0 +1,123 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="setDateFilter">
+	if(portlet.datefilter == tmlparam1){
+		portlet.datefilter = ""
+	}
+	else{
+		portlet.datefilter = tmlparam1;
+	}
+	tmlform.processcontext.put('page', 1)
+</tml:action>
+
+<tml:action id="setAreaFilter">
+	if(portlet.areafilter == tmlparam1)	
+		portlet.areafilter = "";
+	else portlet.areafilter = tmlparam1;
+	tmlform.processcontext.put('page', 1)
+</tml:action>
+
+<tml:action id="setDoctypeFilter">
+	if(portlet.doctypefilter == tmlparam1)	
+		portlet.doctypefilter = "";
+	else portlet.doctypefilter = tmlparam1;
+	tmlform.processcontext.put('page', 1)
+</tml:action>
+
+<tml:script>
+	_area_filter = CMM.setting('area_filter')
+	_area_context = CMM.setting('rootcontext')
+</tml:script>
+
+<div class="filter-contents">
+
+	<tml:case condition="_area_filter" context="[docid:{_area_context}]" iscontextvalid="true">
+		<div class="header"><tml:label key="search.area"/>:</div>
+		<ul>
+			<tml:navigator type="siblings">
+				<li <tml:case condition="portlet.areafilter==STRUCTKEY">class="selected"</tml:case>>
+					<a class="gray"
+						title="<tml:script expression="label('search.filter.' + (portlet.areafilter==STRUCTKEY?'deactivate':'activate'))"/>"
+						href="<tml:url ajax="true" type="action" action="setAreaFilter" param1="{STRUCTKEY}"/>"
+					>
+						<tml:meta name="title"/>
+					</a>
+				</li>
+			</tml:navigator>
+		</ul>
+	</tml:case>
+	
+	<div class="header"><tml:label key="search.published"/>:</div>
+	<ul>
+		<li <tml:case condition="portlet.datefilter=='last-7-days'">class="selected"</tml:case>>
+			<a class="gray"
+				title="<tml:script expression="label('search.filter.' + (portlet.datefilter=='last-7-days'?'deactivate':'activate'))"/>"
+				href="<tml:url ajax="true" type="action" action="setDateFilter" param1="last-7-days"/>"
+			>
+				<tml:label key="search.filter.date.last-7-days"/>
+			</a>
+		</li>
+		
+		<li <tml:case condition="portlet.datefilter=='last-12-month'">class="selected"</tml:case>>
+			<a class="gray" 
+				title="<tml:script expression="label('search.filter.' + (portlet.datefilter=='last-12-month'?'deactivate':'activate'))"/>"
+				href="<tml:url ajax="true" type="action" action="setDateFilter" param1="last-12-month"/>"
+			>
+				<tml:label key="search.filter.date.last-12-month"/>
+			</a>
+		</li>
+		
+		<li <tml:case condition="portlet.datefilter=='older'">class="selected"</tml:case>>
+			<a class="gray"
+				title="<tml:script expression="label('search.filter.' + (portlet.datefilter=='older'?'deactivate':'activate'))"/>"
+				href="<tml:url ajax="true" type="action" action="setDateFilter" param1="older"/>"
+			>
+				<tml:label key="search.filter.date.older"/>
+			</a>
+		</li>
+	</ul>
+	
+	<tml:case condition="CMM.setting('search_attachments')===true">
+		<div class="header"><tml:label key="search.doctype"/>:</div>
+		<ul>
+			<li <tml:case condition="portlet.doctypefilter=='content'">class="selected"</tml:case>>
+				<a class="gray"
+					title="<tml:script expression="label('search.filter.' + (portlet.doctypefilter=='content'?'deactivate':'activate'))"/>"
+					href="<tml:url ajax="true" type="action" action="setDoctypeFilter" param1="content"/>"
+				>
+					<tml:label key="search.filter.doctype.content"/>
+				</a>
+			</li>
+			<li <tml:case condition="portlet.doctypefilter=='attachment'">class="selected"</tml:case>>
+				<a class="gray"
+					title="<tml:script expression="label('search.filter.' + (portlet.doctypefilter=='attachment'?'deactivate':'activate'))"/>"
+					href="<tml:url ajax="true" type="action" action="setDoctypeFilter" param1="attachment"/>"
+				>
+					<tml:label key="search.filter.doctype.attachments"/>
+				</a>
+			</li>
+		</ul>	
+	</tml:case>
+</div>

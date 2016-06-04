@@ -1,0 +1,48 @@
+<tml:{p} if="$option_filemd.description">
+	<tml:item name="$option_filemd.description"/>
+</tml:{p}>
+
+<tml:item name="$option_filemd.title" var="_meta"/>
+<tml:{h3} if="_meta"><tml:item name="_meta"/></tml:{h3}>
+
+<tml:script expression="null" var="_filemetas"/>
+
+<tml:script expression="AFW.content().attachment($option_filemd.name).getType().name" var="_meta"/>
+<tml:if condition="_meta!='others'" appendvar="_filemetas">
+	<tml:then>
+		<tml:label key="[filetype.{_meta}]"/>
+	</tml:then>
+	<tml:else>
+		<tml:script expression="$option_filemd.mimeType"/>
+	</tml:else>
+</tml:if>
+<tml:case condition="_meta=='images'" appendvar="_filemetas">
+	<tml:script expression="$option_filemd.displayWidth"/>
+	x
+	<tml:script expression="$option_filemd.displayHeight"/>
+	Pixel
+</tml:case>
+
+<tml:script expression="$option_filemd.size" var="_meta"/>
+<tml:case condition="_meta" appendvar="_filemetas"><tml:script expression="AFW.Util.renderFileSize(_meta)"/></tml:case>
+
+<tml:script expression="$option_filemd.getCustomFieldValue('pageCount')" var="_meta"/>
+<tml:case condition="_meta" appendvar="_filemetas">
+	<tml:label key="{_meta>1?'search.attachments.pages':'search.attachments.pages-one'}" param1="{WGA.format(_meta, '0')}"/>
+</tml:case>
+
+<tml:script expression="$option_filemd.copyright" var="_meta"/>
+<tml:case condition="_meta" appendvar="_filemetas">&copy; <tml:item name="_meta"/></tml:case>
+
+<tml:case condition="_filemetas">
+	<div><tml:item name="_filemetas" divider=", " encode="none" trim="true"/></div>
+</tml:case>
+
+<tml:option name="body"/>
+
+<tml:case condition="option('preview')">
+	<a class="btn btn-small preview-button">
+		<i class="icon icon-fullscreen"></i>
+		Vorschau
+	</a>
+</tml:case>

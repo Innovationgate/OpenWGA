@@ -1,0 +1,119 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_top_news = CMM.setting('top_news');
+	_width_img_col = CMM.setting('width_img_col') || "30%";
+</tml:script>
+<div class="news-collection">
+	<tml:foreach sourcetag="{scoped:child-collection}" 
+			id="{scoped:child-collection-loop}"
+			sortexpression="date||PAGEPUBLISHED" sortorder="descending" 
+			pagesize="{CMM.setting('entries')||'0'}"
+			offset="{$option_offset}"			
+	>
+		<div class="clearfix news <tml:script expression="taginfo(WGA.scoped('child-collection-loop'),'iteration')%2?'even':'odd'"/><tml:case islastloop="true"> last</tml:case><tml:case isfirstloop="true"> first</tml:case>">
+
+			<tml:script>
+				_filename=img;
+				var primary = content().getPrimaryFileName();
+				if(!_filename){
+					// find first image
+					var filenames = content().getFileNames().iterator();
+					var extensions = WGA.createList(["jpg","png", "jpeg", "gif"])
+					while(filenames.hasNext()){
+						var filename = filenames.next();
+						var parts = filename.split(".")
+						var ext = parts[parts.length-1].toLowerCase();
+						if(parts.length>1 && extensions.contains(ext)){
+							_filename = filename
+							if(_filename==primary)
+								break;		// we take this primary
+							// if not primary continue becaus we might find it later.
+						}
+					}
+				}
+			</tml:script>
+		
+			<tml:if isfirstloop="true" condition="_top_news">
+				<tml:then>
+					<div class="top-news">
+						<h1><tml:script expression="headline||TITLE"/></h1>	
+						<div class="img">
+							<tml:case condition="_filename">
+								<tml:[util:link] o_linktitle="{TITLE}">
+									<img src="<tml:url type="file" file="{_filename}"/>" border="0">
+								</tml:[util:link]>
+							</tml:case>
+						</div>
+						<div class="date"><tml:script expression="date||PAGEPUBLISHED||MODIFIED" format="longdate"/></div>
+						<div>
+							<div class="intro"><tml:script expression="intro||DESCRIPTION" encode="rtf"/></div>
+							<div class="more">
+								<tml:[util:link]><tml:label key="more"/> ...</tml:[util:link]>
+							</div>
+						</div>
+					</div>
+				</tml:then>
+				<tml:else>
+					<div class="standard-news clearfix">
+						<div class="date"><tml:script expression="date||PAGEPUBLISHED||MODIFIED" format="longdate"/></div>
+						<div class="date-elements">
+							<tml:script>
+								_values = format(date||PAGEPUBLISHED||MODIFIED, "d#MMMMM#yyyy").split("#");
+							</tml:script>
+							<span class="day"><tml:script expression="_values[0]"/></span>
+							<span class="month"><tml:script expression="_values[1]"/></span>
+							<span class="year"><tml:script expression="_values[2]"/></span>
+						</div>
+						<h1><tml:script expression="headline||TITLE"/></h1>	
+						<tml:case condition="_filename">
+							<div class="img">
+								<tml:[util:link] o_linktitle="{TITLE}">								
+									<tml:if condition="db().hasFeature(db().FEATURE_CONTENT_FILE_DERIVATES)">
+										<tml:then>
+											<img src="<tml:url type="file" file="{_filename}" derivate="usage=poster,width~320"/>" border="0">
+										</tml:then>
+										<tml:else>
+											<img src="<tml:url type="file" file="{_filename}" u_maxwidth="320"/>" border="0">
+										</tml:else>
+									</tml:if>
+								</tml:[util:link]>
+							</div>
+						</tml:case>
+						<div class="body">
+							<tml:if isfilled="intro">
+								<tml:then><div class="intro"><tml:item name="intro" encode="rtf"/></div></tml:then>
+								<tml:else><p class="intro"><tml:meta name="DESCRIPTION"/></p></tml:else>
+							</tml:if>
+							<div class="more">
+								<tml:[util:link]><tml:label key="more"/> ...</tml:[util:link]>
+							</div>
+						</div>
+					</div>
+				</tml:else>
+			</tml:if>
+		</div>
+	</tml:foreach>
+</div>

@@ -1,7 +1,8 @@
 
 dependencies {
     compile project(":wga");
-    compile project(":wgapi");    
+    compile project(":wgapi");
+    compile project(":wgutils");    
     
     compileClasspath project(":wgaBuildTools");    
     compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
@@ -11,9 +12,13 @@ dependencies {
 sourceSets {
 	main {
 		java {
-			srcDir 'src'  
+			srcDir 'src'
+			output.classesDir = 'design/java'  			
 		}
-		output.classesDir = 'design/java'
+		resources {
+			srcDir 'src'
+			output.resourcesDir = 'design/java'
+		}
 	}
 } 
 
@@ -28,8 +33,12 @@ task updatePluginVersion << {
 }
 
 task buildPlugin(type: Zip, dependsOn: [build, updatePluginVersion]){
-    archiveName = "de.innovationgate.contentmanager-${project.version}.wgaplugin"    
+    archiveName = "de.innovationgate.contentmanager-${project.version}.wgaplugin"
     from('design') {
         into '/'
+        exclude 'java'
     }
+    from (tasks.jar.archivePath){
+   		into 'files/system'
+   	}
 }

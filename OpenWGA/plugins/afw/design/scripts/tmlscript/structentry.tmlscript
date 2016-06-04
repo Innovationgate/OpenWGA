@@ -1,0 +1,451 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+var Util;
+
+var Database;
+var database;		// WGDatabase object
+var Area;
+var struct;			// WGStructEntry object
+var reason;			// reason message for may-functions
+function _false(msg){
+	reason=msg;
+	return false;
+}
+
+this.init=function(structobj, dbobj){
+	
+	if(typeof structobj == "string"){
+		Database=createObject(this, "database", dbobj);
+		database=Database.WGObject;
+		struct=this.WGObject=database.getStructEntryByKey(structobj);
+	}
+	else {
+		if(!structobj)
+			struct = this.WGObject = content().getStructEntry(); 
+		else if(structobj instanceof Packages.de.innovationgate.webgate.api.WGStructEntry)
+			struct=this.WGObject=structobj;
+		else struct=this.WGObject=structobj.WGObject;
+		Database=createObject(this, "database", struct.getDatabase());
+		database=Database.WGObject;
+	}
+	if(struct)
+		Area = createObject(this, "area", struct.getArea());
+	Util = createObject(this, "util");
+}
+
+this.isValid=function(){
+	return struct!=null;
+}
+
+this.getReason=function(){
+	return reason;
+}
+
+this.getKey=this.getStructKey=function(){
+	return struct.getStructKey().toString();
+}
+
+this.getContextPath=function(){
+	return 'db:'+Database.getKey() +'/$struct:'+this.getKey();
+}
+
+this.getContentTypeName=function(){
+	var ct = struct.getContentType() 
+	return (ct && ct.getName()) || "";
+}
+
+this.getPosition=function(){
+	return struct.getPosition();
+}
+this.getNextSibling=function(){
+	return struct.getNextSibling();
+}
+
+this.mayCreatePage=function(){
+
+	if(Area.isTrashArea())
+		return _false(label("reason.no-creations-in-trash"))
+
+	if(Area.isTemplateArea())
+		return _false(label("reason.no-subpages-in-templates"))
+
+	if(!Database.hasValidLicense())
+		return _false(label("reason.no-valid-license"))
+
+	if(Database.isManager())
+		return true;
+		
+	if(!Database.isAuthor())
+		return _false(label("reason.database.you-need-to-be-author"))
+
+	var baddoc=struct.mayEditChildren();
+	if(baddoc!=null){
+		if(baddoc instanceof Packages.de.innovationgate.webgate.api.WGArea)
+			return _false(label("reason.area-settings-denies-creation", createlist([baddoc.getName()])));
+		return _false(label("reason.struct-settings-denies-creation", createlist([baddoc.getTitle()])));
+	}
+
+	// check if languages available for current user:
+	if(!Database.hasAllowedLanguages())
+		return _false(label("reason.language-settings-denies-creation"));	
+	
+	// check if contenttypes are avalable for me:
+	var pagetypes=database.getContentTypes().iterator();
+	while(pagetypes.hasNext()){
+		var pagetype=pagetypes.next();
+		try{
+			struct.performChildCreationCheck(pagetype)
+		}
+		catch(e){
+			continue;
+		}
+		if(pagetype.mayCreateContent() 						// may I genaraly use this content type?
+				&& pagetype.mayCreateChildEntry(struct))	// may I use this contenttype with this struct as parent?
+			return true;
+	}
+	return _false(label("reason.struct-no-allowed-pagetypes"));
+}
+
+this.mayCreateRootPage=function(){
+	if(!Database.hasValidLicense())
+		return _false(label("reason.no-valid-license"))
+
+	if(Area.isTrashArea())
+		return _false(label("reason.no-creations-in-trash"))
+
+	if(!Database.isAuthor())
+		return _false(label("reason.database.you-need-to-be-author"))
+
+	return struct.getArea().mayEditAreaChildren();
+}
+
+this.mayDeletePage=function(deep_check){
+
+	reason="";
+
+	if(Area.isTrashArea())
+		return _false(label("reason.no-edit-in-trash"))
+
+	try{
+		struct.performRemoveCheck(deep_check||false)
+		return true;
+	}
+	catch(e){
+		var errorCode, cause;
+		if(e.javaException.getErrorCode)
+			errorCode = e.javaException.getErrorCode()
+		if(errorCode){
+			if(e.javaException.getCauseDocument)
+				cause = e.javaException.getCauseDocument();
+			if(cause){			
+				var causeTitle = cause.getTitle ? cause.getTitle() : cause.getName ? cause.getName() : "unknown";
+				return _false(label("reason."+errorCode, [causeTitle]))
+			}
+			else return _false(label("reason."+errorCode))
+		}
+		else{
+			return _false(label("reason.unknown"))
+			logException(e);
+		}
+	}
+
+}
+
+this.mayEditContent=function(){
+	reason="";
+
+	if(Area.isTrashArea())
+		return _false(label("reason.no-edit-in-trash"))
+
+	if(!Database.hasValidLicense())
+		return _false(label("reason.no-valid-license"))
+	
+	if(Database.isManager())
+		return true;
+
+	if(!Database.isAuthor())
+		return _false(label("reason.database.you-need-to-be-author"))
+
+	var baddoc=struct.mayEditEntryAndContent();
+	if(baddoc!=null){
+		if(baddoc instanceof Packages.de.innovationgate.webgate.api.WGArea)
+			return _false(label("reason.area-settings-denies-edit", createlist([baddoc.getName()])));
+		return _false(label("reason.struct-settings-denies-edit", createlist([baddoc.getTitle()])));
+	}
+	
+	if(!struct.getContentType().mayCreateContent())
+		return _false(label("reason.pagetype-settings-denies-edit", createlist([struct.getContentType().getName()])))
+	
+	return true;
+}
+
+this.mayEditStruct=function(){
+	reason="";
+
+	if(Area.isTrashArea())
+		return _false(label("reason.no-edit-in-trash"))
+
+	if(!Database.hasValidLicense())
+		return _false(label("reason.no-valid-license"))
+	
+	if(!Database.isEditor())
+		return _false(label("reason.database.you-need-to-be-editor"))
+
+	var baddoc=struct.mayEditEntryAndContent();
+	if(baddoc!=null){
+		if(baddoc instanceof Packages.de.innovationgate.webgate.api.WGArea)
+			return _false(label("reason.area-settings-denies-edit", createlist([baddoc.getName()])));
+		return _false(label("reason.struct-settings-denies-edit", createlist([baddoc.getTitle()])));
+	}
+	
+	return true;
+}
+
+this.mayCreateContent=function(){
+	if(!this.mayEditContent())		// check if struct allowes creation (database and contenttype allows edit)
+		return _false(reason);
+	
+	// check if languages available for current user that have no content yet:		
+	var langs = database.getLanguages().values().iterator();
+	while(langs.hasNext()){
+		var lang=langs.next();
+		if(lang.mayCreateContent() && !this.hasContent(lang.name))
+			return true;
+	}
+	return _false(label("reason.no-more-languages"));
+}
+
+this.contentHasReaders=function(lang){
+	var lang = lang || Database.getPreferedLanguage();
+	var bestContent=this.getAllContent(lang, false);
+	if(bestContent.isEmpty()){
+		return this.hasContent(lang)
+	}
+	return !database.anyoneAllowed(bestContent.get(0).getReaders())
+}
+
+this.getTitle=function(encode){
+	var t=struct.getTitle();
+	return encode ? t.replace(/"/g, "'").replace(/[\n\r]/g, "") : t;
+}
+
+this.getContentTitle=function(encode, lang){
+	var lang = lang || Database.getPreferedLanguage();
+	var bestContent=this.getAllContent(lang, false);
+	if(bestContent.isEmpty()){
+		if(this.hasContent(lang))
+			return "("+label("no-reader-access")+")"
+		else return this.getTitle(encode);
+	}
+
+	var t=bestContent.get(0).getTitle();
+	return encode ? t.replace(/"/g, "'").replace(/[\n\r]/g, "") : t;
+}
+
+this.getContentTitleJsEncoded=function(quote){
+	return Util.encodeForScript(this.getContentTitle(), quote);
+}
+
+this.getAllContent=function(lang, include_archive){
+	var result=createlist();
+	var contentlist=struct.getAllContent(include_archive);
+	for(var i=0; i<contentlist.size(); i++){
+		var version=contentlist.get(i);
+		if(version.getLanguage().getName()==lang)
+			result.add(version)
+	}
+	sortList(result, "version", "down");
+	return result;
+}
+
+this.getBestContent=function(lang){
+	var lang = lang || Database.getPreferedLanguage();
+	var bestContent=this.getAllContent(lang, false);
+	if(bestContent.isEmpty())
+		return null;
+	return bestContent.get(0);
+}
+
+this.hasContent=function(lang, includeArchived){
+	if(includeArchived)
+		return struct.hasContent(lang, null);
+	else return struct.hasContent(lang, "p") || struct.hasContent(lang, "w") || struct.hasContent(lang, "g");
+}
+
+this.hasChildrenInStatus=function(status, lang){
+	var children=struct.getChildEntries().iterator();
+	while(children.hasNext()){
+		var child=createObject("structentry", Database, children.next())
+		if(!child.getAllContentInStatus(status, lang).isEmpty())
+			return true;
+	}
+	return false;	
+}
+
+this.hasChildren=function(){
+	return struct.hasChildren();
+}
+
+this.isRoot=function(){
+	return struct.isRoot();
+}
+
+this.getParentEntry=function(){
+	if(struct.isRoot())
+		return struct.getArea()
+	return struct.getParentEntry();
+}
+
+this.getAllContentInStatus=function(status, lang){
+	var result=createlist();
+	var contentlist=this.getAllContent(lang, false);
+	for(var i=0; i<contentlist.size(); i++){
+		var version=contentlist.get(i);
+		if(version.getStatus()==status)
+			result.add(version)
+	}
+	return result;
+}
+
+this.getPath=function(prefix, separator){
+	var separator = separator||"/";
+	var prefix = prefix||"";
+	
+	var path=[prefix+"struct:"+this.getStructKey()];
+	for(var parent=struct.getParentEntry(); parent; parent=parent.getParentEntry())
+		path.push(prefix+"struct:"+parent.getStructKey().toString());
+
+	path.push(prefix+"area:"+struct.getArea().getName());
+	return path.reverse().join(separator);
+}
+
+this.getPathInfo=function(separator){
+	var separator = separator||"/";
+	
+	var path=[this.getContentTitle(true)];
+	for(var parent=struct.getParentEntry(); parent; parent=parent.getParentEntry())
+		path.push(AFW.structentry(parent).getContentTitle(true));
+
+	path.push("["+struct.getArea().getName()+"]");
+	return path.reverse().join(separator);
+}
+
+this.isChildrenOf=function(otherStruct){
+	if(otherStruct.database!=database)
+		return false;
+	var s=struct;
+	while(s!=null){
+		if(s==otherStruct)
+			return true;
+		s=s.getParentEntry()
+	}
+	return false;
+}
+
+this.hasAccessRights=function(){
+	var list=struct.getChildEditors().iterator()
+	while(list.hasNext())
+		if(list.next()!="")
+			return true;
+	return false;
+}
+
+this.getRemoteList=function(){
+	
+	return createRemoteList(struct);
+	
+	/**
+	 * recursivly scan all children for remote infos
+	 */
+	function createRemoteList(sdoc){
+		var remotelist=createlist();
+		var remote_info_list=createlist();
+		var contentlist=sdoc.getAllReleasedContent().values().iterator();
+		while(contentlist.hasNext()){
+			var cdoc=contentlist.next();
+			if(cdoc.hasItem("remote_references")){
+				remotelist.addAll(cdoc.getItemValueList("remote_references"));
+			}
+			if(cdoc.hasItem("remote_info")){
+				var remote_info=cdoc.getItemText("remote_info");
+				var info=createlist();
+				info.add("db:"+cdoc.getDatabase().getDbReference() + "/docid:" + cdoc.getStructKey().toString()+"."+cdoc.getLanguage().getName()+".0")
+				info.add(remote_info);
+				remote_info_list.add(info);
+			}
+		}
+		var children=sdoc.getChildEntries();
+		var it=children.iterator();
+		while(it.hasNext()){
+			var child_scan=createRemoteList(it.next());
+			remotelist.addAll(child_scan.remote_references);
+			remote_info_list.addAll(child_scan.remote_infos);
+		}
+		return {
+			remote_references:	remotelist,
+			remote_infos:		remote_info_list
+		}
+	}
+}
+
+this.createChildEntry=function(contenttype, title){
+	return struct.createChildEntry(contenttype, title);
+}
+this.getChildEntries=function(){
+	return struct.getChildEntries();
+}
+
+/**
+ * copy structure from remote contentstore
+ */
+this.copyFromRemote=function(remotedb, remotekey){
+	
+	var remotestruct = db(remotedb).getStructEntryByKey(remotekey);		
+	copyStructure(struct, remotestruct);
+	
+	function copyStructure(deststruct, remotestruct){
+		log.info("create content in struct " + deststruct.getTitle());		
+		var contentlist=remotestruct.getAllReleasedContent().values().iterator();
+		while(contentlist.hasNext()){
+			var cdoc=contentlist.next();
+			cdoc.createClone(database, deststruct);
+		}
+		var children=remotestruct.getChildEntries();
+		var it=children.iterator();
+		while(it.hasNext()){
+			var child = it.next();
+			var sdoc;
+			if(deststruct.getDatabase()==remotestruct.getDatabase()){
+				log.info("same db: create child " + remotestruct.getTitle());
+				sdoc = deststruct.createChildEntry(child.getContentType(), child.getTitle());
+				//child.pushData(sdoc);
+				sdoc.setPosition(child.getPosition());
+			}
+			else sdoc = child.createClone(database, deststruct)
+			sdoc.save();
+			copyStructure(sdoc, child)
+		}	
+	}
+}

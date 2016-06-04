@@ -1,0 +1,147 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="selectModule">
+	var tabview=createObject("@ui/tabview", portlet);
+	tabview.addPage("setup:module-setup:portlet", tmlparam1, tmlparam2);			
+</tml:action>
+
+<tml:include designdb="@ui" ref="tabview_dynamic" o_designdb="{WGA.design().db().getDbReference()}">
+
+	<tml:option name="title">Content Modules</tml:option>	
+	
+	<tml:option name="body">			
+		<tml:case condition="portlet.currentpage<=0">
+
+			<tml:include ref="init"/>
+			<tml:script>			
+				_strcmp = function(a,b){
+					return (a<b) ? -1 : (a==b) ? 0 : 1;
+				}
+			</tml:script>
+			
+			<tml:include designdb="@ui" ref="windowview">
+
+				<tml:option name="title">
+					Content Modules by Design-DB
+				</tml:option>
+				
+				<tml:option name="body">
+				
+					<tml:script>
+						_CM_MODULES = createObject("modules");
+						_mods = WGA.createLookupTable()
+						var mods = _CM_MODULES.getModuleDefs();
+						for(var i=0; i<mods.length; i++){
+							var mod = mods[i];
+							var designdb = mod.designdb;
+							if(!_mods.get(designdb))
+								_mods.put(designdb, WGA.createList());
+							if(!mod.allowedparents)
+								_mods.get(designdb).add(mod);
+						}
+						_designdbs = _mods.keySet();
+					</tml:script>
+					
+					<tml:foreach item="_designdbs" currentvalue="_designdb">
+						<fieldset>
+							<legend><tml:item name="_designdb"/></legend>
+							<tml:script>
+								_dbmods = WGA.sortList(_mods.get(_designdb), function(a,b){
+									var ca = a.category||""
+									var cb = b.category||""
+									if(ca==cb)
+										return _strcmp(a.title, b.title);
+									else return _strcmp(ca, cb);
+								})
+							</tml:script>
+							<div style="padding:0 8px">
+							<tml:foreach item="_dbmods" currentvalue="_mod">
+								<div style="float:left;width:280px;margin-bottom:10px">
+									<b><tml:script expression="_mod.category ? _mod.category+'/':''"/><tml:script expression="_mod.title"/></b>
+									<br><tml:script expression="_mod.id"/>
+								</div>
+							</tml:foreach>
+							</div>
+						</fieldset>
+					</tml:foreach>
+
+					<div style="margin-top:10px"></div>
+
+					<tml:include designdb="@ui" ref="windowview" o_title="Global Module Configurations">
+						<table class="collection" width="100%">
+							<tr class="collection-title">
+								<td width="1%" class="indent"></td>
+								<td>Name</td>
+								<td>ID</td>
+								<td>Design Source</td>
+							</tr>
+	
+							<tml:script>
+								var mods = createlist(_CM_MODULES.getModuleDefs()).iterator();
+								_mods = createlist();
+								
+								while(mods.hasNext()){
+									var mod = mods.next();
+									if(mod.setuptml)
+										_mods.add(mod);
+								}
+								
+								_mods = WGA.sortList(_mods, function(a,b){
+									var ca = a.category||"";
+									var cb = b.category||"";
+									if(ca==cb)
+										return _strcmp(a.title, b.title);
+									return _strcmp(ca, cb);
+								})
+							</tml:script>
+							
+							<tml:foreach type="itemvalue" item="_mods" currentvalue="_mod">
+	
+								<tml:groupchange expression="_mod.category" id="gc">
+									<tr><td colspan="3"><h2><tml:script expression="_mod.category || 'Allgemein'"/></h2></td></tr>
+								</tml:groupchange>
+	
+								<tml:include designdb="@ui" ref="tr">
+									<tml:option name="ajaxaction" trim="true">
+										WGA.ajax.callAction('<tml:action ref="selectModule" param1="{_mod.id}" param2="{_mod.title}"/>', '<tml:script expression="portlet.portletkey"/>')
+									</tml:option>
+								</tml:include>
+	
+									<td class="indent"><img src="<tml:script expression="_mod.icon"/>"></td>
+									<td><tml:script expression="_mod.title"/></td>
+									<td><tml:script expression="_mod.id"/></td>
+									<td><tml:script expression="_mod.designdb"/></td>
+								</tr>
+								
+							</tml:foreach>
+						</table>
+					</tml:include>
+				</tml:option>
+			</tml:include>
+		</tml:case>
+	</tml:option>
+	
+</tml:include>

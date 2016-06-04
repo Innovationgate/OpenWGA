@@ -1,0 +1,83 @@
+/*
+
+ CSS for jquery-plugin modal
+
+ This file is part of the OpenWGA server platform.
+ (c) Innovation Gate
+
+*/ 
+
+<tml:include medium="jss" ref="toCSS" o_scope="body">
+
+	".body-mask": {
+		position: "fixed",
+		top: 0,
+		bottom: 0,
+		left: 0,
+		right: 0,
+		background: "black",
+		opacity: ".7",
+		filter: "alpha(opacity = 70)",
+		display: "none",
+		z_index: "101"
+	},
+	".modal-popup": {
+		position: "fixed",
+		overflow: "auto",
+		z_index: "102",
+		width: 600,
+		margin_left: -300,
+		"@html.small": {
+			width: "90% !important",
+			margin_left: "-45% !important",
+			top: "5%"
+		},
+		top: "10%",
+		left: "50%",
+		max_height: "80%",
+		background: "white",
+		padding: 0,
+		box_shadow: "0 0 20px black",
+		display: "none",
+		
+		".header": {
+			line_height: "1em",
+			padding: "20px 15px",
+			border_bottom: "solid #efefef 1px",
+			font_size: "2em",
+			position: ["-webkit-sticky", "sticky"],
+			top: 0,
+			z_index: "1",
+			background: "white",
+			"a[data-modal='hide']": {
+				float: "right",
+				cursor: "pointer",
+				text_decoration: "none"
+			}
+		},
+		".content": {
+			padding: 15
+		},
+		".footer": {
+			position: "sticky",
+			bottom: 0,
+			text_align: "right",
+			background: "#efefef",
+			border_top: "solid #dddddd 1px",
+			padding: 15
+		},
+		
+		">.close, .close-modal": {
+			background_image: "url('<tml:url type="file" doc="images" file="apple-close.png"/>')",
+			position: "absolute",
+			cursor: "pointer",
+			opacity: "1",
+			z_index: "1",
+			left: -14,
+			top: -12,
+			"height,width": 28
+		}
+		
+	}
+	
+</tml:include>

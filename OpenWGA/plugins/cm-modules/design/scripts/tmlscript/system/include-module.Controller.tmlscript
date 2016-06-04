@@ -1,0 +1,94 @@
+function Controller(){}
+
+Controller.prototype.prepare = function($cx, CMM){
+
+	this.mod = $cx.option("module-config");
+
+	var title = this.mod.selectSingleNode("@title");
+	this.title = title ? title.getText() : null;
+		
+	var id = this.mod.selectSingleNode("@id")
+	this.id = id ? id.getText() : null;
+	
+	this.module_id = this.mod.selectSingleNode("@module_id").getText();
+	this.mod_config = CMM.getModuleConfig(this.module_id);
+		
+	var tml=null;
+	if(this.mod_config){
+		tml = this.mod_config.tml;
+		//$cx.setOption("isContainer", this.mod_config.type=="container", "local");
+		// no longer used ???
+	}
+	else WGA.log.error("no module definition found for id '" + this.module_id + "'");
+	
+	if(tml){
+		var parts = tml.split("/");	
+		if(parts.length>1){
+			this.designdb = parts[0];
+			this.tml = parts[1];
+		}
+		else{
+			this.tml = tml;
+			this.designdb = this.mod_config.designdb;			
+		}
+		// check for TML: 
+		this.medium = $cx.option("medium") || $cx.request.getAttribute("MediaKey")
+		var html_fallback = $cx.option("fallback-to-html");
+		var main_db = $cx.context("main").db().getDbReference();
+		if(!$cx.db(this.designdb).getTMLModule(this.tml, this.medium)){		
+			// TML not found for main medium: check in current design:
+			//log.info("tml " + _tml + " not found in " + _designdb + " for " + _medium);
+			
+			var alternate_tml = "content-modules:" + this.module_id;
+			
+			if($cx.context("main").db().getTMLModule(this.tml, this.medium)){
+				this.designdb = main_db;
+				this.tml = alternate_tml;
+				//log.info("but tml " + _tml + " found in " + _designdb + " for " + _medium);
+			}
+			else if($cx.context("main").db().getTMLModule("overlay:"+alternate_tml, this.medium)){
+				this.designdb = main_db;
+				this.tml = "overlay:"+alternate_tml;
+				//log.info("but tml " + _tml + " found in " + _designdb + " for " + _medium);
+			}
+			else if(html_fallback=="true")
+				this.medium = "html"; 
+			else {
+				$cx.log.warn("alternate tml " + alternate_tml + " not found in " + $cx.context("main").db().getDbReference() + " for medium " + this.medium + ". Module " + this.module_id + " will be ignored.");
+				this.tml = false;
+			}
+		}
+		
+	}
+	else this.tml=false;
+	
+	//console.log("prepare", $cx, this.mod_config, this.tml);
+	
+}.nonIsolated();
+
+
+Controller.prototype.hasTml = function() Boolean(this.tml)
+
+Controller.prototype.hasCss = function(){
+	return Boolean(this.mod_config && ((this.mod_config.includes && this.mod_config.includes.css) || this.mod_config.css))
+}
+
+Controller.prototype.hasIncludeCss = function(){
+	return Boolean(this.mod_config.includes && this.mod_config.includes.css)
+}
+
+Controller.prototype.getCssCode = function(css){
+	var ret = css || "";
+	if(this.mod_config.css){
+		var design = WGA.design(this.mod_config.designdb).resolve(this.mod_config.css)
+		if(design){
+			try{
+				ret = (ret||"") + design.getCSSCode()
+			}
+			catch(e){
+				WGA.log.error(e.message);
+			}
+		}
+	}
+	return ret.replace(/\n/g, "").replace(/"/g, "'");
+}

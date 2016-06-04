@@ -1,0 +1,73 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".content-modules .module-cm_survey">
+	
+	".question":{
+		margin: "5px 0",
+		font_weight: "bold"
+	},
+	
+	".result label": {
+		float: "none"
+	},
+	
+	".answers": {
+		margin: "5px 0",
+		line_height: "1.5em",
+		label: {
+			float: "none",
+			display: "inline"
+		},
+		input: {
+			margin: "0 5px 0 0"
+		}
+	},
+	
+	".messages":{
+		color: "red",
+		margin: "5px 0"
+	},
+	
+	".buttons": {
+		margin: "10px 0"
+	},
+	
+	".bar": {
+		background_color: "black",
+		background_image: JSS.linearGradient("gray", "gray 40%", "black 60%"),
+		border: "solid silver 1px",
+		margin: 0,
+		border_radius: 4
+	},
+	
+	".bar-wrapper":{
+		margin: "2px 3px 10px 0",
+		background: "#efefef",
+		border: "solid silver 1px",
+		border_radius: 4
+	}
+	
+</tml:include>

@@ -1,0 +1,75 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:include ref="cmm-styles"/>
+
+<tml:include designdb="@afw" medium="stylesheet" ref="jquery-plugins">
+	<tml:option name="jquery-plugins" expression="jquery_plugin_css"/>
+</tml:include>
+
+<tml:case context="[db:{dbkey}/docid:{contentkey}]" iscontextvalid="true">
+	
+	<tml:script>
+		responsive = WGA.design(db()).getGlobal("RESPONSIVE")
+	</tml:script>
+	
+	<tml:include ref="init" medium="html"/>
+
+	<tml:script>
+		_CM_MODULES = createObject("modules");
+		_css = _CM_MODULES.getIncludes("css");
+	</tml:script>
+	<tml:foreach type="itemvalue" item="_css" currentvalue="_tml">
+		<tml:include designdb="{_tml.designdb}" ref="{_tml.tml}" medium="html"/>
+		<tml:case condition="responsive">
+			<tml:script>
+				_small_css = db(_tml.designdb).getTMLModule(_tml.tml+"-small", "html");
+			</tml:script>
+			<tml:case condition="_small_css">
+				@media screen and (max-width: <tml:script format="0" expression="responsive.medium.width-1"/>px) {
+					<tml:include designdb="{_tml.designdb}" ref="{_small_css.getName()}" medium="html"/>
+				}
+			</tml:case>
+			<tml:script>
+				_medium_css = db(_tml.designdb).getTMLModule(_tml.tml+"-medium", "html");
+			</tml:script>
+			<tml:case condition="_medium_css">
+				@media screen and (min-width: <tml:script format="0" expression="responsive.medium.width"/>px) {
+					<tml:include designdb="{_tml.designdb}" ref="{_medium_css.getName()}" medium="html"/>
+				}
+			</tml:case>
+			<tml:script>
+				_large_css = db(_tml.designdb).getTMLModule(_tml.tml+"-large", "html");
+			</tml:script>
+			<tml:case condition="_large_css">
+				@media screen and (min-width: <tml:script format="0" expression="responsive.large.width"/>px) {
+					<tml:include designdb="{_tml.designdb}" ref="{_large_css.getName()}" medium="html"/>
+				}
+			</tml:case>
+		</tml:case>
+	</tml:foreach>
+	
+</tml:case>
+

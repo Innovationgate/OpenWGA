@@ -1,0 +1,137 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="login">
+	if(!tmlform.validate())
+		return;
+	
+	var dbkey=tmlparam1
+	var database=wgacore.getContentdbs().get(dbkey)
+	if(!database)
+		return tmlform.addmessage("login database '" + dbkey + "' not found");
+	var domain =WGA.database(database).domain().name
+	
+	var success = login(tmlform.username, tmlform.password, domain)
+	if(!success){
+		if(WGACore.getBruteForceLoginBlocker().isLoginBlocked(domain, tmlform.username))
+			tmlform.addmessage(label("login.login-blocked", [tmlform.username]))
+		else tmlform.addmessage(label("login.login-error"))		
+	}
+	else redirectto(contenturl(null, null));
+</tml:action>
+
+<tml:action id="logout">
+	var dbkey=tmlparam1
+	var database=wgacore.getContentdbs().get(dbkey)
+	if(!database)
+		return tmlform.addmessage("logout database '" + dbkey + "' not found");
+	var domain = WGA.database(database).domain().name
+	logout(domain);
+	redirectto(contenturl(null, null));
+</tml:action>
+
+<tml:script>
+	_username = "anonymous";
+	_dbkey = CMM.setting("dbkey")||db().getDbReference();
+	var dbcontext = context("db:"+_dbkey, false)
+	if(!dbcontext)
+		log.info("CMM-Login-Module: unable to find database " + _dbkey);
+	else{
+		_username = dbcontext.meta("db", "username");
+	}
+	
+</tml:script>
+
+<tml:if condition="_username=='anonymous'">
+	
+	<tml:then>
+		
+		<tml:select switch="CMM.setting('action')">
+			<tml:case value="login">
+				<div class="login-message">
+					<tml:[setting] o_name="loginmessage" encode="html"/>
+				</div>
+				
+				<tml:if condition="CMM.setting('https')===true && !request.isSecure()">
+					<tml:then>
+						<tml:url protocol="https" var="_url"/>
+						<tml:label key="login.https-link" param1="{_url}"/>
+					</tml:then>
+
+					<tml:else>				
+						<tml:form id="{scoped:login-form}" onsubmit="window.login()" cssclass="login-form box">
+							<script>
+								function login(){
+									WGA.callAction("<tml:action ref="login" param1="{_dbkey}"/>");
+								}
+							</script>
+							
+							<div class="login-error">
+								<tml:formmessages divider="<br>"/>
+							</div>			
+							
+							<label><tml:label key="module.login.label.username"/>:</label>
+							<div class="data">
+								<tml:input type="text" name="username" focus="true"
+									validation="$E_VALUE!=''"
+									message="{label('module.login.username.validation')}"
+								/>
+							</div>
+							
+							<label><tml:label key="module.login.label.password"/>:</label>
+							<div class="data">
+								<tml:input type="password" name="password"/>
+							</div>
+							
+							<div class="button-bar">
+								<button type="submit" class="btn">login</button>
+							</div>
+							
+						</tml:form>
+					</tml:else>
+				</tml:if>
+				
+			</tml:case>
+
+		</tml:select>
+		
+			
+	</tml:then>
+	
+	<tml:else>
+
+		<div class="logout">
+			<tml:label key="module.login.you-are-loggedin-as"/>
+			<strong><tml:item name="_username" encode="html"/></strong>.
+			<tml:button cssclass="btn" clickaction="logout" param1="{_dbkey}">logout</tml:button>		
+		</div>
+		
+	
+		<tml:include ref="system:include-child-modules">
+			<tml:option name="margins" expression="true" scope="local"/>
+		</tml:include>
+	</tml:else>
+	
+</tml:if>

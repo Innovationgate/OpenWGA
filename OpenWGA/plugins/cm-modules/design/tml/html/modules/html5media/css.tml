@@ -1,0 +1,51 @@
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_html5videoplayer">
+	
+	video: {
+		outline: "none",
+		width: "100%",
+		"&.dragover": {
+			opacity: ".5"
+		}
+	}
+		
+</tml:include>
+
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_html5audioplayer">
+	
+	line_height: 30,
+	
+	".playlist-entry": {
+		".info": {
+			float: "right",
+			margin_left: 5
+		},
+		".can-not-play":{
+			font_size: ".8em",
+			line_height: "1em"
+		},
+		audio: {
+			outline: "none",
+			width: "100%"
+		},
+		".song-title": {
+			margin: 0,
+			cursor: "pointer",
+			white_space: "nowrap",
+			overflow: "hidden",
+			text_overflow: "ellipsis",
+			display: "block",
+			padding: "0 0 0 25px",
+			background_:{
+				repeat: "no-repeat",
+				position: "left center",
+				image: "url('<tml:url type="file" doc="images" file="kmixdocked_mute.png"/>')"
+			}
+		},
+		"&.playing .song-title":{
+			background_image: "url('<tml:url type="file" doc="images" file="kmixdocked.png"/>')"
+		},
+		"&.error .song-title":{
+			background_image: "url('<tml:url type="file" doc="images" file="kmixdocked_error.png"/>')"
+		}
+	}
+</tml:include>

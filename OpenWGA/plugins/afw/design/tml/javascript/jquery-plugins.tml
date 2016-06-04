@@ -1,0 +1,16 @@
+<tml:script>
+	_plugins = WGA.createList(request.getParameter("plugins"), ",")
+</tml:script>
+<tml:foreach item="_plugins" currentvalue="_plugin">
+	<tml:script>
+		_plugin = _plugin.trim()
+	</tml:script>
+	<tml:case condition="_plugin">
+		<tml:script>
+			var js = WGA.design().db().getCSSJSModule("jquery-"+_plugin, "js")
+			if(js)
+				return "\n" + js.getCode();
+			else log.info("jquery-plugin " + _plugin + " not found");
+		</tml:script>
+	</tml:case>		
+</tml:foreach>

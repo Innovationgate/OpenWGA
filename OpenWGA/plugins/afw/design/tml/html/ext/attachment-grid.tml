@@ -1,0 +1,188 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:input type="hidden" name="attachments"/>
+
+<script>
+
+	AFW.util.createAttachmentGrid=function(el, type, dbkey, key, autoHeight){
+		
+		var id=el;
+		
+		var ds = new Ext.data.Store({
+	        proxy: new Ext.data.HttpProxy(new Ext.data.Connection({
+	        		url: "<tml:url type="tml" context="db:plugin-wga-app-framework" layout="json:get-attachments"/>"
+	        	})),
+	        reader: new Ext.data.JsonReader(
+	        	{
+	        		id: "id",
+	        		totalProperty: "total",
+	        		root: "data"
+	        	},
+	         	[
+	               {name: 'name'},
+	               {name: 'url'},
+	               {name: 'size', type: 'float'}
+	          	])
+	    });
+		//console.log("initial loading data ...", el, ds.proxy.useAjax)
+	    var urlparams={dbkey: dbkey, type:type, key: key, who:el};
+	    ds.load({params:urlparams});
+	    
+	    ds.on("loadexception", function(record, option){
+	    	console.log("grid.store load exception", record)
+	    })
+		/*
+	    ds.on("load", function(record, option){
+	    	console.log("grid.store loaded: " + id, record)
+	    })
+		*/
+		
+		function renderSize(value) {
+			// start with GB and work way down to kB
+			var kb = 1024;
+			var mb = kb*kb;
+			var gb = mb*kb;				
+			if (value >= gb)
+				return Math.round(value/gb) + ' GB';
+			else if (value >= mb)
+				return Math.round(value/mb) + ' MB';
+			else if (value >= kb)
+				return Math.round(value/kb) + ' KB';
+			else
+				return value + ' bytes';		
+		}
+	
+	    var colModel = new Ext.grid.ColumnModel([
+			{id: "col-filename", header: "{%label:filename%}", width: 400, sortable: true, dataIndex: 'name'},
+			{id: "col-size", header: "{%label:filesize%}", width: 50, resizable:false, align:"right", renderer: renderSize, sortable: true, dataIndex: 'size'}
+		]);
+		
+	    // create the Grid
+	    var grid = new Ext.grid.Grid(el, {
+	        ds: ds,
+	        cm: colModel,
+	        autoHeight: autoHeight||false,
+	        autoExpandColumn: "col-filename"
+	    });
+		grid.render();
+		
+		return grid;
+	}
+
+	var x = function(){
+
+		// create dialog
+		AFW.dialog.create("attachment-dialog",
+			{
+				id: 				"attachment-dialog",
+				title:				"{%label:attachments%} ...",
+				tml: 				"ext:attachment-dialog",
+				designdb:			"plugin-wga-app-framework",
+				submitButton:		{
+					text:			"{%label:upload%}",
+					action:			"attachFile",
+					msg:			"{%label:content-attachments.msg%} ..."
+				}
+			}
+		)
+		
+		// create grid:						
+		var grid = AFW.util.createAttachmentGrid("<tml:option name="divid"/>", "content", "<tml:meta type="db" name="dbkey"/>", "<tml:meta name="key"/>", false);
+		var ds=grid.getDataSource();
+		
+		<tml:case condition="option('mode')=='edit'">
+			grid.on("rowclick", function(){
+				tb.items.get(1).enable();
+			})
+		</tml:case>
+		
+		grid.on("rowdblclick", function(){
+			var selection=grid.getSelections()[0];
+			//console.log(selection);
+			window.open(selection.data.url, "_blank");
+		})
+	
+		var gridHead = grid.getView().getFooterPanel(true);
+		var tb = new Ext.Toolbar(gridHead, [
+			    {
+			        text: '{%label:new%}',
+			        icon: "<tml:url type="file" doc="icons" file="database_add.png"/>",
+			        cls: "x-btn-text-icon",
+			        disabled: <tml:script expression="option('mode')=='view'"/>,
+			        handler : function(m, ev){
+						AFW.dialog.show("attachment-dialog", ev.target, {
+							context: "db:<tml:meta name="dbkey" type="db"/>/docid:<tml:meta name="key"/>",
+							params:{type:'content', dbkey:"<tml:meta name="dbkey" type="db"/>", key:"<tml:meta name="key"/>"}
+						});
+			        }
+			    },
+			    {
+			        text: '{%label:delete%}',
+			        icon: "<tml:url type="file" doc="icons" file="database_delete.png"/>",
+			        cls: "x-btn-text-icon",
+			        disabled: true,
+			        handler : function(m, ev){
+			        	var selections=grid.getSelections();
+			        	var files=[];
+			        	for(var i=0; i<selections.length; i++){
+							//console.log("delete", selections[i].data.name)
+							files.push(selections[i].data.name)
+						}
+						Ext.MessageBox.confirm('{%label:confirm-deletion%}', '{%label:query-delete-selected-attachments%}?', function(btn){
+							if(btn=="no")
+								return;
+							document.forms['<tml:script expression="tmlform.formid"/>'].attachments.value=files.join("|")			
+							WGA.ajax.action({
+									action: "<tml:action ajax="norefresh">
+											var files=tmlform.attachments.split("|");
+											for(i in files)
+												content().removeFile(files[i]);
+											content().save();
+											var ev= createEvent("CMS_attachments_changed");
+											portlet.fireEvent(ev);
+									</tml:action>",
+									id: "<tml:script>return portlet.portletkey</tml:script>",
+									graydiv: false,
+									mode: "norefresh"
+								}
+							);
+						});
+						
+			        }
+			    }
+	    ]);
+	
+		WGA.event.register(
+			"portlet-content-properties",
+			"CMS_attachments_changed", 
+			function(e){
+				ds.load({params:{dbkey: "<tml:meta name="dbkey" type="db"/>", key: "<tml:meta name="key"/>", type:'content', who:'portlet-content-properties'}});
+				tb.items.get(1).disable();
+			}
+		);
+		
+		//return grid;
+	}();
+</script>

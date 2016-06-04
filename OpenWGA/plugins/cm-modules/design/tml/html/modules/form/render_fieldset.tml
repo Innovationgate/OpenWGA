@@ -1,0 +1,6 @@
+<fieldset>
+	<legend><tml:script expression="CMM.setting('legend')"/></legend>
+	<tml:include ref="system:include-child-modules">
+		<tml:option name="margins" expression="true" scope="local"/>
+	</tml:include>
+</fieldset>

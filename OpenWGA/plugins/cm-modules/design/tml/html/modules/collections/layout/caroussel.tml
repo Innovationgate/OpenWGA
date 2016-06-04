@@ -1,0 +1,89 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<div class="column-slider" style="opacity:0;transition: opacity .2s">
+	<div class="columns">
+		<tml:foreach sourcetag="{scoped:child-collection}"
+				id="{scoped:child-collection-loop}"
+				sortexpression="date||PAGEPUBLISHED" sortorder="descending"
+				offset="{$option_offset}"
+				pagesize="{CMM.setting('entries')||0}"
+		>
+
+			<tml:script>
+				_filename=img;
+				var primary = content().getPrimaryFileName();
+				if(!_filename){
+					// find first image
+					var filenames = content().getFileNames().iterator();
+					var extensions = WGA.createList(["jpg","png", "jpeg", "gif"])
+					while(filenames.hasNext()){
+						var filename = filenames.next();
+						var parts = filename.split(".")
+						var ext = parts[parts.length-1].toLowerCase();
+						if(parts.length>1 && extensions.contains(ext)){
+							_filename = filename
+							if(_filename==primary)
+								break;		// we take this primary
+							// if not primary continue because we might find it later.
+						}
+					}
+				}
+				
+				_wgakey = KEY;
+				if(Virtuallink && Virtuallinktype!="int")
+					_wgakey=null;
+				
+			</tml:script>
+
+			<div class="column">
+				<div class="img">
+					<tml:case condition="_filename">						
+						<tml:[util:link] o_linktitle="{TITLE}">
+							<img src="<tml:url type="file" file="{_filename}"/>" border="0">
+						</tml:[util:link]>
+					</tml:case>
+				</div>
+				<div class="date"><tml:script expression="date||PAGEPUBLISHED||MODIFIED" format="longdate"/></div>
+				<div>
+					<h1><tml:script expression="headline||TITLE"/></h1>
+					<div class="intro"><tml:script expression="intro||DESCRIPTION" encode="rtf"/></div>
+					<div class="more">
+						<tml:[util:link]><tml:label key="more"/> ...</tml:[util:link]>
+					</div>
+				</div>
+			</div>
+		</tml:foreach>
+	</div>
+</div>
+
+<script>
+	require(["jquery", "jquery-columnslider", "jquery-swipehandler"], function(){
+		$("#module-<tml:option name="ns"/> .column-slider").columnslider({
+			<tml:case condition="CMM.setting('autorun')">
+				autoslide: 4000
+			</tml:case>
+		}).css("opacity", 1);
+	})
+</script>

@@ -1,0 +1,25 @@
+<tml:script>
+	_plugins = option("jquery-plugins") || WGA.createList(request.getParameter("plugins"), ",")
+</tml:script>
+<tml:foreach item="_plugins" currentvalue="_plugin">
+
+	<tml:script>
+		_plugin = _plugin.trim()
+		_tml = _css = null;
+		if(_plugin){
+			try{
+				_tml = WGA.design().db().getTMLModule("jquery-"+_plugin, "stylesheet")
+				_css = WGA.design().resolve("jquery-"+_plugin).getCSSCode();
+			}
+			catch(e){} 
+		}
+	</tml:script>
+
+	<tml:case condition="_plugin && _tml">
+		<tml:include ref="[jquery-{_plugin}]"/>
+	</tml:case>
+	<tml:case condition="_plugin && _css">
+		<tml:item name="_css" encode="none"/>
+	</tml:case>
+	
+</tml:foreach>

@@ -1,0 +1,24 @@
+function Controller(){}
+
+Controller.prototype = {
+
+	wgakey: function($cx){
+	
+		if($cx.Virtuallink && $cx.Virtuallinktype!="int")
+			return null;
+		return $cx.KEY
+	}
+
+	,linkTitle: function($option_linktitle){
+		return $option_linktitle || ""
+	}
+
+	,linkTarget: function($option_linktarget){
+		return $option_linktarget || ""
+	}
+
+	,linkBody: function($option_body, $cx){
+		return $option_body || $cx.TITLE
+	}
+
+}

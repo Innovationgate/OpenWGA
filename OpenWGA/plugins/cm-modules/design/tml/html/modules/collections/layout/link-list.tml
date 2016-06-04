@@ -1,0 +1,58 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:item name="{scoped:target}" var="_target"/>
+
+<tml:foreach sourcetag="{scoped:child-collection}" 
+		id="{scoped:child-collection-loop}"
+		sortexpression="date||PUBLISHED||CREATED" sortorder="descending" 
+		pagesize="{CMM.setting('entries')||'0'}"
+		offset="{$option_offset}"
+>
+	<tml:if condition="CMM.setting('group_by_date')">
+		<tml:then>
+			<tml:script>
+				_dateGroup = AFW.Util.dateGroup(date||PUBLISHED||CREATED);
+			</tml:script>
+			<tml:groupchange id="groupchange" expression="_dateGroup.text">
+				<tml:case isfirstloop="false"></ul></tml:case>
+				<div class="headline<tml:case isfirstloop="true"> first-child</tml:case>"><tml:taginfo sourcetag="groupchange" name="currentvalue" />:</div>
+				<ul class="children">
+			</tml:groupchange>
+		</tml:then>
+		<tml:elseif isfirstloop="true">
+			<ul class="children">
+		</tml:elseif>
+	</tml:if>
+	
+	<li>
+		<tml:[util:link] o_linktarget="{_target}"/>
+		<tml:case condition="CMM.setting('show_description') && DESCRIPTION">
+			<div class="description"><tml:metadata name="description"/></div>
+		</tml:case>
+	</li>
+	<tml:case islastloop="true"></ul></tml:case>
+</tml:foreach>
+

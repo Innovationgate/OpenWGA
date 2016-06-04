@@ -1,0 +1,124 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:if condition="!CMM.setting('map_address')">
+	<tml:then>
+		<tml:label key="google-maps-no-address"/>
+	</tml:then>
+	<tml:else>
+		<div id="<tml:script expression="WGA.scoped('map_canvas')"/>" class="google-map" style="height:<tml:[setting] o_name="map_height" o_default="200"/>px"></div>
+		<tml:script>
+			var ctx = context("db:"+WGA.design().db().getDbReference()+"/name:cm_google_map", false)
+			if(ctx)
+				_apikey = ctx.apikey
+		</tml:script>
+		<script>
+			require(["jquery", 
+				"<tml:url type="tml" name="::js" u_noext=""/>",
+				"async!///maps.googleapis.com/maps/api/js?libraries=weather,places<tml:case condition="_apikey">&key=<tml:item name="_apikey"/></tml:case>"
+			], function(){
+			
+				$(function(){
+					MAPS.codeAddress("<tml:[setting] o_name="map_address"/>", function (lat, lng) {
+				
+						var MyMap = {
+							lat: lat||51.30268,
+							lng: lng||6.84192,
+							zoom: <tml:script expression="CMM.setting('map_zoom')||15"/>
+						}
+						
+					    var latlng = new google.maps.LatLng(MyMap.lat, MyMap.lng);
+					    var myOptions = {
+					      zoom: MyMap.zoom,
+					      center: latlng,
+					      mapTypeControl: true,
+					      mapTypeControlOptions: {style: google.maps.MapTypeControlStyle.DROPDOWN_MENU},
+					      navigationControlOptions: {style: google.maps.NavigationControlStyle.SMALL},
+					      mapTypeId: <tml:[setting] o_name="map_type" o_default="google.maps.MapTypeId.ROADMAP"/>
+					    };
+					    var map = new google.maps.Map(document.getElementById("<tml:script expression="WGA.scoped('map_canvas')"/>"), myOptions);
+					    WGA.event.addListener("google-map-module", "CMM-element-activated", function(e){
+					    	if(e.params.el){
+						    	var p = $(e.params.el);
+						    	var me = document.getElementById("<tml:script expression="WGA.scoped('map_canvas')"/>")
+						    	if(p.length && $.contains(p[0], me)){
+						    		google.maps.event.trigger(map, 'resize');
+						    		map.setCenter(latlng)
+						    	}
+						    }
+					    })
+	
+						<tml:case condition="CMM.settingList('layers').contains('weather')">
+							var weatherLayer = new google.maps.weather.WeatherLayer({
+								temperatureUnits: google.maps.weather.TemperatureUnit.CELSIUS
+							});
+							weatherLayer.setMap(map);
+						</tml:case>
+						
+						<tml:case condition="CMM.settingList('layers').contains('traffic')">
+							var trafficLayer = new google.maps.TrafficLayer();
+							trafficLayer.setMap(map);
+						</tml:case>
+	
+						<tml:case condition="CMM.settingList('layers').contains('parking')">
+							var request = {
+							    location: latlng,
+							    radius: '500',
+							    query: 'parking'
+					  		};
+					
+						  	var service = new google.maps.places.PlacesService(map);
+						 	service.textSearch(request, function(results, status){
+					  			if (status == google.maps.places.PlacesServiceStatus.OK) {
+					    			for (var i = 0; i < results.length; i++) {
+					    				MAPS.addMarker(
+					    					map,
+					    					results[i].geometry.location,
+					    					results[i].formatted_address,
+					    					results[i].formatted_address,
+					    					"http://google-maps-icons.googlecode.com/files/parking.png"
+					    				)
+									}
+								}
+						 	});	
+	
+						</tml:case>
+						
+						<tml:script>
+							_mods = option("child-modules");
+						</tml:script>
+					    <tml:foreach type="itemvalue" item="_mods" currentvalue="_mod">
+					    	<tml:include ref="::render-marker" tmlscope="{_mod.selectSingleNode('@id').getText()}">
+						    	<tml:option name="title" expression="_mod.selectSingleNode('@title').getText()"/>
+					    	</tml:include>
+					    </tml:foreach>
+					    
+					})
+				})
+			})
+		</script>
+	</tml:else>
+</tml:if>
+

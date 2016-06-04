@@ -1,0 +1,74 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<label><tml:label key="content-box.settings.style"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:style}" type="select" options="{label('content-box.settings.style.options')}" mode="{option('mode')}"/>
+</div>
+
+<label><tml:label key="content-box.settings.background-image"/>:</label>
+<tml:include ref="util:select-image" o_mode="{option:mode}"/>
+
+<label><tml:label key="content-box.settings.margin"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:padding}" cssstyle="width:100%" type="text" default="5px" mode="{option('mode')}"/>
+</div>
+
+<label><tml:label key="content-box.settings.fixed_height"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:fixed_height}" type="boolean" changeaction="$refresh" ajax="true" default="false" mode="{option('mode')}"/>
+</div>
+<tml:case condition="tmlform.field(WGA.scoped('fixed_height'))">
+	<label><tml:label key="content-box.settings.height"/>:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:height}" type="text" mode="{option('mode')}"/>
+	</div>
+</tml:case>
+
+<label><tml:label key="content-box.settings.title"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:show_title}" type="checkbox" options="{label('content-box.settings.title-options')}" changeaction="$refresh" ajax="true" mode="{option('mode')}"/>
+</div>
+
+<tml:case condition="tmlform.field('show_title_'+option('ns'))=='show'">
+	<label><tml:label key="content-box.settings.title-as-link"/>:</label>
+	<div style="margin:10px">
+		<tml:input name="[url_{option('ns')}]" cssstyle="width:100%" mode="{option('mode')}"/>
+	</div>
+	<tml:case condition="option('mode')!='view'">
+		<div id="link-view-<tml:option name="ns"/>" class="ychooser-view" style="height:170px;overflow:auto"></div>
+		<script>
+			var sitemap = new BI.util.structTree("link-view-<tml:option name="ns"/>", "<tml:meta type="database" name="dbkey"/>");			
+			sitemap.tree.on("click", function(node, e) {
+	        	var a = node.id.split(":");
+	        	if(a[0]=="node-struct" && !node.disabled)
+		        	document.forms["<tml:script expression="tmlform.formid"/>"].elements["url_<tml:option name="ns"/>"].value = a[1];		        
+	        }, this);
+			<tml:case context="{'docid:'+tmlform.field('url_'+option('ns'))}" iscontextvalid="true">
+		        sitemap.tree.selectPath("/root/<tml:script expression="AFW.structentry().getPath('node-', '/')"/>")				
+			</tml:case>
+		</script>
+	</tml:case>
+</tml:case>

@@ -1,0 +1,265 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<tml:action id="saveFile">
+	var filename=tmlform.filenames.get(0);
+	var a=filename.split(".");
+	if(a.length>1)
+		var ext="." + a[a.length-1];
+	else var ext="";
+	this.tmlform.attach(this.content(), isEmptyValue(tmlform.filename) ? filename : tmlform.filename+ext);
+	this.content().save();
+	tmlform.reset();
+</tml:action>			
+
+<tml:action id="deleteFile">
+	content().removeFile(tmlparam1);
+	content().save();
+</tml:action>
+
+<HTML>
+<tml:range context="{'db:'+request.getParameter('dbkey')+'/docid:'+request.getParameter('contentkey')}">
+<head>
+	<tml:htmlhead/>
+	<script>
+		var selectedFile=null;
+		function selectFile(tr){
+			if(selectedFile){
+				selectedFile.style.backgroundColor="";
+				selectedFile.style.color="";
+			}
+			selectedFile=tr;
+			if(selectedFile){
+				selectedFile.style.backgroundColor="highlight";
+				selectedFile.style.color="highlighttext";
+				selectedFile.scrollIntoView(false);
+				if(selectedFile.id && parent.system && parent.system.fileEntrySelector)
+					parent.system.fileEntrySelector(selectedFile.id);
+			}
+			//document.getElementById("files").focus();
+		}
+	
+		function showUploadForm(){
+			var el=document.getElementById("filelist");
+			el.style.display="none";
+			var el=document.getElementById("buttonarea");
+			el.style.display="none";
+			var el=document.getElementById("uploadform");
+			el.style.display="block";			
+		}
+		function hideUploadForm(){
+			var el=document.getElementById("filelist");
+			el.style.display="block";
+			var el=document.getElementById("buttonarea");
+			el.style.display="block";
+			var el=document.getElementById("uploadform");
+			el.style.display="none";
+			document.getElementById("files").focus();			
+		}
+		function updateSaveAs(el){
+			var f = el.value;
+			f = f.replace(/\//g, "\\");		// replace / (used on unix systems) with \ (used on windows) 
+			var filepath=f.split("\\");
+			var filename=filepath[filepath.length-1].split(".");
+			filename.pop();		// remove file extension
+			el.form.filename.value=filename.join(".");
+		}
+		
+		function keyHandler(event){
+			if(!event)
+				event=window.event;
+			var keycode=event.keyCode;
+			switch(keycode){
+				case 40:	// down
+				case 39:	// right
+					var tr=selectedFile;
+					do{
+						tr=tr.nextSibling;
+					}
+					while(tr && tr.tagName!="TR")
+					if(tr)
+						selectFile(tr);
+					stopEvent(event);
+					break;
+				case 38:	// up
+				case 37:	// left
+					var tr=selectedFile;
+					do{
+						tr=tr.previousSibling;
+					}
+					while(tr && tr.tagName!="TR")
+					if(tr)
+						selectFile(tr);
+					stopEvent(event);
+					break;
+				case 46:	// delete
+					deleteSelectedFile();
+					stopEvent(event);
+					break;
+//				default: alert(keycode);
+			}
+		}
+		function deleteSelectedFile(){
+			if(selectedFile==null)
+				return alert("<tml:label file="rtf" key="showfiles.no-file-selected"/>");
+			if(confirm(selectedFile.id + "\n<tml:label file="rtf" key="showfiles.query-delete"/>"))
+				callAction(selectedFile.getAttribute("deleteaction"));
+			else document.getElementById("files").focus();
+			
+		}
+		function stopEvent(event){
+			// stop "normal" eventhandling:
+			if (document.all){
+				event.cancelBubble = true;
+				event.returnValue = false;
+			}
+			else {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+		}
+		function openWindow(url, title){
+			window.open(escape(url), title);
+		}
+	</script>
+	<style>
+		body,button,input,td,select{
+			font-size:8pt;
+		}
+		input[type=text],input[type=file]{
+			border:inset gray 1px;
+		}
+		#uploadform{
+			padding:5px;
+		}
+		#buttonarea{
+			/*border-top:solid black 1px;*/
+			padding-top:2px;
+		}
+		#files{
+			overflow:auto;
+			height:135px;
+			margin-top:1px;
+			padding-top:1px;
+			background-color:white;
+			border:inset white 1px;
+		}
+		#files td{
+			padding-right:4px;
+			padding-left:4px;
+		}
+		body{
+			overflow:hidden;
+			background-color:transparent;
+		}
+		
+	</style>
+</head>
+
+<body style="margin:2" style="background-color:transparent">
+	
+	<tml:if condition="content().mayEditContent()">
+		<tml:then>
+	
+			<tml:script var="filenames">
+				return this.content().getFileNames();
+			</tml:script>
+		
+			<div id="uploadform" style="display:none">
+				<tml:form id="upload" cssstyle="display:inline">
+					<tml:input type="file" name="newfile">size="45" onchange="updateSaveAs(this)"</tml:input>
+					<tml:label file="rtf" key="showfiles.form.save-as"/>:
+					<tml:input name="filename">size="66"</tml:input>
+					<br/>
+					<hr size="1">
+					<tml:button clickaction="saveFile"><tml:label file="rtf" key="showfiles.button.save"/></tml:button>
+					<button type="button" onclick="hideUploadForm();return false;"><tml:label file="rtf" key="showfiles.button.cancel"/></button>
+				</tml:form>
+			</div>
+			
+			<div id="filelist" onkeydown="keyHandler(event)">
+				<div id="files">	
+					<table width="100%" style="border-collapse:collapse;" >
+						<tml:foreach type="itemvalue" item="filenames" currentvalue="filename">
+							<tr style="cursor:pointer" id="<tml:item name="filename"/>" 
+									deleteaction="<tml:action ref="deleteFile" param1="{filename}"/>"
+									onclick="selectFile(this)"
+									ondblclick="openWindow('<tml:url type="file" file="{filename}"/>', '_blank')">
+								<td><tml:item name="filename"/></td>
+								<td width="100" align="right">
+									<tml:script format="#0.0">return content().getFileSize(filename)/1000</tml:script> KB
+								</td>
+							</tr>
+						</tml:foreach>
+					</table>
+				</div>
+			</div>
+			<script>		
+				var div=document.getElementById("files");
+				//div.focus();
+				<tml:if hasurlparameter="key">
+					<tml:then>
+						var tr = document.getElementById("<tml:urlparameter name="key"/>");
+						selectFile(tr);
+					</tml:then>
+					<tml:else>
+						var trs=div.getElementsByTagName("tr");
+						if(trs.length>0)
+							selectFile(trs[0]);
+					</tml:else>
+				</tml:if>
+			</script>
+		
+			<tml:script var="isEditable">
+				var isDesigner = ( this.content().getDatabase().getSessionContext().getAccessLevel() >= this.content().getDatabase().ACCESSLEVEL_EDITOR_DESIGNER );
+				var isEditable = ( this.content().getStatus().equals(this.content().STATUS_DRAFT) || isDesigner );
+			
+				// Check-Out?			
+				var userNameList = this.createList();
+				userNameList.add(this.content().getAuthor());
+				//if( username.equalsIgnoreCase( this.content().getAuthor() ) ){
+				if( !this.content().getDatabase().isMemberOfUserList( userNameList ) && this.content().getStatus() == this.content().STATUS_DRAFT ){			
+					isEditable = false;	
+				}	
+				
+				return isEditable;	
+			</tml:script>
+			
+			<tml:case condition="isEditable">
+				<div id="buttonarea">
+					<button type="button" accesskey="u" onclick="showUploadForm()"><tml:label file="rtf" key="showfiles.button.upload"/></button>
+					<button id="deletebutton" onclick="deleteSelectedFile()"><tml:label file="rtf" key="showfiles.button.delete"/></button>
+				</div>
+			</tml:case>
+		</tml:then>
+		<tml:else>
+			<tml:label file="rtf" key="not-allowed"/>
+		</tml:else>
+	</tml:if>
+
+</body>
+</html>
+</tml:range>

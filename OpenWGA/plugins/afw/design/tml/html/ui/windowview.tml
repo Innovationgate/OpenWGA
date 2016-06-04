@@ -1,0 +1,136 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	if (this.option('actions')!=null)
+	{
+		var actions=option('actions').split(',');
+		var alist=createList();
+		for (i=0; i<actions.length; i++)
+			alist.add(actions[i]);
+		_actions=alist;
+	}
+	
+	if (this.option('ajaxactions')!=null)
+	{
+		var actions=option('ajaxactions').split(',');
+		var alist=createList();		
+		for (i=0; i<actions.length; i++)
+			alist.add(actions[i]);
+		_ajaxactions=alist;
+	}	
+</tml:script>
+
+<div class="windowview">
+	<div class="windowtitle_back">
+		<table  class="windowtitle" width="100%" border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td nowrap unselectable="on" >			
+					<tml:option name="title"/>
+				</td>
+		
+				<td align="right" nowrap>
+					<tml:case condition="this.option('ajaxactions')!=null && this.option('ajaxactions')!=''">
+						<tml:foreach type="itemvalue" item="_ajaxactions" currentvalue="_ajaxaction">
+							<tml:script>
+								if (_ajaxaction=="")
+									return_actioncode="";
+								var action=_ajaxaction.split("|");
+								_actiontitle=action[0];
+								_actioncode=action[1];
+								_actionkey=action[2];
+							</tml:script>
+							
+							<a class="actionlink" 
+								<tml:case condition="_actionkey!=undefined">
+									accesskey="<tml:item name="_actionkey"/>"
+								</tml:case>
+								<tml:if condition="_actioncode!='' &&_actioncode!=undefined && _actioncode.substr(0, 10)=='javascript'">
+									<tml:then>
+										href="<tml:item name="_actioncode" encode="none"/>"
+									</tml:then>
+									<tml:elseif condition="_actioncode!=''">
+										href="javascript:WGA.ajax.callAction('<tml:item name="_actioncode" encode="none"/>', '<tml:script>return option('portletkey')==null?portlet.portletkey:option('portletkey')</tml:script>')"
+									</tml:elseif>
+								</tml:if>
+							>
+								<tml:item name="_actiontitle" encode="none"/>
+							</a>					
+							<tml:between><tml:script>return option('betweenactions')==null?' | ':option('betweenactions')</tml:script></tml:between>
+						</tml:foreach>
+					</tml:case>
+				
+					<tml:case condition="this.option('actions')!=null && this.option('actions')!=''">
+						<tml:case condition="this.option('ajaxactions')!=null && this.option('ajaxactions')!=''">
+							|
+						</tml:case>
+						<tml:foreach type="loop" count="{this.itemList('_actions').size()}" currentvalue="_index">
+							<tml:script>
+								if (this.itemList("_actions").get(this._index-1)=="")
+									return;
+								var action=this.itemList("_actions").get(this._index-1).split("|");
+								_actiontitle=action[0];
+								_actionurl=action[1];
+								_actionkey=action[2];
+							</tml:script>
+							
+							<a class="actionlink" 
+								<tml:case condition="_actionkey!=undefined">
+									accesskey="<tml:item name="_actionkey"/>"
+								</tml:case>
+								href="<tml:item name="_actionurl" encode="none"/>"
+							>
+								<tml:item name="_actiontitle" encode="none"/>
+							</a>
+							<tml:between> | </tml:between>
+						</tml:foreach>
+					</tml:case>
+				</td>
+		
+			</tr>
+		</table>
+	</div>
+	
+	<table class="window_view" border="0" width=100% cellpadding="0" cellspacing="0">
+		<tr>
+			<td valign="top" class="<tml:option name="css"/>" style="padding:0px">	
+				<tml:option name="body"/>
+			</td>
+		</tr>	
+	</table>
+	
+	<table class="window_footer" border="0" width=100% cellpadding="0" cellspacing="0">
+		<tr>
+			<td class="window_footer_cells">		
+				<b class="window_footer_rounded" style="width:1px;height:2px;margin-left:1px">&nbsp;</b>
+				<b class="window_footer_rounded" style="width:1px;height:1px;margin-left:2px">&nbsp;</b>
+				<b class="window_footer_rounded" style="width:2px;height:1px;margin-left:3px">&nbsp;</b></td>
+			<td class="window_footer_middle"><img height="1"></td>
+			<td class="window_footer_cells">
+				<b class="window_footer_rounded" style="width:1px;height:2px;margin-left:3px">&nbsp;</b>
+				<b class="window_footer_rounded" style="width:1px;height:1px;margin-left:2px">&nbsp;</b>
+				<b class="window_footer_rounded" style="width:2px;height:1px;margin-bottom:1px">&nbsp;</b></td>
+		</tr>
+	</table>
+</div>

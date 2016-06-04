@@ -1,0 +1,137 @@
+<tml:action id="setFiles">
+	var mp3 = request.getParameter("mp3")
+	var ogg = request.getParameter("ogg")
+	
+	WGA.synchronizedFunction(function(){
+		db().reopenSession();
+		var map = CMM.getModulesSettingsMap("document")
+		var module_settings_map = CMM.getModulesSettingsMap(null, option("ns"))
+		map.putAll(module_settings_map);
+	
+		if(ogg)	
+			map.put(WGA.scoped("ogg"), ogg);
+		if(mp3)	
+			map.put(WGA.scoped("mp3"), mp3);
+		map.put(WGA.scoped("setting_source"), "document");
+		
+		CMM.writeContentModulesSettingsData(map);
+	
+		content().save();
+	}, content())()
+	
+</tml:action>
+
+<tml:script>
+	_so=AFW.Util.serializeJsObject({
+		dbkey: meta("database", "dbkey"),
+		contentkey: KEY
+	})
+</tml:script>
+
+<script>
+	require(["jquery", "jquery-wga-drophandler"], function(){
+		$(function(){
+			
+			var BI = window.parent.BI
+			
+			function upload(file, finished){
+				BI.UploadManager.upload(file, {
+					url: "<tml:url db="plugin-contentmanager" type="tml" name="cms:action-panel:attachments:html5-upload-processor"/>",
+					params: {
+						so: "<tml:item name="_so"/>",
+						filename: file.name
+					},
+					callback: function(filename){
+						window.parent.WGA.event.fireEvent("CMS_attachments_changed");
+						var url = "../../file/<tml:meta name="key"/>/"+filename.replace(/\+/g, "%2B");
+						finished(url);
+					}
+				})
+			}
+			function setFilesAction(params){
+				WGA.ajax.action({
+					action: "<tml:action ref="setFiles" ajax="norefresh"/>",
+					mode: "norefresh",
+					graydiv: false,
+					params: params
+				})
+			}
+			
+			function onDesktopDrop(files){
+				var $this = $(this);
+				if(!BI)
+					return;	// No Content Manager
+				var mp3, ogg;
+			    for(var i=0; i<files.length; i++){
+					var ext = files[i].name.split(".").pop();
+					if("mp3".indexOf(ext)>=0)
+						mp3=files[i]
+					if(ext=="ogg")
+						ogg=files[i]
+				}
+	
+				if(mp3){
+					upload(mp3, function(url){
+						var el = $this.find("source [type='audio/mpeg']").first();
+						if(el.length)
+							el.attr("src", url);
+						else $this.append('<source type="audio/mpeg" src="'+url+'"></source>')
+						setFilesAction({
+							mp3: mp3.name
+						})
+					}) 
+				}
+				if(ogg){
+					upload(ogg, function(url){
+						var el = $this.find("source [type='audio/ogg']").first();
+						if(el.length)
+							el.attr("src", url);
+						else $this.append('<source type="audio/ogg" src="'+url+'"></source>')
+						setFilesAction({
+							ogg: ogg.name
+						})
+					}) 
+				}
+			}
+			
+			function onFilesDrop(data){
+	
+				var mp3, ogg;
+				var audio = $(this).find("audio")
+				for(var i=0; i<data.length; i++){
+					var ext = data[i].name.split(".").pop();
+					if("mp3".indexOf(ext)>=0){
+						mp3=data[i].name
+						var el = audio.find("source [type='audio/mpeg']").first();
+						if(el.length)
+							el.attr("src", data[i].url);
+						else audio.append('<source type="audio/mpeg" src="'+data[i].url+'"></source>')
+						audio.load();
+						$(this).removeClass("error")
+							.find(".can-not-play").remove();
+					}
+					if(ext=="ogg"){
+						ogg=data[i].name
+						var el = audio.find("source [type='audio/ogg']").first();
+						if(el.length)
+							el.attr("src", data[i].url);
+						else audio.append('<source type="audio/ogg" src="'+data[i].url+'"></source>')
+						audio.load();
+						$(this).removeClass("error")
+							.find(".can-not-play").remove();
+					}
+				}
+	
+				setFilesAction({
+					mp3: mp3,
+					ogg: ogg
+				})
+			}
+			
+			$("#module-<tml:option name="ns"/> .playlist-entry").wga_drophandler({
+				onDesktopDrop: !window.parent.BI ? false : onDesktopDrop,
+				onFilesDrop: onFilesDrop					
+			})
+		})
+	})
+</script>

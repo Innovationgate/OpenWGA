@@ -1,0 +1,116 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+var Database;
+var database;		// WGDatabase object
+var area;			// WGStructEntry object
+var reason;			// reason message for may-functions
+function _false(msg){
+	reason=msg;
+	return false;
+}
+
+this.init=function(areaobj, dbobj){
+	
+	//runtime.debug();
+	if(typeof areaobj == "string"){
+		Database=createObject(this, "database", dbobj);
+		database=Database.WGObject;
+		area=this.WGObject=database.getArea(areaobj);
+	}
+	else{
+		if(!areaobj)
+			area = this.WGObject = content().getStructEntry().getArea();
+		else if(areaobj instanceof Packages.de.innovationgate.webgate.api.WGArea)
+			area=this.WGObject=areaobj;
+		else area=this.WGObject=areaobj.WGObject;
+		Database=createObject(this, "database", area.getDatabase());
+		database=Database.WGObject;		
+	}
+}
+
+/*
+ * System areas:
+ */
+this.isTemplateArea=function(){
+	return area.name=="$templates"
+}
+this.isTrashArea=function(){
+	return area.name=="$trash"
+}
+this.isSystemArea=function(){
+	return area.name.charAt(0)=="$";
+}
+/****/
+
+this.getReason=function(){
+	return reason;
+}
+
+this.mayEditChildren=function(){
+	if(!Database.hasValidLicense())
+		return _false(label("reason.no-valid-license"))
+
+	if(!Database.isAuthor())
+		return _false(label("reason.database.you-need-to-be-author"))
+
+	return area.mayEditAreaChildren();
+}
+
+this.mayCreatePage=this.mayCreateRootPage=function(){
+	if(this.isTrashArea())
+		return false;
+		
+	// check if contenttypes are avalable for me:
+	var hasPageTypes=false;
+	var pagetypes=database.getContentTypes().iterator();
+	while(pagetypes.hasNext()){
+		var pagetype=pagetypes.next();
+		try{
+			area.performRootCreationCheck(pagetype)
+		}
+		catch(e){
+			continue;
+		}
+		if(pagetype.mayCreateContent() 						// may I genaraly use this content type?
+				&& pagetype.mayCreateChildEntry(area)){		// may I use this contenttype with this struct as parent?
+			hasPageTypes=true;
+			break;
+		}
+	}
+	if(!hasPageTypes)
+		return false;		// no pagetypes availabe;
+				
+	if(this.mayEditChildren())
+		return Database.hasAllowedLanguages();
+	return false;
+}
+
+this.createChildEntry=function(contenttype, title){
+	return area.createRootEntry(contenttype, title);
+}
+this.getChildEntries=function(){
+	return area.getRootEntries();
+}

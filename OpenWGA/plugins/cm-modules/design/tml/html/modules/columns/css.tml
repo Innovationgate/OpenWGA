@@ -1,0 +1,62 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_columns">
+
+	"> .columns-wrapper":{
+		margin: "0 -10px",
+	
+		"> .module-cm_column":{
+			"> div":{
+				float: "left",
+				".inner-column": {
+					padding: "0 10px"
+				}
+			}
+		},
+	
+		"&.layout-lines": {
+			position: "relative",
+			"> .module-cm_column":{
+				"> div > .inner-column": {
+					border: "transparent",
+					"&:after": {
+					    content: "\"\"",
+					    position: "absolute",
+					    height: "100%",
+					    top: 0,
+					    margin_left: -10,
+					    border_right: "1px solid silver"
+					}
+				},
+				"&.first-child > div > .inner-column:after": {
+					border: "none"
+				}
+			}			
+		}
+	
+	}
+			
+</tml:include>

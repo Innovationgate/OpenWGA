@@ -1,0 +1,53 @@
+var Handlebars;
+
+this.init = function(){
+	if(!require)
+		return;
+
+	try{
+		Handlebars = require("handlebars-v2.0.0")
+		Handlebars.registerHelper("foreach", function(obj, options){
+			var ret = ""
+			for(var doc in Iterator(obj)){
+				ret += options.fn(doc)
+			}
+			return ret;
+		})
+		Handlebars.registerHelper("url", function(obj, options){
+			if(obj instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)
+				return WGA.urlBuilder(obj).build(true)
+		})
+	}
+	catch(e){
+		logException(e);
+	}
+}
+
+this.stringTemplate = function(input, data){
+	if(!Handlebars)
+		throw "Handlebars not available";
+	var template = Handlebars.compile(input)
+	return template(data);
+}
+
+this.fileTemplate = function(container, file, data){
+
+	if(!Handlebars)
+		throw "Handlebars not available";
+	
+	var c = db().getFileContainer(container)
+	if(!c)
+		throw "file container " + container + " not found."
+	var f = c.getFileData(file)
+	if(!f)
+		throw "File " + file + " not found in container " + container;
+	var filereader = new java.io.InputStreamReader(f, "UTF-8");
+	if(!filereader)
+		throw "Unable to open file " + file + " in container " + container;
+
+	var filetext = WGA.Utils.readString(filereader) 
+	filereader.close();
+
+	var template = Handlebars.compile(filetext)
+	return template(data);
+}

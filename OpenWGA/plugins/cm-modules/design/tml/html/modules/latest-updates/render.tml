@@ -1,0 +1,62 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<div class="latest-updates">
+	
+	<tml:collection>
+		<tml:query type="hql" includecurrent="true" max="{CMM.setting('entries')}">
+			not content.structentry.contenttype.name='hdb-contenttype'
+			order by content.published DESC
+		</tml:query>
+			
+		<tml:foreach>
+		
+			<tml:script>
+				_dateGroup = AFW.Util.dateGroup(PUBLISHED);
+			</tml:script>
+		
+			<tml:groupchange id="groupchange" expression="_dateGroup.text">
+				<tml:case isfirstloop="false"></ul></tml:case>
+				<div class="headline"><tml:taginfo sourcetag="groupchange" name="currentvalue" />:</div>
+				<ul style="margin: 3px 0">
+			</tml:groupchange>
+		
+			<li>
+				<a class="clearfix" href="<tml:url/>" title="<tml:metadata name="PUBLISHED" format="EE, d.MM.yyyy HH:ss"/>">
+					<span class="datetime">
+						<tml:meta name="PUBLISHED" format="{_dateGroup.format}"/>
+					</span>
+					<span class="title">
+						<tml:meta name="title"/>
+					</span>
+				</a>
+			</li>
+			
+			<tml:case islastloop="true"></ul></tml:case>
+		</tml:foreach>
+		<div style="clear:right"></div>
+				
+	</tml:collection>
+	
+</div>

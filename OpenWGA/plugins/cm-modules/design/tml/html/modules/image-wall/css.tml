@@ -1,0 +1,28 @@
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".content-modules .module-cm_image-wall">
+
+	".album":{
+		overflow: "hidden",
+		padding: 10,
+		margin: -10,
+	
+		".image-row": {
+			margin_bottom: 10,
+			width: 10000,		
+			img: {
+				display: "block",
+				max_width: "none !important",
+				max_height: "none !important",
+				opacity: "0",
+				transition: "opacity .2s"
+			},
+			".image-wrap":{
+				margin_right: 10,			
+				float: "left"
+			}
+		},
+		":last-child": {
+			margin_bottom: 0
+		}
+	}
+
+</tml:include>

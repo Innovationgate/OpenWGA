@@ -1,0 +1,47 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+{
+	id:				'cm_google_map',
+	title:			'<tml:label key="module.google-map"/>',
+	category:		"<tml:label key="module.category.social"/>",
+	icon:			'<tml:url db="@afw" type="file" doc="icons" file="map.png"/>',
+	type:			'container',
+	tml:			'modules:google-map:render',
+	settingstml:	'modules:google-map:settings',
+	setuptml:		'modules:google-map:setup',
+	allowedchildren: ["cm_google_map_marker"],
+	includes:		{
+		tml:	'modules:google-map:google-maps-api',
+		js:		'modules:google-map:js',
+		css:	'modules:google-map:css'
+	}
+}
+,{
+	id:				'cm_google_map_marker',
+	title:			'<tml:label key="module.google-map-marker"/>',
+	icon:			'<tml:url type="file" doc="icons" file="google-marker.png"/>',
+	settingstml:	'modules:google-map:settings-marker',
+	allowedparents: ["cm_google_map"]
+}

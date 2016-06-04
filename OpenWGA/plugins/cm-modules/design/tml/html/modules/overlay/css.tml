@@ -1,0 +1,26 @@
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_overlay">
+
+
+	".modal-popup .header": {
+		font_size: "1.5em"
+	},
+
+	".overlay":{
+		background: "transparent",
+		overflow: "visible",
+		
+		".inner-overlay":{
+			background: "white",
+			box_shadow: "0px 0px 30px black",
+			border_radius: 10,
+			border: "solid silver 5px",
+			overflow_x: "hidden",
+			overflow_y: "auto",
+			padding: 10
+		},
+		img: {
+			max_width: "100%"
+		}
+	}
+
+</tml:include>

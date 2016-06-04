@@ -40,12 +40,14 @@
 		<div class="block">
 			<tml:include ref="::trash-entries"/>
 		</div>
-		<div class="block">
-			<tml:include ref="::waiting-to-be-approved"/>
-		</div>
-		<div class="block">
-			<tml:include ref="::to-be-approved"/>
-		</div>
+		<tml:case condition="!db().getWorkflowEngine().getWorkflowDefinitions().isEmpty()">
+			<div class="block">
+				<tml:include ref="::waiting-to-be-approved"/>
+			</div>
+			<div class="block">
+				<tml:include ref="::to-be-approved"/>
+			</div>
+		</tml:case>
 	</div>
 	
 	<tml:case hasoptions="body">

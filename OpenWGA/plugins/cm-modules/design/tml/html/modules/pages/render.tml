@@ -1,0 +1,87 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	var page = request.getParameter(WGA.scoped('page'))||0;
+	page = Number(page);
+	var mods = option("child-modules");
+	if(!mods.size())
+		return;
+	if(page>mods.size()-1)
+		page=0;
+	_child_mod = mods.get(page);
+</tml:script>
+
+<tml:if condition="_child_mod">
+	<tml:then>
+		<tml:include ref="system:include-module">
+			<tml:option name="module-config" expression="_child_mod"/>
+		</tml:include>
+		
+		<tml:script>
+			// recalc vars because they may have been changes in included module
+			_mods = option("child-modules");
+			_page = request.getParameter(WGA.scoped('page'))||0;
+			_page = Number(_page);
+			_mods = option("child-modules");
+			if(_page>_mods.size()-1)
+				_page=0;
+		</tml:script>
+		
+		<tml:case condition="_mods.size()>1">
+			<div class="box paging-toolbar">
+				<tml:case condition="_page>0">
+					<button onclick="location.href='<tml:url>
+						<tml:param name="{WGA.scoped('page')}" type="url" expression="_page-1"/>
+					</tml:url>'">
+						<<
+					</button>
+				</tml:case>
+				<tml:foreach type="loop" count="{_mods.size()}" currentvalue="_i">
+					<tml:if condition="_i == _page+1">
+						<tml:then><b><tml:label key="page"/> <tml:item name="_i"/></b></tml:then>
+						<tml:else>
+							<button onclick="location.href='<tml:url>
+								<tml:param name="{WGA.scoped('page')}" type="url" expression="_i-1"/>
+							</tml:url>'">
+								<tml:label key="page"/> <tml:item name="_i"/>
+							</button>
+						</tml:else>
+					</tml:if>
+				</tml:foreach>
+				<tml:case condition="_page<_mods.size()-1">
+					<button onclick="location.href='<tml:url>
+						<tml:param name="{WGA.scoped('page')}" type="url" expression="_page+1"/>
+					</tml:url>'">
+						>>
+					</button>
+				</tml:case>			
+			</div>
+		</tml:case>
+	</tml:then>
+	<tml:else>
+		Module "pages": No pages defined
+	</tml:else>
+</tml:if>

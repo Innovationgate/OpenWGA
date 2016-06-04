@@ -1,0 +1,57 @@
+<label><tml:label key="column-slider.number-of-columns"/>:</label>
+<tml:script>
+	try{
+		_responsive = WGA.design(db()).createObject("responsive").definition()
+	}
+	catch(e){
+		_responsive = null;
+	}
+	_responsive = WGA.design(db()).getGlobal("RESPONSIVE")
+</tml:script>
+
+<tml:if condition="_responsive">
+	<tml:then>
+		<div style="margin:10px">
+			(<tml:label key="column-slider.settings.hint-responsive"/>)
+		</div>
+		<div style="margin:10px">
+			<label><tml:label key="column-slider.settings.responsive.small-medium-large"/>:</label>
+			<tml:input name="{scoped:cols_s}" type="number" default="1" cssstyle="width:30px" mode="{option('mode')}"/>
+			/
+			<tml:input name="{scoped:cols_m}" type="number" default="2" cssstyle="width:30px" mode="{option('mode')}"/>
+			/
+			<tml:input name="{scoped:cols_l}" type="number" default="3" cssstyle="width:30px" mode="{option('mode')}"/>
+		</div>
+	</tml:then>
+	<tml:else>
+		<div style="margin:10px">
+			<tml:input name="{scoped:cols}" type="number" default="1" mode="{option('mode')}"/>
+		</div>		
+	</tml:else>
+</tml:if>
+
+<label><tml:label key="column-slider.settings.effect"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:effect}" type="select" options="slide,fade" default="slide" mode="{option('mode')}"/>
+</div>		
+
+<label><tml:label key="column-slider.settings.show-title"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:show_title}" type="boolean" default="false" mode="{option('mode')}"/>
+</div>		
+
+<label><tml:label key="column-slider.settings.autorun"/>:</label>
+<div style="margin:10px">
+	<tml:input type="boolean" name="{scoped:autorun}" changeaction="$refresh" default="false" mode="{option('mode')}"/>
+</div>
+
+<tml:case condition="tmlform.field(WGA.scoped('autorun'))">
+	<label><tml:label key="column-slider.settings.autorun-time-in-seconds"/>:</label>
+	<div style="margin:10px">
+		<tml:input type="number" name="{scoped:time}" default="4" mode="{option('mode')}"/>
+	</div>
+	<label><tml:label key="column-slider.settings.hide-navigation"/>:</label>
+	<div style="margin:10px">
+		<tml:input type="boolean" name="{scoped:hide-nav}" default="false" mode="{option('mode')}"/>
+	</div>
+</tml:case>

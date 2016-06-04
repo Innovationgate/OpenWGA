@@ -1,0 +1,164 @@
+/*******************************************************************************
+  *Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+  *
+  *This file is part of the OpenWGA server platform.
+  *
+  *OpenWGA is free software: you can redistribute it and/or modify
+  *it under the terms of the GNU General Public License as published by
+  *the Free Software Foundation, either version 3 of the License, or
+  *(at your option) any later version.
+  *
+  *In addition, a special exception is granted by the copyright holders
+  *of OpenWGA called "OpenWGA plugin exception". You should have received
+  *a copy of this exception along with OpenWGA in file COPYING.
+  *If not, see <http://www.openwga.com/gpl-plugin-exception>.
+  *
+  *OpenWGA is distributed in the hope that it will be useful,
+  *but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *GNU General Public License for more details.
+  *
+  *You should have received a copy of the GNU General Public License
+  *along with OpenWGA in file COPYING.
+  *If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+.List{
+	background-color: white;
+	background:transparent url(../../plugin-wga-app-framework/file/bg/nav_button_bg_normal.gif) repeat scroll 0 0;
+	cursor:pointer;
+}
+.List td{
+	border-bottom: solid 1px black;
+	-moz-user-select:none;
+}
+
+.List.mouseOverRow td{
+	cursor:pointer;	
+	background-color:#96A1B9;
+	background:transparent url(../../plugin-wga-app-framework/file/bg/nav_button_bg_over.gif) repeat scroll 0 0;
+}
+.List.mouseOverRow td, .List.mouseOverRow td *{
+	color: red; 
+}
+
+/* table collections */
+table.collection{
+	border-collapse:collapse;
+	empty-cells:show;
+	cursor:default;	
+}
+table.collection td.indent{
+	padding-left: 20px;
+}
+table.collection td.indent-small{
+	padding-left: 10px;
+}
+table tr.collection-title td{
+	border-bottom:solid black 1px;
+	color: gray;
+	font-style: italic;
+}
+table.collection-total td{
+	border-top:solid gray 2px;
+	font-weight:bold;
+}
+table.collection-sum td{
+	border-top:double black 3px;
+	font-weight:bold;
+}
+table.collection td{
+	vertical-align:top;	
+	padding: 2px 4px 2px 4px;
+}
+
+
+/*
+ * Ext
+ */
+
+.x-panel-fbar{
+	width: 100%;	/* IE nedds this */
+}
+ 
+.x-panel-tbar td{
+	padding:0px;
+}
+
+.x-panel-header{
+	background-image: url(../../plugin-wga-app-framework/file/bg/nav_button_bg_over.gif);
+	background-position: 0px -5px;
+	border-bottom-color:silver;
+	border-top-color: rgb(159,171,195);
+	
+	padding: 2px 2px 2px 5px;
+	color: #111111;
+	font-weight: normal;
+	
+	-webkit-border-top-left-radius: 4px;		 /* Round each corner of the created rectangle */
+	-webkit-border-top-right-radius: 4px;		 /* Round each corner of the created rectangle */
+	-moz-border-radius-topleft: 4px;
+	-moz-border-radius-topright: 4px;
+	-moz-background-clip:padding;
+}
+.x-panel-tbar .x-toolbar{
+	padding: 0px;
+}
+
+.x-panel-body{
+	-webkit-border-bottom-right-radius: 4px;		 /* Round each corner of the created rectangle */
+	-webkit-border-bottom-left-radius: 4px;		 /* Round each corner of the created rectangle */
+	-moz-border-radius-bottomright: 4px;
+	-moz-border-radius-bottomleft: 4px;
+	border-color: rgb(159,171,195);
+}
+
+
+/** Tabs **/
+
+.tab_header{
+	width: 100%;
+	padding:0
+}
+.tab_header td{
+	padding: 0;
+}
+
+.tab_header .tab_r{				/*selected, .tab_header .tab_normal{*/
+	font-weight: bold;
+	padding: 3px 5px 3px 5px;
+	margin-left: 2px;
+	display:block;
+	background-color: #efefef;
+	border-width: 1px 1px 0 1px;
+	border-style: solid;
+	border-color: rgb(159,171,195);
+	-webkit-border-top-right-radius: 4px;		 /* Round each corner of the created rectangle */
+	-webkit-border-top-left-radius: 4px;		 /* Round each corner of the created rectangle */
+	-moz-border-radius-topright: 4px;
+	-moz-border-radius-topleft: 4px;
+}
+.tab_header .tab_selected .tab_r{
+	background-color: rgb(159,171,195) !important;
+	color: white;
+}
+.tab_header a{
+	text-decoration: none;
+	cursor: pointer;
+}
+.tab_header .tab_selected .tab_r *{
+	color: white;
+}
+
+.tab_addon{
+  text-align:right;
+  width:100%;
+  padding:0 5px 0 0;  
+}
+
+.tab_close{
+	padding: 1px;
+	width: 6px;
+	background-color: #efefef;
+	border: solid gray 1px;
+}
+

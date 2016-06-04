@@ -1,0 +1,117 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+
+	var mp4 = CMM.setting("mp4");
+	var webm = CMM.setting("webm");
+	var mp4_mobile = CMM.setting("mp4_mobile");
+	var urls={
+		"video/mp4": mp4 && fileurl(mp4),
+		"video/webm": webm && fileurl(webm)
+	}
+
+	var image = CMM.setting("image");
+	if(image)
+		_poster_url = WGA.urlBuilder(fileurl(image))
+			.setParameter("derivate", "usage=poster")
+			.build();
+	else _poster_url = null;
+	_title = null;
+
+	var video_file = CMM.setting("video_file");
+	if(video_file){
+		var mimetype = content().getFileMetaData(video_file).mimeType
+		urls[mimetype]=fileurl(video_file);
+		_title = content().getFileMetaData(video_file).title;
+		
+		// check for derivates
+		for(type in urls){
+			if(!urls[type] && WGA.selectDerivate(video_file, "usage=video,type="+type)){
+				urls[type] = WGA.urlBuilder(fileurl(video_file))
+					.setParameter("derivate", "usage=video,type="+type)
+					.build();
+			}
+		}
+		
+		if(!_poster_url){
+			var poster_derivat = WGA.selectDerivate(video_file, "usage=poster")
+			if (poster_derivat){
+				var url = WGA.urlBuilder(fileurl(video_file))
+					.setParameter("derivate", "usage=poster")
+				if(isbrowserinterface()){
+					var cs = poster_derivat.getSha512Checksum()
+					url.setParameter("cs", cs);
+				}
+				_poster_url = url.build();
+			}
+		}
+	}
+	_urls = WGA.createLookupTable(urls)
+	
+</tml:script>
+
+<video controls="controls" preload="metadata" title="<tml:item name="_title"/>"
+	<tml:case condition="_poster_url">
+		poster="<tml:item name="_poster_url"/>"
+	</tml:case> 
+	<tml:case condition="CMM.setting('autoplay')">
+		autoplay 
+	</tml:case>
+	style="opacity:0;transition: opacity .2s">
+>
+		
+	<tml:script expression="_urls.keySet()" var="_types"/>
+	<tml:foreach item="_types" currentvalue="_type">
+		<tml:case condition="_urls.get(_type)">
+			<source src="<tml:script expression="_urls.get(_type)"/>" type="<tml:item name="_type"/>"></source>
+		</tml:case>
+	</tml:foreach>
+	
+</video>
+
+<script>
+	require(["jquery"], function(){
+		$("#module-<tml:option name="ns"/> source").each(function(index, el){
+			el.src = el.src.split(";").slice(0)[0];
+		})
+		$("#module-<tml:option name="ns"/> video").each(function(index, el){
+			if(el.poster)	
+				el.poster = el.poster.split(";").slice(0)[0];
+		}).css("opacity", 1);
+		if(window.parent.BI){
+			WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "derivates-updated", function(ev){
+				if(ev.params.filename=="<tml:script expression="CMM.setting('video_file')"/>"){
+					WGA.ajax.callAction("<tml:action ref="$refresh"/>");
+				}
+			})
+		}
+	})
+</script>
+
+<tml:case condition="option('mode')=='edit'">
+	<tml:include ref="::dragdrop-video"/>
+</tml:case>
+

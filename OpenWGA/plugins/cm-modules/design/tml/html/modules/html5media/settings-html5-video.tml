@@ -1,0 +1,98 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:eventscript onevent="file-selected">
+	var ev = portletEvent
+	var field = ev.getParameter("field")
+	if(field == WGA.scoped("video_file")){
+		tmlform.removefield(WGA.scoped("mp4"))
+		tmlform.removefield(WGA.scoped("webm"))
+		tmlform.removefield(WGA.scoped("image"))
+	}
+</tml:eventscript>
+
+<tml:script>
+	setOption("icon", fileurl("images", "video-32.png"));
+	
+	// für Abwärzkompatibilität:
+	var video = tmlform.field(WGA.scoped("video_file"))
+	var webm = tmlform.field(WGA.scoped("webm"))
+	var mp4 = tmlform.field(WGA.scoped("mp4"))
+	
+	if(!video){
+		if(mp4)
+			tmlform.setField(WGA.scoped("video_file"), mp4)
+		else if(webm)
+			tmlform.setField(WGA.scoped("video_file"), webm)
+	}
+	
+</tml:script>
+
+<label><tml:label key="html5media.video-file"/>:</label>
+<tml:include ref="util:select-file" o_fieldname="video_file" o_mimetype="video"/>
+
+<tml:case condition="tmlform.field(WGA.scoped('video_file'))">
+	
+	<tml:script>
+		var filename = tmlform.field(WGA.scoped('video_file'));
+		var mimetype = content().getFileMetaData(filename).mimeType
+		_hasWebm = (mimetype=="video/webm" || WGA.selectDerivate(filename, "usage=video,type=video/webm")!=null)
+		_hasMp4 = (mimetype=="video/mp4" || WGA.selectDerivate(filename, "usage=video,type=video/mp4")!=null)
+		_hasPoster = WGA.selectDerivate(filename, "usage=poster")!=null
+	</tml:script>
+	
+	<tml:case isfalse="_hasMp4">
+		<label><tml:label key="html5media.mp4-video-file"/>:</label>
+		<tml:include ref="util:select-file" o_fieldname="mp4" o_mimetype="video/mp4"/>
+	</tml:case>
+	<tml:case isfalse="_hasWebm">
+		<label><tml:label key="html5media.webm-video-file"/>:</label>
+		<tml:include ref="util:select-file" o_fieldname="webm" o_mimetype="video/webm"/>
+	</tml:case>
+
+	<label><tml:label key="html5media.posterimage"/>:</label>
+	<tml:include ref="util:select-image" o_empty-text="{_hasPoster ? 'Aus Video':VOID}"/>
+	
+	<label><tml:label key="html5media.autoplay"/>:</label>
+	<div style="margin:10">
+		<tml:input name="{scoped:autoplay}" type="boolean" mode="{option:mode}"/>
+	</div>
+	
+</tml:case>
+
+	<tml:comment><hr>
+	<label><tml:label key="html5media.mp4-video-file"/>:</label>
+	<tml:include ref="util:select-file" o_fieldname="mp4" o_file-extensions="mov,m4v,mp4"/>
+	
+	<label><tml:label key="html5media.webm-video-file"/>:</label>
+	<tml:include ref="util:select-file" o_fieldname="webm" o_file-extensions="webm"/>
+
+	<label><tml:label key="html5media.posterimage"/>:</label>
+	<tml:include ref="util:select-image" o_empty-text="{_hasPoster ? 'Aus Video':VOID}"/>
+	
+	<label><tml:label key="html5media.autoplay"/>:</label>
+	<div style="margin:10">
+		<tml:input name="{scoped:autoplay}" type="boolean" mode="{option:mode}"/>
+	</div></tml:comment>
