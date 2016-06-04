@@ -69,7 +69,7 @@
         <minorVersion>2</minorVersion>
         <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>644</buildVersion>
+        <buildVersion>645</buildVersion>
       </version>
     </id>
     <title>OpenWGA Content Manager</title>
