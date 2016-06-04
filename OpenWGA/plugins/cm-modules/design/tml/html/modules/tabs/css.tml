@@ -32,7 +32,8 @@
 			float: "left",
 			padding: "10px 20px",			
 			"&:focus": {
-				outline: "none"
+				outline: "none",
+				text_decoration: "none"
 			},
 			"&.current" :{
 				margin_bottom: -1,
