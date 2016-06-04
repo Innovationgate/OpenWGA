@@ -411,7 +411,7 @@ this.copyMetas = function(sourcedoc){
 		log.warn("could not copy unique name from remote document because the name is already used in this contentstore");
 	else content.setUniqueName(uname);
 
-	var metas = [content.META_DESCRIPTION, content.META_KEYWORDS , content.META_READERS, content.META_VALID_FROM, content.META_VALID_TO, content.META_IS_HIDDEN_FROM];
+	var metas = [content.META_DESCRIPTION, content.META_KEYWORDS, content.META_BROWSERTITLE, content.META_READERS, content.META_VALID_FROM, content.META_VALID_TO, content.META_IS_HIDDEN_FROM];
 	for(var i=0; i<metas.length; i++){
 		content.setMetaData(metas[i], sourcedoc.getMetaData(metas[i]));
 	}
