@@ -38,7 +38,7 @@
 			</tml:case>
 		})
 		.on("activated", function(ev, el){
-			WGA.event.fireEvent("CMM-accordion-activated", "CMM", {el:el})
+			WGA.event.fireEvent("CMM-element-activated", "CMM", {el:el})
 		})
 		.css("opacity", 1);
 	})

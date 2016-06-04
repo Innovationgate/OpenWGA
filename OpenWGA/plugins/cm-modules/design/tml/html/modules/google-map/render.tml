@@ -59,7 +59,7 @@
 					      mapTypeId: <tml:[setting] o_name="map_type" o_default="google.maps.MapTypeId.ROADMAP"/>
 					    };
 					    var map = new google.maps.Map(document.getElementById("<tml:script expression="WGA.scoped('map_canvas')"/>"), myOptions);
-					    WGA.event.addListener("google-map-module", "CMM-accordion-activated", function(e){
+					    WGA.event.addListener("google-map-module", "CMM-element-activated", function(e){
 					    	if(e.params.el){
 						    	var p = $(e.params.el);
 						    	var me = document.getElementById("<tml:script expression="WGA.scoped('map_canvas')"/>")

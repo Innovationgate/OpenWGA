@@ -50,6 +50,9 @@
 			$(this).addClass("current");
 			var index = $("#module-<tml:option name="ns"/> .tabs li a").index(this);
 			$("#module-<tml:option name="ns"/> .pane").hide().eq(index).show();
+			WGA.event.fireEvent("CMM-element-activated", "CMM", {
+				el: $("#module-<tml:option name="ns"/> .pane").eq(index)[0]
+			})
 		})
 		$("#module-<tml:option name="ns"/> .tabs a").first().addClass("current");
 		$("#module-<tml:option name="ns"/> .pane").first().show();
