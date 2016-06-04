@@ -1,5 +1,5 @@
 ## LICENSE START ###############################################################
-## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## Copyright Innovation Gate GmbH. All Rights Reserved.
 ## 
 ## This file is part of the OpenWGA server platform.
 ## 
@@ -23,7 +23,7 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<div class="modal-popup <tml:script expression="CMM.setting('layout')||'overlay'"/>" id="<tml:[setting] o_name="id"/>">
+<div style="display:none" class="modal-popup <tml:script expression="CMM.setting('layout')||'overlay'"/>" id="<tml:[setting] o_name="id"/>">
 	<tml:if condition="CMM.setting('layout')=='dialog'">
 		<tml:then>
 			<div class="header">
@@ -36,9 +36,16 @@
 		</tml:else>
 	</tml:if>
 	<div class="content inner-overlay">
-		<tml:include ref="system:include-child-modules">
-			<tml:option name="margins" expression="true" scope="local"/>
-		</tml:include>		
+		<tml:if condition="CMM.setting('lazy_load_content_on_show')">
+			<tml:then>
+				<tml:portlet name="[overlay-{CMM.setting('id')}]" ref="::content:portlet" ajax="true" portletmode="view"/>
+			</tml:then>
+			<tml:else>		
+				<tml:include ref="system:include-child-modules">
+					<tml:option name="margins" expression="true" scope="local"/>
+				</tml:include>
+			</tml:else>
+		</tml:if>		
 	</div>
 	
 	<tml:case condition="CMM.setting('layout')=='dialog'">
@@ -52,6 +59,13 @@
 	require(["jquery", "jquery-modal"], function(){
 		$("a[href='#<tml:[setting] o_name="id"/>']").not(".WGA-Item-Value-Unencoded a").wga_modal({
 			width: <tml:[setting] o_name="width" o_default="600"/>
-		});
+		}).on({
+			load: function(){
+				WGA.event.fireEvent("overlay-loaded", "cmm", {id: "<tml:[setting] o_name="id"/>"})			
+			},
+			close: function(){
+				WGA.event.fireEvent("overlay-closed", "cmm", {id: "<tml:[setting] o_name="id"/>"})
+			}
+		})
 	})
 </script>
