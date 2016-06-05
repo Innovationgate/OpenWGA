@@ -31,7 +31,7 @@
 					if(WGA.design().db().getTMLModule('jquery-'+plugin, 'stylesheet'))
 						_css.add(plugin);
 					else{
-						var css = WGA.design().resolve("jquery-"+_plugin).getCSSCode();
+						var css = WGA.design().resolve("jquery-"+plugin).getCSSCode();
 						if(css)
 							_css.add(plugin);
 					}
