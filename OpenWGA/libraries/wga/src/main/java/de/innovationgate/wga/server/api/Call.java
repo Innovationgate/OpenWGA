@@ -44,6 +44,7 @@ import org.apache.commons.fileupload.FileItem;
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGException;
+import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wga.config.VirtualHost;
 import de.innovationgate.wga.server.api.tml.Context;
 import de.innovationgate.wgpublisher.WGACore;
@@ -62,6 +63,7 @@ import de.innovationgate.wgpublisher.webtml.utils.URLBuilder;
  * The object reads data of the request and is able to influence the response, if possible on the environment.  
  * If no call is available on the environment there is no data returned.
  */
+@CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
 public class Call {
     
     private WGA _wga;

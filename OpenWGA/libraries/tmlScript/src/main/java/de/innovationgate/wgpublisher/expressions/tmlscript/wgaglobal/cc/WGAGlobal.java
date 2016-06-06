@@ -55,6 +55,11 @@ import de.innovationgate.wgpublisher.webtml.form.TMLFormInfo;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 import de.innovationgate.wgpublisher.webtml.utils.URLBuilder;
 
+import de.innovationgate.wga.server.api.tml.TMLPage;
+import de.innovationgate.wga.server.api.Call;
+import de.innovationgate.wga.server.api.ObjectScope;
+import de.innovationgate.wga.server.api.Session;
+
 @CodeCompletion(propertyMode=CodeCompletion.MODE_EXCLUDE)
 public abstract class WGAGlobal extends WGA {
     
@@ -71,7 +76,13 @@ public abstract class WGAGlobal extends WGA {
     public de.innovationgate.wga.server.api.Server Server = null;
     public de.innovationgate.wga.server.api.Jobs Jobs = null;
     public Validate Validate = null;
-    
+
+    public TMLPage TMLPage = null;
+    public Call Call = null;
+    public ObjectScope Scopes = null;
+    public Session Session = null;
+    public de.innovationgate.wga.server.api.Cookie Cookie = null;
+
     public abstract List<String> buildOptions(Iterable<WGContent> contents);
     public abstract List<String> buildOptions(Iterable<WGContent> contents, String titleExpression);
     public abstract List<String> buildOptions(Iterable<WGContent> contents, String titleExpression, String emptyTitle);
