@@ -107,6 +107,7 @@ ospackage {
 
 buildDeb.dependsOn configurations.server
 
+/*
 task updateDebRepository(dependsOn: buildDeb) << {
     def buildProps = new Properties()
     buildProps.load(file(build_properties_file).newInputStream())
@@ -133,4 +134,19 @@ task updateDebRepository(dependsOn: buildDeb) << {
 }
 updateDebRepository.onlyIf{
     project.hasProperty('build_properties_file') && project.hasProperty('build_quality') 
+}
+*/
+
+
+task updateDebRepository(dependsOn: buildDeb) << {
+    def debFile = buildDeb.archivePath
+    println "Publishing debian package: ${debFile}"
+    for (distro in linuxDistros) {
+        def reprepro_command = "/usr/bin/reprepro -C main -Vb ${debian_repository} includedeb ${distro} ${debFile}"
+        println reprepro_command
+        ant.exec(command:reprepro_command)
+    }
+}
+updateDebRepository.onlyIf{
+    project.hasProperty('debian_repository') 
 }
