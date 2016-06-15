@@ -108,29 +108,14 @@ ospackage {
 buildDeb.dependsOn configurations.server
 
 task updateDebRepository(dependsOn: buildDeb) << {
-    def buildProps = new Properties()
-    buildProps.load(file(build_properties_file).newInputStream())
-    
-    
-    def localRepo;
-    if (build_quality == 'beta') {
-        localRepo = buildProps['deploy.apt.ce.beta-repository.local']
-    }
-    else if (build_quality == 'early') {
-        localRepo = buildProps['deploy.apt.ce.early-repository.local']
-    }
-    else if (build_quality == 'final') {
-        localRepo = buildProps['deploy.apt.ce.repository.local']
-    }
-
     def debFile = buildDeb.archivePath
     println "Publishing debian package: ${debFile}"
     for (distro in linuxDistros) {
-        def reprepro_command = "/usr/bin/reprepro -C main -Vb ${localRepo} includedeb ${distro} ${debFile}"
+        def reprepro_command = "/usr/bin/reprepro -C main -Vb ${debian_repository} includedeb ${distro} ${debFile}"
         println reprepro_command
         ant.exec(command:reprepro_command)
     }
 }
 updateDebRepository.onlyIf{
-    project.hasProperty('build_properties_file') && project.hasProperty('build_quality') 
+    project.hasProperty('debian_repository') 
 }

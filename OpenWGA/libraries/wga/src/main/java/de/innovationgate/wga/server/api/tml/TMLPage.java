@@ -31,11 +31,13 @@ import java.io.Reader;
 import java.util.Map;
 
 import de.innovationgate.webgate.api.WGException;
+import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wga.server.api.Design;
 
 /**
  * Represents the WebTML page being currently rendered
  */
+@CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
 public interface TMLPage {
 
     /**
