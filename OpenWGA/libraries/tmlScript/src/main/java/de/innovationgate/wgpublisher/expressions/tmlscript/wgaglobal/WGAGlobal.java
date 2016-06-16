@@ -281,7 +281,6 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
         "Brand",
         "Call",
         "Core",
-        "Cookie",
         "EventScopes",
         "Html",
         "Jobs",
