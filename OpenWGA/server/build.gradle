@@ -32,7 +32,7 @@ publishing {
 }
 
 war {
-    war.archiveName = "openwga-ce.war"
+	war.archiveName = "openwga-${openwga_version_major}.${openwga_version_minor}.${openwga_version_maintenance}.${openwga_version_patch}-ce.war" 
     from('build/extra/WEB-INF') {
         into('WEB-INF')
     }
@@ -53,5 +53,3 @@ buildPlugins.dependsOn project(":plugin-admin").tasks.buildPlugin
 buildPlugins.dependsOn project(":plugin-additional-script-langs").tasks.buildPlugin
 
 war.dependsOn writeVersion, buildPlugins
-
-

@@ -22,7 +22,7 @@
 		var cols;
 		var col=0;
 		var columnWidth;
-		var margin = typeof(config.margin)=="undefined" = 10 : config.margin;
+		var margin = typeof(config.margin)=="undefined" ? 10 : config.margin;
 
 		var supportsTransition = ("transition" in document.createElement("p").style)
 

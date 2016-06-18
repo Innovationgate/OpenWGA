@@ -25,31 +25,55 @@
 
 package de.innovationgate.wgpublisher;
 
-import java.util.Enumeration;
-import java.util.Locale;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
+import java.util.Properties;
 
 /**
  * Returns data about the brand of OpenWGA product
  */
 public abstract class WGABrand {
-    
-    public static final String BRAND_LABELFILE = "brand";
-    
-    private static ResourceBundle BUNDLE = ResourceBundle.getBundle(WGACore.SYSTEMLABEL_BASE_PATH + BRAND_LABELFILE, Locale.ENGLISH, WGAVersion.class.getClassLoader());
+
+    public static final Properties BRAND = new Properties();
+    static {
+        InputStream propsIn = null;
+        try {
+            if (WGACore.INSTANCE.getServletContext() != null) {
+                propsIn = WGACore.INSTANCE.getServletContext().getResourceAsStream("/WEB-INF/brand.properties");
+                if (propsIn == null) {
+                    throw new Error("/WEB-INF/brand.properties does not exist");
+                }
+                
+                BRAND.load(propsIn);
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (propsIn != null) {
+                try {
+                    propsIn.close();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     public static String getName() {
-        return BUNDLE.getString("brand.name") + BUNDLE.getString("brand.trademark.sign");
+        return BRAND.getProperty("brand.name") + BRAND.getProperty("brand.trademark.sign");
     }
     
     public static String getProduct() {
-        return getName() + " " + BUNDLE.getString("product.name");
+        return getName() + " " + BRAND.getProperty("product.name");
     }
     
     public static String getPlatform() {
         try {
-            return BUNDLE.getString("platform.name");
+            return BRAND.getProperty("platform.name");
         }
         catch(MissingResourceException e) {
             return null;
@@ -57,8 +81,7 @@ public abstract class WGABrand {
     }
     
     public static String get(String key) {
-        return BUNDLE.getString(key);
+        return BRAND.getProperty(key);
     }
-
 
 }
