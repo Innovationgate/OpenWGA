@@ -12,7 +12,7 @@
 
 <script>
 	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "overlay-closed", function(ev){	
-		console.log("overlay closed", ev, "me: <tml:[setting] o_name="id"/>", ev.params.id=="<tml:[setting] o_name="id"/>");
+		//console.log("overlay closed", ev, "me: <tml:[setting] o_name="id"/>", ev.params.id=="<tml:[setting] o_name="id"/>");
 		if(ev.params.id=="<tml:[setting] o_name="id"/>")
 			WGA.ajax.callAction('<tml:action ref="$refresh" portletmode="view" />', '<tml:script expression="portlet.portletkey"/>')
 	})	
