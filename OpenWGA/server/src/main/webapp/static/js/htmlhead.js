@@ -1423,6 +1423,14 @@ WGA.event = function() {
 
 	return {
 
+		init: function(){
+			eventStack = [];
+			listeners = {};
+			if (timer)
+				window.clearTimeout(timer)
+			timer=null;		
+		},
+		
 		/**
 		 * dispacht an event (put it on event stack) the event is not fired. use
 		 * this function to dispacht multiple events and then call fireEvents()
@@ -1567,6 +1575,16 @@ WGA.portlet = function() {
 	}
 
 	return {
+
+		init: function(){
+			childRegistry = {};
+			parentRegistry = {};
+			parentFormRegistry = {};
+			objectReg = {};
+			portletStates = {};
+			reloadPortlets = [];
+		},
+		
 		/**
 		 * WGA.portlet.onload registers function to be called when a portlet is
 		 * refreshed by an ajax call Callbacks are not called on page loads like
