@@ -55,7 +55,10 @@ public class VersionCompliance extends KeyValueBean<String, String> {
     }
     
     public static VersionCompliance get(String complianceString) {
-        return VERSIONCOMPLIANCES.get(complianceString);
+    	VersionCompliance v = VERSIONCOMPLIANCES.get(complianceString);
+    	if(v!=null)
+    		return v;
+    	else return VERSIONCOMPLIANCES.get(VERSIONCOMPLIANCE_MAX);
     }
      
     public static VersionCompliance get(Version wgaVersion) {
