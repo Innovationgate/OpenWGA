@@ -52,7 +52,7 @@
 <img src="<tml:url type="static" file="images/brand/logo_85.png"/>" align="left" height="38">
 
 <h1>
-	Logged in to <tml:script expression="WGA.Brand.product"/> '<tml:script expression="DBM.wgaconfig.get().getServerName()"/>'
+	<tml:script expression="WGA.Brand.product"/> '<tml:script expression="DBM.wgaconfig.get().getServerName()"/>'
 </h1>
 
 <script>
