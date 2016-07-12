@@ -43,7 +43,7 @@
 </div>
 
 <script>
-	require(["jquery"], function() {
+	require(["jquery"], function($) {
 		$("#module-<tml:option name="ns"/> .tabs a").click(function(ev){
 			ev.preventDefault();
 			$("#module-<tml:option name="ns"/> .tabs a").removeClass("current");
@@ -54,7 +54,9 @@
 				el: $("#module-<tml:option name="ns"/> .pane").eq(index)[0]
 			})
 		})
-		$("#module-<tml:option name="ns"/> .tabs a").first().addClass("current");
-		$("#module-<tml:option name="ns"/> .pane").first().show();
+		$(function(){
+			$("#module-<tml:option name="ns"/> .tabs a").first().addClass("current");
+			$("#module-<tml:option name="ns"/> .pane").first().show();
+		})
 	});
 </script>
