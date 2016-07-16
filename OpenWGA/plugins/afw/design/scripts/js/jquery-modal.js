@@ -34,12 +34,17 @@
 		$(currentModal)[fn]({
 			duration: 200,
 			complete: function(){
-				if(onclose)
+				$("body").removeClass("modal-open");
+				if(onclose){
 					onclose();
+					onclose=null
+				}
 				$(this).trigger("modal-closed");
-				if(triggerEl)
-					$(triggerEl).trigger("close", currentModal);
-				triggerEl=null;
+				if(triggerEl){
+					$(triggerEl).trigger("modal-closed", currentModal);
+					$(triggerEl).trigger("close", currentModal);	// deprecated
+					triggerEl=null;
+				}
 			}
 		});
 	}
@@ -61,32 +66,61 @@
 		$(id)[fn]({
 			duration: 200,
 			complete: function(){
-				if(onload)
+				$("body").addClass("modal-open");
+				if(onload){
 					onload();
+					onload=null;
+				}
 				$(this).trigger("modal-shown", triggerEl);
-				if(triggerEl)
-					$(triggerEl).trigger("load", id);
+				if(triggerEl){
+					$(triggerEl).trigger("load", id);	// deprecated
+					$(triggerEl).trigger("modal-shown", id);
+				}
 			}
 		});
 	}
-	
+
+	var exports={
+		show: showModal,
+		hide: function(el, callback){
+			hideModal(callback);
+		}
+	}
+
 	$.fn.wga_modal = function(config){
 		var config = config||{};
+		var args = [];
+		for(i=1; i<arguments.length; i++)
+			args.push(arguments[i]);
+		
 		return this.each(function(){
-			$(this).on("click", function(e){
-				e.preventDefault();
-				onload = config.onload;
-				onclose = config.onclose;
-				triggerEl=this;
-				var target = config.target || this.hash
-				if(config.width){
-					$(target).css({
-						width: config.width,
-						marginLeft: -config.width/2 
-					})
+			$this = $(this);
+			if(typeof(config)=="string"){
+				try{
+					var f = exports[config.toLowerCase()]
+					return f.apply($this, [$this].concat(args));
 				}
-				showModal(target);
-			})
+				catch(e){
+					throw("jquery plugin wga_modal: method '" + config + "' not found.")
+					return null;
+				}
+			}
+			else{
+				$this.on("click", function(e){
+					e.preventDefault();
+					onload = config.onload;		// deprecated. User jquery events instead
+					onclose = config.onclose;	// deprecated. User jquery events instead
+					triggerEl=this;
+					var target = config.target || $this.data("target") || this.hash
+					if(config.width){
+						$(target).css({
+							width: config.width,
+							marginLeft: -config.width/2 
+						})
+					}
+					showModal(target);
+				})
+			}
 		})
 	}
 	
@@ -100,7 +134,7 @@
 	$(document).on('click.wga_modal_show', "[data-modal='show']", function(e){
 		e.preventDefault();
 		triggerEl=this;
-		showModal(this.hash || $(this).data("target"));
+		showModal($(this).data("target") || this.hash);
 	}) 
 
 	// Globals
