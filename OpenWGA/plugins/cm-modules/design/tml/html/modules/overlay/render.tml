@@ -60,13 +60,13 @@
 		$("a[href='#<tml:[setting] o_name="id"/>']").not(".WGA-Item-Value-Unencoded a").wga_modal({
 			width: <tml:[setting] o_name="width" o_default="600"/>
 		}).on({
-			load: function(){
+			"modal-shown": function(){
 				WGA.event.fireEvent("overlay-loaded", "cmm", {id: "<tml:[setting] o_name="id"/>"})
 				WGA.event.fireEvent("CMM-element-activated", "CMM", {
 					el: $("#module-<tml:option name="ns"/> .content")[0]
 				})			
 			},
-			close: function(){
+			"modal-closed": function(){
 				WGA.event.fireEvent("overlay-closed", "cmm", {id: "<tml:[setting] o_name="id"/>"})
 			}
 		})
