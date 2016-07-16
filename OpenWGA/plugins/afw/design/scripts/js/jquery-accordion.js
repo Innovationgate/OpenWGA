@@ -7,7 +7,10 @@
  
 !function(root, factory) {
   	if(typeof define === 'function' && define.amd)
-    	define(["jquery"], factory);
+    	define([
+    	    "jquery",
+    	    "css!/plugin-wga-app-framework/css/jquery-accordion"
+    	], factory);
   	else factory(root.jQuery);
 }(window, function($){
 
