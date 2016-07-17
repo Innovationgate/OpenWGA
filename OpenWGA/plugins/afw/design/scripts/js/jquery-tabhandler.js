@@ -11,6 +11,25 @@
   	else factory(root.jQuery);
 }(window, function($){
 
+	function getLineAtCursor(el){
+		var pos = el.selectionStart;
+		var lines = el.value.split("\n");
+		for(var start=0, i=0; i<lines.length; i++){
+			var line = lines[i];
+			var length = line.length+1;		// count one \n here
+			if(start<=pos && pos<start+length)
+				return line
+			start += length
+		}
+	}
+	
+	function insertAtCursor(el, text){
+		var pos = el.selectionStart;
+		var endPos = el.selectionEnd;
+		el.value = el.value.substr(0, pos) + text + el.value.substr(endPos);
+        el.selectionEnd = pos + text.length;
+	}
+	
 	function handleTab(el, shiftKey){
 		var pos = el.selectionStart;
 	    var endPos = el.selectionEnd;
@@ -66,12 +85,27 @@
         	
 	}
 
+	function handleEnter(el){
+		var tabs="";
+		var line = getLineAtCursor(el)
+		for(var i=0; i<line.length; i++){
+			if(line.charAt(i)=="\t")
+				tabs += "\t";
+			else break;
+		}
+		insertAtCursor(el, "\n"+tabs)
+	}
+	
 	$.fn.tabhandler = function(){
 		return this.each(function(){
 			$(this).keydown(function(ev){
 				if(ev.keyCode==9){
 					ev.preventDefault();
 					handleTab(this, ev.shiftKey)
+				}
+				else if(ev.keyCode==13){
+					ev.preventDefault();
+					handleEnter(this)
 				}
 			});
 		})
