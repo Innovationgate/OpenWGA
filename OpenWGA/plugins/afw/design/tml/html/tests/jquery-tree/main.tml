@@ -1,0 +1,46 @@
+<tml:include ref="tests:layout" o_title="jquery-tree">
+
+	<div class="clearfix">
+		<div style="float:left;width:50%">
+			Local Data:
+			<div id="tree1" style="padding:0 10px 0 0"></div>
+		</div>
+		<div style="float:left;width:50%">
+			Remote Data:
+			<div id="tree2"></div>
+		</div>
+	</div>
+	
+	<tml:option name="html-head">
+		<script>
+			requirejs(["jquery", "jquery-tree"], function($, Tree){
+			
+				$("#tree1").wga_tree({
+					data: [
+						{
+							title: "root",
+							children: [
+								{
+									title: "child 1"
+								},
+								{
+									title: "child 2"
+								}
+							]
+						}
+					]
+				}).on("select", function(event, node){
+					console.log("Local: Node selected", node);
+				})
+				
+				$("#tree2").wga_tree({
+					url: "<tml:url type="tml" medium="json" name="::tree"/>"
+				}).on("select", function(event, node){
+					console.log("Remote: Node selected", node);
+				})
+				
+			})
+		</script>
+	</tml:option>
+	
+</tml:include>

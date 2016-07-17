@@ -1,0 +1,27 @@
+function Renderer() {}
+
+Renderer.prototype.render = function($urlParam_id){
+
+	var node=$urlParam_id
+	console.log("tree load", node);
+	var data = []
+	
+	if(node=="root"){
+		data.push({
+			title: "Root",
+			id: "4711",
+			hasChildren: true
+		})
+	}
+	else{
+		for(let i=0; i<3; i++)
+			data.push({
+				id: String(Math.random()),
+				title: "Random " + Math.random(),
+				hasChildren: Math.random()<.5
+			})
+	}
+	
+	WGA.TMLPage.write(JSON.stringify(data));
+
+}
