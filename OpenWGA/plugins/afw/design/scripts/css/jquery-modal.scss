@@ -1,0 +1,90 @@
+/*
+
+ SCSS for jquery-plugin modal
+
+ This file is part of the OpenWGA server platform.
+ (c) Innovation Gate
+
+*/ 
+
+body{
+
+	.body-mask {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background: black;
+		opacity: .7;
+		filter: alpha(opacity = 70);
+		display: none;
+		z-index: 101;
+	}
+	.modal-popup {
+		position: fixed;
+		overflow: auto;
+		z-index: 102;
+		width: 600px;
+		margin-left: -300px;
+				
+		top: 10%;
+		left: 50%;
+		max-height: 80%;
+		background: white;
+		padding: 0;
+		box-shadow: 0 0 20px black;
+		display: none;
+		
+		.header {
+			line-height: 1em;
+			padding: 20px 15px;
+			border-bottom: solid #efefef 1px;
+			font-size: 2em;
+			position: sticky;
+			top: 0;
+			z-index: 1;
+			background: white;
+			a[data-modal='hide'] {
+				float: right;
+				cursor: pointer;
+				text-decoration: none;
+			}
+		}
+		
+		.content {
+			padding: 15px;
+		}
+		
+		.footer {
+			position: sticky;
+			bottom: 0;
+			text-align: right;
+			background: #efefef;
+			border-top: solid #dddddd 1px;
+			padding: 15px;
+		}
+		
+		>.close, .close-modal {
+			$url: wga_file_url("images", "apple-close.png");
+			background-image: url('$url');
+			position: absolute;
+			cursor: pointer;
+			opacity: 1;
+			z-index: 1;
+			left: -14px;
+			top: -12px;
+			width: 28px;
+			height: 28px;
+		}
+		
+	}
+	
+}
+
+html.small body .modal-popup {
+	width: 90% !important;
+	margin-left: -45% !important;
+	top: 5%
+}
+
