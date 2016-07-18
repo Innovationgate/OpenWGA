@@ -5,7 +5,9 @@ dependencies {
     compileClasspath project(":wgaBuildTools");
     
     compileClasspath 'ro.isdc.wro4j:wro4j-core:1.7.8'
-	compileClasspath 'ro.isdc.wro4j:wro4j-extensions:1.7.8'
+	compileClasspath ('ro.isdc.wro4j:wro4j-extensions:1.7.8'){
+		exclude group: 'me.n4u.sass', module: 'sass-gems'
+	}
 	compileClasspath 'org.jruby:jruby-complete:1.7.20'
 	compileClasspath 'com.darrinholst:sass-java-gems:3.4.4.3'
     
