@@ -1759,7 +1759,7 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
     private void doCustomCollect(WGDatabase db) throws WGException {
     
         Map<String,Login> newLoginInformation = new HashMap<String,Login>();
-        Map<String,Group> newGroupInformation = new HashMap<String,Group>();
+        HashSet<String> newGroupInformation = new HashSet<String>();
     
         // Get collect script
         WGCSSJSModule mod = db.getCSSJSModule(_scriptCollect, WGScriptModule.CODETYPE_TMLSCRIPT);
@@ -1781,7 +1781,10 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
         }
     
         _loginInformation =  newLoginInformation;
-        _groupInformation = newGroupInformation;
+        
+        for(String groupName: newGroupInformation){
+        	_groupInformation.put(groupName, new Group(groupName));
+        }
     
     }
     
