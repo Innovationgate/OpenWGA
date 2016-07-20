@@ -28,10 +28,11 @@ function Renderer() {
 }
 
 Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey){
-	console.log("$urlParam_dbkey", $urlParam_dbkey)
+	//console.log("$urlParam_dbkey", $urlParam_dbkey)
 	if(!$urlParam_dbkey){
 		if(this.custom_login_url)
 			WGA.redirectTo(this.custom_login_url);
+		else WGA.TMLPage.renderDefault();
 	}	
 	else {
 		if(!WGA.app($urlParam_dbkey).isAuthor() && this.custom_login_url){
