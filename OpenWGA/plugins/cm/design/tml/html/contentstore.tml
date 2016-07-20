@@ -34,25 +34,11 @@
 	
 	_dbkey= _dbkey || request.getParameter("dbkey");
 	if(!_dbkey){
-		// check for custom login URL:
-		var custom_login_url = WGA.Core.getWgaConfiguration().getServerOptions().get("CM.customLoginURL");
-		if(custom_login_url)
-			redirectto(custom_login_url);
 		return;
 	}
 	setOption("dbkey", _dbkey);
 
 	_Database = AFW.database(_dbkey);
-
-	if(!_Database.isAuthor()){
-		var custom_login_url = WGA.Core.getWgaConfiguration().getServerOptions().get("CM.customLoginURL");
-		if(custom_login_url){
-			var b = WGA.urlBuilder(custom_login_url)
-			b.setParameter("dbkey", _dbkey)
-			b.setParameter("contentkey", request.getParameter("contentkey"))
-			redirectto(b.build(true));
-		}
-	}
 
 	if(!_Database.isValid()){
 		setOption("dberror", _Database.initError||label("database-not-found-on-server"));
