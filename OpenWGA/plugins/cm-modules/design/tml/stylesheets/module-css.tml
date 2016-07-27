@@ -29,12 +29,12 @@
 			<tml:include designdb="{_css_tml_designdb}" ref="{_medium_css.getName()}" medium="html"/>
 		}
 	</tml:case>
-	<tml:comment><tml:script>
+	<tml:script>
 		_large_css = db(_css_tml_designdb).getTMLModule(_css_tml+"-large", "html");
 	</tml:script>
 	<tml:case condition="_large_css">
 		@media screen and (min-width: <tml:script format="0" expression="_responsive.large.width"/>px) {
 			<tml:include designdb="{_css_tml_designdb}" ref="{_large_css.getName()}" medium="html"/>
 		}
-	</tml:case></tml:comment>
+	</tml:case>
 </tml:case>

@@ -56,7 +56,7 @@
 				_medium_css = db(_tml.designdb).getTMLModule(_tml.tml+"-medium", "html");
 			</tml:script>
 			<tml:case condition="_medium_css">
-				@media screen and (min-width: <tml:script format="0" expression="responsive.medium.width"/>px) {
+				@media screen and (max-width: <tml:script format="0" expression="responsive.large.width-1"/>px) {
 					<tml:include designdb="{_tml.designdb}" ref="{_medium_css.getName()}" medium="html"/>
 				}
 			</tml:case>
