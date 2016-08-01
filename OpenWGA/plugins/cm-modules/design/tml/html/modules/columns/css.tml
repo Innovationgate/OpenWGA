@@ -32,7 +32,8 @@
 			"> div":{
 				float: "left",
 				".inner-column": {
-					padding: "0 10px"
+					padding: "0 10px",
+					min_height: 1
 				}
 			}
 		},
