@@ -923,7 +923,7 @@ public class RhinoExpressionEngineImpl implements ExpressionEngine, RhinoExpress
     }
     
     public CachedScript getCompiledScript(String code, RhinoContext cx, String scriptName, Scriptable scope) throws IOException {
-        String codeCacheKey = String.valueOf(scope.getClass().getName() + "/" + code.hashCode());
+        String codeCacheKey = String.valueOf(scope.getClass().getName() + "/" + scriptName + "/" + code.hashCode());
         CachedScript script = null;
         try {
             script = (CachedScript) _cachedScripts.read(codeCacheKey);
