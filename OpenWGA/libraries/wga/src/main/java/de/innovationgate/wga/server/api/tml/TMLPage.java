@@ -28,6 +28,7 @@ package de.innovationgate.wga.server.api.tml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.Map;
 
 import de.innovationgate.webgate.api.WGException;
@@ -98,6 +99,19 @@ public interface TMLPage {
      * @throws WGException
      */
     public abstract void render(Design design, String mediaKey, Context cx, Map<Object,Object> options) throws WGException;
+
+    /**
+     * Renders with parameters specified as map
+     * @param map
+     * @throws WGException
+     */
+    public abstract void render(HashMap<String,Object> map) throws WGException;
+
+    /**
+     * Renders with all values default == renderDefault()
+     * @throws WGException
+     */
+    public abstract void render() throws WGException;
 
     /**
      * Writes the given string to the output
