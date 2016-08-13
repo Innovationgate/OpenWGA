@@ -83,6 +83,13 @@
 	</div>
 </tml:case>
 
+<tml:case condition="tmlform.field(WGA.scoped('fieldtype'))=='date'">
+	<label><tml:label key="form.settings.date.year-range"/>:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:year_range}" type="text" default="-10:+10" cssstyle="width:100%" mode="{option('mode')}"/>
+	</div>
+</tml:case>
+
 <label><tml:label key="form.settings.defaultvalue"/>:</label>
 <div style="margin:10px">
 	<tml:input name="{scoped:defaultvalue}" type="text" cssstyle="width:100%" mode="{option('mode')}"/>

@@ -224,14 +224,19 @@
 				], function(picker, config){
 					if(picker){
 						picker.setDefaults(config);
-						picker.setDefaults({
+						picker.setDefaults({							
 							showWeek: true,
 							changeMonth: true,
 							changeYear: true,
 							showAnim: "show"
 						})
 					}
-					$(".field-type-date input").datepicker()
+					$(".field-type-date input").each(function(el){
+						$this = $(this)
+						$this.datepicker({
+							yearRange: $this.data("year-range")
+						})
+					})
 				})
 			</script>
 			
