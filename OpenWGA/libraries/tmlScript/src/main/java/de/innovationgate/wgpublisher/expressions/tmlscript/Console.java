@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 
 public class Console {
 	
-	static HashMap<String, Long> _timer= new HashMap<String, Long>();
+	private HashMap<String, Long> _timer= new HashMap<String, Long>();
     private Logger _logger;
 	public Console(Logger logger) {
 		_logger = logger;
