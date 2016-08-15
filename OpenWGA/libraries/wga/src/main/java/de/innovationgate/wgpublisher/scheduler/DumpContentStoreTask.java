@@ -68,9 +68,13 @@ public class DumpContentStoreTask extends Task {
             
             String endMessage = (String) getOption("endmessage");
             
+            Boolean includeACL = Boolean.valueOf((String) getOption("includeACL", "true"));
+            Boolean includeSystemAreas = Boolean.valueOf((String) getOption("includeSystemAreas", "false"));
+            Boolean includeArchived = Boolean.valueOf((String) getOption("includeArchived", "true"));
+            
             // Creating dump
             jobContext.getLog().info("Starting Content Store Dump");
-            InputStream dumpIn = jobContext.getWgaCore().dumpContentStore(db, filter, autoCorrect.booleanValue(), jobContext.getLog());
+            InputStream dumpIn = jobContext.getWgaCore().dumpContentStore(db, filter, autoCorrect, jobContext.getLog(), includeACL, includeSystemAreas, includeArchived);
             
             
             // Copying dump to target
