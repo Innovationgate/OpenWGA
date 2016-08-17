@@ -13,10 +13,6 @@
 
 	function loadJson(el, callback){
 
-		/*var url = el.data("url");
-		if(!url)
-			url = el.parents(".wga_tree").first().data("url");*/
-
 		var url = el.data("url") || el.parents(".wga_tree").first().data("url");
 		if(!url){
 			if(callback)
@@ -39,6 +35,7 @@
 					this.callback.call(el);
 			},
 			error: function(xhr, status, error){
+				console.log(xhr)
 				alert("jquery-tree load error: " + status);
 			}
 		})
@@ -70,9 +67,9 @@
 		el.attr("data-haschildren", "true");
 
 		var hasChildren = data.hasChildren||false;
-		if(data.children && data.children.length)
-			hasChildren=true;
-			 
+		if(data.children)
+			hasChildren = (data.children.length>0)
+		
 		var li = $("<li/>", {
 			"class": "node collapsed",
 			"data-id": data.id,
@@ -99,19 +96,11 @@
 		})
 		entry.append(indent);
 
-		if(hasChildren || true){
-			var twisty = $("<span/>", {
-				"class": "twisty",
-				html: "&nbsp;"
-			}).on("click", toggleTwisty)
-			entry.append(twisty);
-		}
-		else{
-			entry.append($("<span/>", {
-				"class": "spacer",
-				html: "&nbsp;"
-			}))
-		}
+		var twisty = $("<span/>", {
+			"class": "twisty",
+			html: "&nbsp;"
+		}).on("click", toggleTwisty)
+		entry.append(twisty);
 
 		var icon = $("<span/>", {
 			"class": "icon",
@@ -310,7 +299,7 @@
 			}
 			else{
 				$this.addClass("wga_tree");
-				var url = $this.data("url") || config.url;
+				var url = config.url || $this.data("url");
 				if(url){
 					$this.data("url", url)
 					loadJson($this);
@@ -517,5 +506,5 @@
 			}
 		})
 	}
-
+	
 })

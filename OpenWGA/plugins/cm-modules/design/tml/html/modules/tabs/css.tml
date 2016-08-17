@@ -27,11 +27,13 @@
 	".tabs": {
 		list_style_type: "none",
 		margin: "0 0 10px",
+		padding: 0,
 		border_bottom: "solid silver 1px",
 		"li a": {
 			float: "left",
-			padding: "10px 20px",			
-			"&:focus": {
+			padding: "10px 20px",
+			text_decoration: "none",
+			"&:focus, &:hover": {
 				outline: "none",
 				text_decoration: "none"
 			},

@@ -54,7 +54,9 @@
 				el: $("#module-<tml:option name="ns"/> .pane").eq(index)[0]
 			})
 		})
-		$("#module-<tml:option name="ns"/> .tabs a").first().addClass("current");
-		$("#module-<tml:option name="ns"/> .pane").first().show();
+		$(function(){
+			$("#module-<tml:option name="ns"/> .tabs a").first().addClass("current");
+			$("#module-<tml:option name="ns"/> .pane").first().show();
+		})
 	});
 </script>

@@ -381,7 +381,7 @@ addUpdateListener(function(){
 	}
 
 	// paragraph styles:
-	var para = editor.getNearestTagFromSelection("p");	//editor.getParagraph()
+	var para = editor.getParagraph()
 	if(para){
 		if(BI.rtftoolbar.paragraphStyleList.length>0){
 			pStyleButton.enable();

@@ -36,6 +36,6 @@
 </tml:script>
 
 <div class="clearfix columns-wrapper columns-<tml:item name="_class"/> layout-<tml:script expression="CMM.setting('layout')"/>">
-	<tml:include ref="system:include-child-modules" o-total="_total"/>
+	<tml:include ref="system:include-child-modules" o-margins="false" o-total="_total" o-responsive_clear="_class"/>
 </div>
 

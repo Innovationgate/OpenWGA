@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html class="">
+
+	<head>
+		<title><tml:option name="title"/></title>
+		<tml:htmlhead/>
+		<link rel="stylesheet" href="<tml:url type="css" name="reset"/>">
+		<style>
+			body{margin:20px}
+			h1{font-size:2em}
+		</style>
+		<tml:include ref="include:requirejs"/>
+		<tml:option name="html-head"/>
+	</head>
+	
+	<body>
+	
+		<h1><tml:option name="title"/></h1>
+		<hr>
+		<tml:option name="body"/>
+		
+	</body>
+	
+</html>

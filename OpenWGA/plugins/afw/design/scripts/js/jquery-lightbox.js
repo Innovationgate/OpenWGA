@@ -198,12 +198,12 @@
 		var config = config||{};
 		return this.not(".WGA-Item-Value-Unencoded *").each(function(){
 			var $this = $(this);
-			var url = $this.data("image-url")||this.href||this.src;
+			var url = config.imageURL || $this.data("image-url") || this.href||this.src;
 			url=url.split(";")[0];	// ignore ;jsessiond-s
-			var title = $this.data("image-title")||this.title||this.alt||decodeURI(url.split("/").pop())
+			var title = config.title || $this.data("image-title")||this.title||this.alt||decodeURI(url.split("/").pop())
 			var group = config.group||$this.data("image-group")||"default";
 			var download = config.download || $this.data("image-download")
-			var download_url = $this.data("image-download-url")||url;
+			var download_url = config.imageDownloadURL || $this.data("image-download-url")||url;
 			
 			if(config.remove){
 				var index = getImageIndex(url, group)
@@ -272,4 +272,6 @@
 		$.lightbox.destroy();	
 	})
 
+	return $.lightbox; 
+	
 });

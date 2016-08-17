@@ -71,7 +71,11 @@
 			default="{CMM.setting('defaultvalue')}" 
 			type="{CMM.setting('fieldtype')||'text'}" 
 			optionsitem="_opts"			
-		/>
+		>
+			<tml:case condition="CMM.setting('fieldtype')=='date'">
+				data-year-range="<tml:[setting] o_name="year_range" o_default="-10:+10"/>"
+			</tml:case>
+		</tml:input>
 	</div>
 </div>
 <tml:case condition="tmlform.hasmessage(_fieldname)">

@@ -28,6 +28,7 @@ package de.innovationgate.wgpublisher.webtml.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -209,12 +210,18 @@ public class TMLPageImpl implements TMLPage {
     @Override
     public void render(Design design, String mediaKey, Context cx, Map<Object,Object> options) throws WGException {
         
-        if (cx == null) {
-            cx = _wga.tmlcontext();
+        if(design==null){
+            String resourceLocalName = _wga.design().getBaseReference().getResourceLocalName();
+            String tmlName = resourceLocalName.substring(0, resourceLocalName.length() - ".renderer".length());
+            design = _wga.design().resolve("::" + tmlName);
         }
-        
+
         if (mediaKey == null) {
             mediaKey = _wga.call().getMediaKey();
+        }
+
+        if (cx == null) {
+            cx = _wga.tmlcontext();
         }
         
         if (!isAvailable()) {
@@ -626,5 +633,20 @@ public class TMLPageImpl implements TMLPage {
     	name = TMLContext.getThreadMainContext().convertVarName(name);    	
         return unwrapVar(TMLContext.getThreadMainContext().getEnvironment().getPageVars().remove(name));
     }
+
+	@Override
+	public void render(HashMap<String, Object> map) throws WGException {
+		render(
+			(Design) map.get("design"), 
+			(String) map.get("medium"), 
+			(Context) map.get("context"), 
+			(Map) map.get("options")
+		);
+	}
+
+	@Override
+	public void render() throws WGException {
+		renderDefault();
+	}
 
 }

@@ -25,14 +25,50 @@
 
 <tml:script>
 	_width = CMM.setting("width") || "1";
-	if(_width.indexOf("%")<0 && _width.indexOf("px")<0)
+	_imagederivates=null;
+	var col_width_factor = Number(_width)/option("total")
+
+
+	var option_imagederivates = option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES)
+	var max_width;
+	if(option_imagederivates){
+		var match = /width~([0-9]+)/.exec(option_imagederivates)
+		if(match && match.length>0)
+			max_width = match[1]
+	} 
+	
+	if(_width.indexOf("%")<0 && _width.indexOf("px")<0){
 		_width = 100*Number(_width)/option("total") + "%";
+		var responsive = WGA.design(db()).getGlobal("RESPONSIVE")
+		if(responsive){
+		
+			if(!max_width)
+				max_width = responsive.maxPageWidth
+				
+			switch(option('responsive_clear')){
+				case "clear":
+					_imagederivates = Math.max((responsive.small && responsive.small.maxPageWidth)||responsive.medium.width, max_width * col_width_factor);
+					break;
+				case "medium-clear":
+					var min_width = Math.min(max_width, responsive.medium.maxPageWidth||responsive.large.width);
+					_imagederivates = Math.max(min_width, max_width * col_width_factor);
+					break;
+				case "keep":
+					_imagederivates = max_width * col_width_factor;
+					break;
+			}
+		}
+		else if(max_width)
+			_imagederivates = max_width * col_width_factor;
+	}
 </tml:script>
 
 <div style="width:<tml:item name="_width"/>">
 	<div style="<tml:item name="{scoped:style}"/>" class="inner-column <tml:item name="{scoped:class}"/>">
-		<tml:include ref="system:include-child-modules">
-			<tml:option name="margins" expression="true" scope="local"/>
-		</tml:include>
+		<tml:range imagederivates="{_imagederivates ? 'width~'+WGA.format(_imagederivates, '0') : VOID}">
+			<tml:include ref="system:include-child-modules">
+				<tml:option name="margins" expression="true" scope="local"/>
+			</tml:include>
+		</tml:range>
 	</div>
 </div>

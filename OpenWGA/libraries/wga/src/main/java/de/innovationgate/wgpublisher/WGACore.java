@@ -7699,8 +7699,12 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
     public InputStream dumpContentStore(WGDatabase dbSource, String filterExpression, boolean autoCorrect, Logger log, boolean includeACL) throws WGAPIException, IOException {
         return dumpContentStore(dbSource, filterExpression, autoCorrect, log, includeACL, false);
     }
-    
+
     public InputStream dumpContentStore(WGDatabase dbSource, String filterExpression, boolean autoCorrect, Logger log, boolean includeACL, boolean includeSystemAreas) throws WGAPIException, IOException {
+    	return dumpContentStore(dbSource, filterExpression, autoCorrect, log, includeACL, includeSystemAreas, true);
+    }
+
+    public InputStream dumpContentStore(WGDatabase dbSource, String filterExpression, boolean autoCorrect, Logger log, boolean includeACL, boolean includeSystemAreas, boolean includeArchived) throws WGAPIException, IOException {
 
         log.info("Creating dump database");
         
@@ -7721,7 +7725,7 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
         dbSource.lock();
         try {
             ContentStoreDumpManager importer = new ContentStoreDumpManager(dbSource, dbTarget, log);
-            importer.exportDump(includeACL, includeSystemAreas);
+            importer.exportDump(includeACL, includeSystemAreas, includeArchived);
         }
         finally {
             dbSource.unlock();

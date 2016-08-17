@@ -77,7 +77,11 @@ public class BasicVariousOptionsModuleDefinition implements ModuleDefinition, Re
         LocalizedOptionDefinition designEncoding = new LocalizedOptionDefinition(WGAConfiguration.SERVEROPTION_ENCODING_DESIGN, TextEncodingOptionType.INSTANCE, _bundleLoader);
         designEncoding.setDefaultValue("UTF-8");
         options.addOption(designEncoding);
-        
+
+        LocalizedOptionDefinition sessionTimeout = new LocalizedOptionDefinition(WGACore.SERVEROPTION_SERVER_SESSIONTIMEOUT, IntegerOptionType.INSTANCE, _bundleLoader);
+        sessionTimeout.setDefaultValue(WGACore.SERVEROPTIONDEFAULT_SESSIONTIMEOUT.toString());
+        options.addOption(sessionTimeout); 
+
         LocalizedOptionDefinition webTMLBuffer = new LocalizedOptionDefinition(WGAConfiguration.SERVEROPTION_WEBTML_OUTPUT_BUFFER, IntegerOptionType.INSTANCE, _bundleLoader);
         webTMLBuffer.setDefaultValue(WGAConfiguration.SERVEROPTIONDEFAULT_WEBTML_OUTPUT_BUFFER);
         webTMLBuffer.setOptional(true);
@@ -138,11 +142,6 @@ public class BasicVariousOptionsModuleDefinition implements ModuleDefinition, Re
         testSessionVar.setOptional(true);
         testSessionVar.setDefaultValue(Boolean.FALSE.toString());
         options.addOption(testSessionVar);
-        
-        LocalizedOptionDefinition sessionTimeout = new LocalizedOptionDefinition(WGACore.SERVEROPTION_SERVER_SESSIONTIMEOUT, IntegerOptionType.INSTANCE, _bundleLoader);
-        sessionTimeout.setOptional(true);
-        sessionTimeout.setDefaultValue(WGACore.SERVEROPTIONDEFAULT_SESSIONTIMEOUT.toString());
-        options.addOption(sessionTimeout);
         
         LocalizedOptionDefinition loginRedirectHost = new LocalizedOptionDefinition(WGACore.SERVEROPTION_LOGINREDIRECTHOST, StringOptionType.INSTANCE, _bundleLoader);
         loginRedirectHost.setOptional(true);

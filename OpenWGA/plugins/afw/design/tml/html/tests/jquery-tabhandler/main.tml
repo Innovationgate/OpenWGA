@@ -1,0 +1,13 @@
+<tml:include ref="tests:layout" o_title="jquery-tabhandler">
+
+	<textarea id="ta" style="width:500px"></textarea>
+
+	<tml:option name="html-head">
+		<script>
+			requirejs(["jquery", "jquery-tabhandler", "jquery-textarea-autogrow"], function($){
+				$("#ta").tabhandler().autogrow();
+			})
+		</script>
+	</tml:option>
+	
+</tml:include>

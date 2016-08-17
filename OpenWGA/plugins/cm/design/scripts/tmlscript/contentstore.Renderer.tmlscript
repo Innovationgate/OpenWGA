@@ -23,32 +23,25 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:include designdb="@afw" medium="jss" ref="tocss" o_scope=".module-cm_accordion .accordion">
+function Renderer() {
+	this.custom_login_url = WGA.Core.getWgaConfiguration().getServerOptions().get("CM.customLoginURL");
+}
 
-	"> div.accordion-panel": {
-		padding: 10,
-		overflow: "hidden",
-		display: "none"
-	},
-	
-	".accordion-header": {
-		cursor: "pointer",
-		font_size: "100%",
-		margin_top: 0,
-		margin_bottom: 5,
-		padding: "5px 10px",
-		border: "none",
-		
-		background: "#efefef url(<tml:url type="file" doc="accordion" file="acc-plus.png"/>) no-repeat right 10px center",
-		color: "#666666",
-		
-		"&:focus": {
-			outline: "none"
-		},
-		
-		"&.active": {
-			background_image: "url(<tml:url type="file" doc="accordion" file="acc-minus.png"/>)"
+Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey){
+	//console.log("$urlParam_dbkey", $urlParam_dbkey)
+	if(!$urlParam_dbkey){
+		if(this.custom_login_url)
+			WGA.redirectTo(this.custom_login_url);
+		else WGA.TMLPage.renderDefault();
+	}	
+	else {
+		if(!WGA.app($urlParam_dbkey).isAuthor() && this.custom_login_url){
+			var b = WGA.urlBuilder(this.custom_login_url)
+			b.setParameter("dbkey", $urlParam_dbkey)
+			if($urlParam_contentkey)
+				b.setParameter("contentkey", $urlParam_contentkey)
+			WGA.redirectTo(b.build(true));
 		}
-	}
-	
-</tml:include>
+		else WGA.TMLPage.renderDefault();
+	}	
+}

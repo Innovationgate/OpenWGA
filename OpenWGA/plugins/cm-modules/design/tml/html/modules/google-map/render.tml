@@ -30,16 +30,19 @@
 	<tml:else>
 		<div id="<tml:script expression="WGA.scoped('map_canvas')"/>" class="google-map" style="height:<tml:[setting] o_name="map_height" o_default="200"/>px"></div>
 		<tml:script>
-			var ctx = context("db:"+WGA.design().db().getDbReference()+"/name:cm_google_map", false)
-			if(ctx)
-				_apikey = ctx.apikey
+			_apikey = option("google-maps-api-key");
+			if(!_apikey){
+				var ctx = context("db:"+WGA.design().db().getDbReference()+"/name:cm_google_map", false)
+				if(ctx)
+					_apikey = ctx.apikey
+			}
 		</tml:script>
 		<script>
 			require(["jquery", 
 				"<tml:url type="tml" name="::js" u_noext=""/>",
 				"async!///maps.googleapis.com/maps/api/js?libraries=weather,places<tml:case condition="_apikey">&key=<tml:item name="_apikey"/></tml:case>"
 			], function(){
-			
+
 				$(function(){
 					MAPS.codeAddress("<tml:[setting] o_name="map_address"/>", function (lat, lng) {
 				

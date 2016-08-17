@@ -41,7 +41,7 @@ require.config({
 
 		//"jquery-lightbox": 				["css!/plugin-wga-app-framework/stylesheet/jquery-lightbox.int.stylesheet?noext"],
 		"jquery-lookup-surgestions": 	["css!/plugin-wga-app-framework/stylesheet/jquery-lookup-surgestions.int.stylesheet?noext"],
-		"jquery-modal": 				["css!/plugin-wga-app-framework/stylesheet/jquery-modal.int.stylesheet?noext"],
+		//"jquery-modal": 				["css!/plugin-wga-app-framework/stylesheet/jquery-modal.int.stylesheet?noext"],
 		"jquery-tree": 					["css!/plugin-wga-app-framework/stylesheet/jquery-tree.int.stylesheet?noext"]
 
     }

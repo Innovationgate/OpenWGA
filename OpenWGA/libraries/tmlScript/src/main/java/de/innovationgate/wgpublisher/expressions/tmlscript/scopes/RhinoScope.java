@@ -101,6 +101,7 @@ public class RhinoScope extends ImporterTopLevel {
     private WGAGlobal _wgaGlobal;
     private RhinoExpressionEngineImpl _runtime;
     private Function _addMethodsFunction;
+    private static Console _console;
 
     private static final String[] METHODS ={
         "callAction",
@@ -143,6 +144,7 @@ public class RhinoScope extends ImporterTopLevel {
     public RhinoScope(RhinoExpressionEngineImpl runtime) throws IllegalAccessException, InstantiationException, InvocationTargetException, SecurityException, NoSuchMethodException {
         super();
         _runtime = runtime;
+        _console = new Console(WGAGlobal.fetchWGA().getLog());
         defineFunctionProperties(METHODS, RhinoScope.class, DONTENUM);
         for (String prop : PROPERTIES) {
             defineProperty(prop, null, getClass().getMethod("jsGet_" + prop, new Class[] {ScriptableObject.class}), null, DONTENUM | READONLY);
@@ -181,7 +183,7 @@ public class RhinoScope extends ImporterTopLevel {
     }
     
     public static Console jsGet_console(ScriptableObject thisObj) throws JavaScriptException, NoSuchMethodException, SecurityException {
-        return new Console(WGAGlobal.fetchWGA().getLog());
+        return _console;
     }
 
     /**

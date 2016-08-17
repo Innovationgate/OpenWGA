@@ -28,9 +28,12 @@
 		_google_maps_api_included=true;
 		_prot = request.getRequestURL().toString().split("://")[0]
 
-		var ctx = context("db:"+WGA.design().db().getDbReference()+"/name:cm_google_map", false)
-		if(ctx)
-			_apikey = ctx.apikey
+		_apikey = option("google-maps-api-key");
+		if(!_apikey){
+			var ctx = context("db:"+WGA.design().db().getDbReference()+"/name:cm_google_map", false)
+			if(ctx)
+				_apikey = ctx.apikey
+		}
 	</tml:script>
 	<script type="text/javascript" src="<tml:item name="_prot"/>://maps.google.com/maps/api/js?libraries=weather,places<tml:case condition="_apikey">&key=<tml:item name="_apikey"/></tml:case>"></script>
 </tml:case>

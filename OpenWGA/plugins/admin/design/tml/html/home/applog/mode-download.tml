@@ -1,0 +1,77 @@
+<tml:action id="download">
+	var path = tmlparam1;
+	var filename = WGA.Core.getDispatcher().addTemporaryDownload(httpsession, new java.io.File(path));
+	_download_url = WGA.Core.getDispatcher().getPublisherURL(request, false) + "/tempdwn/" + filename;	
+</tml:action>
+
+<tml:case isfilled="_download_url">
+	<script>
+		window.open("<tml:item name="_download_url"/>");
+	</script>
+</tml:case>
+
+<tml:include designdb="@ui" ref="windowview">
+	<tml:option name="title">OpenWGA Application Logsfiles</tml:option>
+
+	<tml:option name="config" scope="local">
+		tools: [
+			{
+				id: "close",
+				qtip: "Close",
+				handler: function(){
+					WGA.ajax.callAction('<tml:action ref="$refresh" portletmode="view"/>', '<tml:script expression="portlet.portletkey"/>')
+				}
+			}
+		],
+		tbar: [
+			"->",
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_white_text.png"/>',		                
+				text: "Current Application Log",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action ref="$refresh" portletmode="view"/>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+		]
+	</tml:option>
+
+	<tml:script>
+		_files=WGA.createList()
+		var logs = wgacore.getTransientLogAppender().getActiveFiles();
+		for(let log in Iterator(logs)){
+		  	_files.add(log.getFile())
+		}
+	</tml:script>
+	
+	<table class="collection" width="100%">
+		<tr class="collection-title">
+			<td>Logfile</td>
+			<td>Start</td>
+			<td align="right">Size</td>
+		</tr>
+	
+		<tml:foreach item="_files" currentvalue="_file">
+			<tml:script format="dd.MM.yyyy HH:mm:ss">
+				var parts = _file.name.split(".")
+				var date = parts[0].split("wga-")
+				_date = WGA.parseDate(date[1], "yyyy-DDD-HHmmss-SSS")
+				_size = _file.length();
+			</tml:script>
+			<tr>
+				<td>
+					<a href="<tml:url action="download" param1="{_file.path}" ajax="true"/>" title="download ...">
+						<tml:script expression="_file.name"/>
+					</a>
+				</td>
+				<td>
+					<tml:item name="_date" format="dd.MM.yyyy HH:mm:ss"/>
+				</td>
+				<td align="right">
+					<tml:script expression="AFW.Util.renderFileSize(_size)"/>
+				</td>
+			</tr>
+		</tml:foreach>
+	</table>
+	
+</tml:include>
