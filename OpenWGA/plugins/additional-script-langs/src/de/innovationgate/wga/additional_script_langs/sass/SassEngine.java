@@ -70,20 +70,24 @@ public class SassEngine {
      *          the Sass content to process.
      */
     public synchronized String process(final String content) {
+
       if (StringUtils.isEmpty(content)) {
         return StringUtils.EMPTY;
       }
+      
       try {
-        final ScriptEngine rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
-        Bindings bindings = rubyEngine.createBindings();
-        bindings.put("wga", _wga);
-        bindings.put("wgaDesign", _design);
-        bindings.put("wgaContext", _context);
-        bindings.put("wgaResult", _ppr);
-        return rubyEngine.eval(buildUpdateScript(content), bindings).toString();
+    	  final ScriptEngine rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
+	      Bindings bindings = rubyEngine.createBindings();
+	      bindings.put("wga", _wga);
+	      bindings.put("wgaDesign", _design);
+	      bindings.put("wgaContext", _context);
+	      bindings.put("wgaResult", _ppr);
+	      
+	      return rubyEngine.eval(buildUpdateScript(content), bindings).toString();
       }
       catch (final Exception e) {
-        throw new WroRuntimeException(e.getMessage(), e);
+    	  _wga.getLog().info(content);;
+    	  throw new WroRuntimeException(e.getMessage(), e);
       }
     }
     
