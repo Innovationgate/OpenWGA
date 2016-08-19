@@ -161,7 +161,7 @@ public class DesignFileDocument extends AbstractDesignFile implements WGDocument
         this(fileSystemDesignManager, moduleFile.getFile(), moduleFile.getModuleName(), moduleFile.getType(), moduleFile.getCategory());
         if (fileSystemDesignManager.isNoBackgroundChanges()) { // Load into cache if we have "no background changes" to prevent future file lookup
             getData();
-    }
+        }
     }
 
     public DesignFileDocument(FileSystemDesignProvider fileSystemDesignProvider, Data cacheData) throws FileSystemException, WGDesignSyncException {
@@ -398,7 +398,7 @@ public class DesignFileDocument extends AbstractDesignFile implements WGDocument
             return cacheData;
         }
         
-        WGOperationKey op = _wgdoc.getDatabase().obtainOperationKey(WGOperationKey.OP_DESIGN_BACKEND, _docKey.toString());
+        WGOperationKey op = _manager.getDb().obtainOperationKey(WGOperationKey.OP_DESIGN_BACKEND, _docKey.toString());
         synchronized (op) {
             try {
                     op.setUsed(true);
