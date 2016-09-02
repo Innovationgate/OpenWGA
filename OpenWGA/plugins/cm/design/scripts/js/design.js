@@ -155,9 +155,7 @@ BI.design.designTree=function(el, panel, type, title){
 		if(node==root){
 			root.toggle();
 			return false;
-		}			
-		if(this.panel.mode=="edit" && !confirm($L.cancel_edit))
-			return false;
+		}
 		this.panel.mode="view";
 		return true;
 	}, this)
