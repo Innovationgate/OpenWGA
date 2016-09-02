@@ -3377,7 +3377,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
 
             // Retrieving platform info
             String endDate = (new SimpleDateFormat("yyyy")).format(new Date());
-            log.info(getReleaseString() + " (c)2001-" + endDate + " InnovationGate GmbH");
+            log.info(getReleaseString() + " (c) 2001-" + endDate + " Innovation Gate GmbH");
             try {
                 this.servletPlatform = new Double(arg0.getServletContext().getMajorVersion() + "." + arg0.getServletContext().getMinorVersion()).doubleValue();
                 this.jspPlatform = new Double(javax.servlet.jsp.JspFactory.getDefaultFactory().getEngineInfo().getSpecificationVersion()).doubleValue();
