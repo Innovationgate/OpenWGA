@@ -52,6 +52,10 @@ public class Importer {
         Design design = (Design) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wgaDesign"));
         PostProcessResult result = (PostProcessResult) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wgaResult"));
         
+        uri = uri.replace("/", ":");
+        if(uri.endsWith(".scss")){
+        	uri = uri.substring(0, uri.length() - ".scss".length());
+        }
         Module importerModule = findModule(design, uri);
         
         // Return SASS engine with the given module code
