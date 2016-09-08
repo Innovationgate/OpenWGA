@@ -48,7 +48,6 @@ public class Importer {
     public Object find(String uri,RubyHash options) throws IOException, WGException {
         
         Ruby runtime = org.jruby.Ruby.getGlobalRuntime();
-        WGA wga = (WGA) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wga"));
         Design design = (Design) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wgaDesign"));
         PostProcessResult result = (PostProcessResult) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wgaResult"));
         
@@ -109,9 +108,7 @@ public class Importer {
     public Date mtime(String uri,RubyHash options) throws WGException {
         
         Ruby runtime = org.jruby.Ruby.getGlobalRuntime();
-        WGA wga = (WGA) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wga"));
         Design design = (Design) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wgaDesign"));
-        PostProcessResult result = (PostProcessResult) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wgaResult"));
 
         Module importerModule = findModule(design, uri);
         if (importerModule != null) {
