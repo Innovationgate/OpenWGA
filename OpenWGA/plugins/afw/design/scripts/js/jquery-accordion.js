@@ -23,22 +23,59 @@
 		});
 	}
 
+	function activate(el, index){
+		
+		console.log("activate", el, index);
+		var header = el.find(".accordion-header").eq(index)
+		var isActive = header.hasClass("active");
+		el.find(".accordion-header").removeClass("active").next().slideUp("fast");
+		if(!isActive)
+			expand(header)
+		
+	}
+	
+	var exports={
+		activate: activate
+	}	
+	
 	$.fn.wga_accordion = function(config){
 		var config = config||{};
 		return this.each(function(){
 			var el = $(this);
-			if(config.active!=undefined){
-				expand(el.find(".accordion-header").eq(config.active))
+
+			if(typeof(config)=="string"){
+				try{
+					var f = exports[config.toLowerCase()]
+					return f.apply(el, [el].concat(args));
+				}
+				catch(e){
+					throw("jquery plugin wga_accordion: method '" + config + "' not found.")
+					return null;
+				}
 			}
-			el.find(".accordion-header").click(function(ev){
-				ev.preventDefault();
-				var $this = $(this);
-				var isActive = $this.hasClass("active");
-				el.find(".accordion-header").removeClass("active").next().slideUp("fast");
-				if(!isActive)
-					expand($this);
-			})
+			else{
+				if(config.active!=undefined){
+					expand(el.find(".accordion-header").eq(config.active))
+				}
+				el.find(".accordion-header").click(function(ev){
+					ev.preventDefault();
+					var $this = $(this);
+					var isActive = $this.hasClass("active");
+					el.find(".accordion-header").removeClass("active").next().slideUp("fast");
+					if(!isActive)
+						expand($this);
+				})
+			}
 		})
 	}
 
+	// data interface:
+	$(document).on('click.wga_accordion_activate', "[data-accordion='activate']", function(e){
+		e.preventDefault();
+		var root_el = $(this).data("target") || $(this).parents(".accordion")
+		var index = $(this).data("index") || this.hash.substr(1) || 0
+		activate(root_el, index);
+	})
+	
+	
 })
