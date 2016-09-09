@@ -69,7 +69,7 @@
 		</tml:case>
 	</tml:then>
 	<tml:else>
-		<div class="content-modules" id="content-modules-<tml:item name="$mc.section"/>" <tml:case condition="option('animate')=='true'">style="opacity:0;transition:opacity .2s"</tml:case>>
+		<div class="content-modules" id="content-modules-<tml:item name="$mc.section"/>" <tml:case condition="option('animate')===true || option('animate')=='true'">style="opacity:0;transition:opacity .2s"</tml:case>>
 			<tml:case if="$mc.mayEdit">
 				<div style="position:relative">
 					<a style="display:none" class="WGA-Item-Edit edit-modules-button" href="#">
@@ -110,7 +110,7 @@
 				<tml:option name="margins" expression="true" scope="local"/>
 			</tml:include>
 			
-			<tml:case condition="option('animate')=='true'">
+			<tml:case condition="option('animate')===true || option('animate')=='true'">
 				<script>
 					require(["jquery"], function(){
 						$("#content-modules-<tml:item name="$mc.section"/>").css("opacity", 1);
