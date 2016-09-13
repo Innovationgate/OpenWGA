@@ -86,7 +86,7 @@ public class SassEngine {
 	      return rubyEngine.eval(buildUpdateScript(content), bindings).toString();
       }
       catch (final Exception e) {
-    	  _wga.getLog().info(content);;
+    	  _wga.getLog().info(content);
     	  throw new WroRuntimeException(e.getMessage(), e);
       }
     }
