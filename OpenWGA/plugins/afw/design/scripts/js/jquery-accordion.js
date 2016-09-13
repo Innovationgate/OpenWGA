@@ -14,9 +14,9 @@
   	else factory(root.jQuery);
 }(window, function($){
 
-	function expand(panel){
+	function expand(panel, speed){
 		panel.addClass("active").next().slideDown({
-			duration: "fast",
+			duration: speed,
 			complete: function(){
 				panel.trigger("activated", this);
 			}
@@ -24,13 +24,12 @@
 	}
 
 	function activate(el, index){
-		
-		console.log("activate", el, index);
 		var header = el.find(".accordion-header").eq(index)
 		var isActive = header.hasClass("active");
-		el.find(".accordion-header").removeClass("active").next().slideUp("fast");
+		var speed = el.data("accordion-effect-speed") || "fast"
+		el.find(".accordion-header").removeClass("active").next().slideUp(speed);
 		if(!isActive)
-			expand(header)
+			expand(header, speed)
 		
 	}
 	
@@ -54,16 +53,23 @@
 				}
 			}
 			else{
+				var speed = config.effectSpeed||'fast';
+				el.data("accordion-effect-speed", speed)
 				if(config.active!=undefined){
-					expand(el.find(".accordion-header").eq(config.active))
+					if(config.delay){
+						setTimeout(function(){
+							expand(el.find(".accordion-header").eq(config.active), speed)
+						}, config.delay);
+					}
+					else expand(el.find(".accordion-header").eq(config.active), speed)
 				}
 				el.find(".accordion-header").click(function(ev){
 					ev.preventDefault();
 					var $this = $(this);
 					var isActive = $this.hasClass("active");
-					el.find(".accordion-header").removeClass("active").next().slideUp("fast");
+					el.find(".accordion-header").removeClass("active").next().slideUp(speed);
 					if(!isActive)
-						expand($this);
+						expand($this, speed);
 				})
 			}
 		})
