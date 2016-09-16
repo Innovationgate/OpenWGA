@@ -36,6 +36,11 @@
     font: normal 10pt verdana,tahoma,helvetica;
 }
 
+#splash img{
+	max-width: 100%;
+	max-height: 135px;
+}
+
 #splash td{
 	padding:1px;
 }
