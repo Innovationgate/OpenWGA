@@ -80,7 +80,7 @@ public class DerivatePublishingFile extends PublishingFile {
         String fileName = derivateMd.getId();
         String derivateSuffix = WGFactory.getMimetypeDeterminationService().determineSuffixByMimeType(derivateMd.getMimeType());
         if (derivateSuffix != null) {
-            return fileName += "." + derivateSuffix;
+            return fileName + "." + derivateSuffix;
         }
         else {
             return fileName;
