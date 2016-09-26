@@ -190,6 +190,10 @@
 		}
 
 		function effect_fade(new_left){
+			var left = $wrapper.css("left");
+			left = Number(left.substr(0, left.length-2))
+			if(left==new_left)
+				return;
 			if(supportsTransition){
 				$wrapper.css("transition", "opacity .2s ease");
 				$wrapper.on("transitionend", function(){
