@@ -216,11 +216,12 @@
 				</tml:button>
 			</div>
 			
-			<script>
+			<tml:[script]>
 				require([
 					"jquery-ui-js/datepicker",
 					"jquery-ui-js/i18n/datepicker-<tml:metadata name="language"/>", 
-					"css!jquery-ui-css"
+					"css!jquery-ui-css",
+					"jquery-textarea-autogrow"
 				], function(picker, config){
 					if(picker){
 						picker.setDefaults(config);
@@ -231,14 +232,17 @@
 							showAnim: "show"
 						})
 					}
-					$(".field-type-date input").each(function(el){
-						$this = $(this)
-						$this.datepicker({
-							yearRange: $this.data("year-range")
+					$("#<tml:script expression="tmlform.formid"/>")
+						.find(".field-type-date input").each(function(el){
+							$this = $(this);
+							$this.datepicker({
+								yearRange: $this.data("year-range")
+							})
 						})
-					})
+						.end()
+						.find(".field-type-textarea textarea").autogrow()
 				})
-			</script>
+			</tml:[script]>
 			
 		</tml:else>
 		
