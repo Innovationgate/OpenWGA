@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 
 import ro.isdc.wro.WroRuntimeException;
 import de.innovationgate.utils.WGUtils;
+import de.innovationgate.webgate.api.WGException;
+import de.innovationgate.wga.additional_script_langs.ResourceRef;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wga.server.api.tml.Context;
@@ -37,8 +39,9 @@ public class SassEngine {
     private Design _design;
     private Context _context;
     private PostProcessResult _ppr;
+    private ResourceRef _ref;
 
-    public SassEngine(WGA wga, Design design, Context cx, String uri, PostProcessResult result) {
+    public SassEngine(WGA wga, Design design, Context cx, String uri, PostProcessResult result) throws WGException {
       System.setProperty("org.jruby.embed.compat.version", "JRuby1.9");
       requires = new LinkedHashSet<String>();
       requires.add(RUBY_GEM_REQUIRE);
@@ -48,6 +51,7 @@ public class SassEngine {
       _design = design;    
       _context = cx;
       _ppr = result;
+      _ref = new ResourceRef(_design, ResourceRef.TYPE_CSS);
     }
     
     /**
@@ -82,6 +86,7 @@ public class SassEngine {
 	      bindings.put("wgaDesign", _design);
 	      bindings.put("wgaContext", _context);
 	      bindings.put("wgaResult", _ppr);
+	      bindings.put("wgaResourceRef", _ref);
 	      
 	      return rubyEngine.eval(buildUpdateScript(content), bindings).toString();
       }
@@ -108,11 +113,12 @@ public class SassEngine {
       options.put(":trace_selectors", lineNumbers);
       options.put(":style", style);
       options.put(":filesystem_importer", "Java::DeInnovationgateWgaAdditional_script_langsSass::Importer");
-      options.put(":filename", "\"" + _design.getBaseReference() + "\"");
+      options.put(":filename", "\"" + _ref.toString() + "\"");
       options.put(":wga", "$wga");
       options.put(":wgaDesign", "$wgaDesign");
       options.put(":wgaContext", "$wgaContext");
       options.put(":wgaResult", "$wgaResult");
+      options.put(":wgaResourceRef", "$wgaResourceRef");
       
       boolean firstOption = true;
       for (Map.Entry<String,String> option : options.entrySet()) {
