@@ -23,7 +23,6 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-
 <tml:include ref="init"/>
 
 <tml:case isbrowserinterface="true" iscurrentdocument="true">
@@ -98,12 +97,12 @@
 				</script>
 			</tml:case>
 			
-			<tml:{script} if="!_cmm_style_included">
+			<tml:[script] if="!_cmm_style_included">
 				<tml:include medium="stylesheets" ref="cmm-styles" var="_css"/>
-				require(["<tml:url type="js" name="cmm"/>"], function(CM_MODULES){
-					CM_MODULES.createStyle("<tml:item name="$mc.cssCode" a-css="_css" encode="none"/>", "cmm-global-styles");
+				require(["<tml:url type="js" name="cmm"/>"], function(CMM){
+					CMM.createStyle("<tml:item name="$mc.cssCode" a-css="_css" encode="none"/>", "cmm-global-styles");
 				})
-			</tml:{script}>
+			</tml:[script]>
 			
 			<tml:include ref="system:include-child-modules" trim="true">
 				<tml:option name="child-modules" expression="$mc.mods"/>
@@ -111,11 +110,11 @@
 			</tml:include>
 			
 			<tml:case condition="option('animate')===true || option('animate')=='true'">
-				<script>
+				<tml:[script]>
 					require(["jquery"], function(){
 						$("#content-modules-<tml:item name="$mc.section"/>").css("opacity", 1);
 					})
-				</script>
+				</tml:[script]>
 			</tml:case>
 		</div>
 	</tml:else>

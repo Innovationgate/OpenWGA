@@ -30,7 +30,7 @@
 	</tml:include>
 </div>
 
-<script>
+<tml:[script]>
 	require(["jquery-accordion"], function(){
 		$("#module-<tml:option name="ns"/> .accordion").wga_accordion({
 			effectSpeed: "<tml:script expression="CMM.setting('effect_speed')||'fast'"/>"
@@ -43,4 +43,4 @@
 		})
 		.css("opacity", 1);
 	})
-</script>
+</tml:[script]>
