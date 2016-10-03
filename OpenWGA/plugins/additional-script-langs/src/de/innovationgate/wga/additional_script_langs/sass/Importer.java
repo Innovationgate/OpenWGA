@@ -61,9 +61,10 @@ public class Importer {
         	ref.setResourceName("_" + ref.getResourceName());
             if(ref.getCode()!=null)
             	return ref;
+            else return null;
         	
         }
-       	return ref;
+        else return ref;
     }
     
     public Date mtime(String uri,RubyHash options) throws WGException, IOException {
@@ -82,7 +83,7 @@ public class Importer {
         PostProcessResult result = (PostProcessResult) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wgaResult"));
         if(base_ref!=null){
         	ResourceRef ref = findResourceRef(base_ref, uri);
-        	if(ref.getDesignDocument()!=null)
+        	if(ref!=null && ref.getCode()!=null)
         		return importResource(ref, result, runtime, options);
         }
         return null;
