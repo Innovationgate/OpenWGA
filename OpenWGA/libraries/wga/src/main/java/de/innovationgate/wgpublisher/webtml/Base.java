@@ -1991,16 +1991,15 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
         TMLContext context = this.getTMLContext();
     	WGContent content = context.content();
     	
-    	if( content != null ){		
-    		// Eventually put out meta tags
+    	if( content!=null && metaOutput==true){		
+    		// put out meta tags
     		this.appendResult("<meta name=\"generator\" content=\"").appendResult(WGACore.getGeneratorString()).appendResult("\">\n");		
-    		if (metaOutput == true ) {
-    			this.appendResult("<meta name=\"keywords\" content=\"").appendResult(de.innovationgate.utils.WGUtils.serializeCollection(content.getKeywords(), ",")).appendResult("\">\n");
-    		}				
+   			this.appendResult("<meta name=\"keywords\" content=\"").appendResult(de.innovationgate.utils.WGUtils.serializeCollection(content.getKeywords(), ",")).appendResult("\">\n");
     	}
     
-    	this.appendResult(includeScript("htmlhead"));
-    	this.appendResult("<script type=\"text/javascript\">");
+    	if(scripts==null || this.stringToBoolean(scripts)!=false)
+    		this.appendResult(includeScript("htmlhead"));
+    	this.appendResult("<script type=\"text/javascript\" id=\"wga-htmlhead\">");
     	this.appendResult("WGA.contextpath=\"" + getWGPPath() + "\";");    // used by htmlhead.js since wga-4
     	this.appendResult("WGA.uriHash =\"" + getTMLContext().getUriHash() + "\";");
     	
@@ -2014,13 +2013,16 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     	
         this.appendResult("</script>\n");
     
-    	// optional includes for input fields		
-    	if (scripts!=null){
+    	// optional includes for input fields	
+        /*
+         * 	We don't have any includeble scripts anymore in 2016
+    	if (scripts!=null && !scripts.equalsIgnoreCase("none")){
     		java.util.StringTokenizer options = new java.util.StringTokenizer(scripts, ",");
     		while (options.hasMoreTokens()) {
     			this.appendResult(includeScript(options.nextToken().trim()));
     		}
     	}
+    	*/
     	
     	// Process HTML head inclusion modules
     	for (HTMLHeadInclusion inc : getCore().getHtmlHeadInclusions()) {
