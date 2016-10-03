@@ -49,15 +49,21 @@ public class Importer {
 
     private ResourceRef findResourceRef(ResourceRef parent, String uri) throws WGException, IOException{
         ResourceRef ref = new ResourceRef(parent, uri); 
-        if(ref.getDesignDocument()!=null)
-        	return ref;
-        else{
-            // Try partial
+    	if(ref.getType().equals(ResourceRef.TYPE_FILE)){
+    		// type=file must have file extension. If not add .scss
+    		if(!ref.getResourceName().contains(".")){
+    			ref.setResourceName(ref.getResourceName() + ".scss");
+    		}
+    	}
+        
+        if(ref.getCode()==null){
+            // Try _filename 
         	ref.setResourceName("_" + ref.getResourceName());
-            if(ref.getDesignDocument()!=null)
+            if(ref.getCode()!=null)
             	return ref;
+        	
         }
-        return null;
+       	return ref;
     }
     
     public Date mtime(String uri,RubyHash options) throws WGException, IOException {
