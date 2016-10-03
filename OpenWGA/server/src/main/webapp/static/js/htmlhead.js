@@ -506,18 +506,6 @@ WGA.buildContentURL = function(key) {
 };
 
 /**
- * Loads content of the given key DEPRECATED WS: not sure, who uses this
- * function.
- * 
- * @param {String}
- *            key
- */
-function loadContent(key) {
-	location.href = WGA.buildContentURL(key);
-}
-
-
-/**
  * Module to register onload functions in WGA. onload-s are attached to the
  * window.onload-event and are called after Ajax calls
  */
@@ -789,17 +777,18 @@ WGA.action = function(actionDef) {
 
 };
 
-function decode(s) {
-	try {
-		return decodeURIComponent(s).replace(/\r\n|\r|\n/g, "\r\n");
-	} catch (e) {
-		return "";
-	}
-}
-
-function getQueryString(win) {
+WGA.getQueryString = function(win) {
 	var qs = win.location.search;
 	var map = {};
+
+	function decode(s) {
+		try {
+			return decodeURIComponent(s).replace(/\r\n|\r|\n/g, "\r\n");
+		} catch (e) {
+			return "";
+		}
+	}
+	
 	if (qs.length > 1) {
 		qs = qs.substr(1);
 
@@ -847,7 +836,7 @@ WGA.toQueryString = function(customParams, keepParams, encodeParams, removeParam
 
 	// Push current URL params
 	if (keepParams == undefined || keepParams == true) {
-		var currentParams = getQueryString(window);
+		var currentParams = WGA.getQueryString(window);
 		for ( var key in currentParams) {
 			if (currentParams[key] != null) {
 				params[String(key)] = String(currentParams[key]);
