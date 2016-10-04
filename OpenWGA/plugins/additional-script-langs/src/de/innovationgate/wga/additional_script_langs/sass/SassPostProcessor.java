@@ -1,9 +1,12 @@
 package de.innovationgate.wga.additional_script_langs.sass;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 import javax.json.JsonString;
+
+import org.apache.commons.lang3.StringUtils;
 
 import ro.isdc.wro.model.group.processor.Injector;
 import de.innovationgate.utils.FormattingException;
@@ -39,11 +42,15 @@ public class SassPostProcessor extends CssDialectsPostProcessor {
         
         completeCode.append(code);
         
-        Design design = wga.design(doc.getDatabase().getDbReference()).resolve(doc.getName());
-        Context cx = wga.createTMLContext(data.getDocument().getDatabase(), design);
-        SassEngine engine = new SassEngine(wga, design, cx, doc.getDesignReference().toString(), result);
-        String out = engine.process(completeCode.toString());
-        return out;
+		try {
+	        Design design = wga.design(doc.getDatabase().getDbReference()).resolve(doc.getName());
+	        Context cx = wga.createTMLContext(data.getDocument().getDatabase(), design);
+	        SassEngine engine = new SassEngine(wga, design, cx, doc.getDesignReference().toString(), result);
+	        return engine.process(completeCode.toString());
+		} catch (IOException e) {
+			wga.getLog().error("Unable to process SCSS-Source", e);
+		}
+        return StringUtils.EMPTY;
     }
 
     private String formatValue(Object value) {

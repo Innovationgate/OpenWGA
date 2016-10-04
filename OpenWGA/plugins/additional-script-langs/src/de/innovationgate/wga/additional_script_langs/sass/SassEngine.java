@@ -2,17 +2,21 @@ package de.innovationgate.wga.additional_script_langs.sass;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -72,13 +76,15 @@ public class SassEngine {
      *
      * @param content
      *          the Sass content to process.
+     * @throws IOException 
      */
-    public synchronized String process(final String content) {
+    public synchronized String process(final String content) throws IOException {
 
       if (StringUtils.isEmpty(content)) {
         return StringUtils.EMPTY;
       }
       
+      StringWriter sw = new StringWriter();
       try {
     	  final ScriptEngine rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
 	      Bindings bindings = rubyEngine.createBindings();
@@ -88,14 +94,21 @@ public class SassEngine {
 	      bindings.put("wgaResult", _ppr);
 	      bindings.put("wgaResourceRef", _ref);
 	      
+	      rubyEngine.getContext().setErrorWriter(new PrintWriter(sw));
+	      
 	      return rubyEngine.eval(buildUpdateScript(content), bindings).toString();
       }
-      catch (final Exception e) {
-    	  _wga.getLog().info(content);
-    	  throw new WroRuntimeException(e.getMessage(), e);
+      catch(ScriptException e){
+    	  StringReader reader = new StringReader(sw.toString());
+    	  List<String> errors = IOUtils.readLines(reader);
+	      _wga.getLog().error(errors.get(0));    	  
       }
-    }
-    
+      catch (Exception e) {
+	      _wga.getLog().error(e);
+      }
+      return StringUtils.EMPTY;
+      
+    }    
 
     private String buildUpdateScript(final String content) throws UnsupportedEncodingException, IOException {
       Validate.notNull(content);
