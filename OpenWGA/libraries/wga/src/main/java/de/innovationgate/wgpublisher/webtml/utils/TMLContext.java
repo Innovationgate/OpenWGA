@@ -120,6 +120,8 @@ import de.innovationgate.wga.common.beans.LuceneConfiguration;
 import de.innovationgate.wga.common.beans.LuceneIndexItemRule;
 import de.innovationgate.wga.common.beans.csconfig.v1.MediaKey;
 import de.innovationgate.wga.common.beans.csconfig.v1.PluginID;
+import de.innovationgate.wga.config.VirtualHost;
+import de.innovationgate.wga.config.WGAConfiguration;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.TMLScript;
 import de.innovationgate.wga.server.api.TMLScript.ObjectType;
@@ -145,6 +147,7 @@ import de.innovationgate.wgpublisher.expressions.tmlscript.RhinoExpressionEngine
 import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager.DerivateQuery;
 import de.innovationgate.wgpublisher.files.derivates.WGInvalidDerivateQueryException;
 import de.innovationgate.wgpublisher.filter.WGAFilter;
+import de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
 import de.innovationgate.wgpublisher.filter.WGAFilter.RequestWrapper;
 import de.innovationgate.wgpublisher.lang.WebTMLLanguageChooser;
 import de.innovationgate.wgpublisher.lucene.LuceneManager;
@@ -5352,6 +5355,22 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
             _environment = new IsolatedTMLContextEnvironment(this, getEnvironment().getCore(), getprofile(), getEnvironment().getForm(), getEnvironment().getRequest(), getEnvironment().getResponse(), getEnvironment().getSession());
         }
     }
-    
+
+    @Override
+    public boolean ishomepage(){
+    	if(getcontent().isDummy())
+    		return false;
+    	String homepageName = (String) db().getAttribute(WGACore.DBATTRIB_HOME_PAGE_NAME);
+    	if(homepageName!=null){
+			try {
+				String name = getcontent().getStructEntry().getUniqueName();
+				if(name==null)
+					name = getcontent().getUniqueName();
+				if(name!=null && name.equalsIgnoreCase(homepageName))
+					return true;
+			} catch (WGAPIException e) {}
+    	}
+    	return false;
+    }
 	
 } 
