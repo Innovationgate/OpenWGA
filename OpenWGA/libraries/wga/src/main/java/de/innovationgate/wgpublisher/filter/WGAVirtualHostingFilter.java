@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.net.IDN;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
@@ -45,18 +44,19 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import de.innovationgate.utils.URLBuilder;
+import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.wga.config.ConfigBean;
 import de.innovationgate.wga.config.ContentDatabase;
 import de.innovationgate.wga.config.VirtualHost;
 import de.innovationgate.wga.config.VirtualResource;
 import de.innovationgate.wga.config.WGAConfiguration;
 import de.innovationgate.wgpublisher.WGACore;
-import de.innovationgate.wgpublisher.WGPDispatcher;
 import de.innovationgate.wgpublisher.WGPRequestPath;
 import de.innovationgate.wgpublisher.WGPDispatcher.PathDispatchingOccasion;
 import de.innovationgate.wgpublisher.problems.Problem;
 import de.innovationgate.wgpublisher.problems.ProblemOccasion;
 import de.innovationgate.wgpublisher.problems.ProblemSeverity;
+import de.innovationgate.wgpublisher.url.WGAURLBuilder;
 
 public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProvider {
     
@@ -150,16 +150,35 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
             else {
                 String[] pathElements = uri.split("/");
                 if (pathElements == null || pathElements.length < 1) {
-                    // root url request - redirect to default database or hide
-                    // db
+                    // root url request - redirect to default database or hide db
                     if (defaultDBKey != null) {
+                    	
                         if (vHost.isHideDefaultDatabaseInURL()) {
-                            httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
+                        	//httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
+                        	
+                        	if(vHost.isHideHomepageURL()){
+								try {
+		                            WGDatabase db = (WGDatabase) _core.getContentdbs().get(defaultDBKey);
+		                            WGAURLBuilder urlBuilder = _core.retrieveURLBuilder(httpRequest, db);	                            
+									String homepage = "/" + defaultDBKey + urlBuilder.buildHomepageURL(db, httpRequest);
+	                                httpRequest.getRequestDispatcher(homepage).forward(request, response);
+	                                return;
+								} catch (Exception e) {
+									_core.getLog().error("v-host: unable to proxy homepage", e);
+									// fallback:
+									httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
+								}    
+                        	}
+							else httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
+							
                         }
                         else {
                             httpResponse.sendRedirect(httpResponse.encodeRedirectURL(uri + defaultDBKey));
                             return;
                         }
+                        
+                        httpResponse.sendRedirect(httpResponse.encodeRedirectURL(uri + defaultDBKey));
+                        return;
                     }
                 }
                 else if (pathElements.length == 2 && isRootResource(vHost, pathElements[1])) {
