@@ -22,7 +22,6 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ro.isdc.wro.WroRuntimeException;
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.additional_script_langs.ResourceRef;

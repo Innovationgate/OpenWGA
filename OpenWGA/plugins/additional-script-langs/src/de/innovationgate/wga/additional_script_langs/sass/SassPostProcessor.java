@@ -53,7 +53,8 @@ public class SassPostProcessor extends CssDialectsPostProcessor {
         return StringUtils.EMPTY;
     }
 
-    private String formatValue(Object value) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	private String formatValue(Object value) {
 
         if (value instanceof List<?>) {
             return WGUtils.serializeCollection((List) value, " ", new ObjectFormatter() {

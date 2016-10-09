@@ -1,6 +1,5 @@
 package de.innovationgate.wga.additional_script_langs.jsmin;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Iterator;
