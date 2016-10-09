@@ -7,7 +7,7 @@
 
 !function(root, factory) {
   	if(typeof define === 'function' && define.amd)
-    	define(['jquery'], factory);
+    	define("jquery-tree", ['jquery'], factory);
   	else factory(root.jQuery);
 }(window, function($){
 
@@ -552,4 +552,4 @@
 		})
 	}
 	
-})
+});

@@ -7,7 +7,7 @@
 
 !function(root, factory) {
   	if(typeof define === 'function' && define.amd)
-    	define(['jquery'], factory);
+    	define("jquery-tabhandler", ['jquery'], factory);
   	else factory(root.jQuery);
 }(window, function($){
 
@@ -111,4 +111,4 @@
 		})
 	}
 
-})
+});

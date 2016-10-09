@@ -7,7 +7,7 @@
  
 !function(root, factory) {
   	if(typeof define === 'function' && define.amd)
-    	define([
+    	define("jquery-accordion", [
     	    "jquery",
     	    "css!/plugin-wga-app-framework/css/jquery-accordion"
     	], factory);
@@ -84,4 +84,4 @@
 	})
 	
 	
-})
+});

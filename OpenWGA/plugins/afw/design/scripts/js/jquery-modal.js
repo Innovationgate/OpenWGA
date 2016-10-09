@@ -7,7 +7,7 @@
 
 !function(root, factory) {
   	if(typeof define === 'function' && define.amd)
-    	define([
+    	define("jquery-modal", [
     	    "jquery",
     	    "css!/plugin-wga-app-framework/css/jquery-modal"
     	], factory);
