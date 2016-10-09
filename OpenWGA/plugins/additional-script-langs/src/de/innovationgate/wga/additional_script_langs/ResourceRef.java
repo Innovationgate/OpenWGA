@@ -70,9 +70,10 @@ public class ResourceRef {
 		path_parts.remove(_resourceName);
 		_path = StringUtils.join(path_parts, ":");
 
-		if((_type.equals(TYPE_CSS) || _type.equals(TYPE_JS)) && _resourceName.contains("."))			
-			_resourceName = _resourceName.substring(0, _resourceName.indexOf("."));	// remove file extension 
-
+		if((_type.equals(TYPE_CSS) || _type.equals(TYPE_JS)) && _resourceName.contains(".")){			
+			_resourceName = _resourceName.substring(0, _resourceName.lastIndexOf("."));	// remove file extension
+		}
+		
 		if(_db==null){
 			_db = parentref.getDb();
 			if(!_path.startsWith(":") && !_resourceName.contains("@") && !_type.equals(TYPE_STATIC))	// relative Adressierung
