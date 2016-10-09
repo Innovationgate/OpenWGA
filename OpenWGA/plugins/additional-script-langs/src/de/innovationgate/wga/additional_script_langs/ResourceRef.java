@@ -64,24 +64,26 @@ public class ResourceRef {
 
 		if(_type==null)
 			_type = parentref.getType();
-		
-		if(_db==null)
-			_db = parentref.getDb();
-		else if(!_path.startsWith(":"))
-			_path = ":"+_path;		// ensure path is absolute if db attribute is given
-		
+				
 		List<String> path_parts = new ArrayList<String>(Arrays.asList(_path.split(":")));
 		_resourceName = path_parts.get(path_parts.size()-1);
 		path_parts.remove(_resourceName);
 		_path = StringUtils.join(path_parts, ":");
-		
+
 		if((_type.equals(TYPE_CSS) || _type.equals(TYPE_JS)) && _resourceName.contains("."))			
 			_resourceName = _resourceName.substring(0, _resourceName.indexOf("."));	// remove file extension 
+
+		if(_db==null){
+			_db = parentref.getDb();
+			if(!_path.startsWith(":") && !_resourceName.contains("@") && !_type.equals(TYPE_STATIC))	// relative Adressierung
+				_path = parentref.getPath() + (_path.equals("") ? "" : ":" + _path);
+		}
+		else if(!_path.equals("") && !_path.startsWith(":")){
+			_path = ":"+_path;		// ensure path is absolute if db attribute is given
+		}
 		
-		if(!_path.startsWith(":") && !_resourceName.contains("@") && !_type.equals(TYPE_STATIC))	// relative Adressierung
-			_path = parentref.getPath() + (_path.equals("") ? "" : ":" + _path);
-		
-		_design = parentref.getDesign().resolve(_db + "/" + _path + (!_type.equals(TYPE_FILE) ? ":"+_resourceName : ""));
+		String pathToResolve = _db + "/" + _path + (!_type.equals(TYPE_FILE) ? ":"+_resourceName : "");
+		_design = parentref.getDesign().resolve(pathToResolve);
 				
 	}
 	
@@ -108,6 +110,18 @@ public class ResourceRef {
 		}
 	}
 	
+	public String getJavaScriptCode() throws WGException, IOException{
+		if(_type==TYPE_JS)
+			return _design.getJavaScriptCode();
+		else return getCode();
+	}
+
+	public String getCSSCode() throws WGException, IOException{
+		if(_type==TYPE_CSS)
+			return _design.getCSSCode();
+		else return getCode();
+	}
+
 	public WGDesignDocument getDesignDocument() throws WGException, IOException{
 		try{
 			switch (_type) {

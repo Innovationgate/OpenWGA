@@ -44,9 +44,9 @@ public class JSMinPostProcessor implements PostProcessor{
 				if(line.trim().startsWith(IMPORT_SCRIPT)){
 					String path = line.substring(IMPORT_SCRIPT.length()).trim();
 					ResourceRef ref = new ResourceRef(base_ref, path);
-					String mod_code = ref.getCode();
+					String mod_code = ref.getJavaScriptCode();
 					if(mod_code!=null){
-						convertedCode.append("// @import " + ref.toString() + "\n");
+						convertedCode.append("// @imported " + ref.toString() + "\n");
 						convertedCode.append(mod_code + "\n");
 						if(ref.getDesignDocument()!=null)
 							result.addIntegratedResource(ref.getDesignDocument());
@@ -57,9 +57,9 @@ public class JSMinPostProcessor implements PostProcessor{
 					}
 				}
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			convertedCode.append("// unable to read JSMin module\n");
-			wga.getLog().error("jsmin: unable to read module");
+			wga.getLog().error("jsmin: unable to read module: " + e.getMessage());
 		}
 
 		if(WGACore.isDevelopmentModeEnabled()){
