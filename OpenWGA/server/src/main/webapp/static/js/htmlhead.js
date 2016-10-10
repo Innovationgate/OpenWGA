@@ -167,6 +167,7 @@ WGA.util = /**
 			if(firstElement)
 				document.body.insertBefore(div, firstElement);
 			else document.body.appendChild(div);
+			reloadButton.focus();
 		}
 		div.children[1].innerHTML = msg + "<br>";
 		div.style.display="block";
@@ -450,27 +451,43 @@ WGA.util.generateInterval = function(attempts, max) {
 WGA.util.label = function(labels, defaultLanguage) {
 	
 	// Full locale codes
-	for (var idx=0; idx < navigator.languages.length ; idx++) {
-		var label = labels[navigator.languages[idx]];
+	if(navigator.languages){
+		for (var idx=0; idx < navigator.languages.length ; idx++) {
+			var label = labels[navigator.languages[idx]];
+			if (label) {
+				return label;
+			}
+		}
+		
+		// Only language codes
+		for (var idx=0; idx < navigator.languages.length ; idx++) {
+			var locale = navigator.languages[idx];
+			var subIdx = locale.indexOf("_");
+			if (subIdx != -1) {
+				var language = locale.substring(0, subIdx);
+				var label = labels[language];
+				if (label) {
+					return label;
+				}
+			}
+		}
+	}
+	else if(navigator.language){
+		var label = labels[navigator.language];
 		if (label) {
 			return label;
 		}
-	}
-	
-	// Only language codes
-	for (var idx=0; idx < navigator.languages.length ; idx++) {
-		var locale = navigator.languages[idx];
-		var subIdx = locale.indexOf("_");
+		var subIdx = navigator.language.indexOf("_");
 		if (subIdx != -1) {
-			var language = locale.substring(0, subIdx);
+			var language = navigator.language.substring(0, subIdx);
 			var label = labels[language];
 			if (label) {
 				return label;
 			}
 		}
 	}
-	
-	// Default language
+
+	// Fallback: Default language
 	if (defaultLanguage) {
 		return labels[defaultLanguage];
 	}
