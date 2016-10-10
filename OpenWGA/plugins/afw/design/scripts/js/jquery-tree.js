@@ -312,16 +312,30 @@
 		selectpath: 	selectpath,
 		reloadselected: reloadSelectedNode,
 		
-		addnode: 		function(node_or_id, data, select)	addNode(findNode(this, node_or_id), data, select),
-		addnodes: 		function(node_or_id, data) 			addNodes(findNode(this, node_or_id), data),
-		expandnode: 	function(node_or_id, callback) 		expandNode(findNode(this, node_or_id), callback),
-		collapsenode:	function(node_or_id) 				collapseNode(findNode(this, node_or_id)),
-		selectnode: 	function(node_or_id, trigger_selected) selectNode(findNode(this, node_or_id), trigger_selected),
+		addnode: function(node_or_id, data, select){
+			return addNode(findNode(this, node_or_id), data, select)
+		},
+		addnodes: function(node_or_id, data){
+			return addNodes(findNode(this, node_or_id), data)
+		},
+		expandnode: function(node_or_id, callback){
+			return expandNode(findNode(this, node_or_id), callback)
+		},
+		collapsenode: function(node_or_id){
+			return collapseNode(findNode(this, node_or_id))
+		},
+		selectnode: function(node_or_id, trigger_selected){
+			return selectNode(findNode(this, node_or_id), trigger_selected)
+		},
 
-		updatenode: 	function(node_or_id, data) 			updateNode(findNode(this, node_or_id), data),
-		removenode: 	function(node_or_id, data) 			removeNode(findNode(this, node_or_id)),
+		updatenode: function(node_or_id, data){
+			return updateNode(findNode(this, node_or_id), data)
+		},
+		removenode: function(node_or_id, data){
+			return removeNode(findNode(this, node_or_id))
+		},
 		
-		reload: 		reload
+		reload: reload
 	}
 
 	$.fn.wga_tree = function(config){
