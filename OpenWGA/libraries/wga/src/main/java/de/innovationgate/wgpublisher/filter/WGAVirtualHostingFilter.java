@@ -176,9 +176,6 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                             httpResponse.sendRedirect(httpResponse.encodeRedirectURL(uri + defaultDBKey));
                             return;
                         }
-                        
-                        httpResponse.sendRedirect(httpResponse.encodeRedirectURL(uri + defaultDBKey));
-                        return;
                     }
                 }
                 else if (pathElements.length == 2 && isRootResource(vHost, pathElements[1])) {
