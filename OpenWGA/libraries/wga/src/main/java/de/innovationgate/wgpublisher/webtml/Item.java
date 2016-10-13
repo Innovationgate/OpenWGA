@@ -292,15 +292,15 @@ public class Item extends FormBase implements DynamicAttributes {
 
 		StringBuffer prefix = createItemEditorDeclaration(itemName, editor, rawLabel);
 		
-		prefix.append("<span class=\"WGA-Item-Value\" id=\"item_"+itemName+"\">");
+		prefix.append("<div class=\"WGA-Item-Value\" id=\"item_"+itemName+"\">");
 		
 		// item content will be inserted here
 		
-		StringBuffer suffix = new StringBuffer("</span>\n");
+		StringBuffer suffix = new StringBuffer("</div>\n");
 		
 		if(editor.equalsIgnoreCase("rtf") || editor.equalsIgnoreCase("textblock")){
             // Add unencoded version to suffix. Will be used by RTF editor for updates
-            suffix.append("<span class=\"WGA-Item-Value-Unencoded\" id=\"item_"+itemName+"_unencoded\" style=\"display:none\" >");
+            suffix.append("<div class=\"WGA-Item-Value-Unencoded\" id=\"item_"+itemName+"_unencoded\" style=\"display:none\" >");
             if (result.size() >= 1) {
                 RTFEncodingFormatter formatter = new RTFEncodingFormatter(true);
                 formatter.setContext(getTMLContext());
@@ -312,12 +312,12 @@ public class Item extends FormBase implements DynamicAttributes {
                     suffix.append(String.valueOf(result.get(0)));
                 }
             }
-            suffix.append("</span>\n");
+            suffix.append("</div>\n");
 		}
 		else if (editor.equalsIgnoreCase("custom")) {
 		    suffix.append(getCustomEditorCode());
 		}
-        suffix.append("\n</span>\n");
+        suffix.append("\n</div>\n");
 		
         this.setPrefix(prefix.toString());
 		this.setSuffix(suffix.toString());
@@ -353,7 +353,7 @@ public class Item extends FormBase implements DynamicAttributes {
 		String LS = System.getProperty("line.separator");
 		
 		editorCode.append(LS);
-		editorCode.append("<span class=\"WGA-Custom-Form\" style=\"display:none;\">");
+		editorCode.append("<div class=\"WGA-Custom-Form\" style=\"display:none;\">");
 		editorCode.append(LS);		
 		
 		StringBuffer submitCode = new StringBuffer();
@@ -379,15 +379,15 @@ public class Item extends FormBase implements DynamicAttributes {
 		editorCode.append(LS);
 		editorCode.append(renderFormEndTag());
 		editorCode.append(LS);
-		editorCode.append("</span>");
+		editorCode.append("</div>");
 		
 		if( status.thisForm.hasmessages() ){
-		    editorCode.append("<span class=\"WGA-Custom-Form-Errors\" style=\"display:none;\">");
+		    editorCode.append("<div class=\"WGA-Custom-Form-Errors\" style=\"display:none;\">");
 		    for (String message : (List<String>) status.thisForm.getmessages()) {
-		        editorCode.append("<span class=\"WGA-Custom-Form-Error-Message\">" + WGUtils.encodeHTML(message) + "</span>");
+		        editorCode.append("<div class=\"WGA-Custom-Form-Error-Message\">" + WGUtils.encodeHTML(message) + "</div>");
 		    }
 		    
-		    editorCode.append("</span>");
+		    editorCode.append("</div>");
 		}
 		
 		return editorCode.toString();
