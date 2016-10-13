@@ -28,14 +28,15 @@ function Renderer() {
 }
 
 Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey){
-	//console.log("$urlParam_dbkey", $urlParam_dbkey)
+	//console.log("$urlParam_dbkey", $urlParam_dbkey, WGA.app("demo2"))
 	if(!$urlParam_dbkey){
 		if(this.custom_login_url)
 			WGA.redirectTo(this.custom_login_url);
 		else WGA.TMLPage.renderDefault();
 	}	
 	else {
-		if(!WGA.app($urlParam_dbkey).isAuthor() && this.custom_login_url){
+		var app = WGA.app($urlParam_dbkey)
+		if((!app || !app.isAuthor()) && this.custom_login_url){
 			var b = WGA.urlBuilder(this.custom_login_url)
 			b.setParameter("dbkey", $urlParam_dbkey)
 			if($urlParam_contentkey)
