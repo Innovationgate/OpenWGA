@@ -3944,6 +3944,8 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
     
     public static final String DBATTRIB_TITLEPATHURL_INCLUDEKEYS = "TitlePathURL.IncludeKeys";
     
+    public static final String DBATTRIB_TITLEPATHURL_ALLOW_UMLAUTE = "TitlePathURL.AllowUmlaute";
+
     public static final String DBATTRIB_TITLEPATHMANAGER = "TitlePathManager";
 
     public static final String DBATTRIB_WEBTMLCACHE_SERVESTALEDATA = "WebTMLCache.ServeStaleData";
