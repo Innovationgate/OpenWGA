@@ -7,22 +7,27 @@ Controller.prototype.prepare = function($option_section, $cx, CMM){
 	this.mods = CMM.getContentModulesAsXML($cx.content()).selectNodes("/modules/section[@id='"+this.section+"']/mod");
 }.nonIsolated();
 
-Controller.prototype.allowedModulesString = function($cx, CMM){
+Controller.prototype.allowedModulesString = function($cx, $option_modules, CMM){
 	var mods = false;
-	if($cx.option("modules")){
-		var mods = $cx.option("modules").split(/\s*,\s*/);
+	if($option_modules){
+		var parts = $option_modules.split(",")
+		var mods=[]
+		for(let [index, value] in parts)
+			mods.push(value.trim());
 		return JSON.stringify(mods)
 	}
 	else if($cx.option("exclude-modules")){
-		var mods = [];
-		var exclude = $cx.option("exclude-modules").split(/\s*,\s*/);		
+		var mods = [],
+			exclude = [];
+		var parts = $cx.option("exclude-modules").split(",");
+		for(let [index, value] in parts)
+			exclude.push(value.trim());
 		var modules = CMM.getModuleDefs()
 		for (var i=0; i < modules.length; i++) {
 			var id = modules[i].id
 			if(exclude.indexOf(id)<0)
 				mods.push(id)
 		}
-		
 		return JSON.stringify(mods)
 	}
 	else return "true"
