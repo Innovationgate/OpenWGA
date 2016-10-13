@@ -295,6 +295,12 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
         METAINFO_BROWSERTITLE.setOutputConverter(TITLE_CONVERTER);
     }
     
+    public static final String META_TITLEPATH = "TITLEPATH";
+    public static final MetaInfo METAINFO_TITLEPATH = new MetaInfo(META_TITLEPATH, String.class, null);
+    static {
+        METAINFO_TITLEPATH.setExtdata(true);
+    }
+    
 	public static final String META_LANGUAGE = "LANGUAGE";
     public static final MetaInfo METAINFO_LANGUAGE = new MetaInfo(META_LANGUAGE, String.class, null);
     static { METAINFO_LANGUAGE.setLowerCase(true); };
