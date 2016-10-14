@@ -1,0 +1,167 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope="#seo">
+
+	label: {
+		margin: "10px 0"
+	},
+	"input[type=text], textarea": {
+		width: "100%"
+	},
+
+	".alert": {
+		margin: "10px 0",
+		color: "red"
+	},
+	
+
+	"#app-outline":{
+
+		".content-words ul": {
+			list_style_type: "disc",
+			padding_left: 15
+		},
+		
+		".struct": {
+			margin: "10px 0",
+			".tag": {
+				padding: "2px 0",
+				margin_left: 30,
+				font_size: ".9em",
+				border_bottom: "solid silver 1px",
+				"&.outline-error": {
+					color: "red",
+					font_style: "italic",
+					"&:before": {
+						background: "red"
+					}
+				},
+				"&:before": {
+					float: "left",
+					color: "white",
+					background: "#286090",
+					padding: "0 4px",
+					border_radius: 5,
+					margin_left: -30
+				}
+			},
+			".tag-H1": {
+				font_weight: "bold",
+				"&:before": {
+					content: "\"H1\"",
+				}
+			},
+			".tag-H2": {
+				padding_left: 30,
+				"&:before": {
+					content: "\"H2\"",
+				}
+			},
+			".tag-H3": {
+				padding_left: 60,
+				color: "gray",
+				"&:before": {
+					content: "\"H3\"",
+				}
+			},
+			".tag-H4": {
+				padding_left: 90,
+				color: "gray",
+				"&:before": {
+					content: "\"H4\"",
+				}
+			},
+			".tag-H5": {
+				padding_left: 120,
+				color: "gray",
+				"&:before": {
+					content: "\"H5\"",
+				}
+			},
+			".tag-H6": {
+				padding_left: 150,
+				color: "gray",
+				"&:before": {
+					content: "\"H6\"",
+				}
+			}
+		}
+				
+	},
+
+	"#seo-searchengine": {
+		".anzeige":{
+			margin: "20px 0",
+			padding: 20,
+			border: "solid silver 1px",
+			".title": {
+				color: "#1a0dab",
+				font_size: "1.5em",
+				margin: 0
+			},
+			".url": {
+				color: "#006621",
+				margin: "5px 0",
+				white_space: "pre",
+				text_overflow: "ellipsis",
+				overflow: "hidden"
+			},
+			".description": {
+				color: "​​#545454"
+			}
+		},
+	},
+
+	h1: {
+		margin: "20px 0 10px",
+		border_bottom: "solid silver 1px"
+	}
+		
+</tml:include>
+
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope="#seo-w3c">
+
+	max_height: 400,
+	overflow: "auto",
+
+	".entry":{
+		margin: "10px 0",
+		border_bottom: "solid silver 1px",
+		"&:last-child": {
+			border_bottom: "none"
+		},
+		pre: {
+			white_space: "nowrap",
+			background: "#efefef",
+			padding: 5,
+			margin: "5px 0"
+		},
+		".w3c-error": {
+			color: "red"
+		}
+	}
+	
+</tml:include>

@@ -23,16 +23,48 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:include designdb="@afw" ref="compress" medium="javascript">
-	<tml:option name="files" trim="true">
-		wga
-		
-		siteexplorer.css
-		splash
-		SyntaxHighlighter
+<div id="seo-w3c">W3C Validierung der Seite</div>
 
-	</tml:option>
-</tml:include>
+<script>
 
-<tml:include ref="seo"/>
+	!function(){
 
+		var doc = BI.sitepanel.iframe.document;
+		var win = BI.sitepanel.iframe.window;
+
+		function encodeHTML(input) {
+		    return $('<span>').text(input).html().trim().replace(/\"/g, "'");
+		}
+
+		$.get(win.location, function(data){
+
+			$("#seo-w3c").html("Warte auf Antwort ...");
+			
+			$.ajax({
+				method: "POST",
+				contentType: "text/html;charset=UTF-8",
+				url: "https://validator.w3.org/nu/?out=json",
+				data: data,
+				dataType: "json"
+			})
+			.done(function(data){
+				$("#seo-w3c").html("<h1>" + data.messages.length + " Fehler gefunden</h1>");
+				for(var i=0; i<data.messages.length; i++){
+					var entry = data.messages[i]
+					
+					$("#seo-w3c").append(
+						'<div class="entry">'
+							+ (entry.extract ? '<pre>' + encodeHTML(entry.extract) + '</pre>' : '')
+							+ '<p class="w3c-' + entry.type + '">' + entry.type.toUpperCase() + ': ' + encodeHTML(entry.message) + '</p>'
+						+ '</div>'
+					);
+					
+				}
+				BI.dialog.autoHeight()
+			})
+
+		})
+
+	}()			
+
+</script>

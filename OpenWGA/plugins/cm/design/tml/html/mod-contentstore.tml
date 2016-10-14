@@ -94,6 +94,7 @@
 		<link type="text/css" rel="stylesheet" href="<tml:url type="tml" medium="stylesheets" name="all"/>"/>
 		
 		<tml:htmlhead/>
+		<tml:include designdb="@afw" ref="include:jquery"/>
 
 	</head>
 	
