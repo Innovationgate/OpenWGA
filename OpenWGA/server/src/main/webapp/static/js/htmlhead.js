@@ -94,6 +94,30 @@ WGA = function() {
 
 }();
 
+WGA.responsive = {
+	breakpoints:{
+		medium: 0,
+		large: 0
+	},
+	getMediaWidth: function(){
+		if(window.matchMedia){
+			if(window.matchMedia("(min-width:" + this.breakpoints.large + "px)").matches)
+				return "large"
+			if(window.matchMedia("(min-width:" + this.breakpoints.medium + "px)").matches)
+				return "medium"
+			else return "small"
+		}
+		else{
+			var w = window.innerWidth || $(window).width();
+			if(w<this.breakpoints.medium)
+				return "small"
+			if(w<this.breakpoints.large)
+				return "medium"
+			else return "large"
+		}
+	}
+}
+
 WGA.util = /**
  * @author oliver
  *
