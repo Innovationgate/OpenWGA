@@ -193,18 +193,24 @@
 					
 					function getWords(selector){
 						var words = {};
-						$(selector, doc).not(".WGA-Item-Value-Unencoded *, .WGA-Editor-Options, .WGA-Item-Label, .WGA-Item-Info, .WGA4-Editor-Options, script").contents()
+						var index=0;;
+						$(selector, doc).not(".WGA-Item-Value-Unencoded *, .WGA-Editor-Options, .WGA-Item-Label, .WGA-Item-Info, .WGA4-Editor-Options, WGA-Item-Edit, script, nav *, sidebar *").contents()
 							.filter(function () { return this.nodeType === 3; })
 							.each(function(){
 								var relevanz = 1;
 								var in_headings = $(this).parents("h1,h2,h3,h4,h5,h6").length>0
 								if(in_headings){
-									relevanz = 2
+									relevanz *= 2
 								} 
+								//console.log(this.nodeValue.trim(),in_headings, index,relevanz);
 								var w = this.nodeValue.match(/[A-z_äöüÄÖÜß]+/g);
-								if(w)
+								if(w){
+									if(index++ < 10){
+										relevanz *= 2;
+										//console.log(this, w,in_headings, index,relevanz); 
+									}
 									for(var i=0; i<w.length; i++){
-										//console.log(this, w);
+										//console.log(this, w, index);
 										var word = w[i].toLowerCase();
 										if(word.length<3 || stopwords.indexOf(word)>=0)
 											continue;
@@ -217,7 +223,8 @@
 											count: 1,
 											weight: relevanz
 										}
-									}				
+									}
+								}				
 							});
 							
 						var words_array = Object.getOwnPropertyNames(words).sort(function(a,b){
@@ -246,7 +253,7 @@
 			
 						$("#app-outline .content-words ul").append(
 							'<li>'
-								+ word 	+ ' (' + entry.count + ') '
+								+ word 	//	+ ' (' + entry.count + '/' + entry.weight +') '
 							+ '</li>'
 						)
 					}
