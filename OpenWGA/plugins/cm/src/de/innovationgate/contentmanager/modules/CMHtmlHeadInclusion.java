@@ -25,11 +25,14 @@
 
 package de.innovationgate.contentmanager.modules;
 
+import javax.servlet.ServletRequest;
+
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGStructEntry;
+import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.webtml.utils.HTMLHeadInclusion;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 
@@ -47,6 +50,15 @@ public class CMHtmlHeadInclusion implements HTMLHeadInclusion {
             	content = context.content();
         		structentry = content.getStructEntry();
 
+        		ServletRequest request = context.getEnvironment().getPageContext().getRequest();
+        		if(request.getParameter("$clean")!=null 
+        				|| (content.hasCompleteRelationships() && content.getStructEntry().getArea().getName().equals("$trash"))
+        		)
+        			request.removeAttribute(WGACore.ATTRIB_EDITDOCUMENT);
+        		
+    			result.append("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + 
+						context.fileurl("plugin-wga-app-framework", "cms", "bi.css") +
+						"\">");
 				result.append("\n<script id=\"wga-cm-contentinfo\" type=\"text/javascript\">");
 	        	result.append("\nWGA.contentinfo={");
 	        	result.append("\n\tdbkey:\"" + content.getDatabase().getDbReference() + "\"");
@@ -58,9 +70,11 @@ public class CMHtmlHeadInclusion implements HTMLHeadInclusion {
 	    			result.append("\",");
 	    			result.append("\n\tlanguage:\"" + content.getLanguage().getName() + "\"");
 	    		}
-	    		result.append("\n}");
+	    		result.append("\n};");
+	    		result.append("\nWGA.CMM={sections:{},hasSections:false}");
 	    		result.append("\n</script>\n");
-        	} catch (WGAPIException e) {
+        	
+        	} catch (WGException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 				return null;
