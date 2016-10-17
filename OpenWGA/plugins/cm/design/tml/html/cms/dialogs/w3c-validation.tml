@@ -36,7 +36,7 @@
 		    return $('<span>').text(input).html().trim().replace(/\"/g, "'");
 		}
 
-		$.get(win.location, function(data){
+		$.get(win.location + "?$clean", function(data){
 
 			$("#seo-w3c").html("Warte auf Antwort ...");
 			
