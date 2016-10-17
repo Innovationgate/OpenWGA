@@ -81,7 +81,7 @@
 							<div>
 								<label>Titel</label>
 								<tml:input name="browsertitle" meta="true" html_maxlength="60"/>
-								<div><tml:script expression="BROWSERTITLE.length"/>/60 Zeichen</div>
+								<div><tml:script expression="(BROWSERTITLE && BROWSERTITLE.length) || 0"/>/60 Zeichen</div>
 							</div>
 							<tml:script>
 								_isTilepath = false
@@ -125,6 +125,7 @@
 					var level, currentLevel = 0;
 					var errors = false;
 					var doc = BI.sitepanel.iframe.document;
+					var win = BI.sitepanel.iframe.window;
 					
 					var struct = $("#app-outline .struct")
 					var alert = $("#app-outline .alert")
@@ -133,7 +134,7 @@
 					struct.html("");
 					
 					// read page with URL param $clean to get clean HTML without item-editors
-					var href=BI.sitepanel.iframe.el.dom.src + "?$clean"
+					var href = ((win.location && win.location.href) || BI.sitepanel.iframe.el.dom.src) + "?$clean"
 					
 					$.get(href)
 						.success(function(html){
