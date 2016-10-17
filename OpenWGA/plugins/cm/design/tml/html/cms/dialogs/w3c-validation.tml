@@ -48,7 +48,7 @@
 				dataType: "json"
 			})
 			.done(function(data){
-				$("#seo-w3c").html("<h1>" + data.messages.length + " Fehler gefunden</h1>");
+				$("#seo-w3c").html("<h1>" + data.messages.length + " Fehler/Hinweise gefunden</h1>");
 				for(var i=0; i<data.messages.length; i++){
 					var entry = data.messages[i]
 					
