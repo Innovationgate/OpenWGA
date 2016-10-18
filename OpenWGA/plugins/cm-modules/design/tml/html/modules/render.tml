@@ -97,13 +97,6 @@
 				</script>
 			</tml:case>
 			
-			<tml:[script] if="!_cmm_style_included">
-				<tml:include medium="stylesheets" ref="cmm-styles" var="_css"/>
-				require(["<tml:url type="js" name="cmm"/>"], function(CMM){
-					CMM.createStyle("<tml:item name="$mc.cssCode" a-css="_css" encode="none"/>", "cmm-global-styles");
-				})
-			</tml:[script]>
-			
 			<tml:include ref="system:include-child-modules" trim="true">
 				<tml:option name="child-modules" expression="$mc.mods"/>
 				<tml:option name="margins" expression="true" scope="local"/>

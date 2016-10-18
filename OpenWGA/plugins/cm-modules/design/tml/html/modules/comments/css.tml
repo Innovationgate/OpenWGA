@@ -22,6 +22,9 @@
 ## along with OpenWGA in file COPYING.
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
+
+<tml:include medium="stylesheets" ref="cmm-styles"/>
+
 .module-cm_comments label{
 	display: block;
 }
