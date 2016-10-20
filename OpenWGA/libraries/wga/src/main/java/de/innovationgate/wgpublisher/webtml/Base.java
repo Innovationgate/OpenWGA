@@ -1997,7 +1997,16 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
    			this.appendResult("<meta name=\"keywords\" content=\"").appendResult(de.innovationgate.utils.WGUtils.serializeCollection(content.getKeywords(), ",")).appendResult("\">\n");
     	}
     
-    	if(scripts==null || this.stringToBoolean(scripts)!=false)
+    	boolean includeHTMLHeadScript = true;
+    	if(scripts!=null){
+	    	try{
+	    		includeHTMLHeadScript = WGUtils.stringToBoolean(scripts);
+	    	}
+	    	catch(Exception e){
+	    		addWarning(e.getMessage(), false);
+	    	}
+    	}
+    	if(includeHTMLHeadScript)
     		this.appendResult(includeScript("htmlhead"));
     	this.appendResult("<script type=\"text/javascript\" id=\"wga-htmlhead\">");
     	this.appendResult("WGA.contextpath=\"" + getWGPPath() + "\";");    // used by htmlhead.js since wga-4
@@ -2014,6 +2023,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
         this.appendResult("</script>\n");
     
     	// optional includes for input fields	
+        //	no longer supported since ... a long time. Removed Code.
         /*
          * 	We don't have any includeble scripts anymore in 2016
     	if (scripts!=null && !scripts.equalsIgnoreCase("none")){
