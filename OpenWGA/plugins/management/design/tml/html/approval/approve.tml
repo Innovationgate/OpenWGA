@@ -62,20 +62,6 @@
 		
 			<tml:form id="approve" source="content" context="{item:contextPath}">
 		
-				<tml:comment>
-				<table cellpadding="5">
-					<tr>
-						<td><tml:label key="validFrom"/>:</td>
-						<td><tml:input meta="true" name="validfrom" type="date"/></td>
-					</tr>
-				
-					<tr>
-						<td><tml:label key="validTo"/>:</td>
-						<td><tml:input meta="true" name="validTo" type="date"/></td>
-					</tr>
-				</table>
-				</tml:comment>
-				
 				<p>
 					<tml:label key="comment"/>:<br/>
 					<tml:input name="comment" type="textarea">rows="5" cols="50"</tml:input><br/>

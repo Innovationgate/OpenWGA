@@ -31,7 +31,7 @@ callAction("::initPage");
 		
 		<html>
 			<head>
-				<tml:htmlhead scripts="calendar"/>
+				<tml:htmlhead/>
 				<link rel="stylesheet" href="<tml:url type="css" doc="main"/>"/>
 			</head>
 			<body>
