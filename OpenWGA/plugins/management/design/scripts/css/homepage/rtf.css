@@ -1,0 +1,108 @@
+/*******************************************************************************
+  *Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+  *
+  *This file is part of the OpenWGA server platform.
+  *
+  *OpenWGA is free software: you can redistribute it and/or modify
+  *it under the terms of the GNU General Public License as published by
+  *the Free Software Foundation, either version 3 of the License, or
+  *(at your option) any later version.
+  *
+  *In addition, a special exception is granted by the copyright holders
+  *of OpenWGA called "OpenWGA plugin exception". You should have received
+  *a copy of this exception along with OpenWGA in file COPYING.
+  *If not, see <http://www.openwga.com/gpl-plugin-exception>.
+  *
+  *OpenWGA is distributed in the hope that it will be useful,
+  *but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *GNU General Public License for more details.
+  *
+  *You should have received a copy of the GNU General Public License
+  *along with OpenWGA in file COPYING.
+  *If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+body.rtf, body.rtf *{
+	font-size: 12px;
+	font-family: verdana,arial,sans-serif;
+}
+.rtf{
+	line-height: 150%;
+}
+
+.rtf h1{
+	padding-bottom: 5px;
+}
+.rtf h1{
+	color: #004080;
+    font-size: 28px;
+	font-weight: normal;
+}
+
+.rtf h2, .rtf h2 *{
+	color: white;
+}
+.rtf li{
+	margin-bottom: 10px;
+}
+
+.rtf .code{
+	border: solid #ffc800 1px;
+	background-color: rgba(255,255,255, .5);
+	font-family: courier; 
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	padding: 10px;
+}
+.rtf .code, .rtf .code *{
+	font-family: courier; 
+	color: black;
+}
+.rtf .code b{
+	color: white;
+}
+
+table td{
+	vertical-align: top;
+}
+
+.rtf table{
+	border-spacing: 10px !important;
+	border-collapse: separate !important;
+	table-layout: fixed;
+}
+
+/** table styles for RTFs **/
+table.gray{
+	border-spacing: 10px !important;
+	border-collapse: separate !important;
+}
+
+
+tr.table-header td{
+	background-color: gray !important;
+	color: white;
+}
+tr.table-header td *{
+	color: white;
+}
+
+
+td.box50{
+	width: 500px;
+}
+td.box25{
+	width: 225px;
+}
+td.box50, td.box25{
+	border: solid gray 1px;
+	padding: 20px;
+	
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-box-shadow: 0 1px 10px rgba(0,0,0,.3);
+	-moz-box-shadow: 0 1px 10px rgba(0,0,0,.3);
+	box-shadow: 0 1px 10px rgba(0,0,0,.3);
+	
+	background: rgba(255, 255, 255, 0.3);
+}

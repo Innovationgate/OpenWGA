@@ -68,7 +68,7 @@
         <minorVersion>3</minorVersion>
         <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>650</buildVersion>
+        <buildVersion>651</buildVersion>
       </version>
     </id>
     <title>OpenWGA Content Management Modules</title>

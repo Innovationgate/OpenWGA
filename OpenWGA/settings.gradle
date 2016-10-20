@@ -42,6 +42,9 @@ project(":plugin-cmm").projectDir = file("plugins/cm-modules")
 include ":plugin-afw"
 project(":plugin-afw").projectDir = file("plugins/afw")
 
+include ":plugin-management"
+project(":plugin-management").projectDir = file("plugins/management")
+
 include ":plugin-additional-script-langs"
 project(":plugin-additional-script-langs").projectDir = file("plugins/additional-script-langs")
 

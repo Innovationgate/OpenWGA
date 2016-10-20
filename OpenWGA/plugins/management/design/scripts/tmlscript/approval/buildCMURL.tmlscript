@@ -1,0 +1,1 @@
+return meta("request", "wgaurl") + "/plugin-contentmanager?dbkey=" + condbkey + "#" + condbkey + "/" + conkey;

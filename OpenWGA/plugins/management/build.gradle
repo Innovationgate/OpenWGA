@@ -1,0 +1,24 @@
+dependencies {
+    compileClasspath project(":wgaBuildTools");
+}
+
+task updatePluginVersion << {
+	def version = "${openwga_version_major}.${openwga_version_minor}.${openwga_version_maintenance}.${openwga_version_patch}"
+	def build = "${openwga_version_build}"
+	println "Update ${project.name} to version ${version} Build ${openwga_version_build}"
+
+    ant.taskdef(name:"UpdatePluginVersion", classname:"de.innovationgate.ant.UpdatePluginVersion", classpath: configurations.compileClasspath.asPath)
+    ant.UpdatePluginVersion(designDir: "design", version: "${version}", build: "${build}")
+
+}
+
+task buildPlugin(type: Zip, dependsOn: [build, updatePluginVersion]){
+    archiveName = "de.innovationgate.management-${project.version}.wgaplugin"    
+    from('design') {
+        into '/'
+        exclude 'java'
+    }
+    from (tasks.jar.archivePath){
+   		into 'files/system'
+   	}
+}
