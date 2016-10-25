@@ -1,0 +1,27 @@
+function Controller() {
+}
+
+Controller.prototype.prepare = function() {
+}
+
+Controller.prototype.style = function(CMM) {
+	return CMM.setting('style')||'box';
+}.nonIsolated();
+
+Controller.prototype.styles = function(CMM, $cx) {
+	var padding = CMM.setting("padding");
+	var fixed_height = CMM.setting("fixed_height");
+	var height = CMM.setting("height");
+	var image = CMM.setting("image");
+	
+	var styles = 'padding:' + padding + ';'
+		+ (fixed_height ? 'height:' + height + ';overflow-y:hidden;' : '')
+		+ (image ? 'background-image: url(' + $cx.fileURL(image) + ');' : '')
+		
+	return styles.replace(/[\n^\t]/g, '')
+	
+}.nonIsolated();
+
+Controller.prototype.showTitle = function(CMM) {
+	return CMM.setting('show_title')=='show'
+}.nonIsolated();
