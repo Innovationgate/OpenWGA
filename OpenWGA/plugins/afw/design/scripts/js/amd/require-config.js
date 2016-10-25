@@ -1,5 +1,4 @@
 require.config({
-	//baseUrl: "/plugin-cm-next/js",
     paths: {
 
 		"afw":							"/plugin-wga-app-framework/js",

@@ -41,7 +41,7 @@
 	</div>
 </div>
 
-<script>
+<tml:[script]>
 	require(["jquery", "jquery-columnslider", "jquery-swipehandler"], function(){
 		$(function(){
 			$("#module-<tml:option name="ns"/> .column-slider").columnslider({
@@ -65,4 +65,4 @@
 			}).css("opacity", 1);
 		});
 	})
-</script>
+</tml:[script]>

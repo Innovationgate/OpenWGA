@@ -26,7 +26,7 @@
 	<h1 class="headline">
 		<a href="<tml:url/>?highlight=true" data-wgakey="<tml:metadata name="key"/>"><tml:meta name="title"/></a>
 	</h1>
-	<tml:case hasoption="body">
+	<tml:case hasoptions="body">
 		<div class="body">
 			<tml:option name="body"/>
 		</div>

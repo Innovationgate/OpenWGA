@@ -711,7 +711,8 @@ public interface Context {
     public abstract Form tmlformbyid(String id);
 
 
-
-    
+    @CodeCompletion(preferredCase="isHomePage")
+    public abstract boolean ishomepage();
+   
 
 }

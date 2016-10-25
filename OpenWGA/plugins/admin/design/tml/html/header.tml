@@ -49,10 +49,11 @@
 	</tml:form>
 </div>
 
-<img src="<tml:url type="static" file="images/brand/logo_85.png"/>" align="left" height="38">
+<img src="<tml:url type="static" file="images/brand/logo_200.png"/>" style="height:30px;margin: 4px 0;float:left">
 
 <h1>
-	<tml:script expression="WGA.Brand.product"/> '<tml:script expression="DBM.wgaconfig.get().getServerName()"/>'
+	<tml:comment><tml:script expression="WGA.Brand.product"/> '<tml:script expression="DBM.wgaconfig.get().getServerName()"/>'</tml:comment>
+	<tml:script expression="DBM.wgaconfig.get().getServerName()"/>
 </h1>
 
 <script>

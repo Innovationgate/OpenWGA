@@ -376,6 +376,16 @@
 			})
 			,new Ext.Toolbar.Separator()
 			,new Ext.Toolbar.Button({
+					id:'seo-button',
+					cls: "x-btn-text-icon",
+					icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="application_view_columns.png"/>",
+					text: "SEO",
+		       		handler: function(m, ev){
+		       			BI.seopanel.activate();
+		       		}
+			})
+			,new Ext.Toolbar.Separator()
+			,new Ext.Toolbar.Button({
 					id:'content-view-button',
 					cls: "x-btn-text-icon",
 					icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="application_view_columns.png"/>",

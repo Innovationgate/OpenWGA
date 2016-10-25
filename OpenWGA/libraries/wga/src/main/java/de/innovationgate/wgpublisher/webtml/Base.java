@@ -1991,16 +1991,24 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
         TMLContext context = this.getTMLContext();
     	WGContent content = context.content();
     	
-    	if( content != null ){		
-    		// Eventually put out meta tags
+    	if( content!=null && metaOutput==true){		
+    		// put out meta tags
     		this.appendResult("<meta name=\"generator\" content=\"").appendResult(WGACore.getGeneratorString()).appendResult("\">\n");		
-    		if (metaOutput == true ) {
-    			this.appendResult("<meta name=\"keywords\" content=\"").appendResult(de.innovationgate.utils.WGUtils.serializeCollection(content.getKeywords(), ",")).appendResult("\">\n");
-    		}				
+   			this.appendResult("<meta name=\"keywords\" content=\"").appendResult(de.innovationgate.utils.WGUtils.serializeCollection(content.getKeywords(), ",")).appendResult("\">\n");
     	}
     
-    	this.appendResult(includeScript("htmlhead"));
-    	this.appendResult("<script type=\"text/javascript\">");
+    	boolean includeHTMLHeadScript = true;
+    	if(scripts!=null){
+	    	try{
+	    		includeHTMLHeadScript = WGUtils.stringToBoolean(scripts);
+	    	}
+	    	catch(Exception e){
+	    		addWarning(e.getMessage(), false);
+	    	}
+    	}
+    	if(includeHTMLHeadScript)
+    		this.appendResult(includeScript("htmlhead"));
+    	this.appendResult("<script type=\"text/javascript\" id=\"wga-htmlhead\">");
     	this.appendResult("WGA.contextpath=\"" + getWGPPath() + "\";");    // used by htmlhead.js since wga-4
     	this.appendResult("WGA.uriHash =\"" + getTMLContext().getUriHash() + "\";");
     	
@@ -2014,13 +2022,17 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     	
         this.appendResult("</script>\n");
     
-    	// optional includes for input fields		
-    	if (scripts!=null){
+    	// optional includes for input fields	
+        //	no longer supported since ... a long time. Removed Code.
+        /*
+         * 	We don't have any includeble scripts anymore in 2016
+    	if (scripts!=null && !scripts.equalsIgnoreCase("none")){
     		java.util.StringTokenizer options = new java.util.StringTokenizer(scripts, ",");
     		while (options.hasMoreTokens()) {
     			this.appendResult(includeScript(options.nextToken().trim()));
     		}
     	}
+    	*/
     	
     	// Process HTML head inclusion modules
     	for (HTMLHeadInclusion inc : getCore().getHtmlHeadInclusions()) {
@@ -2090,19 +2102,19 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
 
     protected StringBuffer createItemEditorDeclaration(String itemName, String editor, String label) {
         
-        StringBuffer prefix = new StringBuffer("<span class=\"WGA-Item\">\n");
-    	prefix.append("<span class=\"WGA-Item-Info\" style=\"display:none\">");
+        StringBuffer prefix = new StringBuffer("<div class=\"WGA-Item\">\n");
+    	prefix.append("<div class=\"WGA-Item-Info\" style=\"display:none\">");
     	prefix.append(itemName+"|"+editor);
-    	prefix.append("</span>\n");
+    	prefix.append("</div>\n");
     	
     	if (!editor.equalsIgnoreCase("custom")) {
-    		prefix.append("<span class=\"WGA-Editor-Options\" style=\"display:none\">");
+    		prefix.append("<div class=\"WGA-Editor-Options\" style=\"display:none\">");
     		prefix.append("{" + getResultString(false) +"}");
-    		prefix.append("</span>\n");
+    		prefix.append("</div>\n");
     	
     		// Old Style WGA4 Options:
     		if (editor.equalsIgnoreCase("rtf")) {
-        		prefix.append("<span class=\"WGA4-Editor-Options\" style=\"display:none\">");
+        		prefix.append("<div class=\"WGA4-Editor-Options\" style=\"display:none\">");
         		prefix.append("{");
         		String opt;
         		
@@ -2132,14 +2144,14 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
         
         		prefix.append("dummy:true");
         		prefix.append("}");
-        		prefix.append("</span>\n");
+        		prefix.append("</div>\n");
     		}
     	}
     	
-    	prefix.append("<span class=\"WGA-Item-Edit\" style=\"display:none\"></span>");
-    	prefix.append("<span class=\"WGA-Item-Label\" style=\"display:none\">");
+    	prefix.append("<div class=\"WGA-Item-Edit\" style=\"display:none\"></div>");
+    	prefix.append("<div class=\"WGA-Item-Label\" style=\"display:none\">");
     	prefix.append(label);
-    	prefix.append("</span>\n");
+    	prefix.append("</div>\n");
         return prefix;
     }
     

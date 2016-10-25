@@ -4,7 +4,6 @@ import java.util.Locale;
 
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGScriptModule;
-import de.innovationgate.wga.additional_script_langs.coffeescript.JSCoffeeScriptConversion;
 import de.innovationgate.wga.additional_script_langs.typescript.JSTypeScriptConversion;
 import de.innovationgate.wga.modules.KeyBasedModuleDefinition;
 import de.innovationgate.wga.modules.ModuleDefinition;

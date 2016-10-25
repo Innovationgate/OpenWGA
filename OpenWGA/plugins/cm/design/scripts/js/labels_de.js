@@ -374,6 +374,12 @@ $L.dialogs=[
 		submitButtonText: "Poster aktualisieren"
 	}
 
+	,{
+		id: "w3c-validation",
+		title: "W3C Validierung",
+		cancelButtonText: "Schliessen"
+	}
+
 ];
 
 

@@ -115,10 +115,8 @@
 		}
 		
 		.adminlogin #content{
-			background-image: -moz-linear-gradient(100% 75% 90deg, #96A1B9, #CACDD9);
-			background-image: -webkit-gradient(linear, 0% 0%, 0% 75%, from(#CACDD9), to(#96A1B9));
-			background-color: #96A1B9;
-			color: white;
+			background-color: white;
+			color: black;
 			-moz-box-shadow: 1px 1px 10px rgba(0,0,0, 0.3);
 			-webkit-box-shadow: 1px 1px 10px rgba(0,0,0, 0.3);
 			box-shadow: 1px 1px 10px rgba(0,0,0, 0.3);
@@ -131,8 +129,7 @@
 		}
 		h1.servername{
 			text-align: center;
-			color: #ffc800;
-			text-shadow: 1px 1px 2px black;
+			color: gray;
 		}
 		form{
 			border-top: solid #dfdfdf 1px;

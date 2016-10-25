@@ -75,14 +75,11 @@
 	</tml:foreach>	
 </div>
 
-<script>
+<tml:[script]>
 	require(["jquery", "<tml:url type="tml" name="::js" u_noext=""/>"], function(){
 		$("#album-<tml:option name="ns"/>").imageAlbum();
-	})
-</script>
-
-<tml:case condition="CMM.setting('lightbox')">
-	<script>
+	});
+	<tml:case condition="CMM.setting('lightbox')">
 		require(["jquery", "jquery-lightbox"], function(){
 			$(function(){
 				$("#album-<tml:option name="ns"/>").find("img").lightbox({
@@ -91,5 +88,6 @@
 				})
 			})
 		})
-	</script>
-</tml:case>
+	</tml:case>
+</tml:[script]>
+

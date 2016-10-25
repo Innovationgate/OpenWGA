@@ -359,6 +359,18 @@ this.tmlform=function(self){
 			while(fields.hasNext()){
 				var field = fields.next();
 				if(field.charAt(0)=="/"){
+					if(field.indexOf("$hidden")>=0){
+						// hidden field as "shadow" of boolean that may not be submitted because it is false.
+						var org_field = field.substr(0, field.indexOf("$hidden"));
+						if(!tmlform.hasfield(org_field)){
+							// create tmlformm-field with value false
+							tmlform.setField(org_field, false)
+							field = org_field;
+						}
+						else{
+							continue;	// ognore .hidden field when org-field is found.
+						}
+					}
 					try{
 						var value = tmlform.field(field);
 						var optionDef = tmlform.processContext.get(field);
@@ -384,7 +396,6 @@ this.tmlform=function(self){
 		,setConfigProperties: function(bean){	
 		
 			var JXPathContext = Packages.org.apache.commons.jxpath.JXPathContext.newContext(bean);
-			runtime.debug();			
 			this.forEachField(function(field, value){
 				try{
 					JXPathContext.setValue(field, value);

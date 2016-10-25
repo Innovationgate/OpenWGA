@@ -20,7 +20,7 @@
 <fieldset>
 	<legend>Databases</legend>
 
-	<label>Allowed Databases:</label>
+	<label>Allowed Apps:</label>
 	<div class="data">
 		<tml:script>
 			if(!tmlform.allowedDbsOption){
@@ -36,7 +36,7 @@
 				}
 			}	
 		</tml:script>
-		<tml:input name="allowedDbsOption" type="select" options="All|all,None|none,Specified Databases|select" default="all"/>
+		<tml:input name="allowedDbsOption" type="select" options="All|all,None|none,Specified Apps|select" default="all"/>
 		<tml:include ref="system:convert-to-ext-field" o_fieldname="allowedDbsOption" o_type="select" o_changeaction="$refresh"/>
 		
 	</div>
@@ -58,7 +58,7 @@
 	</tml:script>
 
 	<tml:case condition="tmlform.allowedDbsOption=='select'">
-		<label>Databases allowed for this host:</label>
+		<label>Apps allowed for this host:</label>
 		<div class="data">
 			<tml:input name="allowedDatabases" options="{_dbs}" type="checkbox" multiple="true"/>
 		</div>
@@ -68,7 +68,10 @@
 	<tml:case condition="tmlform.allowedDbsOption && tmlform.allowedDbsOption!='none'">
 		<tml:[system:fs-input] o_field="defaultDatabase" o_type="select" o_options="{'- None -|,'+_dbs}" o_changeaction="$refresh"/>
 		<tml:case condition="tmlform.field('/defaultDatabase')">
-			<tml:[system:fs-input] o_field="hideDefaultDatabaseInURL" o_type="boolean"/>
+			<tml:[system:fs-input] o_field="hideDefaultDatabaseInURL" o_type="boolean" o_changeaction="$refresh"/>
+		</tml:case>
+		<tml:case condition="tmlform.field('/hideDefaultDatabaseInURL')">
+			<tml:[system:fs-input] o_field="hideHomepageURL" o_type="boolean"/>
 		</tml:case>
 	</tml:case>
 

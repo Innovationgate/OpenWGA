@@ -28,13 +28,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.DynamicAttributes;
 
 import org.apache.commons.httpclient.URIException;
@@ -48,6 +46,8 @@ import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGFileMetaData;
 import de.innovationgate.webgate.api.WGUnavailableException;
 import de.innovationgate.webgate.api.WGUnresolveableVirtualLinkException;
+import de.innovationgate.wga.config.VirtualHost;
+import de.innovationgate.wga.config.WGAConfiguration;
 import de.innovationgate.wga.server.api.App;
 import de.innovationgate.wga.server.api.Database;
 import de.innovationgate.wga.server.api.UnavailableResourceException;
@@ -56,6 +56,7 @@ import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGPDispatcher;
 import de.innovationgate.wgpublisher.design.DesignResourceReference;
 import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager.DerivateQuery;
+import de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
 import de.innovationgate.wgpublisher.webtml.actions.TMLAction;
 import de.innovationgate.wgpublisher.webtml.form.TMLForm;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
@@ -64,54 +65,27 @@ import de.innovationgate.wgpublisher.webtml.utils.URLBuilder;
 
 public class URL extends ActionBase implements DynamicAttributes {
 
-    
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = 1L;
-
+	private static final long serialVersionUID = 1L;
     private String type;
-
     private String db;
-
     private String doc;
-
     private String file;
-
     private String sourceTag;
-
     private String layout;
-
     private String medium;
-
     private String mode;
-
     private String pkey;
-    
     private String absolute;
-    
     private String protocol;
-
     private String action;
-
     private String param1;
-
     private String param2;
-
     private String param3;
-
     private String param4;
-
     private String param5;
-
     private String debounce;
-
     private String keepparams;
-    
     private String derivate;
-    
-
     
     public String getKeepparams() {
         return getTagAttributeValue("keepparams", keepparams, null);
@@ -218,7 +192,16 @@ public class URL extends ActionBase implements DynamicAttributes {
         if (dbKey == null) {
             dbKey = getTMLContext().db().getDbReference();
         }
-        
+        WGACore _core = WGACore.INSTANCE;
+        WGAConfiguration config = _core.getWgaConfiguration();
+        VirtualHost vHost = WGAVirtualHostingFilter.findMatchingHost(config, getTMLContext().getrequest());
+        if(vHost!=null){
+        	String defaultDBKey = WGAVirtualHostingFilter.getDefaultDBKey(_core, vHost);
+	        if(vHost.isHideHomepageURL() && dbKey.equalsIgnoreCase(defaultDBKey)){
+	        	url.append("/" + getTMLContext().getrequest().getContextPath());
+	        	return;
+	        }
+        }
         url.append(getTMLContext().getURLBuilder().buildHomepageURL(getTMLContext().db(dbKey), getTMLContext().getrequest()));
         
     }
@@ -906,7 +889,8 @@ public class URL extends ActionBase implements DynamicAttributes {
                 }
             }
             
-            Map<String,Object> varParams = (Map<String, Object>) getTMLContext().getrequest().getAttribute(WGACore.ATTRIB_VAR_PARAMETERS);
+            @SuppressWarnings("unchecked")
+			Map<String,Object> varParams = (Map<String, Object>) getTMLContext().getrequest().getAttribute(WGACore.ATTRIB_VAR_PARAMETERS);
             if (varParams != null) {
                 varParams.keySet().removeAll(status.varparams.keySet());
                 status.varparams.putAll(varParams);

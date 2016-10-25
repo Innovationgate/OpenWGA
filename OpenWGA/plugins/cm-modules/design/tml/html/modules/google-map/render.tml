@@ -101,7 +101,7 @@
 					    					results[i].geometry.location,
 					    					results[i].formatted_address,
 					    					results[i].formatted_address,
-					    					"http://google-maps-icons.googlecode.com/files/parking.png"
+					    					"<tml:url type="file" doc="icons" file="parking.png"/>"
 					    				)
 									}
 								}

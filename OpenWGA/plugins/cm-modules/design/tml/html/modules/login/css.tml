@@ -23,6 +23,8 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
+<tml:include medium="stylesheets" ref="cmm-styles"/>
+
 .login-form{
 	padding: 10px;
 }

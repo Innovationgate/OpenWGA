@@ -66,10 +66,10 @@
       <uniqueName>de.innovationgate.contentmanager</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>2</minorVersion>
-        <maintenanceVersion>1</maintenanceVersion>
+        <minorVersion>3</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>647</buildVersion>
+        <buildVersion>651</buildVersion>
       </version>
     </id>
     <title>OpenWGA Content Manager</title>

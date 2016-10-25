@@ -62,9 +62,7 @@ BI.selectContent=function(contentkey, structkey){
 	var contentframe=document.getElementById("web-content");
 	if(contentframe){
 		BI.setStatus($L.statusbar.loading_page + " " + contentkey + " ...");
-		//WGA.contentinfo={};
 		if(contentkey==undefined || contentkey=="nothing")
-			//contentframe.src="<tml:url type="tml" layout="cms:no-content"/>?structkey="+structkey;
 			contentframe.src=BI.noContentURL+"?structkey="+structkey+"&dbkey="+BI.dbkey;
 		else if (contentkey=="")
 			contentframe.src=BI.dbpath
@@ -313,6 +311,33 @@ BI.searchpanel=new BI.panel("search-panel", $L.searchpanel.searchresult, "cms:se
 
 BI.contentpanel=new BI.panel("content-panel", $L.contentviewpanel.title, "system:portlet-includer.int.html");
 BI.contentpanel.defaultParams={portlet_tml: "cms:content-views:portlet-contentviews"};
+
+BI.seopanel=new BI.panel("seo-panel", "SEO", "system:portlet-includer.int.html", [
+	{
+		cls: "x-btn-text-icon",
+		icon: "../../plugin-wga-app-framework/file/icons/accept.png",
+		tooltip: $L.propertypannel.button_tooltip,
+		text: $L.save,
+		saveButton: true,
+		handler: function(m, ev){
+			BI.seopanel.submit();	// implemented in included TML-module
+		}
+	},
+	new Ext.Toolbar.Separator(),
+	{
+		cls: "x-btn-text-icon",
+		icon: "../../plugin-wga-app-framework/file/icons/html.png",
+		text: "W3C Validierung",
+		handler: function(m, ev){
+			BI.dialog.show("w3c-validation", ev.target)
+		}
+	}
+]);
+BI.seopanel.defaultParams={portlet_tml: "cms:seo"};
+BI.seopanel.on("activate", function(params, created){
+	if(!created)
+		BI.seopanel.reload()
+});
 
 BI.dashboardpanel=new BI.panel("dashboard-panel", "Dashboard", "cms:dashboard.int.html", {
 	cls: "x-btn-text-icon",

@@ -23,7 +23,7 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:include ref="cmm-styles"/>
+<tml:comment><tml:include ref="cmm-styles"/></tml:comment>
 
 <tml:include designdb="@afw" medium="stylesheet" ref="jquery-plugins">
 	<tml:option name="jquery-plugins" expression="jquery_plugin_css"/>

@@ -1,0 +1,3 @@
+<tml:range var="_code">
+	<script type="text/javascript" <tml:case hasoptions="id">id="<tml:option name="id"/>"</tml:case>><tml:option name="body"/></script>
+</tml:range><tml:script expression="_code.replace(/[\n^\t]/g, '')"/>

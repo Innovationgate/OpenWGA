@@ -31,7 +31,6 @@ import de.innovationgate.wga.modules.ModuleRegistry;
 public class AFWRegistrar implements ModuleRegistrar {
 
     public void registerModules(ModuleRegistry registry) {
-        registry.addModuleDefinition(new ItemEditorHtmlHeadInclusionModuleDefinition());
         registry.addModuleDefinition(new CAPTCHAServiceApiModuleDefinition());
         registry.addModuleDefinition(new SimpleCAPTCHAServiceApiModuleDefinition());
         registry.addModuleDefinition(new JCAPTCHAServiceApiModuleDefinition());

@@ -94,6 +94,30 @@ WGA = function() {
 
 }();
 
+WGA.responsive = {
+	breakpoints:{
+		medium: 0,
+		large: 0
+	},
+	getMediaWidth: function(){
+		if(window.matchMedia){
+			if(window.matchMedia("(min-width:" + this.breakpoints.large + "px)").matches)
+				return "large"
+			if(window.matchMedia("(min-width:" + this.breakpoints.medium + "px)").matches)
+				return "medium"
+			else return "small"
+		}
+		else{
+			var w = window.innerWidth || $(window).width();
+			if(w<this.breakpoints.medium)
+				return "small"
+			if(w<this.breakpoints.large)
+				return "medium"
+			else return "large"
+		}
+	}
+}
+
 WGA.util = /**
  * @author oliver
  *
@@ -167,6 +191,7 @@ WGA.util = /**
 			if(firstElement)
 				document.body.insertBefore(div, firstElement);
 			else document.body.appendChild(div);
+			reloadButton.focus();
 		}
 		div.children[1].innerHTML = msg + "<br>";
 		div.style.display="block";
@@ -450,27 +475,43 @@ WGA.util.generateInterval = function(attempts, max) {
 WGA.util.label = function(labels, defaultLanguage) {
 	
 	// Full locale codes
-	for (var idx=0; idx < navigator.languages.length ; idx++) {
-		var label = labels[navigator.languages[idx]];
+	if(navigator.languages){
+		for (var idx=0; idx < navigator.languages.length ; idx++) {
+			var label = labels[navigator.languages[idx]];
+			if (label) {
+				return label;
+			}
+		}
+		
+		// Only language codes
+		for (var idx=0; idx < navigator.languages.length ; idx++) {
+			var locale = navigator.languages[idx];
+			var subIdx = locale.indexOf("_");
+			if (subIdx != -1) {
+				var language = locale.substring(0, subIdx);
+				var label = labels[language];
+				if (label) {
+					return label;
+				}
+			}
+		}
+	}
+	else if(navigator.language){
+		var label = labels[navigator.language];
 		if (label) {
 			return label;
 		}
-	}
-	
-	// Only language codes
-	for (var idx=0; idx < navigator.languages.length ; idx++) {
-		var locale = navigator.languages[idx];
-		var subIdx = locale.indexOf("_");
+		var subIdx = navigator.language.indexOf("_");
 		if (subIdx != -1) {
-			var language = locale.substring(0, subIdx);
+			var language = navigator.language.substring(0, subIdx);
 			var label = labels[language];
 			if (label) {
 				return label;
 			}
 		}
 	}
-	
-	// Default language
+
+	// Fallback: Default language
 	if (defaultLanguage) {
 		return labels[defaultLanguage];
 	}
@@ -504,18 +545,6 @@ WGA.buildContentURL = function(key) {
 		}
 	}
 };
-
-/**
- * Loads content of the given key DEPRECATED WS: not sure, who uses this
- * function.
- * 
- * @param {String}
- *            key
- */
-function loadContent(key) {
-	location.href = WGA.buildContentURL(key);
-}
-
 
 /**
  * Module to register onload functions in WGA. onload-s are attached to the
@@ -789,17 +818,18 @@ WGA.action = function(actionDef) {
 
 };
 
-function decode(s) {
-	try {
-		return decodeURIComponent(s).replace(/\r\n|\r|\n/g, "\r\n");
-	} catch (e) {
-		return "";
-	}
-}
-
-function getQueryString(win) {
+WGA.getQueryString = function(win) {
 	var qs = win.location.search;
 	var map = {};
+
+	function decode(s) {
+		try {
+			return decodeURIComponent(s).replace(/\r\n|\r|\n/g, "\r\n");
+		} catch (e) {
+			return "";
+		}
+	}
+	
 	if (qs.length > 1) {
 		qs = qs.substr(1);
 
@@ -847,7 +877,7 @@ WGA.toQueryString = function(customParams, keepParams, encodeParams, removeParam
 
 	// Push current URL params
 	if (keepParams == undefined || keepParams == true) {
-		var currentParams = getQueryString(window);
+		var currentParams = WGA.getQueryString(window);
 		for ( var key in currentParams) {
 			if (currentParams[key] != null) {
 				params[String(key)] = String(currentParams[key]);

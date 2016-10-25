@@ -33,3 +33,6 @@
 
 	</tml:option>
 </tml:include>
+
+<tml:include ref="seo"/>
+

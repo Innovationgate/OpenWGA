@@ -1,0 +1,75 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+var pluginSet = wgacore.getPluginSet();
+plugins = pluginSet.getPlugins();
+plugins = Packages.de.innovationgate.utils.WGUtils.sortByProperty(plugins, "identification");
+java.util.Collections.reverse(plugins);
+
+if (!isdefined('showDisabled')) {
+	setSessionVar("showDisabled", false);
+}
+</tml:script>
+
+<div class="header">
+	<table style="width:100%">
+		<tr>
+			<td class="header">
+				Current Plugin Configuration
+			</td>
+			<td align="right">
+				<span id="dfShow" style="visibility:hidden">
+					<tml:include ref="::developerFunctions"/>
+				</span>
+				<span id="dfHide">
+					<a class="plain" href="javascript:switchDF()">&lt;&lt; Show developer tools</a>
+				</span>
+				
+				<tml:if istrue="showDisabled">
+					<tml:then>
+						<tml:button clickaction="::toggleShowDisabled"><b>Hide disabled plugins</b></tml:button>
+					</tml:then>
+					<tml:else>
+						<tml:button clickaction="::toggleShowDisabled"><b>Show disabled plugins</b></tml:button>
+					</tml:else>
+				</tml:if>
+				
+				<tml:case isfalse="showWorkspace">
+					<tml:include ref="::uploadPlugin"/>
+				</tml:case>
+			</td>
+		</tr>
+	</table>
+</div>
+
+<tml:foreach type="itemvalue" item="plugins" currentvalue="plugin">
+
+	<tml:case condition="plugin.active == true || showDisabled == true">
+		<tml:include ref="::plugin-info">
+			<tml:option name="workspace" expression="false"/>
+		</tml:include>
+	</tml:case>
+
+</tml:foreach>

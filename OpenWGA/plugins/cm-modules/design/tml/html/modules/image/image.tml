@@ -109,7 +109,7 @@
 	<img src="<tml:item name="_url"/>"
 		title="<tml:script expression="_img_title || option('title')"/>"
 		alt="<tml:script expression="_img_title || option('title')"/>"
-		<tml:case isfilled="_srcset">
+		<tml:case condition="_srcset">
 			srcset="<tml:item name="_srcset"/>"
 		</tml:case>
 		<tml:case condition="_url_mo">
@@ -160,13 +160,13 @@
 <tml:{div} if="_info" html_class="info"><tml:item name="_info" encode="none"/></tml:{div}>
 
 <tml:case condition="CMM.setting('onclick')=='zoom'">
-	<script>
+	<tml:[script]>
 		require(["jquery-lightbox"], function(){
 			$("#module-<tml:option name="ns"/> img").css("cursor", "pointer").lightbox({
 				group: "<tml:script expression="CMM.setting('image_group')||'default'"/>"
 			})
 		})
-	</script>
+	</tml:[script]>
 </tml:case>
 
 <tml:case condition="option('mode')=='edit'">

@@ -7,7 +7,7 @@
 
 !function(root, factory) {
   	if(typeof define === 'function' && define.amd)
-    	define(['jquery'], factory);
+    	define("jquery-tree", ['jquery'], factory);
   	else factory(root.jQuery);
 }(window, function($){
 
@@ -270,12 +270,71 @@
 		return this.find("li.selected")
 	}
 
+	function reloadSelectedNode(){
+		var selected_node = this.find(".node.selected")
+		var collapsed = selected_node.hasClass("collapsed");
+		var selected_id = selected_node.data("id");
+		var node = selected_node.parents(".node").first();
+		if(node.length){
+			node.find("ul").remove();
+			expandNode(node, function(node){
+				var node = node.find("[data-id="+selected_id + "]")
+				selectNode(node);
+				if(!collapsed)
+					expandNode(node);
+			});
+		}
+	}
+
+	function findNode(root, node_or_id){		
+		if(typeof(node_or_id)=="string")
+			return root.find("[data-id=" + node_or_id + "]")
+		else return $(node_or_id);
+	}
+
+	function updateNode(node, data){
+		node.find(".entry").attr("class", "clearfix entry " + (data.cssclass||""))
+		if(data.html||data.title)
+			node.find(".link-text").html(data.html||data.title)
+	}
+	
+	function removeNode(node){
+		var parent = node.parents('.node').first();
+		node.remove();
+		var children = parent.find(".node")
+		if(!children.length){
+			parent.attr("data-haschildren", false)
+			collapseNode(parent);
+		}
+	}
+
 	var exports={
-		addnode: addNode,
-		addnodes: addNodes,
-		expandnode: expandNode,
-		selectnode: selectNode,
-		selectpath: selectpath,
+		selectpath: 	selectpath,
+		reloadselected: reloadSelectedNode,
+		
+		addnode: function(node_or_id, data, select){
+			return addNode(findNode(this, node_or_id), data, select)
+		},
+		addnodes: function(node_or_id, data){
+			return addNodes(findNode(this, node_or_id), data)
+		},
+		expandnode: function(node_or_id, callback){
+			return expandNode(findNode(this, node_or_id), callback)
+		},
+		collapsenode: function(node_or_id){
+			return collapseNode(findNode(this, node_or_id))
+		},
+		selectnode: function(node_or_id, trigger_selected){
+			return selectNode(findNode(this, node_or_id), trigger_selected)
+		},
+
+		updatenode: function(node_or_id, data){
+			return updateNode(findNode(this, node_or_id), data)
+		},
+		removenode: function(node_or_id, data){
+			return removeNode(findNode(this, node_or_id))
+		},
+		
 		reload: reload
 	}
 
@@ -507,4 +566,4 @@
 		})
 	}
 	
-})
+});

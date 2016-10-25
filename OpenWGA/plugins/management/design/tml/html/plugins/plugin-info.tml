@@ -1,0 +1,256 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	pluginCssClass = "plugin";
+	
+	if (option("workspace") == true) {
+		pluginCssClass = "workspacePlugin";
+	}
+	else if (plugin.active == false || plugin.valid == false) {
+		pluginCssClass = "inactivePlugin";
+	}
+	
+	pc = plugin.csConfig.pluginConfig;
+</tml:script>
+
+<!-- operation title header for workspace -->
+<tml:case condition="option('workspace')">
+	<div class="workspacePluginHeader">
+		<b><tml:item name="plugin" xpath="operation/title"/></b>
+	</div>
+</tml:case>
+
+<!-- Some variables -->
+<tml:range var="infoID" trim="true">
+	<tml:script expression="plugin.hashCode()"/><tml:script expression="option('workspace') ? '_ws' : ''"/>
+</tml:range>
+<tml:case var="protectedPlugin" condition="plugin.pluginID.uniqueName=='de.innovationgate.Management'">true</tml:case>
+
+<div id="plugin_<tml:item name="infoID"/>" class="<tml:item name="pluginCssClass"/>">
+	<table style="width:100%">
+		<tr>
+			<!-- Status symbol -->
+			<td class="pluginSymbol" style="height:100%" rowspan="2">
+				<tml:select>
+					<tml:case condition="plugin.isValid() == false">
+						<tml:image doc="icons" file="plugin_invalid.gif">align="left" alt="Invalid plugin"</tml:image>
+					</tml:case>
+					<tml:case condition="plugin.isActive() == false">
+						<tml:image doc="icons" file="plugin_deactivated.gif">align="left" alt="Deactivated plugin"</tml:image>
+					</tml:case>
+					<tml:caseelse>
+						<tml:image doc="icons" file="plugin.gif">align="left" valign="middle" alt="Active Plugin"</tml:image>
+						<br/>
+						
+						
+					</tml:caseelse>
+				</tml:select>
+			</td>
+			
+			<!-- General info -->
+			<td class="pluginGeneralInfo">
+			
+				<h4>
+					<tml:range var="vTitle"><tml:item name="plugin" xpath="csConfig/pluginConfig/title"/></tml:range>
+					<tml:if condition="plugin.active && plugin.valid">
+						<tml:then>
+							<tml:script var="pHomepage" expression="plugin.pluginHomepage"/>
+							
+							<tml:if condition="option('workspace') == false && !isEmpty('pHomepage')">
+								<tml:then>
+									<a target="_blank" href="<tml:meta type="request" name="wgaurl"/>/<tml:script expression="plugin.buildDatabaseKey()"/>"><tml:item name="vTitle"/></a>
+								</tml:then>
+								<tml:else>
+									<tml:item name="vTitle"/>
+								</tml:else>
+							</tml:if>
+							Version <tml:item name="plugin" xpath="pluginID/version"/>
+							(<tml:item name="plugin" xpath="installationKey"/>)	
+						</tml:then>
+						<tml:else>
+							<tml:item name="vTitle"/> Version <tml:item name="plugin" xpath="pluginID/version"/>
+						</tml:else>
+					</tml:if>
+				</h4>
+				
+				<!-- Developer plugin directory -->
+				<tml:case condition="plugin.isDirectory()">
+					(Directory <tml:item name="plugin" xpath="filePath"/>)
+				</tml:case>
+				
+				<!-- Status -->
+				<tml:select>
+					<tml:case condition="plugin.active == false">
+						Deactivated
+					</tml:case>
+					<tml:case condition="plugin.valid == false">
+						Invalid.
+						<tml:case condition="option('workspace')">
+						You can install/activate this plugin but it will not be connected until the invalidity cause is resolved.
+						</tml:case>
+					</tml:case>
+				</tml:select>
+				
+				<!-- Installation faults -->
+				<tml:case condition="plugin.installationFaults.size() > 0">
+					<tml:script var="faults" expression="plugin.installationFaults"/>
+					<ul>
+						<tml:foreach type="itemvalue" item="faults" currentvalue="fault">
+							<li><tml:script expression="fault.toErrorMessage()"/></li>
+						</tml:foreach>
+					</ul>
+				</tml:case>
+				
+				<p>
+					<tml:item name="plugin" xpath="csConfig/pluginConfig/description"/>
+				</p>
+				
+				
+			</td>
+			
+			<!-- Installation/Update information and settings -->
+			<td class="pluginInstallInfo">
+				<tml:if condition="option('workspace') == true">
+				
+					<!-- Functionalities for workspace plugins -->
+					<tml:then>
+				
+						<tml:case condition="plugin.updateStatus != plugin.UPDATESTATUS_NEW">
+					
+							<p>
+							<tml:select>
+								<tml:case condition="plugin.updateStatus == plugin.UPDATESTATUS_UPDATE">
+									This plugin will replace the previously installed version, which will be deactivated, and take over it's data.
+								</tml:case>
+								<tml:case condition="plugin.updateStatus == plugin.UPDATESTATUS_INSTALL_DEACTIVATED">
+									This plugin will be installed deactivated bc. of an already installed newer version.
+								</tml:case>
+								<tml:case condition="plugin.updateStatus == plugin.UPDATESTATUS_INSTALL_PARALLEL">
+									This plugin will be installed in parallel to the already installed version and have it's own data.
+								</tml:case>
+								<tml:case condition="plugin.updateStatus == plugin.UPDATESTATUS_UPDATE_IDENTICAL">
+									This plugin will replace the already installed identical version, which will be removed.
+								</tml:case>
+							</tml:select>
+							</p>
+							
+							<tml:case condition="plugin.updateStatus != plugin.UPDATESTATUS_UPDATE_IDENTICAL">
+								<tml:form id="{'plugin_' + infoID}" source="none">
+									<tml:script>
+										tmlform.updateStrategy = javaObject(plugin.operation.updateStrategy).toString();
+										tmlform.operationHash = plugin.operation.hashCode();
+									</tml:script>
+								
+									<p>
+									Update-Strategy:<br/>
+									<tml:input name="updateStrategy" changeaction="::changeUpdateSettings" divider="<br/>" type="radio" options="Disable old version. New version continues to use data of old Version.|1,Install in parallel and keep old version|2" default="1"/><br/>
+									</p>
+									
+									<tml:case condition="tmlform.updateStrategy == '1'">
+										<p>
+											<tml:script>
+												installkeys = createList();
+												prevPlugins = wgacore.getPluginSet().getPluginsByUniqueName(plugin.pluginID.uniqueName).iterator();
+												while (prevPlugins.hasNext()) {
+													prevPlugin = prevPlugins.next();
+													if (prevPlugin.active) {
+														installkeys.add(prevPlugin.buildDatabaseKey() + " (" + prevPlugin.getPluginID().toString() + ")|" + prevPlugin.installationKey);
+													}
+												}
+											</tml:script>
+										
+											Replace plugin: <tml:input type="select" changeaction="::changeUpdateSettings" name="replaceKey" optionsitem="installkeys" default="{plugin.installationKey}"/>
+										</p>
+									</tml:case>
+									
+									
+								</tml:form>
+							</tml:case>
+						</tml:case>
+						
+					</tml:then>
+					
+					<!-- Functionality for installed plugins -->
+					<tml:else>
+						
+						<!-- Currently none -->
+					
+					</tml:else>
+					
+					
+				</tml:if>
+			</td>
+			
+			<!-- Operation buttons -->
+			<td class="pluginButtons">
+			
+				<tml:if condition="option('workspace')">
+				
+					<tml:then>
+						<p><tml:button clickaction="::cancelOperation" param1="{plugin.operation.hashCode()}">Cancel operation</tml:button></p>
+					</tml:then>
+					
+					<tml:elseif condition="isDefined('workspacePlugins') && workspacePlugins.contains(plugin)">
+						<p>(Pending change)</p>
+					</tml:elseif>
+					
+					<tml:else>
+						<p><button onclick="showDialog('functions_<tml:item name="infoID"/>', event, this)">Actions</button></p>
+					</tml:else>
+					
+				</tml:if>
+
+			</td>
+		</tr>
+		
+		<!-- License information -->
+		<tml:case condition="option('workspace') == true && plugin.operation instanceof Packages.de.innovationgate.wgpublisher.plugins.InstallPluginOperation && plugin.licenseText != null">
+		<tr>
+			<td colspan="4" style="padding-top: 15px">
+					This plugin is distributed under the given license terms which must be accepted when installing it:<br>
+					<textarea readonly="readonly" cols="100" rows="10" wrap="off" style="background-color:white"><tml:script expression="plugin.licenseText" encode="xml"/></textarea><br>
+					<form name="<tml:item name="infoID"/>_license">
+						<input type="checkbox" name="acceptLicense"> I accept this license
+					</form>
+					<script>
+						WGAManagement.licensedPlugins.push('<tml:item name="infoID"/>');
+					</script>
+			</td>
+		</tr>
+		</tml:case>
+		
+		<!-- <tml:case condition="plugin.valid == true && plugin.active == true"> -->
+		<tr>
+			<td valign="bottom" colspan="4" align="right">
+				<button onclick="showDetails('<tml:item name="infoID"/>', <tml:script expression="option('workspace')"/>)" class="pluginDetails">
+					View details <tml:image doc="icons" file="details.gif">style="vertical-align: top;" border="0"</tml:image>
+				</button>
+			</td>		
+		</tr>
+		<!-- </tml:case>  -->
+	</table>
+</div>
+
+<tml:include ref="::plugin-details"/>

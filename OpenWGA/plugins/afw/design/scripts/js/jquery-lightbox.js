@@ -7,7 +7,7 @@
  
 !function(root, factory) {
   	if(typeof define === 'function' && define.amd)
-    	define([
+    	define("jquery-lightbox", [
     		'jquery',
     		"css!/plugin-wga-app-framework/css/jquery-lightbox"
     	], factory);
