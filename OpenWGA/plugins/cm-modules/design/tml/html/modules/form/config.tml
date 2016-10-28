@@ -1,0 +1,68 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+{
+	id:				'cm_form',
+	category:		'<tml:label key="module.category.functions"/>',
+	title:			'<tml:label key="module.form"/>',
+	icon:			"<tml:url db="@afw" type="file" doc="icons" file="application_form.png"/>",
+	type:			'container',				
+	tml:			'plugin-cm-modules/modules:form:render',
+	settingstml:	'plugin-cm-modules/modules:form:settings',
+	setuptml:		'modules:form:setup',
+	allowedchildren: ["cm_formfield", "cm_fieldset", "cm_captcha", "cm_rtf"],
+	includes: {
+		tml:	'@afw/include:jquery-ui-all',
+		css: 	'plugin-cm-modules/modules:form:css'
+	}
+},
+{
+	id:				'cm_fieldset',
+	title:			'<tml:label key="module.fieldset"/>',
+	icon:			"<tml:url db="@afw" type="file" doc="icons" file="textfield.png"/>",
+	type:			'container',
+	tml:			'modules:form:render_fieldset',
+	settingstml:	'plugin-cm-modules/modules:form:settings_fieldset',
+	allowedparents: ["cm_form"],
+	allowedchildren: ["cm_formfield", "cm_captcha", "cm_rtf"]
+},
+{
+	id:				'cm_formfield',
+	title:			'<tml:label key="module.formfield"/>',
+	icon:			"<tml:url db="@afw" type="file" doc="icons" file="textfield.png"/>",
+	tml:			'plugin-cm-modules/modules:form:render_field',
+	settingstml:	'plugin-cm-modules/modules:form:field-settings',
+	allowedparents: ["cm_form", "cm_fieldset"],
+	allowedchildren: []
+},
+{
+	id:				'cm_captcha',
+	title:			'<tml:label key="module.captcha"/>',
+	icon:			"<tml:url db="@afw" type="file" doc="icons" file="textfield.png"/>",
+	tml:			'plugin-cm-modules/modules:form:render-captcha',
+	settingstml:	'plugin-cm-modules/modules:form:captcha-settings',
+	singleton:		true,
+	allowedparents: ["cm_form", "cm_fieldset"],
+	allowedchildren: []
+}

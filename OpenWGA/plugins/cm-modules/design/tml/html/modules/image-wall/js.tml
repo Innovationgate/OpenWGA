@@ -1,0 +1,70 @@
+
+!function(root, factory) {
+  	if(typeof define === 'function' && define.amd)
+    	define(['jquery'], factory);
+  	else factory(root.jQuery);
+}(window, function($){
+
+	var resizeTimer={};
+
+	function updateAlbums(){
+		$(".module-cm_image-wall .album").each(function(){
+			updateSize(this);
+		})
+	}
+
+	function updateImageSrc(el){
+		if(el.naturalWidth									// available in IE>9 and all modern browser
+				&& el.naturalWidth < $(el).data("width")	// do we have a better derivate? 
+				&& el.width > el.naturalWidth / (window.devicePixelRatio||1))		// do we need a better derivate?
+		{
+			var base = el.src.split("?")[0];
+			if(resizeTimer[base]){
+				window.clearTimeout(resizeTimer[base])
+				resizeTimer[base]=null;
+			}
+			var that=el
+			resizeTimer[base] = window.setTimeout(function(){
+				that.src=base + "?derivate=" + encodeURI("usage=poster,dpr=" + (window.devicePixelRatio||1) + ",width~" + that.width);
+			}, 250);
+		}
+	}
+	
+	function updateSize(selector){
+		var el = $(selector);
+		var count = el.data("count");
+		var el_width = el.width();
+		el.find(".image-row").each(function(){
+			var s=0;
+			var w = el_width+10
+			var c=0;
+			$(this).find("img").each(function(){
+				var wi = $(this).attr("data-width");
+				var hi = $(this).attr("data-height");
+				s+=wi/hi
+				w-=10;	// margin
+				w-= $(this).outerWidth(true) - $(this).width()	// padding + border
+				c++;
+			})
+			s += count-c;
+			var h = w/s;
+			$(this).find("img").each(function(){
+				$(this).height(h).width("auto");
+				updateImageSrc(this);
+			})
+			.css("opacity", 1)
+		})
+	}
+	
+	$.fn.imageAlbum = function(config){
+		var config = config||{};
+		return this.each(function(){
+			var el = $(this);
+			updateSize(el)
+			$(window).on("resize", function(){
+				updateSize(el)
+			});
+		})
+	}
+
+})

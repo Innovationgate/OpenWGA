@@ -38,11 +38,15 @@ public class Group {
         return _documentKey;
     }
     
-    
     public Group(String name, String documentKey) {
-        super();
+        //super();
         _name = name;
         _documentKey = documentKey;
     }
+
+	public Group(String name) {
+        //super();
+        _name = name;
+	}
 
 }

@@ -1,0 +1,297 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="saveMetas">
+	tmlform.storeincontent();
+</tml:action>
+
+<tml:script>
+	_dbkey = option("dbkey")
+	_contentkey = option("contentkey")
+</tml:script>
+
+<tml:if context="[db:{_dbkey}/docid:{_contentkey}]" iscontextvalid="true">
+	<tml:then>
+
+		<tml:script>
+			var Content=AFW.content();
+			_mode = (!Content.isInTrashArea() && Content.getDatabase().isChiefEditor()) || (Content.mayEditContent() && Content.isDraft() && Content.isMine()) ? "edit":"view";
+		</tml:script>
+
+		<tml:form id="seo" mode="{item:_mode}">
+
+			<div class="dashboard seo">
+				<div style="float:left;width:30%">
+					<div class="block" id="app-outline">
+						<h1>Outline</h1>
+						<div class="alert"></div>
+						<div class="struct"></div>
+						<h1>TOP-10 Begriffe</h1>
+						<div class="content-words"><ul></ul></div>
+						<div class="stats" style="margin-top:20px"></div>
+					</div>
+				</div>
+				<div style="float:left;width:50%">
+					<div class="block">
+						<h1>So erscheint die Seite in Suchmaschinen</h1>
+						<div id="seo-searchengine">
+							<div class="alert" <tml:case condition="DESCRIPTION">style="display:none"</tml:case>>
+								Sie haben keine Beschreibung festgelegt. 
+								Suchmaschinen werden daher die ersten Absätze der Website als Beschreibung anzeigen und nach 160 Zeichen abschneiden.
+							</div>
+							<div class="anzeige">
+								<div class="title"><tml:metadata name="browsertitle"/></div>
+								<div class="url"><tml:script>
+									var url = WGA.urlBuilder(this);
+									url.setHost("meine-domain.com");
+									url.setPort(80);
+									// check titlePath
+									var tpm = db().getAttribute(WGA.getCore().DBATTRIB_TITLEPATHMANAGER);
+									if(tpm && url.getPath()!="/"){
+										var langChooser = new Packages.de.innovationgate.wgpublisher.lang.WebTMLLanguageChooser(db(), this)
+										var path = tpm.buildTitlePath(content(), "html", langChooser); 
+										url.setPath("/" + path.toArray().join("/"));
+									}
+									return url.build(true);						
+								</tml:script></div>
+								<div class="description"><tml:metadata name="description"/></div>
+							</div>
+							<div>
+								<label>Titel</label>
+								<tml:input name="browsertitle" meta="true" html_maxlength="60"/>
+								<div><tml:script expression="(BROWSERTITLE && BROWSERTITLE.length) || 0"/>/60 Zeichen</div>
+							</div>
+							<tml:script>
+								_isTilepath = false
+								var tpm = db().getAttribute(WGA.Core.DBATTRIB_TITLEPATHMANAGER)
+								if(tpm && tpm.isIncludeKeys())
+									_isTilepath = true;
+							</tml:script>
+							<tml:case istrue="_isTilepath">
+								<div>
+									<label>Benutzerdefinierter URL-Bestandteil</label>
+									<tml:input name="titlepath" meta="true"/>
+								</div>
+							</tml:case>
+							<div>
+								<label>Beschreibung</label>
+								<tml:input name="description" meta="true" type="textarea" html_maxlength="160"/>
+								<div><tml:script expression="DESCRIPTION.length"/>/160 Zeichen</div>
+							</div>
+						</div>
+					</div>
+				</div>
+	
+				<div style="float:left;width:20%">
+					<div class="block">
+						<h1>Robots / Sitemap</h1>
+						<tml:input meta="true" name="seo_robots_index" type="boolean" options="index|true"/>
+						<br>
+						<tml:input meta="true" name="seo_robots_follow" type="boolean" options="follow|true"/>
+						<label>Updatehäufigkeit</label>
+						<tml:input meta="true" name="seo_sitemap_changefreq" type="select" options="stündlich|hourly,täglich|daily,wöchentlich|weekly,monatlich|monthly,jährlich|yearly" default="monthly"/>
+						<label>Relative Priorität (1-10)</label>
+						<tml:input meta="true" name="seo_sitemap_priority" type="select" options="1 (niedrig)|0.1,2|0.2,3|0.3,4|0.4,5 (normal)|0.5,6|0.6,7|0.7,8|0.8,9|0.9,10 (hoch)|1" default="0.5"/>
+					</div>
+				</div>
+				
+			</div>		
+		
+			<script>
+
+				!function(){
+					var level, currentLevel = 0;
+					var errors = false;
+					var doc = BI.sitepanel.iframe.document;
+					var win = BI.sitepanel.iframe.window;
+					
+					var struct = $("#app-outline .struct")
+					var alert = $("#app-outline .alert")
+										
+					alert.html("");
+					struct.html("");
+					
+					// read page with URL param $clean to get clean HTML without item-editors
+					var href = ((win.location && win.location.href) || BI.sitepanel.iframe.el.dom.src) + "?$clean"
+					
+					$.get(href)
+						.success(function(html){
+							var el = document.createElement("div");
+							el.innerHTML = html;
+					
+							$(el).find("h1, h2, h3, h4, h5, h6").each(function(){				
+								level = Number(this.tagName.substr(1,1));
+								if(level > currentLevel+1){
+									errors = true;
+									for(var i=currentLevel+1; i<level; i++)
+										struct.append('<div class="outline-error tag tag-H' + i + '">fehlt</div>');
+								}
+								currentLevel = level
+								struct.append('<div class="tag tag-' + this.tagName + '">' + $(this).text() + "</div>");			
+							})
+							var h1 = $(el).find("h1").length
+							if(h1!=1)
+								alert.append("<p>Die Seite sollte genau eine H1 Überschrift enthalten.</p>")
+									.show();
+							if(errors){ 
+								alert.append("<p>Die Dokumentstruktur enthält Fehler.</p>")
+									.show();
+							}
+							else if(h1==1){
+								alert.hide();
+							}
+							
+					
+							/*
+							 * Suchmaschinenanzeige
+							 */
+							if(!$("#seo-searchengine .anzeige .title").html()){
+								var title = doc.title;
+								$("#seo-searchengine .anzeige .title").html(title.substr(0,60));
+							}
+							if(!$("#seo-searchengine .anzeige .description").html()){					
+								var description = ""
+								$(el).find("p").each(function(){
+									if(description.length<160){
+										var text = $(this).text().trim();
+										if(text)
+											description += (text + " ")
+									}
+								})
+								if(description.length>=160)
+									description = description.substr(0,160) + " ..."
+								$("#seo-searchengine .anzeige .description").html(description);
+								$("#seo-searchengine .alert").show();
+							}
+													
+							$("#seo-searchengine textarea[name=description]").on("keyup", function(ev){
+								var value = $(this).val();
+								$(this).next().html(value.length + "/160 Zeichen");
+							})
+							$("#seo-searchengine input[name=browsertitle]").on("keyup", function(ev){
+								var value = $(this).val();
+								$(this).next().html(value.length + "/60 Zeichen");
+							})
+				
+				
+							/********/
+							
+							var stopwords = "gmbh ag ab aber aehnlich ähnlich alle allein allem allen aller alles allg allgemein als also am an and ander andere anderem anderen anderer anderes anderm andern anderr anders auch auf aus außer author autor been bei beim bereits besonders besser bevor bietet bin bis bist böden boeden bzw ca da dabei dadurch dafuer daher damit daneben dann daran darauf daraus darum das dass daß dasselbe davon davor dazu dein deine deinem deinen deiner deines dem demselben den denen denn dennoch denselben der derem deren derer derselbe derselben des deshalb desselben dessen dich die dies diese dieselbe dieselben diesem diesen dieser dieses dinge dir doch dort du dunklen durch eben eher eigenen eigenes eigentlich ein eine einem einen einer eines einfach einig einige einigem einigen einiger einiges einmal er erst erste erster es etc etwa etwas euch euer eure eurem euren eurer eures fall finden for für ganz ganze ganzem ganzen ganzer ganzes gar geben gegen geht gewesen ggf gibt gleich gute guten hab habe haben hat hatte hatten hattest hattet hier hin hinter hinterher ich ihm ihn ihnen ihr ihre ihrem ihren ihrer ihres im immer in indem information ins ist ja je jede jedem jeden jeder jedes jedoch jene jenem jenen jener jenes jetzt kann kannst kein keine keinem keinen keiner keines koennen koennt kommen kommt können könnt konnte könnte langsam lassen leicht leider lesen lichten liest machen mag man manche manchem manchen mancher manches mehr mehrere mein meine meinem meinen meiner meines meist mich mir mit möchte moechte moeglich möglich muß müssen mußt müßt musste müsste nach nachdem nachher natürlich ncht neben nein neu neue neuem neuen neuer neues nicht nichts noch nun nur nutzung ob oder off ohne online per schnell schon schwierig sehen sehr sehrwohl seid sein seine seinem seinen seiner seines seit seite seiten selber selbst sich sie sieht sind so sodaß solch solche solchem solchen solcher solches soll sollen sollst sollt sollte sollten solltest sondern sonst soviel soweit sowie sowohl spielen statt steht suchen titel über um und uns unse unsem unsen unser unsere unseren unseres unter version viel viele vieles vom von vor vorher wachen während wann war waren warst warum was weg weil weiter weitere welche welchem welchen welcher welches wenig wenige weniger wenn wer werde werden werdet weshalb wie wieder wieso wieviel will wir wird wirklich wirst wo woher wohin wohl wollen wollte wurde würde wurden würden zu zum zur zwar zwischen".split(" ");
+							
+							function getWords(selector){
+								var words = {};
+								var index=0;;
+								$(el).find(selector).not("script, nav *, sidebar *").contents()
+									.filter(function () { return this.nodeType === 3; })
+									.each(function(){
+										var relevanz = 1;
+										var in_headings = $(this).parents("h1,h2,h3,h4,h5,h6").length>0
+										if(in_headings){
+											relevanz *= 2
+										} 
+										//console.log(this.nodeValue.trim(),in_headings, index,relevanz);
+										var w = this.nodeValue.match(/[A-z_äöüÄÖÜß]+/g);
+										if(w){
+											if(index++ < 10){
+												relevanz *= 2;
+												//console.log(this, w,in_headings, index,relevanz); 
+											}
+											for(var i=0; i<w.length; i++){
+												//console.log(this, w, index);
+												var word = w[i].toLowerCase();
+												if(word.length<3 || stopwords.indexOf(word)>=0)
+													continue;
+												if(words[word]){
+													words[word].count++
+													words[word].weight = Math.max(relevanz, words[word].weight)
+												}
+												else words[word]={
+													word: word,
+													count: 1,
+													weight: relevanz
+												}
+											}
+										}				
+									});
+									
+								var words_array = Object.getOwnPropertyNames(words).sort(function(a,b){
+									return words[a].count * words[a].weight < words[b].count * words[b].weight ? 1 : -1; 
+								})
+								
+								var ret = [];
+								var total = 0;
+								for(var i=0; i<words_array.length; i++){
+									var word = words_array[i]
+									ret.push(words[word])
+									total += words[word].count;
+								}
+								return {
+									total: total,
+									words: ret
+								}
+							}
+							
+							var words = getWords("*");
+							var total = words.total;
+							
+							for(var i=0; i<Math.min(10,words.words.length); i++){
+								var entry = words.words[i]
+								var word = entry.word
+					
+								$("#app-outline .content-words ul").append(
+									'<li>'
+										+ word 	//	+ ' (' + entry.count + '/' + entry.weight +') '
+									+ '</li>'
+								)
+							}
+					
+							$("#app-outline .stats").append(total + " Wörter gesamt")
+					
+							// submit function called from dialog handler and on RETURN
+							BI.seopanel.submit=function(){
+								WGA.ajax.callAction("<tml:action ref="saveMetas"/>");
+							}
+							BI.seopanel.toolbar.items.each(function(item){
+								if(item.saveButton)
+									item["<tml:script expression="_mode=='edit' ? 'enable':'disable'"/>"]()
+							})
+				
+						})	// end $get.success
+						.error(function(error){
+							console.log("error", this, error);
+						})
+				
+				}()
+			</script>
+			
+		</tml:form>				
+		
+	</tml:then>
+
+	<tml:else>
+		content not valid
+	</tml:else>
+
+</tml:if>

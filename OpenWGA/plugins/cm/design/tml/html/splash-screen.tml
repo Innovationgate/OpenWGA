@@ -27,7 +27,7 @@
 	<tml:include ref="system:x-box">
 		<tml:option name="body">
 			<div align="center">
-				<img src="<tml:url type="static" file="images/brand/logo_600.png"/>" style="width:300px;margin:10px 0">
+				<img src="<tml:url type="static" file="images/brand/logo_600.png"/>" style="margin:10px 0;max-height:135px">
 				<tml:comment><div>
 					<tml:include ref="releasestring"/>
 				</div>

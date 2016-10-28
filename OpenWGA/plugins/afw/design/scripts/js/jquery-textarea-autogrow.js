@@ -1,0 +1,100 @@
+/*
+ *	jquery-plugin textarea-autogrow
+ *
+ *	This script is part of the OpenWGA CMS plattform.
+ *	(c) Innovation Gate
+ */
+
+!function(root, factory) {
+  	if(typeof define === 'function' && define.amd)
+    	define("jquery-textarea-autogrow", ['jquery'], factory);
+  	else factory(root.jQuery);
+}(window, function($){
+
+	var ta;
+    var shadow;
+
+	function initShadow(config){
+
+		shadow.css({
+		    boxSizing: 	"border-box",
+		    fontSize:   ta.css('fontSize'),
+		    fontFamily: ta.css('fontFamily'),
+		    fontWeight: ta.css('fontWeight'),
+		    lineHeight: ta.css('lineHeight')
+		})
+		if(config.minHeight)
+			shadow.css("min-height", config.minHeight); 
+
+		if(ta.css("box-sizing")=="border-box"){
+			var padding = (ta.outerHeight(true)-ta.height())/2 + "px 0"
+			shadow.css("padding", padding);
+		}
+
+		update();
+	}
+	
+	function update(){
+		if(ta){
+			var width = ta.width();
+			if(WGA.isMobile)
+				width -= 2;		// Keine Ahnung warum, aber das iPad braucht das.
+			shadow.css("width", width)
+			shadow.html(ta.val().replace(/\n$/, '\n&nbsp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') || " ")
+			ta.css("height", shadow.outerHeight(true));
+		}
+	}
+
+	function createShadow(){
+	    shadow = $('<div></div>').css({
+	    	whiteSpace:	"pre-wrap",
+	    	wordWrap: "break-word",
+	    	"-webkit-appearance": "textarea",
+	    	background: "yellow",
+	        position:   'absolute',
+	        top:        -10000,
+	        left:       -10000
+	        
+	        /*
+	        ,zIndex:		1000,
+	        top:        0,
+	        left:       0
+	        */
+	        
+		}).appendTo(document.body);
+	}
+
+	$.fn.autogrow = function(config){
+
+		if(!shadow){
+			createShadow();
+			$(window).resize(update);
+		}
+		
+		var config = config||{}
+		
+		return this.each(function(){
+			ta = $(this);
+			ta.css({
+				overflow: "hidden",
+	    		resize: 'none',
+	    		"-webkit-transition": "height .05s",
+	    		"-moz-transition": "height .05s",
+	    		"transition": "height .05s"
+			})
+			if(WGA.isMobile)
+				ta.css("-webkit-transform", "translateZ(0)")
+				
+			initShadow(config);
+			ta.on({
+				"keyup keydown click": update,
+				focus: function(){
+					ta = $(this);
+					initShadow(config);
+				} 
+			})
+
+		});
+	}
+	
+});

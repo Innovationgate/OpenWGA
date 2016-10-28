@@ -1,0 +1,58 @@
+$(function(){
+	$(document).off("click.preview")
+	$(document).on("click.preview", ".entry .preview-button", function(ev){
+		ev.preventDefault();
+		$this = $(this);
+		var preview = $this.parents(".entry").find(".preview-popup");
+		$(".preview-popup").not(preview).fadeOut().parents(".entry").removeClass("preview");
+		preview.fadeIn().parents(".entry").addClass("preview");
+		var page = preview.data("page");
+		preview.find("img").attr("src", preview.data("pageurl"+page));
+		updateNav(preview)
+	})
+	$(document).on("click.preview", function(e) {
+		if (!$(e.target).hasClass("preview-button") && !$(e.target).parents(".preview-button").length && !$(e.target).parents(".preview-popup").length) {
+			$(".preview-popup").fadeOut().parents(".entry").removeClass("preview");
+		}
+	})
+	$(document).on("click.preview", ".entry .preview-nav .next", function(ev){
+		ev.preventDefault();
+		var preview = $(this).parents(".preview-popup");
+		var page = preview.data("page")+1;
+		var url = preview.data("pageurl"+page)
+		if(url){
+			preview.find("img").attr("src", url);
+			preview.data("page", page);
+			updateNav(preview)
+		}		
+	})
+	$(document).on("click.preview", ".entry .preview-nav .prev", function(ev){
+		ev.preventDefault();
+		var preview = $(this).parents(".preview-popup");
+		var page = preview.data("page")-1;
+		var url = preview.data("pageurl"+page)
+		if(url){
+			preview.find("img").attr("src", url);
+			preview.data("page", page);
+			updateNav(preview)
+		}		
+	})
+	
+	function updateNav(preview){
+		var page = preview.data("page");
+		preview.find(".preview-nav .info .page").html(page);
+		
+		var link = preview.find("a.open-doc")[0]
+		link.hash = "#page="+page
+		
+		var url = preview.data("pageurl"+(page+1))
+		if(url)
+			preview.find(".preview-nav .next").removeClass("disabled");
+		else preview.find(".preview-nav .next").addClass("disabled");
+		var url = preview.data("pageurl"+(page-1))
+		if(url)
+			preview.find(".preview-nav .prev").removeClass("disabled");
+		else preview.find(".preview-nav .prev").addClass("disabled");
+	}
+		
+})

@@ -64,6 +64,8 @@
 			struct = dest.createChildEntry(Contenttype.WGObject, source.getTitle())
 			children = dest.getChildEntries();
 		}
+		struct.setReaders(source.getReaders())
+		struct.setPageEditors(source.getPageEditors())
 		
 		if(position && position!="auto"){
 			var pos;

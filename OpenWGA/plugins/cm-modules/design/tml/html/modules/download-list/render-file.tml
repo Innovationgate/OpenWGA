@@ -1,0 +1,55 @@
+<tml:script>
+	_filename = CMM.setting('filename');
+	_ext = _filename.split(".").pop();
+
+	var c;
+	if(!CMM.setting("source"))
+		c = CMM.settingSource()=="template" ? CMM.getTemplateContext() : this;
+	else c = context("docid:" + CMM.setting("parent"), false);
+
+	if(_filename && c && c.content().hasFile(_filename)){
+		_url = c.fileurl(_filename)
+		_filesize = AFW.Util.renderFileSize(c.content().getFileSize(_filename))
+	}
+	else _url=null;		
+</tml:script>
+
+<tml:if condition="_filename && _url">
+	<tml:then>
+		<a class="clearfix download <tml:item name="_ext"/>"
+			href="<tml:item name="_url"/>?forcedownload=true"
+			title="Download <tml:item name="_filename"/> ..."
+		>
+			<div class="filename">
+				<tml:script>
+					switch(CMM.setting('title_source')){
+						case "file_md":
+							return content().getFileMetaData(_filename).title
+							break;
+						case "filename":
+							return _filename;
+							break;
+						default:
+							return option("title")
+					}
+				</tml:script>
+				<div class="description">
+					<tml:[setting] o_name="description" encode="html"/>
+				</div>
+			</div>
+			<div class="filesize">
+				<tml:script format="#,##0.0" expression="_filesize"/>
+			</div>
+		</a>
+	</tml:then>
+	<tml:else>
+		<a class="clearfix download no-file">
+			<div class="filename">{<tml:option name="title"/>}</div>
+			<div class="filesize">-</div>			
+		</a>		
+	</tml:else>
+</tml:if>
+
+<tml:case condition="AFW.content().isDraft() && AFW.content().isMine()">
+	<tml:portlet name="[{option('ns')}-drag-drop]" ref="::portlet-dragdrop" ajax="true"/>
+</tml:case>

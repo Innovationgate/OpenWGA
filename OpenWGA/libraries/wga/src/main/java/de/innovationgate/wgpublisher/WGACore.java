@@ -3377,7 +3377,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
 
             // Retrieving platform info
             String endDate = (new SimpleDateFormat("yyyy")).format(new Date());
-            log.info(getReleaseString() + " (c)2001-" + endDate + " InnovationGate GmbH");
+            log.info(getReleaseString() + " (c) 2001-" + endDate + " Innovation Gate GmbH");
             try {
                 this.servletPlatform = new Double(arg0.getServletContext().getMajorVersion() + "." + arg0.getServletContext().getMinorVersion()).doubleValue();
                 this.jspPlatform = new Double(javax.servlet.jsp.JspFactory.getDefaultFactory().getEngineInfo().getSpecificationVersion()).doubleValue();
@@ -3944,6 +3944,8 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
     
     public static final String DBATTRIB_TITLEPATHURL_INCLUDEKEYS = "TitlePathURL.IncludeKeys";
     
+    public static final String DBATTRIB_TITLEPATHURL_ALLOW_UMLAUTE = "TitlePathURL.AllowUmlaute";
+
     public static final String DBATTRIB_TITLEPATHMANAGER = "TitlePathManager";
 
     public static final String DBATTRIB_WEBTMLCACHE_SERVESTALEDATA = "WebTMLCache.ServeStaleData";
@@ -7699,8 +7701,12 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
     public InputStream dumpContentStore(WGDatabase dbSource, String filterExpression, boolean autoCorrect, Logger log, boolean includeACL) throws WGAPIException, IOException {
         return dumpContentStore(dbSource, filterExpression, autoCorrect, log, includeACL, false);
     }
-    
+
     public InputStream dumpContentStore(WGDatabase dbSource, String filterExpression, boolean autoCorrect, Logger log, boolean includeACL, boolean includeSystemAreas) throws WGAPIException, IOException {
+    	return dumpContentStore(dbSource, filterExpression, autoCorrect, log, includeACL, includeSystemAreas, true);
+    }
+
+    public InputStream dumpContentStore(WGDatabase dbSource, String filterExpression, boolean autoCorrect, Logger log, boolean includeACL, boolean includeSystemAreas, boolean includeArchived) throws WGAPIException, IOException {
 
         log.info("Creating dump database");
         
@@ -7721,7 +7727,7 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
         dbSource.lock();
         try {
             ContentStoreDumpManager importer = new ContentStoreDumpManager(dbSource, dbTarget, log);
-            importer.exportDump(includeACL, includeSystemAreas);
+            importer.exportDump(includeACL, includeSystemAreas, includeArchived);
         }
         finally {
             dbSource.unlock();

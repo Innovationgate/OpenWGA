@@ -1,0 +1,64 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_imagederivates=null;
+
+	var max_width;
+	
+	var option_imagederivates = option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES)
+	if(option_imagederivates){
+		var match = /width~([0-9]+)/.exec(option_imagederivates)
+		if(match && match.length>0)
+			max_width = match[1]
+	} 
+	
+	var responsive = WGA.design(db()).getGlobal("RESPONSIVE")
+	if(responsive){
+
+		if(!max_width)
+			max_width = responsive.maxPageWidth
+
+		var cols_l=Number(option('cols_l'))||3
+		var cols_m=Number(option('cols_m'))||2
+		var cols_s=Number(option('cols_s'))||1
+		
+		var max_s = ((responsive.small && responsive.small.maxPageWidth)||responsive.medium.width)/cols_s;
+		var max_m = Math.min(max_width, responsive.medium.maxPageWidth||responsive.large.width)/cols_m;
+	
+		_imagederivates = Math.max(max_s, max_m, max_width/cols_l)
+
+	}
+	else if(max_width){
+		var cols = Number(option('cols_s'))||1
+		_imagederivates = max_width/cols
+	}
+</tml:script>
+
+<div class="column" <tml:case condition="CMM.setting('show_title')">data-title="<tml:option name="title"/>"</tml:case>>
+	<tml:range imagederivates="{_imagederivates ? 'width~'+WGA.format(_imagederivates, '0') : VOID}">
+		<tml:include designdb="plugin-cm-modules" ref="system:include-child-modules"/>
+	</tml:range>
+</div>

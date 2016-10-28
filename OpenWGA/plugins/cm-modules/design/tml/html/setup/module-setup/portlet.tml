@@ -1,0 +1,96 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="saveModuleConfig">
+	if(tmlform.storeincontent())
+		_msg = "Module config saved."
+	else _msg = "Unable to save module config"
+</tml:action>
+
+<tml:include ref="init"/>
+
+<tml:script>
+	_key = portlet.getSessionVar("key");
+	// find module:
+	_mod = null;
+	_CM_MODULES = createObject("modules");
+	var mods = _CM_MODULES.getModuleDefs();
+	for(var i=0; i<mods.length; i++){
+		if(mods[i].id == _key){
+			_mod = mods[i];
+			_setupdesigndb = _mod.designdb;
+			_setuptml = _mod.setuptml.split("/");
+			if(_setuptml[1]){
+				_setupdesigndb = _setuptml[0]
+				_setuptml = _setuptml[1] 
+			}
+			break;
+		}
+	}
+
+	_ctx = "db:" + WGA.design().db().getDbReference() + "/name:"+_key;
+	if(!context(_ctx, false)){
+		var hdb = WGA.hdb(WGA.design().db().getDbReference())
+		var root = hdb.getOrCreateStorage("modules")
+		var doc = hdb.createContent(root, _key)
+		doc.setUniqueName(_key)
+		doc.save();
+	}
+
+</tml:script>
+
+<tml:form id="[setup-{_key}]" context="{_ctx}">
+	<tml:include designdb="@ui" ref="windowview">
+		<tml:option name="title">Module '<tml:script expression="_mod.title"/>'</tml:option>
+		
+		<tml:option name="config" scope="local">
+			buttonAlign: "left",
+			buttons:[
+				{
+					text: "save",
+					iconCls: 'action-save-icon',
+					handler: function(){
+						DBM.callAction("<tml:action ref="saveModuleConfig"/>", "<tml:script expression="portlet.portletkey"/>", "updating module configuration");
+					}
+				}
+			]
+		</tml:option>
+		
+		<tml:option name="body">
+			<tml:case condition="_msg">
+				<tml:include designdb="@ui" ref="message">
+					<tml:option name="body">
+						<tml:item name="_msg"/>
+					</tml:option>
+				</tml:include>
+			</tml:case>
+
+			<fieldset>
+				<tml:include designdb="{_setupdesigndb}" ref="{_setuptml}"/>
+			</fieldset>
+		</tml:option>
+	</tml:include>
+
+</tml:form>

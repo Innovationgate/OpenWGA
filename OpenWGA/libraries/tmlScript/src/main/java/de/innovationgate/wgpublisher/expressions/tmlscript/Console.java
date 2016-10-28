@@ -5,10 +5,9 @@ import java.util.HashMap;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-
 public class Console {
 	
-	HashMap<String, Long> _timer= new HashMap<String, Long>();
+	private HashMap<String, Long> _timer= new HashMap<String, Long>();
     private Logger _logger;
 	public Console(Logger logger) {
 		_logger = logger;
@@ -111,11 +110,10 @@ public class Console {
 	public void timeEnd(String str) {
 		if(_timer.containsKey(str)) {
 			long endtime= System.currentTimeMillis() - _timer.get(str);
-			_logger.log(Level.INFO, str + ":" + endtime + "ms");
+			_logger.log(Level.INFO, str + ": " + endtime + "ms");
 		} else {
-		    _logger.log(Level.INFO, "Timer name " + str + " not found.");
+		    _logger.log(Level.INFO, "Timer '" + str + "' not found.");
 		}
 	}
-	
 	
 }

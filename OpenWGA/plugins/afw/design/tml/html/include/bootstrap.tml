@@ -1,0 +1,24 @@
+<tml:case isfalse="_bootstrap_included">
+
+	<tml:if condition="option('bootstrap-js-url')">
+		<tml:then>
+			<link rel="stylesheet" href="<tml:option name="bootstrap-css-url" trim="true"/>">
+			<tml:case condition="option('responsive')=='true'">
+				<link rel="stylesheet" href="<tml:option name="bootstrap-responsive-css-url" trim="true"/>">
+			</tml:case>
+			<script type="text/javascript" src="<tml:option name="bootstrap-js-url" trim="true"/>"></script>			
+		</tml:then>
+		<tml:else>
+			<link rel="stylesheet" href="<tml:url type="file" doc="bootstrap:all" file="css/bootstrap.min.css"/>">
+			<tml:case condition="option('responsive')=='true' || option('bootstrap-responsive')=='true'">
+				<link rel="stylesheet" href="<tml:url type="file" doc="bootstrap:all" file="css/bootstrap-responsive.min.css"/>">
+			</tml:case>
+			<script type="text/javascript" src="<tml:url type="file" doc="bootstrap:all" file="js/bootstrap.min.js"/>"></script>			
+		</tml:else>
+	</tml:if>
+	
+	<tml:script>
+		_bootstrap_included=true
+	</tml:script>
+
+</tml:case>

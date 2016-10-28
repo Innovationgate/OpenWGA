@@ -840,7 +840,7 @@ public class ForEach extends Base implements IterationTag {
 			status.currentObject = status.resultIterator.next();
 
 			// Convert placeholder objects for contents
-			if (status.currentObject instanceof WGRelationData) {
+			if ("content".equals(status.forEachType) && status.currentObject instanceof WGRelationData) {
                 status.currentObject = ((WGRelationData) status.currentObject).getParentContent();
             }
 			

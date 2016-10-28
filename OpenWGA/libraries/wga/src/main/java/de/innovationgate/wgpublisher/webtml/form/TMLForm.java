@@ -245,11 +245,18 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
                     String xml = WGUtils.unzipString(zipped);
                     FormParseInfo formParseInfo = (FormParseInfo) XStreamUtils.XSTREAM_CLONING.fromXML(xml);
                     
+                    /*
                     // Look if there is a process context for this parseinfo on the session, to prevent the parseinfo from being "stolen" from other sessions
                     ProcessContextRegistration contexts = TMLContext.fetchProcessContextRegistration(request.getSession());
                     if (contexts != null && contexts.getProcessContext(formParseInfo.getProcessId()) != null) {
                         _parseInfo = formParseInfo;
                     }
+                    	This does no longer work in wga 7.2
+                    	The processContext of the form is not available here
+                    	and ... the code does not make any sence anyway: 
+                    	If parseinfo has been stolen the request should be canceled instead of taking the default upload limit.
+                    */
+                    _parseInfo = formParseInfo;
                     
                 }
                 else if (SYSTEMFIELD_FORMINFO.equals(fileItem.getFieldName())) {

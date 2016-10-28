@@ -1,0 +1,46 @@
+
+<tml:include ref="compress" o_jsmin="true">
+
+	<tml:option name="files">
+		afw-ext-utils
+		afw-ext-dialog
+	</tml:option>
+
+	(function(){
+		var El = Ext.Element;
+		var gc = El.garbageCollect
+		
+		if(Ext.isIE && El.collectorThreadId){
+			window.clearInterval(El.collectorThreadId)
+			El.collectorThreadId = window.setInterval(function(){
+				try{
+					gc();
+				}
+				catch(e){}
+			}, 30000)
+		}
+	}())
+	
+	
+	// Combobox's expand method needs to be overwritten in order
+	// to avoid a overflow problem with safari
+	Ext.form.ComboBox.prototype.expand = function() {
+		
+		if(this.isExpanded() || !this.hasFocus){
+            return;
+        }
+        this.list.alignTo(this.el, this.listAlign);
+        this.list.show(); 
+		
+		// safari fix
+        this.list.dom.style.overflow = 'hidden';
+          
+        Ext.get(document).on('mousedown', this.collapseIf, this);
+        Ext.get(document).on('mousewheel', this.collapseIf, this);
+        this.fireEvent('expand', this);
+	};
+	
+	AFW.loadingImg="<tml:url type="file" doc="ext" file="loading.gif"/>";
+	Ext.UpdateManager.defaults.loadScripts=true;
+
+</tml:include>

@@ -1,0 +1,123 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+var Database;
+var database;		// WGDatabase object
+var contenttype;	// WGContentType object
+var reason;			// reason message for may-functions
+
+function _false(msg){
+	reason=msg;
+	return false;
+}
+
+this.init=function(ctobj, dbobj){
+	
+	if(typeof ctobj == "string"){
+		Database=createObject(this, "database", dbobj);
+		database=Database.WGObject;
+		contenttype=this.WGObject=database.getContentType(ctobj);
+	}
+	else{
+		if(!ctobj){
+			contenttype = this.WGObject = content().getStructEntry().getContentType();
+		}
+		else if(ctobj instanceof Packages.de.innovationgate.webgate.api.WGContentType)
+			contenttype=this.WGObject=ctobj;
+		else contenttype=this.WGObject=ctobj.WGObject;
+		Database=createObject(this, "database", contenttype.getDatabase());
+		database=Database.WGObject;
+	}
+}
+
+this.isValid=function(){
+	return contenttype!=null;
+}
+
+this.getReason=function(){
+	return reason;
+}
+
+this.getAlias=function(){
+	var aliases=contenttype.getNameAliases();
+	var enumLocales = request.getLocales();
+
+	while (enumLocales.hasMoreElements()){
+		var locale = enumLocales.nextElement().toString().split("_")[0];
+		var alias=findAlias(aliases, locale);
+		if(alias!="")
+			return alias;
+	}
+	
+	return contenttype.getName();
+}
+
+this.getAliasDescription=function(){
+	var enumLocales = request.getLocales();
+	var aliases = contenttype.getDescriptionAliases();
+
+	while (enumLocales.hasMoreElements()){
+		var locale = enumLocales.nextElement().toString().split("_")[0];
+		var alias=findAlias(aliases, locale);
+		if(alias!="")
+			return alias;
+	}
+	
+	if(contenttype.getDescription() != null && contenttype.getDescription() != "")
+		return contenttype.getDescription();
+	
+	return label('contenttype.no-description');
+}
+
+function findAlias(aliases, lang){
+	var it=aliases.iterator();
+	while(it.hasNext()){
+		var alias=it.next().split(":");
+		if(alias[0]==lang)
+			return alias[1];
+	}
+	return "";			
+}
+
+this.isAllowed=function(parentdoc){
+	if(!contenttype)
+		return false;
+	if(contenttype.isAuthoring && !contenttype.isAuthoring() && !Database.isManager())
+		return false; 
+	try{
+		database.performStructCreationCheck(null, parentdoc, contenttype)
+	}
+	catch(e){
+		return false;
+	}
+		
+	return contenttype.mayCreateContent() && contenttype.mayCreateChildEntry(parentdoc)
+}
+
+this.mayDelete=function(){
+	// checks if this CT is used by any struct
+	if(contenttype.mayRemove)
+		return contenttype.mayRemove();
+	else return true;		// no checks if WGA 4.0 
+}

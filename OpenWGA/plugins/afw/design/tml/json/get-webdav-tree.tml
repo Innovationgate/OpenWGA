@@ -1,0 +1,104 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+##MDSET directAccess=true
+
+<tml:script>
+	// calculate context:
+	var dbkey = request.getParameter("dbkey");
+	_folder = request.getParameter("folder");
+	_file = request.getParameter("file");
+	_lang = request.getParameter("language");
+	var node = request.getParameter("node");
+	var root = request.getParameter("root");
+	
+	if(!node){
+		log.info("missing parameter node");
+		_missing_parameter=true;
+	}
+	if(!dbkey){
+		log.info("missing parameter dbkey");
+		_missing_parameter=true;
+	}
+	if(!_lang){
+		log.info("missing parameter language");
+		_missing_parameter=true;
+	}
+	if(!root){
+		log.info("missing parameter root");
+		_missing_parameter=true;
+	}
+
+	if(!dbkey || !_lang || !node || !root){
+		log.info("missing parameter");
+		_missing_parameter=true;
+	}
+	else{
+		_missing_parameter=false;
+		//log.info("node="+node);
+		var database = db(dbkey);	
+		//log.info("db="+dbkey + "/" + database);
+		if(node=="root"){
+			//log.info("root=" + root);
+			var root = root.split(":");
+			//log.info("root=" + root);
+			if(root[0]=="area"){
+				var area = database.getArea(root[1]);
+				_children = area.getRootEntries();
+			}
+			else if(root[0]=="struct"){
+				var struct = database.getStructEntryByKey(root[1]);
+				_children = struct.getChildEntries();
+				//log.info(_children.size());
+			}
+			else _missing_parameter=true;
+		}
+		else{
+			var doc = database.getStructEntryByKey(node);
+			_children=doc.getChildEntries();
+		}
+	}
+</tml:script>
+
+[
+	<tml:case isfalse="_missing_parameter">
+		<tml:foreach type="itemvalue" item="_children" currentvalue="_struct">
+			<tml:script>
+				//log.info("struct: " + _struct.getTitle() + "/" + _struct.hasReleasedContent('de'));
+				_contenttype = _struct.getContentType().getName();
+			</tml:script>
+		
+			<tml:case condition="_struct.hasReleasedContent(_lang) && (_contenttype==_file || _contenttype==_folder)">
+			{
+				text: "<tml:script expression="_struct.getReleasedContent(_lang).getTitle()"/>",
+				id: "<tml:script expression="_struct.getStructKey().toString()"/>",
+				has_children: <tml:script expression="_struct.hasChildren()"/>,
+				//icon: "<tml:url db="plugin-wga-app-framework" type="file" doc="icons" file="{_contenttype==_file?'page.png':'folder.png'}"/>"
+			}<tml:between>,</tml:between>
+			</tml:case>
+	
+		</tml:foreach>
+	</tml:case>
+]
+

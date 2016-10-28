@@ -1,0 +1,4 @@
+<label><tml:label key="column-slider-page.settings.show-title"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:show_title}" type="boolean" default="false"/>
+</div>

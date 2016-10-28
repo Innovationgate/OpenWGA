@@ -293,7 +293,6 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
         "Validate",
         "Version",
         "Xml"
-        
     };
     
     public static Html jsGet_Html(ScriptableObject thisObj) {

@@ -1,0 +1,65 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:include medium="stylesheets" ref="cmm-styles"/>
+
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".content-modules .content-box">
+	"&.box > .title": {
+		color: "white",
+		background_color: "black",
+		background_image: JSS.linearGradient("gray, gray 40%, black 60%"),
+		padding: "4px 5px 5px 5px",
+		margin: "0 !important",
+		
+		border_radius_: {
+			"topleft,topright": 3
+		},
+		
+		a: {
+			display: "block",
+			color: "inherit",
+			text_decoration: "none",
+			background: "url(<tml:url type="file" doc="images" file="arrow-right.png"/>) no-repeat right center"
+		}
+	},
+	
+	"> .content": {
+	 	background_:{
+	 		repeat: "no-repeat",
+			size: "cover"
+		}
+	},
+	
+	"&.border > .content": {
+		border: "solid silver 5px",
+		border_radius: 5		
+	},
+	
+	"&.color > .content": {
+		background_color: "#efefef",
+		border_radius: 5		
+	}
+
+</tml:include>

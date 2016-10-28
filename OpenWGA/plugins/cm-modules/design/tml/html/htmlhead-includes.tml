@@ -1,0 +1,73 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:include ref="init"/>
+
+<tml:script>
+	_jq_includes = (isbrowserinterface() ? 'wga-drophandler' : '')
+</tml:script>
+<tml:include designdb="@afw" ref="include:jquery" o_jquery-plugins="{(option('jquery-plugins')||'') + (_jq_includes ? ','+_jq_includes : '')}"/>
+
+<tml:script>
+	_CM_MODULES = createObject("modules");
+	var statics = option("static-modules");
+	if(statics)
+		setsessionvar("cm_static_modules", statics=="$all" ? _CM_MODULES.getModuleIdList() : WGA.createList(statics, ",") , false)
+	else removesessionvar("cm_static_modules");
+	
+	_tmls = _CM_MODULES.getIncludes("tml");
+
+	// Handle jquery plugins:	
+	var plugins = _CM_MODULES.getIncludes("jquery_plugins").iterator()
+	var included = _jquery_plugins_included || WGA.createList()
+	_plugins = WGA.createList()
+	while(plugins.hasNext()){
+		var plugin = plugins.next().tml.trim()
+		if(plugin && !included.contains(plugin)){
+			_plugins.add(plugin);
+		}
+	}
+	_jquery_plugins_included = included
+	_jquery_plugins_included.addAll(_plugins);
+
+	WGA.TMLPage.setVar("_cmm_style_included", true);
+</tml:script>
+
+<link rel="stylesheet" href="<tml:url type="tml" medium="stylesheets" name="include">
+		<tml:param name="dbkey" expression="meta('db', 'dbkey')"/>
+		<tml:param name="contentkey" expression="KEY"/>
+		<tml:param name="jquery_plugin_css" expression="_plugins"/>
+		<tml:param name="modified" expression="MODIFIED"/>
+	</tml:url>">
+
+<script type="text/javascript" src="<tml:url type="tml" medium="javascripts" name="include">
+		<tml:param name="dbkey" expression="meta('db', 'dbkey')"/>
+		<tml:param name="contentkey" expression="KEY"/>
+		<tml:param name="jquery_plugins" expression="_plugins"/>
+		<tml:param name="modified" expression="MODIFIED"/>
+	</tml:url>"></script>	
+
+<tml:foreach type="itemvalue" item="_tmls" currentvalue="_tml">
+	<tml:include designdb="{_tml.designdb}" ref="{_tml.tml}" medium="html"/>
+</tml:foreach>

@@ -37,6 +37,12 @@
 	tabview.deleteCurrentPage();	
 </tml:action>
 
+<tml:action id="show-databases">
+	if(callAction("::testConnection", portlet.getSessionVar('key'))){
+		_msg = "";
+		portlet.showDatabases=true;
+	}
+</tml:action>
 
 <tml:include designdb="@ui" ref="windowview">
 
@@ -193,31 +199,38 @@
 			</tml:form>
 		</tml:case>
 		
-		<br>
-		<tml:include designdb="@ui" ref="windowview">			
-			<tml:option name="title">
-				<tml:label key="{'databases.'+(option('dbtype')||'all')}"/> in
-				<tml:form id="filter-server" source="portletsessionvars" cssstyle="display:inline">
-					<tml:script>
-						_opts = createlist();
-						_opts.add("all Domains|");
-						var domains = DBM.domains.get().iterator();
-						while(domains.hasNext()){
-							var domain = domains.next();
-							_opts.add("Domain '" + domain.name + "'|" + domain.uid);
-						}
-					</tml:script>
-					<tml:input name="filter" type="select" optionsitem="_opts" changeaction="$store" ajax="true"/>
-				</tml:form>
-			</tml:option>				
-			<tml:option name="body">			
-				<tml:include ref="webprojects:projects-by-domain-listview">				
-					<tml:option name="dbserver"><tml:item name="key"/></tml:option>
-					<tml:option name="ignore-disabled-servers">true</tml:option>
+		<tml:if condition="portlet.showDatabases">
+			<tml:then>
+				<br>
+				<tml:include designdb="@ui" ref="windowview">			
+					<tml:option name="title">
+						<tml:label key="{'databases.'+(option('dbtype')||'all')}"/> in
+						<tml:form id="filter-server" source="portletsessionvars" cssstyle="display:inline">
+							<tml:script>
+								_opts = createlist();
+								_opts.add("all Domains|");
+								var domains = DBM.domains.get().iterator();
+								while(domains.hasNext()){
+									var domain = domains.next();
+									_opts.add("Domain '" + domain.name + "'|" + domain.uid);
+								}
+							</tml:script>
+							<tml:input name="filter" type="select" optionsitem="_opts" changeaction="$store" ajax="true"/>
+						</tml:form>
+					</tml:option>				
+					<tml:option name="body">			
+						<tml:include ref="webprojects:projects-by-domain-listview">				
+							<tml:option name="dbserver"><tml:item name="key"/></tml:option>
+							<tml:option name="ignore-disabled-servers">true</tml:option>
+						</tml:include>	
+					</tml:option>			
 				</tml:include>	
-			</tml:option>			
-		</tml:include>			
-				
+			</tml:then>
+			<tml:else>
+				<tml:button clickaction="show-databases" ajax="true">Show Databases</tml:button>
+			</tml:else>
+		</tml:if>
+		
 	</tml:inline>
 	
 </tml:include>

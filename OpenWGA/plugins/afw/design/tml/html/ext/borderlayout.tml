@@ -1,0 +1,131 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_theme="default";
+	if(option("theme")!=null)
+		_theme=option("theme");
+	var config=parseXML(option('panels'));
+	_panels=config.selectNodes("//panel");
+	_layout=config.selectSingleNode("//layout").getText();
+</tml:script>
+
+<body class="ytheme-<tml:item name="_theme"/>">
+	<tml:include ref="::include-css"/>
+	
+	<tml:case condition="option('splash')!=null">
+		<tml:include ref="::splash">
+			<tml:option name="body"><tml:option name="splash"/></tml:option>
+		</tml:include>
+	</tml:case>
+	
+	<tml:comment>
+		include CSS and JS AFTER the splash screen!
+	</tml:comment>
+	
+	<tml:include ref="::include-js-all"/>
+	
+	<div class="x-layout-inactive-content">
+		<tml:option name="body"/>
+	</div>
+
+	<tml:include ref="::dialogs"/>
+	
+	<script type="text/javascript">
+	
+	/**
+	 * create the panel layout for the application
+	 */
+	
+	AFW.borderlayout = function(){
+		// locals:
+		var layout;
+		var hasLayout=false;
+		
+	    return {
+			init : function(){
+				var defaultPanels={};
+
+				Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
+			
+				// create the main layout
+	            layout = new Ext.BorderLayout(document.body, {
+	                hideOnLayout: true,
+	                <tml:item name="_layout" encode="none"/>
+	            });
+	
+	            layout.beginUpdate();
+	
+				<tml:foreach type="itemvalue" item="_panels" currentvalue="_panel">
+		            var panel=new Ext.ContentPanel('<tml:item name="_panel" xpath="@id"/>', {<tml:item name="_panel"/>});	            
+		            layout.add('<tml:item name="_panel" xpath="@region"/>', panel);
+		            if(!defaultPanels['<tml:item name="_panel" xpath="@region"/>'])
+		            	defaultPanels['<tml:item name="_panel" xpath="@region"/>']='<tml:item name="_panel" xpath="@id"/>';
+				</tml:foreach>
+	
+				// activate first panel of each region:
+				for(reg in defaultPanels)
+					layout.getRegion(reg).showPanel(defaultPanels[reg]);
+								
+				layout.endUpdate();
+				layout.restoreState();
+				hasLayout=true;
+			},
+			
+			addPanel: function(reg, panel){
+				layout.add(reg, panel);
+				return panel;
+			},
+			
+			
+			findPanel: function(id){
+				return layout.findPanel(id);
+			},
+			
+			showPanel: function(id){
+				var panel=layout.findPanel(id)
+				if(panel && !panel.active)
+					layout.getRegion('center').showPanel(id);
+			},
+			
+			getRegion: function(reg){
+				return layout.getRegion(reg);
+			},
+			
+			hasLayout: function(){
+				return hasLayout;
+			}
+		}				
+	}();
+	
+	Ext.onReady(function(){
+		AFW.borderlayout.init();
+		Ext.get("splash").puff({duration:.25,remove:true});
+		Ext.QuickTips.init();
+		<tml:option name="onready"/>
+	});
+	
+	</script>
+
+</body>

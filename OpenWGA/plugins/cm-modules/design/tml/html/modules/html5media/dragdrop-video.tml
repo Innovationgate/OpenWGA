@@ -1,0 +1,117 @@
+<tml:action id="setFiles">
+
+	var poster = request.getParameter("poster")
+	var video = request.getParameter("video")
+	
+	var map = CMM.getModulesSettingsMap("document")
+	var module_settings_map = CMM.getModulesSettingsMap(null, option("ns"))
+	map.putAll(module_settings_map);
+
+	if(poster)	
+		map.put(WGA.scoped("image"), poster);
+
+	if(video){
+		map.put(WGA.scoped("video_file"), video);
+		map.put(WGA.scoped("image"), "");
+		map.put(WGA.scoped("webm"), "");
+		map.put(WGA.scoped("mp4"), "");
+	}
+	
+	map.put(WGA.scoped("setting_source"), "document");
+	
+	CMM.writeContentModulesSettingsData(map);
+
+	content().save();
+		
+</tml:action>
+
+<tml:script>
+	_so=AFW.Util.serializeJsObject({
+		dbkey: meta("database", "dbkey"),
+		contentkey: KEY
+	})
+</tml:script>
+
+<script>
+	require(["jquery", "jquery-wga-drophandler"], function(){
+		$(function(){
+			
+			var BI = window.parent.BI
+			
+			function upload(file, finished_callback){
+				BI.UploadManager.upload(file, {
+					url: "<tml:url db="plugin-contentmanager" type="tml" name="cms:action-panel:attachments:html5-upload-processor"/>",
+					params: {
+						so: "<tml:item name="_so"/>",
+						filename: file.name
+					},
+					callback: function(filename){
+						window.parent.WGA.event.fireEvent("CMS_attachments_changed");
+						finished_callback();
+					}
+				})
+			}
+	
+			function setFilesAction(params){
+				WGA.ajax.action({
+					action: "<tml:action ref="setFiles"/>",
+					params: params
+				})
+			}
+			
+			function onDesktopDrop(files){
+				var $this = $(this);
+				if(!BI)
+					return;	// No Content Manager
+	
+				var file = files[0];
+				var ext = file.name.split(".").pop();
+				if("jpg,jpeg,png,gif".indexOf(ext)>=0){
+					upload(file, function(){
+						setFilesAction({
+							poster: file.name
+						})
+					}) 
+				}
+				else if("mov,m4v,mp4,webm".indexOf(ext)>=0){
+					upload(file, function(){
+						setFilesAction({
+							video: file.name
+						})
+					}) 
+				}
+	
+			}
+			
+			function onFilesDrop(data){
+	
+				var video, poster;
+				
+				for(var i=0; i<data.length; i++){
+					if(data[i].container)
+						continue;
+					var ext = data[i].name.split(".").pop();
+					if("mov,m4v,mp4,webm".indexOf(ext)>=0){
+						video=data[i].name
+					}
+					if("jpg,jpeg,png,gif".indexOf(ext)>=0){
+						poster=data[i].name
+					}
+				}
+	
+				setFilesAction({
+					video: video,
+					poster: poster
+				})
+			}
+			
+			$("#module-<tml:option name="ns"/> video").wga_drophandler({
+			
+				ops: ["copy"],
+			
+				onDesktopDrop: !window.parent.BI ? false : onDesktopDrop,
+				onFilesDrop: onFilesDrop					
+			})
+		})
+	})
+</script>

@@ -190,26 +190,26 @@ public class AppLogAppender extends FileAppender {
        Calls the underlying FileLogger's start() method.
     */
     public void activateOptions() {
-    if (m_prefix == null) {
-        m_prefix = "";
-    }
-    if (m_suffix == null) {
-        m_suffix = "";
-    }
-    if ((m_directory == null) || (m_directory.length() == 0)) {
-        m_directory = ".";
-    }
+	    if (m_prefix == null) {
+	        m_prefix = "";
+	    }
+	    if (m_suffix == null) {
+	        m_suffix = "";
+	    }
+	    if ((m_directory == null) || (m_directory.length() == 0)) {
+	        m_directory = ".";
+	    }
         m_path = new File(m_directory);
         if (!m_path.isAbsolute()) {
             String base = System.getProperty("catalina.base");
-        if (base != null) {
-        m_path = new File(base, m_directory);
-        }
-    }
+	        if (base != null) {
+	        	m_path = new File(base, m_directory);
+		    }
+	    }
         m_path.mkdirs();
         if (m_path.canWrite()) {
-        m_calendar = Calendar.getInstance();        // initialized
-    }
+	        m_calendar = Calendar.getInstance();        // initialized
+	    }
     }
 
     /**
@@ -217,30 +217,30 @@ public class AppLogAppender extends FileAppender {
        according to the layout defined for this appender.
     */
     public void append(LoggingEvent event) {
-    if(this.layout == null) {
-        errorHandler.error("No layout set for the appender named ["+ name+"].");
-        return;
-    }
-    if (this.m_calendar == null) {
-        errorHandler.error("Improper initialization for the appender named ["+ name+"].");
-        return;
-    }
-    
-    synchronized(this) {
-        if (currentFile == null || currentFile.length() > maxFileSize) {
-            currentFile = new File(m_path, m_prefix + timestamp() + m_suffix);
-            addActiveFile(currentFile);
-            this.fileName = currentFile.getAbsolutePath();
-            super.activateOptions();            // close current file and open new file
-        }
-    }
-    
-    if(this.qw == null) {               // should never happen
-        errorHandler.error("No output stream or file set for the appender named ["+
-                   name+"].");
-        return;
-    }
-    subAppend(event);
+	    if(this.layout == null) {
+	        errorHandler.error("No layout set for the appender named ["+ name+"].");
+	        return;
+	    }
+	    if (this.m_calendar == null) {
+	        errorHandler.error("Improper initialization for the appender named ["+ name+"].");
+	        return;
+	    }
+	    
+	    synchronized(this) {
+	        if (currentFile == null || currentFile.length() > maxFileSize) {
+	            currentFile = new File(m_path, m_prefix + timestamp() + m_suffix);
+	            addActiveFile(currentFile);
+	            this.fileName = currentFile.getAbsolutePath();
+	            super.activateOptions();            // close current file and open new file
+	        }
+	    }
+	    
+	    if(this.qw == null) {               // should never happen
+	        errorHandler.error("No output stream or file set for the appender named ["+
+	                   name+"].");
+	        return;
+	    }
+	    subAppend(event);
     }
 
     private String timestamp() {

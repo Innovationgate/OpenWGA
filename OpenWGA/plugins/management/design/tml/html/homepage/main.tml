@@ -1,0 +1,105 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<tml:script var="designUsageOnly" expression="hasOption('content') || hasOption('include')"/>
+	<tml:if condition="!designUsageOnly && !wgacore.getWgaConfiguration().isStartPageEnabled()">
+		<tml:then>
+			<body>The OpenWGA start page is disabled.</body>
+		</tml:then>
+		<tml:else>
+
+			<head>
+				<tml:htmlhead/>
+				<title><tml:script expression="wgacore.releaseString"/></title>
+				<meta name="robots" content="noindex">
+				
+				<link rel="stylesheet" href="<tml:url type="css" name="::basic"/>">
+				<link rel="stylesheet" href="<tml:url type="css" name="::rtf"/>">
+				
+				<tml:option name="head"/>
+				
+			</head>
+			
+			<body>
+				<div id="body-background"></div>
+					<div id="page">
+						<div id="header">
+							<div style="float:left;">
+								<img src="<tml:url type="static" file="images/brand/logo_600.png"/>"
+									height="90"
+									border="0"
+									style="position: absolute; margin-left: -20px;">
+							</div>
+							<div align="right" style="float:right">
+								<div class="site-title">
+									<h1 style="color: gray; margin:0; padding:0">Web Content & Application Development Platform</h1>
+									<div style="margin-top:10px;color:white">
+										<tml:script expression="wgacore.releaseString"/>
+									</div>
+								</div>
+							</div>
+							<div class="clear"></div>
+							
+						</div>
+					
+						<div id="page-content">
+							<div class="content-box rounded-box">
+								<tml:if hasoption="content">
+									<tml:then>
+										<tml:option name="content"/>
+									</tml:then>
+									<tml:elseif hasoption="include">
+										<tml:include designdb="{option:includedb}" ref="{option:include}"/>
+									</tml:elseif>
+									<tml:elseif condition="wgacore.getWgaConfiguration().isRunWizard()">
+										<tml:include ref="::setup"/>
+									</tml:elseif>
+									<tml:else>
+										<tml:include ref="::content"/>
+									</tml:else>
+								</tml:if>
+							</div>
+						</div>
+						
+						<div id="footer">
+							<table width="100%">
+								<tr>
+									<td width="25%">
+										<tml:image doc="images" file="ig-logo.png"/><br>
+										&copy; Innovation Gate GmbH
+									</td>
+									<td width="50%" align="center" valign="top"></td>
+									<td width="25%" align="right" valign="top"></td>
+								</tr>
+							</table>
+						</div>
+				</div>
+					
+			</body>
+		</tml:else>
+	</tml:if>
+
+</html>

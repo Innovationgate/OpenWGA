@@ -1,0 +1,110 @@
+
+var self=this;
+var contents=WGA.createList();
+
+var Util;
+
+/*
+ *	Usage:
+ *		AFW.$(context-expression | TMLContext | WGContent | undefined)
+ *	Without arguments the current content() Object is selected.
+ *
+ *	Samples:
+ *
+ *		AFW.$("name:home").children().item("myitem", "my value").save();
+ *
+ *		AFW.$().children().each(function(doc){
+ *			log.info(doc.getTitle())
+ *		}) 
+ */
+
+this.init = function(arg){
+
+	contents=WGA.createList();
+	
+	if(typeof(arg)=="string"){
+		var c = context(arg, false)
+		c && contents.add(c.content());
+	}	
+	else if(arg instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)
+		contents.add(arg.content())
+	else if(arg instanceof Packages.de.innovationgate.webgate.api.WGContent)
+		contents.add(arg)
+	else contents.add(content());
+	
+	Util = createObject(this, "util");
+}
+
+this.each = function(func){
+	var it = contents.iterator();
+	while(it.hasNext())
+		func(it.next())
+	return self;
+}
+
+this.save = function(){
+	return this.each(function(doc){
+		doc.save();
+	})
+}
+
+this.children = function(){
+	if(contents.size()){
+		contents = contents.get(0).getChildContents();
+	}
+	return self;
+}
+
+this.siblings = function(){
+	if(contents.size()){
+		contents = contents.get(0).getSiblingContents();
+	}
+	return self;
+}
+
+this.first = function(){
+	if(contents.size()){
+		contents = WGA.createList([contents.get(0)])
+	}
+	return self;
+}
+
+this.size = function(){
+	return contens.size();
+}
+
+this.toList = function(){
+	return contents;
+}
+
+this.title = function(){
+	return contents.size() ? contents.get(0).getTitle() : ""
+}
+
+this.item = function(arg0, arg1){
+	if(!contents.size())
+		return self;
+	if(arguments.length==2){
+		return this.each(function(doc){
+			doc.setItemValue(arg0, arg1);
+		})
+	}
+	if(typeof(arg0)=="object"){
+		return this.each(function(doc){
+			for(var item in arg0)
+				doc.setItemValaue(item, arg0[item]);
+		})
+	}
+	return contents.get(0).getItemValue(arg0);
+}
+
+this.toString = function(){
+	var ret=""
+	var it = contents.iterator();
+	while(it.hasNext()){
+		if(ret!="")
+			ret += ", "
+		ret += it.next().getTitle();
+	}
+	return "["+ret+"]";
+}

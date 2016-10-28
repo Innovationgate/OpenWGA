@@ -1,0 +1,127 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="clearImages">
+	tmlform.removeField(WGA.scoped('image'))
+	tmlform.removeField(WGA.scoped('image_mo'))
+</tml:action>
+
+<label><tml:label key="image.settings.datasource"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:source}" type="select" options="{label(CMM.settingSource()=='template'?'image.settings.source.template':'image.settings.source')}"
+		changeaction="clearImages" ajax="true"
+		mode="{option:mode}"
+	/>
+</div>
+
+<tml:case condition="tmlform.field(WGA.scoped('source'))=='container'">
+
+	<label><tml:label key="image.settings.database"/>:</label>
+	<div style="margin:10px">
+		<tml:script>
+			_dbs = CMM.getDbKeys()
+		</tml:script>
+		<tml:input name="{scoped:dbkey}" type="select" optionsitem="_dbs"
+			changeaction="clearImages" ajax="true"
+			mode="{option:mode}"
+		/>
+	</div>
+	
+	<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document">
+		<tml:option name="dbkey" expression="tmlform.field(WGA.scoped('dbkey'))"/>
+		<tml:option name="fieldname" expression="WGA.scoped('sourcedoc')"/>
+		<tml:option name="changeaction"><tml:action ref="clearImages"/></tml:option>
+	</tml:include>
+	
+</tml:case>
+
+<tml:script>
+	_context = null;
+	var source = tmlform.field(WGA.scoped('source')) 
+	if(!source)
+		_context= CMM.settingSource()=="template" ? CMM.getTemplateContextPath() : "this";
+	else _context='db:'+tmlform.field(WGA.scoped('dbkey'))+'/docid:'+tmlform.field(WGA.scoped('sourcedoc'))
+</tml:script>
+<tml:case context="{_context}" iscontextvalid="true">
+	<label><tml:label key="image"/>:</label>
+	<tml:include ref="util:select-image" o_derivate="usage=poster"/>
+	
+	<label><tml:label key="image.img-mouse-over"/>:</label>
+	<tml:include ref="util:select-image" o_derivate="usage=poster" o_fieldname="image_mo" o_empty-text="Original"/>
+</tml:case>
+
+<label><tml:label key="image.settings.labeling"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:descriptions}" type="checkbox" options="{label('image.settings.descriptions.options')}" changeaction="$refresh" ajax="true" mode="{option:mode}"/>
+	<tml:case condition="tmlform.fieldList(WGA.scoped('descriptions')).contains('subtitle')">
+		<br>
+		<tml:input name="{scoped:subtitle}" type="textarea" cssstyle="width:100%" mode="{option:mode}"/>
+	</tml:case>
+</div>
+
+<label><tml:label key="image.click"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:onclick}" type="select" options="{label('image.settings.click-options')}" default="nothing"
+		changeaction="$refresh" ajax="true"
+		mode="{option:mode}"
+	/>
+</div>
+
+<tml:select switch="tmlform.field(WGA.scoped('onclick'))">
+	<tml:case value="link">
+		<label>Link:</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:url}" cssstyle="width:100%" mode="{option:mode}"/>
+		</div>
+		
+		<tml:case condition="option('mode')=='edit'">
+			<div id="link-view-<tml:option name="ns"/>" class="ychooser-view" style="height:170px;overflow:auto"></div>
+			<script>
+				var sitemap = new BI.util.structTree("link-view-<tml:option name="ns"/>");			
+				sitemap.tree.on("click", function(node, e) {
+		        	var a = node.id.split(":");
+		        	if(a[0]=="node-struct" && !node.disabled)
+			        	document.forms["<tml:script expression="tmlform.formid"/>"].elements["<tml:script expression="WGA.scoped('url')"/>"].value = a[1];		        
+		        }, this);
+				<tml:case context="{'docid:'+tmlform.field('url_'+option('ns'))}" iscontextvalid="true">
+			        sitemap.tree.selectPath("/root/<tml:script expression="AFW.structentry().getPath('node-', '/')"/>")				
+				</tml:case>
+			</script>
+		</tml:case>
+	</tml:case>
+	<tml:case value="zoom">
+		<tml:case context="{_context}" iscontextvalid="true">
+			<label>Lightbox-Image:</label>
+			<tml:include ref="util:select-image" o_fieldname="lightbox_image" o_empty-text="Original"/>
+			<div style="margin:10px">
+				<tml:input name="{scoped:download}" type="boolean" default="false" options="{label('image.settings.lightbox.show-download.options')}" mode="{option:mode}"/>
+			</div>
+		</tml:case>
+		<label><tml:label key="image.settings.lightbox-group"/>:</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:image_group}" cssstyle="width:100%" default="default" mode="{option:mode}"/>
+		</div>
+	</tml:case>
+</tml:select>

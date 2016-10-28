@@ -71,6 +71,9 @@ public class VirtualHost extends IdentifiableConfigBean {
     @Attribute (required=false)
     private boolean hideDefaultDatabaseInURL = false;
 
+    @Attribute (required=false)
+    private boolean hideHomepageURL = false;
+
     public VirtualHost() {
         super();
     }
@@ -135,6 +138,15 @@ public class VirtualHost extends IdentifiableConfigBean {
 
     public void setHideDefaultDatabaseInURL(boolean hideDefaultDatabaseInURL) {
         this.hideDefaultDatabaseInURL = hideDefaultDatabaseInURL;
+    }
+
+
+    public boolean isHideHomepageURL() {
+        return hideHomepageURL;
+    }
+
+    public void setHideHomepageURL(boolean proxyDefaultDatabaseInURL) {
+        this.hideHomepageURL = proxyDefaultDatabaseInURL;
     }
 
 }

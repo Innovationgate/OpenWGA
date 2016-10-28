@@ -1,0 +1,2 @@
+WGA.Core.moduleRegistry.removeChangeListener(CMM.clearCacheListener);
+WGA.design().unregisterGlobal("CMM");

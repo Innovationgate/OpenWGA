@@ -1,0 +1,173 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="nextPage">
+	var page = tmlform.processcontext.get('page');
+	tmlform.processcontext.put('page', page ? page+1 : 2)
+</tml:action>
+
+<tml:action id="prevPage">
+	var page = tmlform.processcontext.get('page');
+	tmlform.processcontext.put('page', (page && page>1) ? page-1 : 1)
+</tml:action>
+
+<tml:action id="resetDateFilter">
+	portlet.datefilter = ""
+	tmlform.processcontext.put('page', 1)
+</tml:action>
+
+<tml:action id="resetAreaFilter">
+	portlet.areafilter = ""
+	tmlform.processcontext.put('page', 1)
+</tml:action>
+
+<tml:action id="resetDoctypeFilter">
+	portlet.doctypefilter = ""
+	tmlform.processcontext.put('page', 1)
+</tml:action>
+
+<tml:script>
+	_datefilter = function(c){
+		var d = createcalendar(createdate());
+		switch(portlet.datefilter){
+			case "last-7-days":
+				d.add(d.DAY_OF_YEAR, -7);
+				return c.PUBLISHED.after(d.time)
+			case "last-12-month":
+				d.add(d.MONTH, -12);
+				return c.PUBLISHED.after(d.time);
+			case "older":
+				d.add(d.MONTH, -12);
+				return c.PUBLISHED.before(d.time)
+		}
+		return true;
+	}
+
+	_areafilter = function(c){
+		if(portlet.areafilter){
+			var path = c.content().getStructEntry().getStructKeyPath();
+			return path.indexOf(portlet.areafilter)>=0
+		}
+		return true;
+	}
+	
+	var lm = wgacore.getLuceneManager();
+	_luceneConfig = lm.retrieveLuceneConfig(context("main").meta("db", "dbkey"));
+
+	_result_empty=true;
+	
+</tml:script>
+
+
+<tml:case condition="portlet.datefilter||portlet.areafilter||portlet.doctypefilter">
+	<tml:label key="search.search-options"/>:
+	<ul class="filter-message">
+		<tml:case condition="portlet.datefilter">
+			<li>
+				<tml:label key="{'search.filter.date.'+portlet.datefilter+'.description'}"/>
+				<a href="<tml:url ajax="true" type="action" action="resetDateFilter"/>" class="filter-remove-link" title="<tml:label key="search.filter.deactivate"/>"></a>
+			</li>
+		</tml:case>
+	
+		<tml:case condition="portlet.areafilter">
+			<li>
+				<tml:label key="search.filter.area" param1="{context('docid:'+portlet.areafilter).TITLE}"/>
+				<a href="<tml:url ajax="true" type="action" action="resetAreaFilter"/>" class="filter-remove-link" title="<tml:label key="search.filter.deactivate"/>"></a>
+			</li>
+		</tml:case>
+		<tml:case condition="portlet.doctypefilter">
+			<li>
+				<tml:label key="{'search.filter.doctype.'+portlet.doctypefilter+'.description'}"/>
+				<a href="<tml:url ajax="true" type="action" action="resetDoctypeFilter"/>" class="filter-remove-link" title="<tml:label key="search.filter.deactivate"/>"></a>
+			</li>
+		</tml:case>
+	</ul>
+</tml:case>
+
+<tml:case condition="tmlform.query">
+	<tml:foreach id="searchresult_loop" page="{tmlform.processcontext.get('page')||1}" filllastpage="false" pagesize="{CMM.setting('pagesize')||5}" sourcetag="lucene-search" filter="_datefilter(this) && _areafilter(this)">
+		<tml:include ref="[::collection-entry-{content().getSearchDetails().getDoctype()}]" o-showmetas="true">
+			<tml:script>
+				_result_empty = false;
+				
+				_fragments={};
+				_hasFragments=false;
+				var len = 100;
+				
+				// get item names that have lucene rules "fulltext" or "keyword"
+				var indexedItems = createlist();
+				var items=content().getItemNames().iterator();
+				while(items.hasNext()){
+					var item = items.next();
+					var index_rule = _luceneConfig.getMatchingItemRule(item);
+					if(index_rule && index_rule.getIndexType()!=index_rule.INDEX_TYPE_NO_INDEX)
+						indexedItems.add(item);
+				}
+			
+				var items = indexedItems.iterator();
+				var i=0;
+				while(items.hasNext()){
+					var item = items.next();
+					var fragment = bestFragments(item, len, 1, "<span class='lucene-highlight'>", "</span>", "html")
+					if(!fragment.isEmpty()){
+						_fragments[item]=fragment;
+						_hasFragments=true;
+						if(++i >= 3)
+							break;
+					}
+				}
+			</tml:script>
+			<tml:if istrue="_hasFragments">
+				<tml:then>
+					<div class="lucene-fragments">
+						<tml:script>
+							ret="";
+							for (f in _fragments){
+								var fragment=_fragments[f];
+								for(i=0; i<fragment.size(); i++){
+									ret += '<div class="fragment">'
+										+ (i==0 ? '&hellip; ' : '') 
+										+ fragment.get(i) + ' &hellip; </div>'
+								}
+							}
+							return ret;
+						</tml:script>
+					</div>
+				</tml:then>
+				<tml:else>
+					<p><tml:metadata name="description"/></p>
+				</tml:else>
+			</tml:if>
+		</tml:include>
+	</tml:foreach>
+	
+	<tml:[system:page-control-ajax] o_sourcetag="searchresult_loop"/>
+
+	<tml:case condition="_result_empty">
+		<div class="no-results">
+			<tml:label key="search.no-results-found"/>
+		</div>
+	</tml:case>
+	
+</tml:case>

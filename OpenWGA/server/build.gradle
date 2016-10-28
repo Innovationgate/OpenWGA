@@ -32,7 +32,7 @@ publishing {
 }
 
 war {
-    war.archiveName = "openwga-ce.war"
+	war.archiveName = "openwga-${openwga_version_major}.${openwga_version_minor}.${openwga_version_maintenance}.${openwga_version_patch}-ce.war" 
     from('build/extra/WEB-INF') {
         into('WEB-INF')
     }
@@ -41,14 +41,17 @@ war {
 task buildPlugins(type: Copy) {
 	from (project(":plugin-admin").tasks.buildPlugin.archivePath)
 	from (project(":plugin-cm").tasks.buildPlugin.archivePath)
+	from (project(":plugin-cmm").tasks.buildPlugin.archivePath)
+	from (project(":plugin-afw").tasks.buildPlugin.archivePath)
 	from (project(":plugin-additional-script-langs").tasks.buildPlugin.archivePath)
+	from (project(":plugin-management").tasks.buildPlugin.archivePath)
    	into 'build/extra/WEB-INF/default-plugins'
 }
 buildPlugins.dependsOn project(":plugin-cm").tasks.buildPlugin
+buildPlugins.dependsOn project(":plugin-cmm").tasks.buildPlugin
+buildPlugins.dependsOn project(":plugin-afw").tasks.buildPlugin
 buildPlugins.dependsOn project(":plugin-admin").tasks.buildPlugin
 buildPlugins.dependsOn project(":plugin-additional-script-langs").tasks.buildPlugin
-
+buildPlugins.dependsOn project(":plugin-management").tasks.buildPlugin
 
 war.dependsOn writeVersion, buildPlugins
-
-

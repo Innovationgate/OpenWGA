@@ -1,0 +1,23 @@
+{
+	id:				'cm_image-wall',
+	title:			'<tml:label key="module.image-wall"/>',
+	category:		'Container',
+	type:			'container',
+	tml:			'modules:image-wall:render',
+	settingstml: 	'modules:image-wall:settings',
+	allowedchildren: ["cm_image-wall-image"],
+	icon:			'<tml:url db="plugin-wga-app-framework" type="file" doc="icons@base" file="photos.png"/>',
+	includes: {
+		jquery_plugins: ["lightbox"],
+		css: 			'modules:image-wall:css',
+		js: 			'modules:image-wall:js'
+	}	
+},
+{
+	id:				'cm_image-wall-image',
+	title:			'<tml:label key="module.image-wall-image"/>',
+	icon:			"<tml:url db="@afw" type="file" doc="icons" file="photo.png"/>",
+	tml:			'modules:image-wall:render-image',
+	settingstml: 	'modules:image-wall:settings-image',
+	allowedparents: ["cm_image-wall"]
+}

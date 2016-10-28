@@ -1,0 +1,133 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:include ref="init"/>
+
+<tml:case isbrowserinterface="true" iscurrentdocument="true">
+	<script>
+		WGA.CMM.hasSections=true;
+		WGA.CMM.sections["<tml:item name="$mc.section"/>"]=<tml:item name="$mc.allowedModulesString" encode="none"/>;
+	</script>
+</tml:case>
+
+<tml:if condition="$mc.mods.isEmpty()">
+	<tml:then>
+		<tml:case if="$mc.mayEdit">
+			<a class="WGA-Item-Edit no-modules" style="display:none" href="#" id="no-modules-<tml:item name="$mc.section"/>"
+				title = "<tml:label key="cm.click-to-add-modules"/>"
+			>
+				<tml:label key="cm.add-your-modules-please" param1="{$mc.section}"/>				
+			</a>
+			<script>
+				require(["jquery", "jquery-wga-drophandler"], function(){				
+					if(window.name=="wga-contentmanager-iframe" && window.parent.BI.sitepanel.editItemsVisible){
+						var el = document.getElementById("no-modules-<tml:item name="$mc.section"/>");
+						el.style.display="block";
+					}
+					$(function(){
+						function onFilesDrop(data){
+							WGA.action({
+								action: "<tml:action ref="$mc.addImageModule"/>",
+								params: {
+									section: "<tml:item name="$mc.section"/>",
+									filename: data[0].name,
+									dbkey: data[0].dbkey,
+									container: data[0].container
+								}
+							})
+						}
+						$("#no-modules-<tml:item name="$mc.section"/>").wga_drophandler({
+							ops: ["copy"],
+							onFilesDrop: onFilesDrop
+						})
+					})
+				})			
+			</script>
+		</tml:case>
+	</tml:then>
+	<tml:else>
+		<div class="content-modules" id="content-modules-<tml:item name="$mc.section"/>" <tml:case condition="option('animate')===true || option('animate')=='true'">style="opacity:0;transition:opacity .2s"</tml:case>>
+			<tml:case if="$mc.mayEdit">
+				<div style="position:relative">
+					<a style="display:none" class="WGA-Item-Edit edit-modules-button" href="#">
+						<div>
+							<tml:label key="cm.edit-modules"/>
+						</div>
+					</a>
+				</div>
+				<script>
+					require(["jquery"], function(){		
+						if(window.name=="wga-contentmanager-iframe"){
+							$("#content-modules-<tml:item name="$mc.section"/>").bind({
+								mouseover: function(){
+									$(this).find(".edit-modules-button").show();
+								},
+								mouseout: function(){
+									if(!window.parent.BI.sitepanel.editItemsVisible)
+										$(this).find(".edit-modules-button").hide();
+								}	 
+							})						
+						}
+						WGA.event.addListener("module-editor", "CMS_item_edit", function(){
+							$("#content-modules-<tml:item name="$mc.section"/>").unbind();
+						})
+					})
+				</script>
+			</tml:case>
+			
+			<tml:include ref="system:include-child-modules" trim="true">
+				<tml:option name="child-modules" expression="$mc.mods"/>
+				<tml:option name="margins" expression="true" scope="local"/>
+			</tml:include>
+			
+			<tml:case condition="option('animate')===true || option('animate')=='true'">
+				<tml:[script]>
+					require(["jquery"], function(){
+						$("#content-modules-<tml:item name="$mc.section"/>").css("opacity", 1);
+					})
+				</tml:[script]>
+			</tml:case>
+		</div>
+	</tml:else>
+</tml:if>
+
+<tml:case isbrowserinterface="true">
+	<script>
+		require(["jquery"], function(){
+			if(window.name=="wga-contentmanager-iframe"){		
+				$("#no-modules-<tml:item name="$mc.section"/>.no-modules, #content-modules-<tml:item name="$mc.section"/> .edit-modules-button").click(function(ev){
+					ev.preventDefault();
+					parent.BI.dialog.show('content-modules', this, {mode:'edit', section:"<tml:item name="$mc.section"/>"})
+				})
+			}
+			if(window.parent.CM){
+				$("#no-modules-<tml:item name="$mc.section"/>.no-modules, #content-modules-<tml:item name="$mc.section"/> .edit-modules-button").click(function(ev){
+					ev.preventDefault();
+					window.parent.CM.openDialog('content-modules', {mode:'edit', section:"<tml:item name="$mc.section"/>"})
+				})
+			}
+		})
+	</script>
+</tml:case>

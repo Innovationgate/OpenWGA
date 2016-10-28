@@ -900,7 +900,10 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
     }
 
     public String getAuthenticationSource() {
-        return "Content-Store-Authentication against database " + _dbkey + (_internalConfiguration ? " (internally configured)" : " (user documents under '" + _userRootDoc + "')");
+    	String cs = "Content-Store-Authentication against database " + _dbkey;
+    	if(_scriptCollect!=null)
+    		return cs + ": custom script " + _scriptCollect;
+    	else return cs + (_internalConfiguration ? " (internally configured)" : " (user documents under '" + _userRootDoc + "')");
     }
 
     public void setCore(WGACore core) {
@@ -1759,7 +1762,7 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
     private void doCustomCollect(WGDatabase db) throws WGException {
     
         Map<String,Login> newLoginInformation = new HashMap<String,Login>();
-        Map<String,Group> newGroupInformation = new HashMap<String,Group>();
+        HashSet<String> newGroupInformation = new HashSet<String>();
     
         // Get collect script
         WGCSSJSModule mod = db.getCSSJSModule(_scriptCollect, WGScriptModule.CODETYPE_TMLSCRIPT);
@@ -1781,7 +1784,10 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
         }
     
         _loginInformation =  newLoginInformation;
-        _groupInformation = newGroupInformation;
+        
+        for(String groupName: newGroupInformation){
+        	_groupInformation.put(groupName, new Group(groupName));
+        }
     
     }
     
@@ -1804,7 +1810,10 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
         if (result.isError()) {
             throw new WGException("Error executing custom load script", result.getException());
         }
-        if (!(result.getResult() instanceof Login)) {
+        else if (result.getResult()==null) {
+            return null;
+        }
+        else if (!(result.getResult() instanceof Login)) {
             throw new WGException("Error executing custom load script: The result is not of type " + Login.class.getName() + ": " + result.getResult());
         }
         

@@ -76,7 +76,7 @@ import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
  */
 public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventListener, WGDatabaseConnectListener {
     
-    public static String SHARE_NAME_SPECIAL_CHARS = " _-?!(),.§%&*#'";
+    public static String SHARE_NAME_SPECIAL_CHARS = " _-?!(),.Â§%&*#'";
     
     public static String MODE_URL = "url";
     public static String MODE_SHARE = "share";
@@ -436,6 +436,8 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
     private boolean _contentIndexing;
 
     private WGDatabase _db;
+    
+    private boolean _allowUmlaute;
 
     private boolean _includeKeys;
     
@@ -455,6 +457,7 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
         _generateTitlePathURLs = generateTitlePathURLs;
         _contentIndexing = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_CONTENTINDEXING, false);
         _includeKeys = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_INCLUDEKEYS, false);
+        _allowUmlaute = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_ALLOW_UMLAUTE, false);
         _db = db;
         db.addDatabaseEventListener(this);
         
@@ -550,16 +553,17 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
             if (c == ' ') {
                 name.append('_');
             }
-            else if (c == 'ä') {
+            
+            else if (c == 'Ã¤' && !_allowUmlaute) {
                 name.append("ae");
             }
-            else if (c == 'ö') {
+            else if (c == 'Ã¶' && !_allowUmlaute) {
                 name.append("oe");
             }
-            else if (c == 'ü') {
+            else if (c == 'Ã¼' && !_allowUmlaute) {
                 name.append("ue");
             }
-            else if (c == 'ß') {
+            else if (c == 'ÃŸ' && !_allowUmlaute) {
                 name.append("ss");
             }
 
@@ -955,13 +959,26 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
                 language = WGPDispatcher.DEFAULT_LANGUAGE_TOKEN;
             }
             if (content == baseContent) {
+            	String customTitlepath = (String)content.getMetaData("titlepath");
+            	boolean hasCustomTitlepath = (customTitlepath!=null && !customTitlepath.equals("")); 
                 StringBuffer baseContentSuffix = new StringBuffer();
+                
                 if (_includeKeys) {
+                	if(hasCustomTitlepath){
+                		title = normalizeURLTitle(customTitlepath);
+                	}
                     baseContentSuffix.append("~").append(String.valueOf(content.getStructKey()));
                 }
                 baseContentSuffix.append(".").append(language).append(".").append(mediaKey);
                 
                 title += baseContentSuffix.toString();
+                
+                // if custom titlepath is set, we are finished:
+                if(hasCustomTitlepath && _includeKeys){
+                	path.add(title);
+                	break;
+                }
+                
             }
             path.add(title);
             

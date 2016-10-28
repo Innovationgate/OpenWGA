@@ -1,0 +1,8 @@
+<label><tml:label key="accordion.settings.effect-speed"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:effect_speed}" type="select" options="{label('accordion.settings.effect-speed-options')}" default="fast" mode="{option('mode')}"/>
+</div>	
+
+<div style="margin:10px">
+	<tml:input name="{scoped:expand_first}" type="boolean" options="{label('accordion.settings.expand.first-section-options')}" default="false" mode="{option('mode')}"/>
+</div>

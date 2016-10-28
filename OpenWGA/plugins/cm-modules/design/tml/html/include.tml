@@ -1,0 +1,25 @@
+<tml:include ref="init"/>
+
+<tml:script>
+	_CM_MODULES = createObject("modules");
+	_mod = _CM_MODULES.findModuleConfig(option("module"))
+	if(_mod){
+		var t = _mod.tml.split("/");
+		if(t.length>1)
+			_mod.tml = t[1];
+	}
+</tml:script>
+
+<tml:if condition="_mod">
+	<tml:then>
+		<div class="module-<tml:option name="module"/>">
+			<tml:include designdb="{_mod.designdb}" ref="{_mod.tml}">
+				<tml:option name="content-module-id"><tml:option name="module"/></tml:option>
+			</tml:include>
+		</div>
+	</tml:then>
+	<tml:else>
+		Module <tml:option name="module"/> not found.
+	</tml:else>
+</tml:if>
+

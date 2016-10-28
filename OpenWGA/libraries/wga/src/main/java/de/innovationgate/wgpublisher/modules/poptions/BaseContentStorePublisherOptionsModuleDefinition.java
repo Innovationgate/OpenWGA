@@ -267,6 +267,13 @@ public class BaseContentStorePublisherOptionsModuleDefinition implements ModuleD
         tpuIncludeKeys.addDependentOption(WGACore.DBATTRIB_TITLEPATHURL, Boolean.TRUE.toString());
         options.addOption(tpuIncludeKeys);
         
+        LocalizedOptionDefinition tpuAllowUmlaute = new LocalizedOptionDefinition(WGACore.DBATTRIB_TITLEPATHURL_ALLOW_UMLAUTE, BooleanOptionType.INSTANCE, _bundleLoader);
+        tpuAllowUmlaute.setDefaultValue(Boolean.FALSE.toString());
+        tpuAllowUmlaute.addDependentOption(WGACore.DBATTRIB_TITLEPATHURL, Boolean.TRUE.toString());
+        tpuAllowUmlaute.setOptional(true);
+        tpuAllowUmlaute.setExpert(true);
+        options.addOption(tpuAllowUmlaute);
+        
         LocalizedOptionDefinition tmlCacheServeStale = new LocalizedOptionDefinition(WGACore.DBATTRIB_WEBTMLCACHE_SERVESTALEDATA, BooleanOptionType.INSTANCE, _bundleLoader);
         tmlCacheServeStale.setOptional(true);
         tmlCacheServeStale.setExpert(true);

@@ -1,0 +1,113 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+/**
+ * License check
+ */
+ 
+var LNAME;
+var lm = Packages.de.innovationgate.license.LicenseManager.getInstance();
+var license;
+
+this.init=function(productname){
+	LNAME=productname;
+	var it = lm.getValidLicenses().iterator();
+	while(it.hasNext()){
+		var l=it.next();
+		if(l.getProduct()==LNAME)
+			license=l;
+	}
+}
+
+this.isLocalRequest=function(){
+	// check for wga 4.0.5 or newer:
+	if(wgacore.isLocalRequest)
+		return wgacore.isLocalRequest(request);
+
+	// Solution before wga 4.0.5:
+	return request.getLocalName()=="localhost"
+}
+
+this.hasValidLicense=function(){
+	if (this.isLocalRequest()) {
+		return true;
+	}
+	
+	return lm.hasValidLicense(LNAME);
+}
+
+this.getLicenseCount=function(){
+	return this.hasEnterpriseLicense() ? label("license.unlimeted") : lm.getLicenseCount(LNAME);
+}
+
+this.hasEnterpriseLicense=function(){
+	return lm.hasEnterpriseLicense(LNAME);
+}
+
+this.isDemoLicense=function(){
+	return !lm.hasValidLicense(LNAME);
+}
+
+this.getLicensedFor=function(){
+	if(license)
+		return license.getCompany()
+	else return "-"
+}
+
+this.getValidTo=function(){
+	if(license)
+		return license.getValidTo()
+	else return "-"
+}
+
+this.autoregisterUser=function(username){
+	var userdoc=getmaincontext().db().getContentByName(username);
+	if(userdoc==null){
+		var pluginhdb=getmaincontext().hdb();
+		var users = pluginhdb.getOrCreateStorage("users");
+		if(!lm.hasEnterpriseLicense(LNAME)){
+			// count # of registered users
+			var count = users.getStructEntry().getChildEntries().size();
+			if(lm.getLicenseCount(LNAME)<=count){
+				log.info("could not autoregister user " + username + " because no clients licenses left");
+				return false;		// no more client licenses
+			}
+		}
+		var userdoc=pluginhdb.createContent(users, username);
+		userdoc.setUniqueName(username);
+		userdoc.save();
+		log.info("autoregistered client license for user " + username);
+	}
+
+	return true;
+}
+
+this.hasValidClientLicense=function(username){
+	if (this.isLocalRequest()) {
+		return true;
+	}
+	
+	var userdoc=getmaincontext().db().getContentByName(username);
+	return userdoc!=null;
+}

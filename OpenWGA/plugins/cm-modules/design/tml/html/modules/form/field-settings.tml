@@ -1,0 +1,97 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<label><tml:label key="form.settings.label"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:label}" mode="{option('mode')}" cssstyle="width:100%"/> 
+</div>
+
+<label><tml:label key="form.settings.fieldname"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:fieldname}" mode="{option('mode')}" cssstyle="width:100%"/> 
+</div>
+
+<label><tml:label key="form.settings.field-type"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:fieldtype}" type="select" options="{label('form.settings.field-type.options')}"
+		default="text"
+		changeaction="$refresh" ajax="true"
+		mode="{option('mode')}"
+	/>	
+</div>
+
+<tml:case condition="createlist(['text', 'number', 'radio', 'date', 'password']).contains(tmlform.field(WGA.scoped('fieldtype')))">
+	<label><tml:label key="form.settings.validation"/>:</label>
+	<div style="margin:10px">
+		<tml:script>
+			_opts = label('form.settings.validation.options');
+			if(tmlform.field(WGA.scoped('fieldtype'))=="text")
+				_opts += label('form.settings.validation.options.mail');
+		</tml:script>
+		<tml:input name="{scoped:validation}" type="select" options="{_opts}"
+			changeaction="$refresh" ajax="true"
+			mode="{option('mode')}"
+		/>	
+	</div>
+	<tml:case condition="tmlform.field(WGA.scoped('validation'))">
+		<label><tml:label key="form.settings.validationmessage"/>:</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:validationmessage}" type="textarea" cssstyle="height:auto;width:100%;overflow:hidden" mode="{option('mode')}">
+				onkeyup="this.rows=this.value.split('\n').length"
+				rows="<tml:script expression="item(WGA.scoped('validationmessage')) ? item(WGA.scoped('validationmessage')).split('\n').length : 1"/>"
+			</tml:input>
+		</div>
+	</tml:case>
+</tml:case>
+
+<tml:case condition="createlist(['checkbox','radio']).contains(tmlform.field(WGA.scoped('fieldtype')))">
+	<label><tml:label key="form.settings.layout"/>:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:divider}" type="checkbox" options="{label('form.settings.layout.options')}" mode="{option('mode')}"/>
+	</div>
+</tml:case>
+
+<tml:case condition="createlist(['select', 'checkbox','radio']).contains(tmlform.field(WGA.scoped('fieldtype')))">
+	<label><tml:label key="form.settings.options"/>:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:options}" type="textarea" multiple="true" cssstyle="height:auto;width:100%;overflow:hidden" mode="{option('mode')}">
+			onkeyup="this.rows=this.value.split('\n').length"
+			rows="<tml:script expression="tmlform.field(WGA.scoped('options')) ? tmlform.fieldList(WGA.scoped('options')).size() : 1"/>"
+		</tml:input>
+	</div>
+</tml:case>
+
+<tml:case condition="tmlform.field(WGA.scoped('fieldtype'))=='date'">
+	<label><tml:label key="form.settings.date.year-range"/>:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:year_range}" type="text" default="-10:+10" cssstyle="width:100%" mode="{option('mode')}"/>
+	</div>
+</tml:case>
+
+<label><tml:label key="form.settings.defaultvalue"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:defaultvalue}" type="text" cssstyle="width:100%" mode="{option('mode')}"/>
+</div>
+

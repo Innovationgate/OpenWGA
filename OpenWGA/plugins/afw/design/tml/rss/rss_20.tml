@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tml:comment>
+###########################################################################
+  Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+  
+  This file is part of the OpenWGA server platform.
+  
+  OpenWGA is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+  
+  In addition, a special exception is granted by the copyright holders
+  of OpenWGA called "OpenWGA plugin exception". You should have received
+  a copy of this exception along with OpenWGA in file COPYING.
+  If not, see <http://www.openwga.com/gpl-plugin-exception>.
+  
+  OpenWGA is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with OpenWGA in file COPYING.
+  If not, see <http://www.gnu.org/licenses/>.
+############################################################################ 
+</tml:comment>
+
+<tml:script>
+
+	// define some values here:
+	_config={
+		base_context:	option("base_context"),
+		query_context:	option("query_context"),
+		title: 			option("title")||meta("db", "title"),
+		description: 	option("description")||"",
+		copyright: 		option("copyright")||"",
+		headline_item: 	option("headline_item")||"headline",
+		body_item: 		option("body_item")||"body",
+		body_encode: 	option("encode")||"rtf"
+	}
+
+	_encoding = wgacore.getCharacterEncoding(); 
+	if (_encoding == null) { 
+		_encoding = Packages.java.lang.System.getProperty("file.encoding"); 
+	}
+</tml:script> 
+
+<tml:range var="SName"><%= request.getServerName() %></tml:range>
+<tml:range var="SPort"><%= request.getServerPort() %></tml:range>
+<tml:range var="SerPath"><tml:item name="Sname"/><tml:if condition="this.sport != '' && this.sport!='80' "><tml:then>:<tml:item name="SPort"/></tml:then></tml:if></tml:range>
+
+<rss version="2.0"  
+		xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+		xmlns:dc="http://purl.org/dc/elements/1.1/"
+		xmlns:content="http://purl.org/rss/1.0/modules/content/"
+		xmlns:rss="http://backend.userland.com/rss2">
+
+	<channel>
+
+	<title><tml:script expression="_config.title"/></title>
+	<tml:case var="_url" context="{_config.base_context||'name:home'}" iscontextvalid="true">
+		<tml:script>
+			ret="http://"+serpath+contenturl("html", null);
+			return ret.split(";")[0];
+		</tml:script>
+	</tml:case>
+	<link><tml:item name="_url"/></link> 
+	<description><tml:script expression="_config.description"/></description>
+	<copyright><tml:script expression="_config.copyright"/></copyright>
+	<generator>OpenWGA</generator>	
+	<lastBuildDate><tml:script expression="db().getLastChanged()"/></lastBuildDate>
+	
+	<tml:collection>
+		
+		<tml:query max="10" alllanguages="true" context="{_config.query_context||_config.query_context||'name:home'}">
+			<tml:option name="query"/>
+		</tml:query>
+
+		<tml:foreach pagesize="10">
+			<tml:eval var="_url">
+				ret="http://"+serpath+contenturl("html", null);
+				return ret.split(";")[0];
+			</tml:eval>
+			<item>
+				<guid isPermaLink="false"><tml:meta name="structkey"/></guid>
+				<title><tml:script expression="(item(_config.headline_item)||TITLE).replace(/<br>/g, '')" encode="xml"/></title>
+				<link><tml:item name="_url"/></link>
+				<description>
+					<![CDATA[				
+					<tml:item name="{_config.body_item}" encode="{_config.body_encode||'rtf'}"/>
+					]]>
+				</description>
+				<pubDate><tml:eval>return MODIFIED.toGMTString()</tml:eval></pubDate>
+				<dc:creator><tml:meta name="author"/></dc:creator>			
+			</item>
+	
+		</tml:foreach>
+	</tml:collection>
+	
+	</channel>
+</rss>

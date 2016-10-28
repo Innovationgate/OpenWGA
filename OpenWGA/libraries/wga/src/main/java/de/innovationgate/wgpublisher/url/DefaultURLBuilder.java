@@ -49,6 +49,7 @@ import de.innovationgate.webgate.api.WGIllegalStateException;
 import de.innovationgate.webgate.api.WGLanguage;
 import de.innovationgate.wga.config.ContentDatabase;
 import de.innovationgate.wga.config.VirtualHost;
+import de.innovationgate.wga.config.WGAConfiguration;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.DBLoginInfo;
@@ -120,26 +121,50 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
     public static final String DEFAULT_LOGIN_URL = "/login.jsp";
     protected boolean _titlePathAllowed = true;
     protected WGACore _core;
+    
     public String buildContentURL(TMLContext context, String mediaKey, String layoutKey, boolean ignoreVirtualLink) throws WGException {
-        ContentURL url = innerBuildContentURL(context, mediaKey, layoutKey, ignoreVirtualLink);
+
+    	String defaultMediaKey = (String) _core.readPublisherOptionOrDefault(context.db(), WGACore.DBATTRIB_DEFAULT_MEDIAKEY);
+    	HttpServletRequest request = context.getrequest();
+
+        if (mediaKey == null) {
+            mediaKey = context.getDesignContext().getMediaKey();
+            if (mediaKey == null) {
+                mediaKey = defaultMediaKey;
+            }
+        }
+
+    	if(request!=null && mediaKey.equalsIgnoreCase(defaultMediaKey) && context.ishomepage()){
+    		// check v-host config
+            WGAConfiguration config = _core.getWgaConfiguration();
+            VirtualHost vHost = WGAVirtualHostingFilter.findMatchingHost(config, request);
+            if(vHost!=null){
+            	String defaultDBKey = WGAVirtualHostingFilter.getDefaultDBKey(_core, vHost);
+    	        if(vHost.isHideHomepageURL() && context.db().getDbReference().equalsIgnoreCase(defaultDBKey)){
+    	        	return "/" + request.getContextPath();
+    	        }
+            }    		
+    	}
+    	
+    	ContentURL url = innerBuildContentURL(context, mediaKey, layoutKey, ignoreVirtualLink);
         if (!url.isExternal()) { // Do not rewrite for external URLs (#00003853)
             return rewriteURL(url.getUrl(), context.getrequest(), context.getwgacore(), context.content().isVirtual());
         }
         else {
             return url.getUrl();
         }
-    }
-
+    } 
 
     protected ContentURL innerBuildContentURL(TMLContext context, String mediaKey, String layoutKey, boolean ignoreVirtualLink) throws WGException {
 
         String completeUrl = null;
         boolean external = false;
-        
+        String defaultMediaKey = (String) _core.readPublisherOptionOrDefault(context.db(), WGACore.DBATTRIB_DEFAULT_MEDIAKEY);
+
         if (mediaKey == null) {
             mediaKey = context.getDesignContext().getMediaKey();
             if (mediaKey == null) {
-                mediaKey = (String) _core.readPublisherOptionOrDefault(context.db(), WGACore.DBATTRIB_DEFAULT_MEDIAKEY);
+                mediaKey = defaultMediaKey;
             }
         }
 
@@ -399,8 +424,8 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
     public String buildHomepageURL(WGDatabase db, HttpServletRequest request) throws WGException {
         String url = innerBuildHomepageURL(db, request);
         if (url != null) {
-        return rewriteURL(url, request, _core, false);
-    }
+	        return rewriteURL(url, request, _core, false);
+	    }
         else {
            return null;
         }
@@ -427,8 +452,9 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
             WGContent content = langBehaviour.requestSelectContentForName(db, request, homepageName, false);
                 
             if (content != null && content.mayBePublished(false, WGContent.DISPLAYTYPE_NONE)) {
-                    TMLContext cx = new TMLContext(content, _core, null, null, request, null, request.getSession());
-                    return innerBuildContentURL(cx, null, null, false).getUrl();
+                TMLContext cx = new TMLContext(content, _core, null, null, request, null, request.getSession());
+                String mediaKey = (String) _core.readPublisherOptionOrDefault(db, WGACore.DBATTRIB_DEFAULT_MEDIAKEY);
+                return innerBuildContentURL(cx, mediaKey, null, false).getUrl();
             }
         }
         

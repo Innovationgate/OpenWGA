@@ -1,0 +1,57 @@
+<tml:case isfalse="_jquery_included">
+
+	<tml:if condition="option('jquery-url')">
+		<tml:then>
+			<script type="text/javascript" src="<tml:option name="jquery-url" trim="true"/>"></script>
+		</tml:then>
+		<tml:else>
+			<script type="text/javascript" src="<tml:url type="js" name="jquery-1.12.0.min"/>"></script>
+		</tml:else>
+	</tml:if>
+	
+	<tml:script>
+		_jquery_included=true
+	</tml:script>
+	
+</tml:case>
+
+<tml:case hasoption="jquery-plugins">
+
+	<tml:script>
+		var plugins = WGA.createList(option("jquery-plugins").split(/\s*,\s*/)).iterator()
+		var included = _jquery_plugins_included || WGA.createList()
+		_plugins = WGA.createList()
+		_css = WGA.createList()
+		while(plugins.hasNext()){
+			var plugin = plugins.next().trim()
+			if(plugin && !included.contains(plugin)){
+				_plugins.add(plugin);
+				try{
+					// check for CSS Code to avoid empty <link>s
+					if(WGA.design().db().getTMLModule('jquery-'+plugin, 'stylesheet'))
+						_css.add(plugin);
+					else{
+						var css = WGA.design().resolve("jquery-"+plugin).getCSSCode();
+						if(css)
+							_css.add(plugin);
+					}
+				}
+				catch(e){}
+			}
+		}
+		_jquery_plugins_included = included
+		_jquery_plugins_included.addAll(_plugins);
+	</tml:script>
+	
+	<tml:case condition="_plugins.size()"> 
+		<script type="text/javascript" src="<tml:url type="tml" medium="javascript" name="jquery-plugins">
+				<tml:param name="plugins" type="url" expression="_plugins.toArray().join(',')"/>
+			</tml:url>"></script>
+		<tml:case condition="_css.size()">
+			<link rel="stylesheet" href="<tml:url type="tml" medium="stylesheet" name="jquery-plugins">
+					<tml:param name="plugins" type="url" expression="_css.toArray().join(',')"/>
+				</tml:url>">
+		</tml:case>
+	</tml:case>
+	
+</tml:case>	

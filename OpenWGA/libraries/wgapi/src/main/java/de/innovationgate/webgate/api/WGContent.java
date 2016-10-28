@@ -295,6 +295,12 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
         METAINFO_BROWSERTITLE.setOutputConverter(TITLE_CONVERTER);
     }
     
+    public static final String META_TITLEPATH = "TITLEPATH";
+    public static final MetaInfo METAINFO_TITLEPATH = new MetaInfo(META_TITLEPATH, String.class, null);
+    static {
+        METAINFO_TITLEPATH.setExtdata(true);
+    }
+    
 	public static final String META_LANGUAGE = "LANGUAGE";
     public static final MetaInfo METAINFO_LANGUAGE = new MetaInfo(META_LANGUAGE, String.class, null);
     static { METAINFO_LANGUAGE.setLowerCase(true); };
@@ -311,6 +317,29 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     
 	public static final String META_VERSION = "VERSION";
     public static final MetaInfo METAINFO_VERSION = new MetaInfo(META_VERSION, Integer.class, null);
+
+	public static final String META_SEO_SITEMAP_PRIORITY= "SEO_SITEMAP_PRIORITY";
+    public static final MetaInfo METAINFO_SEO_SITEMAP_PRIORITY = new MetaInfo(META_SEO_SITEMAP_PRIORITY, String.class, "0.5");
+    static {
+        METAINFO_SEO_SITEMAP_PRIORITY.setExtdata(true);
+    };
+	public static final String META_SEO_SITEMAP_CHANGEFREQ = "SEO_SITEMAP_CHANGEFREQ";
+    public static final MetaInfo METAINFO_SEO_SITEMAP_CHANGEFREQ = new MetaInfo(META_SEO_SITEMAP_CHANGEFREQ, String.class, "monthly");
+    static {
+    	METAINFO_SEO_SITEMAP_CHANGEFREQ.setExtdata(true);
+    }
+    
+    public static final String META_SEO_ROBOTS_INDEX = "SEO_ROBOTS_INDEX";
+    public static final MetaInfo METAINFO_SEO_ROBOTS_INDEX = new MetaInfo(META_SEO_ROBOTS_INDEX, Boolean.class, Boolean.TRUE);
+    static {
+    	METAINFO_SEO_ROBOTS_INDEX.setExtdata(true);
+    }
+    public static final String META_SEO_ROBOTS_FOLLOW = "SEO_ROBOTS_FOLLOW";
+    public static final MetaInfo METAINFO_SEO_ROBOTS_FOLLOW = new MetaInfo(META_SEO_ROBOTS_FOLLOW, Boolean.class, Boolean.TRUE);
+    static {
+    	METAINFO_SEO_ROBOTS_FOLLOW.setExtdata(true);
+    }
+    
     
 	public static final String META_UNIQUE_NAME = "UNIQUENAME";
     public static final MetaInfo METAINFO_UNIQUE_NAME = new MetaInfo(META_UNIQUE_NAME, String.class, null);
@@ -1874,10 +1903,10 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
                 
                 // filenames might contain path separators for e.g. in domino rtf fields (body/file.txt)
                 // these files cannot be extracted without filename convertion bc. the file cannot be extracted
-                // to the filesystem - therefore '/' is replaced by '§§§'
+                // to the filesystem - therefore '/' is replaced by 'ï¿½ï¿½ï¿½'
                 // the attachFile method of the JDBC-ContentStore do the back convertion so
                 // the file name stays constant after migration
-                String convertedFileName = WGUtils.strReplace(fileName, "/", "§§§", true);
+                String convertedFileName = WGUtils.strReplace(fileName, "/", "ï¿½ï¿½ï¿½", true);
                                                 
                 final TemporaryFile tempFile = new TemporaryFile(convertedFileName, getFileData(fileName), WGFactory.getTempDir());
                 newContent.afterSave(new SaveAction() {
@@ -1916,10 +1945,10 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
         		
         		// filenames might contain path separators for e.g. in domino rtf fields (body/file.txt)
         		// these files cannot be extracted without filename convertion bc. the file cannot be extracted
-        		// to the filesystem - therefore '/' is replaced by '§§§'
+        		// to the filesystem - therefore '/' is replaced by 'ï¿½ï¿½ï¿½'
         		// the attachFile method of the JDBC-ContentStore do the back convertion so
         		// the file name stays constant after migration
-        		String convertedFileName = WGUtils.strReplace(fileName, "/", "§§§", true);
+        		String convertedFileName = WGUtils.strReplace(fileName, "/", "ï¿½ï¿½ï¿½", true);
         		        		        		
         		final TemporaryFile tempFile = new TemporaryFile(convertedFileName, getFileData(fileName), WGFactory.getTempDir());
         		newContent.afterSave(new SaveAction() {

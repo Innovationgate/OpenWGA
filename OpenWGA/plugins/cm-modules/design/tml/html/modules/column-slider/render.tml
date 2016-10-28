@@ -1,0 +1,68 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_responsive = WGA.design(db()).getGlobal("RESPONSIVE")
+</tml:script>
+
+<tml:case condition="CMM.setting('show_title')">
+	<h2><tml:option name="title"/></h2>
+</tml:case>
+<div class="column-slider" style="opacity:0;transition: opacity .2s">
+	<div class="columns">
+		<tml:include ref="system:include-child-modules" o-raw="true"
+			o_cols_l="{CMM.setting('cols_l')}"
+			o_cols_m="{CMM.setting('cols_m')}"
+			o_cols_s="{CMM.setting('cols_s')}"
+			o_cols="{CMM.setting('cols')}"
+		/>
+	</div>
+</div>
+
+<tml:[script]>
+	require(["jquery", "jquery-columnslider", "jquery-swipehandler"], function(){
+		$(function(){
+			$("#module-<tml:option name="ns"/> .column-slider").columnslider({
+				<tml:if condition="_responsive">
+					<tml:then>
+						cols: {
+							large: <tml:script expression="CMM.setting('cols_l')||3"/>,
+							medium: <tml:script expression="CMM.setting('cols_m')||2"/>,
+							small: <tml:script expression="CMM.setting('cols_s')||1"/>
+						}
+					</tml:then>
+					<tml:else>
+						cols: <tml:script expression="CMM.setting('cols')||1"/>
+					</tml:else>
+				</tml:if>
+				<tml:case condition="CMM.setting('autorun')">
+					,autoslide: <tml:script format="0" expression="(CMM.setting('time')||4)*1000"/>
+					,hide_nav: <tml:script expression="CMM.setting('hide-nav')||false"/>
+				</tml:case>
+				,effect: "<tml:script expression="CMM.setting('effect')||'slide'"/>"
+			}).css("opacity", 1);
+		});
+	})
+</tml:[script]>

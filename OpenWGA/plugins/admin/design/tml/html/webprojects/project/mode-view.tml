@@ -99,12 +99,17 @@ _server_message = portletEvent.getParameter("msg");
 				}
 				if (patchLevel >= 4) {
 					_derivatesUpdatable = true;
-					if (!Packages.de.innovationgate.wgpublisher.scheduler.UpgradeFileStorageTask.isRunning()) {
-						var result = WGA.app(_db).query("fullhql", "select count(*) as cnt from ContentFileMeta as cfm where cfm.checksumSha512 is null").getFirstResultContent();
-						if (result.getItemNumber("cnt") > 0) {
-							_dbFileStorageUpgradeable = true;
+					try{
+						if (!Packages.de.innovationgate.wgpublisher.scheduler.UpgradeFileStorageTask.isRunning()) {
+							var result = WGA.app(_db).query("fullhql", "select count(*) as cnt from ContentFileMeta as cfm where cfm.checksumSha512 is null", {}, {
+								alllanguages: true
+							}).getFirstResultContent();
+							if (result.getItemNumber("cnt") > 0) {
+								_dbFileStorageUpgradeable = true;
+							}
 						}
 					}
+					catch(e){}
 				}
 			}
 			

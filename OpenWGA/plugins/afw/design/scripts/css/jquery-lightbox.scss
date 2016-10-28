@@ -1,0 +1,134 @@
+/*
+
+ CSS for jquery-plugin lightbox
+
+ This file is part of the OpenWGA server platform.
+ (c) Innovation Gate
+
+ BETA - not finished
+
+*/ 
+
+#lightbox-body-mask {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background: black;
+	opacity: .7;
+	filter: alpha(opacity = 70);
+	display: none;
+	z-index: 101
+}
+
+#lightbox {
+
+	z-index: 102;
+	position: fixed;
+	background: white;
+	padding: 10px;
+	box-shadow: 0 0 20px black;
+
+	img {
+		max-width: none;
+		max-height: none;
+	}
+
+	.image-loading {
+		position: absolute;
+		top: 45%;
+		width: 100%;
+		text-align: center;
+	}
+
+	a.lightbox-close {
+		cursor: pointer;
+		background: url(wga_file_url("images", "apple-close.png")) no-repeat;
+		background-size: contain;
+		position: absolute;
+		width: 28px;
+		height: 28px;
+		top: -10px;
+		left: -12px;
+	}
+	
+	.image-prev, .image-next {
+		cursor: pointer;
+		position: absolute;
+		padding: 10px 20px;
+		border: solid white 1px;
+		top: 40%;
+		width: 15px;
+		height: 20px;
+		text-decoration: none;
+		opacity: 0;
+		filter: alpha(opacity = 0);
+	}
+	
+	a.image-prev {
+		left: 0;
+		background: rgba(255, 255, 255, 0.3) url(wga_file_url("images", "prev.png")) no-repeat 18px 5px;
+		&:hover {
+			background-image: url(wga_file_url("images", "prev_mo.png"));
+		}
+		border-top-right-radius: 20px;
+		border-bottom-right-radius: 20px;
+		border-left-width: 0
+	}
+	
+	a.image-next {
+		right: 0;
+		background: rgba(255, 255, 255, 0.3) url(wga_file_url("images", "next.png")) no-repeat 6px 5px;
+		&:hover {
+			background-image: url(wga_file_url("images", "next_mo.png"));
+		}
+		border-top-left-radius: 20px;
+		border-bottom-left-radius: 20px;
+		border-right-width: 0;
+	}
+
+	&:hover {
+		.image-prev, .image-next {
+			opacity: 1;
+			filter: alpha(opacity = 100);
+		}
+	}
+	
+	.image-info {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		height: 40px;
+		white-space: nowrap;
+		padding: 10px;
+		background: #efefef;
+		border-top: solid #dddddd 1px;
+		font-size: 12px;
+		.image-title, image-group {
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		.image-group {
+			margin-top: 7px;
+		}
+		.image-download {
+			display: none;
+			position: absolute;
+			bottom: 10px;
+			right: 10px;
+			padding: 2px 10px;
+			background: #efefef;
+			box-shadow: 0 0 2px gray;
+			a {
+				text-decoration: none;
+			}
+		}
+	}
+	
+	&.download .image-info .image-download {
+		display: block;
+	}
+	
+}

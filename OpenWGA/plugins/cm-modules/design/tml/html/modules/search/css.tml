@@ -1,0 +1,211 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_sitesearch">
+	
+	".col-left": {
+		
+		//margin_right: 220,
+		width: "75%",
+		float: "left"
+	},
+
+	".col-right": {
+		float: "right",
+		width: "25%",
+		".filter": {
+
+			".filter-contents":{
+				padding: "5px 0"
+			},
+
+			".header": {
+				border_bottom: "dotted silver 1px",
+				margin_bottom: 10,
+				font_weight: "bold"
+			},
+
+			ul: {
+				margin: 0,
+				padding: "0 0 10px 0px",
+				list_style_type: "none",
+
+				li: {
+					padding: "3px 0px 3px 25px",
+					margin: 0,
+					background: "url(<tml:url type="file" db="@afw" doc="icons" file="bullet_black.png"/>) no-repeat 0 center",
+					"&.selected": {
+						background_image: "url(<tml:url type="file" db="@afw" doc="icons" file="accept.png"/>)",
+						a:{
+							font_weight: "bold"
+						}
+					}
+				}
+			}
+
+		}
+	},
+
+
+	".filter-message":{
+		margin:  "10px 25px",
+		".filter-remove-link":{
+			background: "url(<tml:url type="file" db="@afw" doc="icons" file="cross.png"/>) no-repeat",
+			width: 15,
+			height: 14,
+			display: "inline-block" 
+		}
+	},
+
+	".search-input":{
+		width: "100%",
+		input: {
+			width: "50%"<tml:comment>,
+			padding_left: 20,
+			margin_bottom: 0,
+			background: "white url(<tml:url db="@afw" type="file" doc="icons" file="zoom.png"/>) no-repeat 3px center",
+			border: "solid silver 1px",</tml:comment>
+			<tml:comment>border_radius: 5</tml:comment>
+		}
+	},
+	
+	".results": {
+		margin_top: 20,
+		
+		".entry": {
+		
+			position: "relative",
+			padding: 10,
+			margin: "10px 10px 0 0",
+			
+			"&.preview": {
+				background: "#efefef",
+				border_radius: 5
+			},
+			
+			".body": {
+				margin: "5px 0px",
+				
+				".lucene-fragments .fragment": {
+					margin: "10px 0",
+					".lucene-highlight": {
+						font_weight: "bold",
+						background: "yellow"
+					}
+				}
+
+			},
+			".path":{
+				margin: "10px 0 5px",
+				font_size: ".8em"
+			},
+			".metas": {
+				border_top: "dotted silver 1px",
+				padding_top: 5,
+				font_size: ".8em"
+			},
+			
+			".attachment-poster": {
+				float: "left",
+				width: 60,
+				img: {
+					box_shadow: "0 0 5px silver"
+				}
+			},
+			".attachment-body": {
+				margin_left: 80,
+				font_size: ".8em"
+			},
+			
+			".preview-popup": {
+				display: "none",
+				position: "absolute",
+				z_index: "6",
+				background: "white",
+				right: 10,
+				top: 10,
+				padding: 5,
+				border_radius: 5,
+				border: "solid silver 1px",
+				box_shadow: "0 0 20px silver",
+				max_width: 250,
+				img: {
+					max_width: "100%"
+				},
+				".arrow": {
+					border: "solid transparent 10px",
+					border_right_color: "silver",
+					position: "absolute",
+					top: 15,
+					left: -20,
+					"&:after": {
+						content: "\"\"",
+						position: "absolute",
+						border: "solid transparent 10px",
+						border_right_color: "white",
+						left: -9,
+						bottom: -10
+					}
+				},
+				".preview-nav": {
+					border_top: "solid silver 1px",
+					padding_top: 5,
+					".info": {
+						margin: "2px 40px",
+						text_align: "center",
+						font_size: 12,
+						line_height: 20
+					},
+					a: {
+						color: "red",
+						display: "block",
+						padding: "0 10px",
+						font_weight: "bold",
+						font_size: 20,
+						text_decoration: "none",
+						"&:hover": {
+							text_decoration: "none"
+						},
+						"&:focus": {
+							outline: "none"
+						},
+						"&.prev": {
+							float: "left"
+						},
+						"&.next": {
+							float: "right"
+						},
+						"&.disabled": {
+							visibility: "hidden"
+						}
+					}
+				}
+			}
+		}
+		
+	}
+	
+</tml:include>
+

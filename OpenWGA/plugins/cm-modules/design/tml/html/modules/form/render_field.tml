@@ -1,0 +1,85 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_opts = CMM.settingList("options");	//	itemList(WGA.scoped('options'));
+	_divider = CMM.setting('divider')=="single-line" ? " " : null;
+	
+	_message = CMM.setting('validationmessage');
+	_fieldname = CMM.setting('fieldname');
+	_label = CMM.setting("label");
+
+	var validation = CMM.setting('validation')
+	if(validation == "required"){
+		_validation = "$E_VALUE!=''"
+		_message = _message || label("form.validation.message.required", [_label||_fieldname]) 
+	}
+	else if(validation=="mail"){
+		_validation = "AFW.Util.validate.mailAddress($E_VALUE)"
+		_message = _message || label("form.validation.message.invalid-mail-address")
+	}
+	else _validation=null;
+	
+	var fieldtype = CMM.setting('fieldtype');
+	if(fieldtype=="date")
+		_format = label("format.date.short");
+	else _format="";
+		
+	var fieldinfo =  WGA.createLookupTable();
+	fieldinfo.put("label", CMM.setting("label"))
+	fieldinfo.put("name", _fieldname);
+	fieldinfo.put("type", fieldtype||'text');
+
+	tmlform.processcontext.get("forminfo").put(WGA.scoped(""), fieldinfo);		
+</tml:script>
+
+<div class="clearfix formfield field-type-<tml:script expression="CMM.setting('fieldtype')"/><tml:case condition="tmlform.hasmessage(_fieldname)"> error</tml:case>">
+	<label>
+		<tml:case condition="_validation">* </tml:case> 
+		<tml:[setting] o_name="label"/>
+	</label>
+	<div class="data">
+		<tml:input name="{CMM.setting('fieldname')}"
+			focus="{isFirstLoop() && CMM.setting('fieldtype')!='date'}"
+			validation="{_validation||true}"
+			message="{_message}"
+			labeled="true"
+			format="{_format}"
+			divider="{_divider}"
+			default="{CMM.setting('defaultvalue')}" 
+			type="{CMM.setting('fieldtype')||'text'}" 
+			optionsitem="_opts"			
+		>
+			<tml:case condition="CMM.setting('fieldtype')=='date'">
+				data-year-range="<tml:[setting] o_name="year_range" o_default="-10:+10"/>"
+			</tml:case>
+		</tml:input>
+	</div>
+</div>
+<tml:case condition="tmlform.hasmessage(_fieldname)">
+	<div class="field-message">
+		<tml:script expression="tmlform.getmessage(_fieldname)"/>
+	</div>
+</tml:case>

@@ -1,0 +1,327 @@
+var modReg = {}
+var self = this;
+
+var dbs_with_local_modules = {}
+
+this.registerConfigTML = function(tml){
+	var database = WGA.design().db();
+	var dbkey = database.getDbReference();
+	
+	var tmls;
+	if(tml instanceof Array)
+		tmls = tml;
+	else tmls = [tml];
+
+	var cmm_local_mods = database.getAttribute("cmm_local_mods");
+	if(!cmm_local_mods){
+		cmm_local_mods = WGA.createLookupTable();
+		database.setAttribute("cmm_local_mods", cmm_local_mods); 
+	}
+	
+	for(var i=0; i<tmls.length; i++){
+		try{
+			var tml = WGA.design().resolve(tmls[i]).getTMLModule("html").getName();
+			log.info("CMM: register local config-tml: " + dbkey + "/" + tml);
+			cmm_local_mods.put(dbkey + "/" + tml, {
+				dbkey: dbkey,
+				configtml: tml
+			})
+		}
+		catch(e){
+			log.warn("CMM: config tml " + tmls[i] + " could not be resolved.");
+		}
+	}
+	
+	dbs_with_local_modules[dbkey]=true;
+	delete modReg[dbkey]
+}
+
+this.getConfigTMLs = function(){
+	var mods = WGA.createList();
+	
+	var regmods = WGA.Core.moduleRegistry.getModulesForType("de.innovationgate.wga.modules.types.CmmDefinitionModuleType").values().iterator();
+	while(regmods.hasNext())
+		mods.add(regmods.next().properties)
+	
+	var locals = db().getAttribute("cmm_local_mods");
+	if(locals)
+		mods.addAll(locals.values());
+	return mods;
+}
+
+this.getModuleDefs = function(){
+	var dbkey = db().getDbReference();
+	if(dbs_with_local_modules[dbkey] && !db().getAttribute("cmm_local_mods")){
+		// this is a db with registered local module, has been reconnected and now has NO modules:
+		// remove from reg
+		log.info("degerister former registered local modules for db " + dbkey);
+		delete dbs_with_local_modules[dbkey]
+		return [];
+	}
+	return modReg[dbkey]||[]
+}
+
+this.setModuleDefs = function(mod_defs){
+	var dbkey = db().getDbReference();
+	var modules = mod_defs;
+	if(modules[0] instanceof Array)
+		modules = modules[0];
+	if(modules[0] && modules[0].modules)
+		modules = modules[0].modules;
+	//this.modules = modules;
+	modReg[dbkey]=modules;
+}
+
+this.settings = function(doc){
+	var settings_map = this.getExtensionData(doc || content(), "content-modules-settings") || WGA.createLookupTable() 
+	return {
+		get: function(name) settings_map.get(WGA.scoped(name))
+	}
+}
+
+this.settingList = function(name, scope){
+
+	var ret = WGA.createList();
+
+	// check options for static modules:
+	var modid = option("content-module-id");
+	if(modid)
+		addToList(option(modid + "." + name));
+	else{
+		var itemname = WGA.scoped(name, scope||null)
+		var settings_map = this.getModulesSettingsMap();
+		if(settings_map.containsKey(itemname))
+			addToList(settings_map.get(itemname));
+	}
+	return ret;
+	
+	function addToList(value){
+		if(value instanceof Packages.java.util.ArrayList)
+			ret.addAll(value)
+		else ret.add(value);
+	}
+	
+}
+
+this.setting = function(name, scope){
+	var list = this.settingList(name, scope);	// this is either a List or null
+	if(list && list.size())
+		return list.get(0);
+	else return null;
+}
+
+this.settingSource = function(){
+	if(tmlform && tmlform.field(WGA.scoped("setting_source")))
+		return tmlform.field(WGA.scoped("setting_source"))
+	if(this.setting("setting_source"))
+		return this.setting("setting_source")
+	return this.hasTemplate() ? "template" : "document";
+}
+
+this.getModulesSettingsMap = function(source, forModule){
+	
+	var templateSettings = WGA.createLookupTable();
+	var template = this.getTemplate();
+	if(template)
+		templateSettings = this.getExtensionData(template, "content-modules-settings") || templateSettings;
+	
+	var contentSettings = this.getExtensionData(content(), "content-modules-settings") || WGA.createLookupTable()
+
+	var map;
+	if(source=="template")
+		map = templateSettings;
+	else if(source=="document")
+		map = contentSettings;
+	else {
+		map = templateSettings;
+		map.putAll(contentSettings);
+	}
+
+	if(forModule){
+		// filter settings for single module
+
+		function endsWith(s1, s2){
+			var i = s1.indexOf(s2);
+			return i>=0 && (i + s2.length == s1.length)
+		}
+	
+		// delete settings from map:
+		var modSettings = WGA.createLookupTable();
+		var itemNames = map.keySet().iterator();
+
+		while(itemNames.hasNext()){
+			var itemName = itemNames.next();
+			if(endsWith(itemName, forModule))
+				modSettings.put(itemName, map.get(itemName));
+		}
+		map = modSettings;
+
+	}
+	
+	return map;	
+}
+
+this.getTemplate = function(){
+	var db = content().getDatabase();
+	if(db.getContentStoreVersion() < db.CSVERSION_WGA5)
+		return null;
+	var template = content().getRelation("created-from-template");
+	if(template && template.getStructEntry().hasReleasedContent(LANGUAGE))
+		template = template.getStructEntry().getReleasedContent(LANGUAGE);
+	return template;
+}
+
+this.getTemplateContext = function(){
+	return this.getTemplate() && context(this.getTemplate());
+}
+
+this.getTemplateContextPath = function(){
+	return this.getTemplate() && context(this.getTemplate()).path;
+}
+
+this.getModulesSource = function(){
+	return this.getTemplate()||content();
+}
+
+this.hasTemplate = function(){
+	return this.getTemplate() != null;
+}
+
+// Module change listener callback
+this.moduleRegistryChanged = function(registry, moduleType) {
+	modReg = {};
+	log.info("Cleared CMM module cache");		
+}
+
+
+/**
+ * Extension Data fake for older content stores
+ **/
+
+function toXML(obj){
+	return Packages.de.innovationgate.utils.XStreamUtils.XSTREAM_CLONING.toXML(obj)
+}
+function fromXML(xml){
+	return Packages.de.innovationgate.utils.XStreamUtils.XSTREAM_CLONING.fromXML(xml)
+}
+
+this.getExtensionData = function(content, name){
+	var db = content.getDatabase();
+	if(db.getContentStoreVersion() < db.CSVERSION_WGA5){
+		var value = content.getItemValue("_ext_data_"+name);
+		if(value)
+			return fromXML(value);
+		else return null;
+	}
+	else return content.getExtensionData(name);
+}
+this.writeExtensionData = function(content, name, value){
+	var db = content.getDatabase();
+	if(db.getContentStoreVersion() < db.CSVERSION_WGA5)
+		content.setItemValue("_ext_data_"+name, toXML(value));
+	else content.writeExtensionData(name, value);
+}
+
+this.getContentModulesData=function(doc){
+	return this.getExtensionData(doc||content(), "content-modules");
+}
+this.writeContentModulesData=function(data, doc){
+	this.writeExtensionData(doc||content(), "content-modules", data);
+}
+
+this.getContentModulesSettingsData=function(doc){
+	// return module settings map
+	return this.getExtensionData(doc||content(), "content-modules-settings");
+}
+this.writeContentModulesSettingsData=function(map, doc){
+	// write module settings map
+	this.writeExtensionData(doc||content(), "content-modules-settings", map);
+	setOption("content-module-settings", this.getModulesSettingsMap());
+}
+
+this.getDbKeys = function(){
+	var dblist = WGA.createList()	
+	var dbs=wgacore.getContentdbs().values().iterator();
+	var wgaconfig = wgacore.getWgaConfiguration()
+	var vhost_filter = Packages.de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
+	var vHost = vhost_filter.findMatchingHost(wgaconfig, request);
+	var mydomain=meta("db", "domain");
+	while(dbs.hasNext()){
+		var db = dbs.next();
+		if(db.getAttribute(wgacore.DBATTRIB_DOMAIN)!=mydomain)
+			continue;
+		// check V-Hosts
+		if(vHost && !vhost_filter.isDBKeyAllowed(wgaconfig, vHost, db.getDbReference()))
+			continue;
+		if(!db.hasFeature(db.FEATURE_FULLCONTENTFEATURES))
+			continue;
+		// Open the database, if possible
+		if (!db.isSessionOpen()) {
+			wgacore.openContentDB(db, request, false);
+			if (!db.isSessionOpen())
+				continue;
+		}
+		dblist.add(db.getDbReference());
+	}			
+	return dblist
+}
+
+
+this.getContentModulesAsJson = function(doc){
+	return JSON.parse(this.getExtensionData(doc||content(), "content-modules")) || {}
+}
+
+this.getContentModulesAsXML = function(doc){
+	var json = this.getContentModulesAsJson(doc)
+	var xml = AFW.Util.parseXML("<modules/>");
+	
+	function addModules(xml, mods){
+		for(var i=0; i<mods.length; i++){
+			var mod = mods[i];
+			var children = mod.children;
+			mod.children = null;
+			var el = xml.addElement("mod", mod);
+			if(children)
+				addModules(el, children);
+		}		
+	}
+
+	for(section in json){
+		var s = xml.addElement("section", {id:section});
+		addModules(s, json[section]);
+	}
+	
+	return xml.dom;	
+}
+
+this.getContentModuleIds = function(doc){
+	var ids = WGA.createList();
+	var mods = this.getContentModulesAsXML(doc).selectNodes("//mod");
+	for(var mod in Iterator(mods)){
+		var id = mod.selectSingleNode("@module_id").getText()
+		if(!ids.contains(id))
+			ids.add(id);
+	}
+	return ids;
+}
+
+this.getContentModuleScopes = function(doc){
+	var ids = WGA.createList();
+	var mods = this.getContentModulesAsXML(doc).selectNodes("//mod");
+	for(var mod in Iterator(mods)){
+		var id = mod.selectSingleNode("@id").getText()
+		if(!ids.contains(id))
+			ids.add(id);
+	}
+	return ids;
+}
+
+this.getModuleConfig = function(id){
+	var id;
+	var modules = this.getModuleDefs();
+	for (var i=0; i < modules.length; i++) {
+		if (modules[i].id==id || (modules[i].id_alias && modules[i].id_alias==id)) 
+			return modules[i];
+	}
+	return null;
+}

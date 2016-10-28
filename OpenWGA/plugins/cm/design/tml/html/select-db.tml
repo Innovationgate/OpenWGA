@@ -39,7 +39,7 @@
 				<tml:option name="body">
 
 					<div align="center">
-						<img src="<tml:url type="static" file="images/brand/logo_600.png"/>" style="width:300px;margin-top:10px">
+						<img src="<tml:url type="static" file="images/brand/logo_600.png"/>" style="margin-top:10px">
 						<div style="color:gray;margin-bottom:20px">
 							<tml:include ref="releasestring"/>
 						</div>

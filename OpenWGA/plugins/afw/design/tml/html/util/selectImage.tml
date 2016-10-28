@@ -1,0 +1,341 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<tml:action id="saveAndResizeFile">
+	var filename=tmlform.filenames.get(0);
+	if(tmlform.scale=="1"){
+		var scaler = createImageScaler(tmlform.getfile(filename));
+		if(tmlform.grow=="1")
+			scaler.growToSize(tmlform.width, tmlform.height);
+		scaler.shrinkToSize(tmlform.width, tmlform.height);
+		switch(tmlform.fileformat){
+			case "PNG":
+				scaler.usePNGForOutput();
+				break;
+			case "JPG":
+				scaler.useJPEGForOutput();
+				break;
+		}
+		tmlform.attachScaledImage(content(), scaler, isEmptyValue(tmlform.filename) ? filename.split(".")[0] : tmlform.filename);
+	}
+	else{
+		var a=filename.split(".");
+		if(a.length>1)
+			var ext="." + a[a.length-1];
+		else var ext="";
+		this.tmlform.attach(this.content(), tmlform.filename=="" ? filename : tmlform.filename+ext);
+	}
+	this.content().save();
+	tmlform.reset();
+</tml:action>			
+
+<tml:action id="deleteFile">
+	content().removeFile(tmlparam1);
+	content().save();
+</tml:action>
+
+<HTML>
+<tml:range context="{'db:'+request.getParameter('dbkey')+'/docid:'+request.getParameter('contentkey')}">
+<head>
+	<tml:htmlhead/>
+	<script>
+		var selectedImg=null;
+		function selectImg(dblclick, imgid, url){
+			if(selectedImg)
+				selectedImg.style.borderColor="beige";
+			selectedImg=document.getElementById(imgid);
+			if(selectedImg)
+				selectedImg.style.borderColor="red";
+			if (parent.dialogCallback)
+				parent.dialogCallback(dblclick, url);
+			else alert("parent.dialogCallback not found");
+			if(!dblclick)
+				document.getElementById("filelist").focus();			
+		}
+		function showUploadForm(){
+			var el=document.getElementById("filelist");
+			el.style.display="none";
+			var el=document.getElementById("buttonarea");
+			el.style.display="none";
+			var el=document.getElementById("uploadform");
+			el.style.display="block";			
+		}
+		function hideUploadForm(){
+			var el=document.getElementById("filelist");
+			el.style.display="block";
+			var el=document.getElementById("buttonarea");
+			el.style.display="block";
+			var el=document.getElementById("uploadform");
+			el.style.display="none";
+			document.getElementById("filelist").focus();
+			
+		}
+		function showHideScaleOptions(show){
+			var el=document.getElementById("scaleoptions");
+			el.style.display= show ? "block" : "none";
+		}
+		function updateSaveAs(el){
+			var filepathRaw = el.value.replace(/\//g, "\\");
+			var filepath=filepathRaw.split("\\");
+			var filename=filepath[filepath.length-1].split(".");
+			el.form.filename.value=filename[0];
+		}
+		function checkFileExtension(form){
+			var msg="<tml:label file="rtf" key="showimages.form.no-image-file"/>";
+			var filepath=form.newfile.value.split("\\");
+			var filename=filepath[filepath.length-1].split(".");			
+			var ext=filename[1];
+			if(!ext){
+				alert(msg);
+				return false;
+			}
+			ext=ext.toLowerCase();
+			if(ext=="gif"||ext=="png"||ext=="jpg"||ext=="bmp"||ext=="tif")
+				return true;
+			else {
+				alert(msg);
+				return false;
+			}
+		}
+		function setImageTitles(){
+			if(document.all)
+				return;		// IE cant do this :-)
+			var images=document.images;
+			for(var i in images){
+				var image=images[i];
+				image.alt=image.alt + " (" + image.naturalHeight + "x" + image.naturalWidth + ")";
+				image.title=image.alt;
+			}
+		}
+		function deleteSelectedFile(){
+			if(selectedImg==null)
+				return alert("<tml:label file="rtf" key="showfiles.no-file-selected"/>");
+			if(confirm(selectedImg.id + "\n<tml:label file="rtf" key="showfiles.query-delete"/>"))
+				callAction(selectedImg.getAttribute("deleteaction"));
+				else document.getElementById("filelist").focus();
+		}
+		
+		function keyHandler(event){
+			if(!event)
+				event=window.event;
+			var keycode=event.keyCode;
+			switch(keycode){
+				case 40:	// down
+				case 39:	// right
+					var img=selectedImg;
+					do{
+						img=img.nextSibling;
+					}
+					while(img && img.tagName!="IMG")
+					if(img)
+						selectImg(false, img.id, "../../../<tml:meta type="database" name="dbkey"/>/file/<tml:meta name="key"/>/" +img.id);
+					stopEvent(event);
+					break;
+				case 38:	// up
+				case 37:	// left
+					var img=selectedImg;
+					do{
+						img=img.previousSibling;
+					}
+					while(img && img.tagName!="IMG")
+					if(img)
+						selectImg(false, img.id, "../../../<tml:meta type="database" name="dbkey"/>/file/<tml:meta name="key"/>/" +img.id);
+					stopEvent(event);
+					break;
+				case 46:	// delete
+					deleteSelectedFile();
+					stopEvent(event);
+					break;
+				case 13:	// Enter
+					selectImg(true, selectedImg.id, selectedImg.src);
+					break;
+//				default: alert(keycode);
+			}
+		}
+		function stopEvent(event){
+			// stop "normal" eventhandling:
+			if (document.all){
+				event.cancelBubble = true;
+				event.returnValue = false;
+			}
+			else {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+		}
+	</script>
+	<style>
+		body,button,input,td,select{
+			font-size:8pt;
+		}
+		body{
+			overflow:hidden;
+			background-color:transparent;
+		}
+		button,input,td,select{
+			font-size:8pt;
+		}
+		#uploadform{
+			padding:5px;
+		}
+		#buttonarea{
+			/*border-bottom:solid black 1px;*/
+			padding-top:2px;			
+		}
+		#filelist{
+			overflow:auto;
+			background-color:white;
+			height:170px;
+			margin-top:1px;
+			padding-top:1px;
+			border:inset white 2px;
+		}
+	</style>
+</head>
+
+<body style="margin:2" onload="setImageTitles()">
+
+	<tml:if condition="content().mayEditContent()">
+		<tml:then>
+			<tml:script var="filenames">				
+				return this.content().getFileNames();
+			</tml:script>
+		
+			<div id="uploadform" style="display:none">
+				<tml:form id="upload" cssstyle="display:inline">
+					<tml:script>
+						tmlform.scale=request.getParameter("scale");
+						tmlform.width=request.getParameter("width");
+						if(tmlform.width=="")
+							tmlform.width="300";
+						tmlform.height=request.getParameter("height");
+						if(tmlform.height=="")
+							tmlform.height="300";
+						tmlform.grow=request.getParameter("grow");
+						tmlform.format=request.getParameter("format");
+						var fs=request.getParameter("forcescale");
+						if(fs=="true" || fs=="1"){
+							_forcescale=true;
+						}
+					</tml:script>
+					<tml:input type="file" name="newfile">size="50" onchange="updateSaveAs(this)"</tml:input>
+					<tml:label file="rtf" key="showfiles.form.save-as"/>:
+					<tml:input name="filename">size="66"</tml:input>
+					<br/>
+					<tml:label file="rtf" key="showimages.form.scale-options" var="_opts"/>
+					<tml:input mode="{_forcescale==true?'readonly':'edit'}" name="scale" type="checkbox" options="{_opts}">
+						onclick="showHideScaleOptions(this.checked)"
+					</tml:input>
+
+					
+					<div id="scaleoptions" style="display:<tml:script>return tmlform.scale=='1'?'block':'none'</tml:script>;border-bottom:solid gray 1px;border-top:solid gray 1px;padding-top:5px">
+					<table>
+						<tr>
+							<td><tml:label file="rtf" key="showimages.form.width-height"/>:</td>
+							<td>
+								<tml:input mode="{_forcescale==true?'readonly':'edit'}" name="width" default="300">size="3"</tml:input>
+								/
+								<tml:input mode="{_forcescale==true?'readonly':'edit'}" name="height" default="300">size="3"</tml:input>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2">
+								<tml:label file="rtf" key="showimages.form.grow-options" var="_opts"/>
+								<tml:input mode="{_forcescale==true?'readonly':'edit'}" type="checkbox" name="grow" options="{_opts}" default=""/>
+							</td>
+						</tr>
+						<tr>
+							<td><tml:label file="rtf" key="showimages.form.format"/>:</td>
+							<td><tml:input mode="{_forcescale==true?'readonly':'edit'}" name="fileformat" type="select" options="PNG,JPEG|JPG" default="PNG"/></td>
+						</tr>
+					</table>
+					</div>
+					<br>
+					<button type="button" onclick="if(checkFileExtension(this.form))callAction('<tml:action ref="saveAndResizeFile"/>')">
+						<tml:label file="rtf" key="showfiles.button.save"/>
+					</button>
+					<button type="button" onclick="hideUploadForm();return false;"><tml:label file="rtf" key="showfiles.button.cancel"/></button>
+				</tml:form>
+			</div>
+			
+			<div id="filelist" onkeydown="keyHandler(event)">
+				<tml:foreach type="itemvalue" item="filenames" currentvalue="filename">
+					<tml:script>
+						var file=this.filename.split('.');
+						var extension = file.pop();
+						//log.info("file=" + file + "->" + extension);
+						if (file.length>0 && (extension.toLowerCase()=="gif"
+								|| extension.toLowerCase()=="jpg"
+								|| extension.toLowerCase()=="png"))
+							this.setvar("file", this.filename);
+						else this.setvar("file", "");
+					</tml:script>
+					<tml:case condition="!isEmptyValue(this.file)">	
+						<tml:img file="{this.filename}">
+							id="<tml:item name="filename"/>" 
+							alt="<tml:item name="filename"/>" 
+							title="<tml:item name="filename"/>" 
+							height="100"
+							style="border: outset beige 2px"
+							deleteaction="<tml:action ref="deleteFile" param1="{filename}"/>"
+							onclick="selectImg(false, 
+								'<tml:item name="filename"/>',
+								'<tml:meta type="request" name="absolutewgaurl"/>/<tml:meta type="database" name="dbkey"/>/file/<tml:meta name="key"/>/<tml:item name="filename"/>');
+								"
+							ondblclick="selectImg(true, 
+								'<tml:item name="filename"/>', 
+								'<tml:meta type="request" name="absolutewgaurl"/>/<tml:meta type="database" name="dbkey"/>/file/<tml:meta name="key"/>/<tml:item name="filename"/>')"
+						</tml:img>
+						<script>
+							var img=document.getElementById("<tml:item name="filename"/>");
+							if(img.width>280){
+								img.height=100*(280/img.width);
+								img.width=280;
+							}
+						</script>
+					</tml:case>
+				</tml:foreach>
+			</div>
+			<SCRIPT>		
+				var div=document.getElementById("filelist");
+				div.focus();
+				var imgs=div.getElementsByTagName("img");
+				if(imgs.length>0)
+					selectImg(false, imgs[0].id, "../../../<tml:meta type="database" name="dbkey"/>/file/<tml:meta name="key"/>/" +imgs[0].id);
+			</SCRIPT>
+			
+			<div id="buttonarea">
+				<button accesskey="u" onclick="showUploadForm()"><tml:label file="rtf" key="showfiles.button.upload"/></button>
+				<button id="deletebutton" onclick="deleteSelectedFile()"><tml:label file="rtf" key="showfiles.button.delete"/></button>
+			</div>
+		</tml:then>
+		<tml:else>
+			<tml:label file="rtf" key="not-allowed"/>
+		</tml:else>
+	</tml:if>
+</body>
+</html>
+</tml:range>

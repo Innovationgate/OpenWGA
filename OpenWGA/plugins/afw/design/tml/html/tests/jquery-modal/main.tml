@@ -1,0 +1,61 @@
+<tml:include ref="tests:layout" o_title="jquery-modal">
+	
+	<a href="#test-modal-nothing" id="show-modal-link">showModal</a>
+	<div class="modal-popup" id="test-modal" style="display:none">
+		<div class="header">
+			Hallo
+			<a data-modal="hide">&times;</a>
+		</div>
+		<div class="content">
+			Welt ...
+		</div>
+	</div>
+	
+	<tml:option name="html-head">
+		<script>
+			require(["jquery", "jquery-modal"], function($, Modal){
+			
+				console.log("Modal", Modal);
+				Modal.effect = "slide"
+				
+				// auto popup on load:
+				$("#test-modal").wga_modal("show", function(){
+					console.log("onshow callback");
+					Modal.effect = "fade"
+					setTimeout(function(){
+						$("#test-modal").wga_modal("hide", function(){
+							console.log("custom modal hide callback");
+						})
+					}, 3000)
+				}).on({
+					"modal-shown": function(){
+						console.log("modal modal-shown", this);
+					},
+					"modal-closed": function(){
+						console.log("modal modal-closed");
+					}
+				});
+				
+				// configer link:
+				$("#show-modal-link").wga_modal({
+					target: "#test-modal",
+					onload: function(){
+						console.log("deprecated show-modal-load");
+					},
+					onclose: function(){
+						console.log("deprecated show-modal-close");
+					}
+				}).on({
+					"modal-shown": function(){
+						console.log("link modal-shown");
+					},
+					"modal-closed": function(){
+						console.log("link modal-closed");
+					}				
+				})
+				
+			})
+		</script>
+	</tml:option>
+	
+</tml:include>

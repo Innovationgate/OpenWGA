@@ -1,0 +1,46 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	var countVoter = Number(content().getItemValueList('voter').size()) || 0;
+	var countVotes = Number(content().getItemValue('votes'));
+	var countAverage = countVotes / countVoter;
+	_voteWidth = ((100 / 5) * countAverage).toFixed(0);
+	if(countVoter == 1)
+		_votes = label("vote.one-vote")
+	else _votes = countVoter+" "+ label("vote.votes");
+</tml:script>
+
+<div class="headline"><tml:label key="vote.current-votes"/>:</div>
+
+<div>
+	<div class="voting_bar">
+		<div style="width:<tml:item name="_voteWidth"/>%"></div>
+	</div>
+	
+	<div class="legend">
+		<tml:item name="_votes"/>, <tml:item name="_voteWidth"/>% <tml:label key="vote.agreements"/>
+	</div>
+	
+</div>

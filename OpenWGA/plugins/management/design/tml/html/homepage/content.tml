@@ -1,0 +1,198 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="showAllApps">
+	_app_pagesize=1000;
+</tml:action>
+
+<div class="rounded-box-top-right doc-header">
+	<h1 class="headline">Server running, what's next?</h1>
+</div>
+
+
+<div id="content">
+	
+	<div class="rtf" style="width: 100%;">
+		<p>This is the start page of your OpenWGA Server, which is now up and running, ready for service. Here are some suggestions for possible next steps to get productive with the platform.</p>
+	
+		<tml:script var="isDevStudio" expression="java.lang.System.getProperty('de.innovationgate.license.DevelopmentModeEnabled') == 'true'"/>
+		<tml:script>
+			// Find out what apps run on this server right now
+			apps = createList();
+			var dbKeys = wgacore.getContentdbs().keySet().iterator();
+			while (dbKeys.hasNext()) {
+				var dbKey = dbKeys.next();
+				if (!javaObject(dbKey).startsWith("plugin-")) {
+					try {
+						var theDB = wgacore.getContentdbs().get(dbKey);
+						if (theDB && theDB.hasFeature(theDB.FEATURE_FULLCONTENTFEATURES)) {
+							apps.add(dbKey);
+						}
+					}
+					catch (e) {
+					}
+				}
+			}
+			
+			anyCMLinkShown = false;
+		</tml:script>
+		
+		
+			<tml:case istrue="isDevStudio">
+			
+				<tml:case condition="apps.size() == 0">
+					<h1>Create a new application in OpenWGA Developer Studio</h1>
+					
+					<div class="whatsnext">
+						<p>
+						If you want to learn how to develop web applications for the OpenWGA platform yourself you should start by creating a new web application in the <b>runtime configuration editor</b> of the OpenWGA Developer Studio:
+						</p>
+						
+						<ul>
+							<li>If not already opened, double-click the file <b>runtime.xml</b> in your OpenWGA runtime project to bring up the runtime configuration editor
+							<li>Click the link <b>Create new web application</b> on tab <b>Status</b>
+							<lI>In the application creation dialog give your new design a name. If you want to learn using OpenWGA with some existing design you should choose an application template in field <b>Use template</b> for your new application.
+							<li>After the design was created you can view it online by selecting it in the runtime editor's applications list and click the link <b>Browser</b> to the right of it
+						</ul>
+					</div>
+				</tml:case>
+			
+				<tml:case condition="apps.size() > 0">
+					<h1>Open existing OpenWGA applications</h1>
+						
+					<div class="whatsnext">
+						<p>
+						The following applications are already running on your OpenWGA Server:
+						</p>
+						
+						<ul>
+							<tml:foreach type="itemvalue" item="apps" currentvalue="app" pagesize="{_app_pagesize||10}">
+								<tml:if context="[db:{app}]" iscontextvalid="true">
+									<tml:then>
+										<li>
+											<b><a href="<tml:url type="homepage"/>" title="Open homepage"><tml:script expression="db().title"/> (<tml:item name="app"/>)</a></b>
+											<tml:script var="showCMLink">
+												if (db().getAttribute(wgacore.DBATTRIB_AUTHORING_APP) == 'true') {
+													return false;
+												}
+												/*if (!(db().getDesignProvider() instanceof Packages.de.innovationgate.wgpublisher.design.fs.FileSystemDesignProvider)) {
+													return false;
+												}*/
+												if(!AFW.database().isAuthoringAllowed())
+													return false;
+												anyCMLinkShown = true;
+												return true;
+											</tml:script>
+											<tml:case istrue="showCMLink">
+												&nbsp;<a href="<tml:url db="{plugin:de.innovationgate.contentmanager}" type="homepage"/>?dbkey=<tml:item name="app"/>" title="Manage content"><tml:image db="{plugin:de.innovationgate.wga-app-framework}" doc="icons" file="layout_edit.png">border="0"</tml:image></a>
+											</tml:case>
+											<tml:script>
+												var cs_config = wgacore.getWgaConfiguration().getContentDatabase(app);
+												_uid = cs_config.uid;
+											</tml:script>
+											&nbsp;<a href="<tml:url db="{plugin:de.innovationgate.admin}" type="homepage"/>?app=webprojects&uid=<tml:item name="_uid"/>" title="configure application"><tml:image db="{plugin:de.innovationgate.wga-app-framework}" doc="icons" file="cog.png">border="0"</tml:image></a>
+										</li>
+									</tml:then>
+								</tml:if>
+							</tml:foreach>
+							
+							<tml:case condition="apps.size()>10 && !isdefined('_app_pagesize')">
+								<tml:comment><li>View more running applications in <a href="<tml:url type="layout" db="{plugin:de.innovationgate.admin}" layout="home"/>">OpenWGA Admin Client...</a></tml:comment>
+								<li>
+									<i style="color: silver">
+										... (<tml:script expression="apps.size()-5"/> more applications) 
+										<tml:button clickaction="showAllApps">Show all</tml:button>
+									</i>
+								</li>
+							</tml:case>
+							
+						</ul>
+						
+						<tml:case condition="isDevStudio && anyCMLinkShown">
+							<p>
+								For content management log in as user <b>designer</b>, password <b>wga</b>, which is created by default and has access to your applications.
+							</p>
+						</tml:case>
+						
+					</div>
+				</tml:case>
+			
+			</tml:case>
+		
+			<h1>Administer your server</h1>
+				
+			<div class="whatsnext">
+				<p>
+				Open the <b><a href="<tml:url type="layout" db="{plugin:de.innovationgate.admin}" layout="home"/>">OpenWGA Admin Client</a></b> to...
+				</p>
+				
+				<ul>
+					<li>Create OpenWGA web applications for production use or connect to existing OpenWGA content stores on database servers
+					<li>Control which users are allowed to access your applications in the ACL
+					<li>Upload OpenWGA plugins to enhance your server with additional features
+					<lI>Get an impression of the overall capabilities of the OpenWGA platform
+				</ul>
+				
+			</div>
+			
+			<h1>Get application designs</h1>
+				
+			<div class="whatsnext">
+				<p>
+					Download application designs for your needs, like blogs, wikis, forums and the like to use them instantly for new applications on your server. Those designs are available as <b>OpenWGA Plugins</b> which can be installed the following way:
+
+					<ul>
+						<li>Open the <a href="<tml:url type="layout" db="{plugin:de.innovationgate.admin}" layout="home"/>">OpenWGA Admin Client</a> and click <b>Plugins</b> in the menu. Then click <b>Plugin Store</b> in the unfolded submenu.
+						<li>Inside the plugin store you can <b>choose design plugins</b> that you want to use and click the "Install this plugin..." button on them. Accept the license and finally confirm the installation. 
+						<li>To use downloaded designs you <b>create a new Web Application</b> in admin client. In the design configuration> of it you <b>determine "Plugins" as design source</b>. Then you can choose the new applications design from your downloaded plugins.
+					</ul> 
+				</p>
+				
+				<p>
+					The tasks around setting up and developing websites are treated in detail in our <a href="http://openwga.com/main/tutorials">online tutorials</a>.
+				</p>
+			</div>
+			
+	</div>
+	
+	
+	
+</div>
+
+<div id="teaser"><tml:include ref="::teaser"/></div>
+	
+<div class="clear"> </div>
+
+<div class="infoBox">
+	<p>This page will be reachable on the OpenWGA root URL until
+	<tml:if istrue="isDevStudio">
+		<tml:then>you create the first application in this runtime.</tml:then>
+		<tml:else>a default application was registered for this server.</tml:else>
+	</tml:if>
+	 		
+	 <br>Even after that you can always reach it here:</p>
+	<p><b><a href="<tml:meta type="request"  name="absolutewgaurl"/>/start"><tml:meta type="request"  name="absolutewgaurl"/>/start</a></b></p>
+	<p>If you wish to disable this page you can do so in <a href="<tml:url type="layout" db="{plugin:de.innovationgate.admin}" layout="home"/>">OpenWGA Admin Client</a>, on menu <b>Configuration <tml:image doc="images" file="arrow.gif"/> Basic Settings</b>.
+</div>

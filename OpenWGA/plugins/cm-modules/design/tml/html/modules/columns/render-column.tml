@@ -1,0 +1,74 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_width = CMM.setting("width") || "1";
+	_imagederivates=null;
+	var col_width_factor = Number(_width)/option("total")
+
+
+	var option_imagederivates = option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES)
+	var max_width;
+	if(option_imagederivates){
+		var match = /width~([0-9]+)/.exec(option_imagederivates)
+		if(match && match.length>0)
+			max_width = match[1]
+	} 
+	
+	if(_width.indexOf("%")<0 && _width.indexOf("px")<0){
+		_width = 100*Number(_width)/option("total") + "%";
+		var responsive = WGA.design(db()).getGlobal("RESPONSIVE")
+		if(responsive){
+		
+			if(!max_width)
+				max_width = responsive.maxPageWidth
+				
+			switch(option('responsive_clear')){
+				case "clear":
+					_imagederivates = Math.max((responsive.small && responsive.small.maxPageWidth)||responsive.medium.width, max_width * col_width_factor);
+					break;
+				case "medium-clear":
+					var min_width = Math.min(max_width, responsive.medium.maxPageWidth||responsive.large.width);
+					_imagederivates = Math.max(min_width, max_width * col_width_factor);
+					break;
+				case "keep":
+					_imagederivates = max_width * col_width_factor;
+					break;
+			}
+		}
+		else if(max_width)
+			_imagederivates = max_width * col_width_factor;
+	}
+</tml:script>
+
+<div style="width:<tml:item name="_width"/>">
+	<div style="<tml:item name="{scoped:style}"/>" class="inner-column <tml:item name="{scoped:class}"/>">
+		<tml:range imagederivates="{_imagederivates ? 'width~'+WGA.format(_imagederivates, '0') : VOID}">
+			<tml:include ref="system:include-child-modules">
+				<tml:option name="margins" expression="true" scope="local"/>
+			</tml:include>
+		</tml:range>
+	</div>
+</div>

@@ -1,0 +1,25 @@
+{
+	id_alias:		'ig_column-slider',
+	id:				'cm_column-slider',
+	title:			'<tml:label key="module.column-slider"/>',
+	category:		'Container',
+	type:			'container',
+	tml:			'modules:column-slider:render',
+	settingstml: 	'modules:column-slider:settings',
+	allowedchildren: ["cm_column-slider-page","ig_column-slider-page"],
+	icon:			'<tml:url db="plugin-wga-app-framework" type="file" doc="icons@base" file="application_side_contract.png"/>',
+	includes: {
+		jquery_plugins: ["columnslider", "swipehandler"]
+	}	
+},
+{
+	id_alias:		'ig_column-slider-page',
+	id:				'cm_column-slider-page',
+	title:			'<tml:label key="module.column-slider-column"/>',
+	icon:			"<tml:url db="@afw" type="file" doc="icons" file="application_tile_horizontal.png"/>",
+	type:			'container',				
+	tml:			'modules:column-slider:render-column',
+	settingstml: 	'modules:column-slider:settings-column',
+	allowedparents: ["cm_column-slider", "ig_column-slider"]
+}
+

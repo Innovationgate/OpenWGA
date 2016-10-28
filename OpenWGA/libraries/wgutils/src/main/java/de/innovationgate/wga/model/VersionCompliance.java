@@ -31,8 +31,8 @@ public class VersionCompliance extends KeyValueBean<String, String> {
 		super(compliance, title);
 	}
 	
-	public static final String VERSIONCOMPLIANCE_DEFAULT = CSConfig.VERSIONCOMPLIANCE_WGA72;
-    public static final String VERSIONCOMPLIANCE_MAX = CSConfig.VERSIONCOMPLIANCE_WGA72;
+	public static final String VERSIONCOMPLIANCE_DEFAULT = CSConfig.VERSIONCOMPLIANCE_WGA73;
+    public static final String VERSIONCOMPLIANCE_MAX = CSConfig.VERSIONCOMPLIANCE_WGA73;
     
     public static final Map<String, VersionCompliance> VERSIONCOMPLIANCES = new LinkedHashMap<String, VersionCompliance>();
     static {
@@ -52,10 +52,14 @@ public class VersionCompliance extends KeyValueBean<String, String> {
         VERSIONCOMPLIANCES.put(CSConfig.VERSIONCOMPLIANCE_WGA70, new VersionCompliance(CSConfig.VERSIONCOMPLIANCE_WGA70, "WGA 7.0"));
         VERSIONCOMPLIANCES.put(CSConfig.VERSIONCOMPLIANCE_WGA71, new VersionCompliance(CSConfig.VERSIONCOMPLIANCE_WGA71, "WGA 7.1"));
         VERSIONCOMPLIANCES.put(CSConfig.VERSIONCOMPLIANCE_WGA72, new VersionCompliance(CSConfig.VERSIONCOMPLIANCE_WGA72, "WGA 7.2"));
+        VERSIONCOMPLIANCES.put(CSConfig.VERSIONCOMPLIANCE_WGA73, new VersionCompliance(CSConfig.VERSIONCOMPLIANCE_WGA73, "WGA 7.3"));
     }
     
     public static VersionCompliance get(String complianceString) {
-        return VERSIONCOMPLIANCES.get(complianceString);
+    	VersionCompliance v = VERSIONCOMPLIANCES.get(complianceString);
+    	if(v!=null)
+    		return v;
+    	else return VERSIONCOMPLIANCES.get(VERSIONCOMPLIANCE_MAX);
     }
      
     public static VersionCompliance get(Version wgaVersion) {

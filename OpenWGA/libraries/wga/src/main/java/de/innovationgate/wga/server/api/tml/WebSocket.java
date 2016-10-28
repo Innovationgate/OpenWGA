@@ -28,10 +28,12 @@ package de.innovationgate.wga.server.api.tml;
 import java.util.Map;
 
 import de.innovationgate.webgate.api.WGException;
+import de.innovationgate.wga.common.CodeCompletion;
 
 /**
  * A server-side Websocket endpoint, used to communicate with Websocket client
  */
+@CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
 public interface WebSocket {
     
     /**

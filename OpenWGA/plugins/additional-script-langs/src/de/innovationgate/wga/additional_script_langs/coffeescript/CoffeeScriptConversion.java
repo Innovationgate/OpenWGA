@@ -12,7 +12,6 @@ import ro.isdc.wro.model.resource.Resource;
 import ro.isdc.wro.model.resource.ResourceType;
 import de.innovationgate.webgate.api.WGBackendException;
 import de.innovationgate.webgate.api.WGException;
-import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.design.conversion.DesignResourceConversion;
 import de.innovationgate.wgpublisher.design.conversion.PreProcessData;
@@ -30,8 +29,6 @@ public abstract class CoffeeScriptConversion implements DesignResourceConversion
             Context.set(Context.standaloneContext(), config);
             
             Injector injector = new InjectorBuilder().build();
-            
-            Design design = data.getApp().design().resolve(data.getDocumentKey().getName());
             
             CoffeeScriptProcessor processor = new CoffeeScriptProcessor();
             injector.inject(processor);

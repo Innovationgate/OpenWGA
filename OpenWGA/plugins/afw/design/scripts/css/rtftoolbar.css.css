@@ -1,0 +1,112 @@
+/*******************************************************************************
+  *Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+  *
+  *This file is part of the OpenWGA server platform.
+  *
+  *OpenWGA is free software: you can redistribute it and/or modify
+  *it under the terms of the GNU General Public License as published by
+  *the Free Software Foundation, either version 3 of the License, or
+  *(at your option) any later version.
+  *
+  *In addition, a special exception is granted by the copyright holders
+  *of OpenWGA called "OpenWGA plugin exception". You should have received
+  *a copy of this exception along with OpenWGA in file COPYING.
+  *If not, see <http://www.openwga.com/gpl-plugin-exception>.
+  *
+  *OpenWGA is distributed in the hope that it will be useful,
+  *but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *GNU General Public License for more details.
+  *
+  *You should have received a copy of the GNU General Public License
+  *along with OpenWGA in file COPYING.
+  *If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+.WGABI_editor td{
+	border:dotted 1px silver;
+}
+.WGABI_contextmenu{
+	border:solid 1px;
+	position:absolute;
+}
+.WGABI_rtftoolbar{
+	background-image:url(../file/rtf/wgabg.gif);
+	width:100%;
+	padding-top: 1px;
+	border-bottom:solid 1pt gray;
+	white-space:nowrap;
+	height:26px;
+	z-index:1000;
+	text-align: left;
+	font-size: 10px !important;
+}
+.WGABI_rtftoolbar *{
+	font-size: 10px !important;
+}
+.WGABI_rtftoolbar button{
+	border: none;
+	background:transparent;
+	margin:0px;
+	padding:0px;
+	vertical-align:middle;
+	width:24px;
+	height:24px;
+}
+.WGABI_rtftoolbar button:hover{
+	border:1px outset white;
+}
+.WGABI_rtftoolbar button img{
+	vertical-align:top;
+	text-align:center;
+}
+
+.WGABI_rtftoolbar .btn_selected{
+ 		background-color:ButtonShadow;
+ 		border:inset white 1px;
+}
+.WGABI_rtftoolbar select, .WGABI_rtftoolbar input{
+	vertical-align:middle;
+	color: ButtonText;
+	margin: 3px;
+	font-size: 10px !important;
+}
+.WGABI_rtftoolbar option{
+	padding-right: 6px;
+}
+.WGABI_rtftoolbar .separator {
+	margin-left:2px;
+	margin-right:2px;
+	vertical-align:middle;
+	border-left:1px solid white;
+	border-right:1px solid silver;
+	height:24px;
+	width:2px;
+}
+.WGABI_rtftoolbar .dialog{
+	background-image:url(../file/rtf/wgabg.gif);					
+	padding: 5px;
+	border: 1px solid black;		
+}
+.WGABI_rtftoolbar .dialog *{
+	font-size:10px;
+	color: black;		
+}
+.WGABI_rtftoolbar .dialogTitle{
+	font-size:12px !important;
+	font-weight:bold;
+	color:captiontext;
+	padding:0px;
+	border-style:none;
+	border-width:0px;
+	min-height:16px;
+	padding-right:2px;
+	padding-top:2px;
+	padding-left:2px;
+}
+
+.WGABI_rtftoolbar .dialog fieldset{
+	margin:0px;
+	margin-top:3px;
+	border:2px groove white;
+	padding:3px;
+}

@@ -1,0 +1,99 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<div style="display:none" id="ta_<tml:option name="fieldname"/>">
+	<tml:input type="textarea" name="{option('fieldname')}" encode="rtf" default="{option('default')}">
+		style="width:100%" 
+		rows="8" 		
+	</tml:input>
+</div>
+
+<tml:script var="_editable">
+	if(option('readonly')!=null && option('readonly')=='true')
+		return false;
+	if (tmlform)
+		return tmlform.mode()=="edit";
+	else return false;	
+</tml:script>
+
+<span style="display:<tml:script>return _editable?'none':'block'</tml:script>"
+		id="<tml:script>return tmlform.formid</tml:script>_item_<tml:option name="fieldname"/>"><tml:script encode="rtf">return tmlform.field(option('fieldname'))</tml:script></span>
+<div id="<tml:script>return tmlform.formid</tml:script>_item_<tml:option name="fieldname"/>_unencoded" style="display:none"><tml:script encode="rtfsystem">return tmlform.field(option('fieldname'))</tml:script></div>		
+
+<tml:case condition="_editable">
+	<script>
+		new function(){
+			if (WGA.isGecko || WGA.isIE || WGA.isSafari){
+				var editor=new AFW.RTF.editor("<tml:script>return tmlform.formid</tml:script>_item_<tml:option name="fieldname"/>",
+						{ 
+							contentinfo: {
+								contentkey: "<tml:meta name="key"/>",
+								dbkey: "<tml:meta type="database" name="dbkey"/>"
+							},
+							autofocus: Boolean(<tml:script>return option('focus')!=null?option('focus'):false</tml:script>),
+							style: "<tml:option name="style"/>",
+							css: "<tml:option name="css"/>",
+							width: "100%"
+						});
+	
+				if (!window.toolbarManager)
+					window.toolbarManager=new AFW.RTFToolbarManager;
+				var tb=window.toolbarManager.createToolbar(editor);
+				//tb.init("<tml:script>return option("empty")=="true"? "InsertSimpleImg":"InsertImg"</tml:script>,UploadFile,InsertLink", "editHTML");
+				tb.tableStyleList=[<tml:option name="tablestylelist"/>];
+				tb.trStyleList=[<tml:option name="trstylelist"/>];
+				tb.tdStyleList=[<tml:option name="tdstylelist"/>];
+				tb.init("<tml:option name="hideoptions"/>", "<tml:option name="showoptions"/>")
+				tb.show("floating");
+							
+				WGA.b4submit.register("<tml:script>return tmlform.formid</tml:script>", function(form){
+					form["<tml:option name="fieldname"/>"].value = editor.getRTFHTML();
+					return true;
+				});
+				
+				// close editor, before any parentportlet makes an ajax-call
+				function closeEditor(){
+					window.toolbarManager.closeEditor("<tml:script>return tmlform.formid</tml:script>_item_<tml:option name="fieldname"/>");
+				}
+				<tml:script>
+					// get all parent portletkeys
+					var pkeys=createlist();
+					var p=portlet;
+					while(p.portletkey!=null && p.portletkey!="" && !p.isRoot()){
+						pkeys.add(p.portletkey);
+						p=p.parentportlet;
+					}
+					_pkeys=pkeys;
+				</tml:script>
+				<tml:foreach type="itemvalue" item="_pkeys" currentvalue="_pkey">
+					WGA.ajax.b4post.register("<tml:item name="_pkey"/>", closeEditor);
+				</tml:foreach>
+							
+			} else {
+				var ta=document.getElementById("ta_<tml:option name="fieldname"/>");
+				ta.style.display="block";
+			}
+		}
+	</script>
+</tml:case>

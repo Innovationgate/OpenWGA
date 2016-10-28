@@ -1,0 +1,93 @@
+<tml:script>
+	_image_rows=[]
+	_count = CMM.setting("images_per_row") || 3
+
+	_images = WGA.createList();
+
+	var image_modules = option("child-modules").iterator();
+	while(image_modules.hasNext()){
+		var id = image_modules.next().selectSingleNode("@id").getText();
+		var file = CMM.setting("image", id);
+		var source = CMM.setting("source", id);
+		var dbkey = CMM.setting("dbkey", id);
+		var sourcedoc = CMM.setting("sourcedoc", id);
+		
+		if(!file)
+			continue;
+			
+		var context = null;
+		if(!source)
+			context= CMM.settingSource()=="template" ? CMM.getTemplateContextPath() : "this";
+		else context='db:'+dbkey+'/docid:'+sourcedoc
+
+		_images.add({
+			context: context,
+			filename: file
+		})
+	}
+</tml:script>
+
+<div class="album clearfix" id="album-<tml:option name="ns"/>" data-count="<tml:item name="_count"/>">
+	<tml:foreach item="_images" currentvalue="_image" id="img-loop">
+
+		<tml:script>
+
+			var file = _image.filename
+			var metas = context(_image.context).content().getFileMetaData(file)
+			
+			var scaler={
+				width: metas.getDisplayWidth(),
+				height: metas.getDisplayHeight()
+			}
+
+			var url = context(_image.context).fileurl(file);
+			var url_tn = WGA.urlBuilder(url).setParameter("derivate", "usage=poster,width~320").build();
+			
+			var i = parseInt((taginfo('img-loop','iteration')-1)/_count)
+			if(!_image_rows[i])
+				_image_rows[i]=[];
+			_image_rows[i].push({
+				title: metas.title || file,
+				url: url,
+				url_tn: url_tn,
+				width: scaler.width,
+				height: scaler.height 
+			})
+		</tml:script>
+	</tml:foreach>
+	
+	<tml:foreach item="_image_rows" currentvalue="_imagerow">
+		<div class="clearfix image-row">
+			<tml:foreach item="_imagerow" currentvalue="_image">
+				<div class="image-wrap">
+					<img src="<tml:script expression="_image.url_tn"/>"
+						title="<tml:script expression="_image.title"/>"
+						alt="<tml:script expression="_image.title"/>"
+						data-image-url="<tml:script expression="_image.url"/>"
+						data-width="<tml:script expression="String(_image.width)"/>"
+						data-height="<tml:script expression="String(_image.height)"/>"
+						style="max-width:<tml:script expression="String(_image.width)"/>px !important;
+							max-height:<tml:script expression="String(_image.height)"/>px !important"
+					>
+				</div>
+			</tml:foreach>
+		</div>
+	</tml:foreach>	
+</div>
+
+<tml:[script]>
+	require(["jquery", "<tml:url type="tml" name="::js" u_noext=""/>"], function(){
+		$("#album-<tml:option name="ns"/>").imageAlbum();
+	});
+	<tml:case condition="CMM.setting('lightbox')">
+		require(["jquery", "jquery-lightbox"], function(){
+			$(function(){
+				$("#album-<tml:option name="ns"/>").find("img").lightbox({
+					group: "<tml:option name="ns"/>",
+					download: <tml:script expression="CMM.setting('download')"/>
+				})
+			})
+		})
+	</tml:case>
+</tml:[script]>
+

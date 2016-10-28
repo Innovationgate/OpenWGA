@@ -94,97 +94,93 @@
 		
 	var optional_config_options_map = createlookuptable();
 
-	if(tmlform.getMode()=="edit"){
-		
-		/*
-		 * Loop through all options and
-		 *	- check dependent options. ignore them if dependent is not in config bean
-		 * 	- add required options to config bean
-		 *	- add other (optional) options to "optional_config_options" if not in config bean.
-		 * Because of dependent checks this loop must be repeated if config bean has been changed (new dependent options may be valid now) 
-		 */
-		var existing_config_changed;
-		do{
-			var existing_config_changed = false;	
-			var it = config_options.iterator();
-			while(it.hasNext()){
-				var opt = it.next();
-				
-				//log.info("option " + opt.name);
-				
-				// check depentents
-				if(!opt.dependentOptions.isEmpty()){
-					var ignoreOption=false
-					var depOpts =opt.dependentOptions.iterator();
-					while(depOpts.hasNext()){
-						var depOpt = depOpts.next(); 
-						if(!_config_bean_options.containsKey(depOpt.name)){
-							// dependent option not in config:
-							// ignore this and remove it if in config
+	/*
+	 * Loop through all options and
+	 *	- check dependent options. ignore them if dependent is not in config bean
+	 * 	- add required options to config bean
+	 *	- add other (optional) options to "optional_config_options" if not in config bean.
+	 * Because of dependent checks this loop must be repeated if config bean has been changed (new dependent options may be valid now) 
+	 */
+	var existing_config_changed;
+	do{
+		var existing_config_changed = false;	
+		var it = config_options.iterator();
+		while(it.hasNext()){
+			var opt = it.next();
+			
+			//log.info("option " + opt.name);
+			
+			// check depentents
+			if(!opt.dependentOptions.isEmpty()){
+				var ignoreOption=false
+				var depOpts =opt.dependentOptions.iterator();
+				while(depOpts.hasNext()){
+					var depOpt = depOpts.next(); 
+					if(!_config_bean_options.containsKey(depOpt.name)){
+						// dependent option not in config:
+						// ignore this and remove it if in config
+						ignoreOption=true;
+						if(_config_bean_options.containsKey(opt.name)){
+							_config_bean_options.remove(opt.name);
+							existing_config_changed = true;
+							_resortOptions = true;
+						}
+						break;
+					}
+					else if(depOpt.neededValue!=null){
+						// also check correct option value
+						var fieldname = option('ns') + "/" + depOpt.name
+						val = tmlform.field(fieldname);
+						if(val==null)
+							val = _config_bean_options.get(depOpt.name)
+						
+						//log.info("option " + opt.name + " depends on " + depOpt.name + " with value " + val);
+						//log.info("needs value: " + depOpt.neededValue);
+						if(val.toString() != depOpt.neededValue){
 							ignoreOption=true;
 							if(_config_bean_options.containsKey(opt.name)){
 								_config_bean_options.remove(opt.name);
 								existing_config_changed = true;
 								_resortOptions = true;
 							}
+							//log.info("option ignored bc. of wrong value");
 							break;
 						}
-						else if(depOpt.neededValue!=null){
-							// also check correct option value
-							var fieldname = option('ns') + "/" + depOpt.name
-							val = tmlform.field(fieldname);
-							if(val==null)
-								val = _config_bean_options.get(depOpt.name)
-							
-							//log.info("option " + opt.name + " depends on " + depOpt.name + " with value " + val);
-							//log.info("needs value: " + depOpt.neededValue);
-							if(val.toString() != depOpt.neededValue){
-								ignoreOption=true;
-								if(_config_bean_options.containsKey(opt.name)){
-									_config_bean_options.remove(opt.name);
-									existing_config_changed = true;
-									_resortOptions = true;
-								}
-								//log.info("option ignored bc. of wrong value");
-								break;
-							}
-						}
-					}
-					if(ignoreOption)
-						continue;
-				}
-				
-				// On path option defs we must test if they are contained in the currently allowed path options.
-				// If not we ignore them.				
-				if (opt.hasFlag("PathOption")) {
-					var pathOptions = option("pathOptions");
-					if (!pathOptions || !pathOptions.contains(opt.name)) {
-						if(_config_bean_options.containsKey(opt.name)){
-							_config_bean_options.remove(opt.name);
-							existing_config_changed = true;
-							_resortOptions = true;
-							break;
-						}
-						continue;
 					}
 				}
-				
-				if(_config_bean_options.containsKey(opt.name))
-					continue;	// we have this already
-				
-				if(!opt.isOptional() && (option("no-required")==null || !opt.dependentOptions.isEmpty())){
-					_config_bean_options.put(opt.name, opt.defaultValue);
-					existing_config_changed = true;
-					_resortOptions = true;
-				}
-				else if(opt.isExpert() && !DBM.isExpertMode())
+				if(ignoreOption)
 					continue;
-				else optional_config_options_map.put(opt.name, opt);
-			}	
-		} while(existing_config_changed)
+			}
+			
+			// On path option defs we must test if they are contained in the currently allowed path options.
+			// If not we ignore them.				
+			if (opt.hasFlag("PathOption")) {
+				var pathOptions = option("pathOptions");
+				if (!pathOptions || !pathOptions.contains(opt.name)) {
+					if(_config_bean_options.containsKey(opt.name)){
+						_config_bean_options.remove(opt.name);
+						existing_config_changed = true;
+						_resortOptions = true;
+						break;
+					}
+					continue;
+				}
+			}
+			
+			if(_config_bean_options.containsKey(opt.name))
+				continue;	// we have this already
+			
+			if(!opt.isOptional() && (option("no-required")==null || !opt.dependentOptions.isEmpty())){
+				_config_bean_options.put(opt.name, opt.defaultValue);
+				existing_config_changed = true;
+				_resortOptions = true;
+			}
+			else if(opt.isExpert() && !DBM.isExpertMode())
+				continue;
+			else optional_config_options_map.put(opt.name, opt);
+		}	
+	} while(existing_config_changed)
 
-	}
-		
 	if (_resortOptions && option("module-definition")) {
 		option("module-definition").getOptionDefinitions().sort(_config_bean_options);		
 	}

@@ -1,0 +1,19 @@
+<tml:include ref="system:include-child-modules">
+	<tml:option name="margins" expression="true" scope="local"/>
+</tml:include>
+
+<tml:case condition="STATUS==content().STATUS_DRAFT">
+	<script>
+		if(window.name=="wga-contentmanager-iframe"){
+			window.parent.BI.sitepanel.initItemEditors();
+		}
+	</script>
+</tml:case>
+
+<script>
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "overlay-closed", function(ev){	
+		//console.log("overlay closed", ev, "me: <tml:[setting] o_name="id"/>", ev.params.id=="<tml:[setting] o_name="id"/>");
+		if(ev.params.id=="<tml:[setting] o_name="id"/>")
+			WGA.ajax.callAction('<tml:action ref="$refresh" portletmode="view" />', '<tml:script expression="portlet.portletkey"/>')
+	})	
+</script>

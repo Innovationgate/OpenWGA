@@ -1,0 +1,43 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:[script] if="$mc.hasCss() & !_cmm_style_included">
+	<tml:include if="$mc.hasIncludeCss" medium="stylesheets" ref="module-css" o_tml="{$mc.mod_config.includes.css}" o_designdb="{$mc.mod_config.designdb}" var="_css"/>
+	require(["<tml:url type="js" name="cmm"/>"], function(CMM){
+		CMM.createStyle("<tml:item name="$mc.getCssCode" a-css="_css" encode="none"/>", "<tml:item name="$mc.mod_config.id"/>");
+	})
+</tml:[script]>
+
+<tml:{div} if="$mc.tml" wrapif="!$option_raw"
+	html_class="[module module-{$mc.module_id} {option('module-class')}]"
+	html_style="{option('module-style')}"
+	html_id="[module-{$mc.id}]"
+	trim="true"
+>
+	<tml:include medium="{$mc.medium}" designdb="{$mc.designdb}" ref="{$mc.tml}" o_ns="{$mc.id}" o_title="{$mc.title}" tmlscope="{$mc.id}" trim="true">
+		<tml:option name="module-config" expression="$mc.mod"/>
+		<tml:option name="child-modules" expression="$mc.mod.selectNodes('mod')"/>
+	</tml:include>
+</tml:{div}>

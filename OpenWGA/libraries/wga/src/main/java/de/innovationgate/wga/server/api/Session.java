@@ -29,6 +29,7 @@ import javax.servlet.http.HttpSession;
 
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGException;
+import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wgpublisher.DBLoginInfo;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGACore.SessionLoginMap;
@@ -40,6 +41,7 @@ import de.innovationgate.wgpublisher.websockets.IndependentWebSocket;
  * This may be a HTTP session or a WebSocket session.
  * If no end-user session is available on the environment no data is returned.
  */
+@CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
 public class Session {
     
     /**

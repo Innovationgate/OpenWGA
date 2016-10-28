@@ -1,0 +1,73 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+
+<tml:script>
+	_dbkeys_options = createlist()
+	var ctx = context("db:"+WGA.design().db().getDbReference()+"/name:cm_survey", false)
+	if(ctx)
+		_dbkeys_options = ctx.itemlist("dbkeys");
+</tml:script>
+
+<tml:if condition="_dbkeys_options.size()">
+	<tml:then>
+		<label><tml:label key="survey.settings.database"/>:</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:dbkey}" type="select" optionsitem="_dbkeys_options" mode="{option:mode}"/>
+		</div>
+	</tml:then>
+	<tml:else>
+		<tml:script>
+			tmlform.setfield(WGA.scoped("dbkey"), "");
+		</tml:script>
+	</tml:else>
+</tml:if>
+
+<label><tml:label key="survey.settings.id"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:id}" type="text" cssstyle="width:100%" mode="{option('mode')}"/>
+</div>
+
+<label><tml:label key="survey.settings.question"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:question}" type="text" cssstyle="width:100%" mode="{option('mode')}"/>
+</div>
+
+<label><tml:label key="survey.settings.answers"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:answers}" multiple="true" type="textarea" cssstyle="width:100%" mode="{option('mode')}"/>
+</div>
+
+<label><tml:label key="survey.settings.multiple-answers"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:multiple}" type="boolean" mode="{option('mode')}"/>
+</div>
+
+<label><tml:label key="form.settings.submit-button-text"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:submit-button-text}" cssstyle="width:100%" mode="{option('mode')}"
+		default="{label('form.settings.submit-button-text.default')}"
+	/>
+</div>

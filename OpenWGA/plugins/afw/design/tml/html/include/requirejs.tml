@@ -1,0 +1,7 @@
+<script src="<tml:url type="js" name="amd:require"/>"></script>
+<script src="<tml:url type="js" name="amd:require-config"/>"></script>
+<script>
+	require.config({
+		baseUrl: "<tml:meta type="request" name="wgaurl"/>/<tml:metadata name="dbkey" type="database" context="main"/>/js"
+	})
+</script>

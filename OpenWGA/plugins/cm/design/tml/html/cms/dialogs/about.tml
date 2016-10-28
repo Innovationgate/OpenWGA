@@ -25,6 +25,7 @@
 <script>
 	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", BI.dialog.autoHeight);
 	BI.dialog.submitButton.hide();
+	BI.dialog.setTitle("<tml:label key="about" param1="{WGA.Brand.getName()}"/>");
 </script>
 
 <div class="about">

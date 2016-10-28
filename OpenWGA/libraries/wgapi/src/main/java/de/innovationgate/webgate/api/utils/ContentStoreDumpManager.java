@@ -84,6 +84,8 @@ public class ContentStoreDumpManager {
     
     private boolean _includeSystemAreas = false;
     
+    private boolean _includeArchivedContents = true;
+
     /**
      * Construtor
      * @param from The source database
@@ -112,6 +114,9 @@ public class ContentStoreDumpManager {
         _log.info("Content Store Dump Transport starting");
         _log.info("Source database: " + _from.getDbReference());
         _log.info("Target database: " + _to.getDbReference());
+        _log.info("include ACL: " + _includeACL);
+        _log.info("include archived: " + _includeArchivedContents);
+        _log.info("include system areas: " + _includeSystemAreas);
         
         if (!_to.hasFeature(WGDatabase.FEATURE_FULLCONTENTFEATURES)) {
             _log.warn("Target database is no full-featured WGA Content Store. This is not supported and transport might fail.");
@@ -516,7 +521,7 @@ public class ContentStoreDumpManager {
         incTargetDocCounter();
 
         // Clone contents of entry
-        Iterator contents = rootEntry.getAllContent(true).iterator();
+        Iterator contents = rootEntry.getAllContent(_includeArchivedContents).iterator();
         WGContent content;
         WGContent contentClone;
         while (contents.hasNext()) {
@@ -562,11 +567,13 @@ public class ContentStoreDumpManager {
 
     }
 
-    private boolean transport(boolean isImport, boolean includeACL, boolean includeSystemAreas) throws WGAPIException {
+    private boolean transport(boolean isImport, boolean includeACL, boolean includeSystemAreas, boolean includeArchived) throws WGAPIException {
         
         _import = isImport;
         _includeACL = includeACL;
         _includeSystemAreas = includeSystemAreas;
+        _includeArchivedContents = includeArchived;
+        
         boolean fromCaching = _from.getSessionContext().isCachingEnabled();
         boolean toCaching = _to.getSessionContext().isCachingEnabled();
         boolean toEvents = _to.getSessionContext().isEventsEnabled();
@@ -607,7 +614,7 @@ public class ContentStoreDumpManager {
      * @throws WGAPIException
      */
     public boolean importDump(boolean includeACL, boolean includeSystemAreas) throws WGAPIException {
-        return transport(true, includeACL, includeSystemAreas);
+        return transport(true, includeACL, includeSystemAreas, true);
     }
     
     /**
@@ -636,18 +643,19 @@ public class ContentStoreDumpManager {
      * @throws WGAPIException
      */
     public boolean exportDump(boolean includeACL) throws WGAPIException {
-        return exportDump(includeACL, false);
+        return exportDump(includeACL, false, true);
     }
     
     /**
      * Exports an OpenWGA content store dump from a content store. Database "from" must be the content store and "to" the soon-to-be dump database.
      * @param includeACL should the ACL of the source be included in the dump or not
      * @param includeSystemAreas should system areas be included in the dump or not
+     * @param includeArchived
      * @return true if the dump succeeeded, false if it was canceled
      * @throws WGAPIException
      */
-    public boolean exportDump(boolean includeACL, boolean includeSystemAreas) throws WGAPIException {
-        return transport(false, includeACL, includeSystemAreas);
+    public boolean exportDump(boolean includeACL, boolean includeSystemAreas, boolean includeArchived) throws WGAPIException {
+        return transport(false, includeACL, includeSystemAreas, includeArchived);
     }
 
     private void setToSessionProps() {

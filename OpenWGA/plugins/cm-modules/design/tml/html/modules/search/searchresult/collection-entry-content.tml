@@ -1,0 +1,46 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<div class="entry">
+	<h1 class="headline">
+		<a href="<tml:url/>?highlight=true" data-wgakey="<tml:metadata name="key"/>"><tml:meta name="title"/></a>
+	</h1>
+	<tml:case hasoptions="body">
+		<div class="body">
+			<tml:option name="body"/>
+		</div>
+	</tml:case>
+	<tml:case isroot="false">
+		<div class="path">
+			<tml:navigator type="path"> &rsaquo; <tml:link html_data-wgakey="{KEY}"/></tml:navigator>
+		</div>
+	</tml:case>
+	<tml:case if="$option_showmetas">
+		<div class="metas">
+			<div class="published"><tml:label key="search.published"/>: <tml:metadata name="published" format="{label('format.date.long-with-time')}"/></div>
+			<div class="author"><tml:label key="search.author"/>: <tml:metadata name="author"/></div>
+			<div class="relevance"><tml:label key="search.relevance"/>: <tml:script expression="Searchscore*100" format="0"/>%</div>
+		</div>
+	</tml:case>
+</div>			

@@ -161,7 +161,7 @@
 						<tml:input name="filename" cssstyle="width:100%" default="{_name}"/><br><br>
 							
 						<b><tml:label key="image-format"/>:</b><br>
-						<tml:input type="select" name="suffix" default="jpg" options="jpg|0,png|1" default="{_filesuffix == 'png' ? '1' : '0'}"/>
+						<tml:input type="select" name="suffix" options="jpg|0,png|1" default="{_filesuffix == 'png' ? '1' : '0'}"/>
 								
 					</div>
 				</div>

@@ -1,0 +1,119 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+.module .news-collection .news{
+	clear: both;
+	border-bottom: dotted silver 1px;
+	padding-bottom: 5px;
+}
+.module .news-collection .news.last{
+	border-bottom: none 1px;
+}
+
+.module .news-collection h1{
+	margin-bottom: 5px;
+}
+
+.module .news-collection .date{
+	margin: 5px 0;
+}
+
+.module .news-collection .date-elements{
+	display: none;
+}
+
+.module .news-collection .img{
+	float:left;
+	width:30%;
+	overflow: hidden;
+	margin-right: 5px;
+}
+
+.module .news-collection .img a{
+	display: block;
+	padding:1px 5px 5px 1px;
+}
+.module .news-collection .img img,
+.module .caroussel .img img{
+	max-width: 100%;
+	margin: 1px 5px 5px 1px;	
+}
+
+.module .news-collection .body{
+}
+
+.module .news-collection .more{
+	text-align: right;
+	margin-top: 5px;
+}
+
+.module .news-collection .top-news .img{
+	float: none;
+	width: 100%;
+}
+
+.content-modules ul.children{
+	margin:0;
+	padding-left: 17px;
+	list-style-type: square;
+}
+
+.module-cm_children .link-list .headline{
+	font-weight: bold;
+	margin-top: 10px;
+	border-top: dotted silver 1px;
+}
+.module-cm_children .link-list .headline.first-child{
+	border-top: none;
+	margin-top: 0px;
+}
+
+.caroussel{
+	text-align: left;
+	position: relative;	
+}
+.caroussel .more{
+	text-align: right;
+}
+
+
+/* sitemap */
+
+.module-cm_sitemap .sitemap ul{
+	list-style-type: none;
+	margin: 0px 0px 5px 0px;
+	padding: 0px;
+}
+.module-cm_sitemap .sitemap li{
+	padding: 5px;
+	background: none;
+}
+.module-cm_sitemap .sitemap li.level-1, .sitemap li.level-2{
+	border-top: 1px dotted silver;
+}
+
+.module-cm_children .description{
+	margin-bottom: 10px;
+}

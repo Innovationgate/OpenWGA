@@ -1,0 +1,93 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="selectpage" debounce="false">
+	if(portlet.currentpage!=tmlparam1){
+		portlet.setitem('currentpage', this.tmlparam1);
+		portlet.save();	
+	}
+</tml:action>
+
+<tml:script>
+	if (this.option('pages')==null || this.option('pages')=="")
+		return "No Tab Pages";
+	
+	var pages=this.option('pages').split(',');
+	
+	_pages=createlist();
+	for (i=0; i<pages.length; i++)
+		_pages.add(pages[i]);
+	
+	if (portlet.currentpage==null)
+	{
+		portlet.currentpage=1;;
+		portlet.save()
+	}	
+</tml:script>
+
+<div class="tabview">
+<div class="tab_header">
+	<table class="tabs" border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			
+			<tml:foreach type="loop" count="{this.itemList('_pages').size()}" currentvalue="_index" trim="true">
+			
+				<tml:script>
+					var p=this.itemList("_pages").get(this._index-1).split("|");
+					this.setvar("_title", p[0]);
+					this.setvar("_hide", p[1]=="hide");				
+				</tml:script>
+
+				<tml:case condition="!_hide">
+				
+					<tml:if condition="portlet.currentpage==_index">
+						<tml:then>
+							<td class="tab_selected" nowrap>
+						</tml:then>
+						<tml:else>
+							<td nowrap class="tab_normal">
+						</tml:else>
+					</tml:if>
+					
+					<span class="tab_r">
+						<a href="#" onclick="WGA.ajax.callAction('<tml:action ref="selectpage" param1="{this._index}"/>',
+									'<tml:script>return portlet.portletkey</tml:script>')">
+							<tml:item name="_title" encode="none"/>
+						</a>							
+					</span>
+				
+					</td>
+				</tml:case>
+							
+			</tml:foreach>
+			
+			<td class="tab_addon">&nbsp;<tml:option name="pageaddon"/></td>
+			
+		</tr>
+	</table>
+</div>
+
+<div class="tab_body"><tml:option name="body" trim="true"/></div>
+
+</div>

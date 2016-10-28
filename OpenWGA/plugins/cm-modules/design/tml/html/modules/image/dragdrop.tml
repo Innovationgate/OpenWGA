@@ -1,0 +1,125 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="setImage">
+	var filename = request.getParameter("filename")
+	var dbkey = request.getParameter("dbkey")
+	var container = request.getParameter("container")
+
+	var c = context( (dbkey ? "db:"+dbkey+"/" : "") + (container ? "docid:"+container : "this"), false);
+	if(!c){
+		log.info("context not valid");
+		return;
+	}
+	var A = AFW.content(c.content()).attachment(filename);
+	if(!WGA.selectDerivate(c, filename, "usage=poster") && !A.waitingForPoster() && !A.isImage())
+		return;
+
+	var map = CMM.getModulesSettingsMap("document")
+	var module_settings_map = CMM.getModulesSettingsMap(null, option("ns"))
+	map.putAll(module_settings_map);
+
+	map.put(WGA.scoped("image"), filename);
+	map.put(WGA.scoped("image_mo"), "");
+	map.put(WGA.scoped("lightbox_image"), "");
+	map.put(WGA.scoped("dbkey"), dbkey);
+	map.put(WGA.scoped("sourcedoc"), container);
+	map.put(WGA.scoped("source"), (dbkey||container) ? "container" : "");
+	map.put(WGA.scoped("setting_source"), "document");
+
+	CMM.writeContentModulesSettingsData(map);
+
+	content().save();
+</tml:action>
+
+<tml:script>
+	_so=AFW.Util.serializeJsObject({
+		dbkey: meta("database", "dbkey"),
+		contentkey: KEY
+	})
+</tml:script>
+
+<script>
+	require(["jquery", "jquery-wga-drophandler"], function(){
+	
+		$(function(){
+		
+			function onFilesDrop(data){
+				var img = data[0]
+				<tml:case condition="CMM.setting('onclick')=='zoom'">
+					$(this).lightbox({remove:true});
+				</tml:case>
+				if(img){
+					WGA.ajax.action({
+						action: "<tml:action ref="setImage"/>",
+						params: {
+							filename: img.name,
+							dbkey: img.dbkey,
+							container: img.container
+						}
+					})
+				}
+			}
+		
+			function onDesktopDrop(files){
+				var BI = window.parent.BI
+				var el = this;
+				if(!BI)
+					return;	// No Content Manager
+			    var file = files[0];
+				el.src="<tml:url db="plugin-contentmanager" type="file" doc="images" file="ajax-loader-2.gif"/>";
+				<tml:case condition="CMM.setting('onclick')=='zoom'">
+					$(this).lightbox({remove:true});
+				</tml:case>
+				BI.UploadManager.upload(file, {
+					url: "<tml:url db="plugin-contentmanager" type="tml" name="cms:action-panel:attachments:html5-upload-processor"/>",
+					params: {
+						so: "<tml:item name="_so"/>",
+						filename: file.name
+					},
+					callback: function(filename){
+						window.parent.WGA.event.fireEvent("CMS_attachments_changed");
+						WGA.ajax.action({
+							action: "<tml:action ref="setImage"/>",
+							params: {
+								filename: filename
+							}
+						})
+					}
+				})
+			}
+		
+			$("#module-<tml:option name="ns"/> img").wga_drophandler({
+			
+				ops: ["copy"],
+				
+				onDesktopDrop: !window.parent.BI ? false : onDesktopDrop,			
+				onFilesDrop: onFilesDrop
+	
+			})
+	
+		})
+	})
+</script>

@@ -1,0 +1,15 @@
+<label><tml:label key="collections.sitemap-area"/>:</label>
+<div style="margin:10px">
+	<tml:script>
+		_opts = WGA.createList()
+		var areas = db().getAreas().iterator()
+		while(areas.hasNext()){
+			var area = areas.next();
+			if(!area.isSystemArea() && area.getRootEntries().size())
+				_opts.add(area.getName());
+		}
+	</tml:script>
+	<tml:input type="select" name="{scoped:area}"
+			optionsitem="_opts" mode="{option('mode')}"/>
+</div>
+

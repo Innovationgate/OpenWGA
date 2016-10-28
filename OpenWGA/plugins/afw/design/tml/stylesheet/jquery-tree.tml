@@ -1,0 +1,129 @@
+<tml:include medium="jss" ref="toCSS" o_scope=".wga_tree">
+	
+	top: 15,
+	
+	ul: {
+		margin: 0,
+		padding: 0,
+		list_style_type: "none",
+		"li": {
+			margin: 0,
+			padding: 0,
+			line_height: "1.5em",
+			a: {
+				cursor: "pointer",
+				display: "block",
+				color: "inherit",
+				outline: "none",
+				"&:hover, &:focus": {
+					color: "inherit",
+					font: "inherit",
+					text_decoration: "none"
+				}
+			},
+			"&.placeholder": {
+				".entry":{
+					height: 2,
+					a: {
+						background: "red",
+						color: "white",
+						opacity: ".5"
+					}
+				}
+			},
+			"&.drop-add-children > .entry": {
+				color: "red",
+				".icon": {
+					background_:{
+						image: "url('<tml:url type="file" doc="icons" file="add.png"/>')",
+						position: "center center"
+					}
+				}<tml:comment>,
+				".icon": {
+					background_image: "url('<tml:url type="file" doc="icons" file="page_white_stack.png"/>')"
+				}</tml:comment>
+			},
+			
+			"&.dragging": {
+				".entry": {
+					background_color: "red !important",
+					opacity: ".2",
+					color: "white"
+				}
+			},
+			<tml:comment>"&.drag-over": {
+				".entry": {
+					color: "red"
+				}
+			},</tml:comment>
+			"&.loading": {
+				font_style: "italic",
+				opacity: ".5",
+				".icon": {
+					background_image: "url('<tml:url type="file" doc="tree" file="ajax-loader.gif"/>') !important"
+				}
+			},
+			"&.selected > .entry": {
+				background_color: "#efefef"
+			},
+			".entry": {
+				overflow: "hidden",
+				max_height: 100,
+				padding_right: 5,
+				transition: "max-height .3s",
+				a:{
+					overflow: "hidden",
+					text_overflow: "ellipsis",
+					".link-text": {
+						margin_left: 20
+					}
+				}
+			},
+			"&.collapsed": {
+				"> .entry > .twisty": {
+					background_position: "0px center",
+					"&:hover": {
+						background_position: "-32px center",
+					}
+				},
+				"ul .entry": {
+					max_height: 0
+				}
+			}
+		}
+	},
+
+	".twisty, .icon, .indent, .spacer": {
+		float: "left",
+		display: "block",
+		width: 20,
+		background_:{
+			repeat: "no-repeat",
+			position: "0 center"
+		}
+	},
+	
+	".spacer": {
+		width: 16
+	},
+	
+	".twisty": {
+		cursor: "pointer",
+		width: 16,
+		background_image: "url('<tml:url type="file" doc="tree" file="arrows.gif"/>')",
+		background_position: "-16px center",
+		"&:hover": {
+			background_position: "-48px center"
+		}
+	},
+	"li[data-haschildren=false] .twisty": {
+		background_image: "none",
+		cursor: "auto"
+	},
+
+	".icon": {
+		background_image: "url('<tml:url type="file" doc="icons" file="page_white.png"/>')",
+		background_size: 16
+	}
+		
+</tml:include>

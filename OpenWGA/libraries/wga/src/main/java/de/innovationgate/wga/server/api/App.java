@@ -30,6 +30,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGContentType;
@@ -39,8 +41,10 @@ import de.innovationgate.webgate.api.WGUserDetails;
 import de.innovationgate.webgate.api.WGUserProfile;
 import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wga.config.ContentStore;
+import de.innovationgate.wga.server.api.tml.Context;
 import de.innovationgate.wga.server.api.tml.UserProfile;
 import de.innovationgate.wgpublisher.PersonalisationManager;
+import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGAServerException;
 import de.innovationgate.wgpublisher.WGPDispatcher;
 import de.innovationgate.wgpublisher.api.Unlocker;
@@ -52,6 +56,7 @@ import de.innovationgate.wgpublisher.expressions.ExpressionEngineFactory;
 import de.innovationgate.wgpublisher.expressions.tmlscript.ManagedTMLScriptGlobalDefinition;
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptGlobal;
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptObjectMetadata;
+import de.innovationgate.wgpublisher.url.RequestIndependentDefaultURLBuilder;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 import de.innovationgate.wgpublisher.webtml.utils.TMLUserProfile;
 
@@ -170,7 +175,23 @@ public class App extends Database {
         return _wga.server().getBaseURL() + "/" + getDbKey();
     }
     
-
+    public Context getHomepage() throws WGException{
+    	String homepageName = (String)getPublisherOption(WGACore.DBATTRIB_HOME_PAGE_NAME);
+    	if(homepageName!=null){
+    		return createTMLContext().context("name:"+homepageName, false);
+    	}
+    	return null;
+    }
+    
+    public String getHomepageURL() throws WGException{
+    	HttpServletRequest request = _wga.getRequest();
+    	if(request!=null){
+	    	RequestIndependentDefaultURLBuilder builder = new RequestIndependentDefaultURLBuilder();
+	    	builder.newIndependentInstance(_wga.getCore());
+	    	return builder.buildHomepageURL(db(), request);
+    	}
+    	return null;
+    }
     
     public ApplicationEventBuilder createEvent(List<? extends Object> qualifiers) throws WGException {
         ApplicationEventPath eventPath = new ApplicationEventPath(getDbKey(), ApplicationEventPath.parseQualifiers(qualifiers));

@@ -25,9 +25,12 @@
 
 package de.innovationgate.wga.server.api;
 
+import de.innovationgate.wga.common.CodeCompletion;
+
 /**
  * Represents an HTTP cookie
  */
+@CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
 public class Cookie {
 
     private String _name;

@@ -1,0 +1,40 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<link rel="stylesheet" type="text/css" href="<tml:url type="file" doc="ext" file="ext-1.1.1/resources/css/core.css"/>">
+
+<!-- Select stylesheets to include via option "additional" -->
+<tml:case condition="option('additional')!=null">
+	<tml:script var="stylesheets" expression="Packages.de.innovationgate.utils.WGUtils.deserializeCollection(option('additional'), ',', true)"/>
+	<tml:foreach type="itemvalue" item="stylesheets" currentvalue="stylesheet">
+		<link rel="stylesheet" type="text/css" href="<tml:url type="file" doc="ext" file="{'ext-1.1.1/resources/css/' + stylesheet + '.css'}"/>">
+	</tml:foreach>
+</tml:case>
+
+
+<tml:case condition="option('theme')!=null">
+	<link rel="stylesheet" type="text/css" href="<tml:url type="file" doc="ext" file="{'ext-1.1.1/resources/css/xtheme-'+option('theme')+'.css'}"/>">
+</tml:case>
+
+<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="afw-ext"/>">

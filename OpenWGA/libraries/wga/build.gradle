@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'maven-publish'
 
-compileJava.options.encoding = 'ISO-8859-1'
+compileJava.options.encoding = 'UTF-8'
 
 dependencies {
     compile project(":wgapi");

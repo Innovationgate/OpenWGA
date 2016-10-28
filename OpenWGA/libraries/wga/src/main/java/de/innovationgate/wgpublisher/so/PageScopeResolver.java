@@ -51,7 +51,9 @@ public class PageScopeResolver implements ScopeResolver {
     public ScopeObjectRegistry resolveObjectRegistry(WGA wga, DesignResourceReference ref) throws WGException {
         TMLPageImpl page = (TMLPageImpl) Unlocker.unlock(wga).tmlPage();
         if (page != null && page.isAvailable()) {
-            return page.getOrCreatePageConnection().getScopeObjectRegistry();
+             PageConnection c = page.getOrCreatePageConnection();
+             if(c!=null)
+            	 return	c.getScopeObjectRegistry();
         }
         
         if (wga.session().isWebSocketSessionAvailable()) {

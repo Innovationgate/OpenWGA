@@ -145,6 +145,7 @@
 		
 			<tml:elseif condition="_config_option.getOptionType() instanceof Packages.de.innovationgate.wga.modules.options.BooleanOptionType">
 				<tml:input name="{_fieldname}" type="boolean" mode="{_mode}" validation="DBM.tmlform.validateOption()"/>
+				<tml:input name="[{_fieldname}$hidden]" type="hidden" mode="{_mode}"/>
 				<tml:include ref="system:convert-to-ext-field" o_fieldname="{_fieldname}" o_type="boolean" o_changeaction="$refresh"/>					
 			</tml:elseif>
 				

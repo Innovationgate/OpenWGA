@@ -395,8 +395,8 @@ public abstract class MailBase implements WGMail {
 
     /**
      * sets the given from address and from name
-     * @param _from e.g. john@example.com	
-     * @param fromName e.g. John Müller
+     * @param address e.g. john@example.com	
+     * @param name e.g. John Mueller
      * @throws UnsupportedEncodingException 
      */
     @CodeCompletion
