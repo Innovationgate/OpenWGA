@@ -64,7 +64,7 @@ public abstract class WGABrand {
     }
 
     public static String getName() {
-        return BRAND.getProperty("brand.name") + BRAND.getProperty("brand.trademark.sign");
+        return BRAND.getProperty("brand.name");
     }
     
     public static String getProduct() {

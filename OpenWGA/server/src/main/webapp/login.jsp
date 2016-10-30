@@ -99,6 +99,9 @@
 		body *{
 			font: 16px helvetica;
 		}
+		img{
+			max-width: 100%;
+		}
 		#content{
 			text-align: left;
 			margin:100px auto 0 auto; 
@@ -147,15 +150,15 @@
 			line-height: 32px;
 		}
 		form input{
-			width: 377px;
-			*width: 355px;
+			width: 100%;
 			border: solid gray 1px;
 			padding: 4px;
-			*height: 28px;
 		}
 		form button{
-			margin-top: 10px;		
-		}
+			border: 1px solid gray;
+    		margin-top: 20px;
+    		padding: 5px 20px;
+   		}
 		
 		#error{
 			display: <%= errorMsg != null ? "block" : "none" %>;
@@ -183,7 +186,7 @@
 
 	<div id="content">
 		<div align="center">
-			<img src="<%= request.getContextPath() %>/static/images/brand/logo_login.png">
+			<img src="<%= request.getContextPath() %>/static/images/brand/logo_600.png">
 		</div>
 		
 		<form method="post" action="login" onsubmit="document.getElementById('error').style.display='none';document.getElementById('submit-button').innerHTML='processing login request ...'" accept-charset="<%= jspHelper.getCore().getCharacterEncoding() %>">
