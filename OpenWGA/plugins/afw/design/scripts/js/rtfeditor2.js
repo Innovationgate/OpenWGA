@@ -1311,8 +1311,7 @@ AFW.RTF.editor=function(id, config){
 		imgTag.removeAttribute("width");
 		imgTag.removeAttribute("height");
 		imgTag.title="";
-		imgTag.alt = WGA.util.decodeURI(imgTag.src.split("/").pop());
-		imgTag.border=0;
+		imgTag.alt = WGA.util.decodeURI(imgTag.src.split("/").pop().split("?")[0]);
 		
 		if(urltype){
 			var c = imgTag.className;
