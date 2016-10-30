@@ -94,7 +94,7 @@
 
 				<tml:include ref="::toolbar-top"/>
 							
-				<tml:case condition="AFW.request().HTML5DragDropSupported && STATUS==content().STATUS_DRAFT">
+				<tml:case condition="AFW.request().HTML5DragDropSupported && _mode=='edit'">
 					// Drop handler from other image panels:
 					Ext.get("form-attachments").on({
 						dragover: function(e){
