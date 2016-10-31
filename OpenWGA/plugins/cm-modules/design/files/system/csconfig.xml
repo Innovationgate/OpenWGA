@@ -28,6 +28,10 @@
       <name>DefaultItemEncoding</name>
       <value>html</value>
     </de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+    <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+      <name>FileExpirationMinutes</name>
+      <value>10080</value>
+    </de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
   </publisherOptions>
   <encoderMappings/>
   <elementMappings/>
