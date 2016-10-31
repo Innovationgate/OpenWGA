@@ -101,6 +101,7 @@
 		}
 		img{
 			max-width: 100%;
+			max-height: 100px;
 		}
 		#content{
 			text-align: left;
