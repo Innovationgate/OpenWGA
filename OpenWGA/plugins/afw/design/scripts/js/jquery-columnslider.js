@@ -186,7 +186,7 @@
 					window.clearInterval(timer);
 			}
 			startTimer();
-			$cols.on("click", stopTimer); 
+			$cols.on("click touchstart", stopTimer); 
 		}
 
 		function effect_fade(new_left){
