@@ -296,7 +296,8 @@ this.getPreferedLanguageTitle=function(){
 }
 
 this.setPreferedLanguage=function(lang){
-	request.getSession().setAttribute("PreferredLanguage", lang);	
+	var lang_attr_name = "AFW."+this.getKey()+".PreferredLanguage";
+	request.getSession().setAttribute(lang_attr_name, lang);	
 }
 
 this.getLanguageOptions=function(all){

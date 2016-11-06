@@ -28,7 +28,6 @@ package de.innovationgate.contentmanager.modules;
 import javax.servlet.ServletRequest;
 
 import de.innovationgate.utils.WGUtils;
-import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGStructEntry;
@@ -50,6 +49,10 @@ public class CMHtmlHeadInclusion implements HTMLHeadInclusion {
             	content = context.content();
         		structentry = content.getStructEntry();
 
+                String dbkey = content.getDatabase().getDbReference();
+                String prefLanguage = content.getLanguage().getName();
+                context.getEnvironment().getPageContext().getSession().setAttribute("AFW."+dbkey+".PreferredLanguage", prefLanguage);
+        		
         		ServletRequest request = context.getEnvironment().getPageContext().getRequest();
         		if(request.getParameter("$clean")!=null 
         				|| (content.hasCompleteRelationships() && content.getStructEntry().getArea().getName().equals("$trash"))
