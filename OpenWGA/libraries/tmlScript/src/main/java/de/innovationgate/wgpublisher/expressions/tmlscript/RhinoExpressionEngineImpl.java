@@ -1366,8 +1366,8 @@ public class RhinoExpressionEngineImpl implements ExpressionEngine, RhinoExpress
             case V2_ISOLATED:
                 return new TMLScriptIsolatedParentScope(objectDefinition, getSharedScope());
             
-            case V2:
-                return new TMLScriptModernObjectParentScope(objectDefinition, getSharedScope());
+//            case V2:
+//                return new TMLScriptModernObjectParentScope(objectDefinition, getSharedScope());
                 
             default:
                 return new TMLScriptLegacyObjectParentScope(_core, objectDefinition, objectDefinition.getModuleDatabase(), false);
