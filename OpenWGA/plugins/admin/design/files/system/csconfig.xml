@@ -63,7 +63,7 @@
     </minimumWGAVersion>
     <minimumJavaVersion>
       <majorVersion>1</majorVersion>
-      <minorVersion>6</minorVersion>
+      <minorVersion>7</minorVersion>
       <maintenanceVersion>0</maintenanceVersion>
       <patchVersion>0</patchVersion>
       <buildVersion>0</buildVersion>
@@ -101,7 +101,7 @@
         </version>
       </de.innovationgate.wga.common.beans.csconfig.v1.PluginID>
     </dependencies>
-    <personalisationMode>4</personalisationMode>
+    <personalisationMode>1</personalisationMode>
     <usageAsDesignProvider>false</usageAsDesignProvider>
     <usageAsAuthSource>false</usageAsAuthSource>
     <usageAsContentStore>true</usageAsContentStore>
