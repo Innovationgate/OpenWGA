@@ -189,7 +189,7 @@ public class WGPRequestPath {
         URL redirectURL = enforceRedirectionRules(database, currentURL);                                    
         
         // currentURL differs from redirectURL - redirect necessary
-        if (redirectURL != null) {
+        if (redirectURL != null && !dispatcher.isBrowserInterface(request.getSession())) {
             pathType = TYPE_REDIRECT;
             resourcePath = redirectURL.toString();
             return;
@@ -988,11 +988,9 @@ public class WGPRequestPath {
      */
     private URL enforceRedirectionRules(WGDatabase db, URL currentURL) throws MalformedURLException {
         
-        
         String redirectProtocol = (String) db.getAttribute(WGACore.DBATTRIB_REDIRECTPROTOCOL);
         String redirectHost = (String) db.getAttribute(WGACore.DBATTRIB_REDIRECTHOST);
         String redirectPort = (String) db.getAttribute(WGACore.DBATTRIB_REDIRECTPORT);
-        
         
         if (redirectProtocol == null && redirectHost == null && redirectPort == null) {
             // no redirect configured
