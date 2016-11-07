@@ -83,7 +83,7 @@
 		<tml:script>
 			_dbs = DBM.wgaconfig.getDatabases(option("dbserver"), _domain.uid, option("dbtype"))
 			_dbs = sortList(_dbs, function(a,b){
-				return Number(a.key > b.key)
+				return a.key > b.key ? 1 : -1
 			})			
 		</tml:script>
 		

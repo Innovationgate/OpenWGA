@@ -26,12 +26,13 @@
 	_jobs = WGA.createList();
 	_jobs.addAll(DBM.jobs().getAll());
 	_jobs = WGA.sortList(_jobs, function(a,b){
-	
 		var sortA = (a.config ? 1 : a.transient ? 2 : 3);
 		var sortB = (b.config ? 1 : b.transient ? 2 : 3);
-		return (sortA - sortB);
 		
-	
+		if(sortA==sortB)
+			return a.name < b.name ? -1 : 1;
+		
+		return sortA < sortB ? -1 : 1;
 	})
 </tml:script>
 

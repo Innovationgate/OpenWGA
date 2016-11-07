@@ -86,8 +86,8 @@
 		<tml:script>
 			_dbs = DBM.wgaconfig.getDatabases(option("dbserver"), _domain.uid, option("dbtype"), option("ignore-disabled-servers"))
 			_dbs = sortList(_dbs, function(a,b){
-				return Number(a.key > b.key)
-			})
+				return a.key > b.key ? 1 : -1
+			})			
 		</tml:script>
 		
 		<tml:if condition="_dbs.isEmpty()">
