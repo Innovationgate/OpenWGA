@@ -26,12 +26,27 @@
 	_contentkey=request.getParameter("contentkey");
 	_structkey=request.getParameter("structkey");
 	_dbkey=request.getParameter("dbkey");
-	_u=request.getParameter("u");
 </tml:script>
 
 <tml:range context="{'db:'+_dbkey+'/docid:'+_contentkey}">
 	<html>
 		<head>
+			<style>
+				body{
+					padding: 0;
+					margin: 0;
+					font-family: sans-serif;
+				}
+				.info{
+					padding: 0 10px; 
+					margin: 0px; 
+					height: 39px; 
+					border-bottom: 1px solid silver; 
+					line-height: 43px;
+					font-size: 14px;
+					background: #efefef;
+				}
+			</style>
 			<script>
 				WGA={};
 				WGA.contentinfo={
@@ -68,7 +83,7 @@
 						var el=iframe;
 						for(var tmp=el; tmp; tmp=tmp.offsetParent)
 						    h -= tmp.offsetTop;		    
-						h-=15;
+						//h-=20;
 						if(el.height!=h)
 							el.height=h;
 					}	
@@ -84,9 +99,14 @@
 		</head>
 		
 		<body onload="init()">
-			<p>
+			<p class="info">
 				<b>{%label:virtual-document%}:</b>
-				<a href="<tml:script>return contenturl("html", null)</tml:script>"><tml:script expression="virtuallinktitle||contenturl('html', null)"/></a>
+				<a href="<tml:script>return contenturl("html", null)</tml:script>">
+					<tml:if context="vlinktarget" iscontextvalid="true">
+						<tml:then><tml:metadata name="title"/></tml:then>
+						<tml:else><tml:script expression="contenturl('html', null)"/></tml:else>
+					</tml:if>
+				</a>
 			</p>
 			
 			<tml:comment>
@@ -99,11 +119,9 @@
 			Link to: <tml:meta name="virtuallink"/> / <tml:meta name="virtuallinktype"/>
 			<br>
 			URL: <tml:script>return contenturl("html", null)</tml:script>
-			<br>
-			u: <tml:item name="_u"/>
 			</tml:comment>
 			
-			<iframe width="100%" height="500" src="<tml:script>return contenturl("html", null)</tml:script>"></iframe>
+			<iframe width="100%" height="500" style="border:solid silver 0px" src="<tml:script>return contenturl("html", null)</tml:script>"></iframe>
 			
 		</body>
 	</html>
