@@ -577,6 +577,8 @@ public class WGContentNavigator {
 	 * @throws WGAPIException 
 	 */
 	public Integer getContentLevel(WGContent relContent) throws WGAPIException {
+		if(relContent.isDummy())
+			return 0;
 	    return relContent.getStructEntry().getLevel();
 	}
 	
