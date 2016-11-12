@@ -144,6 +144,10 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                 uri = uri.substring(0, semiPos);
             }
 
+            if (uri.equalsIgnoreCase("/robots.txt") && findVirtualResource(vHost, "robots.txt")==null){
+            	response.getWriter().print(vHost.getRobotsTxt());
+            	return;
+            }
             if (uri.equalsIgnoreCase("/login") && httpRequest.getMethod().equalsIgnoreCase("post")) {
                 // skip post to login url - for this filter
             }

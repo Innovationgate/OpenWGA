@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Element;
 import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
@@ -74,6 +75,9 @@ public class VirtualHost extends IdentifiableConfigBean {
     @Attribute (required=false)
     private boolean hideHomepageURL = false;
 
+    @Element(required=false)
+    private String robots_txt = "User-agent: *\nDisallow: /plugin-*";
+    
     public VirtualHost() {
         super();
     }
@@ -147,6 +151,13 @@ public class VirtualHost extends IdentifiableConfigBean {
 
     public void setHideHomepageURL(boolean proxyDefaultDatabaseInURL) {
         this.hideHomepageURL = proxyDefaultDatabaseInURL;
+    }
+
+    public String getRobotsTxt(){
+    	return robots_txt;
+    }
+    public void setRobotsTxt(String text){
+    	this.robots_txt = text;
     }
 
 }
