@@ -331,7 +331,7 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
      */
     public void reinitModel() {
         
-        if (!_core.isRunSingleNodeFunctionalities()) {
+        if (!_core.isRunSingleNodeFunctionalities() && _core.isClusteredDatabase(_db)) {
             throw new IllegalStateException("Model reinitialisation in a cluster can only run on the master node");
         }
         
