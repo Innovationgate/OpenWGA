@@ -281,9 +281,9 @@ public class Image extends Base implements DynamicAttributes {
             if( attribEdit != null && attribEdit.equals(this.getTMLContext().getcontent().getContentKey().toString()) && item != null){
                 String theLabel = getLabel();
                 StringBuffer prefix = createItemEditorDeclaration(item, "image", theLabel);
-                prefix.append("<span class=\"WGA-Item-Value\" id=\"item_"+ item +"\">");
+                prefix.append("<div class=\"WGA-Item-Value\" id=\"item_"+ item +"\">");
                 setPrefix(prefix.toString());
-                setSuffix("</span>\n</span>");
+                setSuffix("</div>\n</div>");
                 
                 if (imageHTML == null) {
                     imageHTML = "";
