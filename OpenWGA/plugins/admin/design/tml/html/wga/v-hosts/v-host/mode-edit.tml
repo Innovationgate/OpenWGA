@@ -16,12 +16,12 @@
 
 		host.allowedDatabases.clear();
 		if(tmlform.allowedDbsOption=="all")
-			host.allowedDatabases = createlist(["$all"]);
+			host.allowedDatabases = WGA.createList(["$all"]);
 		else if(tmlform.allowedDbsOption=="select")
 			host.allowedDatabases.addAll(tmlform.fieldlist("allowedDatabases"));		
 		else if(tmlform.allowedDbsOption=="none")
 			host.defaultDatabase="";
-						
+
 		host.virtualResources.clear();
 		host.virtualResources.addAll(vr);
 

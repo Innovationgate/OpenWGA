@@ -100,9 +100,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 
     private static final List<String> BLACK_LIST = new ArrayList<String>();
     static {
-        BLACK_LIST.add("/plugin-*");
         BLACK_LIST.add("/ajaxform*");
-        BLACK_LIST.add("/contentmanager");
         BLACK_LIST.add("/tempdwn*");
         BLACK_LIST.add("/services");
         BLACK_LIST.add("/webdav/*");
@@ -203,8 +201,8 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                             return;
                         }
 
-                        // we have to check if requestedDBKey is a valid content
-                        // database - if not we use defaultDatabase
+                        // we have to check if requestedDBKey is a valid content database
+                        // - if not we use defaultDatabase
                         if (!_core.getContentdbs().containsKey(requestedDBKey.toLowerCase())) {
                             requestedDBKey = defaultDBKey;
                             httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
@@ -212,11 +210,16 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 
                     }
                     if (!requestedDBKey.equalsIgnoreCase("login") && !httpRequest.getMethod().equalsIgnoreCase("post")) {
-                        if (!isDBKeyAllowed(_core.getWgaConfiguration(), vHost, requestedDBKey)) {
-                            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource '" + requestedDBKey + "' is unknown for the requested host.");
-                            ProblemOccasion occ = new PathDispatchingOccasion(httpRequest, requestedDBKey);
-                            _core.getProblemRegistry().addProblem(Problem.create(occ, "dispatching.vhostdenial#" + httpRequest.getRequestURI(), ProblemSeverity.LOW, Problem.var("vhost", vHost.getServername())));
-                            return;
+                    	if (!isDBAllowed(vHost, requestedDBKey)) {
+                        //if (!isDBKeyAllowed(_core.getWgaConfiguration(), vHost, requestedDBKey)) {                        	
+                        	if(defaultDBKey != null)
+                        		httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
+                        	else{
+	                            httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "Resource '" + requestedDBKey + "' is unknown for the requested host.");
+	                            ProblemOccasion occ = new PathDispatchingOccasion(httpRequest, requestedDBKey);
+	                            _core.getProblemRegistry().addProblem(Problem.create(occ, "dispatching.vhostdenial#" + httpRequest.getRequestURI(), ProblemSeverity.LOW, Problem.var("vhost", vHost.getServername())));
+	                            return;
+                        	}
                         }
                     }
 
@@ -227,7 +230,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
         chain.doFilter(httpRequest, httpResponse);
     }
 
-    private VirtualResource findVirtualResource(VirtualHost vHost, String path) {
+	private VirtualResource findVirtualResource(VirtualHost vHost, String path) {
         for (VirtualResource resource : vHost.getVirtualResources()) {
             if (resource.getName().equalsIgnoreCase(path)) {
                 return resource;
@@ -282,8 +285,23 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
         return regExp.toString();
     }
 
+    private boolean isDBAllowed(VirtualHost vHost, String dbkey) {
+    	WGDatabase database = _core.getContentdbs().get(dbkey);
+        boolean adminApp = database.getBooleanAttribute(WGACore.DBATTRIB_ADMIN_APP, false);
+        if (adminApp && !vHost.isAllowAdminApps()) {
+        	return false;
+        }
+        boolean authoringApp = database.getBooleanAttribute(WGACore.DBATTRIB_AUTHORING_APP, false);
+        if (authoringApp && !vHost.isAllowAuthoringApps()) {
+        	return false;
+        }
+    	if(dbkey.startsWith("plugin-"))
+    		return true;	// allow all other plugins
+        return isDBKeyAllowed(_core.getWgaConfiguration(), vHost, dbkey);
+	}
+
     public static boolean isDBKeyAllowed(WGAConfiguration config, VirtualHost vHost, String dbkey) {
-        return retrievePriorityForDatabase(config, vHost, dbkey) != -1;
+    	return retrievePriorityForDatabase(config, vHost, dbkey) != -1;
     }
     
     /**

@@ -26,6 +26,7 @@
 package de.innovationgate.wga.config;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -60,7 +61,13 @@ public class VirtualHost extends IdentifiableConfigBean {
     @ElementList
     @NotNull
     private List<String> allowedDatabases = new ArrayList<String>();
-    
+
+    @Attribute (required=false)
+    private boolean allowAdminApps = true;    
+
+    @Attribute (required=false)
+    private boolean allowAuthoringApps = true;    
+
     @ElementList
     @NotNull
     private List<String> serverAliases = new ArrayList<String>();
@@ -160,4 +167,17 @@ public class VirtualHost extends IdentifiableConfigBean {
     	this.robots_txt = text;
     }
 
+    public void setAllowAdminApps(boolean allow){
+    	this.allowAdminApps=allow;
+    }
+    public boolean isAllowAdminApps(){
+    	return allowAdminApps;
+    }
+    
+    public void setAllowAuthoringApps(boolean allow){
+    	this.allowAuthoringApps=allow;
+    }
+    public boolean isAllowAuthoringApps(){
+    	return allowAuthoringApps;
+    }
 }

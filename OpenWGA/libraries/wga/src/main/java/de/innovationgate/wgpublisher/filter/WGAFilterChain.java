@@ -90,12 +90,13 @@ public class WGAFilterChain implements FilterChain {
 	static {
 		_blacklistURLPatterns.add("/static*");
 		_blacklistURLPatterns.add("/wgadmin*");		
-		_blacklistURLPatterns.add("/admin*");		
+		_blacklistURLPatterns.add("/admin*");
+		_blacklistURLPatterns.add("/contentmanager*");
 		_blacklistURLPatterns.add("/login*");
 		_blacklistURLPatterns.add("/logout*");
-		_blacklistURLPatterns.add("/domainkey*");
-		_blacklistURLPatterns.add("*.jsp");
-		_blacklistURLPatterns.add("/plugin-management*");
+		//_blacklistURLPatterns.add("/domainkey*");
+		//_blacklistURLPatterns.add("*.jsp");
+		//_blacklistURLPatterns.add("/plugin-management*");
 		_blacklistURLPatterns.add("/start");
 		_blacklistURLPatterns.add("/joblog*");
 		_blacklistURLPatterns.add("/favicon.ico");
@@ -105,7 +106,7 @@ public class WGAFilterChain implements FilterChain {
 	// the following patterns are explicit whitelisted from the blacklist above
 	private static List<String> _whitelistURLPatterns = new LinkedList<String>();
 	static {
-		_whitelistURLPatterns.add("/plugin-management/html/approval:*");
+		//_whitelistURLPatterns.add("/plugin-management/html/approval:*");
 	}
 
 
