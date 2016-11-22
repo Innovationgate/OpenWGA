@@ -287,14 +287,16 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 
     private boolean isDBAllowed(VirtualHost vHost, String dbkey) {
     	WGDatabase database = _core.getContentdbs().get(dbkey);
-        boolean adminApp = database.getBooleanAttribute(WGACore.DBATTRIB_ADMIN_APP, false);
-        if (adminApp && !vHost.isAllowAdminApps()) {
-        	return false;
-        }
-        boolean authoringApp = database.getBooleanAttribute(WGACore.DBATTRIB_AUTHORING_APP, false);
-        if (authoringApp && !vHost.isAllowAuthoringApps()) {
-        	return false;
-        }
+    	if(database!=null){
+	        boolean adminApp = database.getBooleanAttribute(WGACore.DBATTRIB_ADMIN_APP, false);
+	        if (adminApp && !vHost.isAllowAdminApps()) {
+	        	return false;
+	        }
+	        boolean authoringApp = database.getBooleanAttribute(WGACore.DBATTRIB_AUTHORING_APP, false);
+	        if (authoringApp && !vHost.isAllowAuthoringApps()) {
+	        	return false;
+	        }
+    	}
     	if(dbkey.startsWith("plugin-"))
     		return true;	// allow all other plugins
         return isDBKeyAllowed(_core.getWgaConfiguration(), vHost, dbkey);
