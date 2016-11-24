@@ -1994,10 +1994,10 @@ WGA.websocket = {
 		},
 		
 		backendLostMessages: {
-			"de": "Die Verbindung zum Server wurde verloren. Eventuell ist ihre Internet-Verbindung abgebrochen oder der Serverdienst hat ein Problem.<br>" +
+			"de": "Die Websocket Verbindung zum Server wurde verloren. Eventuell ist ihre Internet-Verbindung abgebrochen oder der Serverdienst hat ein Problem.<br>" +
 				"Befinden sich ungesicherte Eingaben von ihnen auf dieser Webseite so werden sie diese vermutlich nicht speichern können. Sichern sie diese also an einem anderen Ort um sie nicht zu verlieren.<br>" +
 				"Klicken sie danach auf \"OK\" um zu versuchen, eine neue Verbindung aufzubauen oder laden sie die Seite manuell neu über die Reload-Schaltfläche ihres Browsers.",
-			"en": "The connection to the server is gone. Maybe your internet connection is lost or the server service has problems.<br>" +
+			"en": "The Websocket connection to the server is gone. Maybe your internet connection is lost or the server service has problems.<br>" +
 				"If the current webpage contains unsaved input from you then it is very likely that it cannot be submitted. You should instead store it at another place to avoid losing it.<br>" + 
 				"Then click \"OK\" to try to build a new connection or perform the reload manually using the reload button of your browser."			
 		},
@@ -2138,10 +2138,10 @@ WGA.websocket = {
 			}
 			
 			if (WGA.websocket.reconnectAttempts >= 5) {
-				WGA.util.showReloadMessage(WGA.util.label(WGA.websocket.backendLostMessages, "en"));
 				if (console && console.log) {
 					console.log("Lost connection to WebSocket. Reason code: " + event.code + ", reason: '" + event.reason + "'. Cancelling service after 5 reconnect attempts.");
 				}
+				WGA.util.showReloadMessage(WGA.util.label(WGA.websocket.backendLostMessages, "en"));
 				return;
 			}
 			
