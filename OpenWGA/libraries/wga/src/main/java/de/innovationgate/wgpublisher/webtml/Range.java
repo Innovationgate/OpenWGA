@@ -331,7 +331,10 @@ public class Range extends Base {
                 addExpressionWarning(currentCacheby, result);
                 return true;
             }
-            status._currentCacheKey = String.valueOf(result.getResult());
+            Object key = result.getResult();
+            if(key==null)
+            	return true;
+            status._currentCacheKey = String.valueOf(key);
         }
         else {
             status._currentCacheKey = "";
