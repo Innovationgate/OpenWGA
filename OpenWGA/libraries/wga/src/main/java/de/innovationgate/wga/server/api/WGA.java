@@ -203,8 +203,11 @@ public class WGA {
             _fetched = true;
             try {
                 if (_it.hasNext()) {
-                return WGA.this.createTMLContext(_it.next());
-            }
+                	WGContent doc = _it.next();
+                	if(doc!=null)
+                		return WGA.this.createTMLContext(doc);
+                	else return null; 
+	            }
                 else {
                     return null;
                 }
