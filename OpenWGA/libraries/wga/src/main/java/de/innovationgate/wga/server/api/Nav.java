@@ -37,6 +37,7 @@ import java.util.Map;
 
 import de.innovationgate.utils.ConversionUtils;
 import de.innovationgate.utils.IteratorWrapper;
+import de.innovationgate.utils.PrefetchingIterator;
 import de.innovationgate.utils.SkippingIterator;
 import de.innovationgate.utils.SkippingIteratorWrapper;
 import de.innovationgate.webgate.api.WGAPIException;
@@ -145,7 +146,7 @@ public class Nav {
     /**
      * An iterator converting {@link WGRelationData} into {@link WGContent}
      */
-    public static class RelationDataIterator implements SkippingIterator<WGContent> {
+    public static class RelationDataIterator extends PrefetchingIterator<WGContent> implements SkippingIterator<WGContent> {
 
         private Iterator<WGRelationData> _it;
         private boolean _fetched = false;
@@ -157,26 +158,9 @@ public class Nav {
         }
 
         @Override
-        public boolean hasNext() {
-            _fetched  = true;
-            return _it.hasNext();
-        }
-
-        @Override
         public WGContent next() {
             _fetched = true;
-            try {
-                WGRelationData relData = _it.next();
-                if (_returnsSources) {
-                    return relData.getParentContent();
-                }
-                else {
-                    return relData.getTargetContent();
-                }
-            }
-            catch (WGAPIException e) {
-                throw new RuntimeException("Exception retrieving target content of relation", e);
-            }
+            return super.next();
         }
 
         @Override
@@ -197,6 +181,30 @@ public class Nav {
             }
             return nrOfElements - skipped;
         }
+
+		@Override
+		protected WGContent fetchNextValue() {
+            _fetched = true;
+            try {
+            	while(_it.hasNext()){
+                    WGRelationData relData = _it.next();
+                    WGContent doc;
+                    if (_returnsSources) {
+                        doc = relData.getParentContent();
+                    }
+                    else {
+                        doc = relData.getTargetContent();
+                    }
+                    if(doc!=null)
+                    	return doc;
+            	}
+            	return null;
+            }
+            catch (WGAPIException e) {
+                throw new RuntimeException("Exception retrieving target content of relation", e);
+            }
+            
+		}
 
     }
 
