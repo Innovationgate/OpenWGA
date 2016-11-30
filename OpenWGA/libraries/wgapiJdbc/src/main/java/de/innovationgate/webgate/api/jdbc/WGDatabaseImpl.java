@@ -3138,7 +3138,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
     }
     
     public String convertFileNameForAttaching(String name) {
-        return WGUtils.strReplace(name.toLowerCase(), "§§§", "/", true);
+        return WGUtils.strReplace(name.toLowerCase(), "ï¿½ï¿½ï¿½", "/", true);
     }
 
     public void authenticationDataChanged() {
@@ -3388,7 +3388,8 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                 return entry.getLogtime();
             }
             else {
-                return new Date(Long.MIN_VALUE);
+            	return null;
+                //return new Date(Long.MIN_VALUE);
             }
         }
         else {
