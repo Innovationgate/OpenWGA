@@ -61,7 +61,7 @@ public class WGDatabaseRevision implements Comparable<WGDatabaseRevision>, Seria
         }
     }
 
-    protected WGDatabaseRevision(Number revisionNumber) {
+    public WGDatabaseRevision(Number revisionNumber) {
         if (revisionNumber == null) {
             throw new IllegalArgumentException("Illegal null revision");
         }
