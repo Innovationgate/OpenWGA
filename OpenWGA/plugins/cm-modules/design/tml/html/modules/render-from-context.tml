@@ -22,13 +22,11 @@
 ## along with OpenWGA in file COPYING.
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
-<tml:script>
-	_CM_MODULES=null;
-</tml:script>
 
 <tml:include ref="init"/>
 
 <tml:script>
+	_CM_MODULES = createObject("modules");
 	_section = option("section")||"content";
 	_mods = _CM_MODULES.module_structure_xml.dom.selectNodes("/modules/section[@id='"+_section+"']/mod");
 
