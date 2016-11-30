@@ -135,18 +135,6 @@
 			<td><tml:input type="textarea" cssstyle="width:100%" name="dbkeys" multiple="true"/></td>
 		</tr>
 		<tr>
-			<td>{%label:linkchecker-config.form.mailserver%}:</td>
-			<td><tml:input name="mailserver" cssstyle="width:100%"/></td>
-		</tr>
-		<tr>
-			<td>{%label:linkchecker-config.form.mailserver_username%}:</td>
-			<td><tml:input name="mailserver_username" cssstyle="width:100%"/></td>
-		</tr>
-		<tr>
-			<td>{%label:linkchecker-config.form.mailserver_password%}:</td>
-			<td><tml:input name="mailserver_password" type="password" cssstyle="width:100%"/></td>
-		</tr>
-		<tr>
 			<td>{%label:linkchecker-config.form.root-url%}:</td>
 			<td><tml:input name="rooturl" cssstyle="width:100%" default="{meta('request', 'absolutewgaurl')}"/></td>
 		</tr>

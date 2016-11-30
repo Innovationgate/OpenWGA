@@ -194,13 +194,12 @@ if(config){
 
 		body += "<br>" + report.finished;
 		
-		//var mail = createmail(config.mailserver, config.mailserver_username||"", config.mailserver_password||"");
-		var mail = createmail();
-		mail.setSubject("OpenWGA Content Manager Linkcheck Report");
+		var mail = WGA.createMail();
+		mail.setSubject("OpenWGA Content Manager Linkchecker Report");
 		mail.setBody(body);
 		mail.setTo(config.email);
-		mail.setFrom("OpenWGA-Content-Manager");
 		mail.setMimeType("text/html");
+		mail.encodeText=true;
 		mail.send();
 		log.info("Report sent to " + config.email);
 	}
