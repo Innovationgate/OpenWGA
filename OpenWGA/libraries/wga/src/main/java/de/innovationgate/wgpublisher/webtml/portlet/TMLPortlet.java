@@ -530,7 +530,8 @@ public class TMLPortlet implements TMLObject, Portlet {
         
        if (_state == null) {
            TMLPortletStateStorage stateStorage = getStateStorage();
-           _state = stateStorage.getState(this);
+           if(stateStorage!=null)
+        	   _state = stateStorage.getState(this);
        }
        return _state;
     }
