@@ -1188,7 +1188,7 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
     /**
      * Accesslevel-Name for ACCESSLEVEL_CHIEF_EDITOR
      */
-    public static final String ALNAME_CHIEF_EDITOR = "CHIEF EDITOR";
+    public static final String ALNAME_CHIEF_EDITOR = "CHIEFEDITOR";
 
     /**
      * Accesslevel-Name for ACCESSLEVEL_AUTHOR
