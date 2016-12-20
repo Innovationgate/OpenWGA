@@ -151,12 +151,8 @@ WGA.util = /**
 			div.style.boxShadow="0 0 10px black";
 			div.style.zIndex=10000;
 
-			var imgClose = document.createElement("img")
-			imgClose.src = WGA.contextpath + "/static/images/close.png";
-			imgClose.style.width = "16px";
 			var closeButton = document.createElement("button")
-			//closeButton.appendChild(imgClose);
-			closeButton.appendChild(document.createTextNode("x"));
+			closeButton.appendChild(document.createTextNode("&times;"));
 			closeButton.style.float="right";
 			closeButton.style.margin="0";
 			closeButton.style.color="darkgray";
@@ -2129,9 +2125,14 @@ WGA.websocket = {
 			if (event.code <= 1001) { // Normal closing
 				return;
 			}
+			else if (event.code == 9825) {
+				// MacOS: errSSLPeerBadCert - A bad certificate was encountered.
+				// ignore this
+				return;
+			}
 			else if (event.code == 1008) {
 				if (console && console.log) {
-					console.log("Lost connection to WebSocket bc. of violated policy. Will need to reload page to restart WebSocket: " + event.reason);
+					console.log("Lost connection to WebSocket bc. of violated policy. Will need to reload page to restart WebSocket", event.reason);
 					WGA.util.showReloadMessage(WGA.util.label(WGA.websocket.reloadMessages, "en"));
 				}
 				return;
