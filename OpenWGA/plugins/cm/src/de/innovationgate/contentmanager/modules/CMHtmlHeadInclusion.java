@@ -54,7 +54,7 @@ public class CMHtmlHeadInclusion implements HTMLHeadInclusion {
                 context.getEnvironment().getPageContext().getSession().setAttribute("AFW."+dbkey+".PreferredLanguage", prefLanguage);
         		
         		ServletRequest request = context.getEnvironment().getPageContext().getRequest();
-        		if(request.getParameter("$clean")!=null 
+        		if(request.getParameter(WGACore.URL_PARAM_CLEAN)!=null 
         				|| (content.hasCompleteRelationships() && content.getStructEntry().getArea().getName().equals("$trash"))
         		)
         			request.removeAttribute(WGACore.ATTRIB_EDITDOCUMENT);

@@ -2532,6 +2532,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	    WGA wga = WGA.get(this);
 	    if (wga.call().isAvailable()) {
 	        try {
+	        	if(wga.call().getParam(WGACore.URL_PARAM_CLEAN)!=null)
+	        		return false;
                 return WGPDispatcher.isBrowserInterface(wga.call().getJavaRequest().getSession());
             }
             catch (WGException e) {

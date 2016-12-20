@@ -1183,6 +1183,8 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
     public static final String LANGUAGEBEHAVIOUR_MAINCONTENT = "maincontent";
     public static final String LANGUAGEBEHAVIOUR_BROWSER = "browser";
 
+    public static final String URL_PARAM_CLEAN = "$clean";
+    
     private static DynamicClassLoadingChain libraryClassLoadingChain;
 
     private EventManager _eventManager;
