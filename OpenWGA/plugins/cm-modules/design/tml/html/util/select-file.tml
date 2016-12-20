@@ -23,4 +23,4 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:include designdb="{option('cm_dbkey')}" ref="util:select-file"/>
+<tml:include designdb="{option('cm_dbkey')||'plugin-contentmanager}" ref="util:select-file"/>
