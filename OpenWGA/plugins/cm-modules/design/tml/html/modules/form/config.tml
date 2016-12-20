@@ -33,6 +33,7 @@
 	setuptml:		'modules:form:setup',
 	allowedchildren: ["cm_formfield", "cm_fieldset", "cm_captcha", "cm_rtf"],
 	includes: {
+		jquery_plugins: ["textarea-autogrow"],
 		tml:	'@afw/include:jquery-ui-all',
 		css: 	'plugin-cm-modules/modules:form:css'
 	}
