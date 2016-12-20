@@ -49,7 +49,9 @@
 				<hr size="1">
 			</tml:case>		
 		
-			<tml:include ref="{_Content.getUserdefinedMetasTML()}" designdb="{option('dbkey')}"/>
+			<tml:include ref="{_Content.getUserdefinedMetasTML()}" designdb="{option('dbkey')}">
+				<tml:option name="cm_dbkey" expression="context('main').meta('db', 'dbkey')"/>
+			</tml:include>
 		
 			<script>
 				<tml:case condition="option('mode')=='view'">
