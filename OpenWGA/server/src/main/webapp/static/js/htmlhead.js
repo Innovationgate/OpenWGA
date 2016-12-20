@@ -152,7 +152,7 @@ WGA.util = /**
 			div.style.zIndex=10000;
 
 			var closeButton = document.createElement("button")
-			closeButton.appendChild(document.createTextNode("&times;"));
+			closeButton.appendChild(document.createTextNode("X"));
 			closeButton.style.float="right";
 			closeButton.style.margin="0";
 			closeButton.style.color="darkgray";
@@ -2125,7 +2125,7 @@ WGA.websocket = {
 			if (event.code <= 1001) { // Normal closing
 				return;
 			}
-			else if (event.code == 9825) {
+			else if (event.code == -9825) {
 				// MacOS: errSSLPeerBadCert - A bad certificate was encountered.
 				// ignore this
 				return;
