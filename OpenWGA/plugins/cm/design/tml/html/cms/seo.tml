@@ -203,7 +203,7 @@
 							function getWords(selector){
 								var words = {};
 								var index=0;;
-								$(el).find(selector).not("script, nav *, sidebar *").contents()
+								$(el).find(selector).not("style, script, nav *, sidebar *").contents()
 									.filter(function () { return this.nodeType === 3; })
 									.each(function(){
 										var relevanz = 1;
