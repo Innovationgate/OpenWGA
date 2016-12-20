@@ -3312,7 +3312,7 @@ public class WGPDispatcher extends HttpServlet {
             WGTransientPortletRegistry portletRegistry = null;
             TMLPortletStateStorage portletStateStorage = null;
             try {
-                tmlUserProfile = getCore().getPersManager().fetchUserProfile(request, response, errorDatabase);
+                tmlUserProfile = getCore().getPersManager().prepareUserProfileForRequest(request, response, content, errorDatabase, null, false);            
             }
             catch (Exception e) {
                 _log.error("Unable to personalize WebTML request " + path.getCompleteURL(), e);
@@ -3326,8 +3326,6 @@ public class WGPDispatcher extends HttpServlet {
             request.setAttribute(WGACore.ATTRIB_MIMETYPE, "text/html");
             request.setAttribute(WGACore.ATTRIB_MEDIAKEY, "html");
             request.setAttribute(WGACore.ATTRIB_REQUESTTYPE, REQUESTTYPE_TML);
-            request.setAttribute(WGACore.ATTRIB_TRANSIENTPORTLETREGISTRY, portletRegistry);
-            request.setAttribute(WGACore.ATTRIB_PORTLETSTATESTORAGE, portletStateStorage);
             request.setAttribute(WGACore.ATTRIB_URI_HASH, WGUtils.createMD5HEX(request.getRequestURI().getBytes("UTF-8")));
             request.setAttribute(WGACore.ATTRIB_FORMDATA, null);
             request.setAttribute(WGACore.ATTRIB_OUTER_DESIGN, tmlLib.getName());
