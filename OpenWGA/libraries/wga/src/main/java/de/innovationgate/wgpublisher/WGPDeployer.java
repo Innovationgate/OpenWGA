@@ -567,7 +567,7 @@ public class WGPDeployer implements WGACoreEventListener {
 
         Date lastDeployed = getLastDeployed(designDBKey);
         Date lastChanged = db.getLastChanged();
-        if (lastDeployed == null || lastChanged.after(lastDeployed)) {
+        if (lastDeployed == null || (lastChanged!=null && lastChanged.after(lastDeployed))) {
             return lastChanged;
         }
         else {
