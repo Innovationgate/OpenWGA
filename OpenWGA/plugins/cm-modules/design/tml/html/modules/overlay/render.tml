@@ -35,6 +35,7 @@
 			<a class="close" title="<tml:label key="close"/>"></a>
 		</tml:else>
 	</tml:if>
+	
 	<div class="content inner-overlay">
 		<tml:if condition="CMM.setting('lazy_load_content_on_show')">
 			<tml:then>
@@ -57,18 +58,27 @@
 </div>
 <script>
 	require(["jquery", "jquery-modal"], function(){
-		$("a[href='#<tml:[setting] o_name="id"/>']").not(".WGA-Item-Value-Unencoded a").wga_modal({
-			width: <tml:[setting] o_name="width" o_default="600"/>
+	
+		$(document).off('click.<tml:option name="ns"/> modal-shown.<tml:option name="ns"/> modal-closed.<tml:option name="ns"/>')
+		
+		$(document).on('click.<tml:option name="ns"/>', "a[href='#<tml:[setting] o_name="id"/>']", function(e){
+			e.preventDefault();
+			$.wga_modal.show(this.hash);
 		}).on({
-			"modal-shown": function(){
-				WGA.event.fireEvent("overlay-loaded", "cmm", {id: "<tml:[setting] o_name="id"/>"})
-				WGA.event.fireEvent("CMM-element-activated", "CMM", {
-					el: $("#module-<tml:option name="ns"/> .content")[0]
-				})			
+
+			"modal-shown.<tml:option name="ns"/>": function(ev, el){				
+				if(el.id=="<tml:[setting] o_name="id"/>"){
+					WGA.event.fireEvent("overlay-loaded", "cmm", {id: "<tml:[setting] o_name="id"/>"})
+					WGA.event.fireEvent("CMM-element-activated", "CMM", {
+						el: $("#module-<tml:option name="ns"/> .content")[0]
+					})
+				}
 			},
-			"modal-closed": function(){
-				WGA.event.fireEvent("overlay-closed", "cmm", {id: "<tml:[setting] o_name="id"/>"})
+			"modal-closed.<tml:option name="ns"/>": function(ev, el){
+				if(el.id=="<tml:[setting] o_name="id"/>")
+					WGA.event.fireEvent("overlay-closed", "cmm", {id: "<tml:[setting] o_name="id"/>"})
 			}
 		})
+
 	})
 </script>

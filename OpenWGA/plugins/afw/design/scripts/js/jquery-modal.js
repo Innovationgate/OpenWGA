@@ -34,7 +34,7 @@
 		}
 		var fn = $.wga_modal.effect == "slide" ? "slideUp" : "fadeOut"
 		bodyMask && bodyMask.fadeOut({duration: 200});
-		$(currentModal)[fn]({
+		currentModal[fn]({
 			duration: 200,
 			complete: function(){
 				$("body").removeClass("modal-open");
@@ -42,7 +42,7 @@
 					onclose();
 					onclose=null
 				}
-				$(this).trigger("modal-closed");
+				$(this).trigger("modal-closed", currentModal);
 				if(triggerEl){
 					$(triggerEl).trigger("modal-closed", currentModal);
 					$(triggerEl).trigger("close", currentModal);	// deprecated
@@ -61,12 +61,12 @@
 		}
 		if(!el.hasClass("modal-popup"))
 			el.addClass("modal-popup");
-		currentModal=id;
+		currentModal=el;
 		maskBody();
 		if(callback)
 			onload=callback;
 		var fn = $.wga_modal.effect == "slide" ? "slideDown" : "fadeIn"
-		$(id)[fn]({
+		el[fn]({
 			duration: 200,
 			complete: function(){
 				$("body").addClass("modal-open");
@@ -74,10 +74,10 @@
 					onload();
 					onload=null;
 				}
-				$(this).trigger("modal-shown", triggerEl);
+				$(this).trigger("modal-shown", el);
 				if(triggerEl){
-					$(triggerEl).trigger("load", id);	// deprecated
-					$(triggerEl).trigger("modal-shown", id);
+					$(triggerEl).trigger("load", el);	// deprecated
+					$(triggerEl).trigger("modal-shown", el);
 				}
 			}
 		});
@@ -111,8 +111,8 @@
 			else{
 				$this.on("click", function(e){
 					e.preventDefault();
-					onload = config.onload;		// deprecated. User jquery events instead
-					onclose = config.onclose;	// deprecated. User jquery events instead
+					onload = config.onload;		// deprecated. Use jquery events instead
+					onclose = config.onclose;	// deprecated. Use jquery events instead
 					triggerEl=this;
 					var target = config.target || $this.data("target") || this.hash
 					if(config.width){
