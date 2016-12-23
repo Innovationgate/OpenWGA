@@ -2114,7 +2114,7 @@ WGA.websocket = {
 		onClose: function(event) {
 			
 			if (console && console.log) {
-				console.log("Socket connection closed, pageId: " + WGA.websocket.pageId);
+				console.log("Socket connection closed, pageId: " + WGA.websocket.pageId, "event.code", event.code);
 			}
 			
 			WGA.websocket.socket.onmessage = null;
