@@ -67,7 +67,7 @@ body{
 		
 		>.close, .close-modal {
 			$url: wga_file_url("images", "apple-close.png");
-			background-image: url('$url');
+			background-image: url($url);
 			position: absolute;
 			cursor: pointer;
 			opacity: 1;
