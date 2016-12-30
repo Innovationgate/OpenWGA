@@ -34,6 +34,7 @@ import javax.websocket.Session;
 
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.server.api.WGA;
+import de.innovationgate.wgpublisher.WGAServerException;
 import de.innovationgate.wgpublisher.api.Unlocker;
 import de.innovationgate.wgpublisher.design.DesignResourceReference;
 import de.innovationgate.wgpublisher.events.Event;
@@ -108,6 +109,12 @@ public class PageScopeResolver implements ScopeResolver {
     @Override
     public void notifyScopeObjectStateChange(ScopeObject scopeObject, WGA wga, DesignResourceReference ref) throws WGException {
     }
+
+	@Override
+	public boolean needsWebsockets() {
+		// TODO Auto-generated method stub
+		return true;
+	}
 
 
 }

@@ -95,4 +95,10 @@ public class WebsocketScopeResolver implements ScopeResolver {
         
     }
 
+	@Override
+	public boolean needsWebsockets() {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
 }

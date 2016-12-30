@@ -73,4 +73,11 @@ public class CallScopeResolver implements ScopeResolver {
     public void notifyScopeObjectStateChange(ScopeObject scopeObject, WGA wga, DesignResourceReference ref) throws WGException {
     }
 
+
+	@Override
+	public boolean needsWebsockets() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -36,7 +36,6 @@ import de.innovationgate.wga.server.api.App;
 import de.innovationgate.wga.server.api.ObjectScope;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
-import de.innovationgate.wgpublisher.WGACore.SessionLoginMap;
 import de.innovationgate.wgpublisher.api.Unlocker;
 import de.innovationgate.wgpublisher.design.DesignResourceReference;
 import de.innovationgate.wgpublisher.events.Event;
@@ -58,7 +57,6 @@ public class SessionScopeResolver implements ScopeResolver {
             session.setAttribute(regKey, sessionRegistry);
             
             // Look if the user is already logged in. If so we must now trigger the event
-            SessionLoginMap sessionLogins = WGACore.getSessionLogins(session);
             WGA wga = WGA.get(null, session);
             App app = wga.app(dbKey);
             if (!app.domain().auth().isAnonymous()) {
@@ -103,5 +101,11 @@ public class SessionScopeResolver implements ScopeResolver {
     @Override
     public void notifyScopeObjectStateChange(ScopeObject scopeObject, WGA wga, DesignResourceReference ref) throws WGException {
     }
+
+	@Override
+	public boolean needsWebsockets() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 }

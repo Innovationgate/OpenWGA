@@ -82,4 +82,10 @@ public class PortletScopeResolver implements ScopeResolver {
         }
     }
 
+	@Override
+	public boolean needsWebsockets() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -608,9 +608,9 @@ public class FileDerivateManager {
 
             
             boolean somethingDone = false;
-            Iterator<WGContent> contents = db.getAllContent(true);
+            Iterator<WGContent> contents = db.getAllContent(false);
             int count = 0;
-            int contentCount = db.getAllContentKeys(true).size();
+            int contentCount = db.getAllContentKeys(false).size();
             while (contents.hasNext()) {
                 WGContent content = contents.next();
                 

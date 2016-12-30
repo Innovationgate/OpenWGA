@@ -122,7 +122,11 @@ public enum ObjectScope {
         public boolean isApplicationEventReceiver(Event.Scope scope) {
             return _resolver.isApplicationEventReceiver(scope);
         }
-        
+
+        public boolean needsWebsockets() {
+            return _resolver.needsWebsockets();
+        }
+
         public void notifyScopeObjectStateChange(ScopeObject scopeObject, WGA wga, DesignResourceReference ref) throws WGException {
             _resolver.notifyScopeObjectStateChange(scopeObject, wga, ref);
         }

@@ -71,4 +71,9 @@ public interface ScopeResolver {
      */
     public boolean isApplicationEventReceiver(Event.Scope scope);
 
+    /**
+     * Returns if websockets are required 
+     */
+	public boolean needsWebsockets();
+
 }
