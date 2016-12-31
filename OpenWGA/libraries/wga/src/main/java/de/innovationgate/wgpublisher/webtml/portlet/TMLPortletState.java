@@ -470,7 +470,7 @@ public class TMLPortletState implements Serializable {
             _scopeObjectRegistry.setScopeObjects(getProcessContext().getScopeObjects());
         }
         else {
-            _scopeObjectRegistry.setScopeObjects(new ConcurrentHashMap<DesignResourceReference, ScopeObjectData>());
+            _scopeObjectRegistry.setScopeObjects(new ConcurrentHashMap<String, ScopeObjectData>());
         }
     }
 

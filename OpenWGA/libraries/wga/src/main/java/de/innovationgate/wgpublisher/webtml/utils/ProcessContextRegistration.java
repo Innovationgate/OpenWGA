@@ -62,7 +62,7 @@ public class ProcessContextRegistration implements Serializable {
             if (pc instanceof TMLPortletProcessContext) {
                 TMLPortletProcessContext ppc = (TMLPortletProcessContext) pc;
                 if (ppc.getScopeObjects() != null) {
-                    for (Map.Entry<DesignResourceReference,ScopeObjectData> pcEntry : ppc.getScopeObjects().entrySet()) {
+                    for (Map.Entry<String,ScopeObjectData> pcEntry : ppc.getScopeObjects().entrySet()) {
                         countScopeObjects++;
                         out.append("-- Design '").append(pcEntry.getKey()).append("'\n");
                     }

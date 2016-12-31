@@ -245,7 +245,7 @@ public class ScopeObjectRegistry implements Serializable, HttpSessionActivationL
     /**
      * Stores object instances transiently
      */
-    private transient Map<DesignResourceReference,ScopeObjectData> _scopeObjects = new ConcurrentHashMap<DesignResourceReference, ScopeObjectData>();
+    private transient Map<String,ScopeObjectData> _scopeObjects = new ConcurrentHashMap<String, ScopeObjectData>();
     
     /**
      * Stores serializable object states for persistence/cluster syncing 
@@ -259,7 +259,7 @@ public class ScopeObjectRegistry implements Serializable, HttpSessionActivationL
     
     private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
         in.defaultReadObject();
-        _scopeObjects = new ConcurrentHashMap<DesignResourceReference, ScopeObjectData>();
+        _scopeObjects = new ConcurrentHashMap<String, ScopeObjectData>();
         _name = "Anonymous ScopeObjectRegistry";
     }
     
@@ -279,9 +279,13 @@ public class ScopeObjectRegistry implements Serializable, HttpSessionActivationL
         return _scopeObjects != null && _scopeObjects.containsKey(ref);
     }
     
-    public synchronized ScopeObject getOrCreateScopeObject(WGA wga, DesignResourceReference ref, boolean isController, boolean create) throws WGException {
+    public ScopeObject getOrCreateScopeObject(WGA wga, DesignResourceReference ref, boolean isController, boolean create) throws WGException {
+    	return getOrCreateScopeObject(wga, ref.toString(), ref, isController, create);
+    }
+    
+    public synchronized ScopeObject getOrCreateScopeObject(WGA wga, String name, DesignResourceReference ref, boolean isController, boolean create) throws WGException {
         
-        ScopeObjectData soData = _scopeObjects.get(ref);
+        ScopeObjectData soData = _scopeObjects.get(name);
         Design design = wga.design(ref);
         WGScriptModule module = design.getTMLScriptModule();
         if (module == null) {
@@ -319,7 +323,7 @@ public class ScopeObjectRegistry implements Serializable, HttpSessionActivationL
                 extracted = true;
             }
             
-            _scopeObjects.put(ref, soData);
+            _scopeObjects.put(name, soData);
         }
         
         if (!extracted) {
@@ -375,11 +379,11 @@ public class ScopeObjectRegistry implements Serializable, HttpSessionActivationL
         return _scopeStates;
     }
 
-    public Map<DesignResourceReference, ScopeObjectData> getScopeObjects() {
+    public Map<String, ScopeObjectData> getScopeObjects() {
         return _scopeObjects;
     }
 
-    public void setScopeObjects(Map<DesignResourceReference, ScopeObjectData> scopeObjects) {
+    public void setScopeObjects(Map<String, ScopeObjectData> scopeObjects) {
         _scopeObjects = scopeObjects;
     }
 

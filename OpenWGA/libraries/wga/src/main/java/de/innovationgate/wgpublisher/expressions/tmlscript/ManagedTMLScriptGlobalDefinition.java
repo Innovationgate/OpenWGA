@@ -36,10 +36,12 @@ public class ManagedTMLScriptGlobalDefinition {
     
     private DesignResourceReference _designReference;
     private ManagedGlobalConfig _config;
+    private String _name;
    
-    public ManagedTMLScriptGlobalDefinition(DesignResourceReference designReference, ManagedGlobalConfig config) {
+    public ManagedTMLScriptGlobalDefinition(String name, DesignResourceReference designReference, ManagedGlobalConfig config) {
         _designReference = designReference;
         _config = config;
+        _name = name;
     }
 
     public ManagedGlobalConfig getConfig() {
@@ -51,7 +53,7 @@ public class ManagedTMLScriptGlobalDefinition {
     }
     
     public ScopeObject provideGlobal(WGA wga, boolean create) throws WGException {
-        return provideGlobal(wga, getConfig().getScope().resolve(wga, getDesignReference()), create);
+        return provideGlobal(wga, getConfig().getScope().resolve(wga, _designReference), create);
     }
     
     public ScopeObject provideGlobal(WGA wga, ScopeObjectRegistry reg, boolean create) throws WGException {
@@ -60,7 +62,7 @@ public class ManagedTMLScriptGlobalDefinition {
             return null;
         }
         
-        return reg.getOrCreateScopeObject(wga, getDesignReference(), _config.isIsolated(), create);
+        return reg.getOrCreateScopeObject(wga, _name, _designReference, _config.isIsolated(), create);
     }
 
 }

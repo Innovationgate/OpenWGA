@@ -34,18 +34,18 @@ import de.innovationgate.wgpublisher.webtml.utils.ProcessContextRegistration;
 
 public class TMLPortletProcessContext extends ProcessContext{
     
-    private transient Map<DesignResourceReference,ScopeObjectData> _scopeObjects;
+    private transient Map<String,ScopeObjectData> _scopeObjects;
 
     public TMLPortletProcessContext(TMLPortletState tmlPortletState, ProcessContextRegistration contexts) {
         super(tmlPortletState.getProcessId(), tmlPortletState.getPortletKey(), contexts);
     }
 
-    public Map<DesignResourceReference, ScopeObjectData> getScopeObjects() {
+    public Map<String, ScopeObjectData> getScopeObjects() {
         return _scopeObjects;
     }
 
-    protected void setScopeObjects(Map<DesignResourceReference, ScopeObjectData> scopeObjects) {
-        _scopeObjects = scopeObjects;
+    protected void setScopeObjects(Map<String, ScopeObjectData> map) {
+        _scopeObjects = map;
     }
     
     public String getPortletKey() {
