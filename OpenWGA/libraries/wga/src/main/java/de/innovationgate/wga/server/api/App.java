@@ -41,6 +41,7 @@ import de.innovationgate.webgate.api.WGUserDetails;
 import de.innovationgate.webgate.api.WGUserProfile;
 import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wga.config.ContentStore;
+import de.innovationgate.wga.config.WGAConfiguration;
 import de.innovationgate.wga.server.api.tml.Context;
 import de.innovationgate.wga.server.api.tml.UserProfile;
 import de.innovationgate.wgpublisher.PersonalisationManager;
@@ -212,8 +213,16 @@ public class App extends Database {
         if (design.getTMLScriptModule() == null) {
             throw new WGAServerException("Design reference '" + design.getBaseReference().toString() + "' does not point to a TMLScript module");
         }
-        _wga.getCore().getTmlscriptGlobalRegistry().registerAppGlobal(ExpressionEngineFactory.getTMLScriptEngine().createGlobal(name, TMLScriptGlobal.TYPE_MANAGED, new ManagedTMLScriptGlobalDefinition(design.getBaseReference(), config)), db());
-        
+        if(config.getScope().needsWebsockets()){
+        	// check if websockets are enabled
+            if ((Boolean) _wga.getCore().getServicesServerOptionReader().readOptionValueOrDefault(WGAConfiguration.SERVEROPTION_SERVICE_WEBSOCKETS) == false) {
+                _wga.getLog().error("Websocket network service is disabled - unable to create managed global '" + name + "' of scope " + config.getScope());
+                return;
+            }        	
+        }
+
+        _wga.getCore().getTmlscriptGlobalRegistry().registerAppGlobal(ExpressionEngineFactory.getTMLScriptEngine().createGlobal(name, TMLScriptGlobal.TYPE_MANAGED, new ManagedTMLScriptGlobalDefinition(name, design.getBaseReference(), config)), db());
+
         // Check if there is something we should process on the prototype
         TMLScriptObjectMetadata metaData = ExpressionEngineFactory.getTMLScriptEngine().getTmlscriptObjectMetadata(_wga, design);
         if (config.getScope().isApplicationEventReceiver()) {
