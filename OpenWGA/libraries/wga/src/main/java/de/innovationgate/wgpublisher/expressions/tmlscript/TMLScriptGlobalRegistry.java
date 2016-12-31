@@ -72,7 +72,6 @@ public class TMLScriptGlobalRegistry {
     public boolean registerAppGlobal(TMLScriptGlobal scriptGlobal, WGDatabase db) {
         _wgaCore.getLog().info("Registering TMLScript App Global \"" + scriptGlobal.getName() + "\" for database " + db.getDbReference());
         TMLScriptAppGlobalRegistry globals = getAppGlobalRegistry(db);
-        TMLScriptGlobal previousGlobal = globals.getGlobal(scriptGlobal.getName());
         globals.registerGlobal(scriptGlobal.getName(), scriptGlobal);
         return true;
     }
