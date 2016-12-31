@@ -67,8 +67,8 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>3</minorVersion>
-        <maintenanceVersion>1</maintenanceVersion>
-        <patchVersion>1</patchVersion>
+        <maintenanceVersion>2</maintenanceVersion>
+        <patchVersion>0</patchVersion>
         <buildVersion>655</buildVersion>
       </version>
     </id>
