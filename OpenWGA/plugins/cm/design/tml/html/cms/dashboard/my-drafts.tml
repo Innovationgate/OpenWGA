@@ -31,7 +31,7 @@
 		order by content.lastmodified DESC
 	</tml:query>
 	<ul>
-	<tml:foreach  filter="AREA!='$trash'">
+	<tml:foreach filter="AREA!='$trash'">
 		<tml:include ref="::entry"/>
 	</tml:foreach>
 	</ul>
