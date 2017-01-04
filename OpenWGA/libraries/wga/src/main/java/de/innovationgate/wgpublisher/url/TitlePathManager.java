@@ -662,10 +662,9 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
         }
         
         TitlePathRoot trigger = null;
-        if (urlid.getLanguage() != null) {
+        if (urlid.getLanguage() != null && path.size()==1) {
             trigger = (TitlePathRoot) triggerNames.get(normalizeURLTitle(triggerText) + "/" + urlid.getLanguage());
         }
-        
         else trigger = (TitlePathRoot) triggerNames.get(normalizeURLTitle(triggerText));
         
         if (trigger == null) {
