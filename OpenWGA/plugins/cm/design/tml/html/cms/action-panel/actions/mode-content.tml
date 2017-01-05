@@ -301,7 +301,7 @@
 		
 		<tml:script>
 			_mode="view";
-			if(!_Content.isContentConsumer() && _Content.isMine() && STATUS==content().STATUS_DRAFT)
+			if(!_Content.isContentConsumer() && _Content.isMine() && STATUS==content().STATUS_DRAFT && _Content.mayEditContent())
 				_mode="edit"
 		</tml:script> 
 		<div class="list edit-content-modules" id="edit-content-modules-action" style="display:none"

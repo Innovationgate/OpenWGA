@@ -253,14 +253,14 @@ this.getTitle=function(encode){
 
 this.getContentTitle=function(encode, lang){
 	var lang = lang || Database.getPreferedLanguage();
-	var bestContent=this.getAllContent(lang, false);
-	if(bestContent.isEmpty()){
+	var bestContent=this.getBestContent();
+	if(!bestContent){
 		if(this.hasContent(lang))
 			return "("+label("no-reader-access")+")"
 		else return this.getTitle(encode);
 	}
 
-	var t=bestContent.get(0).getTitle();
+	var t=bestContent.getTitle();
 	return encode ? t.replace(/"/g, "'").replace(/[\n\r]/g, "") : t;
 }
 
@@ -282,10 +282,15 @@ this.getAllContent=function(lang, include_archive){
 
 this.getBestContent=function(lang){
 	var lang = lang || Database.getPreferedLanguage();
-	var bestContent=this.getAllContent(lang, false);
-	if(bestContent.isEmpty())
-		return null;
-	return bestContent.get(0);
+	if(struct.mayEditPage()){
+		var bestContent=this.getAllContent(lang, false);
+		if(bestContent.isEmpty()){
+			console.log("no best content in lang", lang, this.getTitle(), struct.getAllContent());
+			return null;
+		}
+		return bestContent.get(0);
+	}
+	else return struct.getReleasedContent(lang);
 }
 
 this.hasContent=function(lang, includeArchived){

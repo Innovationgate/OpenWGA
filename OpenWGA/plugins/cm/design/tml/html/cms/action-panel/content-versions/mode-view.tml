@@ -33,6 +33,7 @@
 	var langs={};
 	
 	var sdoc=content().getStructEntry();
+	_mayEdit = sdoc.mayEditPage();
 	var contentlist=sdoc.getAllContent(true);
 	_versions = contentlist.size(); 
 	for(var i=0; i<contentlist.size(); i++){
@@ -67,8 +68,6 @@
 		}
 		if(version.getStatus()==version.STATUS_ARCHIVE)
 			_archive.add(version);
-		/*if(version.getVersion()==VERSION)
-			continue;*/
 		if(version.getStatus()==version.STATUS_RELEASE)
 			_released_version=version;
 		else if(version.getStatus()==version.STATUS_DRAFT)
@@ -85,7 +84,7 @@
 </tml:script>
 		
 
-<tml:case condition="_versions>1">
+<tml:case condition="_versions>1 && _mayEdit">
 	<tml:include ref="system:info-window">
 		
 		<tml:option name="collapsed" expression="portlet.getSessionVar('info_window')!='expanded'"/>

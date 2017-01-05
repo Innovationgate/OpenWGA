@@ -2204,6 +2204,10 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	        isAuthoringMode = false;
 	    }
 	    
+	    // If not released and may-not-edit author cannot use authoring mode
+	    if (!content.getStatus().equals(WGContent.STATUS_REVIEW) && !content.getStructEntry().mayEditPage())
+	    	isAuthoringMode = false;
+	    
 	    // Tests that are bypassed by authoring mode
 	    if (!isAuthoringMode) {
 	        

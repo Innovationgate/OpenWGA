@@ -57,32 +57,34 @@
 					</tml:else>
 				</tml:if>
 				
-				<tml:script>
-					_contentlist=sortList(document.getAllContent(true), "status", "down");
-				</tml:script>
-				<tml:case condition="!_contentlist.isEmpty()">
-					<hr>
-					{%label:no-content.other-versions%}:
-					<ul>
-					<tml:foreach type="itemvalue" item="_contentlist" currentvalue="_content">
-					
-						<tml:groupchange expression="STATUS" id="gc">
-							</ul><h2><tml:label key="{'status.'+STATUS}"/></h2><ul>
-						</tml:groupchange>
-					
-						<li>
-							<a href="<tml:script expression="contenturl('html', null, true)"/>">
-								<tml:label key="version"/> <tml:meta name="version"/> (<tml:meta name="modified"/>, <tml:meta name="languagetitle"/>)
-							</a>
-							<div style="float:right">
-								<button 
-									onclick="window.parent.BI.dialog.show('create-content', this, {structkey:'<tml:script>return document.getStructKey()</tml:script>',contentkey:'<tml:meta name="key"/>'});"
-								><tml:label key="no-content.new-version-from-this"/></button>
-							</div>
-							<div style="clear:right"></div>
-						</li>
-					</tml:foreach>
-					</ul>
+				<tml:case condition="document.mayEditPage()">
+					<tml:script>
+						_contentlist=sortList(document.getAllContent(true), "status", "down");
+					</tml:script>
+					<tml:case condition="!_contentlist.isEmpty()">
+						<hr>
+						{%label:no-content.other-versions%}:
+						<ul>
+						<tml:foreach type="itemvalue" item="_contentlist" currentvalue="_content">
+						
+							<tml:groupchange expression="STATUS" id="gc">
+								</ul><h2><tml:label key="{'status.'+STATUS}"/></h2><ul>
+							</tml:groupchange>
+						
+							<li>
+								<a href="<tml:script expression="contenturl('html', null, true)"/>">
+									<tml:label key="version"/> <tml:meta name="version"/> (<tml:meta name="modified"/>, <tml:meta name="languagetitle"/>)
+								</a>
+								<div style="float:right">
+									<button 
+										onclick="window.parent.BI.dialog.show('create-content', this, {structkey:'<tml:script>return document.getStructKey()</tml:script>',contentkey:'<tml:meta name="key"/>'});"
+									><tml:label key="no-content.new-version-from-this"/></button>
+								</div>
+								<div style="clear:right"></div>
+							</li>
+						</tml:foreach>
+						</ul>
+					</tml:case>
 				</tml:case>
 			</tml:then>
 			<tml:else>

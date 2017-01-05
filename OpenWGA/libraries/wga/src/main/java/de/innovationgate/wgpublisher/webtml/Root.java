@@ -296,13 +296,13 @@ public class Root extends Base {
         	userNamesList.add(content.getAuthor());
         	 
         	if ( content.getStatus().equals(WGContent.STATUS_DRAFT) 
-        		&& (!content.hasCompleteRelationships() || content.getStructEntry().mayEditChildPages())
+        		//&& (!content.hasCompleteRelationships() || content.getStructEntry().mayEditChildPages())
+        		&& content.getStructEntry().mayEditPage()
         		&& content.getLanguage().mayCreateContent()
         		&& content.getDatabase().isMemberOfUserList( userNamesList )
         		&& !content.hasItem("remote_info")
-        		) {			
-        		
-        		pageContext.getRequest().setAttribute(WGACore.ATTRIB_EDITDOCUMENT, content.getContentKey().toString());
+        		) {			        		
+        			pageContext.getRequest().setAttribute(WGACore.ATTRIB_EDITDOCUMENT, content.getContentKey().toString());
         	}
         }
         

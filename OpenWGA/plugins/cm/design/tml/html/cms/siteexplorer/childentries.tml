@@ -49,7 +49,7 @@
 
 	for(var i=0; (pagesize ? (i<pagesize) : true) && it.hasNext(); i++){
 		var struct = it.next()
-		if(struct.mayReadContent())
+		if(struct.mayReadContent() && (struct.mayEditPage() || struct.hasReleasedContent(null)))
 			_entries.add(struct);
 	}
 	_hasNext = it.hasNext();

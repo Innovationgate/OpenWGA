@@ -35,7 +35,7 @@ Controller.prototype.allowedModulesString = function($cx, $option_modules, CMM){
 
 Controller.prototype.mayEdit = function(AFW) {
 	var Content = AFW.content();
-	return Content.isDraft() && Content.isMine()
+	return Content.isDraft() && Content.isMine() && Content.mayEditContent()
 }.nonIsolated();
 
 Controller.prototype.cssCode = function(css){
