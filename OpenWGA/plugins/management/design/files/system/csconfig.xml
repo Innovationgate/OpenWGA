@@ -31,10 +31,10 @@
       <uniqueName>de.innovationgate.Management</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>3</minorVersion>
-        <maintenanceVersion>2</maintenanceVersion>
+        <minorVersion>4</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>655</buildVersion>
+        <buildVersion>656</buildVersion>
       </version>
     </id>
     <title>OpenWGA general management</title>
