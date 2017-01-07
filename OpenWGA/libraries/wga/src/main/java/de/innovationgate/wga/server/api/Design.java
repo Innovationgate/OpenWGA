@@ -1352,33 +1352,47 @@ public class Design {
     
     private Design resolveSystemResource(String name, int docType, String codeType, boolean unqualifiedFallback) throws WGException {
         
+    	ArrayList<Design> result = resolveSystemResources(name, docType, codeType, unqualifiedFallback);
+    	if(result.size()>0)
+    		return result.get(0);
+    	else return null;
+    	
+    }
+    
+    public ArrayList<Design> resolveSystemResources(String name, int docType, String codeType, boolean unqualifiedFallback) throws WGException {
+        
+    	ArrayList<Design> result = new ArrayList<Design>();
+    	
         WGDesignDocument mod = null;
         if (isCustomable()) {
             mod =_designContext.getDesignDB().getDesignObject(docType, "overlay:wga:" + name, codeType);
+            if (mod != null) {
+                result.add(resolve(mod.getName()));
+            }
         }
         
-        if (mod == null) {
-            mod = _designContext.getDesignDB().getDesignObject(docType, "wga:" + name, codeType);
+        mod = _designContext.getDesignDB().getDesignObject(docType, "wga:" + name, codeType);
+        if (mod != null) {
+        	result.add(resolve(mod.getName()));
         }
         
-        if (mod == null && unqualifiedFallback) {
+        if (unqualifiedFallback) {
             if (isCustomable()) {
                 mod = _designContext.getDesignDB().getDesignObject(docType, "overlay:" + name, codeType);
+                if (mod != null) {
+                    result.add(resolve(mod.getName()));
+                }
             }
             
-            if (mod == null) {
-                mod = _designContext.getDesignDB().getDesignObject(docType, name, codeType);
+            mod = _designContext.getDesignDB().getDesignObject(docType, name, codeType);
+            if (mod != null) {
+                result.add(resolve(mod.getName()));
             }
         }
         
-        if (mod != null) {
-            return resolve(mod.getName());
-        }
-        else {
-            return null;
-        }
+        return result;
     }
-
+    
     /**
      * Resolves a design reference relatively to the current design
      * This method can be used to address another design resource relative to the current design context. It takes all forms of relative addressation in WebTML into account, like local and overlay references, and therefor can be used just like the design reference attributes in WebTML tags like ref of <tml:include>.
