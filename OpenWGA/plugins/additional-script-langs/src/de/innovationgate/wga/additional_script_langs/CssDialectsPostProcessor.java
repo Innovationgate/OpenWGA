@@ -3,6 +3,8 @@ package de.innovationgate.wga.additional_script_langs;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +17,7 @@ import ro.isdc.wro.model.group.processor.InjectorBuilder;
 import ro.isdc.wro.model.resource.processor.impl.css.CssMinProcessor;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGBackendException;
+import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGIllegalDataException;
 import de.innovationgate.webgate.api.WGScriptModule;
@@ -81,30 +84,31 @@ public abstract class CssDialectsPostProcessor implements PostProcessor {
     @Override
     @SuppressWarnings("unchecked")
     public void prepare(WGA wga, PostProcessData data) throws WGException {
-        
-        Design cssVariables = wga.design(data.getDocument().getDatabase().getDbReference()).resolveSystemScriptModule("css-variables", WGScriptModule.CODETYPE_TMLSCRIPT);
-        if (cssVariables == null) {
-            return;
-        }
-        
+
+    	ArrayList<Design> cssVariables = wga.design(data.getDocument().getDatabase().getDbReference())
+    			.resolveSystemResources("css-variables", WGDocument.TYPE_CSSJS, WGScriptModule.CODETYPE_TMLSCRIPT, false);
+    	if(cssVariables.size()==0)
+    		return;
+
+    	Collections.reverse(cssVariables);		// execute @base design first followed by overlay design
+    	
         Map<String,Object> extraObjects = new HashMap<String, Object>();
         extraObjects.put("cssDocument", data.getDocument());
-        
-        Object result = wga.tmlscript().runScript(cssVariables, wga.createTMLContext(data.getDocument().getDatabase(), cssVariables), cssVariables.getScriptModule(WGScriptModule.CODETYPE_TMLSCRIPT).getCode(), extraObjects);
-        if (!(result instanceof Map<?,?>)) {
-            throw new WGIllegalDataException("The return type of TMLScript module code '" + cssVariables + "' is no lookup table or JS object");
-        }
-        
-        
-        Serializable variables;
-        if (wga.tmlscript().isNativeObject(result)) {
-            variables = new HashMap<Object,Object>((JsonObject) wga.tmlscript().importJsonData(result));
-        }
-        else {
-            variables = new HashMap<Object, Object>((Map<Object,Object>) result);
-        }
-        data.setCacheQualifier(variables);
-        
+
+        Map<String,Object> vars = new HashMap<String, Object>();
+    	for (Design design : cssVariables) {
+            Object result = wga.tmlscript().runScript(design, wga.createTMLContext(data.getDocument().getDatabase(), design), design.getScriptModule(WGScriptModule.CODETYPE_TMLSCRIPT).getCode(), extraObjects);
+            if (!(result instanceof Map<?,?>)) {
+            	wga.getLog().error("The return type of TMLScript module '" + design + "' used to set CSS variables is no lookup table or JS object and will be ignored.");
+            	continue;
+            }
+            if (wga.tmlscript().isNativeObject(result)) {
+                vars.putAll((JsonObject) wga.tmlscript().importJsonData(result));
+            }
+            else vars.putAll((Map<String,Object>)result);
+		}
+			
+        data.setCacheQualifier((Serializable)vars);
     }
 
 }
