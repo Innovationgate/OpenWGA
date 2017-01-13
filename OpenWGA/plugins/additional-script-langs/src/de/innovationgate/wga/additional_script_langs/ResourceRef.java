@@ -88,7 +88,9 @@ public class ResourceRef {
 				
 	}
 	
-
+	/*
+	 * Returns the code "as is" - WITHOUT recursively calling postProcessors
+	 */
 	public String getCode() throws WGException, IOException{
 		switch (_type) {
 			case TYPE_CSS:
@@ -111,12 +113,18 @@ public class ResourceRef {
 		}
 	}
 	
+	/*
+	 * Returns the code recursively calling other postProcessors
+	 */
 	public String getJavaScriptCode() throws WGException, IOException{
 		if(_type==TYPE_JS)
 			return _design.getJavaScriptCode();
 		else return getCode();
 	}
 
+	/*
+	 * Returns the code recursively calling other postProcessors
+	 */
 	public String getCSSCode() throws WGException, IOException{
 		if(_type==TYPE_CSS)
 			return _design.getCSSCode();
