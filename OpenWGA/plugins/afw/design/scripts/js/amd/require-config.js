@@ -14,6 +14,7 @@ require.config({
         "jquery-ui": 					"/plugin-wga-app-framework/file/jquery-ui-1.11/build/jquery-ui.min",
         "jquery-ui-js": 				"/plugin-wga-app-framework/file/jquery-ui-1.11/source",
         "jquery-ui-css": 				"/plugin-wga-app-framework/file/jquery-ui-1.11/build/jquery-ui.min",
+		"cmm":							"/plugin-cm-modules/js/cmm",
         
 		// query plugins:        
         "jquery-columnslider": 			"/plugin-wga-app-framework/js/jquery-columnslider",        
