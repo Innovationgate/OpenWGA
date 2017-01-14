@@ -103,6 +103,8 @@
 		}
 	}
 
+	_downloads = (CMM.setting('download') && _download_url) || false;
+	
 </tml:script>
 
 <tml:range var="_img">
@@ -117,8 +119,8 @@
 			onmouseout="this.src='<tml:item name="_url"/>';<tml:case isfilled="_srcset">this.srcset='<tml:item name="_srcset"/>'</tml:case>"
 		</tml:case>
 		data-image-url="<tml:item name="_url_lightbox"/>"
-		data-image-download="<tml:script expression="CMM.setting('download')||false"/>"
-		<tml:case condition="_download_url">
+		<tml:case condition="_downloads">
+			data-image-download="true"
 			data-image-download-url="<tml:item name="_download_url"/>"
 		</tml:case>
 	>
