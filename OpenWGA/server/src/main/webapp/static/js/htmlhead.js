@@ -1711,6 +1711,24 @@ WGA.portlet = function() {
 			
 			var localIsBetter = false;
 			
+			/*
+			 * #00004824:
+			 * Test, if browser support sessionStorage
+			 * Note that is't not enough to check window.sessionStorage
+			 * Safari doesn't have local storage in private surfing mode. window.sessionStorage returns an Object
+			 * but calling setItem() throws an exception "(DOM Exception 22): The quota has been exceeded".  
+			 */
+			function hasLocalStorage(){
+				var testKey = 'test', storage = window.sessionStorage;
+			    try {
+			        storage.setItem(testKey, '1');
+			        storage.removeItem(testKey);
+			        return true;
+			    } catch (error) {
+			        return false;
+			    }				
+			}
+			
 			// Test if we have a local state.
 			if (testBetterState) {
 				var myState = this.fetchState(pKey);
@@ -1726,7 +1744,7 @@ WGA.portlet = function() {
 						defaultState: (defaultState && defaultState == true)
 				});
 				
-				if (window.sessionStorage) {
+				if (hasLocalStorage()) {
 					window.sessionStorage.setItem(PORTLETSTATE_PREFIX +  WGA.uriHash + "." + pKey, stateObject);
 					var parentKeys = parentRegistry[pKey];
 					if (parentKeys) {
