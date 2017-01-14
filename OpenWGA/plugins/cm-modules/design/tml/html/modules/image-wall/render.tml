@@ -80,7 +80,7 @@
 		$("#album-<tml:option name="ns"/>").imageAlbum();
 	});
 	<tml:case condition="CMM.setting('lightbox')">
-		require(["jquery", "jquery-lightbox"], function(){
+		require(["jquery-lightbox"], function(){
 			$(function(){
 				$("#album-<tml:option name="ns"/>").find("img").lightbox({
 					group: "<tml:option name="ns"/>",

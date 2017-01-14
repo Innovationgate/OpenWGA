@@ -62,7 +62,10 @@ Controller.prototype.prepare = function($cx, CMM){
 	}
 	else this.tml=false;
 	
-	//console.log("prepare", $cx, this.mod_config, this.tml);
+	if(!$cx.request.getAttribute("CMM_module_css_reg")){
+		$cx.request.setAttribute("CMM_module_css_reg", WGA.createList());
+	}
+	this.request_module_css_reg = $cx.request.getAttribute("CMM_module_css_reg");
 	
 }.nonIsolated();
 
@@ -91,4 +94,13 @@ Controller.prototype.getCssCode = function(css){
 		}
 	}
 	return ret.replace(/\n/g, "").replace(/"/g, "'");
+}
+
+Controller.prototype.isCssRendered = function(){
+	var cmm_style_included = WGA.TMLPage.getVar("_cmm_style_included");
+	return cmm_style_included || this.request_module_css_reg.contains(this.module_id);	
+}
+
+Controller.prototype.setCssRendered = function(){
+	this.request_module_css_reg.add(this.module_id);	
 }

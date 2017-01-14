@@ -23,11 +23,13 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:[script] if="$mc.hasCss() & !_cmm_style_included">
+<tml:[script] if="$mc.hasCss & !$mc.isCssRendered">
 	<tml:include if="$mc.hasIncludeCss" medium="stylesheets" ref="module-css" o_tml="{$mc.mod_config.includes.css}" o_designdb="{$mc.mod_config.designdb}" var="_css"/>
-	require(["<tml:url type="js" name="cmm"/>"], function(CMM){
+	require(["cmm"], function(CMM){
 		CMM.createStyle("<tml:item name="$mc.getCssCode" a-css="_css" encode="none"/>", "<tml:item name="$mc.mod_config.id"/>");
 	})
+	<tml:comment><tml:item name="$mc.setCssRendered" output="false"/></tml:comment>
+	<tml:script expression="$mc.setCssRendered()"/>
 </tml:[script]>
 
 <tml:{div} if="$mc.tml" wrapif="!$option_raw"
