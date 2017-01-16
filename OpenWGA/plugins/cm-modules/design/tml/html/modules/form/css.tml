@@ -67,7 +67,6 @@
 		},
 		
 		".data": {
-			margin: "0 10px 0 0px",
 			label: {
 				"float": "none",
 				text_align: "left"
