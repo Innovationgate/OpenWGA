@@ -400,7 +400,11 @@ public abstract class CollectionResult implements Iterable<Context> {
             return null;
         }
     }
-    
+
+    public boolean isEmpty() throws WGException {
+        return !iterator().hasNext();
+    }
+
     /**
      * Returns an iterable whose iterators wrap/transform the returned documents into some custom object
      * @param wrapper A wrapping implementation
