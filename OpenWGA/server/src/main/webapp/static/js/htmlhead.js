@@ -143,30 +143,20 @@ WGA.util = /**
 		if(!div){
 			div = document.createElement("div");
 			div.id = "wga-reload-message";
-			div.style.padding="10px";
+			div.style.padding="20px";
 			div.style.position="fixed";
 			div.style.left=div.style.right=div.style.top=0;
-			div.style.backgroundColor="gray";
+			div.style.backgroundColor="brown";
 			div.style.color="white";
 			div.style.boxShadow="0 0 10px black";
 			div.style.zIndex=10000;
 
 			var closeButton = document.createElement("button")
-			closeButton.appendChild(document.createTextNode("X"));
+			closeButton.appendChild(document.createTextNode("x"));
 			closeButton.style.float="right";
-			closeButton.style.margin="0";
-			closeButton.style.color="darkgray";
-			closeButton.style.fontWeight="normal";
+			closeButton.style.color="#efefef";
 			closeButton.style.border="none";
-			closeButton.style.fontFamily = "sans-serif";
-			closeButton.style.fontSize = "10pt";
 			closeButton.style.background="transparent";
-			closeButton.onmouseenter = function(ev) {
-				ev.target.style.color = "white";
-			}
-			closeButton.onmouseleave = function(ev) {
-				ev.target.style.color = "darkgray";
-			}
 			closeButton.onclick=function(){
 				document.getElementById(id).style.display="none"
 			}
@@ -177,11 +167,25 @@ WGA.util = /**
 			
 			var reloadButton = document.createElement("button")
 			reloadButton.style.margin = "10px 0 0 0";
-			reloadButton.appendChild(document.createTextNode("OK"));
+			reloadButton.appendChild(document.createTextNode(WGA.util.label({
+				de: "Seite neu laden",
+				en: "Reload Page"
+			})));
 			reloadButton.onclick=function(){
 				top.location.reload();
 			}
 			div.appendChild(reloadButton);
+
+			var cancelButton = document.createElement("button")
+			cancelButton.style.margin = "10px 0 0 10px";
+			cancelButton.appendChild(document.createTextNode(WGA.util.label({
+				de: "Schließen",
+				en: "Close"
+			})));
+			cancelButton.onclick=function(){
+				document.getElementById(id).style.display="none"
+			}
+			div.appendChild(cancelButton);
 			
 			var firstElement = document.body.firstElementChild
 			if(firstElement)

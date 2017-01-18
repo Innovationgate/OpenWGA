@@ -275,11 +275,14 @@ public class Root extends Base {
         status.parentTag = status;
         setBasicRequestAttributes(request);
         
+        /*
         // Cancel here if we have an ajax failure when restoring AJAX environment failed
+         * removed bc. #00004828
         if (status._isAjaxFailure) {
             setEvalBody(false);
             return;
         }
+        */
         
         // Eventually enable TML Debug
         HttpSession session = this.pageContext.getSession();
@@ -310,13 +313,6 @@ public class Root extends Base {
         WGAError wgaError = (WGAError) getPageContext().getRequest().getAttribute(WGACore.ATTRIB_WGAERROR);
         if (wgaError != null) {
             WGA.get(getTMLContext()).tmlPage().setVar("wgaerror", wgaError);
-        }
-
-        
-        // Cancel here if we have an ajax failure because action was called for wrong session id
-        if (status._isAjaxFailure) {
-            setEvalBody(false);
-            return;
         }
 
         // Deactivate body on AJAX no refresh call
@@ -480,15 +476,12 @@ public class Root extends Base {
             }
             
             if (!getTMLContext().isbotrequest()) {
-                boolean alreadyWarned = isAlreadyWarnedAboutAJAXFailure(status._ajaxInfo);
-                if (!alreadyWarned) {
-                    String message = getTMLContext().systemLabel("tml", "ajax.sessionexpired.message");
-                    try {
-                        javaScript.append("WGA.util.showReloadMessage(\"" + getTMLContext().encode("javascript", message) +  "\");");
-                    }
-                    catch (FormattingException e) {
-                        getTMLContext().getlog().error("Exception encoding AJAX error message", e);
-                    }
+                String message = getTMLContext().systemLabel("tml", "ajax.sessionexpired.message");
+                try {
+                    javaScript.append("WGA.util.showReloadMessage(\"" + getTMLContext().encode("javascript", message) +  "\");");
+                }
+                catch (FormattingException e) {
+                    getTMLContext().getlog().error("Exception encoding AJAX error message", e);
                 }
             }
             
@@ -497,8 +490,8 @@ public class Root extends Base {
             }
             
             this.setSuffix(javaScript.toString());
-            this.setResult(""); // Neccessary to trigger any tag output
-            return;
+            //this.setResult(""); // Neccessary to trigger any tag output
+            //return;
             
         }
         
