@@ -59,5 +59,26 @@
 		}
 	
 	}
-			
+
 </tml:include>
+
+<tml:script>
+	_responsive = WGA.design(db()).getGlobal("RESPONSIVE")
+</tml:script>
+<tml:case condition="_responsive">
+	@media screen and (max-width: <tml:script format="0" expression="_responsive.medium.width-1"/>px) {
+		<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_columns">
+			"> .columns-wrapper.columns-clear":{
+				<tml:include ref="::css-columns-clear"/>
+			}
+		</tml:include>
+	}
+	@media screen and (max-width: <tml:script format="0" expression="_responsive.large.width-1"/>px) {
+		<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_columns">
+			"> .columns-wrapper.columns-medium-clear":{
+				<tml:include ref="::css-columns-clear"/>
+			}
+		</tml:include>
+	}	
+</tml:case>
+
