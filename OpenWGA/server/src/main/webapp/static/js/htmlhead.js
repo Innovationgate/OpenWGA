@@ -170,7 +170,7 @@ WGA.util = /**
 			reloadButton.appendChild(document.createTextNode(WGA.util.label({
 				de: "Seite neu laden",
 				en: "Reload Page"
-			})));
+			}, "en")));
 			reloadButton.onclick=function(){
 				top.location.reload();
 			}
@@ -181,7 +181,7 @@ WGA.util = /**
 			cancelButton.appendChild(document.createTextNode(WGA.util.label({
 				de: "Schließen",
 				en: "Close"
-			})));
+			}, "en")));
 			cancelButton.onclick=function(){
 				document.getElementById(id).style.display="none"
 			}
@@ -486,7 +486,7 @@ WGA.util.label = function(labels, defaultLanguage) {
 		// Only language codes
 		for (var idx=0; idx < navigator.languages.length ; idx++) {
 			var locale = navigator.languages[idx];
-			var subIdx = locale.indexOf("_");
+			var subIdx = locale.indexOf("-");
 			if (subIdx != -1) {
 				var language = locale.substring(0, subIdx);
 				var label = labels[language];
@@ -501,7 +501,7 @@ WGA.util.label = function(labels, defaultLanguage) {
 		if (label) {
 			return label;
 		}
-		var subIdx = navigator.language.indexOf("_");
+		var subIdx = navigator.language.indexOf("-");
 		if (subIdx != -1) {
 			var language = navigator.language.substring(0, subIdx);
 			var label = labels[language];
