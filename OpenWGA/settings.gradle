@@ -28,7 +28,6 @@ include ":wgaDeb"
 project(":wgaDeb").projectDir = file("distros/wgaDeb")
 
 include ":server"
-include ":server:testRuntime"
 
 include ":plugin-admin"
 project(":plugin-admin").projectDir = file("plugins/admin")
