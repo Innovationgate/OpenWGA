@@ -149,7 +149,7 @@
 										struct.append('<div class="outline-error tag tag-H' + i + '">fehlt</div>');
 								}
 								currentLevel = level
-								struct.append('<div class="tag tag-' + this.tagName + '">' + $(this).text() + "</div>");			
+								struct.append('<div class="tag tag-' + this.tagName + '">' + ($(this).text().trim() || "(leer)") + "</div>");			
 							})
 							var h1 = $(el).find("h1").length
 							if(h1!=1)
