@@ -71,6 +71,8 @@
 <tml:case context="[db:{option('dbkey')}/docid:{option('contentkey')}]" iscontextvalid="true">
 
 	<tml:script>
+		_derivates = content().getFileDerivates(option('filename'))
+		console.log("_derivates", _derivates, option('filename'));
 		_file_md = content().getFileMetaData(option('filename'))
 		_fields = WGA.createList([
 			"title",
@@ -150,6 +152,19 @@
 					    			Pixel
 					    		</td>
 					    	</tr>
+							<tml:case condition="_derivates.size()">
+					    	<tr>
+					    		<td valign="top">Derivate:</td>
+					    		<td>
+					    			<tml:foreach item="_derivates" currentvalue="_derivate" sortexpression="_derivate.size" sortorder="ascending">
+					    				<div>
+						    			<tml:script expression="_derivate.displayWidth + ' x ' + _derivate.displayHeight"/> Pixel,
+										<tml:script expression="_derivate.size/1000" format="0"/> KB
+										</div>
+					    			</tml:foreach>
+					    		</td>
+					    	</tr>
+					    	</tml:case>
 				    	</tml:case>
 				    	<tml:foreach item="_fields" currentvalue="_field">
 							<tr>
