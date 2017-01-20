@@ -1,0 +1,20 @@
+//@import db=@afw rtfeditor2
+//@import db=@afw file-uploader
+
+//@import ext-ext
+//@import bi
+//@import bi-util
+//@import rtftoolbar
+//@import siteexplorer
+//@import sitepanel
+//@import dialog
+//@import layout
+//@import design
+//@import resizable-dialog
+//@import dialog-image
+		
+//@import bi-combotree
+//@import upload-manager
+		
+//@import shCore
+//@import shBrushJs

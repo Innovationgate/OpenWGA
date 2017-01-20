@@ -31,6 +31,7 @@ import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGStructEntry;
+import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.webtml.utils.HTMLHeadInclusion;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
@@ -59,8 +60,9 @@ public class CMHtmlHeadInclusion implements HTMLHeadInclusion {
         		)
         			request.removeAttribute(WGACore.ATTRIB_EDITDOCUMENT);
         		
-    			result.append("\n<link rel=\"stylesheet\" type=\"text/css\" href=\"" + 
-						context.fileurl("plugin-wga-app-framework", "cms", "bi.css") +
+    			result.append("\n<link rel=\"stylesheet\" type=\"text/css\" ws-test href=\"" + 
+						//context.fileurl("plugin-wga-app-framework", "cms", "bi.css") +
+						WGA.get().design("plugin-contentmanager").resolve("bi-style-injection").scriptURL("css") +
 						"\">");
 				result.append("\n<script id=\"wga-cm-contentinfo\" type=\"text/javascript\">");
 	        	result.append("\nWGA.contentinfo={");

@@ -300,17 +300,6 @@ BI.sitepanel.initItemEditors=function(){
 			
 			// show item-label if item is empty:
 			if(item_value_el.dom.innerHTML==""){
-				item_label_el.setStyle({
-					display: "inline",
-					MozBorderRadius: "5px",
-					WebkitBorderRadius: "5px",
-					borderRadius: "5px",				
-					border: "dashed silver 2px",
-					fontStyle: "italic",
-					padding: "0 35px",
-					margin: "5px 0",
-					textAlign: "center"
-				})
 				if(params[1]=="image"){
 					item_label_el.setStyle({
 						display: "block",
