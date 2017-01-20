@@ -267,7 +267,9 @@ public class Image extends Base implements DynamicAttributes {
                         }
                         Dimension originalSize = srcSetCreator.getMaxAvailableSize(content, fileMeta, usage);
                         if (originalSize != null) {
-                            srcSetAttribute = "srcset=\"" + srcSetCreator.createSrcSet(fileurl, stringToBoolean(getAbsolute()), originalSize) + "\" ";
+                        	String srcset = srcSetCreator.createSrcSet(fileurl, stringToBoolean(getAbsolute()), originalSize);
+                        	if(!srcset.isEmpty())
+                        		srcSetAttribute = "srcset=\"" + srcset + "\" ";
                         }
                     }
                 }
