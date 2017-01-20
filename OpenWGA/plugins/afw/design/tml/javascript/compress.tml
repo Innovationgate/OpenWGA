@@ -82,8 +82,11 @@
 </tml:range>
 
 <tml:script>
-	if(option("jsmin")=="true"){
+	/*if(option("jsmin")=="true"){
 		return Packages.de.innovationgate.igutils.JSMin.compress(_jscode, wgacore.getCharacterEncoding());
 	}
-	else return _jscode;
+	else return _jscode;*/
+	
+	return _jscode;
+	
 </tml:script>
