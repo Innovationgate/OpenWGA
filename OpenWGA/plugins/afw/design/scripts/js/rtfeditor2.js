@@ -176,7 +176,7 @@ AFW.RTF.editor=function(id, config){
 	/*
 	create new DOM elements. The DOM structure looks like this when finished:
 	parent element
-	|-span element 					this is a <div> hiddden in viewmode "html" and "preview".
+	|-span element 					this is a <div> hidden in viewmode "html" and "preview".
 	| |-editelement 				<div contenteditable=true> in case of IE and Safari, <iframe> in case of Mozilla
 	|-sourcecode element 			(textarea) - visiable only in viewmode "html"
 	|-original element 				identified by the given ID - hidden in modes "wysiwyg" and "html", visable in mode "preview"
@@ -422,6 +422,13 @@ AFW.RTF.editor=function(id, config){
 
 
 	//-------- end Constructor----------------
+	
+	this.cleanHTML = function(){
+		var html = AFW.RTF.getCleanInnerHTML(editor.editelement);
+		editor.editelement.innerHTML = html;
+		editor.doc.defaultView.focus();
+	}
+
 
 	this.showEditHelper = function(show){
 		var el = this.iframe ? this.doc.body : this.editelement;
@@ -943,7 +950,8 @@ AFW.RTF.editor=function(id, config){
 	
 	this.focus=function(){
 		setFocus();
-		this.selection.restore();
+		if(this.selection)
+			this.selection.restore();
 	}	
 	function setFocus(){
 		editor.editelement.focus();
@@ -1118,7 +1126,7 @@ AFW.RTF.editor=function(id, config){
 		if(ie)
 			return _createRange(_getSelection()).text;
 		else 
-			return _getSelection();
+			return _getSelection().toString();
 	}
 	this.getSelectedText=getSelectedText;
 	
@@ -2002,9 +2010,6 @@ AFW.RTF.getCleanInnerHTML = function(node, isTextBlock){
 				if(tagname=="img" && source.src.indexOf("webkit-fake-url://")==0)
 					return;		// image is useless so ignore this image
 				
-				/* create element */
-				el = dest.appendChild(document.createElement(tagname));
-
 				/* 
 				 * special tags attribute handling 
 				 */
@@ -2031,10 +2036,14 @@ AFW.RTF.getCleanInnerHTML = function(node, isTextBlock){
 					case "h4":
 					case "h5":
 					case "h6":
-						if(!source.childNodes.length)
-							el.appendChild(document.createElement("br"));
+						if(!source.innerHTML.trim())
+							return;		// ignore empty block elements
 						break;
 				}
+
+				/* create element */
+				el = dest.appendChild(document.createElement(tagname));
+
 				// copy attributes
 				for(var i=0; i<attributes.length; i++){
 					var attribute = attributes[i];

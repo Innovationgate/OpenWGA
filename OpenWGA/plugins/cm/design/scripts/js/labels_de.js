@@ -425,7 +425,7 @@ $L.RTFToolbar={
 	undo: "Rückgängig",
 	redo: "Wiederholen",
 	paste: "Ohne Formattierungen einfügen",
-	removeFormatting: "Alle Formatierungen entfernen",
+	removeFormatting: "HTML bereinigen",
 	bold: "Fett",
 	italic: "Kursiv",
 	underline: "Unterstrichen",

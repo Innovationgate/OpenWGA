@@ -772,27 +772,6 @@ BI.rtftoolbar=function(){
 			});
 
 			toolbarElements = [
-			    /*               
-				{
-					cmd: "save",
-					cls: "x-btn-icon",
-					icon: "../../plugin-wga-app-framework/file/icons/accept.png",
-					tooltip: $L.RTFToolbar.save_and_close,
-					handler: function(){
-						BI.contenteditor.saveField();
-					}
-				},
-				{
-					cmd: "save",
-					cls: "x-btn-icon",
-					icon: "../../plugin-wga-app-framework/file/icons/disk.png",
-					tooltip: $L.RTFToolbar.save_and_continue,
-					handler: function(){
-						BI.contenteditor.saveFieldAndContinue();
-					}
-				},
-				'-',
-				*/
 				{
 					cmd: "zoom",
 					cls: "x-btn-icon",
@@ -844,7 +823,9 @@ BI.rtftoolbar=function(){
 					icon: "../../plugin-wga-app-framework/file/icons/html_valid.png",
 					tooltip: $L.RTFToolbar.removeFormatting,
 					handler: function(button, ev){
-						editor.selection.clean();
+						if(editor.getSelectedText())
+							editor.selection.clean();
+						else editor.cleanHTML()						
 					}
 				},				
 				'-',
@@ -1023,6 +1004,7 @@ BI.rtftoolbar=function(){
 					'-'
 				)
 			}
+			/*
 			else {
 				toolbarElements.unshift(
 					{
@@ -1042,6 +1024,7 @@ BI.rtftoolbar=function(){
 					'-'
 				)
 			}
+			*/
 
 			toolbar = new Ext.Toolbar(dialog.body, toolbarElements);			
 		}

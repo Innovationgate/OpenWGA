@@ -419,7 +419,7 @@ $L.RTFToolbar={
 	undo: "Undo",
 	redo: "Redo",
 	paste: "Paste without Formats",
-	removeFormatting: "Remove all Formats",
+	removeFormatting: "Cleanup HTML",
 	bold: "Bold",
 	italic: "Italic",
 	underline: "Underline",
