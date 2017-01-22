@@ -332,6 +332,9 @@
 				BI.enablemenus("archive-content", false);
 			</tml:else>
 		</tml:if>
+
+		Ext.getCmp("seo-show-headings").setChecked($("html", BI.sitepanel.iframe.document).hasClass("show-heading-helper"));
+
 	</script>
 	
 </tml:form>

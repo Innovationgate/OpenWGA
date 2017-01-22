@@ -354,6 +354,25 @@
 		Ext.get("web-content-wrapper").unmask();
 	});
 	
+	BI.menu.seo_headings_menu = new Ext.menu.Menu({
+		items: [
+			new Ext.menu.CheckItem({
+				id:'seo-show-headings',
+				text: "H1-H6 Header einblenden",
+				checked: $("html", BI.sitepanel.iframe.document).hasClass("show-heading-helper"),
+				handler: function(m, ev){
+	       			$("html", BI.sitepanel.iframe.document).toggleClass("show-heading-helper");
+	       		}
+			})
+		]
+	})
+	BI.menu.seo_headings_menu.on("beforeshow", function(){
+		Ext.get("web-content-wrapper").mask();
+	});
+	BI.menu.seo_headings_menu.on("beforehide", function(){
+		Ext.get("web-content-wrapper").unmask();
+	});
+	
 	BI.toolbarbuttons={
 		cms:[
 			new Ext.Toolbar.Button({
@@ -375,14 +394,14 @@
 			        menu : BI.menu.edit
 			})
 			,new Ext.Toolbar.Separator()
-			,new Ext.Toolbar.Button({
-					id:'seo-button',
-					cls: "x-btn-text-icon",
-					icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="application_view_columns.png"/>",
-					text: "SEO",
-		       		handler: function(m, ev){
-		       			BI.seopanel.activate();
-		       		}
+			,new Ext.Toolbar.SplitButton({				
+				cls: "x-btn-text-icon",
+				icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="application_view_columns.png"/>",
+				text: "SEO",
+				handler: function(m, ev){
+	       			BI.seopanel.activate();
+	       		},
+				menu: BI.menu.seo_headings_menu    		
 			})
 			,new Ext.Toolbar.Separator()
 			,new Ext.Toolbar.Button({
