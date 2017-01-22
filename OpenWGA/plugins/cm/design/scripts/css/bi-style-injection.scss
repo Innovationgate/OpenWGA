@@ -1,3 +1,27 @@
 @import "bi-style-injection/wga-item";
 @import "bi-style-injection/cmm";
 @import "bi-style-injection/heading-helper";
+
+
+.BI-create{
+	background-color: white;
+	background-image: linear-gradient(white, #CACCCD);
+	background-image: -moz-linear-gradient(white, #CACCCD);
+	background-image: -webkit-linear-gradient(white, #CACCCD);
+	text-shadow: 1px 1px 1px white;
+	text-decoration: none;
+	color: red;
+	box-shadow: 0 0 10px black;
+	-moz-box-shadow: 0 0 10px black;
+	-webkit-box-shadow: 0 0 10px black;
+	border: solid red 2px;
+	padding: 0px 5px 1px;
+	cursor: pointer;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;	
+	white-space: nowrap; 
+}
+.createpage{
+	display: none;
+}
