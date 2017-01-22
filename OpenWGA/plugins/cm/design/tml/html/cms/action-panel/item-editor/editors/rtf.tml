@@ -312,7 +312,6 @@
 				}
 			}
 			params.ts=now.getTime();
-			console.log(params);
 			var new_params = []
 			for(var i in params)
 				new_params.push(i + "=" + params[i]);
