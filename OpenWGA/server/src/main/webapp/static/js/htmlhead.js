@@ -1735,11 +1735,20 @@ WGA.portlet = function() {
 			
 			// Test if we have a local state.
 			if (testBetterState) {
+				
 				var myState = this.fetchState(pKey);
 				if (myState && myState.data != state) {
+					/*
 					localIsBetter = true;
 					forceReload = true;
+					*/
+					/*
+					console.log("browser has better state");
+					console.log("myState", myState.data);
+					console.log("state", state)
+					*/
 				}
+				
 			}
 			
 			if (!localIsBetter) {
