@@ -92,6 +92,7 @@ WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", fun
 		if(!s){
 			return false;
 		}
+		s = s.allowedModules;
 		if(s!==ALL){
 			var found = false;
 			for(var i=0; i<s.length; i++){
@@ -185,7 +186,7 @@ WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", fun
   			id:			"section_"+section,
   			icon: 		"<tml:url db="@afw" type="file" doc="icons" file="layout_content.png"/>",
   			cls: 		"light-panel-bg tree-root",
-      		text:		section,
+      		text:		sections[section].title,
       		allowDrag: 	false,
       		section:	section
   		});

@@ -1,13 +1,17 @@
 function Controller(){
 	//console.log("render.Controller");
+	this.uid = Packages.de.innovationgate.utils.UIDGenerator.generateUID();
 }
 
 Controller.prototype.prepare = function($option_section, $cx, CMM){
-	this.section = $option_section || "content";
+	var section = $option_section || "content";
+	var parts = section.split("|");
+	this.section = parts[0];
+	this.sectionTitle = parts[1] || parts[0];
 	this.mods = CMM.getContentModulesAsXML($cx.content()).selectNodes("/modules/section[@id='"+this.section+"']/mod");
 }.nonIsolated();
 
-Controller.prototype.allowedModulesString = function($cx, $option_modules, CMM){
+Controller.prototype.allowedModules = function($cx, $option_modules, CMM){
 	var mods = false;
 	if($option_modules){
 		var parts = $option_modules.split(",")
