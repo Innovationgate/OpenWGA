@@ -158,6 +158,7 @@ BI.struct=function(){
 		chooseVLink: function(el){
 
 			var form=el.form;
+			var form_id = form.id;
 			var linktype = form.virtuallinktype.value||"exturl";
 			var path = decodeURI(form.virtuallink.value).split("/");
 			var wgakey;
@@ -178,6 +179,7 @@ BI.struct=function(){
 			};
 			BI.dialog.show("rtf:insert-link", null, opts);
 			BI.dialog.callback=function(url, linktext, linkinfo, target){
+				var form = document.getElementById(form_id);
 				linktype=linkinfo.type;
 				form.virtuallink.value=linkinfo.key;
 				form.virtuallinktype.value=linktype;
