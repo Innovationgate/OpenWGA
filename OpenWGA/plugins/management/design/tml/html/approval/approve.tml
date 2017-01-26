@@ -51,8 +51,7 @@
 			
 		</tml:case>		
 		
-		
-		<tml:case condition="db().getWorkflowEngine().getWorkflow(con).isAlreadyApprovedByUser()">
+		<tml:case condition="con.getDatabase().getWorkflowEngine().getWorkflow(con).isAlreadyApprovedByUser()">
 		
 			<h4><tml:label key="alreadyApproved" param1="{con.title}"/></h4>
 		
