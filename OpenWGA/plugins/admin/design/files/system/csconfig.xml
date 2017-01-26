@@ -44,17 +44,10 @@
       <uniqueName>de.innovationgate.admin</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-<<<<<<< HEAD
         <minorVersion>4</minorVersion>
         <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
         <buildVersion>656</buildVersion>
-=======
-        <minorVersion>3</minorVersion>
-        <maintenanceVersion>2</maintenanceVersion>
-        <patchVersion>1</patchVersion>
-        <buildVersion>657</buildVersion>
->>>>>>> refs/heads/Maintenance_7_3
       </version>
     </id>
     <title>OpenWGA Admin Client</title>

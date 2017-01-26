@@ -76,10 +76,7 @@
 						return false;
 					else if(editor.getNearestTagFromSelection("a"))
 						return true;
-					else{
-						var selection = editor.getSelectedText()
-						return !selection.isCollapsed
-					}
+					else return editor.getSelectedText()!=""
 				}
 				
 				function setDropEffect(e){

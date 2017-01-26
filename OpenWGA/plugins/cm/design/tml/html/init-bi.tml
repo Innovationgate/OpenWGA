@@ -48,11 +48,7 @@
   	}
 
 	<tml:case condition="profile.hasItem('se_pagesize')">
-<<<<<<< HEAD
 		BI.se.pageSize = <tml:script format="0">return profile.se_pagesize||0</tml:script>;
-=======
-		BI.se.pageSize = <tml:script format="0">return profile.se_pagesize || 0</tml:script>;
->>>>>>> refs/heads/Maintenance_7_3
 	</tml:case>
 	
 </script>
