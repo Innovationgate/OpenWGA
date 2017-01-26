@@ -165,7 +165,7 @@
 					else if(!editor.toolbar.isCmdDisabled("InsertImg")){
 						if(!file.poster)
 							return;
-			        	if(!editor.getParagraph())
+			        	if(!editor.getParagraph() && !editor.isInTable())
 			        		editor.execCmd("FormatBlock", "p");
 						var el = editor.createImg(file.poster, file.type||"intfile")
 						AFW.RTF.setURLInfo(el, {type:file.type||"intfile", key:file.key||file.name})
@@ -182,7 +182,7 @@
 					if(cmd=="image"){
 			        	// create image
 			        	
-			        	if(!editor.getParagraph())
+			        	if(!editor.getParagraph() && !editor.isInTable())
 			        		editor.execCmd("FormatBlock", "p");
 			        	
 						var el = editor.createImg("<tml:url type="file" doc="images" file="ajax-loader-2.gif"/>", "intfile")
