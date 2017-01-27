@@ -274,9 +274,11 @@ AFW.RTF.editor=function(id, config){
 		
 		if(this.autofocus){
 			try{
-				this.focus();
+				setFocus();
 			}
-			catch(e){}
+			catch(e){
+				console.log("RTF Editor: unable to set autofocus", e);
+			}
 		}
 		this.doc=document;
 		
