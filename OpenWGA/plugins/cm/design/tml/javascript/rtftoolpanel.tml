@@ -80,14 +80,14 @@ BI.RTFToolpanel = function(){
 			tabs.addTab("rtf-tab-format", "<tml:label key="rtf.format"/>");
 			
 			tab = tabs.addTab("rtf-tab-table", "<tml:label key="rtf.table"/>");
-			if(BI.rtftoolbar.isCmdDisabled("inserttable"))
+			if(BI.rtftoolbar.isCmdDisabled("inserttable", true))
 				tab.disable();
 			
 			tab=tabs.addTab("rtf-tab-img", "<tml:label key="rtf.image"/>");
-			if(BI.rtftoolbar.isCmdDisabled("insertimg"))
+			if(BI.rtftoolbar.isCmdDisabled("insertimg", true))
 				tab.disable();
 			tab=tabs.addTab("rtf-tab-link", "<tml:label key="rtf.link"/>");
-			if(BI.rtftoolbar.isCmdDisabled("insertlink"))
+			if(BI.rtftoolbar.isCmdDisabled("insertlink", true))
 				tab.disable();
 		
 			tabs.activate("rtf-tab-format");

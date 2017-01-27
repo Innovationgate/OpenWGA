@@ -192,12 +192,12 @@ BI.rtftoolbar=function(){
 		editor.execCmd(button.cmd, button.param||null);
 	}
 
-	function isCmdDisabled(cmd){
+	function isCmdDisabled(cmd, ignore_focus){
 		// Helperfunction: check show/hide options.
 		// showoptions count more: If command is in showoptions than show the button.
 		// If not in showoptions but (and) in hideoptions: hide the button. Otherwise show it.
 		// The special showoption "all" defines to enabled all commands. 
-		if(!editor.isEditorSelected())
+		if(!ignore_focus && !editor.isEditorSelected())
 			return true;
 		if(showoptions.indexOf("all") != -1)
 			return false;
