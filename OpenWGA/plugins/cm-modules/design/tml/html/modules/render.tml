@@ -108,7 +108,6 @@
 			<tml:case condition="option('animate')===true || option('animate')=='true'">
 				<tml:[script]>
 					require(["jquery"], function(){
-						console.log("hier", $("#content-modules-<tml:item name="$mc.uid"/>"));
 						$("#content-modules-<tml:item name="$mc.uid"/>").css("opacity", 1);
 					})
 				</tml:[script]>
