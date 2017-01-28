@@ -72,7 +72,6 @@
 
 	<tml:script>
 		_derivates = content().getFileDerivates(option('filename'))
-		console.log("_derivates", _derivates, option('filename'));
 		_file_md = content().getFileMetaData(option('filename'))
 		_fields = WGA.createList([
 			"title",
