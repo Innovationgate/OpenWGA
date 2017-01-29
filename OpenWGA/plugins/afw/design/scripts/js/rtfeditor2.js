@@ -1459,7 +1459,7 @@ AFW.RTF.editor=function(id, config){
 	function insertTable(params){
 		return this.createTable(params.rows, params.cols, params.width, params.align)
 	}
-	this.createTable=function(rows, cols, width, align){
+	this.createTable=function(rows, cols, width){
 		rows=parseInt(rows);
 		cols=parseInt(cols);
 		if (rows.toString()=="NaN" || cols.toString=="NaN"){
@@ -1468,8 +1468,8 @@ AFW.RTF.editor=function(id, config){
 		}
 		//alert(rows + "/" + cols);
 		var el_table=editor.doc.createElement("table");
-		el_table.width=width||"100%"; 
-		el_table.align=align||"";
+		el_table.style.width=width||"100%"; 
+		//el_table.align=align||"";
 		var el_tbody=editor.doc.createElement("tbody");
 		el_table.appendChild(el_tbody);
 		
