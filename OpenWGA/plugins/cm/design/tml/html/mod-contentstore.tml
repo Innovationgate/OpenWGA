@@ -163,7 +163,7 @@
 			</div>
 		
 			<div id="header-panel">
-				<tml:portlet ajax="true" name="panel-header" ref="cms:panel-header" context="[db:{option('dbkey')}]"/>
+				<tml:portlet ajax="true" name="panel-header" ref="cms:panel-header" forcestate="true" context="[db:{option('dbkey')}]"/>
 			</div>
 
 		</div>
@@ -171,14 +171,14 @@
 		<div id="BI-resizable-dialog">
 			<div class="x-dlg-hd ydlg-hd">no title</div>
 		    <div class="x-dlg-bd ydlg-bd">
-				<tml:portlet name="resizable-dialog" ref="system:portlet-resizable-dialog" ajax="true"/>
+				<tml:portlet name="resizable-dialog" forcestate="true" ref="system:portlet-resizable-dialog" ajax="true"/>
 			</div>
 		</div>
 		
 		<div id="BI-dialog">
 		    <div class="x-dlg-hd ydlg-hd">no title</div>
 		    <div class="x-dlg-bd ydlg-bd">
-			    <tml:portlet name="modal-dialog" ref="system:portlet-modal-dialog" ajax="true"/>
+			    <tml:portlet name="modal-dialog" forcestate="true" ref="system:portlet-modal-dialog" ajax="true"/>
 		    </div>
 		</div>
 

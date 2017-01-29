@@ -3221,6 +3221,11 @@
 			<required>false</required>
 			<rtexprvalue>false</rtexprvalue>
 		</attribute>
+		<attribute>
+			<name>forcestate</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
 	</tag>
 	<tag>
 		<name>portlet</name>
@@ -3365,6 +3370,11 @@
 		</attribute>
 		<attribute>
 			<name>portletcontext</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<name>forcestate</name>
 			<required>false</required>
 			<rtexprvalue>false</rtexprvalue>
 		</attribute>

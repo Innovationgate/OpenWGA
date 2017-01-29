@@ -157,20 +157,15 @@ public class Root extends Base {
             }
         }
         
-        // In some situations we may decide not to render the portlet at all and first ask the client for the "best" state
-        // Conditions: AJAX Request & included portlet & the current state is overwritable by the client & no current form (whose field registration may be tainted by this)
-        if (pageContext.getRequest().getAttribute(WGACore.ATTRIB_AJAXINFO) != null && status.receptorTag != null && getTMLContext().gettmlform() == null) {
-            TMLPortletState state = portlet.getState();
-            if (state.isOverwritableByClient()) {
-                setEvalBody(false);
-                setResult(""); // Bypass stupid exiting behaviour of Base when result is null. Would prevent prefix/suffix from being rendered.
-                state.setForceReload(true);
-                
-                if (status.debugNode != null) {
-                    status.debugNode.addAttribute("skippedforreload", "true");
-                }
-            }
-        }
+        // #00004841:
+        // if the portlet state is "isOverwritableByClient" we render an empty portlet and let the client request it.
+        // this prevents the portlet from being rendered twice and avoids "flickering" of the UI on the client side.
+        TMLPortletState state = portlet.getState();
+        if (state.isOverwritableByClient()) {
+            setEvalBody(false);
+            setResult(""); // Bypass stupid exiting behaviour of Base when result is null. Would prevent prefix/suffix from being rendered.
+            state.setForceReload(true);
+        }        	
         
         // Set portlet context.
         TMLContext portletContext = portlet.getcontext();

@@ -1735,20 +1735,12 @@ WGA.portlet = function() {
 			
 			// Test if we have a local state.
 			if (testBetterState) {
-				
 				var myState = this.fetchState(pKey);
 				if (myState && myState.data != state) {
-					/*
 					localIsBetter = true;
 					forceReload = true;
-					*/
-					/*
-					console.log("browser has better state");
-					console.log("myState", myState.data);
-					console.log("state", state)
-					*/
+					//console.log("browser has better state", pKey, processContextId);
 				}
-				
 			}
 			
 			if (!localIsBetter) {
@@ -1863,12 +1855,19 @@ WGA.portlet = function() {
 	
 		// Registers a portlet to be reloaded at the end of the request
 		,registerPortletForReload : function(pKey, processContextId) {
-			if (reloadPortlets.length == 0 && !WGA.isPageLoaded) { // On Non-AJAX requests call performPortletReloads() on window load event. AJAX requests run this manually.
-				WGA.onload.register(function() {
-					WGA.portlet.performPortletReloads();
-				});
+			if (!WGA.pageLoaded) { // On Non-AJAX requests call performPortletReloads() on window load event. AJAX requests run this manually.
+				if (reloadPortlets.length == 0){
+					WGA.onload.register(function() {
+						WGA.portlet.performPortletReloads();
+					});
+				}
+				reloadPortlets.push({key: pKey, processId: processContextId, children: []});
 			}
-			reloadPortlets.push({key: pKey, processId: processContextId, children: []});
+			else {
+				reloadPortlets.push({key: pKey, processId: processContextId, children: []});
+				WGA.portlet.performPortletReloads()
+			}			
+			
 		}
 		
 		// Performs registered portlet reloads

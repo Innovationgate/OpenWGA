@@ -90,6 +90,7 @@ public class Include extends Base implements DynamicAttributes, PreferredOptionR
     private String tmlscope;
     private String portletmode;
     private String limit;
+    private String forcestate;
     
     public static class Status extends BaseTagStatus implements RootTagReceptor, DirectOutputCapableTag {
         String type;
@@ -567,11 +568,14 @@ public class Include extends Base implements DynamicAttributes, PreferredOptionR
             portlet.forcestate();
         }
         
+        if(stringToBoolean(getForcestate()))
+        	portlet.forcestate();
+        
         // Instantiate the controller, if available
         portlet.getState();
     }
 
-    private void createAJAXHTML(Status status, TMLPortlet portlet, String initialMode) throws WGException {
+	private void createAJAXHTML(Status status, TMLPortlet portlet, String initialMode) throws WGException {
         String uniquePortletID = portlet.getportletkey();
         
         // create prefix buffer
@@ -883,6 +887,13 @@ public class Include extends Base implements DynamicAttributes, PreferredOptionR
         this.limit = limit;
     }
 
+    public String getForcestate() {
+    	return getTagAttributeValue("forcestate", forcestate, "false");
+    }
+
+    public void setForcestate(String forcestate) {
+    	this.forcestate = forcestate;
+    }
 
 
 }
