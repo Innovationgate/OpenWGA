@@ -23,8 +23,7 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 <tml:script>
-	_top_news = CMM.setting('top_news');
-	_width_img_col = CMM.setting('width_img_col') || "30%";
+	_top_news = option("top_news");
 </tml:script>
 <div class="news-collection">
 	<tml:foreach sourcetag="{scoped:child-collection}" 
@@ -59,7 +58,7 @@
 			<tml:if isfirstloop="true" condition="_top_news">
 				<tml:then>
 					<div class="top-news">
-						<h1><tml:script expression="headline||TITLE"/></h1>	
+						<<tml:option name="news_headings"/>><tml:script expression="headline||TITLE"/></<tml:option name="news_headings"/>>
 						<div class="img">
 							<tml:case condition="_filename">
 								<tml:[util:link] o_linktitle="{TITLE}">
@@ -87,16 +86,16 @@
 							<span class="month"><tml:script expression="_values[1]"/></span>
 							<span class="year"><tml:script expression="_values[2]"/></span>
 						</div>
-						<h1><tml:script expression="headline||TITLE"/></h1>	
+						<<tml:option name="news_headings"/>><tml:script expression="headline||TITLE"/></<tml:option name="news_headings"/>>	
 						<tml:case condition="_filename">
 							<div class="img">
 								<tml:[util:link] o_linktitle="{TITLE}">								
 									<tml:if condition="db().hasFeature(db().FEATURE_CONTENT_FILE_DERIVATES)">
 										<tml:then>
-											<img src="<tml:url type="file" file="{_filename}" derivate="usage=poster,width~320"/>" border="0">
+											<img src="<tml:url type="file" file="{_filename}" derivate="usage=poster,width~320"/>" alt="<tml:script expression="headline||TITLE"/>">
 										</tml:then>
 										<tml:else>
-											<img src="<tml:url type="file" file="{_filename}" u_maxwidth="320"/>" border="0">
+											<img src="<tml:url type="file" file="{_filename}" u_maxwidth="320"/>" alt="<tml:script expression="headline||TITLE"/>">
 										</tml:else>
 									</tml:if>
 								</tml:[util:link]>

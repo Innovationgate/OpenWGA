@@ -31,10 +31,13 @@
 	if(!_offset)
 		_offset = "1";
 	_layout = CMM.setting('layout');
+
+	_headings = CMM.setting("news_heading") || "h6"
+	_top_news = CMM.setting('top_news');
 </tml:script>
 <tml:case context="{_context}" iscontextvalid="true">
 	<tml:children id="{scoped:child-collection}" exclude="main"/>
 	<div class="<tml:item name="{scoped:class}"/> <tml:[setting] o_name="layout"/>">
-		<tml:include ref="[::layout:{_layout}]" o-offset="_offset"/>
+		<tml:include ref="[::layout:{_layout}]" o-offset="_offset" o-news_headings="_headings" o-top_news="_top_news"/>
 	</div>
 </tml:case>

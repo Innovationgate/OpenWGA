@@ -67,7 +67,7 @@
 				</div>
 				<div class="date"><tml:script expression="date||PAGEPUBLISHED||MODIFIED" format="longdate"/></div>
 				<div>
-					<h1><tml:script expression="headline||TITLE"/></h1>
+					<<tml:option name="news_headings"/>><tml:script expression="headline||TITLE"/></<tml:option name="news_headings"/>>
 					<div class="intro"><tml:script expression="intro||DESCRIPTION" encode="rtf"/></div>
 					<div class="more">
 						<tml:[util:link]><tml:label key="more"/> ...</tml:[util:link]>

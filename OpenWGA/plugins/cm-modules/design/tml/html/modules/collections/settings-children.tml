@@ -78,6 +78,10 @@
 </div>
 
 <tml:case condition="tmlform.field(WGA.scoped('layout'))=='news-list'">
+	<label><tml:label key="collections.news-heading"/>:</label>
+	<div style="margin:10px">
+		<tml:input type="select" name="{scoped:news_heading}" options="h1,h2,h3,h4,h5,h6" mode="{option('mode')}"/>
+	</div>
 	<label><tml:label key="collections.show-top-news"/>:</label>
 	<div style="margin:10px">
 		<tml:input type="boolean" name="{scoped:top_news}" mode="{option('mode')}"/>
@@ -96,6 +100,10 @@
 </tml:case>
 
 <tml:case condition="tmlform.field(WGA.scoped('layout'))=='caroussel'">
+	<label><tml:label key="collections.news-heading"/>:</label>
+	<div style="margin:10px">
+		<tml:input type="select" name="{scoped:news_heading}" options="h1,h2,h3,h4,h5,h6" mode="{option('mode')}"/>
+	</div>
 	<label><tml:label key="collections.caroussel-autorun"/>:</label>
 	<div style="margin:10px">
 		<tml:input type="boolean" name="{scoped:autorun}" default="false" mode="{option('mode')}"/>
