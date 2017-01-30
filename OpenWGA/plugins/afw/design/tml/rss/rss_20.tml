@@ -84,7 +84,7 @@
 			</tml:eval>
 			<item>
 				<guid isPermaLink="false"><tml:meta name="structkey"/></guid>
-				<title><tml:script expression="(item(_config.headline_item)||TITLE).replace(/<br>/g, '')" encode="xml"/></title>
+				<title><tml:script expression="(item(_config.headline_item)||TITLE).replace(/<br>/g, '')" encode="plaintext,xml"/></title>
 				<link><tml:item name="_url"/></link>
 				<description>
 					<![CDATA[				
