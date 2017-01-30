@@ -285,7 +285,7 @@ this.getBestContent=function(lang){
 	if(struct.mayEditPage()){
 		var bestContent=this.getAllContent(lang, false);
 		if(bestContent.isEmpty()){
-			console.log("no best content in lang", lang, this.getTitle(), struct.getAllContent());
+			//console.log("no best content in lang", lang, this.getTitle(), struct.getAllContent());
 			return null;
 		}
 		return bestContent.get(0);
