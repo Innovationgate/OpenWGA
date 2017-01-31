@@ -53,7 +53,7 @@ public class VersionCompliance extends KeyValueBean<String, String> {
         VERSIONCOMPLIANCES.put(CSConfig.VERSIONCOMPLIANCE_WGA71, new VersionCompliance(CSConfig.VERSIONCOMPLIANCE_WGA71, "WGA 7.1"));
         VERSIONCOMPLIANCES.put(CSConfig.VERSIONCOMPLIANCE_WGA72, new VersionCompliance(CSConfig.VERSIONCOMPLIANCE_WGA72, "WGA 7.2"));
         VERSIONCOMPLIANCES.put(CSConfig.VERSIONCOMPLIANCE_WGA73, new VersionCompliance(CSConfig.VERSIONCOMPLIANCE_WGA73, "WGA 7.3"));
-        VERSIONCOMPLIANCES.put(CSConfig.VERSIONCOMPLIANCE_WGA74, new VersionCompliance(CSConfig.VERSIONCOMPLIANCE_WGA73, "WGA 7.4"));
+        VERSIONCOMPLIANCES.put(CSConfig.VERSIONCOMPLIANCE_WGA74, new VersionCompliance(CSConfig.VERSIONCOMPLIANCE_WGA74, "WGA 7.4"));
 
     }
     
