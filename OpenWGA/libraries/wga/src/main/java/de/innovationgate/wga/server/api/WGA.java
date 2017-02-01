@@ -2273,7 +2273,7 @@ public class WGA {
     public Context tmlcontext() throws WGException {
         
         if (isIsolated()) {
-            throw new UnavailableResourceException("TMLContext is not available but needed for this operation");
+            throw new UnavailableResourceException("TMLContext is not available in isolated mode but needed for this operation");
         }
         
         TMLContext tmlContext = fetchTMLContext();
@@ -2285,6 +2285,10 @@ public class WGA {
         }
     }
 
+    public Context context(String expression) throws WGException{
+    	return tmlcontext().context(expression);
+    }
+    
     protected TMLContext fetchTMLContext() {
         TMLContext context = _context.getTMLContext();
         
@@ -3053,7 +3057,11 @@ public class WGA {
     public Nav nav(Context context) throws WGException {
         return new Nav(this, context);
     }
-    
+
+    public Nav nav(String expression) throws WGException {    	
+        return new Nav(this, tmlcontext().context(expression));
+    }
+
     protected TMLContextWrapperIterator wrapIntoTMLContextIterator(SkippingIterator<WGContent> it) {
         if (it instanceof CountReportingIterator<?>) {
             return new CountReportingTMLContextWrapperIterator(it);
