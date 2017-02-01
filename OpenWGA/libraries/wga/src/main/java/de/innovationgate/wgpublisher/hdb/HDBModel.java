@@ -1149,9 +1149,17 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
      * @param contentClass Content class of the content to create
      * @param ref Reference document for the creation below which the content is to be created
      * @return The created content
-     * @throws HDBModelException
-     * @throws WGAPIException
+     * @throws WGException 
      */
+    public WGContent createContent(String contentClass) throws WGException {
+    	return createContent(contentClass, WGA.get().tmlcontext());
+    }
+    public WGContent createContent(String contentClass, String context_expression) throws WGException {
+    	return createContent(contentClass, WGA.get().context(context_expression));
+    }
+    public WGContent createContent(String contentClass, Context ref) throws WGAPIException, HDBModelException {
+    	return createContent(contentClass, ref.content());
+    }
     public WGContent createContent(String contentClass, WGContent ref) throws WGAPIException, HDBModelException {
         HDBModelParams params = newCreateContentParams(contentClass, ref);
         return createContent(params);
@@ -1163,6 +1171,9 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
      * @param parent Reference document for the creation below which the content is to be created
      * @throws WGAPIException
      */
+    public HDBModelParams newCreateContentParams(String contentClass, TMLContext parent) throws WGAPIException {
+    	return newCreateContentParams(contentClass, parent.content());
+    }
     public HDBModelParams newCreateContentParams(String contentClass, WGContent parent) throws WGAPIException {
         HDBModelParams params = new HDBModelParams(HDBModel.TYPE_CONTENT);
         params.setContentClass(contentClass);
@@ -1176,9 +1187,14 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
      * @param ref Reference document for the creation below which the content is to be created
      * @param param Custom parameter to inject to the operation
      * @return The created content
-     * @throws HDBModelException
-     * @throws WGAPIException
+     * @throws WGException 
      */
+    public WGContent createContent(String contentClass, Object param) throws WGException {
+    	return createContent(contentClass, WGA.get().tmlcontext().content(), param);
+    }
+    public WGContent createContent(String contentClass, Context ref, Object param) throws WGAPIException, HDBModelException {
+    	return createContent(contentClass, ref.content(), param);
+    }
     public WGContent createContent(String contentClass, WGContent ref, Object param) throws WGAPIException, HDBModelException {
         HDBModelParams params = newCreateContentParams(contentClass, ref);
         params.setCustomParam(param);
@@ -1299,7 +1315,6 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
      */
     public void updateContent(WGContent content, String tmlscriptModule, Object param) throws WGAPIException, HDBModelException {
         
-        
         HDBModelParams params = newUpdateContentParams(content);
         
         if (tmlscriptModule != null) {
@@ -1311,6 +1326,17 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
         updateContent(params);
         
     }
+    public void updateContent(WGContent content, Object param) throws WGAPIException, HDBModelException {
+    	updateContent(content, null, param);
+    }
+    public void updateContent(Object param) throws WGException {
+    	if(param instanceof Form)
+    		updateContent((Form) param);
+    	else updateContent(WGA.get().tmlcontext().content(), null, param);
+    }
+    public void updateContent() throws WGException {
+    	updateContent(WGA.get().tmlcontext().content());
+    }
     
     /**
      * Update a HDBModel content based on the information from a WebTML form. The form must be of form source appropriate for updating HDBModel contents and have this content as target context. 
@@ -1318,7 +1344,7 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
      * @throws WGAPIException
      * @throws HDBModelException
      */
-    public void updateContent(Form form) throws WGAPIException, HDBModelException {
+    private void updateContent(Form form) throws WGAPIException, HDBModelException {
         
         Context targetContext = form.gettargetcontext();
         if (targetContext == null) {
@@ -1339,7 +1365,13 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
         HDBModelParams params = newDeleteContentParams(content);
         deleteContent(params);
     }
-
+    public void deleteContent(Context context) throws WGAPIException {
+    	deleteContent(context.content());
+    }    
+    public void deleteContent() throws WGException {
+    	deleteContent(WGA.get().tmlcontext().content());
+    }
+    
     /**
      * Delete a HDBModel content
      * @param params Parameters for the operation
@@ -1785,6 +1817,10 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
         }
         content.setItemValue(ITEM_CONTENT_ID, contentId);
         _hdb.assignContentUID(content, UniqueNamePartFormatter.INSTANCE.format(contentId));
+    }
+    
+    public void assignContentID(String contentId) throws WGException {
+    	assignContentID(WGA.get().tmlcontext().content(), contentId);
     }
     
     /**
