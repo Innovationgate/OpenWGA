@@ -1604,6 +1604,25 @@ WGA.portlet = function() {
 		delete objectReg[portletkey];
 	}
 
+	/*
+	 * #00004824:
+	 * Test, if browser support sessionStorage
+	 * Note that is't not enough to check window.sessionStorage
+	 * Safari doesn't have local storage in private surfing mode. window.sessionStorage returns an Object
+	 * but calling setItem() throws an exception "(DOM Exception 22): The quota has been exceeded".  
+	 */
+	function hasLocalStorage(){
+		var testKey = 'test', storage = window.sessionStorage;
+	    try {
+	        storage.setItem(testKey, '1');
+	        storage.removeItem(testKey);
+	        return true;
+	    } catch (error) {
+	    	//console.log("no local storage");
+	        return false;
+	    }				
+	}
+
 	return {
 
 		init: function(){
@@ -1713,25 +1732,9 @@ WGA.portlet = function() {
 		// forceReload: Force reload of the portlet with the best state
 		,registerState : function(pKey, state, processContextId, testBetterState, forceReload, defaultState) {
 			
-			var localIsBetter = false;
+			//console.log("registerState", pKey, processContextId, testBetterState, forceReload, defaultState);
 			
-			/*
-			 * #00004824:
-			 * Test, if browser support sessionStorage
-			 * Note that is't not enough to check window.sessionStorage
-			 * Safari doesn't have local storage in private surfing mode. window.sessionStorage returns an Object
-			 * but calling setItem() throws an exception "(DOM Exception 22): The quota has been exceeded".  
-			 */
-			function hasLocalStorage(){
-				var testKey = 'test', storage = window.sessionStorage;
-			    try {
-			        storage.setItem(testKey, '1');
-			        storage.removeItem(testKey);
-			        return true;
-			    } catch (error) {
-			        return false;
-			    }				
-			}
+			var localIsBetter = false;
 			
 			// Test if we have a local state.
 			if (testBetterState) {
@@ -1789,17 +1792,18 @@ WGA.portlet = function() {
 		}
 		
 		,fetchState : function(pKey) {
-			if (window.sessionStorage) {
+			if (hasLocalStorage()){
 				return JSON.parse(window.sessionStorage.getItem(PORTLETSTATE_PREFIX + WGA.uriHash + "." + pKey));
 			}
-			else {
+			else if (portletStates[pKey]){
 				return JSON.parse(portletStates[pKey]);
 			}
+			else return null;
 		}
 		
 		// Remove state of a portlet that has been explicitly unregistered
 		,disposeState : function(pKey) {
-			if (window.sessionStorage) {
+			if (hasLocalStorage()){
 				window.sessionStorage.removeItem(PORTLETSTATE_PREFIX + WGA.uriHash + "." + pKey);
 			}
 			else {
@@ -1833,7 +1837,7 @@ WGA.portlet = function() {
 				states.push(pKey + "//" + state.data);
 			}
 			
-			if (window.sessionStorage) {
+			if (hasLocalStorage()){
 				var childrenStr = window.sessionStorage.getItem(CHILDPORTLETS_PREFIX + WGA.uriHash + "." + pKey);
 				var children = [];
 				if (childrenStr) {
@@ -1867,7 +1871,7 @@ WGA.portlet = function() {
 				reloadPortlets.push({key: pKey, processId: processContextId, children: []});
 				WGA.portlet.performPortletReloads()
 			}			
-			
+			//console.log("registerPortletForReload", pKey)
 		}
 		
 		// Performs registered portlet reloads
@@ -1904,6 +1908,7 @@ WGA.portlet = function() {
 			reloadPortlets = [];
 			
 			// Perform reloads
+			//console.log("performReloads", reallyReload.length)
 			for (var reallyReloadIdx=0; reallyReloadIdx < reallyReload.length; reallyReloadIdx++) {
 				var reload = reallyReload[reallyReloadIdx];
 				var formId = parentFormRegistry[reload.key];
@@ -2046,7 +2051,7 @@ WGA.websocket = {
 		
 		startService: function() {
 			
-			if (!window.sessionStorage) {
+			if (!hasLocalStorage()){
 				return false;
 			}
 			
