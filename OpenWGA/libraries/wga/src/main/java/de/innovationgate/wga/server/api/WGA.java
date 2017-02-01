@@ -1660,6 +1660,9 @@ public class WGA {
      * @throws FormattingException
      */
     public String encode(String encoding, Object obj) throws WGException, FormattingException {
+    	return encode(encoding, obj, null);
+    }
+    public String encode(String encoding, Object obj, TMLContext ctx) throws WGException, FormattingException {
         
             List<TextChunk> chunks = new ArrayList<TextChunk>();
             chunks.add(new TextChunk(TextChunk.Origin.INPUT, "text/plain", String.valueOf(obj)));
@@ -1698,7 +1701,9 @@ public class WGA {
                 
                 // Legacy WebTML encoder, just converting a string into another string, without chunk handling. They are only fed chunks of origin INPUT.
                 if (encoder == null) {
-                    ObjectFormatter formatter = getCore().getEncodingFormatter(encoderName, (isTMLContextAvailable() ? (TMLContext) tmlcontext() : null));
+                	
+                    ObjectFormatter formatter = getCore().getEncodingFormatter(encoderName, 
+                    		(ctx!=null ? ctx : isTMLContextAvailable() ? (TMLContext) tmlcontext() : null));
                     if (formatter != null) {
                         encoder = new EncodingFormatterEncoder(formatter);
                     }

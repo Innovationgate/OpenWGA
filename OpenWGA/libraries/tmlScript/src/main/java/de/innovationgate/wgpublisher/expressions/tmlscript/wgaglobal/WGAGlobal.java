@@ -95,6 +95,7 @@ import de.innovationgate.wgpublisher.expressions.tmlscript.VarArgParser.Argument
 import de.innovationgate.wgpublisher.expressions.tmlscript.scopes.RhinoScope;
 import de.innovationgate.wgpublisher.expressions.tmlscript.scopes.TMLScriptObjectParentScope;
 import de.innovationgate.wgpublisher.expressions.tmlscript.scopes.TMLScriptRootScope;
+import de.innovationgate.wgpublisher.expressions.tmlscript.wrapping.ContextWrapper;
 import de.innovationgate.wgpublisher.mail.SmtpMail;
 import de.innovationgate.wgpublisher.scheduler.JobContext;
 import de.innovationgate.wgpublisher.webtml.actions.TMLAction;
@@ -1101,15 +1102,30 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
     
     public static String encode(Context cx, Scriptable thisObj, java.lang.Object[] args, Function funObj) throws JavaScriptException, FormattingException {
         
+    	/*
         if (args.length != 2) {
             throw new EvaluatorException("Method get(thisObj).getWga().encode() needs a string and an object parameter");
         }
-        
+        */
         try {
-            return get(thisObj).getWga().encode(
-                    String.valueOf(args[0]), 
-                    Context.jsToJava(args[1], Object.class)
-            );
+        	
+        	if(args.length == 2){            	
+                return get(thisObj).getWga().encode(
+                        String.valueOf(args[0]), 
+                        Context.jsToJava(args[1], Object.class)
+                );        		
+        	}
+        	else if(args.length == 3){
+                return get(thisObj).getWga().encode(
+                        String.valueOf(args[0]), 
+                        Context.jsToJava(args[1], Object.class),
+                        ((ContextWrapper)args[2]).getTmlContext()
+                );        		
+        	}
+        	else{
+        		throw new EvaluatorException("Invalid parameters for WGA.encode(String, Object[, TMLContext])");
+        	}
+        	
         }
         catch (WGException e) {
             throw Context.throwAsScriptRuntimeEx(e);
