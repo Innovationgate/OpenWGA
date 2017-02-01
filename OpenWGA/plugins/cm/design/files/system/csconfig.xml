@@ -122,7 +122,7 @@
   <staticClasspath>false</staticClasspath>
   <minimumWGAVersion>
     <majorVersion>7</majorVersion>
-    <minorVersion>3</minorVersion>
+    <minorVersion>4</minorVersion>
     <maintenanceVersion>0</maintenanceVersion>
     <patchVersion>0</patchVersion>
     <buildVersion>0</buildVersion>
