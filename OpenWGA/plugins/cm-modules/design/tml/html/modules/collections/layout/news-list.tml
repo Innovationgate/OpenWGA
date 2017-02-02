@@ -67,7 +67,7 @@
 							</tml:case>
 						</div>
 						<div class="date"><tml:script expression="date||PAGEPUBLISHED||MODIFIED" format="longdate"/></div>
-						<div>
+						<div class="rtf">
 							<div class="intro"><tml:script expression="intro||DESCRIPTION" encode="rtf"/></div>
 							<div class="more">
 								<tml:[util:link]><tml:label key="more"/> ...</tml:[util:link]>
@@ -101,7 +101,7 @@
 								</tml:[util:link]>
 							</div>
 						</tml:case>
-						<div class="body">
+						<div class="body rtf">
 							<tml:if isfilled="intro">
 								<tml:then><div class="intro"><tml:item name="intro" encode="rtf"/></div></tml:then>
 								<tml:else><p class="intro"><tml:meta name="DESCRIPTION"/></p></tml:else>
