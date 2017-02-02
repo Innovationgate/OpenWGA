@@ -32,7 +32,7 @@
 		_offset = "1";
 	_layout = CMM.setting('layout');
 
-	_headings = CMM.setting("news_heading") || "h6"
+	_headings = CMM.setting("news_heading") || "h2"
 	_top_news = CMM.setting('top_news');
 </tml:script>
 <tml:case context="{_context}" iscontextvalid="true">
