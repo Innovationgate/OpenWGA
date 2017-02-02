@@ -2207,49 +2207,6 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
     }
 
     /**
-     * Extracts a file attachment from this document
-     * if the filename contains the path separator '/' it is replaced by '§'
-     * 
-     * @param name
-     *            The name of the file attachment
-     * @param folder
-     *            The folder to extract the file to     *           
-     * @return The extracted File.
-     * @throws IOException
-     * @throws WGAPIException
-     * @deprecated 
-     */
-    public File extractFile(String name, File folder) throws IOException, WGAPIException {
-
-        if (!folder.isDirectory()) {
-            return null;
-        }
-
-        InputStream in = getFileData(name);
-        if (in == null) {
-            return null;
-        }
-
-        if (name.indexOf("/") != -1) {
-            name = name.replace('/', '§');
-        }
-        
-        File outFile = new File(folder, name);
-        outFile.getParentFile().mkdirs();
-        OutputStream out = new FileOutputStream(outFile);
-
-        byte[] buf = new byte[2048];
-        int len;
-        while ((len = in.read(buf)) != -1) {
-            out.write(buf, 0, len);
-        }
-        in.close();
-        out.close();
-        return outFile;
-
-    }
-
-    /**
      * Removes a file attachment from the document
      * Note: When this method is called you should save the document before attempting to attach a
      * new file of the same name. Some WGAPI implementations will throw exceptions when you remove
@@ -3262,4 +3219,40 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
         getDatabase().getSessionContext().addAutoSaveDoc(this);
     }
 
+    /*
+     * JavaScript like util methods able to be chained
+     */
+    
+    public WGDocument setItem(String name, Object value) throws WGAPIException{
+    	setItemValue(name, value);
+    	return this;
+    }
+    public WGDocument setItems(Map<String, Object> values) throws WGAPIException{
+    	for (Map.Entry<String, Object> entry : values.entrySet()){
+    		setItemValue(entry.getKey(), entry.getValue());
+    	}
+    	return this;
+    }
+
+    public WGDocument setMeta(String name, Object value) throws WGAPIException{
+    	setMetaData(name, value);
+    	return this;
+    }
+    public WGDocument setMetas(Map<String, Object> values) throws WGAPIException{
+    	for (Map.Entry<String, Object> entry : values.entrySet()){
+    		setMetaData(entry.getKey(), entry.getValue());
+    	}
+    	return this;
+    }
+    
+    public WGDocument setValues(Map<String, Object> values) throws WGAPIException{
+    	for (Map.Entry<String, Object> entry : values.entrySet()){
+    		String name = entry.getKey();
+    		if(name.equals(name.toUpperCase()))
+    			setMetaData(name, entry.getValue());
+    		else setItemValue(name, entry.getValue());
+    	}
+    	return this;
+    }
+    
 }

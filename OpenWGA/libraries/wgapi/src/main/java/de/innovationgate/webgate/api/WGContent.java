@@ -839,8 +839,9 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	 * @param title
 	 * @throws WGAPIException 
 	 */
-	public void setTitle(String title) throws WGAPIException {
+	public WGContent setTitle(String title) throws WGAPIException {
 		this.setMetaData(WGContent.META_TITLE, title);
+		return this;
 	}
 	
 	/**
