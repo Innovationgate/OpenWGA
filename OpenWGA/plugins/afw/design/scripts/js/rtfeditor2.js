@@ -480,7 +480,7 @@ AFW.RTF.editor=function(id, config){
 	 * check for parent that is a block element
 	 */
 	this.getParagraph=function(el){
-		var para_tags = "p,h1,h2,h3,h4,h5,h6";
+		var para_tags = "p,h1,h2,h3,h4,h5,h6,pre";
 		if(!this.isEditorSelected())
 			return null;
 		try{
@@ -892,9 +892,14 @@ AFW.RTF.editor=function(id, config){
 
 		// handle tab:
 		if(ev.type=="keydown" && ev.keyCode==9){
-			if(ev.shiftKey)
-				this.execCmd("Outdent");
-			else this.execCmd("Indent");
+			var para = this.getParagraph();
+			console.log(para, para && para.tagName)
+			if(para && para.tagName!="PRE"){
+				if(ev.shiftKey)
+					this.execCmd("Outdent");
+				else this.execCmd("Indent");
+			}
+			else editor.insertHTML("\t")
 			_stopEvent(ev);
 		}
 
@@ -1966,7 +1971,7 @@ AFW.RTF.getCleanInnerHTML = function(node, isTextBlock){
 
 	//console.log("cleanHTML", node, node.childNodes);
 
-	var good_els = "#h1#h2#h3#h4#h5#h6#a#img#p#br#ul#ol#li#blockquote#div#table#tbody#tr#td#b#i#u#sub#sup#";
+	var good_els = "#h1#h2#h3#h4#h5#h6#a#img#p#pre#br#ul#ol#li#blockquote#div#table#tbody#tr#td#b#i#u#sub#sup#";
 	var good_els_textblock = "#br#p#";
 	var bad_els = "#head#script#style#"
 
@@ -2033,6 +2038,7 @@ AFW.RTF.getCleanInnerHTML = function(node, isTextBlock){
 					case "div":
 						attributes = ["align"]
 					case "p":
+					case "pre":
 					case "h1":
 					case "h2":
 					case "h3":

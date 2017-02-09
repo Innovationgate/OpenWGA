@@ -114,8 +114,19 @@ var headingButtonMenuItems = [
 		group: 'headings',
 		handler: headingHandler
 	})
-	,"-"
 ]
+
+if(BI.rtftoolbar.headings.indexOf("pre")>=0){
+	headingButtonMenuItems.push(new Ext.menu.CheckItem({
+		text: "<tml:label key="rtf.paragraph.pre"/>",
+		paraStyle: "pre",
+		group: 'headings',
+		handler: headingHandler
+	}))
+}
+
+headingButtonMenuItems.push("-")
+
 for(var i=0; i<6; i++){
 	var h = "h" + (i+1);
 	headingButtonMenuItems.push(
