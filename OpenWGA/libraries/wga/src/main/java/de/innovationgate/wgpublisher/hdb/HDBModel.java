@@ -1332,6 +1332,8 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
     public void updateContent(Object param) throws WGException {
     	if(param instanceof Form)
     		updateContent((Form) param);
+    	else if(param instanceof HDBModelParams)
+    		updateContent((HDBModelParams) param);
     	else updateContent(WGA.get().tmlcontext().content(), null, param);
     }
     public void updateContent() throws WGException {
