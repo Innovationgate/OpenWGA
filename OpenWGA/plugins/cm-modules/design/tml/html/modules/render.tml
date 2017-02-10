@@ -105,14 +105,16 @@
 				<tml:option name="margins" expression="true" scope="local"/>
 			</tml:include>
 			
-			<tml:case condition="option('animate')===true || option('animate')=='true'">
-				<tml:[script]>
-					require(["jquery"], function(){
-						$("#content-modules-<tml:item name="$mc.uid"/>").css("opacity", 1);
-					})
-				</tml:[script]>
-			</tml:case>
 		</div>
+		
+		<tml:case condition="option('animate')===true || option('animate')=='true'">
+			<tml:[script]>
+				require(["jquery"], function(){
+					$("#content-modules-<tml:item name="$mc.uid"/>").css("opacity", 1);
+				})
+			</tml:[script]>
+		</tml:case>
+		
 	</tml:else>
 </tml:if>
 
