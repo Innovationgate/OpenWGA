@@ -35,5 +35,5 @@
 				_apikey = ctx.apikey
 		}
 	</tml:script>
-	<script type="text/javascript" src="<tml:item name="_prot"/>://maps.google.com/maps/api/js?libraries=weather,places<tml:case condition="_apikey">&key=<tml:item name="_apikey"/></tml:case>"></script>
+	<script type="text/javascript" src="<tml:item name="_prot"/>://maps.googleapis.com/maps/api/js?libraries=weather,places<tml:case condition="_apikey">&key=<tml:item name="_apikey"/></tml:case>"></script>
 </tml:case>
