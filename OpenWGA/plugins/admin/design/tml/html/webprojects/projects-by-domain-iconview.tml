@@ -94,7 +94,7 @@
 			
 			<tml:else>
 				<tml:foreach type="itemvalue" item="_dbs" currentvalue="_db">
-					<tml:portlet name="{'portlet-database-'+_db.uid}" ref="::portlet-database" o_uid="{_db.uid}" ajax="true"/>
+					<tml:portlet forcestate="true" name="{'portlet-database-'+_db.uid}" ref="::portlet-database" o_uid="{_db.uid}" ajax="true"/>
 				</tml:foreach>
 			</tml:else>
 			
