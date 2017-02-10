@@ -91,7 +91,7 @@
 					<tml:item name="{_config.body_item}" encode="{_config.body_encode||'rtf'}"/>
 					]]>
 				</description>
-				<pubDate><tml:eval>return MODIFIED.toGMTString()</tml:eval></pubDate>
+				<pubDate><tml:script>return PAGEPUBLISHED.toGMTString()</tml:script>></pubDate>
 				<dc:creator><tml:meta name="author"/></dc:creator>			
 			</item>
 	
