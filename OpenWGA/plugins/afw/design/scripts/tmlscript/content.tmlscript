@@ -320,7 +320,10 @@ this.getUserdefinedMetasTML=function(){
 		"content-manager:settings:default",
 		"settings:default"		
 	])
-	if(WGA.design(database).isCustomized()){
+	
+	var overlay_support = WGA.app(database).getPublisherOption("OverlaySupport")
+	
+	if(overlay_support!="none"){
 		tmls.addAll(0, WGA.createList([
 			"overlay:wga:content-manager:settings:"+this.getContentTypeName(),
 			"overlay:content-manager:settings:"+this.getContentTypeName(),
