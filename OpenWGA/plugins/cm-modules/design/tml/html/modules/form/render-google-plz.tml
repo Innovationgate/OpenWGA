@@ -1,0 +1,94 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	_fieldname = CMM.setting('fieldname');
+	_label = CMM.setting("label");
+	_message = CMM.setting('validationmessage');
+
+	var validation = CMM.setting('validation')
+	if(validation == "required"){
+		_validation = "$E_VALUE!=''"
+		_message = _message || label("form.validation.message.required", [_label||_fieldname]) 
+	}
+	else _validation=null;
+	
+	var fieldinfo =  WGA.createLookupTable();
+	fieldinfo.put("label", CMM.setting("label"))
+	fieldinfo.put("name", _fieldname);
+	fieldinfo.put("type", "google_zip");
+
+	tmlform.processcontext.get("forminfo").put(WGA.scoped(""), fieldinfo);		
+
+
+	_apikey = option("google-maps-api-key");
+	if(!_apikey){
+		var ctx = context("db:"+WGA.design().db().getDbReference()+"/name:cm_google_map", false)
+		if(ctx)
+			_apikey = ctx.apikey
+	}
+
+</tml:script>
+
+<div class="clearfix formfield field-type-<tml:script expression="CMM.setting('fieldtype')"/><tml:case condition="tmlform.hasmessage(_fieldname)"> error</tml:case>">
+	<label>
+		<tml:case condition="_validation">* </tml:case> 
+		<tml:[setting] o_name="label"/>
+	</label>
+	<div class="data">
+		<tml:input name="{CMM.setting('fieldname')}"
+			focus="{isFirstLoop()}"
+			validation="{_validation||true}"
+			message="{_message}"
+			labeled="true"
+			type="text" 
+			html_placeholder="PLZ oder Ort"
+		/>
+	</div>
+</div>
+<tml:case condition="tmlform.hasmessage(_fieldname)">
+	<div class="field-message">
+		<tml:script expression="tmlform.getmessage(_fieldname)"/>
+	</div>
+</tml:case>
+
+<script>
+	require(["jquery", 
+		"async!///maps.googleapis.com/maps/api/js?libraries=weather,places<tml:case condition="_apikey">&key=<tml:item name="_apikey"/></tml:case>"
+	], function(){
+		console.log("google plz field");
+		var autocomplete = new google.maps.places.Autocomplete(
+			$("#<tml:script expression="tmlform.formid"/> [name=<tml:item name="_fieldname"/>]")[0],			
+			{
+				componentRestrictions: {
+					country: "de"
+				},
+				types: ['(regions)']
+			}
+		);
+	})
+	
+</script>
+

@@ -31,7 +31,7 @@
 	tml:			'plugin-cm-modules/modules:form:render',
 	settingstml:	'plugin-cm-modules/modules:form:settings',
 	setuptml:		'modules:form:setup',
-	allowedchildren: ["cm_formfield", "cm_fieldset", "cm_captcha", "cm_rtf"],
+	allowedchildren: ["cm_formfield", "cm_fieldset", "cm_captcha", "cm_rtf", "cm_google_plz"],
 	includes: {
 		jquery_plugins: ["textarea-autogrow"],
 		tml:	'@afw/include:jquery-ui-all',
@@ -46,7 +46,7 @@
 	tml:			'modules:form:render_fieldset',
 	settingstml:	'plugin-cm-modules/modules:form:settings_fieldset',
 	allowedparents: ["cm_form"],
-	allowedchildren: ["cm_formfield", "cm_captcha", "cm_rtf"]
+	allowedchildren: ["cm_formfield", "cm_captcha", "cm_rtf", "cm_google_plz"]
 },
 {
 	id:				'cm_formfield',
@@ -66,4 +66,14 @@
 	singleton:		true,
 	allowedparents: ["cm_form", "cm_fieldset"],
 	allowedchildren: []
+}<tml:comment>,
+{
+	id:				'cm_google_plz',
+	title:			'Google PLZ/Ort',
+	icon:			"<tml:url db="@afw" type="file" doc="icons" file="textfield.png"/>",
+	tml:			'plugin-cm-modules/modules:form:render-google-plz',
+	settingstml:	'plugin-cm-modules/modules:form:settings-google-plz',
+	allowedparents: ["cm_form", "cm_fieldset"],
+	allowedchildren: []
 }
+</tml:comment>
