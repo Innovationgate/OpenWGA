@@ -514,8 +514,8 @@ public class FileDerivateManager {
                             }
                             
                             // Determine update mode
-                            
-                            // No revision of lastr run: Complete re-init
+
+                            // No revision of last run: Complete re-init
                             if (lastRevision == null) {
                                 performInitialDerivateCreation(db, currentRun, creatorSelector);
                                 currentRun.setSomethingDone(true);
@@ -546,6 +546,7 @@ public class FileDerivateManager {
                         }
                         catch (Throwable t) {
                             LOG.error("Exception creating file derivates for database '" + db.getDbReference() + "'", t);
+                            db.closeSession();
                         }
                         
                     }
