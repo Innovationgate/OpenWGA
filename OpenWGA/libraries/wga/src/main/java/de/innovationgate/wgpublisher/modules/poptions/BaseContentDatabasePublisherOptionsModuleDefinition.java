@@ -116,7 +116,7 @@ public class BaseContentDatabasePublisherOptionsModuleDefinition implements Modu
         LocalizedOptionDefinition fcExpiration = new LocalizedOptionDefinition(WGACore.DBATTRIB_FILEEXPIRATION_MINUTES, IntegerOptionType.INSTANCE, _bundleLoader);
         fcExpiration.setOptional(true);
         fcExpiration.setExpert(true);
-        fcExpiration.setDefaultValue("10");
+        fcExpiration.setDefaultValue("10080");	// one week
         options.addOption(fcExpiration);
         
         LocalizedOptionDefinition externalFileServingEnabled = new LocalizedOptionDefinition(WGACore.DBATTRIB_EXTERNAL_FILE_SERVING_ENABLED, BooleanOptionType.INSTANCE, _bundleLoader);
