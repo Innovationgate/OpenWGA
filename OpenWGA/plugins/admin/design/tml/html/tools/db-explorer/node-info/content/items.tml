@@ -49,7 +49,7 @@
 					<td><tml:item name="_item"/></td>
 					<td><tml:item name="_type"/></td>
 					<td>
-						<tml:script>
+						<tml:script encode="html">
 							return _res.size()>1 ? _res.toString() : _firstElement==null ? "null" : _res
 						</tml:script>		
 					</td>
