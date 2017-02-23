@@ -349,12 +349,13 @@ public class WebTMLScriptletResolver {
         if (generateDataURL == null) {
             generateDataURL = Boolean.FALSE;
         }
-    
         
         List<String> parms = WGUtils.deserializeCollection(param, ",", true);
         String fileName = null;
         String containerName = null;
         String title = fileName;
+        String derivates = null;
+        
         if (parms.size() == 1) {
             fileName = (String) parms.get(0);
             title = fileName;
@@ -370,9 +371,14 @@ public class WebTMLScriptletResolver {
             title = (String) parms.get(2);
         }
         else {
-            return "(invalid parameter count for !filelink: " + parms.size() + ")";
+            return "(invalid parameter count for !" + command + ": " + parms.size() + ")";
         }
-        
+
+        String[] parts = fileName.split("\\?");
+        if(parts.length>1){
+        	fileName = parts[0];        	
+        	derivates = parts[1];
+        }
         
         if (containerName != null) {                
             // if container name is present we should check if this is a content key
@@ -397,7 +403,8 @@ public class WebTMLScriptletResolver {
         }
         
         if (command.equalsIgnoreCase("imgurl")) {
-            String derivates = (String) context.option(Base.OPTION_IMAGE_DERIVATES);
+        	if (derivates == null)
+        		derivates = (String) context.option(Base.OPTION_IMAGE_DERIVATES);
             if (derivates != null) {
                 DerivateQuery derivateQuery = context.getwgacore().getFileDerivateManager().parseDerivateQuery(derivates);
                 url = addDerivateQueryToURL(context, derivateQuery, url);
@@ -496,6 +503,13 @@ public class WebTMLScriptletResolver {
         List<String> params = WGUtils.deserializeCollection(param, ",", true);
         String doc = params.size() >= 2 ? params.get(0) : null;
         String fileName = params.get(params.size() -1);
+        String derivates = null;
+        
+        String[] parts = fileName.split("\\?");
+        if(parts.length>1){
+        	fileName = parts[0];        	
+        	derivates = parts[1];
+        }
         
         TMLContext targetContext = context;
         if (doc != null) {
@@ -506,7 +520,8 @@ public class WebTMLScriptletResolver {
         }
         
         String imgURL = targetContext.fileurl(fileName);
-        String derivates = (String) context.option(Base.OPTION_IMAGE_DERIVATES);
+        if(derivates==null)
+        	derivates = (String) context.option(Base.OPTION_IMAGE_DERIVATES);
         DerivateQuery derivateQuery = null;
         if (derivates != null) {
             derivateQuery = context.getwgacore().getFileDerivateManager().parseDerivateQuery(derivates);

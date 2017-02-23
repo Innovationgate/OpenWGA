@@ -619,6 +619,19 @@ AFW.RTF.editor=function(id, config){
 					var container = key[0];
 					var filename = key[1];
 					var dbkey = key[2];
+
+					if(img.style){
+						if(img.style.width){
+							var i = img.style.width.indexOf("px");
+							if(i)
+								filename += "?width~"+img.style.width.substr(0, i);
+						}
+						else if(img.style.height){
+							var i = img.style.height.indexOf("px");
+							filename += "?height~"+img.style.height.substr(0, i);
+						}
+					}
+					
 					var scriptlet = "{%"
 					if(dbkey)
 						scriptlet += "(db:"+dbkey+")"
@@ -635,6 +648,18 @@ AFW.RTF.editor=function(id, config){
 					img.removeAttribute("srcset");
 					break;
 				case "intfile":
+					if(img.style){
+						if(img.style.width){
+							var i = img.style.width.indexOf("px");
+							if(i)
+								wgakey += "?width~"+img.style.width.substr(0, i);
+						}
+						else if(img.style.height){
+							var i = img.style.height.indexOf("px");
+							wgakey += "?height~"+img.style.height.substr(0, i);
+						}
+					}
+					
 					img.setAttribute("wga:src", "{%!imgurl:"+wgakey+"%}");
 					img.setAttribute("wga:srcset", '{%!srcset:' + wgakey + '%}');
 					img.removeAttribute("src");
