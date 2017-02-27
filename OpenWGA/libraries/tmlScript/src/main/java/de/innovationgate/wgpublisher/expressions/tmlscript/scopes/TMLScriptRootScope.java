@@ -119,7 +119,15 @@ public class TMLScriptRootScope extends ContextWrapper implements ErrorReporter 
         // Look if it is a TMLScript global
         try {
             if (!_isolated) {
-                TMLScriptGlobal global = getTmlContext().getwgacore().getTmlscriptGlobalRegistry().getGlobal(arg0, getTmlContext().designdb());
+                TMLScriptGlobal global = null;
+                global = getTmlContext().getwgacore().getTmlscriptGlobalRegistry().getGlobal(arg0, getTmlContext().db());
+                if (global != null) {
+                    Object globalObj = _data.getRhinoScope().getRuntime().provideGlobal(getWgaGlobal().getWga(), global);
+                    if (globalObj != null) {
+                        return globalObj;
+                    }
+                }
+            	global = getTmlContext().getwgacore().getTmlscriptGlobalRegistry().getGlobal(arg0, getTmlContext().designdb());
                 if (global != null) {
                     Object globalObj = _data.getRhinoScope().getRuntime().provideGlobal(getWgaGlobal().getWga(), global);
                     if (globalObj != null) {
