@@ -57,6 +57,7 @@ import de.innovationgate.wgpublisher.expressions.ExpressionEngineFactory;
 import de.innovationgate.wgpublisher.expressions.tmlscript.ManagedTMLScriptGlobalDefinition;
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptGlobal;
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptObjectMetadata;
+import de.innovationgate.wgpublisher.hdb.HDBModel;
 import de.innovationgate.wgpublisher.url.RequestIndependentDefaultURLBuilder;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 import de.innovationgate.wgpublisher.webtml.utils.TMLUserProfile;
@@ -67,11 +68,31 @@ import de.innovationgate.wgpublisher.webtml.utils.TMLUserProfile;
 @CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
 public class App extends Database {
 
+	public HDBModel HDBModel;
+	
     protected App(WGA wga, WGDatabase db) throws WGException {
         super(wga, db);
         
         if (!db.hasFeature(WGDatabase.FEATURE_FULLCONTENTFEATURES)) {
             throw new WGAServerException("Database '" + db.getDbReference() + "' is no application");
+        }
+        HDBModel = de.innovationgate.wgpublisher.hdb.HDBModel.getModel(db);
+    }
+
+    /**
+     * Returns a TMLScript global that is available for the current app
+     * This method allows to retrieve TMLScript globals with their name as method parameter. It can retrieve normal globals just like globals of design scope.
+     * This might contain native TMLScript objects which are not usable from Java.
+     * @param name Name the global
+     * @throws WGAPIException
+     */
+    public Object getGlobal(String name) throws WGException {
+        TMLScriptGlobal global = _wga.getCore().getTmlscriptGlobalRegistry().getGlobal(name, db());
+        if (global != null) {
+            return global.getRef();
+        }
+        else {
+            return null;
         }
     }
     
