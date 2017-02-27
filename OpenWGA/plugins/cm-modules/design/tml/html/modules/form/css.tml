@@ -57,6 +57,16 @@
 			box_sizing: "border-box"
 		},
 		
+		"input[type=radio], input[type=checkbox]": {
+    		"line-height": "normal",
+    		font: "inherit",
+    		margin: "4px 5px 0 0"
+		},
+		
+		select: {
+			font: "inherit"
+		},
+		
 		"input[type=file]":{
 			margin_bottom: 5,
 			height: "auto"

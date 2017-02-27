@@ -211,7 +211,7 @@
 					else _param2="";
 					_button_action = "form-action-"+action;
 				</tml:script>
-				<tml:button cssclass="btn" clickaction="{_button_action}" param1="{_param1}" param2="{_param2}" param3="{option('title')}" param4="{WGA.scoped('formid')}" ajax="true">
+				<tml:button cssclass="btn btn-default" clickaction="{_button_action}" param1="{_param1}" param2="{_param2}" param3="{option('title')}" param4="{WGA.scoped('formid')}" ajax="true">
 					<tml:[setting] o_name="submit-button-text"/>
 				</tml:button>
 			</div>
