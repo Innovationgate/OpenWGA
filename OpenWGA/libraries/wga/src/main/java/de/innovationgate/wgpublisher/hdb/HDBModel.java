@@ -1157,6 +1157,9 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
     public WGContent createContent(String contentClass, String context_expression) throws WGException {
     	return createContent(contentClass, WGA.get().context(context_expression));
     }
+    public WGContent createContent(String contentClass, String context_expression, Object params) throws WGException {
+    	return createContent(contentClass, WGA.get().context(context_expression).content(), params);
+    }
     public WGContent createContent(String contentClass, Context ref) throws WGAPIException, HDBModelException {
     	return createContent(contentClass, ref.content());
     }
@@ -1328,6 +1331,9 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
     }
     public void updateContent(WGContent content, Object param) throws WGAPIException, HDBModelException {
     	updateContent(content, null, param);
+    }
+    public void updateContent(Context ctx, Object param) throws WGException {
+    	updateContent(ctx.content(), null, param);
     }
     public void updateContent(Object param) throws WGException {
     	if(param instanceof Form)
