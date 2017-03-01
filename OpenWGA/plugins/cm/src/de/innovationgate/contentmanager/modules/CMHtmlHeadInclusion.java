@@ -76,8 +76,10 @@ public class CMHtmlHeadInclusion implements HTMLHeadInclusion {
 	    			result.append("\n\tlanguage:\"" + content.getLanguage().getName() + "\"");
 	    		}
 	    		result.append("\n};");
-	    		result.append("\nWGA.CMM={sections:{},hasSections:false}");
 	    		result.append("\n</script>\n");
+	    		result.append("\n<script type=\"text/javascript\">");
+	    		result.append("WGA.CMM={sections:{},hasSections:false}");
+	    		result.append("</script>\n");
         	
         	} catch (WGException e) {
 				// TODO Auto-generated catch block
