@@ -3451,6 +3451,11 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     }
     
     @CodeCompletion
+    public Date now() {
+    	return createdate();
+    }
+    
+    @CodeCompletion
     public Date createdate(boolean includeMillis) {
         try {
             return WGA.get(this).createDate(includeMillis);
