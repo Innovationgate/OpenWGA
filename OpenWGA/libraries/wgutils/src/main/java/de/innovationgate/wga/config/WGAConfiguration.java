@@ -147,7 +147,7 @@ public class WGAConfiguration extends ConfigBean {
     public static final String SERVEROPTIONDEFAULT_CACHE_DESIGN_NO_BACKGROUND_CHANGES = "false";
     
     public static final String SERVEROPTION_CACHE_STATIC_RESOURCES_EXPIRATION = "Cache.StaticResourcesExpiration";
-    public static final String SERVEROPTIONDEFAULT_CACHE_STATIC_RESOURCES_EXPIRATION = "10";
+    public static final String SERVEROPTIONDEFAULT_CACHE_STATIC_RESOURCES_EXPIRATION = "1440";
     
     public static final String SERVEROPTION_CACHE_USERCACHE_LATENCY = "Cache.UsercacheLatency";
     public static final String SERVEROPTIONDEFAULT_CACHE_USERCACHE_LATENCY = "60";
