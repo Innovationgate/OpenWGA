@@ -269,16 +269,6 @@
 			</tml:if>
 		</script>
 	
-		<tml:comment><tml:case condition="_Content.hasOtherVersions()">
-			<div class="list compare-contents" 
-						onmouseover="Ext.get(this).addClass('selected')"
-						onmouseout="Ext.get(this).removeClass('selected')"
-						onclick="BI.contentComparePanel.show()"
-			>				
-				{%label:actions.content-compare%}
-			</div>
-		</tml:case></tml:comment>
-	
 		<tml:case condition="_Database.hasMailHost()">
 			<div class="list forward-content" 
 						onmouseover="Ext.get(this).addClass('selected')"

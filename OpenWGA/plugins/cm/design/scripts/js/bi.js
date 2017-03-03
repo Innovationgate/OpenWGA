@@ -352,9 +352,6 @@ BI.dashboardpanel.on("activate", function(params, created){
 		BI.dashboardpanel.reload()
 });
 
-BI.contentComparePanel=new BI.panel("content-compare-panel", $L.contentComparePanel.title, "system:portlet-includer.int.html");
-BI.contentComparePanel.defaultParams={portlet_tml: "cms:content-compare:portlet2"};
-
 BI.infoView={
 	animating:false,
 	
