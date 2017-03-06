@@ -236,11 +236,11 @@ public class Design {
     protected Design(WGA wga, WGDatabase db) throws WGException {
         _wga =wga;
         if (db == null) {
-            throw new IllegalArgumentException("Cannot determine design because database could not be retrieved");
+            throw new IllegalArgumentException("Cannot determine design because database could not be retrieved.");
         }
         
         if (!db.isSessionOpen()) {
-            throw new IllegalArgumentException("Cannot determine design because no database session is open");
+            throw new IllegalArgumentException("Cannot determine design because no database session is open: " + db.getDbReference());
         }
         
         if (_wga.isTMLContextAvailable()) {
