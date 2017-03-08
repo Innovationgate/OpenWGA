@@ -34,7 +34,15 @@ public class PostProcessData {
     private WGDesignDocument _document;
     private Serializable _cacheQualifier = null;
     private boolean _cacheable = true;
-    
+    private boolean _compress = true;
+
+    public boolean isCompress() {
+        return _compress;
+    }
+    public void setCompress(boolean compress) {
+        _compress = compress;
+    }
+
     public boolean isCacheable() {
         return _cacheable;
     }

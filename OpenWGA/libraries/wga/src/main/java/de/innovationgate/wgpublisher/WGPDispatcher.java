@@ -2778,6 +2778,10 @@ public class WGPDispatcher extends HttpServlet {
     }
 
     public PostProcessResult postProcessDesignResource(WGCSSJSModule lib, javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws WGException, InstantiationException, IllegalAccessException {
+    	return postProcessDesignResource(lib, request, response, true);
+    }
+
+    public PostProcessResult postProcessDesignResource(WGCSSJSModule lib, javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, Boolean compress) throws WGException, InstantiationException, IllegalAccessException {
         
         @SuppressWarnings("unchecked")
         Class<? extends PostProcessor> postProcessorClass = (Class<? extends PostProcessor>) lib.getExtensionData(DesignFileDocument.EXTDATA_POSTPROCESSOR);
@@ -2788,6 +2792,7 @@ public class WGPDispatcher extends HttpServlet {
         PostProcessData data = new PostProcessData();
         data.setDocument(lib);
         data.setCacheQualifier(null);
+        data.setCompress(compress);
         
         // Create processor and give it the opportunity to fill caching data
         PostProcessor processor = postProcessorClass.newInstance();

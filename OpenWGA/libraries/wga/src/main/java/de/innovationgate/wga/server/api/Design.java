@@ -1047,7 +1047,7 @@ public class Design {
             throw new WGAServerException("No CSS module under name: " + getBaseReference().toString());
         }
 
-        return getModuleCode(mod);
+        return getModuleCode(mod, true);
         
     }
     
@@ -1057,13 +1057,16 @@ public class Design {
      * @throws WGException
      */
     public String getJavaScriptCode() throws WGException {
+    	return getJavaScriptCode(true);
+    }
+    public String getJavaScriptCode(Boolean compress) throws WGException {
         
         WGScriptModule mod = getJavaScriptModule();
         if (mod == null) {
             throw new WGAServerException("No JavaScript module under name: " + getBaseReference().toString());
         }
 
-        return getModuleCode(mod);
+        return getModuleCode(mod, compress);
         
     }
     
@@ -1079,7 +1082,7 @@ public class Design {
             throw new MissingDesignResourceException("No TMLScript module under name: " + getBaseReference().toString());
         }
 
-        return getModuleCode(mod);
+        return getModuleCode(mod, true);
         
     }
     
@@ -1095,11 +1098,11 @@ public class Design {
             throw new WGAServerException("No XML module under name: " + getBaseReference().toString());
         }
 
-        return getModuleCode(mod);
+        return getModuleCode(mod, true);
         
     }
 
-    private String getModuleCode(WGScriptModule mod) throws WGException, WGAServerException {
+    private String getModuleCode(WGScriptModule mod, Boolean compress) throws WGException, WGAServerException {
         try {
             PostProcessResult result = null;
             WGPDispatcher dispatcher = _wga.getCore().getDispatcher();
@@ -1107,7 +1110,9 @@ public class Design {
                 result = dispatcher.postProcessDesignResource(
                     mod, 
                     _wga.isRequestAvailable() ? _wga.getRequest() :  null, 
-                    _wga.isResponseAvailable() ? _wga.getResponse() : null);
+                    _wga.isResponseAvailable() ? _wga.getResponse() : null,
+                    compress
+                );
             }
             
             if (result != null) {

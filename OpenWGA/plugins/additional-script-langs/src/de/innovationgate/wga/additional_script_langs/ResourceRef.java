@@ -116,9 +116,9 @@ public class ResourceRef {
 	/*
 	 * Returns the code recursively calling other postProcessors
 	 */
-	public String getJavaScriptCode() throws WGException, IOException{
+	public String getJavaScriptCode(Boolean compress) throws WGException, IOException{
 		if(_type==TYPE_JS)
-			return _design.getJavaScriptCode();
+			return _design.getJavaScriptCode(compress);
 		else return getCode();
 	}
 

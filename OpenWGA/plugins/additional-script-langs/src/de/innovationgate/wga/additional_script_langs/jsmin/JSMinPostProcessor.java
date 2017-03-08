@@ -43,7 +43,7 @@ public class JSMinPostProcessor implements PostProcessor{
 				if(line.trim().startsWith(IMPORT_SCRIPT)){
 					String path = line.substring(IMPORT_SCRIPT.length()).trim();
 					ResourceRef ref = new ResourceRef(base_ref, path);
-					String mod_code = ref.getJavaScriptCode();
+					String mod_code = ref.getJavaScriptCode(false);
 					if(mod_code!=null){
 						convertedCode.append("// @imported " + ref.toString() + "\n");
 						convertedCode.append(mod_code + "\n");
@@ -61,7 +61,7 @@ public class JSMinPostProcessor implements PostProcessor{
 			wga.getLog().error("jsmin: unable to read module: " + e.getMessage());
 		}
 
-		if(WGACore.isDevelopmentModeEnabled()){
+		if(WGACore.isDevelopmentModeEnabled() || !data.isCompress()){
         	result.setCode(convertedCode.toString());
         }
 		else{
