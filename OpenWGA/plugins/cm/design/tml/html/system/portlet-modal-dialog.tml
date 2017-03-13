@@ -101,7 +101,7 @@
 	<tml:select>
 		<tml:case portletmode="showdialog">
 			<tml:case condition="_tml!=null">
-				<tml:portlet name="{'dialog'+_tml}" ref="{_tml}" ajax="true"/>
+				<tml:portlet name="{'dialog'+_tml}" ref="{_tml}" ajax="true" portletmode="view"/>
 				<script>
 					BI.dialog.autoHeight();
 					BI.dialog.dialog.show(BI.animate.dialogs ? BI.dialog.el:null);
