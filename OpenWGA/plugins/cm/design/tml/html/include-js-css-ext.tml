@@ -39,7 +39,11 @@
 	</tml:else>
 </tml:if>
 
-<script type="text/javascript" src="<tml:url type="js" name="scripts"/>"></script>
+<tml:script>
+    var code = WGA.design().resolve("scripts").getJavaScriptCode();
+    _hash = javaObject(code).hashCode();
+</tml:script>
+<script type="text/javascript" src="<tml:url type="js" name="scripts" u-v="_hash"/>"></script>
 
 <script type="text/javascript" src="<tml:url type="tml" medium="javascript" name="rtftoolpanel"/>"></script>
 
