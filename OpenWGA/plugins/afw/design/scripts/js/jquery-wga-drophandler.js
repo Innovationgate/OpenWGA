@@ -14,10 +14,14 @@
 	$.fn.wga_drophandler = function(config){
 	
 		function isDesktopDrop(dt){
-			return WGA.isWebKit ? (dt.types.indexOf("Files")>=0) : (dt.types.contains("Files"))
+			return dt.types.indexOf ? dt.types.indexOf("Files")>=0 
+					: dt.types.contains ? dt.types.contains("Files")
+					: false
 		}
 		function isFilesDrop(dt){
-			return WGA.isWebKit ? (dt.types.indexOf("wga/files")>=0) : (dt.types.contains("wga/files"))
+			return dt.types.indexOf ? dt.types.indexOf("wga/files")>=0 
+					: dt.types.contains ? dt.types.contains("wga/files")
+					: false
 		}
 		
 		return this.each(function(){

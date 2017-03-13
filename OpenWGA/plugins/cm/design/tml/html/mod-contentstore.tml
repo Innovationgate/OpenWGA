@@ -258,7 +258,7 @@
 					window.addEventListener("dragover", function(e){
 						e.preventDefault();
 					    var dt = e.dataTransfer;
-						if(WGA.isWebKit ? (dt.types.indexOf("Files")>=0) : (dt.types.contains("Files")))
+						if((dt.types.indexOf && dt.types.indexOf("Files")>=0) || (dt.types.contains && dt.types.contains("Files")))
 							dt.dropEffect = "copy";
 					}, true);
 				</tml:case>

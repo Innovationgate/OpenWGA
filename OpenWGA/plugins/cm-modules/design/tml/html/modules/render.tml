@@ -127,7 +127,7 @@
 					parent.BI.dialog.show('content-modules', this, {mode:'edit', section:"<tml:item name="$mc.section"/>"})
 				})
 			}
-			if(window.parent.CM){
+			if(window.parent.CM && window.parent.CM.openDialog){
 				$("#no-modules-<tml:item name="$mc.uid"/>.no-modules, #content-modules-<tml:item name="$mc.uid"/> .edit-modules-button").click(function(ev){
 					ev.preventDefault();
 					window.parent.CM.openDialog('content-modules', {mode:'edit', section:"<tml:item name="$mc.section"/>"})

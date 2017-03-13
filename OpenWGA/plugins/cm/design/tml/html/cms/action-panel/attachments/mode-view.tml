@@ -99,8 +99,10 @@
 					Ext.get("form-attachments").on({
 						dragover: function(e){
 							e.preventDefault();
-							var isFilesDrop = WGA.isWebKit ? (e.browserEvent.dataTransfer.types.indexOf("wga/files")>=0) 
-								: (e.browserEvent.dataTransfer.types.contains("wga/files"))
+							var dt = e.browserEvent.dataTransfer;
+							var isFilesDrop = dt.types.indexOf ? dt.types.indexOf("wga/files")>=0 
+								: dt.types.contains ? dt.types.contains("wga/files")
+								: false	
 							if(isFilesDrop){
 								if(WGA.isWebKit){
 									// since we don't have access to dataTransfer's data we must set drop effect "copy". Just in case.
@@ -117,8 +119,11 @@
 						},
 						drop: function(e){
 							e.preventDefault();
-							var isFilesDrop = WGA.isWebKit ? (e.browserEvent.dataTransfer.types.indexOf("wga/files")>=0) 
-								: (e.browserEvent.dataTransfer.types.contains("wga/files"))
+							var dt = e.browserEvent.dataTransfer;
+							var isFilesDrop = dt.types.indexOf ? dt.types.indexOf("wga/files")>=0 
+								: dt.types.contains ? dt.types.contains("wga/files")
+								: false	
+
 							if(isFilesDrop){
 								try{
 									var json = e.browserEvent.dataTransfer.getData("wga/files")

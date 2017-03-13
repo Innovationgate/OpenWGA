@@ -839,8 +839,12 @@ AFW.RTF.editor=function(id, config){
 	
 		if(ev.type=="paste" && ev.clipboardData){
 			var dt = ev.clipboardData
-			var has_html = WGA.isWebKit ? (dt.types.indexOf("text/html")>=0) : (dt.types.contains("text/html"))
-			var has_rtf = WGA.isWebKit ? (dt.types.indexOf("text/rtf")>=0) : (dt.types.contains("text/rtf"))
+			var has_html = dt.types.indexOf ? (dt.types.indexOf("text/html")>=0) 
+					: dt.types.contains ? (dt.types.contains("text/html"))
+					: false;
+			var has_rtf = dt.types.indexOf ? (dt.types.indexOf("text/rtf")>=0) 
+					: dt.types.contains ? (dt.types.contains("text/rtf"))
+					: false;
 			
 			var html = dt.getData("text/html")
 			var plain = dt.getData("text/plain")
