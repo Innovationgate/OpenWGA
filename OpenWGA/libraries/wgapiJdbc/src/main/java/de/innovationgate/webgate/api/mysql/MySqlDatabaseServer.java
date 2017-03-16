@@ -150,6 +150,14 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
 			if (props == null) {
 				props = new Properties();
 			}
+			
+			Map<String,String> so = serverOptionReader.getOptions();
+			for(Map.Entry<String, String> entry: so.entrySet()){
+				if(entry.getKey().startsWith("jdbc.")){
+					props.put(entry.getKey().substring("jdbc.".length()), entry.getValue());
+				}
+			}
+			
 			if (!props.containsKey("user")) {
 				props.put("user", masterUser);
 			}
