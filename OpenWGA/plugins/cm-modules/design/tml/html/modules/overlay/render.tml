@@ -51,7 +51,7 @@
 	
 	<tml:case condition="CMM.setting('layout')=='dialog'">
 		<div class="footer">
-			<button class="btn btn-default" data-modal="hide"><tml:label key="close"/>
+			<button class="btn btn-default" data-modal="hide"><tml:label key="close"/></button>
 		</div>
 	</tml:case>
 	
