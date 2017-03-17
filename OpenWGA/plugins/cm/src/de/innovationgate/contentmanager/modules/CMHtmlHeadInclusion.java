@@ -60,8 +60,7 @@ public class CMHtmlHeadInclusion implements HTMLHeadInclusion {
         		)
         			request.removeAttribute(WGACore.ATTRIB_EDITDOCUMENT);
         		
-    			result.append("\n<link rel=\"stylesheet\" type=\"text/css\" ws-test href=\"" + 
-						//context.fileurl("plugin-wga-app-framework", "cms", "bi.css") +
+    			result.append("\n<link rel=\"stylesheet\" type=\"text/css\" href=\"" + 
 						WGA.get().design("plugin-contentmanager").resolve("bi-style-injection").scriptURL("css") +
 						"\">");
 				result.append("\n<script id=\"wga-cm-contentinfo\" type=\"text/javascript\">");
