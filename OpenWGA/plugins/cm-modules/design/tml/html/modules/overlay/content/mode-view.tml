@@ -1,4 +1,4 @@
-<tml:img db="{WGA.design().db().getDbReference()}" doc="images" file="ajax-loader.gif"/>
+<tml:img db="{WGA.design().db().getDbReference()}" doc="images" file="ajax-loader.gif" html_alt="loading"/>
 
 <script>
 	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "overlay-loaded", function(ev){
