@@ -2288,6 +2288,12 @@ public class WGA {
     public Context context(String expression) throws WGException{
     	return tmlcontext().context(expression);
     }
+    public Context context(String expression, boolean returnContextOnError) throws WGException{
+    	return tmlcontext().context(expression, returnContextOnError);
+    }
+    public Context context(WGContent content) throws WGException{
+    	return tmlcontext().context(content);
+    }
     
     protected TMLContext fetchTMLContext() {
         TMLContext context = _context.getTMLContext();
