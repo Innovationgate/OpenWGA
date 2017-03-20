@@ -733,8 +733,8 @@ public class Nav {
 
     private String getPageOrderExpression(Map<String, Object> atts) throws WGException {
         String orderExpression = (String) atts.get(NAVATT_ORDER);
-        if (orderExpression != null && _wga.isTMLContextAvailable()) {
-            return "[" + _wga.tmlcontext().content().getLanguage().getName() + "]" + orderExpression;
+        if (orderExpression != null) {
+            return "[" + _context.content().getLanguage().getName() + "]" + orderExpression;
         }
         else {
             return null;
