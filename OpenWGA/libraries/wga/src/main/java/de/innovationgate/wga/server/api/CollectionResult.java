@@ -354,15 +354,15 @@ public abstract class CollectionResult implements Iterable<Context> {
     
 
     /**
-     * Returns the first result content of the query
-     * This is an effective way of returning the very first content document that is returned by the query if only this is important.
+     * Returns the first result of the query
+     * This is an effective way of returning the very first document that is returned by the query if only this is important.
      * If the result contains no contents this method returns null.
      */
 
     public Context getFirstResult() throws WGException {
-        WGContent con = getFirstResultContent();
-        if (con != null) {
-            return _wga.tmlcontext().context(con);
+        Iterator<Context> it = iterator();
+        if (it.hasNext()) {
+            return it.next();
         }
         else {
             return null;
@@ -377,7 +377,8 @@ public abstract class CollectionResult implements Iterable<Context> {
      * @throws WGException
      */
     public Object getSingleValue(String itemName) throws WGException {
-        WGContent con = getFirstResultContent();
+
+    	WGContent con = getFirstResultContent();
         if (con != null) {
             return con.getItemValue(itemName);
         }
@@ -392,13 +393,8 @@ public abstract class CollectionResult implements Iterable<Context> {
      * If the result contains no contents this method returns null.
      */
     public WGContent getFirstResultContent() throws WGException {
-        Iterator<Context> it = iterator();
-        if (it.hasNext()) {
-            return it.next().content();
-        }
-        else {
-            return null;
-        }
+    	Context firstResult = getFirstResult();
+    	return firstResult==null ? null : firstResult.content();
     }
 
     public boolean isEmpty() throws WGException {
