@@ -162,7 +162,7 @@
 					<tml:case condition="con.getWorkflowRole() < Packages.de.innovationgate.webgate.api.workflow.WGWorkflow.ROLE_APPROVER">
 						<div class="info"><tml:label file="actions" key="approveNoApprover" param1="{con.title}"/></div>
 					</tml:case>
-					<tml:case condition="db().getWorkflowEngine().getWorkflow(con).isAlreadyApprovedByUser()">
+					<tml:case condition="con.getDatabase().getWorkflowEngine().getWorkflow(con).isAlreadyApprovedByUser()">
 						<div class="info"><tml:label file="actions" key="alreadyApproved" param1="{con.title}"/></div>
 					</tml:case>
 					<tml:caseelse>
