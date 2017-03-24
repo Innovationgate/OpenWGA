@@ -48,7 +48,7 @@ public class MSSQLCSModuleDefinition extends GenericCSModuleDefinition {
             Class.forName(WGDatabaseImpl.DRIVER);
         }
         catch (ClassNotFoundException e) {
-            throw new ModuleDependencyException("The MySQL JDBC Driver \"Connector/J\" is not in classpath");
+            throw new ModuleDependencyException("The MS-SQL JDBC Driver \"Connector/J\" is not in classpath");
         }
     }
 
