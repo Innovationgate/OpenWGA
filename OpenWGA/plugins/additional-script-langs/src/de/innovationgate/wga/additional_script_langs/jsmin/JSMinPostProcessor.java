@@ -66,15 +66,15 @@ public class JSMinPostProcessor implements PostProcessor{
         }
 		else{
 	        StringWriter minOut = new StringWriter();
-	        UglifyJsProcessor engine = new UglifyJsProcessor();
 	        ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
-	        Thread.currentThread().setContextClassLoader(wga.server().getLibraryLoader());
+	        Thread.currentThread().setContextClassLoader(wga.server().getLibraryLoader());	        
 	        try {
+	        	UglifyJsProcessor engine = new UglifyJsProcessor();
 	        	engine.process(new StringReader(convertedCode.toString()), minOut);
 	        	result.setCode(minOut.toString());
 			} catch (Exception e) {
 				wga.getLog().error("UglifyJsProcessor: unable to process JS-module " + design.toString());
-				wga.getLog().error(e.toString());
+				wga.getLog().error(e.toString(), e);
 				result.setCode(convertedCode.toString());
 			}
 	        finally{
