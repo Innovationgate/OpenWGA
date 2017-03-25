@@ -25,7 +25,6 @@ dependencies {
     compile 'jaxen:jaxen:1.1.6'
     compile 'log4j:log4j:1.2.17'
     compile 'net.sf.json-lib:json-lib:2.4:jdk15'
-    compile fileTree(dir: '../../customLibs/dominoCorba', include: ['*.jar'])
     compile 'quartz:quartz:1.4.5'
     compile fileTree(dir: '../../customLibs/simpleXml', include: ['*.jar'])
     compile 'stax:stax-api:1.0.1'
