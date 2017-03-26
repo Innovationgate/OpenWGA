@@ -47,3 +47,5 @@ project(":plugin-management").projectDir = file("plugins/management")
 include ":plugin-additional-script-langs"
 project(":plugin-additional-script-langs").projectDir = file("plugins/additional-script-langs")
 
+include ":plugin-rest"
+project(":plugin-rest").projectDir = file("plugins/rest")

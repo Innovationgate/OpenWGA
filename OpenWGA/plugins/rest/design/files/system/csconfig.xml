@@ -1,0 +1,70 @@
+<de.innovationgate.wga.common.beans.csconfig.v5.CSConfig>
+  <anonymousAccessLevel>10</anonymousAccessLevel>
+  <defaultAccessLevel>10</defaultAccessLevel>
+  <versionCompliance>wga7.0</versionCompliance>
+  <publisherOptions>
+    <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+      <name>DesignEncoding</name>
+      <value>UTF-8</value>
+    </de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
+  </publisherOptions>
+  <encoderMappings/>
+  <elementMappings/>
+  <remoteActions/>
+  <mediaKeys/>
+  <roles/>
+  <jobDefinitions/>
+  <pluginConfig class="de.innovationgate.wga.common.beans.csconfig.v5.PluginConfig">
+    <id>
+      <uniqueName>de.innovationgate.wgaservices-rest</uniqueName>
+      <version>
+        <majorVersion>7</majorVersion>
+        <minorVersion>4</minorVersion>
+        <maintenanceVersion>1</maintenanceVersion>
+        <patchVersion>0</patchVersion>
+        <buildVersion>658</buildVersion>
+      </version>
+    </id>
+    <title>WGA Services REST Server</title>
+    <description>Adds a REST-ful web service to OpenWGA based on the Jersey framework</description>
+    <vendor>Innovation Gate GmbH</vendor>
+    <webHomepage>http://www.innovationgate.com</webHomepage>
+    <minimumWGAVersion>
+      <majorVersion>4</majorVersion>
+      <minorVersion>0</minorVersion>
+      <maintenanceVersion>0</maintenanceVersion>
+      <patchVersion>0</patchVersion>
+      <buildVersion>0</buildVersion>
+    </minimumWGAVersion>
+    <minimumJavaVersion>
+      <majorVersion>1</majorVersion>
+      <minorVersion>7</minorVersion>
+      <maintenanceVersion>0</maintenanceVersion>
+      <patchVersion>0</patchVersion>
+      <buildVersion>0</buildVersion>
+    </minimumJavaVersion>
+    <dependencies/>
+    <personalisationMode>4</personalisationMode>
+    <usageAsDesignProvider>false</usageAsDesignProvider>
+    <usageAsAuthSource>false</usageAsAuthSource>
+    <usageAsContentStore>false</usageAsContentStore>
+    <showOnStartPage>false</showOnStartPage>
+    <clearDatabaseOnUpdate>false</clearDatabaseOnUpdate>
+    <disablePluginInit>false</disablePluginInit>
+    <options>
+      <entry>
+        <string>noDatabase</string>
+        <string>true</string>
+      </entry>
+    </options>
+  </pluginConfig>
+  <shortcuts/>
+  <staticClasspath>true</staticClasspath>
+  <minimumWGAVersion>
+    <majorVersion>7</majorVersion>
+    <minorVersion>2</minorVersion>
+    <maintenanceVersion>0</maintenanceVersion>
+    <patchVersion>0</patchVersion>
+    <buildVersion>0</buildVersion>
+  </minimumWGAVersion>
+</de.innovationgate.wga.common.beans.csconfig.v5.CSConfig>

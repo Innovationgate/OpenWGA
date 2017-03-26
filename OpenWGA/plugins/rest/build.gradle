@@ -1,0 +1,69 @@
+
+dependencies {
+    
+    compileClasspath project(":wga");
+    compileClasspath project(":wgaBuildTools");
+    compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
+    compileClasspath 'javax.servlet.jsp:jsp-api:2.2'
+    compileClasspath 'javax.websocket:javax.websocket-api:1.1'
+    
+	compile ('io.swagger:swagger-jersey2-jaxrs:1.5.2'){
+		exclude group: 'org.glassfish.jersey.containers', module: 'jersey-container-servlet-core'
+		exclude group: 'javax.servlet', module: 'servlet-api'
+		exclude group: 'org.glassfish.jersey.media', module: 'jersey-media-multipart'
+		exclude group: 'com.fasterxml.jackson.dataformat', module: 'jackson-dataformat-xml'
+		exclude group: 'com.fasterxml.jackson.jaxrs', module: 'jackson-jaxrs-json-provider'
+	}
+
+	compile 'org.glassfish.jersey.core:jersey-server:2.19'
+	compile 'org.glassfish.jersey.media:jersey-media-moxy:2.19'
+	compile 'org.glassfish.jersey.media:jersey-media-json-processing:2.19'
+	compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.19'
+	compile 'org.glassfish.jersey.media:jersey-media-multipart:2.19'
+	compile 'org.glassfish.jersey.containers:jersey-container-servlet-core:2.19'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src'  
+			output.classesDir = 'design/java'		
+		}
+		resources {
+			srcDir 'src'
+			output.resourcesDir = 'design/java'
+		}
+	}
+} 
+
+task cleanupPluginJars(type: Delete) {
+	println "Delete old *.jar-s ..."
+	delete fileTree(dir: "design/files/system/jars", include: "*.jar")
+}
+
+task buildPluginJars(type: Copy, dependsOn: [cleanupPluginJars,jar]) {
+	println "Copy *.jar-s ..."
+    from(configurations.runtime.files)
+   	into 'design/files/system/jars'
+}
+
+task updatePluginVersion << {
+	def version = "${openwga_version_major}.${openwga_version_minor}.${openwga_version_maintenance}.${openwga_version_patch}"
+	def build = "${openwga_version_build}"
+	println "Update ${project.name} to version ${version} Build ${openwga_version_build}"
+
+    ant.taskdef(name:"UpdatePluginVersion", classname:"de.innovationgate.ant.UpdatePluginVersion", classpath: configurations.compileClasspath.asPath)
+    ant.UpdatePluginVersion(designDir: "design", version: "${version}", build: "${build}")
+
+}
+
+task buildPlugin(type: Zip, dependsOn: [buildPluginJars, updatePluginVersion]){
+    archiveName = "de.innovationgate.wgaservices-rest-${project.version}.wgaplugin"    
+    from('design') {
+        into '/'
+        exclude 'java'
+    }
+    from (tasks.jar.archivePath){
+   		into 'files/system'
+   	}
+}
