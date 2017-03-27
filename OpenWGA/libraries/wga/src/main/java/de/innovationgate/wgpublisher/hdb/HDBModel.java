@@ -1147,27 +1147,37 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
     /**
      * Create a HDBModel content
      * @param contentClass Content class of the content to create
-     * @param ref Reference document for the creation below which the content is to be created
      * @return The created content
      * @throws WGException 
      */
     public WGContent createContent(String contentClass) throws WGException {
     	return createContent(contentClass, WGA.get().tmlcontext());
     }
-    public WGContent createContent(String contentClass, String context_expression) throws WGException {
-    	return createContent(contentClass, WGA.get().context(context_expression));
+    
+    /**
+     * Create a HDBModel content
+     * @param contentClass Content class of the content to create
+     * @param ref Reference document (Context|contex-expression|WGContent|null) for the creation below which the content is to be created
+     * @return The created content
+     * @throws WGException 
+     */
+    public WGContent createContent(String contentClass, Object ref) throws WGException {
+    	if(ref instanceof Context){
+    		return createContent(contentClass, ((Context)ref).content());
+    	}
+    	else if(ref instanceof String){
+    		return createContent(contentClass, WGA.get().context((String)ref).content());
+    	}
+    	
+    	else if(ref instanceof WGContent || ref==null){
+	        HDBModelParams params = newCreateContentParams(contentClass, (WGContent)ref);
+	        return createContent(params);
+    	}
+        
+        return createContent(contentClass, WGA.get().tmlcontext().content(), ref);
+        
     }
-    public WGContent createContent(String contentClass, String context_expression, Object params) throws WGException {
-    	return createContent(contentClass, WGA.get().context(context_expression).content(), params);
-    }
-    public WGContent createContent(String contentClass, Context ref) throws WGAPIException, HDBModelException {
-    	return createContent(contentClass, ref.content());
-    }
-    public WGContent createContent(String contentClass, WGContent ref) throws WGAPIException, HDBModelException {
-        HDBModelParams params = newCreateContentParams(contentClass, ref);
-        return createContent(params);
-    }
-
+    
     /**
      * Creates a parameter object for creating a HDBModel content
      * @param contentClass The content class of the content to create
@@ -1187,22 +1197,25 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
     /**
      * Create a HDBModel content
      * @param contentClass Content class of the content to create
-     * @param ref Reference document for the creation below which the content is to be created
+     * @param ref Reference document (Context|contex-expression|WGContent|null) for the creation below which the content is to be created
      * @param param Custom parameter to inject to the operation
      * @return The created content
      * @throws WGException 
      */
-    public WGContent createContent(String contentClass, Object param) throws WGException {
-    	return createContent(contentClass, WGA.get().tmlcontext().content(), param);
-    }
-    public WGContent createContent(String contentClass, Context ref, Object param) throws WGAPIException, HDBModelException {
-    	return createContent(contentClass, ref.content(), param);
-    }
-    public WGContent createContent(String contentClass, WGContent ref, Object param) throws WGAPIException, HDBModelException {
-        HDBModelParams params = newCreateContentParams(contentClass, ref);
+    
+    public WGContent createContent(String contentClass, Object ref, Object param) throws WGException {
+    	if(ref instanceof Context){
+    		return createContent(contentClass, ((Context)ref).content(), param);
+    	}
+    	else if(ref instanceof String){
+    		return createContent(contentClass, WGA.get().context((String)ref).content(), param);
+    	}
+    	// ref should be a WGContent or null here
+        HDBModelParams params = newCreateContentParams(contentClass, (WGContent)ref);
         params.setCustomParam(param);
-        return createContent(params);
+        return createContent(params);    	
     }
+    
     
     /**
      * Create a HDBModel content based on the information from a WebTML form. The form must be of form source appropriate for creating HDBModel contents and have a contentclass specified. 
