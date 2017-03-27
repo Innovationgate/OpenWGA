@@ -5,15 +5,8 @@ dependencies {
     compileClasspath project(":wgaBuildTools");
  	compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'   
     
-	compile 'org.jruby:jruby-complete:1.7.20'
-	compile 'com.darrinholst:sass-java-gems:3.4.4.3'
-
-    compile 'ro.isdc.wro4j:wro4j-core:1.7.8'
-	compile ('ro.isdc.wro4j:wro4j-extensions:1.7.8'){
-		exclude group: 'me.n4u.sass', module: 'sass-gems'
-	}
-	
-	compile 'org.webjars:json2:20110223'	
+    compile 'ro.isdc.wro4j:wro4j-core:1.8.0'
+	compile 'ro.isdc.wro4j:wro4j-extensions:1.8.0'
 }
 
 sourceSets {
