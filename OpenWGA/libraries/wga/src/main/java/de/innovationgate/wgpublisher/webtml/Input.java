@@ -839,6 +839,14 @@ public class Input extends ActionBase implements DynamicAttributes {
 			}
 		}
 
+        boolean doLabelling = stringToBoolean(getLabeled());
+        
+        // We need an id for option inputs so we can reference them from their labels
+        String theId = getId();
+        if (doLabelling && theId == null) {
+            theId = "option" + UIDGenerator.generateUID();
+        }
+
         List<InputOption> options = this.retrieveInputOptions();
         
         boolean renderCheckbox = false;
@@ -849,18 +857,29 @@ public class Input extends ActionBase implements DynamicAttributes {
             renderCheckbox = true;
         }
         
+        int idx=0;
         if (!renderCheckbox) {
             Iterator<InputOption> optionsIt = options.iterator();
             String optionValue;
             String optionText;        
     		while (optionsIt.hasNext()) {
+            	idx++;
                 InputOption option = optionsIt.next();
     			optionValue = option.getValue();
                 optionText = option.getText();
-    	
+			    String optionId = null;
+
+    			if (theId != null) {
+    			    optionId = theId + "_" + idx;
+    			}
+
     			String htmlDivider = getMultiValueDivider();
     	
-    			this.appendResult("<input").appendResult(buildDynamicHtmlAttributes()).appendResult(" type=\"radio\" name=\"").appendResult(name).appendResult("\" ");
+    			this.appendResult("<input").appendResult(buildDynamicHtmlAttributes());
+    			if(optionId!=null){
+    				this.appendResult(" id=\"" + optionId + "\"");
+    			}
+    			this.appendResult(" type=\"radio\" name=\"").appendResult(name).appendResult("\" ");
     			this.appendResult(" value=\"").appendResult(optionValue).appendResult("\" ");
     			
     			createChangeActionJS(name, form, "onclick");
@@ -870,7 +889,14 @@ public class Input extends ActionBase implements DynamicAttributes {
     					this.appendResult(" checked=\"true\"");
     				}								
     			}			
-    			this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">").appendResult(optionText);
+    			this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">");
+
+    			if (doLabelling && optionId!=null) {
+    			    this.appendResult("<label for=\"").appendResult(optionId).appendResult("\">").appendResult(optionText).appendResult("</label>");
+    			}
+    			else {
+    			    this.appendResult(optionText);
+    			}
     			if (optionsIt.hasNext()) {
     				appendResult(htmlDivider);
     			}
@@ -880,7 +906,11 @@ public class Input extends ActionBase implements DynamicAttributes {
         
         // If no options given Build a single checkbox representing "true"
         else {
-            this.appendResult("<input").appendResult(buildDynamicHtmlAttributes()).appendResult(" type=\"checkbox\" name=\"").appendResult(name).appendResult("\" ");
+            this.appendResult("<input").appendResult(buildDynamicHtmlAttributes());
+            if (theId!=null) {
+            	this.appendResult(" id=\"" + theId + "\"");
+            }
+            this.appendResult(" type=\"checkbox\" name=\"").appendResult(name).appendResult("\" ");
             this.appendResult(" value=\"true\" ");
             
             createChangeActionJS(name, form, "onclick");
@@ -890,8 +920,15 @@ public class Input extends ActionBase implements DynamicAttributes {
             }
             
             this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">");
+
             if (options.size() == 1) {
-                this.appendResult(options.get(0).getText());
+            	String optionText = options.get(0).getText();
+    			if (doLabelling) {
+    			    this.appendResult("<label for=\"").appendResult(theId).appendResult("\">").appendResult(optionText).appendResult("</label>");
+    			}
+    			else {
+    			    this.appendResult(optionText);
+    			}
             }
             
         }
