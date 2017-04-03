@@ -131,7 +131,7 @@ DBM = function(){
 		,historyBack: function(){
 			history.shift();
 			var params = history[0];
-			console.log("back to " + params, history)
+			//console.log("back to " + params, history)
 			if(params)
 				WGA.event.fireEvent("PS-app-selected", "*", params)
 		}
