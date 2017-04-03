@@ -136,7 +136,7 @@
 
 <tml:if condition="_portletname && _may_see_doc">
 	<tml:then>				
-		<tml:portlet name="{item:_portletname}" designdb="{_portletdb||db().getDbReference()}" ref="{item:_portlettml}" ajax="true"/>
+		<tml:portlet forcestate="true" name="{item:_portletname}" designdb="{_portletdb||db().getDbReference()}" ref="{item:_portlettml}" ajax="true"/>
 	</tml:then>
 	<tml:else>
 		<div style="padding:20px">
