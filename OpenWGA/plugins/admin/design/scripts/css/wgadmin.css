@@ -694,7 +694,7 @@ div.textfield {
 }
 
 textarea.source-code{
-	font-family:Courier;
+	font-family: Monaco, Courier;
 	font-weight:normal !important;
 	font-size:1.25em;
 	min-height:100px;
