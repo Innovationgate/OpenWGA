@@ -154,11 +154,17 @@
 				<div class="clear"></div>
 				
 				<label>TMLScript-Code to execute:</label>
-				<div>
+				<div class="data">
 					<div style="width:100%">
-						<tml:input name="script" type="textarea" encode="none"/>
+						<tml:input name="script" type="textarea" encode="none" cssclass="source-code">
+							autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+							style="width:500px"
+						</tml:input>
 					</div>
-					<tml:include ref="system:convert-to-ext-field" o_fieldname="script" o_type="textarea"/>					
+					<tml:comment><tml:include ref="system:convert-to-ext-field" o_fieldname="script" o_type="textarea"/></tml:comment>
+					<script>
+						$("#<tml:script expression="tmlform.formid"/> textarea[name=script]").tabhandler().autogrow()
+					</script>					
 				</div>		
 				<div class="clear"></div>
 				

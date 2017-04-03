@@ -692,4 +692,12 @@ div.textfield {
 	padding: 10px;
 	height: 300px;
 }
+
+textarea.source-code{
+	font-family:Courier;
+	font-weight:normal !important;
+	font-size:1.25em;
+	min-height:100px;
+	-moz-tab-size:4;
+	tab-size:4;
 }

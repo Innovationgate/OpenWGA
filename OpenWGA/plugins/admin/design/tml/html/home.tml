@@ -50,6 +50,7 @@
 		<script src="<tml:url type="js" name="shBrushXml"/>"></script>
 		<script src="<tml:url type="js" name="::Chart.min"/>"></script>
 		
+		<tml:include designdb="@afw" ref="include:jquery" o_jquery-plugins="tabhandler, textarea-autogrow"/>
 		<tml:include designdb="@afw" ref="include:jquery-ui-all"/>
 		
 		<script>
