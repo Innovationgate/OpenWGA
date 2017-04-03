@@ -435,23 +435,28 @@ public class WGPRequestPath {
         // Try to determine media key from URL, to see if we should do HTTP Login. This will only work with standard URLs.
         if (this.pathElements.size() >= 2) {
             readMediaKey(core, this.pathElements, 1);
-        if (mediaKey != null && mediaKey.isHttpLogin() || dbAttribHttpLogin.equals("true")) {
+	        if (mediaKey != null && mediaKey.isHttpLogin() || dbAttribHttpLogin.equals("true")) {
+	            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	            response.setHeader("WWW-Authenticate", "Basic realm=\"" + database.getAttribute(WGACore.DBATTRIB_DOMAIN) + "\"");
+	            return;
+	        }
+        }
+        else if(dbAttribHttpLogin.equals("true")){
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setHeader("WWW-Authenticate", "Basic realm=\"" + database.getAttribute(WGACore.DBATTRIB_DOMAIN) + "\"");
-                return;
-        }
+            return;        	
         }
         
         // Redirect to login facility
-            if (request.getParameter("$ajaxInfo") == null) {
-                dispatcher.sendRedirect(response, dispatcher.getLoginURL(request, database, getCompleteURL()));
-            } else {
-                // this is an ajax call without login information - redirect to jsp and fire event LoginRequired
-                String loginRequiredEvent = de.innovationgate.wgpublisher.webtml.portlet.PortletEvent.LOGIN_REQUIRED_EVENT.toJavaScriptObject();
-                String encodedEvent = Base64.encodeWeb(loginRequiredEvent.getBytes());
-                dispatcher.sendRedirect(response, this.publisherURL + "/fireSystemEvent.jsp?event="  + encodedEvent);
-            }
+        if (request.getParameter("$ajaxInfo") == null) {
+            dispatcher.sendRedirect(response, dispatcher.getLoginURL(request, database, getCompleteURL()));
+        } else {
+            // this is an ajax call without login information - redirect to jsp and fire event LoginRequired
+            String loginRequiredEvent = de.innovationgate.wgpublisher.webtml.portlet.PortletEvent.LOGIN_REQUIRED_EVENT.toJavaScriptObject();
+            String encodedEvent = Base64.encodeWeb(loginRequiredEvent.getBytes());
+            dispatcher.sendRedirect(response, this.publisherURL + "/fireSystemEvent.jsp?event="  + encodedEvent);
         }
+    }
 
     private void determineSpecialPathCommand() {
         this.pathCommand = databaseKey;
