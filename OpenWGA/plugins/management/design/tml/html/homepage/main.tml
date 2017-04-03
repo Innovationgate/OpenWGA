@@ -29,7 +29,7 @@
 		<tml:then>
 			<head>
 				<title>The <tml:script expression="WGA.Brand.name" encode="html"/> start page is disabled.</title>
-				<meta name="robots" content="noindex nofollow">		
+				<meta name="robots" content="noindex,nofollow">		
 				<link rel="stylesheet" href="<tml:url type="css" name="::start"/>">		
 			</head>
 			<body>
@@ -42,7 +42,7 @@
 			<head>
 				<tml:htmlhead/>
 				<title><tml:script expression="wgacore.releaseString"/></title>
-				<meta name="robots" content="noindex nofollow">		
+				<meta name="robots" content="noindex,nofollow">		
 				<link rel="stylesheet" href="<tml:url type="css" name="::start"/>">		
 			</head>
 			<body>
