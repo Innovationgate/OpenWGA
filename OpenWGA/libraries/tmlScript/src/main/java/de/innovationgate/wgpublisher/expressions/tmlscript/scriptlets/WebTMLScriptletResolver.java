@@ -296,6 +296,8 @@ public class WebTMLScriptletResolver {
         List<String> parms = WGUtils.deserializeCollection(param, ",", true);
         String dbKey = null;
         String contentKey = null;
+    	String defaultMediaKey;
+
         if (parms.size() == 2) {
             dbKey = (String) parms.get(0);
             contentKey = (String) parms.get(1);
@@ -310,14 +312,16 @@ public class WebTMLScriptletResolver {
         if (context.db().getBooleanAttribute(WGACore.DBATTRIB_USEREMOTECS, false) && context.content().hasItem("remote_info")) {
             TMLContext remoteTargetContext = traceRemoteDocument(context, contentKey);
             if (remoteTargetContext != null) {
-                return remoteTargetContext.contenturl(null, null);
+            	defaultMediaKey = (String) context.getwgacore().readPublisherOptionOrDefault(remoteTargetContext.db(), WGACore.DBATTRIB_DEFAULT_MEDIAKEY);
+            	return remoteTargetContext.contenturl(defaultMediaKey, null);
             }
         }
         else {
             String contextExpr = (dbKey != null ? "db:" + dbKey + "/" : "") + "docid:" + contentKey;
             TMLContext targetContext = context.context(contextExpr, false);
             if (targetContext != null) {
-                return targetContext.contenturl(null, null);
+            	defaultMediaKey = (String) context.getwgacore().readPublisherOptionOrDefault(targetContext.db(), WGACore.DBATTRIB_DEFAULT_MEDIAKEY);
+                return targetContext.contenturl(defaultMediaKey, null);
             }
         }
         
