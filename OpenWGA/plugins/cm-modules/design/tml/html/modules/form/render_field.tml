@@ -24,7 +24,7 @@
 ## LICENSE END #################################################################
 
 <tml:script>
-	_opts = CMM.settingList("options");	//	itemList(WGA.scoped('options'));
+	_opts = CMM.settingList("options");
 	_divider = CMM.setting('divider')=="single-line" ? " " : null;
 	
 	_message = CMM.setting('validationmessage');
@@ -51,6 +51,9 @@
 	fieldinfo.put("label", CMM.setting("label"))
 	fieldinfo.put("name", _fieldname);
 	fieldinfo.put("type", fieldtype||'text');
+
+	if(!WGA.createList(['select', 'checkbox', 'radio']).contains(fieldtype))
+		_opts = null;
 
 	tmlform.processcontext.get("forminfo").put(WGA.scoped(""), fieldinfo);		
 </tml:script>
