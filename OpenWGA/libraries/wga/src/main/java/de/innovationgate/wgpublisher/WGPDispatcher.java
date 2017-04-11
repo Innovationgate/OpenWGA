@@ -1929,20 +1929,17 @@ public class WGPDispatcher extends HttpServlet {
                     if (!((WGContent) fileContainer).getStatus().equals(WGContent.STATUS_RELEASE)) {
                         isAnonymousAccessible = false;
                     }
-                    // check readers
-                    if (isAnonymousAccessible) {
-                        isAnonymousAccessible = ((WGContent) fileContainer).getReaders().size() == 0;
+                    else {
+                    	// check readers
+                    	isAnonymousAccessible = ((WGContent) fileContainer).isPublic();
                     }
                 }
             }
 
-            if (isAnonymousAccessible && fileContainer.getFileSize(fileName) >= externalFileServingConfig.getThreshold()) {
-                // file is anonymous accessible and above external serving
-                // threshold
+            if (isAnonymousAccessible) {
                 dispatchFileExternalImpl(externalFileServingConfig, path, request, response, database, fileContainer);
             }
             else {
-
                 dispatchFileDefaultImpl(path, request, response, database, fileContainer);
             }
         }
@@ -1957,12 +1954,33 @@ public class WGPDispatcher extends HttpServlet {
     private void dispatchFileExternalImpl(ExternalFileServingConfig config, WGPRequestPath path, HttpServletRequest request, HttpServletResponse response, final WGDatabase database,
             final WGDocument fileContainer) throws WGAPIException, IOException, HttpErrorException, WGException {
 
-        final String filename = path.getFileName();
-
-        File dbRoot = config.getRootForDB(database.getDbReference());
+    	final String filename = path.getFileName();
+    	
+    	PublishingFile publishingFile = new DocumentPublishingFile(this, fileContainer, filename);
+    	String derivate = request.getParameter(URLPARAM_DERIVATE);
+        if (derivate != null) {
+            DerivateQuery derivateQuery = getCore().getFileDerivateManager().parseDerivateQuery(derivate);
+            DocumentPublishingFile docPublishingFile = (DocumentPublishingFile) publishingFile;
+            WGFileDerivateMetaData derivateMd = docPublishingFile.queryDerivate(derivateQuery, new ClientHints());
+            if (derivateMd != null) {
+                publishingFile = new DerivatePublishingFile(this, docPublishingFile.getContainer(), derivateMd);
+            }
+            else if (!isFallbackToOriginalOnDerivateQuery(derivateQuery, publishingFile)) {
+                throw new WGNotSupportedException("Derivate queries are not supported on this file type");
+            }                                                
+        }
+        
+        if(publishingFile.getFileSize()<config.getThreshold()){
+        	dispatchFileDefaultImpl(path, request, response, database, fileContainer);
+        	return;
+        }
+        	
+        final PublishingFile thePublishingFile = publishingFile;	// make it final for thread handling
+        final File dbRoot = config.getRootForDB(database.getDbReference());
         if (!dbRoot.exists()) {
             dbRoot.mkdir();
         }
+        
         File externalCacheFolder = new File(dbRoot, fileContainer.getDocumentKey().replaceAll("/", ":"));
         if (!externalCacheFolder.exists()) {
             externalCacheFolder.mkdir();
@@ -1972,84 +1990,73 @@ public class WGPDispatcher extends HttpServlet {
             // fallback to normal dispatch
             _core.getLog().warn("Unable to create external file cache directory '" + externalCacheFolder.getAbsolutePath() + "'. Performing file dispatch in default mode.");
             dispatchFileDefaultImpl(path, request, response, database, fileContainer);
+            return;
+        }
+        
+    	String cacheFileName = "[" + filename + "]";
+    	if(path.getQueryString()!=null)
+    		cacheFileName += path.getQueryString().hashCode();
+    	String mimeType = publishingFile.getContentType();
+    	cacheFileName += "." + WGFactory.getMimetypeDeterminationService().determineSuffixByMimeType(mimeType);
+    	
+    	final File cachedFile = new File(externalCacheFolder, cacheFileName);
+
+        if (cachedFile.exists()) {
+            // perform redirect
+        	//_core.getLog().info("redirect " + filename + " (" + path.getQueryString() + ") " + publishingFile.getContentType() + ") to " + cacheFileName);
+        	response.sendRedirect(config.getRootURL() + database.getDbReference() + "/" + fileContainer.getDocumentKey().replaceAll("/", ":") + "/" + cacheFileName);
         }
         else {
-            final File cachedFile = new File(externalCacheFolder, path.getFileName());
+            // cache file
+            Thread cacheTask = new Thread() {
 
-            if (isExternalCacheUpToDate(cachedFile, fileContainer, filename)) {
-                // perform redirect
-                response.sendRedirect(config.getRootURL() + database.getDbReference() + "/" + fileContainer.getDocumentKey().replaceAll("/", ":") + "/" + filename);
-            }
-            else {
-                // cache file
-                Thread cacheTask = new Thread() {
+                @Override
+                public void run() {
+                    synchronized (WGPDispatcher.class.getName() + ".filecache." + cachedFile.getAbsolutePath().intern()) {
+                        try {
+                            database.openSession();
 
-                    @Override
-                    public void run() {
-                        synchronized (WGPDispatcher.class.getName() + ".filecache." + cachedFile.getAbsolutePath().intern()) {
+                            File temp = new File(cachedFile.getParent(), UIDGenerator.generateUID() + ".tmp");
+                            InputStream in = null;
+                            OutputStream out = null;
                             try {
-                                database.openSession();
-                                // perform synchronized up to date check
-                                if (!isExternalCacheUpToDate(cachedFile, fileContainer, filename)) {
-
-                                    File temp = new File(cachedFile.getParent(), UIDGenerator.generateUID() + ".tmp");
-                                    WGDocument container = database.getDocumentByKey(fileContainer.getDocumentKey());
-                                    InputStream in = null;
-                                    OutputStream out = null;
-                                    try {
-                                        in = container.getFileData(filename);
-                                        out = new FileOutputStream(temp);
-                                        WGUtils.inToOut(in, out, 1024);
-                                    }
-                                    finally {
-                                        if (in != null) {
-                                            try {
-                                                in.close();
-                                            }
-                                            catch (IOException e) {
-                                            }
-                                        }
-                                        if (out != null) {
-                                            try {
-                                                out.close();
-                                            }
-                                            catch (IOException e) {
-                                            }
-                                        }
-                                    }
-
-                                    temp.renameTo(cachedFile);
-                                    cachedFile.setLastModified(fileContainer.getFileLastModified(filename).getTime());
-                                }
-                            }
-                            catch (Throwable e) {
-                                _core.getLog().error("Unable to create cache for external file serving.", e);
+                                in = thePublishingFile.getInputStream();
+                                out = new FileOutputStream(temp);
+                                WGUtils.inToOut(in, out, 1024);
                             }
                             finally {
-                                WGFactory.getInstance().closeSessions();
+                                if (in != null) {
+                                    try {
+                                        in.close();
+                                    }
+                                    catch (IOException e) {}
+                                }
+                                if (out != null) {
+                                    try {
+                                        out.close();
+                                    }
+                                    catch (IOException e) {}
+                                }
                             }
+                            temp.renameTo(cachedFile);
+                        }
+                        catch (Throwable e) {
+                            _core.getLog().error("Unable to create cache for external file serving.", e);
+                        }
+                        finally {
+                            WGFactory.getInstance().closeSessions();
                         }
                     }
+                }
 
-                };
+            };
 
-                cacheTask.start();
+            cacheTask.start();
+            
 
-                dispatchFileDefaultImpl(path, request, response, database, fileContainer);
-            }
-
+            dispatchFileDefaultImpl(path, request, response, database, fileContainer);
         }
-    }
 
-    private boolean isExternalCacheUpToDate(File cachedFile, WGDocument fileContainer, String filename) throws WGAPIException {
-
-        if (cachedFile.exists() && WGUtils.cutoffTimeMillis(cachedFile.lastModified()) == WGUtils.cutoffTimeMillis(fileContainer.getFileLastModified(filename).getTime())
-                && cachedFile.length() == fileContainer.getFileSize(filename)) {
-            return true;
-        }
-        else {
-            return false;
-        }
     }
 
     private void dispatchFileDefaultImpl(WGPRequestPath path, HttpServletRequest request, HttpServletResponse response, WGDatabase database, WGDocument fileContainer) throws IOException,
@@ -2064,7 +2071,27 @@ public class WGPDispatcher extends HttpServlet {
         
         if (fileExpirationMinutes > 0) {
             int fileExpirationSeconds = fileExpirationMinutes * 60;
-            response.setHeader("Cache-Control", "private, max-age=" + fileExpirationSeconds);
+
+            // check if file is anonymous accessible
+            boolean isAnonymousAccessible = database.isAnonymousAccessible();
+            if (isAnonymousAccessible) {
+                // perform further document level checks
+                if (fileContainer != null && fileContainer instanceof WGContent) {
+                    // check status
+                    if (!((WGContent) fileContainer).getStatus().equals(WGContent.STATUS_RELEASE)) {
+                        isAnonymousAccessible = false;
+                    }                    
+                    else {
+                    	// check readers
+                        isAnonymousAccessible = ((WGContent) fileContainer).isPublic(); 
+                    }
+                }
+            }
+
+            if (isAnonymousAccessible) {
+            	response.setHeader("Cache-Control", "public, max-age=" + fileExpirationSeconds);
+            }
+            else response.setHeader("Cache-Control", "private, max-age=" + fileExpirationSeconds);
         }
 
         // Create publishing file object, which will provide the data
@@ -2733,7 +2760,10 @@ public class WGPDispatcher extends HttpServlet {
         int fileExpirationMinutes = ((Integer) _core.readPublisherOptionOrDefault(database, WGACore.DBATTRIB_FILEEXPIRATION_MINUTES)).intValue();
         if (fileExpirationMinutes > 0) {
             int fileExpirationSeconds = fileExpirationMinutes * 60;
-            response.setHeader("Cache-Control", "private, max-age=" + fileExpirationSeconds);
+            boolean isAnonymousAccessible = database.isAnonymousAccessible();
+            if(isAnonymousAccessible)
+            	response.setHeader("Cache-Control", "public, max-age=" + fileExpirationSeconds);
+            else response.setHeader("Cache-Control", "private, max-age=" + fileExpirationSeconds);
         }
 
         // determine lastModified
