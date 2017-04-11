@@ -105,6 +105,12 @@ public class DocumentPublishingFile extends PublishingFile {
         }
     }
 
+    public WGFileMetaData getFileMetaData() throws WGAPIException{
+    	if (_container.getDatabase().getContentStoreVersion() >= WGDatabase.CSVERSION_WGA5)
+    		return _container.getFileMetaData(_fileName);
+    	else return null;
+    }
+    
     private boolean isSystemFileContainer(WGFileContainer fc) throws WGAPIException {
         if (fc.getName().equals("system") || fc.getName().startsWith("system:")) {
             return true;

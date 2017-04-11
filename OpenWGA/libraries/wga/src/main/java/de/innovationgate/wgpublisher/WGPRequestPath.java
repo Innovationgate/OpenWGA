@@ -663,17 +663,20 @@ public class WGPRequestPath {
 		return contentKey;
 	}
 
-
-
-
-
-
 	/**
 	 * Gets the fileName
 	 * @return Returns a String
 	 */
 	public String getFileName() {
 		return fileName;
+	}
+
+	/**
+	 * Gets the queryString
+	 * @return Returns a String
+	 */
+	public String getQueryString() {
+		return queryString;
 	}
 
 

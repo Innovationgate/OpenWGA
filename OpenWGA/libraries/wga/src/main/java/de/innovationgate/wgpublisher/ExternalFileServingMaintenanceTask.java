@@ -48,7 +48,7 @@ public class ExternalFileServingMaintenanceTask implements Runnable {
     }
     
     public void start() {
-        this.thread = new Thread(this);
+    	this.thread = new Thread(this);
         this.thread.setDaemon(true);
         this.thread.setPriority(Thread.MIN_PRIORITY);
         this.thread.start();
@@ -56,6 +56,16 @@ public class ExternalFileServingMaintenanceTask implements Runnable {
     
     public void stop() {
         this.thread = null;
+    }
+
+    private String getFilename(String deployed_filename){
+        // handle URL parameter
+    	String filename = deployed_filename;
+        int q1_pos = filename.indexOf("["); 
+        int q2_pos = filename.lastIndexOf("]");
+        if(q1_pos>=0 && q2_pos>=0)
+        	filename = filename.substring(q1_pos+1, q2_pos);
+        return filename;
     }
     
     public void run() {
@@ -125,6 +135,7 @@ public class ExternalFileServingMaintenanceTask implements Runnable {
                                             for (File container : containers) {
                                                 if (container.getName().startsWith("content:")) {
                                                     String contentKey = container.getName().substring("content:".length());
+                                                    
                                                     WGContent content = db.getContentByKey(contentKey);
                                                     if (content == null || !content.getStatus().equals(WGContent.STATUS_RELEASE)) {
                                                         // content has been deleted or archived - remove file data
@@ -147,8 +158,10 @@ public class ExternalFileServingMaintenanceTask implements Runnable {
                                                             File[] deployedFiles = container.listFiles();
                                                             for (File deployedFile : deployedFiles) {
                                                                 if (deployedFile.isFile()) {
-                                                                    if (!content.hasFile(deployedFile.getName())) {
-                                                                        _core.getLog().info("File '" + deployedFile.getName() + "' has been removed from content '" + content.getContentKey() + "' and will be removed from external file serving cache.");
+                                                                	
+                                                                	String filename = getFilename(deployedFile.getName());
+                                                                    if (!content.hasFile(filename)) {
+                                                                        _core.getLog().info("File '" + filename + "' has been removed from content '" + content.getContentKey() + "' and will be removed from external file serving cache: " + deployedFile.getName());
                                                                         if (!deployedFile.delete()) {
                                                                             _core.getLog().warn("Unable to delete external file serving data '" + deployedFile.getAbsolutePath() + "'. File cache might serve stale data.");
                                                                         }
@@ -177,8 +190,9 @@ public class ExternalFileServingMaintenanceTask implements Runnable {
                                                         File[] deployedFiles = container.listFiles();
                                                         for (File deployedFile : deployedFiles) {
                                                             if (deployedFile.isFile()) {
-                                                                if (!fileContainer.hasFile(deployedFile.getName())) {
-                                                                    _core.getLog().info("File '" + deployedFile.getName() + "' has been removed from file container '" + fileContainer.getName() + "' and will be removed from external file serving cache.");
+                                                            	String filename = getFilename(deployedFile.getName());
+                                                                if (!fileContainer.hasFile(filename)) {
+                                                                    _core.getLog().info("File '" + filename + "' has been removed from file container '" + fileContainer.getName() + "' and will be removed from external file serving cache: " + deployedFile.getName());
                                                                     if (!deployedFile.delete()) {
                                                                         _core.getLog().warn("Unable to delete external file serving data '" + deployedFile.getAbsolutePath() + "'. File cache might serve stale data.");
                                                                     }
