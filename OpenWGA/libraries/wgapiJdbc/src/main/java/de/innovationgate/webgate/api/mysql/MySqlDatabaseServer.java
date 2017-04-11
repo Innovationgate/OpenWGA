@@ -416,8 +416,8 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
         
         ModuleDefinition serverDef = WGFactory.getModuleRegistry().getModuleDefinition(DatabaseServerModuleType.class, MySqlDatabaseServer.class);
         OptionReader serverOptionReader = OptionReader.create(getOptions(), serverDef);
-       try {
-        _usePool = (Boolean) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL);
+        try {
+        	_usePool = (Boolean) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL);
         }
         catch (OptionConversionException e) {
             throw new WGBackendException("Exception reading server configuration", e);
