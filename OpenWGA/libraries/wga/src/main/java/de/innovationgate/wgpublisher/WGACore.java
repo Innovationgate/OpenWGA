@@ -97,8 +97,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
 import javax.servlet.jsp.PageContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -121,7 +119,6 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
-import org.hsqldb.jdbcDriver;
 import org.quartz.SchedulerException;
 import org.quartz.impl.DirectSchedulerFactory;
 import org.quartz.simpl.RAMJobStore;
@@ -408,7 +405,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         URLENCODER_PATH_PART_CHARACTERS.clear('+');
         URLENCODER_PATH_PART_CHARACTERS.clear('%');
     }
-    
+        
     public static class UpdateConfigOccasion implements ProblemOccasion {
 
         @Override
@@ -3129,12 +3126,22 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
     }
     
     public void addAnalyzerMapping(String language, String analyzerClassName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
-    	log.info("Registering analyzer mapping from language code '" + language + "' to '" + analyzerClassName + "'");
+    	log.info("Registering analyzer mapping for language code '" + language + "' to '" + analyzerClassName + "'");
     	Class analyzerClass = getLibraryLoader().loadClass(analyzerClassName);
         Analyzer analyzer = (Analyzer) analyzerClass.newInstance();
     	analyzerMappings.put(language.toLowerCase(), analyzer);
     }
+
+    public void addAnalyzerMapping(String language, Analyzer analyzer){
+    	log.info("Registering analyzer mapping for language code '" + language + "' to '" + analyzer.getClass().getName() + "'");
+    	analyzerMappings.put(language.toLowerCase(), analyzer);
+    }
     
+    public void removeAnalyzerMapping(String language){
+    	log.info("Unregistering analyzer mapping for language code '" + language);
+    	analyzerMappings.remove(language.toLowerCase());
+    }
+
     public void addFileHandlerMapping(String extension, String handlerClassName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
     	log.info("Registering filehandler for extension '" + extension + "' - '" + handlerClassName + "'.");
     	Class fileHandlerClass = getLibraryLoader().loadClass(handlerClassName);
@@ -4390,7 +4397,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             logCategoryInfo(WGAVersion.WGAPUBLISHER_PRODUCT_NAME + " ready", 1);
             WGFactory.getInstance().closeSessions();
             fireCoreEvent(new WGACoreEvent(WGACoreEvent.TYPE_ONLINE, null, this));
-
+            
         }
         catch (Exception exc) {
             log.fatal("Fatal error initializing WGA", exc);

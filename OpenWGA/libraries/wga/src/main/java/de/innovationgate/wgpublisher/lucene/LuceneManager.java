@@ -59,6 +59,10 @@ import org.apache.commons.vfs2.FileMonitor;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.de.GermanAnalyzer;
+import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.fr.FrenchAnalyzer;
+import org.apache.lucene.analysis.it.ItalianAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.CorruptIndexException;
@@ -123,6 +127,7 @@ import de.innovationgate.wga.common.beans.LuceneIndexItemRule;
 import de.innovationgate.wga.common.beans.csconfig.v1.PluginConfig;
 import de.innovationgate.wga.config.ContentStore;
 import de.innovationgate.wga.config.LuceneManagerConfiguration;
+import de.innovationgate.wga.config.WGAConfiguration;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.lucene.analysis.FileHandler;
@@ -241,7 +246,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     private static final String DOCTYPE_ALL = "all";
 
     private WGACore _core;
-
+    
     private long _indexInterval = 1000 * 5;
     private Indexer _indexer;
 
@@ -589,6 +594,19 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     		// this happens on an initial WGA startup
     		return;
     	}
+    	
+    	if(_core.getWgaConfiguration().getLuceneManagerConfiguration().isUseLanguageAnalyzers()){
+            _core.addAnalyzerMapping("de", new GermanAnalyzer(org.apache.lucene.util.Version.LUCENE_35));
+            _core.addAnalyzerMapping("en", new EnglishAnalyzer(org.apache.lucene.util.Version.LUCENE_35));
+            _core.addAnalyzerMapping("it", new ItalianAnalyzer(org.apache.lucene.util.Version.LUCENE_35));
+            _core.addAnalyzerMapping("fr", new FrenchAnalyzer(org.apache.lucene.util.Version.LUCENE_35));
+    	}
+    	else{
+            _core.removeAnalyzerMapping("de");
+            _core.removeAnalyzerMapping("en");    		
+            _core.removeAnalyzerMapping("it");
+            _core.removeAnalyzerMapping("fr");
+    	}
         
         // check if each DB in _indexedDBKeys is in configfile and enabled by wga
         // if not create dropRequest
@@ -603,9 +621,9 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                 // remove from indexed dbs, cannot be done in removeDatabase() because of current iteration over indexedDbKeys
                 //itIndexedDbKeys.remove(); // now done in removeDatabase via copy-replace
             } else if ( !dbConfig.isEnabled() ) {
-                    // if db was disabled, only remove from indexedDbs - do not drop index
-                    //itIndexedDbKeys.remove();
-                    removeDatabase(dbKey, false);
+                // if db was disabled, only remove from indexedDbs - do not drop index
+                //itIndexedDbKeys.remove();
+                removeDatabase(dbKey, false);
             }
         }        
         
@@ -831,7 +849,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
         // add to list and set service status running for DB
             Queue<IndexingRequest> requests = _additionRequestsMap.get(request.getDbkey());
         if (requests == null) {
-                requests = new ConcurrentLinkedQueue<LuceneManager.IndexingRequest>();
+        	requests = new ConcurrentLinkedQueue<LuceneManager.IndexingRequest>();
             _additionRequestsMap.put(request.getDbkey(), requests);
         }        
         requests.add(request);     
@@ -917,7 +935,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
         String langCode = content.getLanguage().getName();
         Analyzer analyzer = null;
         if (langCode != null) {
-            analyzer = _core.getAnalyzerForLanguageCode(langCode);
+            analyzer = _core.getAnalyzerForLanguageCode(langCode.substring(0, 1));
             if (analyzer == null) {
                 analyzer = _core.getDefaultAnalyzer();
             }
@@ -1157,13 +1175,16 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                             db.getSessionContext().setTask("WGA Lucene Indexer");
                             db.getSessionContext().setBatchProcess(true);
                             try {
-                                WGContent content = (WGContent) db.getDocumentByDocumentKey(request.getDocumentKey());
-                                if (content != null) {
-                                    addToIndex(writer, db, content);
-                                    info.docAdded();
-                                    docsWithinThisSession++;
-                                    // the content-core is not needed anymore for data gathering - so drop core to free HEAP
-                                	content.dropCore();                       
+                                WGContent content = (WGContent) db.getDocumentByKey(request.getDocumentKey());
+                                if (content != null){
+                                	boolean indexReleaseOnly = _core.getWgaConfiguration().getContentStore(request.getDbkey()).getLuceneIndexConfiguration().isIndexReleasedOnly();
+                                	if(content.getStatus().equals(WGContent.STATUS_RELEASE) || !indexReleaseOnly) {
+	                                    addToIndex(writer, db, content);
+	                                    info.docAdded();
+	                                    docsWithinThisSession++;
+	                                    // the content-core is not needed anymore for data gathering - so drop core to free HEAP
+	                                	content.dropCore();
+                                	}
                                 }
                                 else {
                                     // content was deleted
@@ -2390,7 +2411,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
      * 
      * @see de.innovationgate.webgate.api.WGContentEventListener#contentHasBeenSaved(de.innovationgate.webgate.api.WGContentEvent)
      */
-    public void contentHasBeenSaved(WGContentEvent event) {
+    public void contentHasBeenSaved(WGContentEvent event) throws WGAPIException {
         if (event.getDatabase().getSessionContext().isTransactionActive()) {
             return;
         }
@@ -2398,7 +2419,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
         String dbkey = (String) event.getDatabase().getDbReference();
         IndexingRequest indexingRequest = new IndexingRequest(dbkey, event.getDocumentKey());
         addDeletionRequest(indexingRequest);
-        addAdditionRequest(indexingRequest);
+       	addAdditionRequest(indexingRequest);
     }
 
     protected void finalize() throws Throwable {

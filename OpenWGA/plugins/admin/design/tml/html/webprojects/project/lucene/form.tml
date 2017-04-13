@@ -53,6 +53,7 @@
 
 		<fieldset>		
 			<tml:[system:fs-input] o_field="luceneIndexConfiguration/enabled" o_type="boolean"/>
+			<tml:[system:fs-input] o_field="luceneIndexConfiguration/indexReleasedOnly" o_type="boolean"/>
 			<tml:case condition="DBM.database(_config_bean.key).isReady && DBM.database(_config_bean.key).version>=5 && DBM.database(_config_bean.key).getPatchLevel()>=5">
 				<tml:[system:fs-input] o_field="luceneIndexConfiguration/indexFileContentOnDocuments" o_type="boolean"/>		
 			</tml:case>
