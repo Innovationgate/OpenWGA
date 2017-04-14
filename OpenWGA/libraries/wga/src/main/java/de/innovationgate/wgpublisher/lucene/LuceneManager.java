@@ -61,6 +61,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.analysis.en.EnglishAnalyzer;
+import org.apache.lucene.analysis.es.SpanishAnalyzer;
 import org.apache.lucene.analysis.fr.FrenchAnalyzer;
 import org.apache.lucene.analysis.it.ItalianAnalyzer;
 import org.apache.lucene.document.Document;
@@ -71,6 +72,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
@@ -267,7 +269,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     
     private volatile boolean _indexerIsRunning;
 
-    
+    private boolean _indexReleasedOnly=false;
     private int _booleanQueryMaxClauseCount = BooleanQuery.getMaxClauseCount();
     private int _maxDocsPerDBSession = 50;
     
@@ -600,14 +602,14 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             _core.addAnalyzerMapping("en", new EnglishAnalyzer(org.apache.lucene.util.Version.LUCENE_35));
             _core.addAnalyzerMapping("it", new ItalianAnalyzer(org.apache.lucene.util.Version.LUCENE_35));
             _core.addAnalyzerMapping("fr", new FrenchAnalyzer(org.apache.lucene.util.Version.LUCENE_35));
+            _core.addAnalyzerMapping("es", new SpanishAnalyzer(org.apache.lucene.util.Version.LUCENE_35));
     	}
     	else{
-            _core.removeAnalyzerMapping("de");
-            _core.removeAnalyzerMapping("en");    		
-            _core.removeAnalyzerMapping("it");
-            _core.removeAnalyzerMapping("fr");
+    		_core.removeAllAnalyzerMappings();
     	}
         
+    	_indexReleasedOnly = _core.getWgaConfiguration().getLuceneManagerConfiguration().isIndexReleasedContentsOnly();
+    	
         // check if each DB in _indexedDBKeys is in configfile and enabled by wga
         // if not create dropRequest
         Iterator itIndexedDbKeys = _indexedDbs.keySet().iterator();
@@ -1177,8 +1179,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                             try {
                                 WGContent content = (WGContent) db.getDocumentByKey(request.getDocumentKey());
                                 if (content != null){
-                                	boolean indexReleaseOnly = _core.getWgaConfiguration().getContentStore(request.getDbkey()).getLuceneIndexConfiguration().isIndexReleasedOnly();
-                                	if(content.getStatus().equals(WGContent.STATUS_RELEASE) || !indexReleaseOnly) {
+                                	if(content.getStatus().equals(WGContent.STATUS_RELEASE) || !_indexReleasedOnly) {
 	                                    addToIndex(writer, db, content);
 	                                    info.docAdded();
 	                                    docsWithinThisSession++;
@@ -1575,9 +1576,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             String dbkey = db.getDbReference();
             LOG.debug("Indexing " + content.getDocumentKey() + " from db " + dbkey);
             
-
-                        
-            org.apache.lucene.document.Document document = new org.apache.lucene.document.Document();
+            Document document = new org.apache.lucene.document.Document();
             addKeyword(document, INDEXFIELD_UNIQUEKEY, buildUniqueIndexKey(content));
             addMetas(document, content, true);   
             addKeyword(document, INDEXFIELD_DOCTYPE, DOCTYPE_CONTENT);
@@ -2584,39 +2583,11 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             if (languagesPriorityList.size() <= 0) {
               searchWithDefaultAnalyzer = true;
             }
-            
-            //build phrase query                
-            BooleanQuery phraseQuery = new BooleanQuery();                
-            Iterator languageList = languagesPriorityList.iterator();                
-            while (languageList.hasNext()) {
-                WGLanguage languageItem = (WGLanguage) languageList.next();
-                Analyzer analyzer = _core.getAnalyzerForLanguageCode(languageItem.getName());
-                if (analyzer != null) {
-                    QueryParser parser = new IndexingRuleBasedQueryParser(INDEXFIELD_ALLCONTENT, analyzer, _indexedDbs, searchDBKeys, _metaKeywordFields);
-                    Query query = parser.parse(phrase);
-                    
-                    BooleanQuery testPhraseAndLangQuery = new BooleanQuery();
-                    testPhraseAndLangQuery.add(query, BooleanClause.Occur.MUST);
-                    testPhraseAndLangQuery.add(new TermQuery(new Term(WGContent.META_LANGUAGE, languageItem.getName())), BooleanClause.Occur.MUST);
-                    
-                    phraseQuery.add(testPhraseAndLangQuery, BooleanClause.Occur.SHOULD);
-                }
-                else {
-                    searchWithDefaultAnalyzer = true;
-                }
-            }
-            
-            if (searchWithDefaultAnalyzer) {
-                QueryParser parser = new IndexingRuleBasedQueryParser(INDEXFIELD_ALLCONTENT, _core.getDefaultAnalyzer(), _indexedDbs, searchDBKeys, _metaKeywordFields);
-                Query query = parser.parse(phrase);
-                phraseQuery.add(query, BooleanClause.Occur.SHOULD);
-            }
-            wholeQuery.add(phraseQuery, BooleanClause.Occur.MUST);
-            
                         
             // parse native options
             Sort sort = null;
             String sortFieldName = "";
+            Operator defaultOperator = QueryParser.AND_OPERATOR; 
             String nativeOptionsStr = (String) parameters.get(WGDatabase.QUERYOPTION_NATIVEOPTIONS);
             boolean includeVirtualContent = false;
             String doctype = DOCTYPE_CONTENT;
@@ -2653,6 +2624,12 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                     } else if (option.startsWith("doctype:")) {
                         doctype = option.substring("doctype:".length()).trim();
                     }
+                    else if(option.startsWith("operator:")) {
+                    	String op = option.substring("operator:".length()).trim();
+                    	if(op.equalsIgnoreCase("or"))
+                    		defaultOperator = QueryParser.OR_OPERATOR;
+                    }
+                    
                 }
             }    
             
@@ -2668,6 +2645,34 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                 wholeQuery.add(new TermQuery(new Term(INDEXFIELD_DOCTYPE, doctype)), BooleanClause.Occur.MUST);
             }
 
+            //build phrase query                
+            BooleanQuery phraseQuery = new BooleanQuery();                
+            Iterator languageList = languagesPriorityList.iterator();                
+            while (languageList.hasNext()) {
+                WGLanguage languageItem = (WGLanguage) languageList.next();
+                Analyzer analyzer = _core.getAnalyzerForLanguageCode(languageItem.getName());
+                if (analyzer != null) {
+                    QueryParser parser = new IndexingRuleBasedQueryParser(INDEXFIELD_ALLCONTENT, analyzer, defaultOperator, _indexedDbs, searchDBKeys, _metaKeywordFields);
+                    Query query = parser.parse(phrase);
+                    
+                    BooleanQuery testPhraseAndLangQuery = new BooleanQuery();
+                    testPhraseAndLangQuery.add(query, BooleanClause.Occur.MUST);
+                    testPhraseAndLangQuery.add(new TermQuery(new Term(WGContent.META_LANGUAGE, languageItem.getName())), BooleanClause.Occur.MUST);
+                    
+                    phraseQuery.add(testPhraseAndLangQuery, BooleanClause.Occur.SHOULD);
+                }
+                else {
+                    searchWithDefaultAnalyzer = true;
+                }
+            }
+            
+            if (searchWithDefaultAnalyzer) {
+                QueryParser parser = new IndexingRuleBasedQueryParser(INDEXFIELD_ALLCONTENT, _core.getDefaultAnalyzer(), defaultOperator, _indexedDbs, searchDBKeys, _metaKeywordFields);
+                Query query = parser.parse(phrase);
+                phraseQuery.add(query, BooleanClause.Occur.SHOULD);
+            }
+            wholeQuery.add(phraseQuery, BooleanClause.Occur.MUST);
+    
             TopDocs hits;
             //register executed query as output parameter
             parameters.put(WGDatabase.QUERYOPTION_RETURNQUERY, wholeQuery.toString());   

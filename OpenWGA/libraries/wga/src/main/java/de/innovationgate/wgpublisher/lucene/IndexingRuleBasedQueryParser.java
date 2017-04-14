@@ -65,10 +65,10 @@ public class IndexingRuleBasedQueryParser extends QueryParser {
      * @param searchDBKeys - list of dbkeys (Strings) to search
      * @param metaKeywordFields - set of metaFields (String fieldname) indexed as keyword
      */
-    public IndexingRuleBasedQueryParser(String arg0, Analyzer arg1, Map luceneConfigurations, List searchDBKeys, Set metaKeywordFields) {
+    public IndexingRuleBasedQueryParser(String arg0, Analyzer arg1, Operator op, Map luceneConfigurations, List searchDBKeys, Set metaKeywordFields) {
         super(Version.LUCENE_35, arg0, arg1);
         // google like search
-        this.setDefaultOperator(AND_OPERATOR);
+        this.setDefaultOperator(op);
         _configs = luceneConfigurations;
         _searchDBKeys = searchDBKeys;
         _metaKeywordFields = metaKeywordFields;

@@ -76,6 +76,7 @@
 					<tml:[system:fs-input] o_field="luceneManagerConfiguration/path"/>
 					<tml:[system:fs-input] o_field="luceneManagerConfiguration/optimizeIndexAutomatically" o_type="boolean"/>
 					<tml:[system:fs-input] o_field="luceneManagerConfiguration/useLanguageAnalyzers" o_type="boolean"/>
+					<tml:[system:fs-input] o_field="luceneManagerConfiguration/indexReleasedContentsOnly" o_type="boolean"/>
 					<tml:[system:fs-input] o_field="luceneManagerConfiguration/maxBooleanClauseCount" o_type="number" o_format="0"/>
 					<tml:[system:fs-input] o_field="luceneManagerConfiguration/maxDocsPerDBSession" o_type="number" o_format="0"/>
 					<tml:[system:fs-input] o_field="luceneManagerConfiguration/indexInterval" o_type="number" o_format="0"/>

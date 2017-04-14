@@ -3142,6 +3142,11 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
     	analyzerMappings.remove(language.toLowerCase());
     }
 
+    public void removeAllAnalyzerMappings(){
+    	log.info("Unregistering all language specific analyzer mappings");
+    	analyzerMappings.clear();
+    }
+
     public void addFileHandlerMapping(String extension, String handlerClassName) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
     	log.info("Registering filehandler for extension '" + extension + "' - '" + handlerClassName + "'.");
     	Class fileHandlerClass = getLibraryLoader().loadClass(handlerClassName);
