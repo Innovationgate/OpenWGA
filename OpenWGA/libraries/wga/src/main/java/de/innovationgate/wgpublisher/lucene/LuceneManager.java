@@ -943,7 +943,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
         String langCode = content.getLanguage().getName();
         Analyzer analyzer = null;
         if (langCode != null) {
-            analyzer = _core.getAnalyzerForLanguageCode(langCode.substring(0, 1));
+            analyzer = _core.getAnalyzerForLanguageCode(langCode.substring(0, 2));
             if (analyzer == null) {
                 analyzer = _core.getDefaultAnalyzer();
             }
