@@ -71,12 +71,14 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.MultiTermQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Similarity;
@@ -91,6 +93,7 @@ import org.apache.lucene.search.highlight.QueryTermScorer;
 import org.apache.lucene.search.highlight.WeightedTerm;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 import org.dom4j.DocumentException;
 
 import de.innovationgate.utils.WGUtils;
@@ -429,7 +432,10 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
         
         if (Boolean.getBoolean(SYSPROP_USE_CONSTANT_IDF_SIMILARITY)) {
             _customSimilarity = new ConstantIDFSimilarity();
-    }
+        }
+        else{
+        	_customSimilarity = new ContantFieldNormSimilarity();
+        }
     }
     
     private void init() throws IOException, DocumentException {              
@@ -1088,6 +1094,8 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                 IndexWriter writer = null;
                 try {
                     writer = new IndexWriter(_indexDirectory, null, MaxFieldLength.UNLIMITED);
+                    if(_customSimilarity!=null)
+                    	writer.setSimilarity(_customSimilarity);
     
                     // additionrequests are grouped by dbKey
                     // get list from map
@@ -1942,17 +1950,14 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             if (metaInfo.getLuceneIndexType().equals(MetaInfo.LUCENE_INDEXTYPE_KEYWORD)) {
                                
                 if (!metaInfo.isMultiple()) {                          
-                        addKeyword(doc, metaInfo.getName(), value, metaInfo.getLuceneBoost());
-                        addSortField(doc, metaInfo.getName(), value);
-                        Iterator synonyms = metaInfo.getSynonyms().iterator();
-                        while (synonyms.hasNext()) {
-                            String synonym = (String) synonyms.next();
-                            addKeyword(doc, synonym, value, metaInfo.getLuceneBoost());
-                            addSortField(doc, synonym, value);
-                        }
-                        if (metaInfo.getLuceneAddToAllContent() && addToAllContent) {
-                            addUnStored(doc, INDEXFIELD_ALLCONTENT, value, metaInfo.getLuceneBoost());
-                        }
+                    addKeyword(doc, metaInfo.getName(), value, metaInfo.getLuceneBoost());
+                    addSortField(doc, metaInfo.getName(), value);
+                    Iterator synonyms = metaInfo.getSynonyms().iterator();
+                    while (synonyms.hasNext()) {
+                        String synonym = (String) synonyms.next();
+                        addKeyword(doc, synonym, value, metaInfo.getLuceneBoost());
+                        addSortField(doc, synonym, value);
+                    }
                 } else {
                     if (value == null) {
                         addKeyword(doc, metaInfo.getName(), "");
@@ -1961,9 +1966,6 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                         while (it.hasNext()) {
                             Object singleValue = it.next();
                             addKeyword(doc, metaInfo.getName(), singleValue);
-                            if (metaInfo.getLuceneAddToAllContent() && addToAllContent) {
-                                addUnStored(doc, INDEXFIELD_ALLCONTENT, value, metaInfo.getLuceneBoost());
-                            }
                             Iterator synonyms = metaInfo.getSynonyms().iterator();
                             while (synonyms.hasNext()) {
                                 String synonym = (String) synonyms.next();
@@ -1982,18 +1984,12 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                         addUnStored(doc, synonym, value, metaInfo.getLuceneBoost());
                         addSortField(doc, synonym, value);
                     }
-                    if (metaInfo.getLuceneAddToAllContent() && addToAllContent) {
-                        addUnStored(doc, INDEXFIELD_ALLCONTENT, value, metaInfo.getLuceneBoost());
-                    }
                 } else {
                     if (value != null) {
                         Iterator it = ((List)value).iterator();
                         while (it.hasNext()) {
                             Object singleValue = it.next();
                             addUnStored(doc, metaInfo.getName(), singleValue, metaInfo.getLuceneBoost());
-                            if (metaInfo.getLuceneAddToAllContent() && addToAllContent) {
-                                addUnStored(doc, INDEXFIELD_ALLCONTENT, singleValue, metaInfo.getLuceneBoost());    
-                            }
                             Iterator synonyms = metaInfo.getSynonyms().iterator();
                             while (synonyms.hasNext()) {
                                 String synonym = (String) synonyms.next();
@@ -2058,7 +2054,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                     if (textToIndex != null) {                    
                         addUnStored(document, itemName.toLowerCase(), textToIndex, rule.getBoost());
                         if (!TECHNICAL_ITEMS.contains(itemName.toLowerCase())) {
-                            addUnStored(document, INDEXFIELD_ALLCONTENT, textToIndex, rule.getBoost());
+                            addUnStored(document, INDEXFIELD_ALLCONTENT, textToIndex, 1);
                         }
                     }
                 }
@@ -2410,7 +2406,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
      * 
      * @see de.innovationgate.webgate.api.WGContentEventListener#contentHasBeenSaved(de.innovationgate.webgate.api.WGContentEvent)
      */
-    public void contentHasBeenSaved(WGContentEvent event) throws WGAPIException {
+    public void contentHasBeenSaved(WGContentEvent event) {
         if (event.getDatabase().getSessionContext().isTransactionActive()) {
             return;
         }
@@ -2430,6 +2426,10 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     }
 
     public WGResultSet search(WGDatabase db, String phrase, Map parameters, WGA wga) throws WGQueryException {
+    	List<String> fields=new ArrayList<String>();
+    	return search(db, fields, phrase, parameters, wga);
+    }
+    public WGResultSet search(WGDatabase db, List<String> fields, String phrase, Map parameters, WGA wga) throws WGQueryException {
         
         if (wga == null) {
             wga = WGA.get(_core);
@@ -2646,20 +2646,44 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             }
 
             //build phrase query                
-            BooleanQuery phraseQuery = new BooleanQuery();                
-            Iterator languageList = languagesPriorityList.iterator();                
+            BooleanQuery phraseQuery = new BooleanQuery();
+            phraseQuery.setBoost(10);
+            Iterator languageList = languagesPriorityList.iterator();     
+            
+            List<String> searchFields = new ArrayList<String>();
+            Map<String,Float> searchBoosts = new HashMap<String,Float>();
+            for(String field: fields){
+            	String[] parts = field.split("\\^");
+            	searchFields.add(parts[0]);
+            	if(parts.length==2){
+            		searchBoosts.put(parts[0], Float.parseFloat(parts[1]));
+            	}
+            }
+            if(!searchFields.contains("allcontent"))
+            	searchFields.add("allcontent");
+            if(!searchFields.contains("TITLE"))
+            	searchFields.add("TITLE");
+            if(!searchFields.contains("DESCRIPTION"))
+            	searchFields.add("DESCRIPTION");
+            if(!searchFields.contains("KEYWORDS"))
+            	searchFields.add("KEYWORDS");
+            
             while (languageList.hasNext()) {
                 WGLanguage languageItem = (WGLanguage) languageList.next();
                 Analyzer analyzer = _core.getAnalyzerForLanguageCode(languageItem.getName());
                 if (analyzer != null) {
-                    QueryParser parser = new IndexingRuleBasedQueryParser(INDEXFIELD_ALLCONTENT, analyzer, defaultOperator, _indexedDbs, searchDBKeys, _metaKeywordFields);
-                    Query query = parser.parse(phrase);
-                    
-                    BooleanQuery testPhraseAndLangQuery = new BooleanQuery();
-                    testPhraseAndLangQuery.add(query, BooleanClause.Occur.MUST);
-                    testPhraseAndLangQuery.add(new TermQuery(new Term(WGContent.META_LANGUAGE, languageItem.getName())), BooleanClause.Occur.MUST);
-                    
-                    phraseQuery.add(testPhraseAndLangQuery, BooleanClause.Occur.SHOULD);
+                	QueryParser parser = new IndexingRuleBasedQueryParser(searchFields.toArray(new String[0]), analyzer, searchBoosts, _indexedDbs, searchDBKeys, _metaKeywordFields);
+                	parser.setDefaultOperator(defaultOperator);
+                    Query query = parser.parse(phrase);                    
+                    if(filterLanguages){
+	                    BooleanQuery testPhraseAndLangQuery = new BooleanQuery();
+	                    testPhraseAndLangQuery.add(query, BooleanClause.Occur.MUST);
+	                    testPhraseAndLangQuery.add(new TermQuery(new Term(WGContent.META_LANGUAGE, languageItem.getName())), BooleanClause.Occur.MUST);
+	                    phraseQuery.add(testPhraseAndLangQuery, BooleanClause.Occur.SHOULD);
+                    }
+                    else{
+                    	phraseQuery.add(query, BooleanClause.Occur.SHOULD);
+                    }
                 }
                 else {
                     searchWithDefaultAnalyzer = true;
@@ -2667,10 +2691,12 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             }
             
             if (searchWithDefaultAnalyzer) {
-                QueryParser parser = new IndexingRuleBasedQueryParser(INDEXFIELD_ALLCONTENT, _core.getDefaultAnalyzer(), defaultOperator, _indexedDbs, searchDBKeys, _metaKeywordFields);
+            	QueryParser parser = new IndexingRuleBasedQueryParser(fields.toArray(new String[0]), _core.getDefaultAnalyzer(), searchBoosts, _indexedDbs, searchDBKeys, _metaKeywordFields);
+                parser.setDefaultOperator(defaultOperator);
                 Query query = parser.parse(phrase);
                 phraseQuery.add(query, BooleanClause.Occur.SHOULD);
             }
+            //LOG.info(phraseQuery.toString());
             wholeQuery.add(phraseQuery, BooleanClause.Occur.MUST);
     
             TopDocs hits;
@@ -2939,24 +2965,22 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
 			}
     	}
     	
-    	//if (!_indexSearcher.getIndexReader().isCurrent()) {
-    		synchronized (this) {
-    			if (!_indexSearcher.getIndexReader().isCurrent()) {
-					// wait for current searches to finish and block further searches
-					_indexSearcherSemaphore.acquire(MAX_CONCURRENT_SEARCHES);
-    				try {
-    				    _indexSearcher.getIndexReader().close();
-    					_indexSearcher.close(); 
-    					_indexSearcher = new IndexSearcher(IndexReader.open(_indexDirectory, true));
-    					if (_customSimilarity != null) {
-                            _indexSearcher.setSimilarity(_customSimilarity);
-                        }
-    				} finally {    					
-    					_indexSearcherSemaphore.release(MAX_CONCURRENT_SEARCHES);	
-    				}
-    			}
-    		}   				
-    	//}	    	
+		synchronized (this) {
+			if (!_indexSearcher.getIndexReader().isCurrent()) {
+				// wait for current searches to finish and block further searches
+				_indexSearcherSemaphore.acquire(MAX_CONCURRENT_SEARCHES);
+				try {
+				    _indexSearcher.getIndexReader().close();
+					_indexSearcher.close(); 
+					_indexSearcher = new IndexSearcher(IndexReader.open(_indexDirectory, true));
+					if (_customSimilarity != null) {
+                        _indexSearcher.setSimilarity(_customSimilarity);
+                    }
+				} finally {    					
+					_indexSearcherSemaphore.release(MAX_CONCURRENT_SEARCHES);	
+				}
+			}
+		}   				
     	return _indexSearcher;
     }
     

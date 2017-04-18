@@ -221,7 +221,7 @@ public class Database {
         if (queryType.startsWith("xp:")) {
             set = executeExpressionQuery(context, queryType, queryString, wgapiParams, outputParams);
         }
-        else if (queryType.equals("lucene")) {
+        else if (queryType.equals("lucene") || queryType.startsWith("lucene:")) {
             set = executeLuceneQuery(queryType, queryString, wgapiParams, outputParams);
         }
         else if (queryType.startsWith("hdbmodel:")) {
@@ -422,7 +422,13 @@ public class Database {
             throw new WGQueryException(queryString, "Lucene index is disabled");
         }
         
-        WGResultSet resultSet= manager.search(_db, queryString, wgapiParams, _wga);
+        List<String> fields=new ArrayList<String>();
+        if(queryType.startsWith("lucene:")){
+        	String field_list = queryType.substring("lucene:".length());
+        	fields = WGUtils.deserializeCollection(field_list, ",");
+        }
+        
+        WGResultSet resultSet= manager.search(_db, fields, queryString, wgapiParams, _wga);
         
         outputParams.put(QUERYOUT_SIMPLIFIED_QUERY, wgapiParams.get(LuceneManager.TAGINFO_SIMPLIFIEDQUERY));
         

@@ -115,12 +115,16 @@ public class MetaInfo {
     }
 
     /**
+     * @deprecated
      * Returns if the contents of this metadata field is added to the global lucene fulltext index field for field-unspecific searches
      */
     public boolean getLuceneAddToAllContent() {
         return _luceneAddToAllContent;
     }
 
+    /**
+     * @deprecated
+     */
     void setLuceneAddToAllContent(boolean luceneAddToAllContent) {
         _luceneAddToAllContent = luceneAddToAllContent;
     }

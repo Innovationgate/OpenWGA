@@ -31,8 +31,8 @@ import java.util.Set;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
-import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.MultiTermQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -48,10 +48,7 @@ import de.innovationgate.wga.common.beans.LuceneIndexItemRule;
  * The standard wga search should be like Google. Defaultoparator is set to "AND".
  *
  */
-public class IndexingRuleBasedQueryParser extends QueryParser {
-
-
-
+public class IndexingRuleBasedQueryParser extends MultiFieldQueryParser {
 
     private Map _configs;
     private List _searchDBKeys;
@@ -65,10 +62,9 @@ public class IndexingRuleBasedQueryParser extends QueryParser {
      * @param searchDBKeys - list of dbkeys (Strings) to search
      * @param metaKeywordFields - set of metaFields (String fieldname) indexed as keyword
      */
-    public IndexingRuleBasedQueryParser(String arg0, Analyzer arg1, Operator op, Map luceneConfigurations, List searchDBKeys, Set metaKeywordFields) {
-        super(Version.LUCENE_35, arg0, arg1);
+    public IndexingRuleBasedQueryParser(String[] fields, Analyzer analyzer, Map boosts, Map luceneConfigurations, List searchDBKeys, Set metaKeywordFields) {
+        super(Version.LUCENE_35, fields, analyzer, boosts);
         // google like search
-        this.setDefaultOperator(op);
         _configs = luceneConfigurations;
         _searchDBKeys = searchDBKeys;
         _metaKeywordFields = metaKeywordFields;
@@ -76,9 +72,10 @@ public class IndexingRuleBasedQueryParser extends QueryParser {
         setMultiTermRewriteMethod(MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE);
     }
     
-    @Override
+    @SuppressWarnings("deprecation")
+	@Override
     protected Query getFieldQuery(String field, String queryText) throws ParseException {
-        if ( (isMetaKeywordField(field)) || (isIndexedAsKeyword(field)) ) {
+        if (field!=null && (isMetaKeywordField(field) || isIndexedAsKeyword(field)) ) {
             return new TermQuery(new Term(field, queryText));
         } else {
             return super.getFieldQuery(field, queryText);
@@ -87,7 +84,7 @@ public class IndexingRuleBasedQueryParser extends QueryParser {
     
     @Override
     protected Query getFieldQuery(String field, String queryText, int slop) throws ParseException {
-        if ( (isMetaKeywordField(field)) || (isIndexedAsKeyword(field)) ) {
+        if (field!=null && (isMetaKeywordField(field) || isIndexedAsKeyword(field)) ) {
             return new TermQuery(new Term(field, queryText));
         } else {
             return super.getFieldQuery(field, queryText, slop);
@@ -97,7 +94,7 @@ public class IndexingRuleBasedQueryParser extends QueryParser {
 
     @Override
     protected Query getFieldQuery(String field, String queryText, boolean quoted) throws ParseException {
-        if ( (isMetaKeywordField(field)) || (isIndexedAsKeyword(field)) ) {
+        if (field!=null &&  (isMetaKeywordField(field) || isIndexedAsKeyword(field)) ) {
             return new TermQuery(new Term(field, queryText));
         } else {
             return super.getFieldQuery(field, queryText, quoted);
@@ -106,7 +103,7 @@ public class IndexingRuleBasedQueryParser extends QueryParser {
         
     @Override
     protected Query getFuzzyQuery(String field, String termStr, float minSimilarity) throws ParseException {
-        if (isMetaKeywordField(field) || isIndexedAsKeyword(field)) {
+        if (field!=null && (isMetaKeywordField(field) || isIndexedAsKeyword(field)) ) {
             Term t = new Term(field, termStr);
             return newFuzzyQuery(t, minSimilarity, getFuzzyPrefixLength());
         } else {
@@ -116,7 +113,7 @@ public class IndexingRuleBasedQueryParser extends QueryParser {
 
     @Override
     protected Query getWildcardQuery(String field, String termStr) throws ParseException {
-        if (isMetaKeywordField(field) || isIndexedAsKeyword(field)) {
+        if (field!=null && (isMetaKeywordField(field) || isIndexedAsKeyword(field)) ) {
           if (!getAllowLeadingWildcard() && (termStr.startsWith("*") || termStr.startsWith("?"))) {
               throw new ParseException("'*' or '?' not allowed as first character in WildcardQuery");
           }
@@ -129,7 +126,7 @@ public class IndexingRuleBasedQueryParser extends QueryParser {
 
     @Override
     protected Query getPrefixQuery(String field, String termStr) throws ParseException {
-        if (isMetaKeywordField(field) || isIndexedAsKeyword(field)) {
+        if (field!=null && (isMetaKeywordField(field) || isIndexedAsKeyword(field)) ){
             if (!getAllowLeadingWildcard() && termStr.startsWith("*")) {
                 throw new ParseException("'*' not allowed as first character in PrefixQuery");
             }

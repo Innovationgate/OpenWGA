@@ -279,10 +279,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	public static final String META_TITLE = "TITLE";
     public static final MetaInfo METAINFO_TITLE = new MetaInfo(META_TITLE, String.class, "");
     static { 
-    	METAINFO_TITLE.setLuceneAddToAllContent(true);
-    	METAINFO_TITLE.setLuceneBoost(2); 
     	METAINFO_TITLE.setLuceneIndexType(MetaInfo.LUCENE_INDEXTYPE_FULLTEXT);
-    	
     	METAINFO_TITLE.setInputConverter(TITLE_CONVERTER);
     	METAINFO_TITLE.setOutputConverter(TITLE_CONVERTER);    
     }
@@ -290,6 +287,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     public static final String META_BROWSERTITLE = "BROWSERTITLE";
     public static final MetaInfo METAINFO_BROWSERTITLE = new MetaInfo(META_BROWSERTITLE, String.class, null);
     static {
+    	METAINFO_BROWSERTITLE.setLuceneIndexType(MetaInfo.LUCENE_INDEXTYPE_FULLTEXT);
         METAINFO_BROWSERTITLE.setExtdata(true);
         METAINFO_BROWSERTITLE.setInputConverter(TITLE_CONVERTER);
         METAINFO_BROWSERTITLE.setOutputConverter(TITLE_CONVERTER);
@@ -421,9 +419,6 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     static { 
         METAINFO_KEYWORDS.setMultiple(true); 
         METAINFO_KEYWORDS.setLuceneIndexType(MetaInfo.LUCENE_INDEXTYPE_FULLTEXT);
-        if ("true".equals(System.getProperty(SYSPROPERTY_LUCENE_KEYWORDS_AS_CONTENT))) {
-            METAINFO_KEYWORDS.setLuceneAddToAllContent(true);
-        }
     };
     
 	public static final String META_AUTHOR = "AUTHOR";
@@ -461,8 +456,6 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     static { 
         METAINFO_DESCRIPTION.setExtdataSinceCsVersion(WGDatabase.CSVERSION_WGA5);
         METAINFO_DESCRIPTION.setLuceneIndexType(MetaInfo.LUCENE_INDEXTYPE_FULLTEXT);
-        METAINFO_DESCRIPTION.setLuceneBoost((float)1.5);
-        METAINFO_DESCRIPTION.setLuceneAddToAllContent(true);
     };
     
 	public static final String META_READERS = "READERS";
