@@ -26,6 +26,7 @@
 package de.innovationgate.wgpublisher.lucene;
 
 
+import org.apache.lucene.index.FieldInvertState;
 import org.apache.lucene.search.DefaultSimilarity;
 
 public class ConstantIDFSimilarity extends DefaultSimilarity {
@@ -35,6 +36,11 @@ public class ConstantIDFSimilarity extends DefaultSimilarity {
     @Override
     public float idf(int docFreq, int numDocs) {
         return 1;
+    }
+
+    @Override
+    public float computeNorm(String field, FieldInvertState state) {
+      	return state.getBoost();
     }
 
 }
