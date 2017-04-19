@@ -31,6 +31,7 @@ import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGStructEntry;
+import de.innovationgate.wga.model.BrowsingSecurity;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.webtml.utils.HTMLHeadInclusion;
@@ -40,7 +41,19 @@ public class CMHtmlHeadInclusion implements HTMLHeadInclusion {
 
     public CharSequence processInclusion(TMLContext context) {
         // Determine, which (if any) document can be edited in this request
-        if (context.isbrowserinterface()) {
+
+		Boolean isAuthoringMode=false;
+		try {
+			WGACore wgacore = WGA.get().getCore();
+			if(wgacore.getDispatcher().getBrowsingSecurity(context.content().getDatabase())>BrowsingSecurity.NO_AUTHORING
+					&& context.isbrowserinterface()
+				){
+				isAuthoringMode=true;
+			}
+				
+		} catch (WGException e) {}
+    	
+        if (isAuthoringMode){
 
         	StringBuffer result = new StringBuffer();
         	WGContent content;
