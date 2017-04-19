@@ -1645,7 +1645,6 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                 useFileRuleBasedIndexing = false;
             }
             
-            
             List<String> filenames = content.getFileNames();
             if (filenames != null) {
                 Iterator<String> it = filenames.iterator();
@@ -1685,6 +1684,10 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                     
                     // add content metas to attachmentDoc - so this doc will hit the same meta queries
                     addMetas(attachmentDoc, content, false);
+                    // we don't want some of this METAs to be indexed in files:
+                    attachmentDoc.removeFields("TITLE");
+                    attachmentDoc.removeFields("DESCRIPTION");
+                    attachmentDoc.removeFields("KEYWORDS");
                     
                     // add file metas
                     WGFileMetaData md = content.getFileMetaData(filename);
@@ -2670,7 +2673,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             
             while (languageList.hasNext()) {
                 WGLanguage languageItem = (WGLanguage) languageList.next();
-                Analyzer analyzer = _core.getAnalyzerForLanguageCode(languageItem.getName());
+                Analyzer analyzer = _core.getAnalyzerForLanguageCode(languageItem.getName().substring(0, 2));
                 if (analyzer != null) {
                 	QueryParser parser = new IndexingRuleBasedQueryParser(searchFields.toArray(new String[0]), analyzer, searchBoosts, _indexedDbs, searchDBKeys, _metaKeywordFields);
                 	parser.setDefaultOperator(defaultOperator);
