@@ -75,9 +75,9 @@ public class SassEngine {
      *
      * @param content
      *          the Sass content to process.
-     * @throws IOException 
+     * @throws Exception 
      */
-    public synchronized String process(final String content) throws IOException {
+    public synchronized String process(final String content) throws Exception {
 
       if (StringUtils.isEmpty(content)) {
         return StringUtils.EMPTY;
@@ -100,7 +100,8 @@ public class SassEngine {
       catch(ScriptException e){
     	  StringReader reader = new StringReader(sw.toString());
     	  List<String> errors = IOUtils.readLines(reader);
-	      _wga.getLog().error(errors.get(0));    	  
+	      _wga.getLog().error(errors.get(0));    
+	      throw new Exception("SASS ERROR");
       }
       catch (Exception e) {
 	      _wga.getLog().error(e);

@@ -2845,7 +2845,7 @@ public class WGPDispatcher extends HttpServlet {
         
         // Process and cache optionally
         PostProcessResult result = processor.postProcess(wga, data, lib.getCode());
-        if (cache != null) {
+        if (cache != null && data.isCacheable()) {
             cache.putResource(data, result);
         }
         

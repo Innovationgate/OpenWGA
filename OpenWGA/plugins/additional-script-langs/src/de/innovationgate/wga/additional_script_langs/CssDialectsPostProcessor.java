@@ -50,7 +50,6 @@ public abstract class CssDialectsPostProcessor implements PostProcessor {
             
             String out = compileDialect(wga, data, code, injector, result);
             
-            
             if (isMinimizingActive()) {
                 CssMinProcessor minProcessor = new CssMinProcessor();
                 injector.inject(minProcessor);
@@ -58,7 +57,6 @@ public abstract class CssDialectsPostProcessor implements PostProcessor {
                 minProcessor.process(new StringReader(out), minOut);
                 out = minOut.toString();
             }
-            
             
             result.setCode(out);
             return result;
@@ -107,7 +105,11 @@ public abstract class CssDialectsPostProcessor implements PostProcessor {
             }
             else vars.putAll((Map<String,Object>)result);
 		}
-			
+    	if(wga.getRequest()!=null){
+    		String host = wga.getRequest().getServerName().replace(".", "_");
+    		//wga.getLog().info("requested host: " + host);
+    		vars.put("requested_host", host);
+    	}
         data.setCacheQualifier((Serializable)vars);
     }
 

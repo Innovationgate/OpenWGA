@@ -29,7 +29,6 @@ public class SassPostProcessor extends CssDialectsPostProcessor {
         StringBuilder completeCode = new StringBuilder();
         WGDesignDocument doc = data.getDocument();
         
-        
         if (data.getCacheQualifier() != null) {
             @SuppressWarnings("unchecked")
             Map<Object,Object> variables = (Map<Object,Object>) data.getCacheQualifier();
@@ -47,8 +46,9 @@ public class SassPostProcessor extends CssDialectsPostProcessor {
 	        Context cx = wga.createTMLContext(data.getDocument().getDatabase(), design);
 	        SassEngine engine = new SassEngine(wga, design, cx, doc.getDesignReference().toString(), result);
 	        return engine.process(completeCode.toString());
-		} catch (IOException e) {
-			wga.getLog().error("Unable to process SCSS-Source", e);
+		} catch (Exception e) {
+			// Unable to process SCSS-Source: don't cache.
+			data.setCacheable(false);
 		}
         return StringUtils.EMPTY;
     }
