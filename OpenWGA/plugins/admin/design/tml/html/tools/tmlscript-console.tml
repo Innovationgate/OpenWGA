@@ -155,10 +155,10 @@
 				
 				<label>TMLScript-Code to execute:</label>
 				<div class="data">
-					<div style="width:100%">
+					<div _style="width:100%;margin-right:20px;">
 						<tml:input name="script" type="textarea" encode="none" cssclass="source-code">
 							autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-							style="width:500px"
+							style="width:99%"
 						</tml:input>
 					</div>
 					<tml:comment><tml:include ref="system:convert-to-ext-field" o_fieldname="script" o_type="textarea"/></tml:comment>
