@@ -58,6 +58,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Semaphore;
 
 import javax.activation.DataSource;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.collections.SortedBag;
 import org.apache.commons.collections.bag.TreeBag;
@@ -78,6 +79,7 @@ import de.innovationgate.utils.cache.CacheDisposalListener;
 import de.innovationgate.utils.cache.CacheException;
 import de.innovationgate.utils.cache.CacheFactory;
 import de.innovationgate.webgate.api.auth.AnonymousAuthSession;
+import de.innovationgate.webgate.api.auth.AnonymousAwareAuthenticationModule;
 import de.innovationgate.webgate.api.auth.AuthSessionWithUserCacheQualifier;
 import de.innovationgate.webgate.api.auth.AuthenticationModule;
 import de.innovationgate.webgate.api.auth.AuthenticationSession;
@@ -3931,7 +3933,7 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
      * @throws WGAPIException
      */
     public int openSession(String user, Object credentials) throws WGAPIException {
-        return innerOpenSession(user, credentials, null);
+        return innerOpenSession(user, credentials, null, null);
     }
     
     /**
@@ -3966,11 +3968,14 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
      *         WGDatabase.ACCESSLEVEL_...
      * @throws WGAPIException
      */
+    public int openSession(String user, Object credentials, String filter, HttpServletRequest request) throws WGAPIException {
+        return innerOpenSession(user, credentials, filter, request);
+    }
     public int openSession(String user, Object credentials, String filter) throws WGAPIException {
-        return innerOpenSession(user, credentials, filter);
+        return innerOpenSession(user, credentials, filter, null);
     }
     
-    private int innerOpenSession(String user, Object credentials, String accessFilterUid) throws WGAPIException {
+    private int innerOpenSession(String user, Object credentials, String accessFilterUid, HttpServletRequest request) throws WGAPIException {
 
         if (!isReady()) {
             throw new WGUnavailableException(this, "The database is currently not ready for operation");
@@ -4040,13 +4045,15 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
             authSession = MasterLoginAuthSession.getInstance();
         }
         
+        
         // Anonymous login
         else if (user.equals(WGDatabase.ANONYMOUS_USER)) {
-            authSession = AnonymousAuthSession.getInstance();
+        	if(authModule!=null && authModule instanceof AnonymousAwareAuthenticationModule)
+        		authSession = ((AnonymousAwareAuthenticationModule)authModule).anonymousLogin(request);
+        	else authSession = AnonymousAuthSession.getInstance();
         }
         
         // Regular login against authentication module
-        
         else if (authModule != null) {
             if (certAuthEnabled() && (credentials instanceof X509Certificate)) {
                 authSession = ((CertAuthCapableAuthModule) authModule).login((X509Certificate) credentials);
@@ -4152,7 +4159,7 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         }
         
         String user = cert.getSubjectDN().toString();
-        return innerOpenSession(user, cert, filter);
+        return innerOpenSession(user, cert, filter, null);
         
     }
 

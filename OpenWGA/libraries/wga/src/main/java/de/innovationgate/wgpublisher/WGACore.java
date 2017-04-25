@@ -1489,7 +1489,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
                             }
                         }
                         if (tokenCookie != null) {
-                            db.openSession(WGDatabase.SESSIONTOKEN_USER, tokenCookie.getValue(), accessFilter);
+                            db.openSession(WGDatabase.SESSIONTOKEN_USER, tokenCookie.getValue(), accessFilter, request);
                             if (db.isSessionOpen()) {
                                 // CONSIDERED HARMFUL: Session tokens may
                                 // expire. Safer to always retrieve "fresh" from
@@ -1514,7 +1514,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
                         db.openSession();
                     }
                     else {
-                        db.openSession(hintDB.getSessionContext().getUser(), hintDB.getSessionContext().getPassword(), accessFilter);
+                        db.openSession(hintDB.getSessionContext().getUser(), hintDB.getSessionContext().getPassword(), accessFilter, request);
                     }
                     if (db.isSessionOpen()) {
                         return prepareDB(db, request);
@@ -1522,13 +1522,13 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
                     
                 }
 
-                db.openSession(WGDatabase.ANONYMOUS_USER, null);
+                db.openSession(WGDatabase.ANONYMOUS_USER, null, null, request);
                 return prepareDB(db, request);
             }
 
             // Try to login by previously stored domain-specific login
             if (sessionLoginInfo != null && !WGDatabase.ANONYMOUS_USER.equals(sessionLoginInfo.getUserName())) {
-                int accessLevel = db.openSession(sessionLoginInfo.getUserName(), sessionLoginInfo.getCredentials(), accessFilter);
+                int accessLevel = db.openSession(sessionLoginInfo.getUserName(), sessionLoginInfo.getCredentials(), accessFilter, request);
                 if (accessLevel > WGDatabase.ACCESSLEVEL_NOTLOGGEDIN) {
                     return prepareDB(db, request);
                 }
@@ -1551,7 +1551,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
 
             // Anonymous login, if nothing else applies. CANNOT BE STORED, bc.
             // Sessionlogins may suddenly be available without notice
-            db.openSession(WGDatabase.ANONYMOUS_USER, null, accessFilter);
+            db.openSession(WGDatabase.ANONYMOUS_USER, null, accessFilter, request);
             return prepareDB(db, request);
         }
     }
@@ -1577,7 +1577,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         
         Principal credentials = request.getUserPrincipal();
         
-        db.openSession(user, credentials, accessFilter);
+        db.openSession(user, credentials, accessFilter, request);
         
         if (db.isSessionOpen()) {
             updateLoginInfo(db, request, DBLoginInfo.AuthType.REQUEST);
