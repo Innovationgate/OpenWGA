@@ -11,9 +11,12 @@ dependencies {
     
     compile fileTree(dir: '../../customLibs/datedFileAppender', include: ['*.jar'])
     compile 'xerces:xercesImpl:2.11.0'
+    
     compile 'org.apache.lucene:lucene-core:3.5.0'
     compile 'org.apache.lucene:lucene-analyzers:3.5.0'
     compile 'org.apache.lucene:lucene-highlighter:3.5.0'
+    compile 'org.apache.lucene:lucene-queries:3.5.0'
+    
     compile 'commons-fileupload:commons-fileupload:1.2.1'
     compile 'org.apache.jackrabbit:jackrabbit-webdav:1.6.5'
     compile 'org.apache.jackrabbit:jackrabbit-jcr-server:1.6.5'
