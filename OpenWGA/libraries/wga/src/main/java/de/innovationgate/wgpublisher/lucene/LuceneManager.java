@@ -2694,7 +2694,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             }
             
             if (searchWithDefaultAnalyzer) {
-            	QueryParser parser = new IndexingRuleBasedQueryParser(fields.toArray(new String[0]), _core.getDefaultAnalyzer(), searchBoosts, _indexedDbs, searchDBKeys, _metaKeywordFields);
+            	QueryParser parser = new IndexingRuleBasedQueryParser(searchFields.toArray(new String[0]), _core.getDefaultAnalyzer(), searchBoosts, _indexedDbs, searchDBKeys, _metaKeywordFields);
                 parser.setDefaultOperator(defaultOperator);
                 Query query = parser.parse(phrase);
                 phraseQuery.add(query, BooleanClause.Occur.SHOULD);
