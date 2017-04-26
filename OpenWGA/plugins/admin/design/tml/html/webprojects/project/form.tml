@@ -53,16 +53,16 @@
 						<fieldset>		
 							<legend>Contentstore Configuration</legend>
 							<tml:include ref="::menu-contentstore-configuration"/>
-							<tml:portlet name="repository-config" ref="::form-db:portlet" ajax="true"/>		
+							<tml:portlet name="repository-config" ref="::form-db:portlet" ajax="true" forcestate="true"/>		
 						</fieldset>		
 						<fieldset>		
 							<legend>Design Configuration</legend>
 							<tml:include ref="::menu-design-configuration"/>		
-							<tml:portlet name="design-config" ref="::form-design:portlet" ajax="true"/>	
+							<tml:portlet name="design-config" ref="::form-design:portlet" ajax="true" forcestate="true"/>	
 						</fieldset>		
 						<fieldset>		
 							<legend>Publishing Settings</legend>		
-							<tml:portlet name="publusher-config" ref="::form-p-options:portlet" ajax="true"/>
+							<tml:portlet name="publusher-config" ref="::form-p-options:portlet" ajax="true" forcestate="true"/>
 						</fieldset>				
 					</tml:option>				
 				</tml:include>				
