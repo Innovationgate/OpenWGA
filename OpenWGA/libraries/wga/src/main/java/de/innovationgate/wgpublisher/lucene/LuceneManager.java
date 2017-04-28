@@ -1696,6 +1696,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                         while (metaInfos.hasNext()) {
                             MetaInfo metaInfo = metaInfos.next();
                             if (!metaInfo.isLuceneSpecialTreatment() && !metaInfo.getLuceneIndexType().equals(MetaInfo.LUCENE_INDEXTYPE_NOINDEX)) {
+                            	//LOG.info(filename + ": index file meta " + metaInfo.getName() + ":" + md.getMetaData(metaInfo.getName()));
                                 addMeta(attachmentDoc, metaInfo, md.getMetaData(metaInfo.getName()), true);
                             }
                         }
@@ -1750,19 +1751,18 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                             LOG.debug("No filehandler found for file " + filename + " of content " + content.getContentKey().toString() + " from db " + db.getDbReference() + ".");
                         }
                     } else {
+                    	//LOG.info("Indexing file " +filename + " of content " + content.getContentKey().toString() + " from db " + db.getDbReference() + ".");
                         WGFileMetaData fileMetaData = content.getFileMetaData(filename);
                         BinaryFieldData plaintext = fileMetaData.getPlainText();
                         if (plaintext != null) {
-                            Field allAttachments = new Field(INDEXFIELD_ALLATTACHMENTS, new InputStreamReader(plaintext.getInputStream()));
-                            document.add(allAttachments);
-                            
-                            Field allContent = new Field(INDEXFIELD_ALLCONTENT, new InputStreamReader(plaintext.getInputStream()));
-                            attachmentDoc.add(allContent);
-                            
+                        	Field allContent = new Field(INDEXFIELD_ALLCONTENT, new InputStreamReader(plaintext.getInputStream()));
                             if (luceneIndexConfig != null && luceneIndexConfig.isIndexFileContentOnDocuments()) {
-                               allContent = new Field(INDEXFIELD_ALLCONTENT, new InputStreamReader(plaintext.getInputStream()));
                                document.add(allContent);
-                            }                            
+                               continue;	// don't create attachmentDoc in index in this case. 
+                            }
+                            else{
+                                attachmentDoc.add(allContent);
+                            }
                         }                        
                     }
                     
@@ -1961,6 +1961,9 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                         addKeyword(doc, synonym, value, metaInfo.getLuceneBoost());
                         addSortField(doc, synonym, value);
                     }
+                    if (metaInfo.getLuceneAddToAllContent() && addToAllContent) {
+                        addUnStored(doc, INDEXFIELD_ALLCONTENT, value, 1.0F);
+                    }
                 } else {
                     if (value == null) {
                         addKeyword(doc, metaInfo.getName(), "");
@@ -1969,10 +1972,16 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                         while (it.hasNext()) {
                             Object singleValue = it.next();
                             addKeyword(doc, metaInfo.getName(), singleValue);
+                            if (metaInfo.getLuceneAddToAllContent() && addToAllContent) {
+                                addUnStored(doc, INDEXFIELD_ALLCONTENT, value, 1.0F);
+                            }
                             Iterator synonyms = metaInfo.getSynonyms().iterator();
                             while (synonyms.hasNext()) {
                                 String synonym = (String) synonyms.next();
                                 addKeyword(doc, synonym, singleValue);
+                            }
+                            if (metaInfo.getLuceneAddToAllContent() && addToAllContent) {
+                                addUnStored(doc, INDEXFIELD_ALLCONTENT, singleValue, 1.0F);
                             }
                         }                                
                     }
@@ -1987,6 +1996,9 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                         addUnStored(doc, synonym, value, metaInfo.getLuceneBoost());
                         addSortField(doc, synonym, value);
                     }
+                    if (metaInfo.getLuceneAddToAllContent() && addToAllContent) {
+                        addUnStored(doc, INDEXFIELD_ALLCONTENT, value, 1.0F);
+                    }
                 } else {
                     if (value != null) {
                         Iterator it = ((List)value).iterator();
@@ -1997,6 +2009,9 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                             while (synonyms.hasNext()) {
                                 String synonym = (String) synonyms.next();
                                 addUnStored(doc, synonym, singleValue, metaInfo.getLuceneBoost());
+                            }
+                            if (metaInfo.getLuceneAddToAllContent() && addToAllContent) {
+                                addUnStored(doc, INDEXFIELD_ALLCONTENT, singleValue, 1.0F);
                             }
                         }                                
                     }

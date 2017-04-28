@@ -115,16 +115,12 @@ public class MetaInfo {
     }
 
     /**
-     * @deprecated
      * Returns if the contents of this metadata field is added to the global lucene fulltext index field for field-unspecific searches
      */
     public boolean getLuceneAddToAllContent() {
         return _luceneAddToAllContent;
     }
 
-    /**
-     * @deprecated
-     */
     void setLuceneAddToAllContent(boolean luceneAddToAllContent) {
         _luceneAddToAllContent = luceneAddToAllContent;
     }
@@ -136,8 +132,11 @@ public class MetaInfo {
         return _luceneBoost;
     }
 
+    /**
+     * @deprecated -> MetaInfo boost will be set to 1.0F. Use boost at search time instead.
+     */
     void setLuceneBoost(float luceneBoost) {
-        _luceneBoost = luceneBoost;
+        _luceneBoost = 1.0F;		//luceneBoost;
     }
 
     /**

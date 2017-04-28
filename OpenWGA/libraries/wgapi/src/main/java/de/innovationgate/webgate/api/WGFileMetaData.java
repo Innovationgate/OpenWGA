@@ -137,7 +137,6 @@ public class WGFileMetaData implements WGExtensionDataContainer, WGFileAnnotatio
     public static final MetaInfo METAINFO_NAME = new MetaInfo(META_NAME, String.class, null);
     static { 
         METAINFO_NAME.setLuceneAddToAllContent(true);
-        METAINFO_NAME.setLuceneBoost((float)1.5); 
         METAINFO_NAME.setLuceneIndexType(MetaInfo.LUCENE_INDEXTYPE_KEYWORD);
     }
     
@@ -145,7 +144,6 @@ public class WGFileMetaData implements WGExtensionDataContainer, WGFileAnnotatio
     public static final MetaInfo METAINFO_TITLE = new MetaInfo(META_TITLE, String.class, null);
     static { 
         METAINFO_TITLE.setLuceneAddToAllContent(true);
-        METAINFO_TITLE.setLuceneBoost(2); 
         METAINFO_TITLE.setLuceneIndexType(MetaInfo.LUCENE_INDEXTYPE_FULLTEXT);
     }
     
@@ -153,12 +151,15 @@ public class WGFileMetaData implements WGExtensionDataContainer, WGFileAnnotatio
     public static final MetaInfo METAINFO_DESCRIPTION = new MetaInfo(META_DESCRIPTION, String.class, null);
     static { 
         METAINFO_DESCRIPTION.setLuceneIndexType(MetaInfo.LUCENE_INDEXTYPE_FULLTEXT);
-        METAINFO_DESCRIPTION.setLuceneBoost((float)1.5);
         METAINFO_DESCRIPTION.setLuceneAddToAllContent(true);
     };
     
     public static final String META_COPYRIGHT = "FILE_COPYRIGHT";
     public static final MetaInfo METAINFO_COPYRIGHT = new MetaInfo(META_COPYRIGHT, String.class, null);
+    static { 
+    	METAINFO_COPYRIGHT.setLuceneIndexType(MetaInfo.LUCENE_INDEXTYPE_FULLTEXT);
+    	METAINFO_COPYRIGHT.setLuceneAddToAllContent(true);
+    };
     
     public static final String META_CREATED = "FILE_CREATED";
     public static final MetaInfo METAINFO_CREATED = new MetaInfo(META_CREATED, Date.class, new Date(Long.MIN_VALUE));
