@@ -25,6 +25,7 @@
 
 package de.innovationgate.wga.server.api;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.search.highlight.Fragmenter;
 import org.apache.lucene.search.highlight.Highlighter;
+import org.apache.lucene.search.highlight.InvalidTokenOffsetsException;
 import org.apache.lucene.search.highlight.SimpleFragmenter;
 import org.apache.lucene.search.highlight.SimpleHTMLFormatter;
 
@@ -54,6 +56,7 @@ import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wga.common.beans.LuceneIndexFileRule;
 import de.innovationgate.wga.common.beans.LuceneIndexItemRule;
 import de.innovationgate.wga.server.api.tml.Context;
+import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGAServerException;
 import de.innovationgate.wgpublisher.lucene.LuceneManager;
 import de.innovationgate.wgpublisher.lucene.LuceneSearchDetails;
@@ -408,6 +411,60 @@ public class Lucene {
     public List<String> highlightMeta(String name, String prefix, String suffix, String encode) throws WGException {
         return _cx.highlightMeta(name, prefix, suffix, encode);
     }
+
+    @CodeCompletion
+    public List<String> highlightLuceneField(String field, String originalText, String prefix, String suffix) throws WGException{
+    	WGACore core = _wga.getCore();
+        if (!core.isLuceneEnabled()) {
+            _wga.getLog().warn("Unable to highlight text bc. lucene is not enabled.");
+            return Collections.singletonList(originalText);
+        }
+        // try to retrieve last lucene query for highlighting
+        org.apache.lucene.search.Query query = (org.apache.lucene.search.Query) _wga.getRequest().getSession().getAttribute(Query.SESSION_ATTRIBUTE_SIMPLIFIED_LUCENEQUERY);
+        if (query == null) {
+            // no query in session - highlighting not possible
+        	return Collections.singletonList(originalText);
+        }
+                
+        // create htmlformatter to highlight fragments with "$HIGHLIGHT_PREFIX$", "$HIGHLIGHT_SUFFIX$"
+        // these placeholders are later on replaced by the given prefix and suffix
+        // this additional step is necessary to encode the fragment text properly
+        String prefixPlaceholder = "$HIGHLIGHT_PREFIX$";
+        String suffixPlaceholder = "$HIGHLIGHT_SUFFIX$";
+        SimpleHTMLFormatter formatter = new SimpleHTMLFormatter(prefixPlaceholder, suffixPlaceholder);
+
+        // create highlighter
+        Highlighter highlighter = core.getLuceneManager().createHighlighter(field, query, formatter);
+        
+        // create tokenstream
+        TokenStream tokenStream = core.getLuceneManager().createTokenStream(originalText, _cx.content());
+        
+        // create fragmenter and set fragmentsize to metaText.length to ensure only one fragments with the whole metaText is returned        
+        Fragmenter fragmenter = new SimpleFragmenter(originalText.length() + 1); // +1 is necessary here 
+        highlighter.setTextFragmenter(fragmenter);
+                
+        try {
+            String highlighted = highlighter.getBestFragment(tokenStream, originalText);
+            if (highlighted != null) {
+
+                // replace highlight placeholders with correct prefix and suffix
+            	highlighted = WGUtils.strReplace(highlighted, prefixPlaceholder, prefix, true);
+            	highlighted = WGUtils.strReplace(highlighted, suffixPlaceholder, suffix, true);
+            	            	
+                return Collections.singletonList(highlighted);
+            } else {
+                return Collections.singletonList(originalText);
+            }
+        } catch (IOException e) {
+        	_wga.getLog().warn("Unable to highlight text bc. of exception '" + e.getMessage() + "'.");
+            return Collections.singletonList(originalText);
+        } catch (InvalidTokenOffsetsException e) {
+        	_wga.getLog().warn("Unable to highlight meta text bc. of exception '" + e.getMessage() + "'.");
+        	return Collections.singletonList(originalText);
+		}                
+
+    }
+    
     
     /**
      * Returns the FieldIndexType for a specific field name
