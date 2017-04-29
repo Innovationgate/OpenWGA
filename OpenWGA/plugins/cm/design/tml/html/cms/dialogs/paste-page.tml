@@ -41,6 +41,7 @@
 	}
 	catch(e){
 		tmlform.addMessage(e);
+		logException(e);
 	}
 	
 	function copyStruct(source, dest, recursive, createReferences, publish, position){

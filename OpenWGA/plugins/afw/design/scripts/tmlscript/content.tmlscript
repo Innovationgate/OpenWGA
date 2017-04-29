@@ -422,7 +422,7 @@ this.copyMetas = function(sourcedoc){
 
 this.copyAttachments = function(sourcedoc){
 	content.removeAllFiles();
-	content.attachAllFiles(sourcedoc);
+	content.attachAllFiles(sourcedoc, true);
 }
 
 this.copyModules = function(sourcedoc){
