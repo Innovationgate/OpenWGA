@@ -25,14 +25,28 @@
 
 package de.innovationgate.wgpublisher.lucene;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.TermFreqVector;
+
+import antlr.collections.impl.Vector;
 import de.innovationgate.webgate.api.SearchDetails;
 
 public class LuceneSearchDetails extends SearchDetails {
     
     private String _doctype = null;
     private String _filename = null;
-
-    
+    private Integer _luceneDoc = null;
+    private TermFreqVector _termFreqVector = null;
     
     public String getDoctype() {
         return _doctype;
@@ -47,8 +61,46 @@ public class LuceneSearchDetails extends SearchDetails {
         _filename = filename;
     }
     
-
+    public Integer getLuceneDoc(){
+    	return _luceneDoc;
+    }
+    public void setLuceneDoc(int doc){
+    	_luceneDoc = doc;
+    }
     
-    
+    public void setTermFreqVector(TermFreqVector vector){
+    	_termFreqVector = vector;
+    }
 
+    public LinkedHashMap<String,Integer> getTerms(){
+    	
+    	LinkedHashMap<String,Integer> map = new LinkedHashMap<String,Integer>();
+    	
+    	if(_termFreqVector==null)
+    		return map;
+    	Integer count = _termFreqVector.size();
+    	String[] terms = _termFreqVector.getTerms();
+    	
+    	for(int i=0; i<count; i++){
+    		if(terms[i].length()>2 && _termFreqVector.getTermFrequencies()[i]>2)
+    			map.put(terms[i], _termFreqVector.getTermFrequencies()[i]);
+    	}
+
+    	LinkedList<Map.Entry<String, Integer>> list =
+                new LinkedList<Map.Entry<String, Integer>>(map.entrySet());
+    	Collections.sort( list, new Comparator<Map.Entry<String, Integer>>(){
+            public int compare( Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2 )
+            {
+                return (o2.getValue()).compareTo(o1.getValue());
+            }
+        });
+    	
+    	LinkedHashMap<String,Integer> result = new LinkedHashMap<String,Integer>();
+    	for (Map.Entry<String, Integer> entry : list){
+            result.put(entry.getKey(), entry.getValue());
+        }
+    	
+    	return result;
+    }
+    
 }
