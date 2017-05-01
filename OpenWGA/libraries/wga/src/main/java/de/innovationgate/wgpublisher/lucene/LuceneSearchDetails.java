@@ -72,6 +72,12 @@ public class LuceneSearchDetails extends SearchDetails {
     	_termFreqVector = vector;
     }
 
+    /**
+     * Experimental: return terms map
+     * not used today
+     * @return
+     */
+    
     public LinkedHashMap<String,Integer> getTerms(){
     	
     	LinkedHashMap<String,Integer> map = new LinkedHashMap<String,Integer>();
