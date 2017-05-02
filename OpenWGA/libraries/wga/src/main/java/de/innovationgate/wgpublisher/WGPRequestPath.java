@@ -346,7 +346,7 @@ public class WGPRequestPath {
             // If content was retrieved with struct key we check if the title path is correct. If not we force redirection to the correct version (#00003145)
             else if (getTitlePathURL().getStructKey() != null) {
                 List<String> correctTitlePath = tpm.buildTitlePath(this.content, mediaKey.getKey(), new RequestLanguageChooser(this.database, request));
-                if (!correctTitlePath.equals(getTitlePathURL().getEncodedTitles())) {
+                if (correctTitlePath==null || !correctTitlePath.equals(getTitlePathURL().getEncodedTitles())) {
                     completePath = false;
                 }
             }
