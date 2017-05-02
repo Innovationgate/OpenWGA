@@ -161,6 +161,11 @@ public class IndexingRuleBasedQueryParser extends MultiFieldQueryParser {
         if (field != null && (field.startsWith(LuceneManager.RELATION_PREFIX) || field.startsWith(LuceneManager.RELATIONGROUP_PREFIX))) {
             return true;
         }
+        
+        if (field != null && field.startsWith("$LUCENE_")) {
+            return true;
+        }
+        
         // retrieve config for each searchDBKey
         // retrieve rules from dbConfig
         // retrieve matching rule for field and check if field was indexed as KEYWORD
