@@ -1079,6 +1079,11 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
             field.setMultipleDivider("\r\n");
             field.parse(this);
         }
+        if( fieldReg.getType().equalsIgnoreCase("hidden") && fieldReg.isMultiple()) {
+        	field.setType(TMLFormField.TYPE_HIDDEN);
+            field.setMultipleDivider("~~~");
+            field.parse(this);
+        }
         else if(fieldReg.getType().equalsIgnoreCase("date")) { 
         	convertDateValues(format, field);
         }

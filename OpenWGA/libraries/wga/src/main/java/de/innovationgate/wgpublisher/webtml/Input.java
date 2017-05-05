@@ -49,6 +49,7 @@ import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.common.beans.hdbmodel.Content;
 import de.innovationgate.wga.common.beans.hdbmodel.Relation;
+import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.expressions.ExpressionEngine;
 import de.innovationgate.wgpublisher.expressions.ExpressionEngineFactory;
@@ -363,9 +364,16 @@ public class Input extends ActionBase implements DynamicAttributes {
         
         // Render
         try {
-            if (type.equals("text") || type.equals("hidden") || type.equals("password")) {
+            if (type.equals("text") || type.equals("password")) {
                 renderSimpleInput(type, name, format, cssClass, cssStyle, singleValue, tagContent, disabledString);
             }   
+            else if(type.equals("hidden")) {
+            	if(isMultipleInput()){
+            		String renderedValue = WGUtils.serializeCollection(values, "~~~");
+            		renderSimpleInput(type, name, format, cssClass, cssStyle, renderedValue, tagContent, disabledString);
+            	}
+            	else renderSimpleInput(type, name, format, cssClass, cssStyle, singleValue, tagContent, disabledString);
+            }
             else if(type.equals("boolean")) {
                 renderBoolean( name, cssClass, cssStyle, formBase, singleValue, tagContent, disabledString);
             }   

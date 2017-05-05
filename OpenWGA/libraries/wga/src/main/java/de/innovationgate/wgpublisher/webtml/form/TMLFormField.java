@@ -52,6 +52,7 @@ public class TMLFormField {
     // field types to switch parsing
     public static final String TYPE_NUMBER = "number";    
     public static final String TYPE_TEXTAREA = "textarea";
+    public static final String TYPE_HIDDEN = "hidden";
     public static final String TYPE_TEXT = "text";
     public static final String TYPE_DATE = "date";
     public static final String TYPE_BOOLEAN = "boolean";
@@ -250,6 +251,9 @@ public class TMLFormField {
             parseBoolean();            
         } else if (_type.equals(TYPE_HASHEDPASSWORD)) {
             parseHashedPassword(form);
+        }
+        else if (_type.equals(TYPE_HIDDEN) && _multiple) {
+            parseMultiple(_multipleDivider);
         }
         else if (_type.equals(TYPE_TEXTAREA) && _multiple) {
             parseMultiple(_multipleDivider);
