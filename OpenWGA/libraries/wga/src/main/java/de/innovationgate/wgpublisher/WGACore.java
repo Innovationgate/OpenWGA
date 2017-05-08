@@ -5905,6 +5905,9 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         
         // Update filter mappings
         initReadFilterMappings();
+        if (getFilter() != null) {
+            getFilter().initFilterChain();
+        }
         
         // Event Manager
         _eventManager.reloadConfig();
