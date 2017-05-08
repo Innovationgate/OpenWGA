@@ -136,7 +136,7 @@
 						
 						//log.info("option " + opt.name + " depends on " + depOpt.name + " with value " + val);
 						//log.info("needs value: " + depOpt.neededValue);
-						if(val && (val.toString() != depOpt.neededValue)){
+						if(val==null || (val.toString() != depOpt.neededValue)){
 							ignoreOption=true;
 							if(_config_bean_options.containsKey(opt.name)){
 								_config_bean_options.remove(opt.name);
