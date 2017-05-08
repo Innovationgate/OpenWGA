@@ -32,7 +32,7 @@ public class SassFunctions {
         }
         catch(Exception e){
         	WGA wga = (WGA) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wga"));
-        	wga.getLog().error("wga_file_url: file not found: " + db + "/" + container + "/" + name);
+        	wga.getLog().error("wga_file_url: file not found: " + db + "/" + container + "/" + name, e);
         	return "/* file not found: " + db + "/" + container + "/" + name + " */";
         }
     }
