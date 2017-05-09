@@ -645,6 +645,7 @@ public class WGAFilter implements Filter {
 		catch (ServletException e) {
 			info.setStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		    info.setStatusMessage(e.getMessage());
+		    _core.getLog().error("Internal Server Error.", e);
 		    throw e;
 		}
 		finally {

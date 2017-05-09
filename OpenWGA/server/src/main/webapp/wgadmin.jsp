@@ -90,8 +90,10 @@ if (adminPassword == null) {
 
 boolean isLoggedIn = core.isAdminLogin(adminName, adminPassword, request);
 if (isLoggedIn) {
-	session.setAttribute(WGACore.SESSION_ADMINNAME, adminName);
-	session.setAttribute(WGACore.SESSION_ADMINPASSWORD, adminPassword);
+	if(adminName!=null)
+		session.setAttribute(WGACore.SESSION_ADMINNAME, adminName);
+	if(adminPassword!=null)
+		session.setAttribute(WGACore.SESSION_ADMINPASSWORD, adminPassword);
 	if (!WGUtils.isEmpty(request.getParameter("wheretogo"))) {
 		response.sendRedirect(request.getParameter("wheretogo"));
 		return;

@@ -180,7 +180,9 @@ public class WGAHttpSession implements HttpSession, de.innovationgate.wgpublishe
     public void setAttribute(String key, Object value) {
         checkValidity();
         access();
-        _attributes.put(key, value);
+        if(value!=null)
+        	_attributes.put(key, value);
+        else WGACore.retrieve(getServletContext()).getLog().warn("WGAHttpSession: ignored null value for key '" + key + "'");
         if (value != null && value instanceof HttpSessionBindingListener) {
             try {
                 HttpSessionBindingEvent event = new HttpSessionBindingEvent(this, key, value);
