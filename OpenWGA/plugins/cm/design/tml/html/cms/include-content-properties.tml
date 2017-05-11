@@ -28,5 +28,5 @@
 	setOption("contentkey", request.getParameter("contentkey"));	
 </tml:script>
 
-<tml:portlet name="content-properties" ref="::portlet-content-properties" ajax="true"/>
+<tml:portlet name="content-properties" ref="::portlet-content-properties" ajax="true" forcestate="true"/>
 
