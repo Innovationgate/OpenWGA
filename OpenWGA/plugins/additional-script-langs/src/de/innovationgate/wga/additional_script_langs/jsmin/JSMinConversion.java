@@ -10,7 +10,7 @@ public class JSMinConversion implements DesignResourceConversion{
 	@Override
 	public PreProcessResult preProcess(WGA wga, PreProcessData data, String code){
 
-		// Do nothing. Convertion is done in post-processing.
+		// No pre-processing. Do nothing. Conversion is done in post-processing.
 		
         PreProcessResult result = new PreProcessResult();
         result.setCode(code);
