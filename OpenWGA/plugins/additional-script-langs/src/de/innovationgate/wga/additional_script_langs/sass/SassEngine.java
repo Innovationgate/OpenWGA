@@ -100,13 +100,14 @@ public class SassEngine {
       catch(ScriptException e){
     	  StringReader reader = new StringReader(sw.toString());
     	  List<String> errors = IOUtils.readLines(reader);
-	      _wga.getLog().error(errors.get(0));    
+	      _wga.getLog().error(errors.get(0), e);    
 	      throw new Exception("SASS ERROR");
       }
       catch (Exception e) {
-	      _wga.getLog().error(e);
+	      _wga.getLog().error("general SASS error", e);
+	      throw e;
       }
-      return StringUtils.EMPTY;
+      //return StringUtils.EMPTY;
       
     }    
 

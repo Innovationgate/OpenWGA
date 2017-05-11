@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGScriptModule;
-import de.innovationgate.wga.additional_script_langs.sass.CssDialectsConversion;
+import de.innovationgate.wga.additional_script_langs.sass.SassConversion;
 import de.innovationgate.wga.modules.KeyBasedModuleDefinition;
 import de.innovationgate.wga.modules.ModuleDefinition;
 import de.innovationgate.wga.modules.ModuleDependencyException;
@@ -30,8 +30,8 @@ public class SassConversionModuleDefinition implements ModuleDefinition, KeyBase
         return DesignResourceConversionModuleType.class;
     }
 
-    public Class<CssDialectsConversion> getImplementationClass() {
-        return CssDialectsConversion.class;
+    public Class<SassConversion> getImplementationClass() {
+        return SassConversion.class;
     }
 
     public void testDependencies() throws ModuleDependencyException {
