@@ -59,6 +59,7 @@ public class JSMinPostProcessor implements PostProcessor{
 		} catch (Exception e) {
 			convertedCode.append("// unable to read JSMin module\n");
 			wga.getLog().error("jsmin: unable to read module: " + e.getMessage());
+			data.setCacheable(false);
 		}
 
 		if(WGACore.isDevelopmentModeEnabled() || !data.isCompress()){
@@ -66,20 +67,16 @@ public class JSMinPostProcessor implements PostProcessor{
         }
 		else{
 	        StringWriter minOut = new StringWriter();
-	        ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
-	        Thread.currentThread().setContextClassLoader(wga.server().getLibraryLoader());	        
 	        try {
 	        	UglifyJsProcessor engine = new UglifyJsProcessor();
 	        	engine.process(new StringReader(convertedCode.toString()), minOut);
 	        	result.setCode(minOut.toString());
 			} catch (Exception e) {
-				wga.getLog().error("UglifyJsProcessor: unable to process JS-module " + design.toString());
-				wga.getLog().error(e.toString(), e);
+				wga.getLog().error("UglifyJsProcessor: unable to process JS-module " + design.toString(), e);
+    			// Unable to process Source: don't cache.
+    			data.setCacheable(false);
 				result.setCode(convertedCode.toString());
 			}
-	        finally{
-	        	Thread.currentThread().setContextClassLoader(oldLoader);
-	        }	        
 		}
 		
         return result;
