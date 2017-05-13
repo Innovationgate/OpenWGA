@@ -1184,13 +1184,15 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
      * @param parent Reference document for the creation below which the content is to be created
      * @throws WGAPIException
      */
-    public HDBModelParams newCreateContentParams(String contentClass, TMLContext parent) throws WGAPIException {
-    	return newCreateContentParams(contentClass, parent.content());
-    }
-    public HDBModelParams newCreateContentParams(String contentClass, WGContent parent) throws WGAPIException {
-        HDBModelParams params = new HDBModelParams(HDBModel.TYPE_CONTENT);
+
+    public HDBModelParams newCreateContentParams(String contentClass, Object parent) throws WGAPIException {
+    	if(parent instanceof TMLContext){
+    		parent = ((TMLContext)parent).content();    		
+    	}
+        @SuppressWarnings("deprecation")
+		HDBModelParams params = new HDBModelParams(HDBModel.TYPE_CONTENT);
         params.setContentClass(contentClass);
-        params.setRefDocument(parent);
+        params.setRefDocument((WGContent)parent);
         return params;
     }
     
