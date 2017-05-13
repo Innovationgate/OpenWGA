@@ -1,3 +1,0 @@
-<tml:script>
-setVar(portlet.name + "TheOtherPortletIncluded", "Ohyes!");
-</tml:script>

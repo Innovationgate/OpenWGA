@@ -1,5 +1,0 @@
-this.render = function($cx) {
-	$cx.setVar("dispatchDefaultRenderRan", "yes");
-	WGA.TMLPage.renderDefault();
-	WGA.TMLPage.write("RenderEnd");
-}

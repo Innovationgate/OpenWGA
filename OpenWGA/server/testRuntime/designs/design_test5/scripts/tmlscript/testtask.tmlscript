@@ -1,4 +1,0 @@
-java.lang.Thread.sleep(3000);
-var app = WGA.app(jobContext.getOption("db"));
-app.db().setAttribute("ScriptTestTaskRan", true);
-        

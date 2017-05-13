@@ -1,9 +1,0 @@
-<HEAD>
-<tml:htmlhead/>
-<title><tml:metadata type="database" name="titleprefix"/>: <tml:metadata name="title"/></title>
-<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="Standard"/>"/>
-<script Language="Javascript" type="text/Javascript" src="<tml:url type="js" name="StandardScript"/>"></script><HTML>
-</HEAD>
-<BODY bgcolor="#A0A29F" leftmargin="0" topmargin="0">
-<tml:include type="innerlayout"/>
-</BODY>

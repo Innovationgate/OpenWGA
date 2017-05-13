@@ -1,6 +1,0 @@
-<tml:script>
-
-return getwgacore().getSID();
-
-</tml:script>
-<tml:warnings/>

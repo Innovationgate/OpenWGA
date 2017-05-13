@@ -1,6 +1,0 @@
-
-<tml:script>
-setVar("changemedium", WGA.design().tmlMedium);
-</tml:script>
-
-<tml:include ref="::includemediumchange_keepmedium"/>

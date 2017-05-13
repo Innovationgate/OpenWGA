@@ -1,9 +1,0 @@
-<tml:script>
-/* this script is not safe for cross-domain misuse!!! */
-this.setvar("_filename", this.request.getParameter("filename"));
-this.setvar("_filelist", this.request.getParameter("filelist"));
-</tml:script>
-<tml:element name="zip">
-	<tml:option name="target"><tml:item name="_filename" /></tml:option>
-	<tml:option name="files"><tml:item name="_filelist" /></tml:option>
-</tml:element>

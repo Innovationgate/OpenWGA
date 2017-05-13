@@ -1,3 +1,0 @@
-<tml:action master="true">
-return callAction("logins/v3_3_0_m3:tmlaction5");
-</tml:action>

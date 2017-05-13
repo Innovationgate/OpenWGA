@@ -1,4 +1,0 @@
-content().setItemValue("saveContentEvent", "done");
-if (content() != null && !content().isDummy() && content() == event.document) {
-	content().setItemValue("saveContentDocumentAccessible", "true");	
-}

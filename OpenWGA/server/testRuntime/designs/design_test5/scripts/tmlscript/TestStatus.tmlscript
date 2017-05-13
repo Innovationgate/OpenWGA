@@ -1,6 +1,0 @@
-function TestStatus($cookie_clickStep, $cookie_testId) {
-	this.clickStep = $cookie_clickStep;
-	this.testId = $cookie_testId;
-}
-
-

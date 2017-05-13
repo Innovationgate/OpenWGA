@@ -1,6 +1,0 @@
-tmlform.validate();
-
-callAction("v4_0_2:innerAction");
-
-theObject = createObject("v4_0_2:innerObject");
-objectOutput = theObject.theMethod();

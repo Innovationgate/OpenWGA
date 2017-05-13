@@ -1,3 +1,0 @@
-this.render = function() {
-	WGA.TMLPage.write(javaObject("Hallo Welt").getBytes("UTF-8"));
-}

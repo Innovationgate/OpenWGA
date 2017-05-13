@@ -1,4 +1,0 @@
-<tml:action master="true">
-log.info("actioncalling1: " + db().getSessionContext().isMasterSession());
-callAction("v3_3_1:actioncalling2");
-</tml:action>

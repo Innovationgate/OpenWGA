@@ -1,4 +1,0 @@
-<p>This is the base version</p>
-<tml:script>
-setVar("include_base", "true");
-</tml:script>

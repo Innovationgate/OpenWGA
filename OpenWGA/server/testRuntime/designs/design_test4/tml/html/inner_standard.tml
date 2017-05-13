@@ -1,9 +1,0 @@
-<p class="title"><tml:meta name="title"/></p>
-
-<p><tml:item name="body" editor="rtf"/></p>
-
-<tml:include ref="demohelper">
-	<tml:option name="usage-de">
-		Dieser Contenttyp demonstriert einfache Texteingabe in einem "Rich-Text-Feld".
-	</tml:option>
-</tml:include>

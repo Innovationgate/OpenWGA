@@ -1,3 +1,0 @@
-this.render = function() {
-	WGA.TMLPage.write("<html>Hello world!</html>");
-}

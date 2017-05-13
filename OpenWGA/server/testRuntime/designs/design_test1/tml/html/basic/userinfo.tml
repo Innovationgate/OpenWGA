@@ -1,8 +1,0 @@
-
-<%
-java.security.cert.X509Certificate cert[] = 
-	(java.security.cert.X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-%>
-	
-	
-<%=cert[0]%>

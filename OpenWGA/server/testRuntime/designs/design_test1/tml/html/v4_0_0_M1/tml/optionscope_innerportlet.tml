@@ -1,5 +1,0 @@
-<tml:script>
-assertEquals("Option with local scope is NOT available in inner portlet", "tml:portletscope", option("optionwithscope"), null);
-assertEquals("Option with implicit global scope is available anywhere", "tml:portletscope", option("optionwithimplicitscope"), "noscope");
-assertEquals("Option without scope is available anywhere", "tml:portletscope", option("optionwithoutscope"), "noscope");
-</tml:script>

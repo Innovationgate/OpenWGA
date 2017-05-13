@@ -1,1 +1,0 @@
-db().setAttribute("ConnectScriptRan", true);

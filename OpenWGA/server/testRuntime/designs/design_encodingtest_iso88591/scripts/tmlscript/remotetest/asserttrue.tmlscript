@@ -1,4 +1,0 @@
-var title = tmlparam1;
-var cat = tmlparam2;
-var test = tmlparam3;
-assertTrue(title, cat, test);

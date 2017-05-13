@@ -1,4 +1,0 @@
-content().setItemValue("workflowMailEvent", "done");  
-if (content() != null && !content().isDummy() && content() == event.document) {
-	content().setItemValue("workflowMailDocumentAccessible", "true");	
-}

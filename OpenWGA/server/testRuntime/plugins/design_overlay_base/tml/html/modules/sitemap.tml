@@ -1,8 +1,0 @@
-
-<div class="sitemap">
-	<ul>
-		<tml:navigator type="sitemap" context="name:home">
-			<li class="level-<tml:script expression="LEVEL"/>" style="padding-left:<tml:script expression="20*(LEVEL-1)"/>px"><tml:link/></li>
-		</tml:navigator>
-	</ul>
-</div>

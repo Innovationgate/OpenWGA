@@ -1,7 +1,0 @@
-var con = db().getContentByKey(tmlparam1);
-if (con != null) {
-	return con.status;
-}
-else {
-	return "unknown doc";
-}

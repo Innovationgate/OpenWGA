@@ -1,3 +1,0 @@
-<tml:action master="true">
-return db().getSessionContext().isMasterSession();
-</tml:action>

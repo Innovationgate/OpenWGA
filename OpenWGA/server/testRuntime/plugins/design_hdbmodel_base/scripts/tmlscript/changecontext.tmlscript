@@ -1,2 +1,0 @@
-portlet.context = this;
-portlet.setmode("browse");

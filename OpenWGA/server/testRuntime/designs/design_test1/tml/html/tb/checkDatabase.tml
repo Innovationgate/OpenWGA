@@ -1,5 +1,0 @@
-<tml:script>
-return getwgacore().waitForDatabase("be_customer_binias_gmbh_23",5000, 20000, "172.20.1.1", 7777, "be");
-
-</tml:script>
-<tml:warnings/>

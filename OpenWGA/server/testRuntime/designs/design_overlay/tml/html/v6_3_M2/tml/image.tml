@@ -1,7 +1,0 @@
-<tml:script>
-	theImage = WGA.createList();
-	theImage.add("images");
-	theImage.add("header-background.jpg");
-	theImage.add("The Title");
-</tml:script>
-<tml:image item="theImage">id="image_ili_remote_overlayconflict"</tml:image>

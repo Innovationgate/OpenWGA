@@ -1,4 +1,0 @@
-content().setItemValue("createContentEvent", "done");
-if (content() != null && !content().isDummy() && content() == event.document) {
-	content().setItemValue("createContentDocumentAccessible", "true");	
-}

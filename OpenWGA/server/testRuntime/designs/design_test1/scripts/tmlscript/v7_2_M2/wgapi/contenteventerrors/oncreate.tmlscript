@@ -1,5 +1,0 @@
-log.info("Running ContentEventError.OnCreate");
-if (db().getAttribute("ContentEventError.OnCreate") == true) {
-	log.info("Cancelling ContentEventError.OnCreate");
-	throw {msg: "This create event failed", code:1};
-}

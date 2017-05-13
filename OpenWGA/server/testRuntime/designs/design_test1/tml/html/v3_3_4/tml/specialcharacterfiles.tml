@@ -1,6 +1,0 @@
-<html>
-<body>
-<tml:image doc="container mit leerzeichen ünd ümläuten" file="datei mit leerzeichen ünd ümläuten.jpg">id="image"</tml:image>
-<tml:warnings/>
-</body>
-</html>

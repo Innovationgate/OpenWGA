@@ -1,1 +1,0 @@
-this.getName = function() { return "theObject3"; };

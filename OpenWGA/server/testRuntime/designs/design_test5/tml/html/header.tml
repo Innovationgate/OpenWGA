@@ -1,5 +1,0 @@
-<div align="right">
-	<a id="homeLink" language="<tml:meta name="language"/>" href="<tml:url context="docid:home"/>">Home</a>
-	|
-	<a href="javascript:openHelp()"><tml:script>return this.LANGUAGE=='de'?'Hilfe':'Help'</tml:script></a>
-</div>

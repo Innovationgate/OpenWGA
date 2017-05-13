@@ -1,3 +1,0 @@
-<tml:script>
-setVar("changemediumagain", WGA.design().tmlMedium);
-</tml:script>

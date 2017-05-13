@@ -1,9 +1,0 @@
-<form style="display:inline">
-	<table width="100%" border=0>
-		<tr>
-			<td width="100%"><input class="textinput" name="query" value="<tml:urlparameter name="query"/>"></td>
-			<td><input class="button" type="submit" value="<tml:script>return this.LANGUAGE=='de'?'suchen':'search'</tml:script>"></td>
-		</tr>
-	</table>
-</form>
-MySQL(1) go!

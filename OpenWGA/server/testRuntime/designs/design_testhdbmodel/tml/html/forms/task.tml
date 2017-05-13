@@ -1,9 +1,0 @@
-<h2>Task</h2>
-
-Name: <tml:input name="name"/><br>
-
-Finished %: <tml:input name="finished" type="number"/><br>
-
-Categories <tml:input name="categories" type="select" multiple="true" relationtype="normal"/><br>
-
-<tml:button id="finishtask" clickaction="finishtask">Finish task</tml:button>

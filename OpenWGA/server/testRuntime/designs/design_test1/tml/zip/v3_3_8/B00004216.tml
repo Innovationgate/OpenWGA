@@ -1,7 +1,0 @@
-<tml:element name="zip">
-	<tml:option name="target">test</tml:option>
-	<tml:option name="files">
-		<tml:url absolute="true" type="file" doc="boerse" file="dax.gif"/>,
-		<tml:url absolute="true" type="file" doc="boerse" file="nemax.gif"/>
-	</tml:option>
-</tml:element>

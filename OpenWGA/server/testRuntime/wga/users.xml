@@ -1,5 +1,0 @@
-<users allowanonymous="true">
-	<user name="ow" password="Heidi" mail="ow@innovationgate.de" aliases="Oliver Weise,oweise"/>
-	<user name="tb" password="sesam" mail="tb@innovationgate.de" aliases="Thorsten Binias,tbinias"/>
-	<group name="admins" members="ow,tb"/>
-</users>

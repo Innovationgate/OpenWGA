@@ -1,2 +1,0 @@
-portlet.setMode("new");
-portlet.setSessionVar("newdocclass", tmlparam1);

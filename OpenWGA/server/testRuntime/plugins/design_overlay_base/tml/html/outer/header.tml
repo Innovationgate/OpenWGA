@@ -1,9 +1,0 @@
-
-<a href="<tml:url context="name:home"/>"><h1><tml:meta type="database" name="title"/></h1></a>
-
-<div class="servicenav">		
-	<tml:siblings context="name:home">
-		<tml:link><tml:case condition="KEY==context('main').KEY">class="selected"</tml:case></tml:link>
-	</tml:siblings>
-</div>
-

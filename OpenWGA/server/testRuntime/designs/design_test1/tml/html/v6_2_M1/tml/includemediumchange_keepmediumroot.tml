@@ -1,3 +1,0 @@
-<tml:script>
-setVar("keepmediumroot", WGA.design().tmlMedium);
-</tml:script>

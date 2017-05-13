@@ -1,7 +1,0 @@
-<h2>Customer</h2>
-
-Name: <tml:input name="name"/><br>
-
-title: <tml:input name="title" meta="true"/><br>
-
-Related customers: <tml:input type="checkbox" name="relatedcustomers" relationtype="normal"/>

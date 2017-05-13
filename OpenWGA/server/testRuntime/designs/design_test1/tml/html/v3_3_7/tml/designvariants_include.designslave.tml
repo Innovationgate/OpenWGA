@@ -1,4 +1,0 @@
-<p>This is the designslave version</p>
-<tml:script>
-setVar("include_designslave", "true");
-</tml:script>

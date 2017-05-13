@@ -1,2 +1,0 @@
-The Portlet
-<tml:portlet name="innerportlet" ref="::inner:portlet"/>

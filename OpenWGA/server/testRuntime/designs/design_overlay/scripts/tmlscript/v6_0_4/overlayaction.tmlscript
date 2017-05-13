@@ -1,2 +1,0 @@
-jobContext.log.info("Running overlay action!");
-return "Referenced!";

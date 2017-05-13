@@ -1,6 +1,0 @@
-<html>
-<frameset cols="300,*">
-	<frame name="nav" src="<tml:url type="tml" layout="test_vdbug_nav"/>">
-	<frame name="IG" src="about:blank">
-</frameset>
-</html>

@@ -1,5 +1,0 @@
-<div align="right">
-	<tml:navigator type="languages">
-		<a class="selected" id="langnav<tml:meta name="language"/>"  href="<tml:url/>"><tml:meta name="languageTitle"/></a>
-	</tml:navigator>
-</div>

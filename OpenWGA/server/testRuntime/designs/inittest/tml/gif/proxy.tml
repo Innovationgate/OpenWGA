@@ -1,9 +1,0 @@
-<tml:script>
-var url = request.getParameter("url");
-var conn = new java.net.URL(url).openConnection();
-var streamIn = new java.io.BufferedInputStream(conn.getInputStream());
-var streamOut = response.getOutputStream();
-Packages.de.innovationgate.utils.WGUtils.inToOut(streamIn, streamOut, 2048);
-streamIn.close();
-streamOut.close();
-</tml:script>

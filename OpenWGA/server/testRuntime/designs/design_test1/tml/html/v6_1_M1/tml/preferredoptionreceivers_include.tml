@@ -1,4 +1,0 @@
-<tml:option name="insideIncludeOption">insideIncludeValue</tml:option>
-<tml:script>
-	setVar("preferredIncludeOptionFromIncludedModule", option("preferredIncludeOption"));
-</tml:script>

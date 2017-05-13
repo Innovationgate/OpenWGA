@@ -1,5 +1,0 @@
-<tml:form id="theform">
-	
-	<tml:input type="text" name="name" default="Oliver"/>
-
-</tml:form>

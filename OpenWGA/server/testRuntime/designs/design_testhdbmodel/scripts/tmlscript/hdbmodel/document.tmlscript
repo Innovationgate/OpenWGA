@@ -1,3 +1,0 @@
-this.onSave = function(e) {
-	content().setTitle(name);
-}

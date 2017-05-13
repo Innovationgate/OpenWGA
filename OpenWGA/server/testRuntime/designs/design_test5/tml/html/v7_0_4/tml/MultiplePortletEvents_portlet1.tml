@@ -1,6 +1,0 @@
-	<PRE>
-	Tests correct execution of multiple portlet events
-	</PRE>
-	<hr>
-	<tml:button id="click1" clickaction="fireUserFilter" ajax="true">Fire user filter</tml:button>
-	<tml:button id="click2" clickaction="fireTagFilter" ajax="true">Fire tag filter</tml:button>

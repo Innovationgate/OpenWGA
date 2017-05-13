@@ -1,4 +1,0 @@
-<tml:script>
-singleDollarInOverlay = String($);
-doubleDollarInOverlay = String($$);
-</tml:script>

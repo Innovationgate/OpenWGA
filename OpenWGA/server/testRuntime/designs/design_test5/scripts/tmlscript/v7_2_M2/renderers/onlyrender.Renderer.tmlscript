@@ -1,3 +1,0 @@
-this.render = function($cx) {
-	WGA.TMLPage.write("This is render output");
-}

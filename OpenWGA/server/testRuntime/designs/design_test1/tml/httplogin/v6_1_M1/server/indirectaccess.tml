@@ -1,1 +1,0 @@
-<tml:range context="db:logins/name:nodirectaccess"><tml:meta type="db" name="username"/>/<tml:item name="info"/></tml:range>

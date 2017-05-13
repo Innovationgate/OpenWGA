@@ -1,7 +1,0 @@
-<WGSchemaDefinition createDefaultLanguage="false" version="5.2">
-   <documentDefinitions class="java.util.ArrayList">
-      <WGSchemaDocumentDefinition class="de.innovationgate.webgate.api.schemadef.WGLanguageDefinition" name="de" autoCreate="true">
-         <metadata class="java.util.ArrayList"/>
-      </WGSchemaDocumentDefinition>
-   </documentDefinitions>
-</WGSchemaDefinition>

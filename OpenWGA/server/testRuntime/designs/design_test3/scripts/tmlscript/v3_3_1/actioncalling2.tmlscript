@@ -1,2 +1,0 @@
-setvar("moduleAction", "done");
-log.info("actioncalling2");

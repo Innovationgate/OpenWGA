@@ -1,3 +1,0 @@
-<tml:script>
-assertEquals("Kept local option still available", "tml:optionScope", option("keptoption"), "keptoption");
-</tml:script>

@@ -1,8 +1,0 @@
-var testId = tmlparam1;
-var title = tmlparam2;
-var cat = tmlparam3;
-var equal1 = tmlparam4;
-var equal2 = tmlparam5;
-var testClassName = testId.substring(testId.indexOf(".")+1).toLowerCase();
-setvar("$testmodule", WGA.Utils.strReplace(String(testClassName.substring("de.innovationgate.wga.test.".length)), ".", ":", true));
-assertEquals(title, cat, equal1, equal2);

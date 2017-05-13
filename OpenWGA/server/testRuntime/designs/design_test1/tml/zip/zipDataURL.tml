@@ -1,8 +1,0 @@
-<tml:element name="zip">
-<tml:option name="target">MyFiles</tml:option>
-<tml:option name="filedivider">~</tml:option>
-<tml:option name="files">
-	<tml:url type="file" file="lola.jpg" doc="tv" dataURL="true"/>|lola.jpg~
-	<tml:url type="file" file="dax.gif" doc="boerse" dataURL="true"/>|dax.gif
-</tml:option>
-</tml:element>

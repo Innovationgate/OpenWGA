@@ -1,9 +1,0 @@
-log.info("Doc " + content().getTitle() + " - Sending workflow mail - current status: " + content().getStatus() + ", Level: " + content().getWorkflow().getWorkflowLevelIndex() + " , Receiver: " + event.mailBody.getToAddresses());
-var mailsSent = content().getItemValue("mailssent");
-if (mailsSent == null) {
-	mailsSent = 1;
-}
-else {
-	mailsSent++;
-}
-content().setItemValue("mailssent", mailsSent);

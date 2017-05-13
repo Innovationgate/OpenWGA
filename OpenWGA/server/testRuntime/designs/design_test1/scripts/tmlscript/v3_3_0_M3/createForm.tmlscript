@@ -1,4 +1,0 @@
-var formInfo = createFormInfo("theform");
-var form = createForm(formInfo);
-form.setfield("afield", "avalue");
-return form;

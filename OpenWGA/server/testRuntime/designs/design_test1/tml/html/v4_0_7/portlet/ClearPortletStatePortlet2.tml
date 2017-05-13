@@ -1,6 +1,0 @@
-Hello, this is the portlet 2 in mode <tml:script expression="portlet.mode"/>.
-
-<tml:script>
-portlet2mode = portlet.mode;
-portlet2sessionvar = sessionvar;
-</tml:script>
