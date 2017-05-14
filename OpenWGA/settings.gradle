@@ -52,3 +52,6 @@ project(":plugin-rest").projectDir = file("plugins/rest")
 
 include ":plugin-cs-maintenance"
 project(":plugin-cs-maintenance").projectDir = file("plugins/cs-maintenance")
+
+include ":plugin-XFireServer"
+project(":plugin-XFireServer").projectDir = file("plugins/XFireServer")
