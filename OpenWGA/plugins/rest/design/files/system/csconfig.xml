@@ -25,7 +25,7 @@
         <buildVersion>660</buildVersion>
       </version>
     </id>
-    <title>WGA Services REST Server</title>
+    <title>OpenWGA Services REST Server</title>
     <description>Adds a REST-ful web service to OpenWGA based on the Jersey framework</description>
     <vendor>Innovation Gate GmbH</vendor>
     <webHomepage>http://www.innovationgate.com</webHomepage>
