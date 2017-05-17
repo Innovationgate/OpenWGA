@@ -12,6 +12,9 @@ project(":wgapiJdbc").projectDir = file("libraries/wgapiJdbc")
 include ":servicesClient"
 project(":servicesClient").projectDir = file("libraries/servicesClient") 
 
+include ":XFireServer"
+project(":XFireServer").projectDir = file("libraries/XFireServer")
+
 include ":wgaBuildTools"
 project(":wgaBuildTools").projectDir = file("libraries/wgaBuildTools")
 
@@ -49,6 +52,3 @@ project(":plugin-rest").projectDir = file("plugins/rest")
 
 include ":plugin-cs-maintenance"
 project(":plugin-cs-maintenance").projectDir = file("plugins/cs-maintenance")
-
-include ":plugin-XFireServer"
-project(":plugin-XFireServer").projectDir = file("plugins/XFireServer")

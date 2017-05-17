@@ -1,0 +1,21 @@
+dependencies {
+    compileClasspath project(":wga");
+    
+    // @jar: don't add dependend JARs to war file
+	compile 'wsdl4j:wsdl4j:1.6.3@jar'
+	compile 'org.codehaus.xfire:xfire-all:1.2.6@jar'
+    
+	compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
+	compileClasspath 'javax.servlet.jsp:jsp-api:2.2'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src'
+		}
+		resources {
+			srcDir 'src'
+		}
+	}
+} 
