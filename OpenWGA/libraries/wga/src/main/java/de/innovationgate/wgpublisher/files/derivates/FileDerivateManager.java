@@ -1002,7 +1002,7 @@ public class FileDerivateManager {
         Runnable updateIndexRunnable = new Runnable() {
             @Override
             public void run() {
-                _core.getLog().info("Manually running update process");
+                //_core.getLog().info("Manually running update process");
                 _updateProcess.run();
                 
             }
