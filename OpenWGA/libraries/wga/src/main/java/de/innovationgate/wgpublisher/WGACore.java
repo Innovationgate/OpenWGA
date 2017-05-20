@@ -178,6 +178,7 @@ import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGFactory;
 import de.innovationgate.webgate.api.WGFileAnnotator;
+import de.innovationgate.webgate.api.WGFileConverter;
 import de.innovationgate.webgate.api.WGHierarchicalDatabase;
 import de.innovationgate.webgate.api.WGHierarchicalDatabaseCoreListener;
 import de.innovationgate.webgate.api.WGIllegalArgumentException;
@@ -403,7 +404,9 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         URLENCODER_PATH_PART_CHARACTERS.clear('+');
         URLENCODER_PATH_PART_CHARACTERS.clear('%');
     }
-        
+    
+    private WGFileConverter _fileConverter =  new ImageFileConverter();
+    
     public static class UpdateConfigOccasion implements ProblemOccasion {
 
         @Override
@@ -2224,7 +2227,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
                 updateFileAnnotators(db);
                 
                 // add File Converter
-                db.setFileConverter(new ImageFileConverter());
+                db.setFileConverter(_fileConverter);
                 
                 // Do system container initialisations
                 if (scContext != null) {
@@ -6767,7 +6770,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
                 updateFileAnnotators(db);
 
                 // add File Converter
-                db.setFileConverter(new ImageFileConverter());
+                db.setFileConverter(_fileConverter);
 
                 // System container initialisations
                 if (scContext != null) {
