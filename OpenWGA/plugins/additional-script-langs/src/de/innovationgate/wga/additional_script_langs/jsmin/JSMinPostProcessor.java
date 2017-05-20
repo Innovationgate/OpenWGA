@@ -67,6 +67,8 @@ public class JSMinPostProcessor implements PostProcessor{
         }
 		else{
 	        StringWriter minOut = new StringWriter();
+	        ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
+	        Thread.currentThread().setContextClassLoader(wga.server().getLibraryLoader());	        
 	        try {
 	        	UglifyJsProcessor engine = new UglifyJsProcessor();
 	        	engine.process(new StringReader(convertedCode.toString()), minOut);
@@ -77,6 +79,9 @@ public class JSMinPostProcessor implements PostProcessor{
     			data.setCacheable(false);
 				result.setCode(convertedCode.toString());
 			}
+	        finally{
+	        	Thread.currentThread().setContextClassLoader(oldLoader);
+	        }	        
 		}
 		
         return result;
