@@ -142,8 +142,5 @@ public class WGADefaultFileAnnotator implements WGFileAnnotator {
     public int getOrderNr() {
         return 0;
     } 
-    
-
-    
 
 }
