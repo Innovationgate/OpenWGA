@@ -42,7 +42,7 @@ public class ImageFileConverter implements WGFileConverter {
 	@Override
 	public void convert(File file) throws IOException {
 		String mimeType = getMimeType(file); 
-		if(mimeType==null || mimeType.equals("image/jpeg"))
+		if(mimeType==null || !mimeType.equals("image/jpeg"))
 			return;	// only JPGs are supported
 		try {
 			Metadata metadata = ImageMetadataReader.readMetadata(file);
