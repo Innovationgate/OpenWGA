@@ -2056,8 +2056,15 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
      */
     public boolean attachFile(final File file, List<WGFileAnnotator> additionalAnnotators) throws WGAPIException {
         
+        WGFileConverter converter = getDatabase().getFileConverter();
+        if(converter!=null){
+			try {
+				converter.convert(file);
+			} catch (IOException e) {}
+        }
+        
         // Run annotators
-        WGFileMetaData meta = new WGFileMetaData(this, getDatabase().convertFileNameForAttaching(file.getName()), file.length(), new Date(), new Date(), null, null, new HashMap<String, Object>());
+        WGFileMetaData meta = new WGFileMetaData(this, getDatabase().convertFileNameForAttaching(file.getName()), file.length(), new Date(), new Date(), null, null, new HashMap<String, Object>());        
         getDatabase().annotateMetadata(file, meta, additionalAnnotators);
         
         return innerAttachFile(file);

@@ -18,6 +18,7 @@ import javax.imageio.stream.ImageInputStream;
 import org.imgscalr.Scalr;
 import org.imgscalr.Scalr.Method;
 import org.imgscalr.Scalr.Mode;
+import org.imgscalr.Scalr.Rotation;
 
 import de.innovationgate.utils.CountBytesOutputStream;
 import de.innovationgate.utils.ImageScaler;
@@ -139,6 +140,10 @@ public class ImgScalrScaler implements ImageScaler, MimeTypeSpecificImageScaler 
      
     }
 
+    public void rotate(Rotation r){
+    	_img = Scalr.rotate(_img, r);
+    }
+    
     public void scaleToSize(int width, int height, boolean keepRatio) {
         
         if (keepRatio && width != -1 && height != -1) {

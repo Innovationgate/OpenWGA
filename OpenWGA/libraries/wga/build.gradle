@@ -25,6 +25,8 @@ dependencies {
     compile 'org.mockito:mockito-core:1.10.19'
     compile 'javax.jcr:jcr:1.0'
     
+	compile 'com.drewnoakes:metadata-extractor:2.10.1'
+    
     compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
     compileClasspath 'javax.websocket:javax.websocket-api:1.1'
     compileClasspath 'javax.servlet.jsp:jsp-api:2.2'

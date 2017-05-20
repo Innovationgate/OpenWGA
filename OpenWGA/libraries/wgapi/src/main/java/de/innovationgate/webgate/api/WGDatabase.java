@@ -1973,6 +1973,8 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
     
     private List<WGFileAnnotator> fileAnnotators = new CopyOnWriteArrayList<WGFileAnnotator>();
 
+    private WGFileConverter fileConverter = null;
+    
     private WGDesignProvider designProvider = null;
     
     private WGSchemaDefinition schemaDefinition = null;
@@ -9776,5 +9778,11 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         refresh();
     }
 
+    public void setFileConverter(WGFileConverter conv){
+    	this.fileConverter = conv;
+    }
+    public WGFileConverter getFileConverter(){
+    	return this.fileConverter;
+    }
     
 }

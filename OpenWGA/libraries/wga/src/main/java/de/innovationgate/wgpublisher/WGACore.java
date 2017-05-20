@@ -158,8 +158,6 @@ import de.innovationgate.utils.cache.EHCacheCore;
 import de.innovationgate.utils.net.IPAddress;
 import de.innovationgate.utils.net.IPRestriction;
 import de.innovationgate.utils.net.IPs;
-import de.innovationgate.utils.net.IPv4Address;
-import de.innovationgate.utils.net.IPv4Restriction;
 import de.innovationgate.utils.security.HashedPassword;
 import de.innovationgate.utils.security.HashingException;
 import de.innovationgate.utils.security.SHA1HashingScheme;
@@ -295,6 +293,7 @@ import de.innovationgate.wgpublisher.expressions.tmlscript.RhinoExpressionEngine
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptAppGlobalRegistry;
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptGlobal;
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptGlobalRegistry;
+import de.innovationgate.wgpublisher.files.ImageFileConverter;
 import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager;
 import de.innovationgate.wgpublisher.filter.WGAFilter;
 import de.innovationgate.wgpublisher.filter.WGAFilterConfig;
@@ -367,7 +366,6 @@ import de.innovationgate.wgpublisher.vlink.VirtualLinkResolver;
 import de.innovationgate.wgpublisher.vlink.VirtualLinkTarget;
 import de.innovationgate.wgpublisher.websockets.IndependentWebSocketManager;
 import de.innovationgate.wgpublisher.websockets.PageConnectionManager;
-import de.innovationgate.wgpublisher.webtml.init.WebTMLEnvironmentBuilder;
 import de.innovationgate.wgpublisher.webtml.portlet.TMLPortletState;
 import de.innovationgate.wgpublisher.webtml.utils.CRLFEncoder;
 import de.innovationgate.wgpublisher.webtml.utils.FlagAwareFormatter;
@@ -2224,6 +2222,9 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
                 
                 // Add file annotators
                 updateFileAnnotators(db);
+                
+                // add File Converter
+                db.setFileConverter(new ImageFileConverter());
                 
                 // Do system container initialisations
                 if (scContext != null) {
@@ -6764,7 +6765,10 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
                 
                 // Add file annotators
                 updateFileAnnotators(db);
-                                                                                                                              
+
+                // add File Converter
+                db.setFileConverter(new ImageFileConverter());
+
                 // System container initialisations
                 if (scContext != null) {
                     scContext.performInitialisation(new Boolean(isEmptyDB));
