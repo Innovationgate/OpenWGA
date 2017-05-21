@@ -42,8 +42,8 @@ public class ImageFileConverter implements WGFileConverter {
 	@Override
 	public void convert(File file) throws IOException {
 		String mimeType = getMimeType(file); 
-		if(mimeType==null || !mimeType.equals("image/jpeg"))
-			return;	// only JPGs are supported
+		if(mimeType==null || !mimeType.startsWith("image/"))
+			return;	// only Images are supported
 		try {
 			Metadata metadata = ImageMetadataReader.readMetadata(file);
 		    Directory directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
@@ -52,9 +52,8 @@ public class ImageFileConverter implements WGFileConverter {
 		    int orientation = directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
 		    if(orientation>1){
 			    ImgScalrScaler scaler = new ImgScalrScaler();
-			    scaler.useJPEGForOutput();
 			    InputStream in = new FileInputStream(file);
-	    		scaler.load(in);
+	    		scaler.load(in, mimeType);
 	    		in.close();
 		    	switch (orientation) {
 			    	case 3:
