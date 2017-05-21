@@ -1830,12 +1830,27 @@ public class Design {
      * @throws WGException
      */
     public String fileURL(String dbKey, String containerName, String fileName) throws WGException {
-        WGAURLBuilder builder = ((TMLContext) _wga.tmlcontext()).getURLBuilder();
+
+        String resource = getBaseReference().getResourceName();
+        if (WGUtils.isEmpty(resource)) {
+            throw new WGAServerException("The design object needs to have a base reference to generate a File URL. Create a design with a base reference using the resolve() method.");
+        }
+        
+        TMLContext cx;
+        if (_wga.isTMLContextAvailable()) {
+            cx = (TMLContext) _wga.tmlcontext();
+        }
+        else {
+            cx = (TMLContext) _wga.createTMLContext(_designContext.getDesignDB());
+        }    	
+    	
+    	WGAURLBuilder builder = cx.getURLBuilder(); 
+
         if (builder instanceof WGASpecificFileURLBuilder) {
             if (dbKey == null) {
                 dbKey = getBaseReference().getDesignApp();
             }
-            return ((WGASpecificFileURLBuilder) builder).buildDesignFileURL((TMLContext) _wga.tmlcontext(), dbKey, containerName, fileName);
+            return ((WGASpecificFileURLBuilder) builder).buildDesignFileURL(cx, dbKey, containerName, fileName);
         }
         else {
             throw new WGAServerException("The URLBuilder used for this project does not support design-specific file URLs as it does not implement " + WGASpecificFileURLBuilder.class.getName() + ": " + builder.getClass().getName());
