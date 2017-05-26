@@ -40,15 +40,7 @@
 		body_encode: 	option("encode")||"rtf"
 	}
 
-	_encoding = wgacore.getCharacterEncoding(); 
-	if (_encoding == null) { 
-		_encoding = Packages.java.lang.System.getProperty("file.encoding"); 
-	}
 </tml:script> 
-
-<tml:range var="SName"><%= request.getServerName() %></tml:range>
-<tml:range var="SPort"><%= request.getServerPort() %></tml:range>
-<tml:range var="SerPath"><tml:item name="Sname"/><tml:if condition="this.sport != '' && this.sport!='80' "><tml:then>:<tml:item name="SPort"/></tml:then></tml:if></tml:range>
 
 <rss version="2.0"  
 		xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
@@ -61,7 +53,7 @@
 	<title><tml:script expression="_config.title"/></title>
 	<tml:case var="_url" context="{_config.base_context||'name:home'}" iscontextvalid="true">
 		<tml:script>
-			ret="http://"+serpath+contenturl("html", null);
+			ret = WGA.urlBuilder(contenturl("html", null)).build(true);
 			return ret.split(";")[0];
 		</tml:script>
 	</tml:case>
@@ -79,7 +71,7 @@
 
 		<tml:foreach pagesize="10">
 			<tml:eval var="_url">
-				ret="http://"+serpath+contenturl("html", null);
+				ret = WGA.urlBuilder(contenturl("html", null)).build(true);
 				return ret.split(";")[0];
 			</tml:eval>
 			<item>
