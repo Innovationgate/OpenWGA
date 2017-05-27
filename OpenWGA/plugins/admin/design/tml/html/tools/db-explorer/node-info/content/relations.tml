@@ -45,7 +45,7 @@
 					<tml:if context="[relation:{_relation_name}]" iscontextvalid="true">
 						<tml:then>
 							<a href="javascript:DBM.switchToObject('tools.db-explorer', '<tml:meta type="db" name="dbkey"/>', 'db:<tml:meta type="db" name="dbkey"/>/docid:<tml:meta name="key"/>')"
-								title="<tml:metadata name="title" encode="javascript"/>"
+								title="<tml:metadata name="title" encode="html,javascript"/>"
 							>
 								<tml:metadata name="key"/>
 							</a>
@@ -72,7 +72,7 @@
 				<label><tml:script expression="_relation.name"/>:</label>
 				<div class="data">
 					<a href="javascript:DBM.switchToObject('tools.db-explorer', '<tml:meta type="db" name="dbkey"/>', 'db:<tml:meta type="db" name="dbkey"/>/docid:<tml:script expression="_relation.getParentContentKey()"/>')"
-						title="<tml:metadata name="title" context="[docid:{_relation.getParentContentKey()}]" encode="javascript"/>"
+						title="<tml:metadata name="title" context="[docid:{_relation.getParentContentKey()}]" encode="html,javascript"/>"
 					>
 						<tml:script expression="_relation.getParentContentKey()"/>						
 					</a>
