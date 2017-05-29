@@ -73,6 +73,8 @@ public class DatabaseResource extends EnvelopeReturningResource<RootResource> {
     private Database _database;
     private RestApplication.DatabaseInfo _dbInfo;
     
+    private Boolean _isAdminLoggedIn=false;
+    
     @XmlTransient
     public Database getDatabase() {
         return _database;
@@ -84,6 +86,8 @@ public class DatabaseResource extends EnvelopeReturningResource<RootResource> {
 
     public DatabaseResource(RootResource root, String dbKey) throws WGException {
         super(root, root.getURI().path(RootResource.REFLIST_DBS).path(dbKey));
+        
+        _isAdminLoggedIn = root.isAdminLoggedIn();
         
         _dbInfo = getRootResource().getApplication().getDatabaseInfo().get(dbKey); 
         if (_dbInfo == null) {
@@ -302,7 +306,10 @@ public class DatabaseResource extends EnvelopeReturningResource<RootResource> {
 
     @Override
     protected void addReferences(References refs) throws WGException {
-        
+
+    	if(!_isAdminLoggedIn)
+    		throw new WebApplicationException("admin login required for db references listing", 403);
+    	
         if (_database.db().isSessionOpen()) {
             
             if (_dbInfo.getEnabledRestAPIs().contains(CmsApiResource.RESOURCE_TYPE)) {

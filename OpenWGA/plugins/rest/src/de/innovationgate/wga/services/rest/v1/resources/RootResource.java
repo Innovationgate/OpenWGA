@@ -51,6 +51,7 @@ public class RootResource extends ExternalRefsResource<RootResource> {
     private HttpHeaders _headers;
     private MediaType _outputMediaType = null;
     private UriInfo _uriInfo;
+    private Boolean _isAdminLoggedIn=false;
 
     private RestApplication _application;
 
@@ -63,6 +64,7 @@ public class RootResource extends ExternalRefsResource<RootResource> {
     public RootResource(@Context UriInfo uriInfo, @Context Application application, @Context HttpServletRequest request, @Context HttpServletResponse response, @Context HttpHeaders headers, @Context ResourceContext resourceContext) {
         super(null, uriInfo.getBaseUriBuilder().path("v1"));
         _wga = WGA.get(request, response, ((RestApplication) application).getCore());
+        _isAdminLoggedIn = _wga.getCore().isAdminLoggedIn(request);
         _application = (RestApplication) application;
         _headers = headers;
         _uriInfo = uriInfo;
@@ -83,6 +85,10 @@ public class RootResource extends ExternalRefsResource<RootResource> {
     @Override
     protected void fillReferenceList(ReferenceCollection list) throws IllegalArgumentException, UriBuilderException, WGException {
         list.noPaging();
+        
+        if(!_isAdminLoggedIn)
+        	throw new WebApplicationException("admin login required for db listing", 403);
+        
         for (RestApplication.DatabaseInfo dbInfo : _application.getDatabaseInfo().values()) {
             try {
                 DatabaseResource dbResource = getDatabase(dbInfo.getDbKey());
@@ -92,6 +98,7 @@ public class RootResource extends ExternalRefsResource<RootResource> {
                 RestApplication.LOG.error("Exception retrieving database resource for dbkey '" + dbInfo.getDbKey() + "'", e);
             }
         }
+        
     }
 
     @Override
@@ -134,4 +141,8 @@ public class RootResource extends ExternalRefsResource<RootResource> {
         return _resourceContext;
     }
 
+    public Boolean isAdminLoggedIn(){
+    	return _isAdminLoggedIn;
+    }
+    
 }
