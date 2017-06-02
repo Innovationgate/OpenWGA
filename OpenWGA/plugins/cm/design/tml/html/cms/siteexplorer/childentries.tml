@@ -25,10 +25,9 @@
 <tml:script>
 	_dbkey=option("dbkey");
 	_structkey=request.getParameter("structkey");
-	_page = String(parseInt(request.getParameter("page")) || 1);
 	
 	var pagesize = parseInt(request.getParameter("pagesize"));
-	//log.info("pagesize="+ pagesize + "; _page=" + _page);
+	var startindex = parseInt(request.getParameter("startindex"));
 	
 	if(_dbkey==null)
 		_dbkey=request.getParameter("dbkey");
@@ -36,18 +35,14 @@
 		log.error("No dbkey specified");
 
 	var database=db(_dbkey)
-	var struct=database.getStructEntryByKey(request.getParameter("structkey"));
+	var struct=database.getStructEntryByKey(_structkey);
 	_indent = 16*(struct.getLevel()+1)-3;
 	_entries=WGA.createList();
 
-	var it=struct.getChildEntries().iterator();
-	if(pagesize){
-		// skip first n visible entries:
-		for(var i=0; i < (_page-1)*pagesize && it.hasNext(); ){
-			var struct = it.next()
-			if(AFW.structentry(struct).isVisible())
-				i++
-		}
+	var it=struct.getChildEntryIterator(50)	// default pagesize to retrieve enough structs
+	if(startindex){
+		// skip 
+		it.skip(startindex);
 	}
 
 	for(var i=0; (pagesize ? (i<pagesize) : true) && it.hasNext();){
@@ -57,6 +52,7 @@
 			i++
 		}
 	}
+	_last_index=it.getCurrentOffset();
 	
 	_hasNext=false;
 	while(it.hasNext()){
@@ -77,7 +73,7 @@
 			// => hide struct if it HAS some content but nothing is readable.
 			var allContent = document.getAllContent(false);
 			if(allContent.isEmpty())
-				allContent = document.getAllContent(true);	// check acrive docs
+				allContent = document.getAllContent(true);	// check archive docs
 			_hideStruct = allContent.isEmpty() && document.hasContent(null, null);
 
 			if(!hideStruct){
@@ -105,7 +101,7 @@
 
 <tml:case istrue="_hasNext">	
 	<div class="struct" id="struct:<tml:item name="_structkey"/>-more"> 
-		<div style="text-align:left;padding-left:<tml:item name="_indent"/>px" onclick="BI.se.updateMore('<tml:item name="_structkey"/>', '<tml:script format="0" expression="Number(_page)+1"/>')"
+		<div style="text-align:left;padding-left:<tml:item name="_indent"/>px" onclick="BI.se.updateMore('<tml:item name="_structkey"/>', '<tml:item format="0" name="_last_index"/>')"
 				ext:width="150" 
 				ext:qtip="weitere Einträge laden ...">
 			<table cellpadding="0" cellspacing="0" border="0">
@@ -129,7 +125,7 @@
 			if(xy[1]+h>doc_h)
 				xy[1]-=h;
 			BI.menu.morecontext.structkey = "<tml:item name="_structkey"/>";
-			BI.menu.morecontext.page = <tml:script format="0" expression="Number(_page)+1"/>;
+			BI.menu.morecontext.lastindex = <tml:item format="0" name="_last_index"/>;
 			BI.menu.morecontext.showAt(xy);
 			Ext.lib.Event.stopEvent(ev);
 		}, el);

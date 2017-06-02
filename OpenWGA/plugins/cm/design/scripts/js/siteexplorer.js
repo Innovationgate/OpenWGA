@@ -387,7 +387,7 @@ BI.se.updateStruct=function(structkey, callback){
 	});
 }
 
-BI.se.updateMore=function(structkey, page){
+BI.se.updateMore=function(structkey, lastindex){
 	var el = Ext.get("struct:"+structkey+"-more");
 	el.dom.className="";
 	el.dom.id="";
@@ -395,7 +395,7 @@ BI.se.updateMore=function(structkey, page){
 	um.showLoadIndicator=true;
 	um.loadScripts=true;
 	um.update(BI.wgapath+"/html/cms:siteexplorer:childentries.int.html", 
-		{dbkey:BI.dbkey, structkey:structkey, page:page, features:BI.se.features,pagesize:BI.se.pageSize}, 
+		{dbkey:BI.dbkey, structkey:structkey, startindex:lastindex, features:BI.se.features,pagesize:BI.se.pageSize}, 
 		function(){
 			if(BI.se.currentEntry==el)
 				BI.se.selectEntryByKey(BI.structkey);

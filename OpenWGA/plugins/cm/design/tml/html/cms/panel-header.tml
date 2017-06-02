@@ -600,7 +600,7 @@
         	{	text: "{%label:more.next-page%} ...",
         		icon: "<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="application_side_list.png"/>",
         		handler: function(m, ev){
-        			BI.se.updateMore(BI.menu.morecontext.structkey, BI.menu.morecontext.page);
+        			BI.se.updateMore(BI.menu.morecontext.structkey, BI.menu.morecontext.lastindex);
         		}
         	},
         	{	text: "{%label:more.all-pages%} ...",
@@ -617,7 +617,6 @@
 	BI.menu.morecontext.on("beforehide", function(){
 		Ext.get("web-content-wrapper").unmask();
 	});
-
 
 
 	WGA.event.register(
