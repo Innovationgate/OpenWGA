@@ -351,8 +351,8 @@
 							</tml:else>
 						</tml:if>
 					</td>
-					<td>
-						<span>
+					<td valign="top">
+						<div>
 							<tml:input name="selectAccessContent" 
 								type="select"
 								options="{label('properties.struct-editors-options')}"
@@ -361,7 +361,7 @@
 								changeaction="$refresh"
 								ajax="true"
 							/>
-						</span>
+						</div>
 						<tml:case condition="tmlform.selectAccessContent=='custom'">
 							<tml:script>
 								if(!tmlform.struct_childeditors){
@@ -398,8 +398,8 @@
 							</tml:else>
 						</tml:if>
 					</td>
-					<td>
-						<span>
+					<td valign="top">
+						<div>
 							<tml:input name="selectAccessStruct" 
 								type="select"
 								options="{label('properties.struct-editors-options')}"
@@ -408,7 +408,7 @@
 								changeaction="$refresh"
 								ajax="true"
 							/>
-						</span>
+						</div>
 						<tml:case condition="tmlform.selectAccessStruct=='custom'">
 							<tml:script>
 								if(!tmlform.struct_pageeditors){
@@ -439,7 +439,7 @@
 								</tml:else>	
 							</tml:if>					
 						</td>
-						<td>
+						<td valign="top">
 							<div>
 								<tml:input name="selectReaders" 
 									type="select"
