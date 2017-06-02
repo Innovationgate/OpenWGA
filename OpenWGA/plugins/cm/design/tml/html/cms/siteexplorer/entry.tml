@@ -31,6 +31,18 @@
 	_mayEditChildren = _Struct.mayCreatePage();
 	
 	_features=request.getParameter("features");
+	
+	_hasChildren = false;
+
+	var it=document.getChildEntries().iterator();
+	while(it.hasNext()){
+		var struct = it.next()
+		if(AFW.structentry(struct).isVisible()){
+			_hasChildren=true;
+			break;		
+		}
+	}
+	
 </tml:script>
 
 
@@ -38,7 +50,7 @@
 
 	<table cellpadding="0" cellspacing="0" border="0">
 		<tr>
-			<td width="1%" class="twisty<tml:case condition="document.hasChildren()"> collapsed</tml:case>">
+			<td width="1%" class="twisty<tml:case istrue="_hasChildren"> collapsed</tml:case>">
 				&nbsp;
 			</td>
 			<tml:script>
@@ -224,7 +236,7 @@
 		allowedPositions:"<tml:script divider="|">return document.getContentType().getAllowedPositions()</tml:script>",
 		mayEditChildren:<tml:item name="_mayEditChildren"/>,
 		mayEditEntryAndContent:<tml:item name="_mayEditEntryAndContent"/>,
-		haschildren:<tml:script>return document.hasChildren()</tml:script>,
+		haschildren:<tml:script expression="_hasChildren"/>,
 		isRoot:<tml:script>return document.isRoot()</tml:script>,
 		isexpanded:false,
 		isloaded:false,

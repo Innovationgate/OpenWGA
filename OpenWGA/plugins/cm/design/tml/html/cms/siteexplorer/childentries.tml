@@ -38,22 +38,35 @@
 	var database=db(_dbkey)
 	var struct=database.getStructEntryByKey(request.getParameter("structkey"));
 	_indent = 16*(struct.getLevel()+1)-3;
-	_entries=createlist();
+	_entries=WGA.createList();
 
-	var it;
+	var it=struct.getChildEntries().iterator();
 	if(pagesize){
-		it=struct.getChildEntryIterator(pagesize+1)
-		it.skip((_page-1)*pagesize);
+		// skip first n visible entries:
+		for(var i=0; i < (_page-1)*pagesize && it.hasNext(); ){
+			var struct = it.next()
+			if(AFW.structentry(struct).isVisible())
+				i++
+		}
 	}
-	else it=struct.getChildEntries().iterator()
 
-	for(var i=0; (pagesize ? (i<pagesize) : true) && it.hasNext(); i++){
+	for(var i=0; (pagesize ? (i<pagesize) : true) && it.hasNext();){
 		var struct = it.next()
-		if(struct.mayReadContent() && (struct.mayEditPage() || struct.hasReleasedContent(null)))
+		if(AFW.structentry(struct).isVisible()){
 			_entries.add(struct);
+			i++
+		}
 	}
-	_hasNext = it.hasNext();
-
+	
+	_hasNext=false;
+	while(it.hasNext()){
+		var struct = it.next()
+		if(AFW.structentry(struct).isVisible()){
+			_hasNext=true;
+			break;		
+		}
+	}
+	
 </tml:script>
 
 <tml:foreach item="_entries" currentvalue="_entry">

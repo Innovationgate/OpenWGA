@@ -454,3 +454,12 @@ this.copyFromRemote=function(remotedb, remotekey){
 		}	
 	}
 }
+
+this.isVisible = function(){
+	if(struct.mayReadContent() && (struct.mayEditPage() || struct.hasReleasedContent(null))){
+		// also check content readers
+		var allContent = struct.getAllContent(true);
+		return !(allContent.isEmpty() && child.hasContent(null, null))
+	}
+	return false;
+}
