@@ -56,12 +56,8 @@
 	_username = "anonymous";
 	_dbkey = CMM.setting("dbkey")||db().getDbReference();
 	var dbcontext = context("db:"+_dbkey, false)
-	if(!dbcontext)
-		log.info("CMM-Login-Module: unable to find database " + _dbkey);
-	else{
+	if(dbcontext)
 		_username = dbcontext.meta("db", "username");
-	}
-	
 </tml:script>
 
 <tml:if condition="_username=='anonymous'">
