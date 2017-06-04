@@ -453,5 +453,6 @@ $L.linktype={
 	intfile: "Datei aus diesem Dokument",
 	extfile: "Datei aus beliebigem Dokument",
 	file: "Datei aus Dateicontainer",
-	primaryfile: "Primäre Datei aus Dokument" 
+	primaryfile: "Primäre Datei aus Dokument",
+	exp: "Context-Ausdruck"
 }

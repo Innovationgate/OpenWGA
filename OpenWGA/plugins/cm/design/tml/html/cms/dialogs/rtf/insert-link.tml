@@ -56,6 +56,10 @@
 			tmlform.linkurl = tmlform.wgakey = tmlform.linkurl_intname;
 			tmlform.linktext = tmlform.linkurl;
 			break;			
+		case "exp":
+			tmlform.linkurl = tmlform.wgakey = tmlform.linkurl_exp;
+			tmlform.linktext = tmlform.linkurl;
+			break;			
 		
 		case "clipboard":
 			tmlform.linksource = "extfile";
@@ -191,6 +195,25 @@
 							     	message="{label('dialog.link.url-required')}"
 							     	type="text"
 								>size="45"</tml:input>
+							</td>
+						</tr>
+					</tml:elseif>
+					<tml:elseif condition="tmlform.linksource=='exp'">
+						<tr>
+							<td width="100">{%label:dialog.link.expression%}:</td>
+							<td>
+								<tml:script>
+									_default = "";
+									if(option("linktype")=="exp" && option("wgakey"))
+										_default = option("wgakey");
+								</tml:script>
+								<tml:input name="linkurl_exp" id="linkurl"
+									default="{_default}"
+							    	validation="$E_VALUE!=''"
+							     	message="{label('dialog.link.url-required')}"
+							     	type="text"
+							     	cssclass="textinput"
+								/>
 							</td>
 						</tr>
 					</tml:elseif>

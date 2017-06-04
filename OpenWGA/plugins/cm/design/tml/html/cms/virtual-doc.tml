@@ -104,7 +104,7 @@
 				<a href="<tml:script>return contenturl("html", null)</tml:script>">
 					<tml:if context="vlinktarget" iscontextvalid="true">
 						<tml:then><tml:metadata name="title"/></tml:then>
-						<tml:else><tml:script expression="contenturl('html', null)"/></tml:else>
+						<tml:else><tml:metadata name="virtuallink"/></tml:else>
 					</tml:if>
 				</a>
 			</p>

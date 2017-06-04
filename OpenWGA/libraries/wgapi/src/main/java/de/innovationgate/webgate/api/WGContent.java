@@ -239,6 +239,10 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     public static final String VIRTUALLINKTYPE_UNIQUENAME = "intname";
     
     /**
+     * Virtual link to a document with context expression
+     */
+    public static final String VIRTUALLINKTYPE_CONTEXREXPRESSION = "exp";
+    /**
      * Virtual link to a file on another content document
      */
     public static final String VIRTUALLINKTYPE_EXTERNAL_FILE = "extfile";

@@ -447,5 +447,6 @@ $L.linktype={
 	intfile: "Attachment from this document",
 	extfile: "Attachment from any document",
 	file: "Attachment from file container",
-	primaryfile: "Primary Attachment from Document"
+	primaryfile: "Primary Attachment from Document",
+	exp: "Context-Expression"
 }
