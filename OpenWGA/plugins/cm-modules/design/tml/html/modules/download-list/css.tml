@@ -2,13 +2,24 @@
 
 	".download": {
 	
-		padding: "5px 0 5px 25px",
+		padding: "5px",
 	
 		"&.caption": {
 			border_bottom: "solid silver 1px"
 		},
-				
+		
+		".image": {
+			float: "left",
+			width: 50,
+			margin_right: 10,
+			box_shadow: "0 0 3px silver", 
+			img: {
+				max_width: "100%"
+			}
+		},
+		
 		".filename": {
+			//margin_left: 60,
 			"float": "left"
 		},
 		
@@ -27,9 +38,9 @@
 	
 			"&:hover":{
 				background_color: "#efefef"
-			},
+			}
 
-			background: "url(<tml:url type="file" db="@afw" doc="icons" file="page_white.png"/>) no-repeat left center",
+			<tml:comment>background: "url(<tml:url type="file" db="@afw" doc="icons" file="page_white.png"/>) no-repeat left center",
 			"&.doc": {
 				background_image: "url(<tml:url type="file" db="@afw" doc="icons" file="page_white_word.png"/>)"
 			},
@@ -53,7 +64,7 @@
 			},
 			"&.no-file": {
 				background_image: "url(<tml:url type="file" db="@afw" doc="icons" file="error.png"/>)"
-			}
+			}</tml:comment>
 
 		}
 

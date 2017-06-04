@@ -2,4 +2,4 @@
 	<div class="filename"><tml:label key="download-list.filename"/></div>
 	<div class="filesize"><tml:label key="download-list.filesize"/></div>
 </div>
-<tml:include ref="system:include-child-modules"/>
+<tml:include ref="system:include-child-modules" o_section-margin="0"/>

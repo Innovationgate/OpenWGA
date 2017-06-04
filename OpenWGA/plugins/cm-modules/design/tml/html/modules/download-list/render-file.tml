@@ -20,6 +20,13 @@
 			href="<tml:item name="_url"/>?forcedownload=true"
 			title="Download <tml:item name="_filename"/> ..."
 		>
+			<div class="image">
+				<tml:comment><tml:image file="{_filename}" derivate="usage=poster,width~100"/></tml:comment>
+				<tml:script expression="AFW.content().attachment(_filename).getThumbnailURL({width:100})" var="_url"/>
+				<tml:case condition="_url">
+					<img src="<tml:item name="_url"/>">
+				</tml:case>
+			</div>
 			<div class="filename">
 				<tml:script>
 					switch(CMM.setting('title_source')){
@@ -28,6 +35,18 @@
 							break;
 						case "filename":
 							return _filename;
+							break;
+						case "file_info":
+							var filemd = content().getFileMetaData(_filename)
+							var type = AFW.content().attachment(_filename).getType().name;
+							var pages = filemd.getCustomFieldValue("pageCount");
+							return "<b>"+filemd.name + "</b>"
+								+ "<br>"
+								+ (filemd.title ? filemd.title + "<br>" : "") 
+								+ (type=="other" ? filemd.mimeType : label("filetype."+type))
+								+ (type=="images" ? ", " + filemd.displayWidth + " &times; " + filemd.displayHeight + " Pixel" : "")
+								+ (pages ? ", " + pages + " Seiten" : "")
+								+ (filemd.copyright ? ", &copy;" + filemd.copyright : "")
 							break;
 						default:
 							return option("title")
