@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
+import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGContentType;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGException;
@@ -281,6 +282,22 @@ public class App extends Database {
         
     }
     
-    
+    /**
+     * TMLContext handling for App
+     * @throws WGException
+     */
+    public Context context() throws WGException{
+    	return createTMLContext();
+    }
+    public Context context(WGContent c) throws WGException{
+    	return createTMLContext().context(c);
+    }
+    public Context context(String expression) throws WGException{
+    	return createTMLContext().context(expression);
+    }
+    public Context context(String expression, boolean returnContextOnError) throws WGException{
+    	return createTMLContext().context(expression, returnContextOnError);
+    }
+
 
 }
