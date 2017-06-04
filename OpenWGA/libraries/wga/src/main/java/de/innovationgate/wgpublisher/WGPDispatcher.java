@@ -3157,7 +3157,9 @@ public class WGPDispatcher extends HttpServlet {
         
         // Virtual link is unresolveable (maybe because read-protected)
         if (target == null) {
-            throw new WGUnresolveableVirtualLinkException("Target document does not exist or is not readable");
+            //throw new WGUnresolveableVirtualLinkException("Target document does not exist or is not readable");
+        	wga.getLog().warn("Virtual link in " + content.getContentKey().toString() + ": Target " + content.getVirtualLink() + " does not exist or is not readable");
+        	return null;
         }
         
         // If the target is again a virtual document descend into its resolving

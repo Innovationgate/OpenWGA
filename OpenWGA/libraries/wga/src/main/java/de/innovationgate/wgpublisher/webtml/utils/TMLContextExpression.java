@@ -475,7 +475,7 @@ public class TMLContextExpression {
                 return errorReturnContext;
             }
             VirtualLinkTarget vlinkTarget = context.getwgacore().resolveVirtualLink(WGA.get(context), content);
-            if (vlinkTarget.getType() == VirtualLinkTarget.Type.CONTENT) {
+            if (vlinkTarget!=null && vlinkTarget.getType() == VirtualLinkTarget.Type.CONTENT) {
                 TMLContext vlinkContext = context.context("docid:" + vlinkTarget.getContainerKey(), false);
                 if (vlinkContext != null) {
                     return vlinkContext;
