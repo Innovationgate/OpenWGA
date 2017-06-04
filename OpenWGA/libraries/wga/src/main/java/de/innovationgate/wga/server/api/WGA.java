@@ -2490,7 +2490,7 @@ public class WGA {
             return createTMLContext(db, chooser, design);
         }
         catch (WGAPIException e) {
-            throw new WGAServerException("Exception creating TMLContext");
+            throw new WGAServerException("Exception creating TMLContext", e);
         }
         
     }
