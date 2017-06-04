@@ -21,7 +21,6 @@
 			title="Download <tml:item name="_filename"/> ..."
 		>
 			<div class="image">
-				<tml:comment><tml:image file="{_filename}" derivate="usage=poster,width~100"/></tml:comment>
 				<tml:script expression="AFW.content().attachment(_filename).getThumbnailURL({width:100})" var="_url"/>
 				<tml:case condition="_url">
 					<img src="<tml:item name="_url"/>">
@@ -45,7 +44,7 @@
 								+ (filemd.title ? filemd.title + "<br>" : "") 
 								+ (type=="other" ? filemd.mimeType : label("filetype."+type))
 								+ (type=="images" ? ", " + filemd.displayWidth + " &times; " + filemd.displayHeight + " Pixel" : "")
-								+ (pages ? ", " + pages + " Seiten" : "")
+								+ (pages ? ", " + label(pages==1 ? "attachment-one-page" : "attachment.pages", [WGA.format(pages, "0")]) : "")
 								+ (filemd.copyright ? ", &copy;" + filemd.copyright : "")
 							break;
 						default:
