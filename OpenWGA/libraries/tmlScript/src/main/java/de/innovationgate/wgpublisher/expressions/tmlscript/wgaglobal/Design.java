@@ -171,7 +171,7 @@ public class Design extends ScriptableObject implements Wrapper {
                 String dbKey = currentAction.getModuleDatabase();
                 WGDatabase designDB = tmlContext.db(dbKey);
                 if (designDB == null || !designDB.isSessionOpen()) {
-                    throw new IllegalArgumentException("Cannot determine design of object");
+                    throw new IllegalArgumentException("Cannot determine design of " + dbKey);
                 }
                 _apiDesign = WGA.get(tmlContext).design(tmlContext.getDesignContext().createContextDelegate((WGDatabase) designDB, currentAction.getModuleName()));
              
