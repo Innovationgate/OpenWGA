@@ -50,6 +50,7 @@ import de.innovationgate.wgpublisher.modules.formsources.UserProfileFormSourceMo
 import de.innovationgate.wgpublisher.modules.imagescaler.ImgScalrFactoryModuleDefinition;
 import de.innovationgate.wgpublisher.modules.imagescaler.ImgScalrScalerModuleDefinition;
 import de.innovationgate.wgpublisher.modules.joboptions.JobOptionsModuleDefinition;
+import de.innovationgate.wgpublisher.modules.lang.BrowserLocaleLanguageBehaviourModuleDefinition;
 import de.innovationgate.wgpublisher.modules.lang.DynamicLanguageBehaviourModuleDefinition;
 import de.innovationgate.wgpublisher.modules.lang.OnlyDefaultLanguageBehaviourModuleDefinition;
 import de.innovationgate.wgpublisher.modules.lang.StaticLanguageBehaviourModuleDefinition;
@@ -140,6 +141,7 @@ public class WGARegistrar implements ModuleRegistrar {
         registry.addModuleDefinition(new StaticLanguageBehaviourModuleDefinition());
         registry.addModuleDefinition(new DynamicLanguageBehaviourModuleDefinition());
         registry.addModuleDefinition(new OnlyDefaultLanguageBehaviourModuleDefinition());
+        registry.addModuleDefinition(new BrowserLocaleLanguageBehaviourModuleDefinition());
         
         // WebTML form sources
         registry.addModuleDefinition(new NoneFormSourceModuleDefinition());
