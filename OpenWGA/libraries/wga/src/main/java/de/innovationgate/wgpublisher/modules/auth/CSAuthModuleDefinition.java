@@ -55,7 +55,7 @@ import de.innovationgate.wgpublisher.modules.TMLScriptCodeOptionType;
 
 public class CSAuthModuleDefinition implements ModuleDefinition, RegistryAwareModuleDefinition, AvailabilityTestableModuleDefinition {
     
-    private LocalisationBundleLoader _bundleLoader = new LocalisationBundleLoader(WGUtils.getPackagePath(this.getClass()) + "/cs", getClass().getClassLoader());
+    private LocalisationBundleLoader _bundleLoader = new LocalisationBundleLoader(WGUtils.getPackagePath(CSAuthModuleDefinition.class) + "/cs", getClass().getClassLoader());
     private ModuleRegistry _registry;
 
     public String getDescription(Locale locale) {
