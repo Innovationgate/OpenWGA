@@ -122,7 +122,8 @@
 							{%label:virtual-document%}<br>
 							<a href="<tml:url/>" target="<tml:script expression="LINKTARGET||'wga-contentmanager-iframe'"/>">
 								<tml:script>
-									_title = virtuallinktitle || VIRTUALLINK
+									var doc = context("vlinktarget", false);
+									_title = (doc && doc.TITLE) || virtuallinktitle || VIRTUALLINK
 								</tml:script>
 								<tml:script expression="_title.length>25 ? _title.substr(0, 22)+' ...' : _title"/> 
 							</a>

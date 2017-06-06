@@ -183,7 +183,10 @@
 														<tml:label key="[linktype.{meta('virtuallinktype')}]"/>
 														- <tml:meta name="virtuallink"/>
 														<tml:case condition="virtuallinktitle!=null && virtuallinktitle!=''">
-															(<b><tml:item name="virtuallinktitle"/></b>)<br>
+															(<b><tml:script>
+																var doc = context("vlinktarget", false);
+																return (doc && doc.TITLE) || virtuallinktitle || VIRTUALLINK
+															</tml:script></b>)<br>
 														</tml:case>
 													</tml:case>
 												</span>
