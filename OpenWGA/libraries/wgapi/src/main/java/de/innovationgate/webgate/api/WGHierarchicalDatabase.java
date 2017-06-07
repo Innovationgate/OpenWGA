@@ -561,23 +561,23 @@ public class WGHierarchicalDatabase {
              }
              
              content.getDatabase().getSessionContext().setAttribute(SESSIONPARAM_HDBPARAMETER, parameter);
-             try {
+        	 try{
                  if (content.getStatus() != null && content.getStatus().equals(WGContent.STATUS_DRAFT)) {
                 	 content.publish("");
                  } else {
                 	 content.save();
                  }
-                 
-                 if (parent != null && _postUpdateEventBehaviour == PostUpdateEventBehaviour.RUN_AFTER_SAVE) {
-                     fireEvent(parent, event);
-                 }
-                 
-                 trans.commit();
-                 return content;
-             }
+        	 }
              finally {
                  content.getDatabase().getSessionContext().removeAttribute(SESSIONPARAM_HDBPARAMETER);
              }
+             
+             if (parent != null && _postUpdateEventBehaviour == PostUpdateEventBehaviour.RUN_AFTER_SAVE) {
+                 fireEvent(parent, event);
+             }
+             
+             trans.commit();
+             return content;
              
          }
          finally {
