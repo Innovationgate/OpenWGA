@@ -516,12 +516,13 @@ this.getAppKeysBasedOnPlugin=function(plugin_name){
  */
 this.csvWriter = function(config){
 
-	var line = "";
+	var line = null;
 	var div = config.divider || ";";
 
 	function addValue(value){
-		if(line)
-			line += div
+		if(line==null)
+			line="";
+		else line += div
 		if(value instanceof Packages.java.util.Date)
 			line += WGA.format(value, config.dateFormat || "yyyy-MM-dd HH:mm:ss")
 		else if(typeof(value)=="string")
@@ -532,7 +533,7 @@ this.csvWriter = function(config){
 	function flush(out){
 		out.println(line);
 		out.flush();
-		line = "";		
+		line = null;		
 	};
 
 	return {
@@ -563,7 +564,7 @@ this.csvWriter = function(config){
 			// headline:
 			if(config.header!==false){
 				var items = itemlist.iterator();
-				var line = "";
+				var line = null;
 				while(items.hasNext()){
 					var item = items.next();
 					var label = (typeof(item)=="string" ? item : item.label)
