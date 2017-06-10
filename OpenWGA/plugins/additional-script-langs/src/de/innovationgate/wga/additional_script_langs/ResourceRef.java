@@ -15,6 +15,7 @@ import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGFileContainer;
 import de.innovationgate.webgate.api.WGScriptModule;
 import de.innovationgate.wga.server.api.Design;
+import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 
 public class ResourceRef {
@@ -42,7 +43,11 @@ public class ResourceRef {
 		_path = StringUtils.join(path_parts, ":");
 				
 	}
-	
+
+	public ResourceRef(String path) throws WGException{
+		this(new ResourceRef(WGA.get().design(), TYPE_FILE), path);
+	}
+
 	public ResourceRef(ResourceRef parentref, String path) throws WGException {
 		String[] parts = path.split("\\s+", 3);
 		for(String part: parts){

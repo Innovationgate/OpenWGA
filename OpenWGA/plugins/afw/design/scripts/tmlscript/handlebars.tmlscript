@@ -1,26 +1,112 @@
 var Handlebars;
+var self;
 
 this.init = function(){
+	self=this;
 	if(!require)
 		return;
 
 	try{
 		Handlebars = require("handlebars-v2.0.0")
-		Handlebars.registerHelper("foreach", function(obj, options){
-			var ret = ""
-			for(var doc in Iterator(obj)){
-				ret += options.fn(doc)
+		Handlebars.registerHelper({
+		
+			foreach: function(obj, options){
+				var ret = ""
+				for(var doc in Iterator(obj)){
+					ret += options.fn(doc)
+				}
+				return ret;
+			},
+			
+			context: function(obj, options){
+				var doc = context(obj, false)
+				return options.fn(doc)
+			},
+
+			encode: function(encoder, options){
+				var txt = options.fn(this)
+				return WGA.encode(encoder, txt)
+			},
+		
+			nav: function(obj, options){
+				var resultset = WGA.nav(this)[obj](options.hash)
+				var ret = ""
+				for(let doc in Iterator(resultset)){
+					ret += options.fn(doc)
+				}
+				return ret;
+			},
+		
+			url: function(ctx, options){
+				var url;
+				if(ctx instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)
+					url = WGA.urlBuilder(ctx)
+				else if(this instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)
+					url = WGA.urlBuilder(this)
+				else url = WGA.urlBuilder(this.url)
+				
+				if(!options)
+					options=ctx;
+					
+				if(options && options.hash){
+					for(let [key, value] in options.hash){
+						url.setParameter(key, value);
+					}
+				}
+				return url.build(true);
+			},
+			
+			files: function(filename, options){
+			
+				if(!(this instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)){
+					return "helper 'files' called outside TMLContext"
+				}
+			
+				var ret = ""
+				var filenames = WGA.createList();
+				if(typeof(filename)=="string")
+					filenames.add(filename);
+				else {
+					filenames.addAll(this.content().getFileNames())
+					options = filename;
+				}
+				
+				for(var filename in Iterator(filenames)){
+					var file_md = this.content().getFileMetaData(filename);
+					ret += options.fn({
+						name: filename,
+						size: this.content().getFileSize(filename),
+						url: WGA.urlBuilder(this.fileurl(filename)).build(true),
+						meta: file_md
+					})
+				}
+				return ret;
+			},
+			
+			format: function(obj, format){
+				return WGA.format(obj, format);
+			},
+			
+			include: function(ref, options){
+				if(!options)
+					options=ref;
+				if(options && options.hash && options.hash.ref)
+					ref=options.hash.ref
+				var ret = self.resourceTemplate(ref, this)
+				return new Handlebars.SafeString(ret);
 			}
-			return ret;
+		
 		})
-		Handlebars.registerHelper("url", function(obj, options){
-			if(obj instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)
-				return WGA.urlBuilder(obj).build(true)
-		})
+		
 	}
 	catch(e){
 		logException(e);
 	}
+}
+
+this.registerHelper = function(cmd, f){
+	console.log("register handlebars helper", cmd);
+	Handlebars.registerHelper(cmd, f)
 }
 
 this.stringTemplate = function(input, data){
@@ -35,7 +121,10 @@ this.fileTemplate = function(container, file, data){
 	if(!Handlebars)
 		throw "Handlebars not available";
 	
-	var c = db().getFileContainer(container)
+	var c = container; 
+	if(typeof(container)=="string"){
+		c = db().getFileContainer(container)
+	}
 	if(!c)
 		throw "file container " + container + " not found."
 	var f = c.getFileData(file)
@@ -50,4 +139,17 @@ this.fileTemplate = function(container, file, data){
 
 	var template = Handlebars.compile(filetext)
 	return template(data);
+}
+
+this.resourceTemplate = function(resource, data){
+
+	var ResourceRef = Packages.de.innovationgate.wga.additional_script_langs.ResourceRef;
+	var ref = new ResourceRef(resource);
+
+	if(ref.getDesignDocument()==null)
+		throw "Design container not found: " + ref.toString()
+
+	var template = Handlebars.compile(ref.getCode())
+	return template(data);
+
 }
