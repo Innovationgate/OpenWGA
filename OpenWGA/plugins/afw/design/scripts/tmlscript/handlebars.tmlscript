@@ -105,7 +105,6 @@ this.init = function(){
 }
 
 this.registerHelper = function(cmd, f){
-	console.log("register handlebars helper", cmd);
 	Handlebars.registerHelper(cmd, f)
 }
 
@@ -113,7 +112,12 @@ this.stringTemplate = function(input, data){
 	if(!Handlebars)
 		throw "Handlebars not available";
 	var template = Handlebars.compile(input)
-	return template(data);
+	try{
+		return template(data);	
+	}
+	catch(e){
+		log.error("Error processing Handlebars template:\n" + e.message);
+	}
 }
 
 this.fileTemplate = function(container, file, data){
@@ -138,7 +142,12 @@ this.fileTemplate = function(container, file, data){
 	filereader.close();
 
 	var template = Handlebars.compile(filetext)
-	return template(data);
+	try{
+		return template(data);
+	}
+	catch(e){
+		log.error("Error processing Handlebars template '" + file + "':\n" + e.message);
+	}
 }
 
 this.resourceTemplate = function(resource, data){
@@ -150,6 +159,11 @@ this.resourceTemplate = function(resource, data){
 		throw "Design container not found: " + ref.toString()
 
 	var template = Handlebars.compile(ref.getCode())
-	return template(data);
-
+	try{
+		return template(data);
+	}
+	catch(e){
+		log.error("Error processing Handlebars template " + ref + ":\n" + e.message);
+	}
+	
 }
