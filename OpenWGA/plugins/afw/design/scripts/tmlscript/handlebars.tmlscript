@@ -18,9 +18,19 @@ this.init = function(){
 				return ret;
 			},
 			
-			context: function(obj, options){
-				var doc = context(obj, false)
-				return options.fn(doc)
+			context: function(ctx, options){
+				if(typeof(ctx)=="string" || (ctx instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)){
+					var doc = context(ctx, false)
+					if(!doc){
+						log.error("#context: context '" + ctx + "' is invalid")
+						return;
+					}
+					else return options.fn(doc)
+				}
+				else{
+					log.error("#context: context expression can't be interpreted: " + ctx)
+					return;
+				}
 			},
 
 			encode: function(encoder, options){
