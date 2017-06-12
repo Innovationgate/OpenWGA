@@ -1344,9 +1344,14 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
         updateContent(params);
         
     }
+    
+    /*
+     * This method can never be called bc. updateContent(WGContent content, HDBModelProcess process) overwrites this.
+     * We need a redesign better usable from TMLScript some day.
     public void updateContent(WGContent content, Object param) throws WGAPIException, HDBModelException {
     	updateContent(content, null, param);
     }
+    */
     public void updateContent(Context ctx, Object param) throws WGException {
     	updateContent(ctx.content(), null, param);
     }
