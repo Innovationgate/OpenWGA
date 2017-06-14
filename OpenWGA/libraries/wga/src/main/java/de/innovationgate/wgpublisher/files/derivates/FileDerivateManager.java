@@ -588,7 +588,7 @@ public class FileDerivateManager {
                         continue;
                     }
                     
-                    // Always store revision if actual documetns were processed
+                    // Always store revision if actual documents were processed
                     currentRun.setSomethingDone(true);
                     
                     if (docKey.getDocType() != WGDocument.TYPE_CONTENT) {
@@ -596,8 +596,7 @@ public class FileDerivateManager {
                     }
                     
                     WGContent content = (WGContent) db.getDocumentByKey(update.getDocumentKey());
-                    if (content != null) {
-                        
+                    if (content != null) {                        
                         performDerivateUpdate(content, currentRun, selector);
                     }
                 }
