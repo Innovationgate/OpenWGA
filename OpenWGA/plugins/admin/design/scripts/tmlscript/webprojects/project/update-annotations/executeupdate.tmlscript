@@ -1,9 +1,11 @@
-var dbkey = tmlparam1;	//_config_bean.key
+var dbkey = tmlparam1;
+
 var error="false";
 var options = createLookupTable();
 
 try {
 	options.put("dbkey", dbkey);
+	options.put("includeArchived", tmlform.includeArchived);
 	_job_name = WGA.Jobs.runTask(Packages.de.innovationgate.wgpublisher.files.UpdateAnnotationsTask, options);
 }
 catch (e) {

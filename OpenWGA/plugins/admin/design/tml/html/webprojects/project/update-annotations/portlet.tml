@@ -23,18 +23,18 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-
-
 <div style="margin-bottom: 10px;">
 	This will iterate through all contents of this database and update the annotations on each attached file with the currently available file annotators. This may take a long time.
 </div>
+<tml:form id="updateAnnotationsForm" source="none">
+	<tml:input name="includeArchived" type="boolean" labeled="true" options=" include archived documents|true" default="true"/>
+	<div id="updateAnnotationsButton" style="color:red; margin: 10px 0;">
+		<tml:button clickaction="::executeUpdate" ajax="norefresh" param1="{option('dbkey') || DBM.getConfigBean().key}" param2="{tmlform.includeArchived}">
+			Update file annotations
+		</tml:button>
+	</div>
+</tml:form>
 
-<div id="updateAnnotationsButton" style="color:red; margin-bottom: 10px;">
-	<tml:button clickaction="::executeUpdate" ajax="norefresh" param1="{option('dbkey') || DBM.getConfigBean().key}">
-		Update file annotations
-	</tml:button>
-	
-</div>
 
 <div id="cs-dump-info">
 	<div id="job-log" style="display:none; padding: 3px;margin-top:5px">
@@ -52,7 +52,7 @@
 			DBM.currentjoblog = DBM.joblog('job-log', ev.params.job_name);
 			DBM.currentjoblog.toggleView();
 		}
-		Ext.get('updateAnnotationsButton').hide();
+		Ext.get('updateAnnotationsForm').setDisplayed(false);
 	});
 
 </script>

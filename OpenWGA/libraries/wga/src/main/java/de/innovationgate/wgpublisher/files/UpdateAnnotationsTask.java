@@ -31,6 +31,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import de.innovationgate.utils.TemporaryFile;
+import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGContentIterator;
@@ -52,6 +53,7 @@ public class UpdateAnnotationsTask implements TaskImplementation, TitledTaskImpl
         try {
             WGA wga = WGA.get(jobContext);
             String dbkey = jobContext.getOption("dbkey");
+            boolean includeArchived = WGUtils.stringToBoolean(jobContext.getOption("includeArchived"));
             if (dbkey == null) {
                 throw new JobFailedException("No database key given");
             }
@@ -61,8 +63,10 @@ public class UpdateAnnotationsTask implements TaskImplementation, TitledTaskImpl
                 throw new JobFailedException("Unknown database of key '" + dbkey + "'");
             }
             
+            jobContext.getLog().info("Updating annotations of app " + app.getDbKey() + ", include archived contents: " + includeArchived);
+            
             int count=0;
-            Iterator<WGContent> allContent = app.db().getAllContent(true);
+            Iterator<WGContent> allContent = app.db().getAllContent(includeArchived);
             while (allContent.hasNext()) {
                 WGContent content = allContent.next();
                 try {
