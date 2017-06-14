@@ -238,6 +238,7 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
 
             // Let the factory create the pool
             _ds = BasicDataSourceFactory.createDataSource(dbcpProperties);
+            _ds.setLogExpiredConnections(false);
             
             // The BasicDataSource has lazy initialization
             // borrowing a connection will start the DataSource
