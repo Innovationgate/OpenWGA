@@ -45,6 +45,8 @@ import de.innovationgate.wgpublisher.WGACore;
 @CodeCompletion(methodMode=CodeCompletion.MODE_INCLUDE, beanMode=CodeCompletion.BEAN_MODE_ALL)
 public class JobContext {
 
+	private static final Integer CLEAR_CACHE_AFTER_UPDATES = 100;
+	
 	private JobExecutionContext _quartzContext = null;
 	private WGACore _wgaCore = null;
 	private Object result = null;
@@ -56,6 +58,8 @@ public class JobContext {
     private volatile boolean _cancelled = false;
     private volatile boolean _cancelable = false;
 	
+    private Map<WGDatabase,Long> _dbUpdates = new HashMap<WGDatabase,Long>();
+    
 	/**
 	 * Constructor.
 	 * @param quartzContext
@@ -251,5 +255,15 @@ public class JobContext {
         _cancelable = cancelable;
     }
 
+    public void dbUpdated(WGDatabase db) throws WGAPIException{
+    	Long updates = _dbUpdates.get(db);
+    	if(updates==null)
+    		updates=1L;	// first update
+    	if(updates % CLEAR_CACHE_AFTER_UPDATES == 0){
+    		db.getSessionContext().clearCache();
+    		_log.info(db.getDbReference() + ": cleared document cache after " + CLEAR_CACHE_AFTER_UPDATES + " updates. Total updates: " + updates);
+    	}
+    	_dbUpdates.put(db, ++updates);
+    }
 
 }
