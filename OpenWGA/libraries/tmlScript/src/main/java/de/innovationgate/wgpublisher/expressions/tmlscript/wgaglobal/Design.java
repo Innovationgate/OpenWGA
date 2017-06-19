@@ -356,6 +356,9 @@ public class Design extends ScriptableObject implements Wrapper {
         // Redirecting to standard object definition functionality.
         else {
             TMLAction objectDefinition = loadObjectDefinitionAction(design, WGAGlobal.fetchInitialContext(cx), (String) definition);
+            if(objectDefinition==null){
+            	throw(new WGException("Unable to load Script module '" + (String) definition + "'"));
+            }
             TMLScriptObjectParentScope scope = new TMLScriptLegacyObjectParentScope(context.getwgacore(), objectDefinition, context.getDesignDBKey(), context.designdb().getSessionContext().isMasterSession());
             return runtime.getObjectCreatorManager().getObjectCreator(WGA.get(context), (RhinoContext) cx, objectDefinition, scope).createManagedObject((RhinoContext) cx, scope, rootScope.getWgaGlobal().getWga(), null, null, parsedArgs.getOverflowArgs().toArray());
         }
