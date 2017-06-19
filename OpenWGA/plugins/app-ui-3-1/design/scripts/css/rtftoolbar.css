@@ -1,0 +1,125 @@
+/*******************************************************************************
+  *Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+  *
+  *This file is part of the OpenWGA server platform.
+  *
+  *OpenWGA is free software: you can redistribute it and/or modify
+  *it under the terms of the GNU General Public License as published by
+  *the Free Software Foundation, either version 3 of the License, or
+  *(at your option) any later version.
+  *
+  *In addition, a special exception is granted by the copyright holders
+  *of OpenWGA called "OpenWGA plugin exception". You should have received
+  *a copy of this exception along with OpenWGA in file COPYING.
+  *If not, see <http://www.openwga.com/gpl-plugin-exception>.
+  *
+  *OpenWGA is distributed in the hope that it will be useful,
+  *but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *GNU General Public License for more details.
+  *
+  *You should have received a copy of the GNU General Public License
+  *along with OpenWGA in file COPYING.
+  *If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+.bi-table-x-menu {
+	border:1px solid #718bb7;
+    z-index: 15000;
+	background: #fff;
+}
+.ext-ie .bi-table-x-menu {
+    zoom:1;
+    overflow:hidden;
+}
+
+.bi-table-menu {
+	
+	width: 100px;
+	height: 100px;
+	overflow:hidden;
+	z-index: 25000;
+	display: block;
+	background-image:url('../file/images/tbl-grid.png');
+}
+
+
+.bi-table-menu .mask {
+	
+	background-image:url('../file/images/tbl-grid-mask.png');
+	z-index: 26001;
+	display: block;
+	width: 16;
+	height: 16;	
+}
+
+
+.bi-table-menu .info {
+	color: white
+	background-color: red;
+	z-index: 25002;
+	width: 40;
+	height: 16;	
+}
+
+#imageview-container, #link-attachmentview-container{
+	height: 260px;
+}
+
+#imageview, #link-attachmentview {
+	border:1px solid #B5B8C8;
+}
+
+.ychooser-view{
+	background:#FFFFFF url(../file/images/text-bg.gif) repeat-x scroll 0pt 0pt;
+
+	font: 11px Arial, Helvetica, sans-serif;
+	height: 230px;
+	overflow: auto;
+}
+.ychooser-view .thumb{
+	/*background: #dddddd;*/
+	padding: 8px;
+	height: 60px;
+	width: 80px;
+	text-align: center;
+	vertical-align: middle;
+	overflow: hidden;
+	border: solid #a0a0a0 1px;
+	-moz-border-radius: 3px;
+	-moz-box-shadow: 0 0 10px gray;
+	-webkit-border-radius: 3px;
+	-webkit-box-shadow: 0 0 10px gray;
+	box-shadow: 0 0 10px gray;
+}
+
+.ychooser-view .thumb img{
+	display: none;
+}
+
+.ychooser-view .thumb-wrap{
+	float: left;
+	margin: 4px;
+	margin-right: 0;
+	padding: 5px;
+}
+.ychooser-view .thumb-wrap span{
+	display: block;
+	overflow: hidden;
+	text-align: center;
+}
+.ychooser-view .x-view-selected{
+	background: #c3daf9;
+	border: 2px solid #6593cf;
+	padding: 3px;
+}
+.ychooser-view .x-view-selected .thumb{
+	background:transparent;
+}
+.ychooser-view .loading-indicator {
+	font-size:11px;
+	background-image:url('../../resources/images/grid/loading.gif');
+	background-repeat: no-repeat;
+	background-position: left;
+	padding-left:20px;
+	margin:10px;
+}

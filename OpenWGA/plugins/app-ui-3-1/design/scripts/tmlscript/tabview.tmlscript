@@ -1,0 +1,205 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+var MAX_PAGES = 5;
+
+this.init=function(theportlet){
+	if(theportlet)		
+		this.portlet=theportlet;	
+	else this.portlet=portlet;
+	this.currentpage=this.portlet.getSessionVar("currentpage");	
+}
+
+this.cleanup=function(validate){
+	var i=0;
+	var thePortlets = portlet.getSessionVar("portlets");
+	var pagesToDelete = [];
+	if (thePortlets != null) {
+		for (pInfoXML in Iterator(thePortlets)){
+			var pInfo = new XML(pInfoXML);
+			var p = portlet.getPortletForName(pInfo.pname);
+			if (p == null) {
+				portlet.registerPortletForName(pInfo.pname, pInfo.tml);
+				p = portlet.getPortletForName(pInfo.pname);
+			}
+			if(!validate(p)){
+				pagesToDelete.push(i);
+			}
+			i++;
+		}
+	}
+	
+	pagesToDelete.reverse();
+	for each (i in pagesToDelete) {
+		log.info("Tabview: removed invalid tab: " + this.portlet.getSessionVar("pages").get(i));
+		this.deletePage(i);
+	}
+
+}
+
+this.setCurrentPage=function(index){
+	if(this.currentpage!=index){
+		this.currentpage=index;
+		this.portlet.setSessionVar("currentpage", this.currentpage);	
+	}
+}
+
+this.addPage=function(tml, key, title, newpage){
+
+	if(newpage==false || newpage==undefined){
+		// check if page with given key already exist
+		var portletkeys=this.portlet.getSessionVar("portlets");
+		if (portletkeys != null) {
+			for (pInfoXML in Iterator(portletkeys)){
+				var pInfo = new XML(pInfoXML);
+				if (pInfo && pInfo.key==key){
+					this.setCurrentPage(i+1);
+					return;
+				}
+			}
+		}
+	}
+	
+	// Use MD5 hash of key for portlet name to ensure it is compliant with portlet name rules
+	pname = Packages.de.innovationgate.utils.UIDGenerator.generateMD5Hash(key);
+	
+	
+	var p = this.portlet.getPortletForName(pname);
+	if (p == null) {
+		this.portlet.registerPortletForName(pname, tml);
+		p = this.portlet.getPortletForName(pname)
+	}
+
+
+	var list=this.portlet.getSessionVar("portlets");
+	if (list == null) {
+		list = WGA.createList();
+	}
+	var pInfo = <pInfo/>;
+	pInfo.key = key;
+	pInfo.pname = pname;
+	pInfo.tml = tml;
+	pInfo.portletKey = p.portletkey;
+	list.add(pInfo.toXMLString());
+	this.portlet.setSessionVar("portlets", list);
+
+	if(key!=""){
+		p.setSessionVar("key", key);
+		var pagetitle=title || context("docid:"+key).TITLE;
+	}
+	else pagetitle=title;
+	
+	// add new page
+	var list=this.portlet.getSessionVar("pages");
+	if (list == null) {
+		list = WGA.createList();
+	}
+	
+	list.add(pagetitle||"no-title");		
+	this.portlet.setSessionVar("pages", list);	
+	
+	this.setCurrentPage(list.size());
+
+	if(list.size()>MAX_PAGES){
+		this.deletePage(0);
+		this.setCurrentPage(MAX_PAGES);
+	}
+
+	return p;
+}
+
+this.deletePage=function(index){	
+	var list=this.portlet.getSessionVar("pages");
+	list.remove(index);
+	this.portlet.setSessionVar("pages", list);
+	if(this.currentpage>index)
+		this.setCurrentPage(index==0?-1:this.currentpage-1);	
+	
+	list=this.portlet.getSessionVar("portlets");
+	var portlet_to_delete= list.get(index);
+	if(portlet_to_delete!=null){
+		var event=createEvent("BE_portletUnregistered");
+		var pInfo = new XML(portlet_to_delete);
+		event.addParameter("key", pInfo.key);
+		var p = getPortletByKey(pInfo.portletKey);
+		if (p != null) {
+			p.fireEvent(event);
+			this.portlet.unregisterPortlet(pInfo.portletKey);
+		}
+		else {
+			portlet.fireEvent(event);
+		}
+		//log.info("fired event BE_portletUnregistered, key=" + list.get(index));
+	}
+	list.remove(index);
+	this.portlet.setSessionVar("portlets", list);
+
+	if(list.isEmpty()){
+		//this.portlet.currentpage=-1;
+		this.setCurrentPage(-1);		
+		this.portlet.removeSessionVar("pages");
+		this.portlet.removeSessionVar("portlets");
+		//log.info("all pages removed");
+	}		
+	this.portlet.save();		
+	//addwarning("DynTab-Page " + index + " deleted", false);
+}
+
+this.deleteCurrentPage=function(){
+	this.deletePage(this.currentpage-1);
+}
+
+this.deleteAllPages=function(){
+	var pages = this.portlet.getSessionVar("pages")
+	if (pages) {
+		var size=pages.size();
+		for(var i=0; i<size; i++)
+			this.deletePage(0);
+	}
+}
+
+this.setCurrentPageTitle=function(title){
+	var list=this.portlet.getSessionVar("pages");
+	list.set(this.currentpage-1, title||"no-title");
+	this.portlet.setSessionVar("pages", list);
+	this.portlet.save();
+	
+	var ev = createEvent("tabview_PageTitleChanged");
+	var title = this.portlet.getSessionVar("pages").get(this.currentpage-1)
+	var pInfoXML = this.portlet.getSessionVar("portlets").get(this.currentpage-1);
+	if (pInfoXML != null) {
+		var pInfo = new XML(pInfoXML);
+		pkey = pInfo.key;
+	}
+	
+	ev.addParameter("pkey", pkey);
+	ev.addParameter("title", title)
+	portlet.fireEvent(ev);	
+}
+
+this.refresh=function(){
+	var ev = createEvent("tabview_refresh");
+	ev.addParameter("portletkey", this.portlet.portletkey);
+	portlet.fireEvent(ev);	
+}

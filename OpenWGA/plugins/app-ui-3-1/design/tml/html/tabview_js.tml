@@ -1,0 +1,108 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	if (this.option('tabnames')!=null) {
+		var tabs = this.option('tabnames').split(',');
+		var tabid = this.createList();
+		var tabname =  this.createList();
+		_tabclasses=createlist();
+		for (var i=0; i < tabs.length; i++) {
+			var tmp = tabs[i].split('|')
+			tabid.add(tmp[1]);
+			tabname.add(tmp[0]);
+			_tabclasses.add(tmp[2]);
+		}
+		this.setvar('_tabid',tabid);
+		this.setvar('_tabname',tabname);
+	}
+</tml:script>
+
+<script type="text/javascript" language="JavaScript">
+	// JS Version zum blättern in den Tabs
+	var tabfound = false;
+	var elements = ['<tml:item name="_tabid" divider="','"/>'];
+	function switchTo(o) {
+		//console.log("switch to " + o, elements);
+		for (i=0; i < elements.length; i++) {
+			//console.log(i, elements[i]);
+			if (elements[i] == o) {
+				document.getElementById(o).className="";
+				document.getElementById('td'+o).className="tab_selected";
+				tabfound = true;	
+			}
+			else {
+				document.getElementById(elements[i]).className="x-hidden";
+				document.getElementById('td'+elements[i]).className="tab_normal";
+			}
+		}
+				
+		if(!tabfound)
+			switchTo(elements[0]);
+		
+		top.name=o;			
+	}
+</script>
+
+<div class="tab_header">
+	
+<table class="tabs" border="0" cellpadding="0" cellspacing="0">
+<tr>
+	<tml:foreach type="loop" count="{this.itemList('_tabname').size()}" currentvalue="i">
+		<tml:evaluate var="action">return "switchTo('<tml:script>return this.itemList('_tabid').get(this.item('i') -1)</tml:script>')";</tml:evaluate>
+		<tml:if condition="this.itemList('_tabname').get(this.item('i') -1) != '' ">
+			<tml:then>
+				<td nowrap
+						<tml:if condition="this.item('i') == 1">
+							<tml:then>
+								class="tab_selected"
+							</tml:then>
+							<tml:else>
+								class="tab_normal"
+							</tml:else>
+						</tml:if>				 
+						id="td<tml:script>return this.itemList('_tabid').get(this.item('i') -1)</tml:script>" 
+						onclick="<tml:item name="action"/>" >
+					<span class="tab_r<tml:case condition="_tabclasses.get(i-1)"> <tml:script expression="_tabclasses.get(i-1)"/></tml:case>"><a><tml:script>return this.itemList('_tabname').get(this.item('i') -1)</tml:script></a></span>
+				</td>					
+			</tml:then>
+		</tml:if>			
+	</tml:foreach>
+	<td class="tab_addon">&nbsp;<tml:option name="pageaddon"/></td>
+</tr>
+</table>
+</div>
+<div class="tab_body" style="clear:left"><tml:option name="body"/></div>
+
+<script type="text/javascript" language="JavaScript">
+	Ext.onReady(function(){
+		var marktab = top.name;
+		if (!marktab || marktab=='') {
+			switchTo(elements[0]);
+		}
+		else {
+			switchTo(marktab);		
+		}
+	})
+</script>

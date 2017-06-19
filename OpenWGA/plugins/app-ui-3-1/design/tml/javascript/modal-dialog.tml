@@ -1,0 +1,214 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+/**
+ * JS functions to handle modal dialogs
+ */
+
+MD={};
+
+MD.callAction=function(action, message){
+	WGA.ajax.b4post.register(MD.portletkey, function(){
+		var el = Ext.get("$ajaxContentDiv_" + MD.portletkey);
+		el.update("<b>"+message+"</b>")
+	})
+	
+	WGA.ajax.action({
+		action: action,
+		id: MD.portletkey,
+		graydiv: false
+	});
+}
+
+/**
+ * object to store all dialogs in
+ */
+MD.dialogs={};
+
+/**
+ * create a dialog
+ * valid config options:
+ * 		id:	the name of the tml to include as portlet
+ * 		title: the title of the dialog
+ * 		submitButtonText: (optional) alternative text for submit button
+ * 		closeButtonText: (optional) alternative text for close button
+ * 		submitOnEnter (boolean): 		
+ * @param {String} name
+ * @param {Object} config
+ */
+MD.create=function(name, config){
+	MD.dialogs[name]=config;
+}
+
+MD.hide=function(){
+	if(MD.dialog){
+		MD.dialog.hide(MD.el);
+	}
+}
+
+MD.onShow=function(){}		// may be overwritten in dialog portlets
+
+MD.focus=function(){
+	var field = MD.config.focus;
+	var form = document.forms[MD.config.tml+"-form"];
+	try{
+		form.elements[field].focus();
+	}
+	catch(e){
+		console.log("field '" + field + "' not found.", form.elements)
+	}
+}
+
+MD.getField=function(field){
+	var form = document.forms[MD.config.tml+"-form"];
+	return form.elements[field];
+}
+
+/**
+ * calculate the size of the dialog and resize it
+ */
+MD.autoHeight=function(){
+	
+	var dialog_el=MD.dialog.getEl();
+	var body_el=MD.dialog.body;
+	var inner_el=dialog_el.child(".dialog");
+	inner_el.setWidth(body_el.getWidth(true));
+	var hdif=body_el.getHeight()- inner_el.getHeight();
+	var h = 5+dialog_el.getHeight()-hdif;
+	MD.dialog.setSize(500, Math.max(h, 140));	
+}
+
+/**
+ * initialises the given dialog using the stored config options
+ * @param {String} dialogname: id of the dialog
+ * @param {Object} el:	the element to start animation from
+ */
+MD.init=function(dialogname, el){
+	MD.el=el;
+
+	var dialog = MD.config = MD.dialogs[dialogname];
+	
+	if(!dialog){
+		alert("Dialog " + dialogname + " ist not defined.")
+		return false;
+	}
+
+	var submitButton = dialog.submitButton;
+	var closeButton = dialog.closeButton;
+	
+	MD.submitOnEnter = false;
+	if(submitButton && submitButton.submitOnEnter)
+		MD.submitOnEnter = true;
+		
+	MD.setTitle(dialog.title);
+
+	if(submitButton){
+		MD.submitButton.show();
+		MD.submitButton.enable();
+		MD.submitButton.setText(submitButton.text||"<tml:label key="save"/>");
+		MD.closeButton.setText("<tml:label key="cancel"/>");
+	}
+	else {
+		MD.submitButton.hide();	
+		MD.closeButton.setText("<tml:label key="close"/>");
+	}
+	
+	if(closeButton){
+		MD.closeButton.setText(closeButton.text||"<tml:label key="cancel"/>");
+	}
+	
+	if(dialog.x)
+		MD.dialog.setPosition(dialog.x, dialog.y);	
+	else MD.dialog.alignTo(Ext.getBody(), "t-t", [0, 20]);
+	
+	return true;
+}
+
+/**
+ * utility function to change the title of the dialog after initialisation
+ * @param {Object} title
+ */
+MD.setTitle=function(title){
+	MD.dialog.setTitle(title);
+}
+
+/**
+ * create one instance of Ext.BasicDialog used for all dialogs
+ */
+MD.initModalDialog=function(){
+	var dialog = MD.dialog = new Ext.Window({ 
+        modal:true,
+		resizable: false,
+		collapsible: false,
+		shim: true,
+        shadow:true,
+		constraintoviewport: true,
+        width:500,
+        height:300,
+        closeAction: "hide",
+        keys: [
+        	{
+        		key: Ext.EventObject.ENTER,
+        		stopEvent: true,
+        		fn: function(){
+					if(MD.submitOnEnter)
+						MD.submit()
+        		}
+        	},
+        	{
+        		key: Ext.EventObject.ESC,
+        		fn: function(){
+        			MD.hide()
+        		}
+        	}
+        ]
+	});	
+	
+	MD.submitButton = dialog.addButton({
+		text: "<tml:label key="save"/>",
+		handler: function(){MD.submit()}
+	})
+	dialog.defaultButton = MD.submitButton; 
+	
+	MD.closeButton = dialog.addButton({
+		text: "<tml:label key="cancel"/>",
+		handler: MD.hide
+	})
+	
+	dialog.on("show", function(){
+		if(MD.config && MD.config.focus)
+			MD.focus.defer(250)
+		MD.onShow();
+	});	
+	dialog.on("move", function(d, x, y){
+		MD.config.x=x;
+		MD.config.y=y;
+	})
+	
+	dialog.applyToMarkup("ext-dialog");
+};
+
+Ext.onReady(function(){
+	MD.initModalDialog();
+})

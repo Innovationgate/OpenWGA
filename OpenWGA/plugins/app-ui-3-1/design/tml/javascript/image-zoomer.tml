@@ -1,0 +1,378 @@
+ImageZoomer = function(){
+	
+	var maskel;
+	var currentGroup;
+	var elements=[];
+	var images={
+		all: []		// default group
+	};
+	var index=0;
+	var info_visible=false;
+	var imgel;
+	
+	function keyNavAction(ev) {
+        var keyCode = ev.getKey();
+        if(
+            keyCode == 88 || // x
+            keyCode == 67 || // c
+            keyCode == 27
+        ){
+        	if(info_visible)
+        		toggleImageInfo();
+            else closeImage();
+        }
+        else if(keyCode==37)	// cursor left 
+        	prevImage();
+        else if(keyCode==39)	// cursor right 
+        	nextImage();
+        else if(keyCode==73)	// i 
+        	toggleImageInfo();
+	}
+	
+	function closeImage(){
+	
+       	if(info_visible)
+       		toggleImageInfo();
+	
+		var el=Ext.get("modal-image");	
+		el.child(".img-wrap").hide();
+		el.hide({
+			callback: function(){
+				imgel.hide();
+				imgel.removeAllListeners();
+				el.removeAllListeners();
+				Ext.fly(document).removeAllListeners();
+				maskBody(false);
+				el.remove();
+			}
+		})
+		index=-1;
+		
+		Ext.fly(document).un('keydown', keyNavAction, this);	
+	}
+	
+	function maskBody(mask){
+		if(!maskel){
+			// create one
+			maskel = Ext.getBody().createChild({tag:"div", cls:"modal-mask"});
+			
+			maskel.setStyle({
+				position: "absolute",
+				zIndex: 100,
+				opacity: .7,
+				top: Ext.getBody().getScroll().top+"px",
+				left: 0,
+				width: Ext.lib.Dom.getViewportWidth()+"px",
+				height: Ext.lib.Dom.getViewportHeight()+"px",
+				backgroundColor: "black",
+				overflow: "hidden"
+			})
+			maskel.on("click", closeImage)
+		}
+		
+		var root= document.compatMode=='BackCompat'? document.body : document.documentElement
+		var isBodyScroll = (root.scrollHeight > root.clientHeight)
+		if(mask){
+			if(isBodyScroll)
+				Ext.getBody().setStyle("overflow", "hidden");
+		}
+		else {
+			Ext.getBody().setStyle("overflow", "")
+			maskel.remove();
+			maskel=null;
+		}
+	}
+	
+	function showImage(url, group){
+				
+		currentGroup = group||"all";
+		
+		maskBody(true);
+		info_visible=false;
+		
+		var el=Ext.get("modal-image");
+		if(el==null){
+			// create div to show images in:
+			el = Ext.getBody().createChild({tag:"div", id:"modal-image"});
+		}
+		el.hide();
+		el.setStyle("zIndex", 30000);
+
+		el.update("<div class='loading'><tml:label key="image-zoomer.loading-image"/></div>");
+		el.setHeight(200)
+		el.setWidth(200);
+
+		//allign element:		
+		el.setLeft((maskel.getWidth()-200)/2);
+		el.setTop(maskel.getTop() + ((maskel.getHeight()-200)/2));
+		
+		el.show(true);		
+		
+		// find index:
+		for(var i=0; i<images[currentGroup].length; i++){
+			if(images[currentGroup][i].url==url){
+				index=i;
+				break;
+			}
+		}
+		
+		var imgdom = document.createElement("img");
+		var img = imgel = Ext.get(imgdom);		
+		
+		if(images[currentGroup][index].posturl){
+			img.setStyle("cursor", "pointer");
+			img.dom.title="Click to open Post"
+			img.on("click", function(){
+				location.href=images[currentGroup][index].posturl;
+			})
+		}
+		
+		img.on("load", function(){
+			img.hide();
+			el.update("");
+			el.appendChild(this.dom);
+			scaleImg(this.dom);
+			
+			var t = new Ext.Template(
+					'<div class="img-wrap" style="display:none;position:abslolute;margin-top:8px;">',
+						'<div class="img-info"></div>',
+					    '<div align="left" style="float:left" class="img-title">{title}</div>',
+					    ImageZoomer.imageInfoURL?'<div style="float:right" class="img-info-link" title="<tml:label key="image-zoomer.show-information"/>"></div>':'',
+					    '<div style="clear:both"></div>',
+					    '<div style="float:left"><tml:label key="image-zoomer.image"/> {index} <tml:label key="general.text-of"/> {count}', 
+						    '<span class="prev-next"> ( <a class="prev" href="javascript:viod()"><tml:label key="image-zoomer.prev-image"/></a> | <a class="next" href="javascript:viod()"><tml:label key="image-zoomer.next-image"/></a> )</span>',
+					    '</div>',
+					    '<div style="float:right"><a href="javascript:void()" class="close-img"><tml:label key="image-zoomer.close"/></a></div>',
+				    '</div>'
+				);
+			t.append(el.dom, {title: images[currentGroup][index].title||'', index:index+1, count: images[currentGroup].length});
+
+			var w = Math.max(img.getWidth()+20, 400);
+			var h = img.getHeight()+55;
+			var x = (Ext.lib.Dom.getViewportWidth()-w)/2
+			var y = Ext.getBody().getScroll().top + (Ext.lib.Dom.getViewportHeight()-h)/2
+			
+			if(navigator.userAgent.indexOf("iPad")>=0){
+				el.setStyle({
+					top: y+"px",
+					height: (h-20)+"px"
+				});
+				el.shift({
+					duration: w==el.getWidth() ? .001 : .2,
+					x: x,
+					width: w,
+					callback: function(){
+						img.show(true)
+						el.child(".img-wrap").show(true);
+						
+					}
+				});
+			}
+			else{
+				
+				el.shift({
+					duration: w==el.getWidth() ? .001 : .2,
+					x: x,
+					width: w
+				}).shift({
+					duration: h==el.getHeight() ? .001 : .2,
+					y: y,
+					height: h,
+					callback: function(){
+						img.show(true)
+						el.child(".img-wrap").show(true);
+						
+					}
+				});
+			}
+			
+			var next = el.child(".next");
+			if(next){
+				if(images[currentGroup].length==1){
+					el.child(".prev-next").hide();
+				}
+				else next.on("click", function(ev){
+					nextImage()
+					ev.stopEvent();
+				})
+			}
+			var prev = el.child(".prev");
+			if(prev){
+				prev.on("click", function(ev){
+					prevImage();
+					ev.stopEvent();
+				})
+			}
+			var close = el.child(".close-img");
+			if(close){
+				close.on("click", function(ev){
+					closeImage();
+					ev.stopEvent();
+				})
+			}
+			var info = el.child(".img-info");
+			var info_link = el.child(".img-info-link");
+			if(info&&info_link){
+				info_link.on("click", function(ev){
+					toggleImageInfo()
+					ev.stopEvent();
+				})
+			}
+			
+		});
+		img.dom.src=url;
+		Ext.fly(document).on('keydown', keyNavAction, img);
+		
+	}
+	
+	function toggleImageInfo(){
+		var info = imgel.parent("div").child(".img-info");
+		if(info && ImageZoomer.imageInfoURL){
+			if(info.isVisible())
+				info.slideOut();
+			else{
+				info.setTop(imgel.getTop(true)+10);
+				info.setHeight(imgel.getHeight());
+				info.setWidth(imgel.getWidth());
+				info.setOpacity(.7);
+				info.slideIn();
+				info.load(ImageZoomer.imageInfoURL+"?id=" + images[currentGroup][index].id);
+			}
+			info_visible = !info_visible;
+		}		 
+	}
+
+	function showNewImage(i){
+		if(i)
+			index=i;
+		imgel.hide({
+			callback: function(){
+				Ext.get("modal-image").update("<div class='loading'><tml:label key="image-zoomer.loading-image"/></div>");
+				imgel.dom.src=images[currentGroup][index].url;
+			}
+		});
+	}
+
+	function nextImage(){
+		info_visible=false;
+		index++;
+		if(index>=images[currentGroup].length)
+			index=0;
+		showNewImage();
+	}
+
+	function prevImage(){
+		info_visible=false;
+		index--;
+		if(index<0)
+			index=images[currentGroup].length-1;
+		showNewImage();
+	}
+	
+	function scaleImg(img, size){
+	
+		img.removeAttribute("width");
+		img.removeAttribute("height");
+
+		var wMax = size || Ext.lib.Dom.getViewportWidth()-70;
+		var hMax = size || Ext.lib.Dom.getViewportHeight()-70;
+	
+		if (Ext.isIE) {
+			// drifferent padding/margin behaviour in IE
+			wMax -= 2 * 3;
+			hMax -= 2 * 3;
+		}
+		
+		var ratio = img.height/img.width;
+
+		if(img.height>hMax){
+			var newW = Math.min(hMax / ratio, wMax);
+			img.height = newW * ratio;
+			img.width = newW;
+			return;
+		}		
+		if(img.width>wMax){
+			var newH = Math.min(ratio * wMax, hMax);
+			img.height = newH;
+			img.width = newH / ratio;
+			return;
+		}
+	}
+
+	function findElement(el){
+		for(var i=0; i<elements.length; i++)
+			if(el==elements[i])
+				return true;
+		return false;
+	}
+
+	function addImage(url, title, posturl, id, el, group){
+	
+		if(el && !findElement(el))
+			elements.push(el);
+		
+		var g = group||"all"
+		if(!images[g])
+			images[g]=[];
+		
+		// check, if we have this URL already. If found: update it
+		for(var i=0; i<images[g].length; i++){
+			if(images[g][i].url==url){
+				images[g][i].title=title;
+				images[g][i].posturl=posturl;
+				images[g][i].id=id;
+				return;
+			}
+		}
+		
+		images[g].push({
+			url: url,
+			title: title,
+			posturl: posturl,
+			id: id
+		})
+	}
+		
+	return{
+		
+		init: function(selector, config, group){
+			Ext.select(selector || ".rtf a").each(function(el){
+				if(el.parent(".WGA-Item-Value-Unencoded"))
+					return;		// ignore this images
+				var href = el.dom.href||el.dom.src;
+				if(!href || findElement(el.dom))
+					return;
+				href=href.split(";")[0];	// ignore ;jsessiond-s
+				var a = href.split(".");
+				if(a.length>1){
+					var ext = a.pop().toLowerCase();
+					if(ext=="png" || ext=="jpg" || ext=="gif"){
+						var title = el.dom.title||"";
+						var posturl = null;
+						if(config){
+							if(typeof(config)=="string")						 
+								title = config;
+							else {
+								title = config.title(el);
+								posturl = config.posturl(el);
+							}
+						}
+						addImage(href, title, posturl, el.dom.id, el.dom, group);
+						el.on("click", function(ev){
+							ev.preventDefault();
+							showImage(this.url, this.group);
+						}, {url:href, group:group})
+					}
+				}
+			})
+		},
+		
+		showImage: showImage,
+		addImage: addImage,
+		scaleImage: scaleImg,
+		clearGroup: function(g){
+			delete images[g];
+		}
+	}
+	
+}()

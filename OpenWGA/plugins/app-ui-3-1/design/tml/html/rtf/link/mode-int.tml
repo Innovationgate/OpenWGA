@@ -1,0 +1,121 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<div id="link-attachmentview-container">
+	<div id="link-attachmentview-toolbar"></div>
+	<div id="link-attachmentview" class="ychooser-view"></div>
+</div>
+
+
+<script>
+
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function() {
+
+		var tb = new Ext.Toolbar({
+			renderTo: 'link-attachmentview-toolbar',
+			items:[
+				"<tml:label key="dialog.link.select-document"/>"
+			]
+		});	
+
+		// Helper function to create an Ext Tree of struct entries
+		function structTree(){
+		
+			var Tree = Ext.tree;
+		    
+			this.tree = new Tree.TreePanel({
+				el: "link-attachmentview",
+		        animate:true, 
+		        loader: new Tree.TreeLoader({
+		        	dataUrl: "<tml:url type="tml" medium="json" name="get-struct-nodes"/>",
+		        	baseParams: { so: '<tml:script>
+			        		return AFW.Util.serializeJsObject({
+			        			dbkey: meta("database", "dbkey"),
+			        			lang: meta("language")
+			        		})
+		        		</tml:script>'
+		        	}		  	
+		        }),
+		        height: 230,
+		        autoScroll: true,
+		        border: false,
+		        enableDD:false,
+		        rootVisible:false,
+		        singleExpand: true
+		    });
+		
+		    var root = new Tree.AsyncTreeNode({
+		        text: "<tml:metadata name="dbkey" type="database"/>",
+		        icon: "../file/database.png",
+		        cls: "root", 
+		        draggable:false, // disable root node dragging
+		        id:'root'
+		    });
+		    
+		    this.tree.setRootNode(root);
+		    
+		    this.tree.render();
+		    root.expand(false, true);
+			
+		}
+
+
+		try {
+			var sitemap = new structTree();
+			
+			sitemap.tree.on("click", function(node, e) {
+	        	var a = node.id.split(":");
+	        	if(a[0]=="node-struct" && !node.disabled)
+		        	MD.LinkDialog.selectLink(a[1], node.attributes.text, a[1]);
+		        else MD.LinkDialog.selectLink();
+	        }, this);
+	        
+	       sitemap.tree.on("dblclick", function(node, e) {
+	        	var a = node.id.split(":");
+	        	if(a[0]=="node-struct" && !node.disabled)
+		        	MD.submit();
+	        }, this);
+
+			<tml:script var="_context">
+				return "docid:" + option("wgakey");
+			</tml:script>
+
+	        <tml:case condition="option('wgakey') != null && option('wgakey') != '' && context(_context, false) != null">
+		        sitemap.tree.selectPath("/root/<tml:script>
+	            	return createObject(
+	            		pluginDbKey("de.innovationgate.wga-app-framework")+"/structentry", 
+	            		context(_context).content().getStructEntry()).getPath("node-", "/")
+		            </tml:script>", null, function(success, node){
+			        	var a = node.id.split(":");
+			        	if(success && a[0]=="node-struct" && !node.disabled)
+				        	MD.LinkDialog.selectLink(a[1], node.attributes.text, a[1]);
+				        else MD.LinkDialog.selectLink();
+		            });
+	        </tml:case>
+		}
+		catch(ex) {
+			//console.log(ex);
+		}
+	});
+</script>

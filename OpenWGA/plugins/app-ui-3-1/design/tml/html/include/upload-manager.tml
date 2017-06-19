@@ -1,0 +1,2 @@
+<link rel="stylesheet" href="<tml:url type="css" name="upload-manager"/>">
+<script src="<tml:url type="tml" medium="javascript" name="upload-manager"/>"></script>

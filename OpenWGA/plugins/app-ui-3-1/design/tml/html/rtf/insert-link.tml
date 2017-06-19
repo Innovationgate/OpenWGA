@@ -1,0 +1,189 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="change-linksource">
+	portlet.linksource=tmlform.linksource;
+	portlet.save();
+	tmlform.clearMessages();
+</tml:action>
+
+<tml:action id="insert-link">
+	if (tmlform.validate()) {
+	
+		switch(tmlform.linksource) {
+			
+			case "int":
+				tmlform.linkurl = context("db:"+option("dbkey") + "/docid:" + tmlform.linkurl).contentURL(null, null);
+				break;
+				
+			case "exturl":
+				tmlform.linkurl = tmlform.wgakey = tmlform.linkurl_exturl;
+				tmlform.linktext = tmlform.linkurl;
+				break;
+				
+			case "intname":
+				tmlform.linkurl = tmlform.wgakey = tmlform.linkurl_intname;
+				tmlform.linktext = tmlform.linkurl;
+				break;			
+			
+			default: break;
+		}
+	
+		_actionDone = true;
+	}
+</tml:action>
+
+<tml:range labelfile="rtf">
+	<tml:script>
+		if(_modal_dialog_included)
+			tmlform.reset();
+	</tml:script>
+	
+	<tml:input name="wgakey" type="hidden" default="{option('wgakey')}" cssclass="textinput"/>
+	
+	<tml:if istrue="_actionDone">
+		<tml:then>
+			<script>
+	            if(MD.callback){
+	                MD.callback("<tml:script expression="AFW.Util.encodeForScript(tmlform.linkurl)"/>", 
+	                		"<tml:script expression="AFW.Util.encodeForScript(tmlform.linktext)"/>",
+	                		{
+		                		type: "<tml:item type="tmlform" name="linksource"/>",
+		                		key: "<tml:script expression="AFW.Util.encodeForScript(tmlform.wgakey)"/>"
+		                	},
+		                	"<tml:script expression="AFW.Util.encodeForScript(tmlform.linktarget)"/>"
+	                );
+				}
+				WGA.ajax.callAction('<tml:action ref="$refresh" portletmode="view"/>', '<tml:script expression="portlet.portletkey"/>')
+	        </script>
+		</tml:then>
+		<tml:else>
+			
+			<script>
+				MD.LinkDialog = {};
+				MD.LinkDialog.selectLink=function(url, linktext, wgakey){
+					var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+					form.linkurl.value = url || '';
+					form.linktext.value = linktext || '';
+					form.wgakey.value = wgakey || '';
+					url ? MD.submitButton.enable() : MD.submitButton.disable();
+				} 
+
+				// submit function called from dialog handler
+				MD.submit=function(){
+					BI.util.callAction("<tml:action ref="insert-link"/>", 
+						"<tml:script>return portlet.portletkey</tml:script>",
+						"inserting link...");
+				}
+
+				MD.submitButton.disable();
+				<tml:if condition="option('wgakey')!=null&&option('wgakey')!=''">
+					<tml:then>
+						MD.submitButton.setText("<tml:label key="dialog.link.update"/>");
+					</tml:then>
+					<tml:else>
+						MD.submitButton.setText("<tml:label key="dialog.link.insert"/>");
+					</tml:else>
+				</tml:if>
+			</script>
+			
+			<tml:case condition="tmlform.hasmessages()">
+				<b class="warning"><tml:formmessages divider="<br/>"/></b>
+				<hr size="1">
+			</tml:case>	
+			
+			<table width="100%" border="0" cellspacing="5">
+
+				<tr>
+					<td width="100">{%label:dialog.link.source%}:</td>
+					<td>
+						<tml:input 
+							type="select" id="linksource" name="linksource" cssclass="textinput" 
+							options="{option('vlink') ? label('dialog.link.sources.light') : label('dialog.link.sources')}"
+							changeaction="change-linksource" ajax="true"
+							default="{option('linktype')||portlet.linksource||'exturl'}"
+						/>
+					</td>
+				</tr>
+				
+				<tml:if condition="tmlform.linksource == 'exturl'">
+					<tml:then>
+						<tr>
+							<td width="100">Url:</td>
+							<td>
+								<tml:script>
+									_default = "http://";
+									if(option("linktype")=="exturl" && option("wgakey"))
+										_default = option("wgakey");
+								</tml:script>
+								<tml:input name="linkurl_exturl" cssclass="textinput required"
+									default="{_default}"
+							    	validation="$E_VALUE!=''"
+							     	message="{label('dialog.link.url-required')}"
+								/>
+							</td>
+						</tr>
+					</tml:then>
+					<tml:elseif condition="tmlform.linksource=='intname'">
+						<tr>
+							<td width="100">{%label:dialog.link.unique-name%}:</td>
+							<td>
+								<tml:script>
+									_default = "";
+									if(option("linktype")=="intname" && option("wgakey"))
+										_default = option("wgakey");
+								</tml:script>
+								<tml:input name="linkurl_intname" id="linkurl"
+									default="{_default}"
+							    	validation="$E_VALUE!=''"
+							     	message="{label('dialog.link.url-required')}"
+							     	type="text"
+								>size="45"</tml:input>
+							</td>
+						</tr>
+					</tml:elseif>
+					<tml:else>	
+						<tr><td colspan="2"><tml:input name="linkurl" validation="true" message="" cssclass="textinput required" type="hidden"/></td></tr>
+					</tml:else>
+				</tml:if>				
+
+				<tml:case condition="option('URLOnly')!='true'">
+					<tr>
+						<td width="100"><tml:label key="dialog.link.target"/>:</td>
+						<td>
+							<tml:input name="linktarget" cssclass="textinput" default="{option('target')||''}"/>
+						</td>
+					</tr>
+				</tml:case>
+				
+			</table>
+	
+			<tml:input type="hidden" name="linktext"/>
+			
+			<tml:include ref="{'::link:mode-' + tmlform.linksource}"/>
+	
+		</tml:else>
+	</tml:if>
+
+</tml:range>

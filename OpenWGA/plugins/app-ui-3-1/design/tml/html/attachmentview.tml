@@ -1,0 +1,131 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	setOption("id", "vw_"+AFW.Util.generateUID(), "local")
+</tml:script>
+
+<div id="<tml:option name="id"/>"></div>
+
+<script>
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+		var datastore = new Ext.data.JsonStore({
+	        url: "<tml:url type="tml" medium="json" layout="get-attachments"/>",	   
+	        baseParams:{
+				type: 'content',
+				key: '<tml:metadata name="key"/>',	
+				so: '<tml:script expression="AFW.Util.serializeJsObject({dbkey:meta('database', 'dbkey')})"/>'
+			},
+	             
+            root: "data",
+            fields: [
+		        { name: 'id'   }, 
+		        { name: 'name' },
+	            { name: 'url'  },
+	            { name: 'size' }
+	        ]
+		});
+			
+		function renderFileSize(value){
+			// start with GB and work way down to kB
+			var kb = 1024;
+			var mb = kb*kb;
+			var gb = mb*kb;				
+			if (value >= gb)
+				return '<span style="color:red">'+ Math.round(value/gb) + ' GB</span>';
+			else if (value >= mb)
+				return '<span style="color:red">'+ Math.round(value/mb) + ' MB</span>';
+			else if (value >= kb)
+				return Math.round(value/kb) + ' KB';
+			else
+				return value + ' bytes';		
+		}
+		
+        var cm = new Ext.grid.ColumnModel([
+			{
+				id:'name', width: 350, header: '<tml:label key="filename"/>', sortable:true, dataIndex:'name'
+				<tml:case condition="option('editable')=='true'">
+					,editor: new Ext.grid.GridEditor(new Ext.form.TextField({
+						allowBlank: false
+		           	})) 
+	           	</tml:case>
+			},
+			{id:'size', width: 100, header: '<tml:label key="filesize"/>', sortable:true, align:"right", renderer: renderFileSize, dataIndex:'size' }
+		]);
+
+		<tml:if condition="option('editable')=='true'">
+			<tml:then>
+        		var grid = new Ext.grid.EditorGridPanel({
+        	</tml:then>
+        	<tml:else>
+        		var grid = new Ext.grid.GridPanel({
+        	</tml:else>
+        </tml:if>
+        	//applyTo: '<tml:option name="id"/>',
+        	renderTo: '<tml:option name="id"/>', 
+            ds: datastore,
+            sm: new Ext.grid.RowSelectionModel(),
+            cm: cm,
+            viewConfig: {
+        		forceFit: true,
+        		autoFill: true
+        		<tml:case condition="option('viewconfig')">
+					,<tml:option name="viewconfig"/>
+				</tml:case>
+        	},
+        	autoExpandColumn: 'name',
+            autoHeight: true
+			<tml:case condition="option('config')">
+				,<tml:option name="config"/>
+			</tml:case>        
+        });
+        	
+        <tml:case hasoption="var">
+	        <tml:option name="var"/> = grid;
+        </tml:case>
+        
+       	grid.on('rowclick', function(g, idx, e) {
+        	var data = datastore.getAt(idx).data;
+        	<tml:option name="onrowclick"/>
+        });
+        
+        grid.on('rowdblclick', function(g, idx, e) {
+			<tml:option name="onrowdblclick"/>
+        });
+        
+        <tml:case condition="option('editable')=='true'">
+			grid.on("afteredit", function(e){
+				<tml:option name="afteredit"/>
+			})
+        </tml:case>
+        
+        datastore.on("load", function(){
+        	grid.setWidth(grid.ownerCt.getInnerWidth())
+        });
+        datastore.load();
+        
+		WGA.portlet.registerObject("<tml:script expression="portlet.portletkey"/>", grid);
+		
+	})
+</script>

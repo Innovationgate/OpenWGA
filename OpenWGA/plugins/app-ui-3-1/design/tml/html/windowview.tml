@@ -1,0 +1,125 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	setOption("id", "vw_"+AFW.Util.generateUID(), "local")
+
+	_buttons=createlist();
+	if (option('toolbar')!=null && option('toobar')!="")
+	{
+		var actions=option('toolbar').split(',');
+		for (i=0; i<actions.length; i++){
+			var action = javaObject(actions[i]).trim()
+			if(action!="")
+				_buttons.add(action);
+		}
+	}
+</tml:script>
+
+<div id="<tml:option name="id"/>" style="padding:0 0 5 0;visibility:hidden" class="windowview">
+	<tml:case condition="option('title')!=null && option('title')!=''">
+		<div class="x-panel-header"><tml:option name="title"/></div>
+	</tml:case>
+	<div class="x-panel-bwrap">
+		<tml:case condition="option('body')">
+			<div class="x-panel-body" style="<tml:script expression="option('bodystyle')||'padding:4px'"/>"><tml:option name="body"/></div>
+		</tml:case>	
+		<tml:case condition="option('footer')">
+			<div class="x-panel-footer" style="padding:2px"><tml:option name="footer"/></div>
+		</tml:case>	
+	</div>
+</div>
+
+<script>
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function(){
+		var p = new Ext.Panel({
+			titleCollapse: true
+			,autoHeight: true
+			,autoScroll: true
+			,autoShow: true
+			,applyTo: "<tml:option name="id"/>"
+			<tml:case condition="option('tools')!=null">
+				,tools:[<tml:option name="tools"/>]
+			</tml:case>
+			<tml:case condition="option('config') && option('config').replace(/\s/g, '')">
+				,<tml:option name="config"/>
+			</tml:case>        
+			<tml:case condition="!_buttons.isEmpty()">
+				,tbar:[
+					<tml:foreach type="itemvalue" item="_buttons" currentvalue="_button">
+						<tml:script>
+							var b = _button.split("|");
+							_text = b[0]||"no buttontext";
+							_code = b[1]||"<tml:action ref="$refresh"/>";
+							_png = b[2]||"help";
+						</tml:script>
+						{
+							cls:'x-btn-text-icon',						
+							icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="{_png+'.png'}"/>',		                
+							text: "<tml:script expression="_text"/>",
+							handler: function(){
+								<tml:if condition="_code.substr(0, 10)=='javascript'">
+									<tml:then>
+										<tml:script>
+											return _code.substr(11);
+										</tml:script>
+									</tml:then>
+									<tml:else>
+										WGA.ajax.callAction("<tml:script expression="_code"/>", "<tml:script expression="portlet.portletkey"/>");
+									</tml:else>
+								</tml:if>
+							}
+						}<tml:between>,</tml:between>					
+					</tml:foreach>
+				]
+			</tml:case>        
+		})
+		Ext.get("<tml:option name="id"/>").show();
+		if(p.topToolbar)
+			p.topToolbar.show();
+		
+		p.on("expand", function(){
+			<tml:option name="onexpand"/>
+		})
+		p.on("collapse", function(){
+			<tml:option name="oncollapse"/>
+		})
+		<tml:case hasoption="var">
+			<tml:option name="var"/>=p;
+		</tml:case>
+		
+		<tml:case hasoption="registerPortletEvent">
+			//console.log("register event <tml:option name="registerPortletEvent"/>"); 
+			WGA.event.addListener("<tml:script expression="portlet.portletkey"/>" , "<tml:option name="registerPortletEvent"/>", function(event){
+				var panel = p;
+				<tml:option name="onevent"/>
+			}) 
+		</tml:case>
+		
+		if(WGA.portlet.registerObject){
+			WGA.portlet.registerObject("<tml:script expression="portlet.portletkey"/>", p)
+			//console.log("panel registered");
+		}
+	});
+</script>

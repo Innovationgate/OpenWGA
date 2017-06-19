@@ -1,0 +1,382 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_defaultContainer=portlet.container||"";
+	_defaultDocContainer="";
+	if(_defaultContainer && db().getFileContainer(_defaultContainer)==null)
+		_defaultContainer="";
+	_devaultKey="";
+	if(option("wgakey")){
+		if(tmlform.imagesource=="file"){
+			var wgakey=option("wgakey").split("/");
+			_defaultContainer=wgakey[0];
+			_defaultKey=wgakey[1];
+		}
+		else if(tmlform.imagesource=="extfile"){
+			var wgakey=option("wgakey").split("/");
+			_defaultDocContainer=wgakey[0];
+			_defaultKey=wgakey[1];
+		}
+		else _defaultKey=option("wgakey");
+	}
+</tml:script>
+
+<tml:input name="container" type="hidden" default="{_defaultContainer}"/>
+<tml:input name="doc_container" type="hidden" default="{_defaultDocContainer}"/>
+<tml:input name="currentselection" type="hidden" default="{_defaultKey}"/>
+
+
+<div id="imageview-container">
+	<div id="imageview-toolbar"></div>
+	<div id="imageview" class="ychooser-view"></div>
+</div>
+
+<tml:script>
+	if(!portlet.viewmode){
+		portlet.viewmode="icons";
+		portlet.save();
+	}
+</tml:script>
+
+<script>
+	
+	MD.ImageDialog.datastore = null;
+
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function() {
+		
+		var grid = null;
+		
+		function selectImage(id, url) {
+			var form = document.forms['<tml:script expression="tmlform.formid"/>'];
+			form.imageurl.value = url||"";
+			form.currentselection.value = id||"";
+			id ? MD.submitButton.enable():MD.submitButton.disable();
+			if(id){
+				var wgakey="";
+				if(form.imagesource.value=="file")
+					wgakey = form.container.value+"/";
+				else if(form.imagesource.value=="extfile")
+					wgakey = form.doc_container.value+"/";
+				form.wgakey.value = wgakey + id;
+			}
+		}
+
+		MD.ImageDialog.datastore = new Ext.data.JsonStore({
+	        url: "<tml:url type="tml" medium="json" layout="get-images"/>",	        
+            root: "data",
+            fields: [
+		        { name: 'id'   }, 
+		        { name: 'name' },
+		        { name: 'shortName'},     
+	            { name: 'url'  },
+	            { name: 'size' }
+	        ]
+		});
+			
+		var tb = new Ext.Toolbar();
+		tb.add({
+        		icon: '<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="application_view_columns.png"/>',
+        		cls: 'x-btn-icon',
+        		tooltip: '{%label:dialog.image.view-list%}',
+        		enableToggle: true,
+   				pressed: ('<tml:item type="portlet" name="viewmode"/>'=='list'),   
+        		toggleHandler: function() {
+        			WGA.ajax.callAction('<tml:action ref="change-view-mode" param1="list" ajax="true"/>', '<tml:script expression="portlet.portletkey"/>');
+        		} 
+    		},
+    		
+    		{
+        		icon: '<tml:url db="{pluginDBKey('de.innovationgate.wga-app-framework')}" type="file" doc="icons" file="application_view_icons.png"/>', 
+        		cls: 'x-btn-icon',
+        		tooltip: '{%label:dialog.image.view-thumbnails%}',
+        		enableToggle: true,
+        		pressed: ('<tml:item type="portlet" name="viewmode"/>'=='icons'),  
+        		toggleHandler: function() {
+        			WGA.ajax.callAction('<tml:action ref="change-view-mode" param1="icons" ajax="true"/>', '<tml:script expression="portlet.portletkey"/>');
+        		}
+    		}
+    	);
+
+    	<tml:case condition="tmlform.imagesource=='file'">
+	    	var dsFileContainer = new Ext.data.JsonStore({
+		        url: "<tml:url type="tml" medium="json" layout="get-image-filecontainers"/>",
+		        baseParams: { so: '<tml:script expression="AFW.Util.serializeJsObject({dbkey:meta('database', 'dbkey')})"/>'},
+	            root: "data",
+	            fields: [
+			        { name: 'id'   }, 
+			        { name: 'name' }
+		        ]
+			});
+	    	
+	    	var combo = new Ext.form.ComboBox({
+			    store: dsFileContainer,
+			    displayField:'name',
+			    valueField: 'id',
+			    editable: false,
+			    mode: 'remote',
+			    triggerAction: 'all',
+			    emptyText:'{%label:dialog.image.select-container%}',
+			    selectOnFocus:true
+			});
+			
+			combo.setValue("<tml:item name="container" type="tmlform"/>");
+			combo.on('select', function(cb, r, idx) {
+				document.forms['<tml:script expression="tmlform.formid"/>'].container.value = r.id;
+				loadImages();
+				WGA.ajax.action({
+					id: "<tml:script expression="portlet.portletkey"/>",
+					action: "<tml:action ajax="norefresh">
+								portlet.container=tmlform.container;
+								portlet.save();
+						</tml:action>",
+					mode: "norefresh",
+					graydiv: false
+				});
+							
+			});
+		
+			tb.add("->", combo);
+		</tml:case>
+		tb.render("imageview-toolbar");
+		
+		
+		<tml:if condition="portlet.viewmode=='icons'">
+			<tml:then>
+				MD.ImageDialog.scaler = function(image, thename, thesize) {
+					var thumb = Ext.get(image);
+					var img = thumb.dom;
+		
+					img.style.display = "block";
+					
+					try{
+						Ext.QuickTips.register({
+							target: img,
+							width: 150,
+							title: "<center>"+thename+"<hr>" + img.width + " x " + img.height + " Pixel<br>" + parseInt(thesize/1000) + " KB</center>"
+						})
+					}
+					catch(e){
+						img.title = img.width + "x" + img.height;
+					}
+					
+					var wMax = 80;
+					var hMax = 60;
+					
+					if (Ext.isIE) {
+						// driffrent padding/margin behaviour in IE
+						wMax -= 2 * 8;
+						hMax -= 2 * 8;
+						img.height = hMax;
+					}
+					
+					// workaround for safari timing problem
+					var ignoreMe = img.offsetWidth;
+					ignoreMe = img.offsetHeight;
+					
+					var ratio = img.height/img.width;
+					if(img.height>hMax){
+						var newW = Math.min(hMax / ratio, wMax);
+						img.height = newW * ratio;
+						img.width = newW;
+					}		
+					else if(img.width>wMax){
+						var newH = Math.min(ratio * wMax, hMax);
+						img.height = newH;
+						img.width = newH / ratio;
+					}
+					
+					thumb.alignTo(thumb.findParent(".thumb"), "c-c");
+					
+				}
+				
+				var tpl = new Ext.Template(
+					'<div class="thumb-wrap" id="{id}">',
+						'<div class="thumb"><img class="thumb_img_tag" onload="MD.ImageDialog.scaler(this, ',
+							"'{name}',",
+							"'{size}')",
+							'" src="{url}">',
+						'</div>',
+						'<span>{shortName}</span>',
+					'</div>'
+				);
+				
+				var tpl = new Ext.XTemplate(
+				    '<tpl for=".">',
+						'<div class="thumb-wrap" id="{id}">',
+							'<div class="thumb"><img class="thumb_img_tag" onload="MD.ImageDialog.scaler(this, ',
+								"'{name}',",
+								"'{size}')",
+								'" src="{url}">',
+							'</div>',
+							'<span>{shortName}</span>',
+						'</div>',
+				    '</tpl>'
+				);				
+				
+				var view = new Ext.DataView({
+					applyTo: "imageview", 
+					tpl: tpl,
+					singleSelect: true,
+					itemSelector:'.thumb-wrap',
+					store: MD.ImageDialog.datastore
+				});
+
+				view.on('selectionchange', function(v, s) {
+					if (s[0]) {
+						var record = MD.ImageDialog.datastore.getById(s[0].id);
+						if (record) {
+							var data = record.data
+							selectImage(data.id, data.url);
+							// need to set css-classes manually because view.select() lacks this feature :-(
+							Ext.each(Ext.query('.x-view-selected'), function(el) {
+								Ext.get(el).removeClass('x-view-selected');
+							});
+							Ext.get(data.id).addClass('x-view-selected');
+						}
+					}
+					else selectImage();	// no selection
+				});
+				
+				view.on('dblclick', function(vw, index, node, e) {
+					MD.submit();
+					e.stopEvent();
+				});
+				
+			</tml:then>
+			<tml:else>
+				// table design
+				
+				function renderFileSize(value){
+					// start with GB and work way down to kB
+					var kb = 1024;
+					var mb = kb*kb;
+					var gb = mb*kb;				
+					if (value >= gb)
+						return Math.round(value/gb) + ' GB';
+					else if (value >= mb)
+						return Math.round(value/mb) + ' MB';
+					else if (value >= kb)
+						return Math.round(value/kb) + ' KB';
+					else
+						return value + ' bytes';		
+				}
+				
+		        var cm = new Ext.grid.ColumnModel([
+					{id:'name', header:'{%label:dialog.image.col-filename%}', sortable:true, dataIndex:'name' },
+					{id:'size', header:'{%label:dialog.image.col-filesize%}', sortable:true, align:"right", renderer: renderFileSize, dataIndex:'size' }
+				]);
+		
+				// do not allow multiple selection of grid rows
+				var singleSelectionModel = new Ext.grid.RowSelectionModel({singleSelect: true});
+		        // create the Grid
+		        grid = new Ext.grid.GridPanel({
+		        	applyTo: 'imageview', 
+		            ds: MD.ImageDialog.datastore,
+		            cm: cm,
+		            selModel: singleSelectionModel,
+		            autoExpandColumn: 'name',
+		            autoHeight: true,
+		            loadMask: (Ext.ieIE == false)  // no loading mask in ie due to known ext-bug
+		        });
+		         
+		        grid.on('rowclick', function(g, idx, e) {
+		        	var data = MD.ImageDialog.datastore.getAt(idx).data;
+					selectImage(data.id, data.url);
+		        });
+		        
+		        grid.on('rowdblclick', function(g, idx, e) {
+		        	MD.submit();
+		        });
+		        WGA.portlet.registerObject("<tml:script expression="portlet.portletkey"/>", grid)
+		        
+			</tml:else>
+		</tml:if>
+		
+		function loadImages(){
+			MD.ImageDialog.datastore.load({
+			  	params:{
+			  		<tml:if condition="tmlform.imagesource=='file'">
+			  			<tml:then>
+							type: "file",
+							key: document.forms['<tml:script expression="tmlform.formid"/>'].container.value,
+						</tml:then>
+						<tml:elseif condition="tmlform.imagesource=='intfile'">
+							type: "content",
+							key: "<tml:meta name="key"/>",
+						</tml:elseif>
+						<tml:elseif condition="tmlform.imagesource=='extfile'">
+							type: "content",
+							key: document.forms['<tml:script expression="tmlform.formid"/>'].doc_container.value,
+						</tml:elseif>						
+					</tml:if>
+					so: '<tml:script expression="AFW.Util.serializeJsObject({dbkey:meta('database', 'dbkey')})"/>'
+				}
+			});	
+		}
+		loadImages();
+		
+		MD.ImageDialog.datastore.on('load', function() {
+			<tml:case condition="portlet.viewmode == 'icons'">
+				if (MD.ImageDialog.datastore.getTotalCount() <= 0) {
+					Ext.get('imageview').insertHtml('afterBegin', 
+						<tml:if condition="tmlform.imagesource=='intfile'">
+							<tml:then>'<b>{%label:dialog.image.no-files-on-doc%}</b>'</tml:then>
+							<tml:else>'<b>{%label:dialog.image.no-files-on-conatiner%}</b>'</tml:else>
+						</tml:if>
+					);
+				}
+			</tml:case>			
+			
+			var current = document.forms['<tml:script expression="tmlform.formid"/>'].currentselection.value;
+			if (!current)
+				return;
+				
+			<tml:if condition="portlet.viewmode == 'icons'">
+				<tml:then>				
+					var node = view.getNode(current);
+					if (node) 
+						view.select(node, false);	
+					if (Ext.get(current)) Ext.get(current).scrollIntoView('imageview');
+				</tml:then>
+				<tml:else>
+					var node = MD.ImageDialog.datastore.getById(current);
+					if (node) {
+						grid.getSelectionModel().selectRecords([node], false);
+						// find row to focus
+						for (var i=0; i < MD.ImageDialog.datastore.data.items.length; i++) {
+							if (MD.ImageDialog.datastore.data.items[i].id == current) {
+								grid.getView().focusRow(i);
+								break;
+							}
+						}
+					}
+				</tml:else>
+			</tml:if>
+			MD.submitButton.enable();
+		});
+		
+	});
+	
+</script>

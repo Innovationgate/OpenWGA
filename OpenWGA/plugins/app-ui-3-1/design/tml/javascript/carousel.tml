@@ -1,0 +1,27 @@
+Carousel = function(){
+
+	return{
+		init: function(selector, config){
+		
+			Ext.select(selector || ".rtf .carousel").each(function(el){
+				if(el.parent(".WGA-Item-Value-Unencoded"))
+					return;		// ignore this images
+
+				var cfg = {
+		            itemSelector: 'img',
+		            interval: 3,
+		            autoPlay: true,
+		            showPlayButton: true,
+		            pauseOnNavigate: true,
+		            freezeOnHover: true,
+		            transitionType: 'fade',
+		            navigationOnHover: true       
+				}
+				Ext.apply(cfg, config);
+				//el.removeClass("carousel");
+				new Ext.ux.Carousel(el, cfg);
+			});
+		}
+	}
+}();
+

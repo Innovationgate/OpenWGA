@@ -1,0 +1,77 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<style>
+	.message{	
+		padding:4px;
+		margin-bottom: 10px;
+	}
+	
+	.message_body {
+		border: solid #FFC300 1px;	
+		border-radius: 5px;	
+		background-color:white;	
+		padding:5px;
+		margin:0px;
+		display:block;	
+		*width: 100%;
+	}
+	.nupshy {
+		margin-top: -1px;
+		text-align: center;
+	}
+</style>
+
+<div class="message" style="display:block">
+
+	<div class="message_body">		
+		<table width="100%" border="0">
+			<tbody>
+			<tr>
+				<tml:case condition="option('icon')!=null">
+					<td rowspan="2" valign="top">
+						<tml:img doc="images" file="{option('icon')}">
+							width="32"
+						</tml:img>
+					</td>
+				</tml:case>
+				<td><b><tml:option name="title"/></b></td>
+				<td align="right" width="1%">
+				<tml:case condition="this.option('close') == null">
+					<tml:img doc="images" file="close.gif">title="<tml:label key="close"/>" alt="<tml:label key="close"/>" style="cursor:pointer;" onclick="Ext.get(this).findParent('.message').style.display='none'"</tml:img>					
+				</tml:case>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<tml:option name="body"/>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+	
+	<div class="nupshy"><tml:img doc="images" file="message_apex.gif"/></div>
+
+</div>

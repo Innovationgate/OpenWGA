@@ -1,0 +1,191 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:action id="selectTabPage" debounce="false">
+	var tabview=createObject("tabview", portlet);
+	tabview.setCurrentPage(tmlparam1);
+</tml:action>
+
+<tml:action id="deleteTabPage">
+	var tabview=createObject("tabview", portlet);
+	tabview.deletePage(tmlparam1-1);
+</tml:action>
+
+<tml:action id="deleteAllTabPages">
+	var tabview=createObject("tabview", portlet);
+	var size=itemList("pages").size();
+	for(var i=0; i<size; i++)
+		tabview.deletePage(0);
+</tml:action>
+
+<tml:script>
+	extractKeys = function(portlets) {
+	
+		var keys = [];
+		
+		for (pInfoXML in Iterator(portlets)) {
+			var pInfo = new XML(pInfoXML);
+			keys.push(pInfo.key);
+		}
+		
+		return keys;
+	
+	}
+
+	if (portlet.getSessionVar("currentpage")==null || resetportlets==true)	{
+		portlet.setSessionVar("currentpage", -1);
+
+	}		
+	
+	
+</tml:script>
+
+<script>
+	WGA.event.register(
+		"<tml:script>return portlet.portletkey</tml:script>",
+		"BE_portletUnregistered", 
+		function(e){
+			var pages="<tml:script expression="extractKeys(itemList('portlets'))" divider=","/>";
+			if(pages.indexOf(e.params.key)>=0){
+				WGA.ajax.callAction('<tml:action ref="$refresh"/>')
+			}
+		}
+	);
+
+	WGA.event.register(
+		"<tml:script>return portlet.portletkey</tml:script>",
+		"tabview_refresh", 
+		function(e){
+			if(e.params.portletkey=="<tml:script expression="portlet.portletkey"/>"){
+				WGA.ajax.callAction('<tml:action ref="$refresh"/>')
+			}
+		}
+	);
+
+	WGA.event.register(
+		"<tml:script>return portlet.portletkey</tml:script>",
+		"tabview_PageTitleChanged", 
+		function(e){
+			var el = document.getElementById(e.params.pkey+"_title");
+			if(el)
+				el.innerHTML = e.params.title;
+		}
+	);
+
+</script>
+
+<div class="tab_header">
+	
+	<table class="tabs" border="0" cellpadding="0" cellspacing="0">
+		<tr>
+
+			<tml:if condition="portlet.getSessionVar('currentpage')==-1">
+				<tml:then>
+					<td class="tab_selected" nowrap>
+				</tml:then>
+				<tml:else>
+					<td nowrap class="tab_normal">
+				</tml:else>
+			</tml:if>
+		
+				<div class="tab_r">
+					<a href="<tml:url type="action" action="selectTabPage" param1="-1" ajax="true"/>">
+						<tml:option name="title" encode="none"/>
+					</a>
+				</div>		
+			</td>			
+			<td class="tab_space">&nbsp;</td>
+			
+			<tml:script>_pages=itemList("pages")</tml:script>
+			<tml:foreach type="itemvalue" item="_pages" currentvalue="_page" id="pageloop" trim="true">
+				
+				<tml:script>
+					pInfo = new XML(portlet.getSessionVar("portlets").get(taginfo('pageloop', 'iteration')-1));
+					_pkey=pInfo.key;
+				</tml:script>
+					
+				<tml:if condition="portlet.getSessionVar('currentpage')==taginfo('pageloop', 'iteration')">
+					<tml:then>
+						<td id="<tml:item name="_pkey"/>" class="tab_selected" nowrap>
+					</tml:then>
+					<tml:else>
+						<td id="<tml:item name="_pkey"/>" class="tab_normal" nowrap>
+					</tml:else>
+				</tml:if>
+					
+					<div class="tab_r">
+						
+						<a href="<tml:url type="action" action="selectTabPage" param1="{taginfo('pageloop', 'iteration')}" ajax="true"/>">
+							<span id="<tml:item name="_pkey"/>_title">
+								<tml:item name="_page" encode="none"/>							
+							</span>
+						</a>				
+						<a href="<tml:url type="action" action="deleteTabPage" param1="{taginfo('pageloop', 'iteration')}" ajax="true"/>">
+							<img class="tab_close" border="0" alt="{%label:tabview.close-tab%}" title="{%label:tabview.close-tab%}" 
+									src="<tml:url type="file" doc="images" file="close.gif"/>">
+						</a>
+						
+					</div>
+				</td>
+				
+			</tml:foreach>
+			
+			<td class="tab_addon" nowrap>&nbsp;<tml:option name="pageaddon"/>&nbsp;</td>
+			<tml:case condition="itemList('pages').size()>0">
+				<td>
+					<a href="#" onclick="WGA.ajax.callAction('<tml:action ref="deleteAllTabPages"/>',
+										'<tml:script>return portlet.portletkey</tml:script>')">
+						<img border="0" alt="{%label:tabview.close-all-tabs%}" title="{%label:tabview.close-all-tabs%}" src="<tml:url type="file" doc="images" file="close.gif"/>">
+					</a>
+							
+				</td>
+			</tml:case>
+		</tr>
+	</table>
+</div>
+
+<div class="tab_body">
+	<tml:if condition="portlet.getSessionVar('currentpage')==-1">
+		<tml:then>
+			<tml:option name="body" trim="true"/>
+		</tml:then>
+		<tml:else>			
+			<tml:script>
+				if (itemList("pages").isEmpty()){
+					addwarning("No pages in Tabview. Should not happen", false);
+					return;		// should not happen!
+				}
+				var pInfo = new XML(portlet.getSessionVar("portlets").get(portlet.getSessionVar('currentpage')-1));
+				_includeRef = pInfo.tml;
+				_includeName = pInfo.pname;
+				return 
+			</tml:script>
+			
+			<tml:case condition="_includeRef">
+				<tml:portlet designdb="{option('designdb')||context('main').meta('db','dbkey')}" name="{item:_includeName}" ref="{item:_includeRef}" ajax="true"/>			
+			</tml:case>
+		</tml:else>
+	</tml:if>	
+</div>
+

@@ -1,0 +1,117 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<div id="link-attachmentview-container">
+	<div id="link-attachmentview-toolbar"></div>
+	<div id="link-attachmentview" class="ychooser-view"></div>
+</div>
+
+<script>
+	
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", function() {
+	
+		var tb = new Ext.Toolbar({
+			renderTo: 'link-attachmentview-toolbar',
+			items:[
+				"Attachments in '<tml:meta name="title"/>':"
+			]
+		});	
+
+		var datastore = new Ext.data.JsonStore({
+	        url: "<tml:url type="tml" medium="json" layout="get-attachments"/>",	        
+            root: "data",
+            fields: [
+		        { name: 'id'   }, 
+		        { name: 'name' },
+	            { name: 'url'  },
+	            { name: 'size' }
+	        ]
+		});
+			
+		function renderFileSize(value){
+			// start with GB and work way down to kB
+			var kb = 1024;
+			var mb = kb*kb;
+			var gb = mb*kb;				
+			if (value >= gb)
+				return Math.round(value/gb) + ' GB';
+			else if (value >= mb)
+				return Math.round(value/mb) + ' MB';
+			else if (value >= kb)
+				return Math.round(value/kb) + ' KB';
+			else
+				return value + ' bytes';		
+		}
+		
+        var cm = new Ext.grid.ColumnModel([
+			{id:'name', header:'{%label:dialog.image.col-filename%}', sortable:true, dataIndex:'name' },
+			{id:'size', header:'{%label:dialog.image.col-filesize%}', sortable:true, align:"right", renderer: renderFileSize, dataIndex:'size' }
+		]);
+
+		var singleSelectionModel = new Ext.grid.RowSelectionModel({singleSelect: true});
+        var grid = new Ext.grid.GridPanel({
+        	applyTo: 'link-attachmentview', 
+            ds: datastore,
+            cm: cm,
+            selModel: singleSelectionModel,
+            autoHeight: true,
+            autoExpandColumn: 'name'
+        });
+         
+       	grid.on('rowclick', function(g, idx, e) {
+        	var data = datastore.getAt(idx).data;
+			MD.LinkDialog.selectLink(data.url, data.id, data.id);
+        });
+        
+        grid.on('rowdblclick', function(g, idx, e) {
+        	MD.submit();
+        });
+        
+		datastore.load({
+		  	params:{
+				type: 'content',
+				key: '<tml:metadata name="key"/>',	
+				so: '<tml:script expression="AFW.Util.serializeJsObject({dbkey:meta('database', 'dbkey')})"/>'
+			}
+		});	
+		
+		datastore.on('load', function() {
+			var key = '<tml:option name="wgakey"/>';
+        	var node = datastore.getById(key);
+			if (node) {
+				MD.LinkDialog.selectLink(node.data.url, node.data.id, node.data.id);
+				grid.getSelectionModel().selectRecords([node], false);
+				// find row to focus
+				for (var i=0; i < datastore.data.items.length; i++) {
+					if (datastore.data.items[i].id == key) {
+						grid.getView().focusRow(i);
+						break;
+					}
+				}
+			}
+        });		
+	
+	});
+	
+</script>

@@ -1,0 +1,160 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:range labelfile="rtf">
+
+Ext.ux.RTF.toolpanel = function(){
+
+	var editor;		
+
+	var updateListener=[];
+	function addUpdateListener(f){
+		updateListener.push(f);
+	}
+	
+	function updateButtons(toolbar){
+		Ext.ux.RTF.toolbar.updateButtons(toolbar);
+	}
+	
+	function updateMenu(menu){
+		Ext.ux.RTF.toolbar.updateMenu(menu);
+	}		
+	
+	function doCommand(button, ev){
+		Ext.ux.RTF.toolbar.restoreEditorSelection();
+		editor.execCmd(button.cmd, button.param||null);
+	};
+
+	var modeButton;
+	function modeButtonHandler(m, ev){
+		editor.changeViewMode(m.mode);
+		if(m.mode!="wysiwyg"){
+			Ext.ux.RTF.toolpanel.hideTabs();
+			Ext.ux.RTF.toolbar.hide();
+		}
+		else {
+			Ext.ux.RTF.toolpanel.showTabs();
+			Ext.ux.RTF.toolbar.showToolbarDialog();
+		}
+		modeButton.setText(m.text);
+	}
+	
+	
+	/*
+	 * public interface:
+	 */
+	return{
+
+		init: function(forceParagraphs){
+		
+			editor = Ext.ux.RTF.toolbar.getEditor();
+			editor.ensureParagraphs=forceParagraphs||false;
+		
+			updateListener=[];
+			Ext.ux.RTF.toolbar.toolpanel = this;
+
+			<tml:include ref="rtftoolpanel:format"/>
+			<tml:include ref="rtftoolpanel:table"/>
+			<tml:include ref="rtftoolpanel:image"/>	
+			<tml:include ref="rtftoolpanel:link"/>	
+			
+			var tabs = new Ext.TabPanel({
+				renderTo: "rtf-tabs",
+				activeTab: 0,
+				items:[
+					{
+						contentEl: "rtf-tab-format", 
+						title: "<tml:label key="rtf.format"/>"
+					}
+					,{
+						contentEl: "rtf-tab-table", 
+						title: "<tml:label key="rtf.table"/>",
+						disabled: Ext.ux.RTF.toolbar.isCmdDisabled("inserttable")
+					}
+					,{
+						contentEl: "rtf-tab-img", 
+						title: "<tml:label key="rtf.image"/>",
+						disabled: Ext.ux.RTF.toolbar.isCmdDisabled("insertimg")
+					}
+					,{
+						contentEl: "rtf-tab-link", 
+						title: "<tml:label key="rtf.link"/>",
+						disabled: Ext.ux.RTF.toolbar.isCmdDisabled("insertlink")
+					}
+				]
+			});
+			WGA.portlet.registerObject("<tml:script expression="portlet.portletkey"/>", tabs)
+			
+			modeButton = new Ext.Button({
+				renderTo: "edititem-mode-button", 
+				text: "<tml:label key="rtf.mode.wysiwyg"/>",
+				menu: {
+					items: [
+						{
+							text: "<tml:label key="rtf.mode.wysiwyg"/>"
+							,mode: "wysiwyg"
+							,handler: modeButtonHandler
+						}
+						,{
+							text: "<tml:label key="rtf.mode.html"/>"
+							,mode: "html"
+							,disabled: Ext.ux.RTF.toolbar.isCmdDisabled("edithtml")
+							,handler: modeButtonHandler
+						}
+						,{
+							text: "<tml:label key="rtf.mode.preview"/>"
+							,mode: "preview"
+							,handler: modeButtonHandler
+						}
+					]
+				}
+			})
+			WGA.portlet.registerObject("<tml:script expression="portlet.portletkey"/>", modeButton)
+		},
+	
+		update: function(eventType){			
+			for(var i=0; i<updateListener.length; i++){
+				try{
+					updateListener[i](eventType)
+				}
+				catch(e){}
+			}
+		},
+		
+		showTabs: function(){
+			if(WGA.isIE)
+				Ext.get("rtf-tabs").setDisplayed(true);
+			else Ext.get("rtf-tabs").removeClass("x-hidden");
+		},
+		hideTabs: function(){
+			if(WGA.isIE)
+				Ext.get("rtf-tabs").setDisplayed(false);
+			else Ext.get("rtf-tabs").addClass("x-hidden");
+		}
+		
+	}
+
+}();	
+
+</tml:range>

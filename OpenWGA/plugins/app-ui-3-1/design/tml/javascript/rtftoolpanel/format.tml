@@ -1,0 +1,583 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+/*
+ * Toolbars:
+ */
+
+var foreColorMenu = new Ext.menu.ColorMenu();
+foreColorMenu.on("select", function(palette, color){
+	Ext.ux.RTF.toolbar.restoreEditorSelection();
+	editor.execCmd("ForeColor", (WGA.isIE?"":"#")+color);
+})
+
+var toolbar = new Ext.Toolbar({
+	renderTo: "rtf-toolbar",
+		items:[
+		{
+			cmd: "RemoveFormat",
+			cls: "x-btn-icon",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="html_delete.png"/>",
+			tooltip: "<tml:label key="rtf.format.remove-all"/>",
+			handler: doCommand
+		},
+		"-",
+		{
+			cmd: "Bold",
+			cls: "x-btn-icon",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="text_bold.png"/>",
+			tooltip: "<tml:label key="rtf.format.bold"/>",
+			handler: doCommand
+		},
+		{
+			cmd: "Italic",
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.format.italic"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="text_italic.png"/>",
+			handler: doCommand
+		},
+		{
+			cmd: "Underline",
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.format.underline"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="text_underline.png"/>",
+			handler: doCommand
+		},
+		"-",
+		{
+			cls: "x-btn-text",
+			cmd: "forecolor",
+			text: "<div style='width:20;border:solid white 1px'>a</div>",
+			menu: foreColorMenu
+		}
+	]
+});
+
+if(!Ext.isGecko){
+	var backColorMenu = new Ext.menu.ColorMenu();
+	backColorMenu.on("select", function(palette, color){
+		Ext.ux.RTF.toolbar.restoreEditorSelection();
+		editor.execCmd("BackColor", (WGA.isIE?"":"#")+color);
+	})
+	toolbar.add({
+		cls: "x-btn-text",
+		text: "<div style='width:20;background-color:black;color:red;text-align:center;border:solid white 1px'>&nbsp;</div>",
+		menu: backColorMenu
+	})
+}
+
+var toolbar_para = new Ext.Toolbar({
+	renderTo: "rtf-toolbar-para",
+	items: [
+		{
+			cmd: "JustifyLeft",
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.paragraph.justify-left"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="text_align_left.png"/>",
+			handler: doCommand
+		},
+		{
+			cmd: "JustifyCenter",
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.paragraph.justify-center"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="text_align_center.png"/>",
+			handler: doCommand
+		},
+		{
+			cmd: "JustifyRight",
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.paragraph.justify-right"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="text_align_right.png"/>",
+			handler: doCommand
+		},
+		{
+			cmd: "JustifyFull",
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.paragraph.justify-full"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="text_align_justify.png"/>",
+			handler: doCommand
+		},
+		"-",
+		{
+			cmd: "Indent",
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.paragraph.indent"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="text_indent.png"/>",
+			handler: doCommand
+		},
+		{
+			cmd: "Outdent",
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.paragraph.outdent"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="text_indent_remove.png"/>",
+			handler: doCommand
+		},
+		"-",
+		{
+			cmd: "InsertUnorderedList",
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.list.bullets"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="text_list_bullets.png"/>",
+			handler: doCommand
+		},
+		{
+			cmd: "InsertOrderedList",
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.list.enum"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="text_list_numbers.png"/>",
+			handler: doCommand
+		}
+		
+	]
+});
+
+/*
+ * Buttons
+ */
+function fontFamilyHandler(m){
+	Ext.ux.RTF.toolbar.restoreEditorSelection();
+	editor.execCmd("FontName", m.fontname);
+}
+var fontFamilyButton = new Ext.Button({
+	renderTo: "rtf-toolbar-format-fonts", 
+	text: "<tml:label key="rtf.standard"/>",
+	menu: {
+		items: [
+			new Ext.menu.CheckItem({
+				text: "<span style='font-family:arial'>Arial</span>",
+				fontname: "arial",
+				group: 'fontFamily',
+				handler: fontFamilyHandler
+			}),
+			new Ext.menu.CheckItem({
+				text: "<span style='font-family:times'>Times</span>",
+				fontname: "times",
+				group: 'fontFamily',
+				handler: fontFamilyHandler
+			}),
+			new Ext.menu.CheckItem({
+				text: "<span style='font-family:helvetica'>Helvetica</span>",
+				fontname: "helvetica",
+				group: 'fontFamily',
+				handler: fontFamilyHandler
+			}),
+			new Ext.menu.CheckItem({
+				text: "<span style='font-family:courier'>Courier</span>",
+				fontname: "courier",
+				group: 'fontFamily',
+				handler: fontFamilyHandler
+			}),
+			new Ext.menu.CheckItem({
+				text: "<span style='font-family:verdana'>Verdana</span>",
+				fontname: "verdana",
+				group: 'fontFamily',
+				handler: fontFamilyHandler
+			})
+		]
+	}
+})
+
+
+function fontSizeHandler(m){
+	Ext.ux.RTF.toolbar.restoreEditorSelection();
+	editor.execCmd("FontSize", m.fontsize);
+}
+var fontSizeButton = new Ext.Button({
+	renderTo: "rtf-toolbar-format-fontsize", 
+	text: "<tml:label key="rtf.standard"/>",
+	menu: {
+		items: [
+			new Ext.menu.CheckItem({
+				text: "<font size='1'><tml:label key="rtf.font.size.very-small"/></font>",
+				infotext: "<tml:label key="rtf.font.size.very-small"/>",
+				fontsize: 1,
+				group: 'fontsize',
+				handler: fontSizeHandler
+			})
+			,
+			new Ext.menu.CheckItem({
+				text: "<font size='2'><tml:label key="rtf.font.size.small"/></font>",
+				infotext: "<tml:label key="rtf.font.size.small"/>",
+				fontsize: 2,
+				group: 'fontsize',
+				handler: fontSizeHandler
+			})
+			,
+			new Ext.menu.CheckItem({
+				text: "<font size='3'><tml:label key="rtf.font.size.normal"/></font>",
+				infotext: "<tml:label key="rtf.font.size.normal"/>",
+				fontsize: 3,
+				group: 'fontsize',
+				handler: fontSizeHandler
+			})
+			,
+			new Ext.menu.CheckItem({
+				text: "<font size='4'><tml:label key="rtf.font.size.big"/></font>",
+				infotext: "<tml:label key="rtf.font.size.big"/>",
+				fontsize: 4,
+				group: 'fontsize',
+				handler: fontSizeHandler
+			})
+			,
+			new Ext.menu.CheckItem({
+				text: "<font size='5'><tml:label key="rtf.font.size.very-big"/></font>",
+				infotext: "<tml:label key="rtf.font.size.very-big"/>",
+				fontsize: 5,
+				group: 'fontsize',
+				handler: fontSizeHandler
+			})
+		]
+	}
+})
+
+var headingButton = new Ext.Button({
+	renderTo: "rtf-toolbar-format-heading", 
+	text: "<tml:label key="rtf.paragraph.normal-heading"/>",
+	menu: {
+		items: [
+			new Ext.menu.CheckItem({
+				text: "<tml:label key="rtf.paragraph.heading-none"/>",
+				paraStyle: "",
+				group: 'headings',
+				handler: function(){
+					var el = editor.getParagraph();
+					if(el){
+						editor.selection.save();
+						editor.removeNode(el, true);
+						editor.selection.restore();
+						Ext.ux.RTF.toolbar.update();
+					}
+				}
+			})
+			,new Ext.menu.CheckItem({
+				text: "<tml:label key="rtf.paragraph.normal-heading"/>",
+				paraStyle: "p",
+				group: 'headings',
+				handler: headingHandler
+			})
+			,"-"
+			,new Ext.menu.CheckItem({
+				text: "<tml:label key="rtf.paragraph.h1"/>",
+				paraStyle: "h1",
+				group: 'headings',
+				handler: headingHandler
+			})
+			,new Ext.menu.CheckItem({
+				text: "<tml:label key="rtf.paragraph.h2"/>",
+				paraStyle: "h2",
+				group: 'headings',
+				handler: headingHandler
+			})
+			,new Ext.menu.CheckItem({
+				text: "<tml:label key="rtf.paragraph.h3"/>",
+				paraStyle: "h3",
+				group: 'headings',
+				handler: headingHandler
+			})
+			,new Ext.menu.CheckItem({
+				text: "<tml:label key="rtf.paragraph.h4"/>",
+				paraStyle: "h4",
+				group: 'headings',
+				handler: headingHandler
+			})
+			,new Ext.menu.CheckItem({
+				text: "<tml:label key="rtf.paragraph.h5"/>",
+				paraStyle: "h5",
+				group: 'headings',
+				handler: headingHandler
+			})
+			,new Ext.menu.CheckItem({
+				text: "<tml:label key="rtf.paragraph.h6"/>",
+				paraStyle: "h6",
+				group: 'headings',
+				handler: headingHandler
+			})
+		]
+	}
+});
+function headingHandler(m){
+	Ext.ux.RTF.toolbar.restoreEditorSelection();
+	editor.execCmd("FormatBlock", m.paraStyle);
+	if(m.paraStyle!="p")
+		editor.getParagraph().className="";
+	Ext.ux.RTF.toolbar.update();
+}
+function updateHeadingButton(){
+	headingButton.setText("<tml:label key="rtf.paragraph.heading-none"/>");
+	headingButton.menu.items.each(function(item){
+		if(item.paraStyle){
+			var isPara = editor.getNearestTagFromSelection(item.paraStyle);
+			if(isPara){
+				headingButton.setText(item.text);
+			}
+			item.setChecked(isPara)
+		}
+	})
+	if(Ext.ux.RTF.toolbar.isCmdDisabled("formatblock"))
+		headingButton.disable();
+	else headingButton.enable();
+}
+
+/* 
+ * paragraph styles
+ */
+function pStyleHandler(menu, ev){
+	Ext.ux.RTF.toolbar.restoreEditorSelection();
+	var el = editor.getParagraph()	
+	if(el){
+		el.className=menu.el_style;
+		Ext.ux.RTF.toolbar.update();
+	}			
+}
+
+var menu = new Ext.menu.Menu()
+menu.add(new Ext.menu.CheckItem({
+	text: "<tml:label key="rtf.style.none"/>",
+	el_style: "",
+	handler: pStyleHandler
+}))
+for(var i=0; i<Ext.ux.RTF.toolbar.paragraphStyleList.length; i++){
+	var style = Ext.ux.RTF.toolbar.paragraphStyleList[i].split("|");
+	menu.add(new Ext.menu.CheckItem({
+		text: style[0],
+		el_style: style[1],
+		handler: pStyleHandler
+	}))
+}
+var pStyleMenu = menu;
+var pStyleButton = new Ext.Button({
+	renderTo: "rtf-toolbar-format-style", 
+	text: "<tml:label key="rtf.no-styles-defined"/>",
+	menu: menu
+})
+
+/* 
+ * sections 
+ */
+var toolbar_section = new Ext.Toolbar({
+	renderTo: "rtf-toolbar-section",
+	items: [
+		{
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.section.add"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="textfield_add.png"/>",
+			handler: function(){
+				if(!editor.getParagraph())
+					editor.execCmd("FormatBlock", "p");
+				editor.selection.surround("div");
+				editor.selection.focus();
+				Ext.ux.RTF.toolbar.update();
+			}
+		}
+		,{
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.section.remove"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="textfield_delete.png"/>",
+			cmd: "section.remove",
+			queryCommandEnabled: function(){
+				return editor.getNearestTagFromSelection("div")!=null
+			},
+			handler: function(){
+				var el = editor.getNearestTagFromSelection("div");
+				if(el){
+					editor.selection.save();				
+					editor.removeNode(el);
+					editor.selection.restore();
+					Ext.ux.RTF.toolbar.update();
+				}
+			}
+		}
+		,"-"
+		,{
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.section.append_paragraph"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="text_padding_bottom.png"/>",
+			cmd: "section.appendParagraph",
+			queryCommandEnabled: function(){
+				return editor.getNearestTagFromSelection("div")!=null
+			},
+			handler: function(){
+				var el = editor.getNearestTagFromSelection("div");
+				if(el){
+					var p = editor.doc.createElement("p");
+					p.appendChild(editor.doc.createElement("br"));
+					if(el.nextSibling)
+						el.parentNode.insertBefore(p, el.nextSibling);
+					else el.parentNode.appendChild(p);
+					editor.selection.selectNodeContents(p);
+				}
+				Ext.ux.RTF.toolbar.update();
+			}
+		}
+		,{
+			cls: "x-btn-icon",
+			tooltip: "<tml:label key="rtf.section.insert_paragraph"/>",
+			icon: "<tml:url db="@afw" type="file" doc="icons" file="text_padding_top.png"/>",
+			cmd: "section_insertParagraph",
+			queryCommandEnabled: function(){
+				return editor.getNearestTagFromSelection("div")!=null
+			},
+			handler: function(){
+				var el = editor.getNearestTagFromSelection("div");
+				if(el){
+					var p = editor.doc.createElement("p");
+					p.appendChild(editor.doc.createElement("br"));
+					el.parentNode.insertBefore(p, el);
+					editor.selection.selectNodeContents(p);
+				}
+				Ext.ux.RTF.toolbar.update();
+			}
+		}
+	]
+});
+function sectionStyleHandler(menu, ev){
+	Ext.ux.RTF.toolbar.restoreEditorSelection();
+
+	var el = Ext.fly(editor.getNearestTagFromSelection("div"));	
+	if(el){
+		if(menu.checked)
+			el.removeClass(menu.el_style);			
+		else el.addClass(menu.el_style);
+		Ext.ux.RTF.toolbar.update();
+	}			
+}
+
+
+var menu = new Ext.menu.Menu()
+for(var i=0; i<Ext.ux.RTF.toolbar.sectionStyleList.length; i++){
+	var style = Ext.ux.RTF.toolbar.sectionStyleList[i].split("|");
+	menu.add(new Ext.menu.CheckItem({
+		text: style[0],
+		el_style: style[1],
+		handler: sectionStyleHandler
+	}))
+}
+var sectionStyleMenu = menu;
+var sectionStyleButton = new Ext.Button({
+	renderTo: "rtf-toolbar-section-style", 
+	text: Ext.ux.RTF.toolbar.sectionStyleList.length ? "<tml:label key="rtf.style.none"/>" : "<tml:label key="rtf.no-styles-defined"/>",
+	menu: menu
+})
+
+
+/*
+ * Update Listener
+ */
+addUpdateListener(function(){
+	// check font selection
+	var fontname = editor.doc.queryCommandValue("fontname");
+	//console.log(fontname);
+	if(fontname){
+		fontname=fontname.toLowerCase();
+		fontFamilyButton.menu.items.each(function(item){
+			if(item.fontname==fontname){
+				fontFamilyButton.setText(item.text);
+			}
+			item.setChecked(item.fontname==fontname)
+		})
+	}
+	else{
+		fontFamilyButton.menu.items.each(function(item){
+			item.setChecked(false)
+		})
+		fontFamilyButton.setText("<tml:label key="rtf.standard"/>");				
+	}
+	if(Ext.ux.RTF.toolbar.isCmdDisabled("fontname"))
+		fontFamilyButton.disable();
+	else fontFamilyButton.enable();
+	
+	// check font size
+	var fontsize = editor.doc.queryCommandValue("fontsize");
+	if(fontsize){
+		fontSizeButton.menu.items.each(function(item){
+			if(item.fontsize==fontsize){
+				fontSizeButton.setText(item.infotext);							
+			}
+			item.setChecked(item.fontsize==fontsize)
+		})
+	}
+	else{
+		fontSizeButton.menu.items.each(function(item){
+			item.setChecked(false)
+		})
+		fontSizeButton.setText("<tml:label key="rtf.standard"/>");				
+	}
+	if(Ext.ux.RTF.toolbar.isCmdDisabled("fontsize"))
+		fontSizeButton.disable();
+	else fontSizeButton.enable();
+	
+	updateHeadingButton();
+
+	// paragraph styles:
+	if(Ext.ux.RTF.toolbar.paragraphStyleList.length>0){
+		var para = editor.getNearestTagFromSelection("p");
+		pStyleMenu.items.each(function(item){
+			if(para){		
+				if(item.el_style==para.className){
+					pStyleButton.setText(item.text);
+				}
+				item.setChecked(item.el_style==para.className)
+				pStyleButton.enable();
+			}
+			else {
+				item.setChecked(false);
+				pStyleButton.setText("<tml:label key="rtf.style.none"/>");
+				pStyleButton.disable();
+			}
+		})
+	}
+	else pStyleButton.disable();
+
+	// section styles:
+	var section = editor.getNearestTagFromSelection("div");
+	if(section){
+		if(Ext.ux.RTF.toolbar.sectionStyleList.length>0){
+			sectionStyleButton.enable();
+			var classes = [];
+			sectionStyleMenu.items.each(function(item){
+				var class_mach = section.className.indexOf(item.el_style)>=0;
+				if(class_mach){
+					classes.push(item.text) 
+				}
+				item.setChecked(class_mach)
+			})
+			if(classes.length)
+				sectionStyleButton.setText(classes.join(", "))
+			else sectionStyleButton.setText("<tml:label key="rtf.style.none"/>"); 
+		}
+		else sectionStyleButton.disable();
+	}
+	else{
+		sectionStyleButton.disable();
+		sectionStyleButton.setText(Ext.ux.RTF.toolbar.sectionStyleList.length ? "<tml:label key="rtf.style.none"/>" : "<tml:label key="rtf.no-styles-defined"/>")
+	}
+	
+	// check format cmd-states
+	updateButtons(toolbar)
+	// check paragraph cmd-states
+	updateButtons(toolbar_para)
+	// sections toolbar:
+	updateButtons(toolbar_section)
+
+})

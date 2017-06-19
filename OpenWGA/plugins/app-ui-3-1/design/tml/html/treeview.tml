@@ -1,0 +1,124 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	setOption("id", "vw_"+AFW.Util.generateUID(), "local")
+</tml:script>
+
+<div id="<tml:option name="id"/>"></div>
+
+<script>
+	// do everything onload:	
+	WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>",
+				
+		function(){
+			var clickTimer = new Ext.util.DelayedTask;
+			var tree = new Ext.tree.TreePanel({
+				el: "<tml:option name="id"/>", 
+				<tml:case condition="option('loaderurl')!=null">
+			        loader: new Ext.tree.TreeLoader({
+			        	dataUrl: "<tml:option name="loaderurl"/>"
+						<tml:case condition="option('baseparams')!=null">
+							,baseParams: <tml:option name="baseparams"/>
+						</tml:case>
+			        }),
+				</tml:case>
+
+		        autoScroll:true,
+        		containerScroll: true, 
+		        animate:true,
+		        autoHeight: true,
+		        enableDD:false
+				<tml:case condition="option('config')!=null && option('config')!=''">
+					,<tml:option name="config"/>
+				</tml:case>        
+		    });
+		    
+			<tml:case condition="option('onclick')!=null">
+				tree.on("click", function(node){
+					clickTimer.delay(250, function(){
+						<tml:option name="onclick"/>
+					}, node);
+				})
+			</tml:case>
+			
+			<tml:if condition="option('loaderurl')!=null">
+				<tml:then>
+				    var root = new Ext.tree.AsyncTreeNode({
+				        id:'root',
+				        text: "root"
+				        <tml:case hasoption="root-icon">
+				        	,icon: "<tml:option name="root-icon"/>"
+				        </tml:case>
+				        ,draggable: false     
+				    });		    
+				</tml:then>
+				<tml:else>
+				    var root = new Ext.tree.TreeNode({
+				        id:'root'
+				        ,text: "root"
+				        <tml:case hasoption="root-icon">
+				        	,icon: "<tml:option name="root-icon"/>"
+				        </tml:case>
+				        ,draggable: false 
+				    });
+					appendChildren(root, [<tml:option name="nodes"/>]);
+					
+					function appendChildren(node, children){
+						for(var n=0; n<children.length; n++){
+					    	var child = children[n]
+							var newnode = new Ext.tree.TreeNode(child);
+							node.appendChild(newnode);
+							//console.log("apended:", child.text, child.children, newnode.id);
+							if(child.children)
+								appendChildren(newnode, child.children);
+						}
+					}
+					
+				</tml:else>
+			</tml:if>
+			<tml:case condition="option('root-title')!=null">
+				root.setText("<tml:option name="root-title"/>")		
+			</tml:case>
+		    tree.setRootNode(root);
+		    
+			<tml:case condition="option('var')!=null">
+				<tml:option name="var"/> = tree;
+			</tml:case>
+			
+		    tree.render();
+		    //new Ext.tree.TreeSorter(tree);
+		    new Ext.tree.TreeSorter(tree, {<tml:option name="treesorter"/>});
+			tree.selectPath("root")
+		    root.expand();
+		    
+		    var onload = function(){
+		    	<tml:option name="onload"/>
+		    };
+		    onload.createDelegate(tree)()
+			
+		}
+	);
+	
+</script>

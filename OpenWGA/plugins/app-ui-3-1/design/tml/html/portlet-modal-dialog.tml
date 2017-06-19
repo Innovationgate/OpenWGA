@@ -1,0 +1,145 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:form id="afw-modal-dialog-form" persist="true" htmlinput="ignore">
+
+	<tml:input type="hidden" name="params"/>
+	<tml:input type="hidden" name="tml"/>
+	<tml:input type="hidden" name="submitAction"/>
+	<tml:input type="hidden" name="formmode"/>
+	<tml:input type="hidden" name="formsource"/>
+	<tml:input type="hidden" name="context"/>
+	<tml:input type="hidden" name="designdb"/>
+
+	<script>	
+
+		MD.portletkey="<tml:script>return portlet.portletkey</tml:script>";
+
+		MD.show=function(dialogname, el, config){
+			
+			if(!MD.init(dialogname, el))
+				return;
+			var dialog=MD.dialogs[dialogname];
+			var form = document.forms["afw-modal-dialog-form"];
+			var config = config || {};
+			Ext.applyIf(config, {
+				mode: "edit",
+				source: "content",
+				context: "currentdocument",
+				params: {}
+			});
+						
+			form.designdb.value=dialog.designdb;
+			form.tml.value=dialog.tml;
+			if(dialog.submitButton)
+				form.submitAction.value=dialog.submitButton.action;
+			
+			form.formmode.value=config.mode;
+			form.formsource.value=config.source;
+			form.context.value=config.context;
+			
+			var encoded_params="";
+			for(p in config.params)
+				encoded_params += "&"+p+"="+config.params[p];
+			form.params.value=encoded_params;
+							
+			WGA.ajax.callAction("<tml:action>
+					portlet.setMode("showdialog");
+				</tml:action>", "<tml:script>return portlet.portletkey</tml:script>");
+		}
+
+		MD.submit=function(){
+			// must be overwritten in dialog-portlet
+			alert("No submit function defined");
+		}
+		MD.onShow=function(){
+			// may be overwritten in dialog-portlet
+		}
+	</script>
+	
+	<tml:script>
+		_tml = tmlform.tml;
+		_submitAction = tmlform.submitAction;
+		_mode = tmlform.formmode;
+		_source = tmlform.formsource;
+		_context = tmlform.context;
+
+		if(tmlform.designdb!="undefined")
+			_designdb = tmlform.designdb;
+		else _designdb = option("designdb") || context("main").meta("db", "dbkey"); 
+		
+		try{
+			var encoded_params=tmlform.params;
+			var params_array=encoded_params.split("&");
+			for(p=0; p<params_array.length; p++){
+				var param=params_array[p].split("=");
+				if(param[0]!="")
+					setOption(param[0], param[1]);
+			}
+		}
+		catch(e){}
+	</tml:script>
+	
+</tml:form>
+	
+<tml:select>
+	<tml:case portletmode="showdialog">
+		<tml:case condition="_tml!=null">
+			
+			<tml:form id="{_tml+'-form'}" mode="{_mode}" source="{_source}" context="{_context}" htmlinput="ignore">
+				<div style="padding:5px">
+					<tml:include designdb="{_designdb}" ref="{_tml}"/>
+				</div>
+				
+				<script>
+					<tml:case isfilled="_submitAction">
+						if(MD.config.submitButton){
+							MD.submit=function(){
+								var msg=MD.config.submitButton.msg || "loading ..."
+								MD.callAction("<tml:action ref="{_submitAction}"/>", msg);
+							}
+						}
+					</tml:case>
+					
+					<tml:case condition="_mode!='edit'">
+						MD.submitButton.hide(true);
+					</tml:case>
+
+					MD.autoHeight();
+					if(!MD.dialog.isVisible())
+						MD.dialog.show(MD.el);
+				</script>
+				
+			</tml:form>
+			
+		</tml:case>
+	</tml:case>
+	<tml:case portletmode="view">
+		<h1>Dialog closed.</h1>
+		<script>
+			MD.hide();
+		</script>
+	</tml:case>
+</tml:select>
+

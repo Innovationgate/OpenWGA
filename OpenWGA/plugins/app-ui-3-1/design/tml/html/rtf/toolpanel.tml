@@ -1,0 +1,160 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:range labelfile="rtf">
+	<script>		
+		Ext.ux.RTF.toolpanel.init(<tml:script expression="tmlform.forceparagraphs=='1'"/>);
+		Ext.ux.RTF.toolpanel.update();
+		Ext.ux.RTF.toolpanel.showTabs();
+	</script>
+	
+	<div style="margin-bottom: 5px">
+		<label style="float:left"><tml:label key="rtf.mode"/>:</label>
+		<div style="float:left;margin-left:40px" id="edititem-mode-button"></div>
+		<div style="clear:both"></div>
+	</div>
+	
+	<tml:script>
+		_Request = createObject(pluginDBKey("de.innovationgate.wga-app-framework")+"/request")
+	</tml:script>
+	
+	<div id="rtf-tabs" <tml:case condition="!_Request.isIE">class="x-layout-inactive-content"</tml:case>></div>
+
+	<div id="rtf-tab-format" style="overflow:hidden" class="x-hide-display">
+		<h1>Text</h1>
+		<div id="rtf-toolbar"></div>
+		<table width="100%">
+			<tr>
+				<td width="70"><tml:label key="rtf.font"/>:</td>
+				<td><div id="rtf-toolbar-format-fonts"></div></td>
+			</tr>
+			<tr>
+				<td><tml:label key="rtf.font.size"/>:</td>
+				<td><div id="rtf-toolbar-format-fontsize"></div></td>
+			</tr>
+		</table>
+
+		<hr size="1">
+
+		<h2><tml:label key="rtf.paragraph"/></h1>
+		<div id="rtf-toolbar-para"></div>
+		<table width="100%">
+			<tr>
+				<td width="70"><tml:label key="rtf.type"/>:</td>
+				<td><div id="rtf-toolbar-format-heading"></div></td>
+			</tr>
+			<tr>
+				<td width="70"><tml:label key="rtf.style"/>:</td>
+				<td><div id="rtf-toolbar-format-style"></div></td>
+			</tr>
+		</table>
+
+		<hr size="1">
+
+		<h2><tml:label key="rtf.section"/></h1>
+		<div id="rtf-toolbar-section"></div>
+		<table width="100%">
+			<tr>
+				<td width="70"><tml:label key="rtf.style"/>:</td>
+				<td><div id="rtf-toolbar-section-style"></div></td>
+			</tr>
+		</table>
+		
+	</div>
+	
+	<div id="rtf-tab-table" class="x-hide-display">
+		<div id="rtf-toolbar-table"></div>
+		<div id="rtf-table-form">
+			<table width="100%">
+				<tr id="rtf-table-format-tableStyles">
+					<td><tml:label key="rtf.table"/>:</td>
+					<td><div id="rtf-toolbar-table-tableStyles-button"></div></td>
+				</tr>
+				<tr id="rtf-table-format-trStyles">
+					<td><tml:label key="rtf.table.row"/>:</td>
+					<td><div id="rtf-toolbar-table-trStyles-button"></div></td>
+				</tr>
+				<tr id="rtf-table-format-tdStyles">
+					<td><tml:label key="rtf.table.cell"/>:</td>
+					<td><div id="rtf-toolbar-table-tdStyles-button"></div></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<div id="rtf-tab-img" class="x-hide-display">
+		<div id="rtf-toolbar-img"></div>
+		<div id="rtf-img-form" style="padding:3px">
+			<tml:label key="rtf.source"/>:<br>
+			<div id="rtf-img-type" style="font-weight:bold"><tml:label key="rtf.image.none-selected"/></div>
+			<div id="rtf-img-input-url-wraper" style="display:none">
+				<tml:label key="rtf.url"/>:<br>
+				<tml:input name="img_url" type="textarea" cssstyle="width:100%">id="rtf-img-input-url" rows="3"</tml:input>
+			</div>
+			<tml:label key="rtf.title"/>:<br>
+			<tml:input name="img_title" cssstyle="width:100%">id="rtf-img-input-title"</tml:input>
+			<tml:label key="rtf.alt"/>:<br>
+			<tml:input name="img_title" cssstyle="width:100%">id="rtf-img-input-alt"</tml:input>
+			
+			<table width="95%">
+				<tr>
+					<td><tml:label key="rtf.text-flow"/>:</td>
+					<td><div id="rtf-img-input-align"></div></td>
+				</tr>
+				<tr>
+					<td width="80"><tml:label key="rtf.border-width"/>:</td>
+					<td><input id="rtf-img-input-border" size="4"></td>
+				</tr>
+				<tr>
+					<td><tml:label key="rtf.width-height"/>:</td>
+					<td><input id="rtf-img-input-width" size="4"> x <input id="rtf-img-input-height" size="4"></td>
+				</tr>
+				<tr>
+					<td><tml:label key="rtf.spacing"/>:</td>
+					<td><input id="rtf-img-input-padding" size="12"></td>
+				</tr>
+			</table>
+			
+			<div id="rtf-img-actionbutton" style="margin-top:5px"></div>
+		</div>
+	</div>
+
+	<div id="rtf-tab-link" class="x-hide-display">
+		<div id="rtf-toolbar-link"></div>
+		<div id="rtf-link-form" style="padding:3px">
+			<tml:label key="rtf.link.type"/>:<br>
+			<div id="rtf-link-type" style="font-weight:bold"><tml:label key="rtf.link.none-selected"/></div>
+			<div id="rtf-link-input-url-wraper" style="display:none">
+				<tml:label key="rtf.url"/>:<br>
+				<tml:input name="link_url" type="textarea" cssstyle="width:100%">id="rtf-link-input-url"</tml:input>
+			</div>
+			<tml:label key="rtf.link.target"/>:<br>
+			<tml:input name="link_target" cssstyle="width:100%">id="rtf-link-input-target"</tml:input>
+			<tml:label key="rtf.title"/>:<br>
+			<tml:input name="link_title" cssstyle="width:100%">id="rtf-link-input-title"</tml:input>
+		</div>
+		
+	</div>
+
+</tml:range>

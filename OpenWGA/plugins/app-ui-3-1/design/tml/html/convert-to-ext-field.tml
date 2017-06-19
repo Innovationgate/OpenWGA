@@ -1,0 +1,240 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:script>
+	_fieldname = option("fieldname");
+	_type = option("type")||"text"
+</tml:script>
+
+<tml:case condition="tmlform.mode()=='edit'">
+	<script>
+		try{
+			var el = document.getElementsByName("<tml:item name="_fieldname"/>")[0];
+			var portletkey = "<tml:script expression="portlet.portletkey"/>";
+			
+			if(el){
+				var fieldParent = Ext.fly(el).findParent("span");
+				if(fieldParent)
+					fieldParent.style.visibility="hidden";				
+				<tml:select switch="_type">
+					<tml:case value="select">
+						var f = new Ext.form.ComboBox({
+							typeAhead: true,
+							lazyRender: false,
+							value: "<tml:script expression="tmlform.field(_fieldname)"/>",
+							validator: function(v){
+								if(this.forceSelection)
+									return this.findRecord("text", v)?true:false;
+								return true
+							},
+							triggerAction: 'all',
+							width: <tml:script expression="option('width')||350"/>,
+							emptyText: "<tml:script expression="option('emptytext')||'Please select a value ...'"/>",
+							forceSelection: <tml:script expression="option('forceselection') ? option('forceselection') : true"/>,
+							editable: <tml:script expression="option('editable')||'false'"/>,
+							<tml:case condition="option('editable')=='true'">
+								hideTrigger : true,
+							</tml:case>
+							transform: el
+						});
+						WGA.portlet.registerObject(portletkey, f);
+						<tml:case hasoption="changeaction">
+							f.on("select", function(){
+								WGA.ajax.callAction('<tml:action ref="{option('changeaction')}"/>', '<tml:script expression="portlet.portletkey"/>');
+							});
+						</tml:case>
+						<tml:case hasoption="onselect">
+							f.on("select", function(){
+								<tml:option name="onselect"/>
+							});
+						</tml:case>
+						
+						<tml:if condition="tmlform.hasMessage(_fieldname)">
+							<tml:then>f.markInvalid("Validation Error: <tml:script expression="DBM.tmlform.getMessage(_fieldname)"/>")</tml:then>
+							<tml:else>if(!f.value)f.clearInvalid();</tml:else>
+						</tml:if>
+					</tml:case>
+		
+					<tml:case value="text">
+						el.style.display="none"
+						var f = new Ext.form.TextField({
+							width: <tml:script expression="option('width')||350"/>,
+							msgTarget: "<tml:script expression="option('msgtarget')||'qtip'"/>",
+							<tml:case condition="tmlform.field(_fieldname)">
+								value: el.value,
+							</tml:case>
+							allowBlank : <tml:script expression="option('allowblank')||false"/>,
+							inputType : "<tml:script expression="option('inputtype')||'text'"/>",
+							<tml:case condition="option('inputtype')!='password'">
+								emptyText: "<tml:script expression="option('emptytext')||'Please enter a value ...'"/>",
+							</tml:case>
+							<tml:case hasoption="vtype">
+								vtype: "<tml:option name="vtype"/>",
+							</tml:case>
+							renderTo: el.parentNode
+						});
+						WGA.portlet.registerObject(portletkey, f);
+						f.on("change", function(field, newVal, oldVal){
+							this.value = newVal;
+						}, el)
+						<tml:case condition="tmlform.hasMessage(_fieldname)">
+							f.markInvalid("Validation Error: <tml:script expression="DBM.tmlform.getMessage(_fieldname)"/>")
+						</tml:case>
+						<tml:case condition="option('onvalid')">
+							f.on("valid", function(field){
+								var valid=true;
+								<tml:option name="onvalid"/>
+							}, el)
+							f.on("invalid", function(field){
+								var valid=false;
+								<tml:option name="onvalid"/>
+							}, el)
+						</tml:case>
+					</tml:case>
+		
+					<tml:case value="password">
+						el.style.display="none"
+						var f = new Ext.form.TextField({
+							width: <tml:script expression="option('width')||350"/>,
+							msgTarget: "<tml:script expression="option('msgtarget')||'qtip'"/>",					
+							<tml:case condition="tmlform.field(_fieldname)">
+								value: el.value,
+							</tml:case>
+							allowBlank : <tml:script expression="option('allowblank')||false"/>,
+							emptyText: "<tml:script expression="option('emptytext')||'Please enter a password ...'"/>",
+							inputType : "<tml:script expression="tmlform.field(_fieldname)?'password':'text'"/>",
+							<tml:case hasoption="vtype">
+								vtype: "<tml:option name="vtype"/>",
+							</tml:case>
+							renderTo: el.parentNode
+						});
+						WGA.portlet.registerObject(portletkey, f);
+						f.on("change", function(field, newVal, oldVal){
+							this.value = newVal;
+						}, el)
+						
+						f.on("focus", function(field){
+							field.el.dom.type="password";
+						})
+						f.on("blur", function(field){
+							if(field.getValue()=="")
+								field.el.dom.type="text";
+						})
+					
+						<tml:case condition="tmlform.hasMessage(_fieldname)">
+							f.markInvalid("Validation Error: <tml:script expression="DBM.tmlform.getMessage(_fieldname)"/>")
+						</tml:case>
+					</tml:case>
+		
+					<tml:case value="number">
+						el.style.display="none"		
+						var f = new Ext.form.NumberField({
+							width: <tml:script expression="option('width')||110"/>,
+							msgTarget: "<tml:script expression="option('msgtarget')||'qtip'"/>",					
+							<tml:case condition="tmlform.field(_fieldname)!=null">
+								value: el.value,
+							</tml:case>
+							allowBlank : false,		
+							emptyText: "<tml:script expression="option('emptytext')||'Enter a number ...'"/>",		
+							<tml:case hasoption="vtype">		
+								vtype: "<tml:option name="vtype"/>",
+							</tml:case>
+							renderTo: el.parentNode		
+						});
+						WGA.portlet.registerObject(portletkey, f);
+						f.on("change", function(field, newVal, oldVal){
+							this.value = newVal;
+						}, el)
+						<tml:case condition="tmlform.hasMessage(_fieldname)">
+							f.markInvalid("Validation Error: <tml:script expression="DBM.tmlform.getMessage(_fieldname)"/>")
+						</tml:case>
+					</tml:case>		
+		
+					<tml:case value="boolean">
+						var onchange=el.onclick;
+						var f = new Ext.form.Checkbox({
+							applyTo: el
+						});
+						WGA.portlet.registerObject(portletkey, f);
+						<tml:case hasoption="changeaction">
+							f.on("check", function(){
+								WGA.ajax.callAction('<tml:action ref="{option('changeaction')}"/>', '<tml:script expression="portlet.portletkey"/>');
+							});
+						</tml:case>
+					</tml:case>
+					
+					<tml:case value="textarea">
+						el.style.display="none"
+						var f = new Ext.form.TextArea({
+							<tml:case condition="tmlform.field(_fieldname)">
+								value: el.value,
+							</tml:case>
+							width: <tml:script expression="option('width')||500"/>,
+							grow: !Ext.isIE,
+							renderTo: el.parentNode					
+						});
+						WGA.portlet.registerObject(portletkey, f);
+						f.on("change", function(field, newVal, oldVal){
+							this.value = newVal;
+						}, el)
+					</tml:case>
+		
+					<tml:case value="checkbox">
+						// nothing to do here
+					</tml:case>
+		
+					<tml:case value="date">
+						el.style.display="none"
+						var f = new Ext.form.DateField({
+							renderTo: el.parentNode,
+							<tml:case condition="tmlform.field(_fieldname)">
+								value: el.value,
+							</tml:case>
+							width: <tml:script expression="option('width')||150"/>,
+							allowBlank : <tml:script expression="option('allowblank')||false"/>,
+							emptyText: "<tml:script expression="option('emptytext')||'Enter a date ...'"/>",
+							format: "<tml:script expression="option('format')||label('format.ext.date.short-with-time')"/>"
+						});
+						WGA.portlet.registerObject(portletkey, f);
+						f.on("change", function(field, newVal, oldVal){
+							this.value = field.getRawValue();
+						}, el)
+					</tml:case>
+		
+					<tml:caseelse>
+						alert("can't convert field <tml:item name="_fieldname"/> of type <tml:item name="_type"/>");
+					</tml:caseelse>
+					
+				</tml:select>
+				if(fieldParent)
+					fieldParent.style.visibility="visible";
+				
+			}
+		}
+		catch(e){
+			// ignore alle exceptions.
+			// Some features are nor available in IE
+		}
+	</script>
+</tml:case>

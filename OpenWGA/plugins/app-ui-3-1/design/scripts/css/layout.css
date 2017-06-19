@@ -1,0 +1,286 @@
+/*******************************************************************************
+  *Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+  *
+  *This file is part of the OpenWGA server platform.
+  *
+  *OpenWGA is free software: you can redistribute it and/or modify
+  *it under the terms of the GNU General Public License as published by
+  *the Free Software Foundation, either version 3 of the License, or
+  *(at your option) any later version.
+  *
+  *In addition, a special exception is granted by the copyright holders
+  *of OpenWGA called "OpenWGA plugin exception". You should have received
+  *a copy of this exception along with OpenWGA in file COPYING.
+  *If not, see <http://www.openwga.com/gpl-plugin-exception>.
+  *
+  *OpenWGA is distributed in the hope that it will be useful,
+  *but WITHOUT ANY WARRANTY; without even the implied warranty of
+  *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  *GNU General Public License for more details.
+  *
+  *You should have received a copy of the GNU General Public License
+  *along with OpenWGA in file COPYING.
+  *If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
+.List{
+	background-color: white;
+	cursor:pointer;
+}
+
+.List td{
+	border-color: white !important;
+	border-bottom: outset 2px white !important;
+}
+
+.List.mouseOverRow td{
+	cursor:pointer;	
+	background-color:#96A1B9;
+	background:transparent url(../../plugin-wga-app-framework/file/bg/nav_button_bg_over.gif) repeat scroll 0 0;
+}
+.List.mouseOverRow td, .List.mouseOverRow td *{
+	color: red; 
+}
+
+.List1, .List2{
+	background: #ebeef1 url(../file/images/tabbg.jpg) repeat scroll 0 0;
+}
+
+
+/* table collections */
+table.collection{
+	border-collapse:collapse;
+	empty-cells:show;
+	cursor:default;	
+}
+table.collection td.indent{
+	padding-left: 20px;
+}
+table.collection td.indent-small{
+	padding-left: 10px;
+}
+table tr.collection-title td{
+	border-bottom: outset white 2px;
+	padding-bottom: 0px;
+	color: #96A1B9;
+	font-style: italic;
+}
+
+table.collection-total td{
+	border-top:solid gray 2px;
+	font-weight:bold;
+}
+table.collection-sum td{
+	border-top:double black 3px;
+	font-weight:bold;
+}
+table.collection td{
+	vertical-align:top;	
+	padding: 4px;
+}
+
+
+/*
+ * Ext
+ */
+
+.x-panel-fbar{
+	width: 100%;	/* IE nedds this */
+}
+ 
+.x-panel-tbar td{
+	padding:0px;
+}
+
+.x-panel-header{
+	background-image: url(../../plugin-wga-app-framework/file/bg/nav_button_bg_over.gif);
+	background-position: 0px -5px;
+	border-bottom-color:silver;
+	border-top-color: rgb(159,171,195);
+	
+	padding: 2px 2px 2px 5px;
+	color: #111111;
+	font-weight: normal;
+	
+	-webkit-border-top-left-radius: 4px;
+	-webkit-border-top-right-radius: 4px;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	-moz-border-radius-topleft: 4px;
+	-moz-border-radius-topright: 4px;
+	-moz-background-clip:padding;
+}
+.x-panel-tbar .x-toolbar{
+	padding: 0px;
+}
+
+.x-panel-body{
+	-webkit-border-bottom-right-radius: 4px;
+	-webkit-border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+	-moz-border-radius-bottomright: 4px;
+	-moz-border-radius-bottomleft: 4px;
+	border-color: rgb(159,171,195);
+}
+
+
+/** Tabs **/
+
+.tab_header{
+	width: 100%;
+	padding:0
+}
+.tab_header td{
+	padding: 0;
+}
+
+.tab_header .tab_r{
+	font-weight: bold;
+	padding: 3px 5px 3px 5px;
+	margin-left: 2px;
+	display:block;
+	background-color: #efefef;
+	border-width: 1px 1px 0 1px;
+	border-style: solid;
+	border-color: rgb(159,171,195);
+	-webkit-border-top-right-radius: 4px;
+	-webkit-border-top-left-radius: 4px;
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	-moz-border-radius-topright: 4px;
+	-moz-border-radius-topleft: 4px;
+}
+.tab_header .tab_selected .tab_r{
+	background-color: rgb(159,171,195);
+	color: white;
+}
+.tab_header a{
+	text-decoration: none;
+	cursor: pointer;
+}
+.tab_header .tab_selected .tab_r *{
+	color: white;
+}
+
+.tab_addon{
+  text-align:right;
+  width:100%;
+  padding:0 5px 0 0;  
+}
+
+.tab_close{
+	padding: 1px;
+	width: 6px;
+	background-color: #efefef;
+	border: solid gray 1px;
+}
+
+/*
+ * App Navigation
+ */
+
+.nav{
+	background-color:#96A1B9;
+	border-right:1px solid black;
+	color:white;
+	padding:0px;
+	margin: 0px;	
+}
+
+.nav-button{
+	/*background-color:#dddfe0;*/
+	background:url(../../plugin-wga-app-framework/file/bg/nav_button_bg_normal.gif);
+	vertical-align:middle;
+	/*padding:2px 0px;*/
+	margin:0px;
+	height:34px;
+	border-top:solid white 1px;
+	border-bottom:solid black 1px;
+	cursor:pointer;
+}
+.nav-button, .nav-button *{
+	font-weight: bold;
+	font-size:12px;
+	color: black;
+}
+.nav-button td{
+	padding: 2px 4px;
+	height: 34px;
+}
+.nav div.selected{
+	background:url(../../plugin-wga-app-framework/file/bg/nav_button_bg_on.gif);
+	border-top:solid #d1d1d1 1px;
+	
+}
+.nav-button.selected *{
+	color:white;
+	text-shadow: black 1px 1px 0px;
+}
+
+
+.nav-button.over{
+	background:url(../../plugin-wga-app-framework/file/bg/nav_button_bg_over.gif);	
+	border-top:solid 1px white;	
+	border-bottom:solid black 1px;
+}
+
+.nav_child_box{
+	background-color:#666B75;
+	padding:4px 0px 4px 0px;
+}
+.nav_child_box *{
+	color: silver;
+}
+.nav_child_box ul{		
+	padding:0px 0px 0px 17px;
+	margin:0px 0px 0px 8px;
+	list-style: disc;
+}
+.nav_child_box ul li{
+	padding:1px 0px 1px 0px;
+	margin:0px 0px 0px 0px;
+}
+.nav_child_box ul li a{
+	text-decoration:none;
+	margin:2px 0px 8px 0px;
+	font-size: 12px;
+}
+
+.nav_child_box ul li a:hover{
+	color:	white;
+}
+.nav_child_box ul li a.selected{
+	color: #ffc800;
+}
+
+.nav_child_box .nav_ul{
+	padding:1px 0px 1px 8px;
+	margin:0px 0px 0px 8px;
+}
+
+#main{
+	padding-left:4px;
+	padding-top:3px;
+	padding-right:3px;
+}
+
+#north {
+	background: url(../file/images/gray-bg.jpg);
+	padding: 0px 3px;
+	color: #efefef;
+	border-bottom: solid gray 1px;	
+}
+
+#south{
+	border-top: solid gray 1px;
+	background: url(../file/images/gray-bg.jpg);
+	color: #efefef;
+	font-size: 12px;
+	font-family: verdana,arial,tahoma,sans-serif;
+	line-height: 18px;
+}
+
+#west{
+	font-family: verdana,arial,tahoma,sans-serif;
+	line-height: 18px;	
+}

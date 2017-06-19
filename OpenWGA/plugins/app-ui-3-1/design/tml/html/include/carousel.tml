@@ -1,0 +1,12 @@
+<tml:include ref="::js-core"/>
+
+<link rel="stylesheet" href="<tml:url type="file" doc="carousel" file="carousel.zip/carousel.css"/>">
+<style type="text/css">
+	.ux-carousel-nav {
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		background-color: transparent;
+	}
+</style>
+<script type="text/javascript" src="<tml:url type="file" doc="carousel" file="carousel.zip/carousel.js"/>"></script>
+<script type="text/javascript" src="<tml:url type="tml" medium="javascript" name="carousel"/>"></script>
