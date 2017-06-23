@@ -783,7 +783,7 @@ public class ForEach extends Base implements IterationTag {
         }
         
         // WebTML-Variable
-        String currentPageParam = this.getId() + "Page";
+        String currentPageParam = this.getId() + "page";
         try {
             String varName = "$" + currentPageParam;
             if (!getTMLContext().isempty(varName)) {

@@ -397,7 +397,7 @@ public class URL extends ActionBase implements DynamicAttributes {
         TMLAction tmlAction = getTMLContext().getActionByID("$" + TMLAction.DEFAULTACTION_SETVAR, getDesignDBKey());
         
         List<Object> params = new ArrayList<Object>();
-        params.add("$" + this.getSourcetag() + "Page");
+        params.add("$" + this.getSourcetag() + "page");
         params.add(String.valueOf(targetPage));
         
         String actionURL = buildActionURL(tmlAction, buildNamedActionParameters(true), params);
