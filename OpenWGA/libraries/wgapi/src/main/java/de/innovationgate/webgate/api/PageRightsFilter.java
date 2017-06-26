@@ -71,4 +71,11 @@ public interface PageRightsFilter {
      */
     public Right mayEditChildPages(WGStructEntry page, WGUserAccess userAccess);
 
+    /**
+     * Called to determine if the current user may edit content of a given language on this page
+     * @param page The page
+     * @param userAccess User information
+     */
+	public Right mayEditContent(WGStructEntry page, WGUserAccess userAccess, WGLanguage wgLanguage);
+
 }

@@ -32,6 +32,7 @@ import java.util.Locale;
 import de.innovationgate.utils.SkippingIterator;
 import de.innovationgate.utils.SkippingIteratorWrapper;
 import de.innovationgate.utils.WGUtils;
+import de.innovationgate.webgate.api.PageRightsFilter.Right;
 import de.innovationgate.webgate.api.locking.ResourceIsLockedException;
 
 /**
@@ -192,8 +193,7 @@ public class WGLanguage extends WGSchemaDocument implements PageHierarchyNode {
 	 * @throws WGAPIException 
 	 */
 	public boolean mayCreateContent() throws WGAPIException {
-		
-		List users = (List) this.getEditors();
+		List users = this.getEditors();
 		if (WGDatabase.anyoneAllowed(users)) {
 			return true;
 		}
@@ -203,6 +203,17 @@ public class WGLanguage extends WGSchemaDocument implements PageHierarchyNode {
 		else {
 			return this.db.isMemberOfUserList(users);
 		}
+	}
+
+	public boolean mayCreateContent(WGStructEntry page) throws WGAPIException {
+		
+		Right right = this.db.getPageRightsFilter().mayEditContent(page, this.db.getSessionContext().getUserAccess(), this);
+		if(right==Right.DENIED)
+			return false;
+		else if (right == Right.ALLOWED_SKIP_DEFAULT_CHECKS)
+			return true;
+
+		return mayCreateContent();
 		
 	} 
 

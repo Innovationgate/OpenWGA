@@ -134,7 +134,7 @@ public class CreatePage extends Base {
         boolean langFound = false;
         while (langs.hasNext()) {
             WGLanguage lang = (WGLanguage) langs.next();
-            if (lang.mayCreateContent()) {
+            if (lang.mayCreateContent(getTMLContext().content().getStructEntry())) {
                 langFound = true;
                 break;
             }

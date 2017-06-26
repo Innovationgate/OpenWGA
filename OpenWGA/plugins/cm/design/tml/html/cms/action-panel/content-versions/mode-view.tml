@@ -33,14 +33,17 @@
 	var langs={};
 	
 	var sdoc=content().getStructEntry();
-	_mayEdit = sdoc.mayEditPage();
 	var contentlist=sdoc.getAllContent(true);
 	_versions = contentlist.size(); 
 	for(var i=0; i<contentlist.size(); i++){
 		var version=contentlist.get(i);
+		var status=version.getStatus();
+
+		if(status!=version.STATUS_RELEASE && !version.mayEditContent())
+			continue;			
+			
 		if(version.getLanguage().getName()!=LANGUAGE){
 			var lang=version.getLanguage().getName();
-			var status=version.getStatus();
 			var rating=0;
 			switch(status){
 				case version.STATUS_DRAFT:
@@ -84,7 +87,7 @@
 </tml:script>
 		
 
-<tml:case condition="_versions>1 && _mayEdit">
+<tml:case condition="_versions>1">
 	<tml:include ref="system:info-window">
 		
 		<tml:option name="collapsed" expression="portlet.getSessionVar('info_window')!='expanded'"/>

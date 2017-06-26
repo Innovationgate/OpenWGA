@@ -196,7 +196,7 @@ public class LanguageBehaviourTools {
         }
         
         // Non-BI mode: Just return released content
-        if (!isBI || !page.mayEditPage()) {
+        if (!isBI) {
             return page.getReleasedContent(language);
         }
         
@@ -212,8 +212,8 @@ public class LanguageBehaviourTools {
             if (!language.equalsIgnoreCase(content.getLanguage().getName())) {
                 continue;
             }
-            
-            allContent.add(content);
+            if(content.getStatus().equals(content.STATUS_RELEASE) || content.mayEditContent())
+            	allContent.add(content);
         }
         
         if (allContent.isEmpty()) {

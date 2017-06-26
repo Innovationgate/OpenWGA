@@ -49,4 +49,9 @@ public class DefaultPageRightsFilter implements PageRightsFilter {
     public void init(WGDatabase db) {
     }
 
+	@Override
+	public Right mayEditContent(WGStructEntry page, WGUserAccess userAccess, WGLanguage wgLanguage) {
+		return Right.ALLOWED;
+	}
+
 }

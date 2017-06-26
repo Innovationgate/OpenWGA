@@ -293,10 +293,8 @@ public class Root extends Base {
         	List<String> userNamesList = new ArrayList<String>();
         	userNamesList.add(content.getAuthor());
         	 
-        	if ( content.getStatus().equals(WGContent.STATUS_DRAFT) 
-        		//&& (!content.hasCompleteRelationships() || content.getStructEntry().mayEditChildPages())
-        		&& content.getStructEntry().mayEditPage()
-        		&& content.getLanguage().mayCreateContent()
+        	if ( content.getStatus().equals(WGContent.STATUS_DRAFT)
+        		&& content.mayEditContent()
         		&& content.getDatabase().isMemberOfUserList( userNamesList )
         		&& !content.hasItem("remote_info")
         		) {			        		

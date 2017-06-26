@@ -78,6 +78,7 @@ import de.innovationgate.utils.cache.Cache;
 import de.innovationgate.utils.cache.CacheDisposalListener;
 import de.innovationgate.utils.cache.CacheException;
 import de.innovationgate.utils.cache.CacheFactory;
+import de.innovationgate.webgate.api.PageRightsFilter.Right;
 import de.innovationgate.webgate.api.auth.AnonymousAuthSession;
 import de.innovationgate.webgate.api.auth.AnonymousAwareAuthenticationModule;
 import de.innovationgate.webgate.api.auth.AuthSessionWithUserCacheQualifier;
@@ -2445,7 +2446,7 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
                 @SuppressWarnings("unchecked")
                 Class<? extends PageRightsFilter> filterClass = (Class<? extends PageRightsFilter>) WGFactory.getImplementationLoader().loadClass(filterName);
                 PageRightsFilter filter = filterClass.newInstance();
-                setPageRightsFilter(filter);
+                _pageRightsFilter=filter;
             }
             catch (Exception e) {
                 throw new WGIllegalArgumentException("Exception instantiating page rights filter: " + filterName, e);
@@ -5089,34 +5090,41 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         }
        
         if (hasFeature(FEATURE_FULLCONTENTFEATURES) && entry != null) {
-            WGDocument restrictionDoc= entry.testEditPageHierarchyRights();
-            if (restrictionDoc != null) {
-                String code = (restrictionDoc instanceof WGArea ? WGAuthorisationException.ERRORCODE_OP_DENIED_BY_AREA : WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGE); 
-                throw new WGAuthorisationException("User is not allowed to create content under this struct entry", code, restrictionDoc);
-            }
-        }
 
-        if (hasFeature(FEATURE_FULLCONTENTFEATURES) && entry != null) {
-            WGContentType contentType = entry.getContentType();
+            // Test if draft content allready exists for this language code in
+            // status DRAFT
+        	if (!getSessionContext().isMasterSession() && entry != null && entry.hasContent(language.getName(), WGContent.STATUS_DRAFT)) {
+                throw new WGIllegalStateException("There is already an existing draft copy in language " + language.getTitle() + ".", WGIllegalStateException.ERRORCODE_CONTENT_DRAFT_EXISTS);
+            }
+
+        	// Ask PageRightsFilter first end stop other checks if ALLOWED_SKIP_DEFAULT_CHECKS
+    		Right right = getPageRightsFilter().mayEditContent(entry, getSessionContext().getUserAccess(), language);
+    		if (right == Right.ALLOWED_SKIP_DEFAULT_CHECKS)
+    			return;				// cancel all other tests
+    		else if (right == Right.DENIED)
+    			throw new WGAuthorisationException("PageRightsFilter denies to edit content in this language", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGERIGHTSFILTER, language);            
+
+        	// does contenttype allow usage:
+        	WGContentType contentType = entry.getContentType();
             if (contentType != null && !contentType.mayCreateContent()) {
                 throw new WGAuthorisationException("User is not allowed to use this content type", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_CONTENTTYPE, contentType);
             }
             else if (contentType == null && getSessionContext().getAccessLevel() != WGDatabase.ACCESSLEVEL_MANAGER) {
                 throw new WGIllegalDataException("The page has no content type");
             }
-        }
 
-        if (hasFeature(FEATURE_FULLCONTENTFEATURES) && !language.mayCreateContent()) {
-            throw new WGAuthorisationException("User is not allowed to create content in this language", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_LANGUAGE, language);
-        }
-
-        // Test if draft content allready exists for this language code in
-        // status DRAFT
-        if (hasFeature(FEATURE_FULLCONTENTFEATURES)) {
-            if (!getSessionContext().isMasterSession() && entry != null && entry.hasContent(language.getName(), WGContent.STATUS_DRAFT)) {
-                throw new WGIllegalStateException("There is already an existing draft copy in language " + language.getTitle() + ".", WGIllegalStateException.ERRORCODE_CONTENT_DRAFT_EXISTS);
+            if (!language.mayCreateContent()) {
+                throw new WGAuthorisationException("User is not allowed to create content in this language", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_LANGUAGE, language);
             }
+            
+        	WGDocument restrictionDoc= entry.testEditPageHierarchyRights();
+            if (restrictionDoc != null) {
+                String code = (restrictionDoc instanceof WGArea ? WGAuthorisationException.ERRORCODE_OP_DENIED_BY_AREA : WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGE); 
+                throw new WGAuthorisationException("User is not allowed to create content under this entry", code, restrictionDoc);
+            }        	
+       	
         }
+
     }
 
     private int findNewVersionNumber(WGStructEntry entry, WGLanguage language) throws WGAPIException {
@@ -7431,7 +7439,7 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
             }
         }
 
-        if (hasFeature(FEATURE_FULLCONTENTFEATURES) && content.getStructEntry().testEditPageHierarchyRights() != null) {
+        if (hasFeature(FEATURE_FULLCONTENTFEATURES) && !content.mayEditContent()) {
             throw new WGAuthorisationException("User is not allowed to create content under this struct entry", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGE, content.getStructEntry());
         }
 

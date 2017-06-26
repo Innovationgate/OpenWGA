@@ -195,7 +195,7 @@
 				</tml:foreach>
 			</tml:case>
 	
-			<tml:case condition="_Content.mayCreateContent()">
+			<tml:case condition="_Struct.mayCreateContent()">
 				<div class="list create-content-version"
 						onmouseover="Ext.get(this).addClass('selected')"
 						onmouseout="Ext.get(this).removeClass('selected')"
@@ -207,13 +207,13 @@
 		</div>
 	</div>
 	
-	<tml:case condition="_Content.mayArchiveContent() || _Content.mayDeletePage() || _Content.mayDeleteContent()">
+	<tml:case condition="_Content.mayArchiveContent() || _Struct.mayDeletePage() || _Content.mayDeleteContent()">
 		<div class="section">
 			<a class="drop-down" href="javascript:void(0)" style="cursor:pointer" onclick="BI.util.toggleElement(Ext.get(this).getNextSibling());Ext.get(this).toggleClass('drop-down-open')">
 				<h1>{%label:actions.section.delete%}</h1>
 			</a>
 			<div style="display:none;padding-left:8px;">
-				<tml:case condition="_Content.mayDeletePage()">
+				<tml:case condition="_Struct.mayDeletePage()">
 					<div class="list delete-page" 
 								onmouseover="Ext.get(this).addClass('selected')"
 								onmouseout="Ext.get(this).removeClass('selected')"

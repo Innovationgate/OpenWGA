@@ -224,14 +224,11 @@ this.mayEditStruct=function(){
 }
 
 this.mayCreateContent=function(){
-	if(!this.mayEditContent())		// check if struct allowes creation (database and contenttype allows edit)
-		return _false(reason);
-	
-	// check if languages available for current user that have no content yet:		
+	// check if languages available for current user that have no content yet and is allowed to be created:		
 	var langs = database.getLanguages().values().iterator();
 	while(langs.hasNext()){
 		var lang=langs.next();
-		if(lang.mayCreateContent() && !this.hasContent(lang.name))
+		if(struct.mayCreateContent(lang) && !this.hasContent(lang.name))
 			return true;
 	}
 	return _false(label("reason.no-more-languages"));
