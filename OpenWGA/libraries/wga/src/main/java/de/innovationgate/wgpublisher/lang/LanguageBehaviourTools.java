@@ -196,7 +196,7 @@ public class LanguageBehaviourTools {
         }
         
         // Non-BI mode: Just return released content
-        if (!isBI) {
+        if (!isBI /*|| !page.mayEditPage()*/) {
             return page.getReleasedContent(language);
         }
         
