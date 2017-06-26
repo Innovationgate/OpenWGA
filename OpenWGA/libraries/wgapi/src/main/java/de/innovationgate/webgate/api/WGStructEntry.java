@@ -1856,8 +1856,10 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
         
         
         PageRightsFilter.Right editRight = getDatabase().getPageRightsFilter().mayEditChildPages(this, getDatabase().getSessionContext().getUserAccess());
-        if (editRight ==  Right.DENIED) 
+        if (editRight ==  Right.DENIED) {
         	return this;
+            //throw new WGAuthorisationException("The page rights filter denies editing child pages of this page", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGERIGHTSFILTER);
+        }
         
         if (editRight != Right.ALLOWED_SKIP_DEFAULT_CHECKS) {
         

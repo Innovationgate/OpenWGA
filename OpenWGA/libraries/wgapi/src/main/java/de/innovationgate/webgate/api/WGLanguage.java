@@ -190,6 +190,8 @@ public class WGLanguage extends WGSchemaDocument implements PageHierarchyNode {
 	
 	/**
 	 * Tests if the current user is allowed to create content in this language
+	 * - asks pageRightsFilter
+	 * - checks struct edit rights (hierarchicaly)
 	 * @throws WGAPIException 
 	 */
 	public boolean mayCreateContent() throws WGAPIException {

@@ -7439,6 +7439,11 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
             }
         }
 
+        /*
+        if (hasFeature(FEATURE_FULLCONTENTFEATURES) && content.getStructEntry().testEditPageHierarchyRights() != null) {
+            throw new WGAuthorisationException("User is not allowed to create content under this struct entry", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGE, content.getStructEntry());
+        }
+        */
         if (hasFeature(FEATURE_FULLCONTENTFEATURES) && !content.mayEditContent()) {
             throw new WGAuthorisationException("User is not allowed to create content under this struct entry", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGE, content.getStructEntry());
         }
