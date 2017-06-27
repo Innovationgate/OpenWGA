@@ -41,9 +41,6 @@ import org.simpleframework.xml.Root;
 @Root(strict=false)
 public class VirtualHost extends IdentifiableConfigBean {
     
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     public static final String UID_ALL_DATABASES = "$all";
@@ -84,7 +81,10 @@ public class VirtualHost extends IdentifiableConfigBean {
 
     @Element(required=false)
     private String robots_txt = "User-agent: *\nDisallow: /plugin-*";
-    
+
+    @Element(required=false)
+    private String preferedLanguages = null;
+
     public VirtualHost() {
         super();
     }
@@ -180,4 +180,12 @@ public class VirtualHost extends IdentifiableConfigBean {
     public boolean isAllowAuthoringApps(){
     	return allowAuthoringApps;
     }
+
+    public String getPreferedLanguages(){
+    	return preferedLanguages;
+    }
+    public void setPreferedLanguages(String lang){
+    	preferedLanguages=lang;
+    }
+    
 }
