@@ -12,7 +12,7 @@ this.init = function(){
 		
 			foreach: function(obj, options){
 				var ret = ""
-				for(var doc in Iterator(obj)){
+				for(let doc in Iterator(obj)){
 					ret += options.fn(doc)
 				}
 				return ret;
