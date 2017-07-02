@@ -28,7 +28,9 @@ public class SassFunctions {
         Ruby runtime = org.jruby.Ruby.getGlobalRuntime();
         Design design = (Design) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wgaDesign"));
         try{
-	        return design.resolve(db, container).fileURL(name);
+        	if(db==null)
+        		db = design.app().getDbKey();
+        	return design.resolve(db, container).fileURL(name);
         }
         catch(Exception e){
         	WGA wga = (WGA) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wga"));
