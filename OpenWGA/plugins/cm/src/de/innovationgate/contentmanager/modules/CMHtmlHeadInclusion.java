@@ -66,7 +66,9 @@ public class CMHtmlHeadInclusion implements HTMLHeadInclusion {
                 String dbkey = content.getDatabase().getDbReference();
                 String prefLanguage = content.getLanguage().getName();
                 context.getEnvironment().getPageContext().getSession().setAttribute("AFW."+dbkey+".PreferredLanguage", prefLanguage);
-        		
+
+                context.getEnvironment().getPageContext().getSession().setAttribute("CM.currentContextPath", context.getpath());
+
         		ServletRequest request = context.getEnvironment().getPageContext().getRequest();
         		if(request.getParameter(WGACore.URL_PARAM_CLEAN)!=null 
         				|| (content.hasCompleteRelationships() && content.getStructEntry().getArea().getName().equals("$trash"))

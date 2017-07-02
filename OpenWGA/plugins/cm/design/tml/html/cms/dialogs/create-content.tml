@@ -71,6 +71,7 @@
 
 <tml:script>
 	var database = db(option("dbkey"));
+	_Database = AFW.database(database);
 	var att=database.getAttribute(wgacore.DBATTRIB_USEREMOTECS);
 	_useRemoteContentStores = (att!=null && att.equalsIgnoreCase('true'))
 </tml:script>
@@ -132,8 +133,7 @@
 					if(tmlform.languages!="")
 						tmlform.languages += ","
 					tmlform.languages += lang.getTitle() + "|" + lang.getName();
-				}	
-		
+				}
 			</tml:script>
 		
 			<tml:case condition="tmlform.hasmessages()">
@@ -163,7 +163,7 @@
 				     	<tr>
 				     		<td>{%label:language%}:</td>
 				     		<td>
-				     			<tml:input name="language" type="select" options="{tmlform.languages}"/>
+				     			<tml:input name="language" type="select" options="{tmlform.languages}" defaultexpression="_Database.getPreferedLanguage()"/>
 				     		</td>
 				     	</tr>
 		

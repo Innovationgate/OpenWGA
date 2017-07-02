@@ -22,6 +22,15 @@
   *along with OpenWGA in file COPYING.
   *If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
+ 
+html{
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 100%;
+}
+ 
 body,div,p,td,pre,input,select, button, textarea{
 	font: normal 11px tahoma, arial, helvetica, sans-serif;
 }
@@ -1037,6 +1046,8 @@ a.drop-down-open{
 }
 #web-content-wrapper .phone-border{
 	height: 100%;
+	overflow: auto;
+	-webkit-overflow-scrolling: touch;
 }
 
 #web-content-wrapper.mobile{

@@ -42,7 +42,18 @@
 			break;		
 		}
 	}
+
+	var currentContextPath = request.getSession().getAttribute("CM.currentContextPath");
+	var currentContext=context(currentContextPath);
 	
+	if(currentContext.STRUCTKEY==document.getStructKey())
+		_bestContent = currentContext.content();
+	else {
+		var langChooser = new Packages.de.innovationgate.wgpublisher.lang.WebTMLLanguageChooser(document.getDatabase(), currentContext);
+		_bestContent = langChooser.selectContentForPage(document, true)
+	}				
+	//console.log("_bestContent", _bestContent && _bestContent.title + ", " + _bestContent.getLanguage().getName())
+	//console.log("iswebenvironment", context(currentContextPath).iswebenvironment())
 </tml:script>
 
 
@@ -56,29 +67,31 @@
 			<tml:script>
 				_class = _mayEditEntryAndContent ? "title" : "title-no-edit";
 
-				var bestContent = _Struct.getBestContent();
-				_status = (bestContent ? bestContent.getStatus() : "");
-				if(_status=="g" && bestContent.isPendingRelease()){
+				_status = (_bestContent ? _bestContent.getStatus() : "");
+				if(_status=="g" && _bestContent.isPendingRelease()){
 					_status = "pending";
-					_valid_from = bestContent.getValidFrom();
+					_valid_from = _bestContent.getValidFrom();
 				}
-				 
-				var published = document.getReleasedContent(_Database.getPreferedLanguage())
-				if(!published || (!published.isVisibleNow() && !_Area.isSystemArea()))
+				
+				if(!_bestContent || (!_bestContent.isVisibleNow() && !_Area.isSystemArea()))
 					_class += " not-visible";
-					
+				
 				if(_Struct.contentHasReaders())
 					_class += " content-has-readers";
 				if(_Struct.hasAccessRights() || (db().isPageReadersEnabled() && document.getReaders().size()))
 					_class += " has-access-rights";
 					
 				_struct_wf = document.getMetaData(document.META_WORKFLOW_NAME);
+				
+				_preferendLanguage = document.getDatabase().getLanguage(_Database.getPreferedLanguage())
+				
 			</tml:script>
 			<td class="entrytitle <tml:item name="_class"/>">
 				<tml:script encode="html">
 					var title = _Struct.getContentTitle();
-					var bestContent = _Struct.getBestContent();
-					if(bestContent && bestContent.isHiddenFrom().contains(bestContent.DISPLAYTYPE_NAVIGATOR))
+					if(_bestContent)
+						title = _bestContent.title;
+					if(_bestContent && _bestContent.isHiddenFrom().contains(_bestContent.DISPLAYTYPE_NAVIGATOR))
 						return "("+title+")"
 					else return title;
 				</tml:script>
@@ -92,51 +105,50 @@
 			</td>
 			<td width="16">
 
-				<tml:comment><tml:case condition="!_Struct.getAllContentInStatus('w', _Database.getPreferedLanguage()).isEmpty()">
-					<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="bullet_wrench.png"/>
-				</tml:case>
-
-				<tml:case condition="!_Struct.getAllContentInStatus('g', _Database.getPreferedLanguage()).isEmpty()">
-					<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="bullet_error.png"/>
-				</tml:case></tml:comment>
-				
-				<tml:case condition="_status=='w'">
-					<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="bullet_wrench.png"/>
-				</tml:case>
-
-				<tml:case condition="_status=='g'">
-					<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="bullet_error.png"/>
-				</tml:case>				
-
-				<tml:case condition="_status=='pending'">
-					<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="date.png">
-						width="12"
-						title="<tml:item name="_valid_from"/>"
-					</tml:img>
-				</tml:case>				
-
-				<tml:case condition="_Struct.getAllContent(_Database.getPreferedLanguage(), false).isEmpty()">
-					<tml:if condition="_Struct.mayCreateContent()">
-						<tml:then>
-							<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="bullet_red.png">
-								ext:width="250"
-								ext:qtitle="<tml:label key="se.create-content"/>"
-								ext:qtip="<tml:label key="se.no-content-in-language" param1="{_Database.getPreferedLanguage()}"/>"
-								id="createcontent:<tml:script>return document.getStructKey()</tml:script>"
-							</tml:img>
-							<script>
-								var el=Ext.get("createcontent:<tml:script>return document.getStructKey()</tml:script>");
-								el.mon("click", function(ev){
-									BI.dialog.show("create-content", this, {structkey:"<tml:script>return document.getStructKey()</tml:script>"});
-									ev.stopEvent();
-								}, el);
-							</script>
-						</tml:then>
-						<tml:else>
-							<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="bullet_red.png"/>
-						</tml:else>
-					</tml:if>						
-				</tml:case>
+				<tml:if condition="_Struct.getAllContent(_Database.getPreferedLanguage(), false).isEmpty()">
+					<tml:then>
+						<tml:if condition="_Struct.mayCreateContent() && document.mayCreateContent(_preferendLanguage)">
+							<tml:then>
+								<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="bullet_red.png">
+									ext:width="250"
+									ext:qtitle="<tml:label key="se.create-content"/>"
+									ext:qtip="<tml:label key="se.no-content-in-language" param1="{_Database.getPreferedLanguage()}"/>"
+									id="createcontent:<tml:script>return document.getStructKey()</tml:script>"
+								</tml:img>
+								<script>
+									var el=Ext.get("createcontent:<tml:script>return document.getStructKey()</tml:script>");
+									el.mon("click", function(ev){
+										BI.dialog.show("create-content", this, {
+											structkey:"<tml:script expression="document.getStructKey()"/>"
+										});
+										ev.stopEvent();
+									}, el);
+								</script>
+							</tml:then>
+							<tml:else>
+								<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="bullet_red.png"/>
+							</tml:else>
+						</tml:if>
+					</tml:then>
+					<tml:else>
+						<tml:select switch="_status">
+							<tml:case value="w">
+								<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="bullet_wrench.png"/>
+							</tml:case>
+			
+							<tml:case value="g">
+								<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="bullet_error.png"/>
+							</tml:case>				
+			
+							<tml:case value="pending">
+								<tml:img db="{pluginDBKey('de.innovationgate.wga-app-framework')}" doc="icons" file="date.png">
+									width="12"
+									title="<tml:item name="_valid_from"/>"
+								</tml:img>
+							</tml:case>
+						</tml:select>
+					</tml:else>
+				</tml:if>
 			</td>
 			<td width="16">
 				<tml:script>
@@ -222,12 +234,12 @@
 	var struct=BI.se.structs["struct:"+structkey]={
 		type: "struct",
 		bestContentKey: "<tml:script>
-			var doc = _Struct.getBestContent();
+			var doc = _bestContent
 			if(doc)
 				return doc.getContentKey(); 
 		</tml:script>",
 		key:structkey,
-		title:"<tml:script>return _Struct.getContentTitleJsEncoded()</tml:script>",
+		title:"xxx<tml:script>return _Struct.getContentTitleJsEncoded()</tml:script>",
 		parent: parentkey,
 		area: "<tml:script>return document.getArea().getName()</tml:script>",
 		isInTemplateArea: <tml:script expression="_Area.isTemplateArea()"/>,

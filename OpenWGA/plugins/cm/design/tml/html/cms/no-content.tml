@@ -53,38 +53,42 @@
 					</tml:then>
 					<tml:else>
 						<h1>{%label:no-content.title%}</h1>
-						<tml:label key="no-content.message" param1="{TITLE}"/>
+						<tml:label key="no-content.message" param1="{TITLE}" param2="{_Database.getPreferedLanguage()}"/>
 					</tml:else>
 				</tml:if>
 				
-				<tml:case condition="document.mayEditPage()">
-					<tml:script>
-						_contentlist=sortList(document.getAllContent(true), "status", "down");
-					</tml:script>
-					<tml:case condition="!_contentlist.isEmpty()">
-						<hr>
-						{%label:no-content.other-versions%}:
-						<ul>
-						<tml:foreach type="itemvalue" item="_contentlist" currentvalue="_content">
-						
-							<tml:groupchange expression="STATUS" id="gc">
-								</ul><h2><tml:label key="{'status.'+STATUS}"/></h2><ul>
-							</tml:groupchange>
-						
-							<li>
-								<a href="<tml:script expression="contenturl('html', null, true)"/>">
-									<tml:label key="version"/> <tml:meta name="version"/> (<tml:meta name="modified"/>, <tml:meta name="languagetitle"/>)
-								</a>
+				<tml:script>
+					_contentlist=WGA.sortList(document.getAllContent(document.mayEditPage()), "status", "down");
+					_mayCreateContent = document.mayCreateContent(document.getDatabase().getLanguage(_Database.getPreferedLanguage()))
+				</tml:script>
+				<tml:case condition="!_contentlist.isEmpty()">
+					<hr>
+					{%label:no-content.other-versions%}:
+					<ul>
+					<tml:foreach type="itemvalue" item="_contentlist" currentvalue="_content">
+					
+						<tml:groupchange expression="STATUS" id="gc">
+							</ul><h2><tml:label key="{'status.'+STATUS}"/></h2><ul>
+						</tml:groupchange>
+					
+						<li>
+							<a href="<tml:script expression="contenturl('html', null, true)"/>">
+								<tml:label key="version"/> <tml:meta name="version"/> (<tml:meta name="modified"/>, <tml:meta name="languagetitle"/>)
+							</a>
+							<tml:case condition="_mayCreateContent">
 								<div style="float:right">
 									<button 
-										onclick="window.parent.BI.dialog.show('create-content', this, {structkey:'<tml:script>return document.getStructKey()</tml:script>',contentkey:'<tml:meta name="key"/>'});"
+										onclick="window.parent.BI.dialog.show('create-content', this, {
+											structkey:'<tml:script>return document.getStructKey()</tml:script>',
+											contentkey:'<tml:meta name="key"/>'
+										});"
 									><tml:label key="no-content.new-version-from-this"/></button>
 								</div>
 								<div style="clear:right"></div>
-							</li>
-						</tml:foreach>
-						</ul>
-					</tml:case>
+							</tml:case>
+						</li>
+					</tml:foreach>
+					</ul>
 				</tml:case>
 			</tml:then>
 			<tml:else>
