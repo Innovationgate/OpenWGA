@@ -47,7 +47,7 @@ public class ImageFileConverter implements WGFileConverter {
 		try {
 			Metadata metadata = ImageMetadataReader.readMetadata(file);
 		    Directory directory = metadata.getFirstDirectoryOfType(ExifIFD0Directory.class);
-		    if(directory==null)
+		    if(directory==null || !directory.containsTag(ExifIFD0Directory.TAG_ORIENTATION))
 		    	return;
 		    int orientation = directory.getInt(ExifIFD0Directory.TAG_ORIENTATION);
 		    if(orientation>1){
