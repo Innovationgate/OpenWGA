@@ -612,7 +612,12 @@ this.attachment = function(filename){
 			}
 		
 			try{
-				var d_rev = WGA.Core.getFileDerivateManager().getDerivateUpdateRevision(database)
+				var derivatesMode = database.getAttribute(WGA.Core.DBATTRIB_FILE_DERIVATES_ENABLED);
+				var derivatesManager = WGA.Core.getFileDerivateManager()
+				if(derivatesMode==derivatesManager.DERIVATEMODE_OFF)
+					return false;
+					
+				var d_rev = derivatesManager.getDerivateUpdateRevision(database)
 				var file_rev = file_md.getUpdateRevision()
 				//console.log("check waining for derivates", filename, d_rev, file_rev)
 				if(file_rev){
