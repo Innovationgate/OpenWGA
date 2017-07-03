@@ -2838,18 +2838,26 @@ public class WGPDispatcher extends HttpServlet {
         
         if (cache != null) {
             PostProcessResult result = cache.getResource(wga, data);
-            if (result != null) {
+            if (result != null) 
                 return result;
-            }
+
+        	synchronized (cache) {
+        		// postProcess and update cache.
+        		// read again because another thread may have filled the cache while I am blocked
+	            result = cache.getResource(wga, data);
+	            if (result != null) 
+	                return result;
+            
+                // Process and optionally cache the result
+                result = processor.postProcess(wga, data, lib.getCode());
+                if (data.isCacheable()) {
+                    cache.putResource(data, result); 
+                    wga.getLog().info("Added to PostProcessResource Cache: " + lib.getDesignReference().toString() + ": " + result.getCode().length() + " Bytes");
+                }
+				return result;
+			}
         }
-        
-        // Process and cache optionally
-        PostProcessResult result = processor.postProcess(wga, data, lib.getCode());
-        if (cache != null && data.isCacheable()) {
-            cache.putResource(data, result);
-        }
-        
-        return result;
+        else return processor.postProcess(wga, data, lib.getCode());
     }
 
     /**
@@ -2869,7 +2877,7 @@ public class WGPDispatcher extends HttpServlet {
         _tmlDebugger = new WebTMLDebugger(this);
 
         this.setServePages(true);
-        _log.debug("WebGate Anywhere Publisher initialized");
+        _log.debug("OpenWGA Publisher initialized");
 
     }
 

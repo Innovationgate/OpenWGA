@@ -37,6 +37,8 @@ public class SassEngine {
     private static final String SASS_PLUGIN_REQUIRE = "sass/plugin";
     private static final String SASS_ENGINE_REQUIRE = "sass/engine";
 
+    private static final ScriptEngine rubyEngine = new ScriptEngineManager(SassEngine.class.getClassLoader()).getEngineByName("jruby");
+    
     private final Set<String> requires;
     private WGA _wga;
     private Design _design;
@@ -77,37 +79,38 @@ public class SassEngine {
      *          the Sass content to process.
      * @throws Exception 
      */
-    public synchronized String process(final String content) throws Exception {
+    public String process(final String content) throws Exception {
 
-      if (StringUtils.isEmpty(content)) {
-        return StringUtils.EMPTY;
-      }
+    	if (StringUtils.isEmpty(content)) {
+    		return StringUtils.EMPTY;
+    	}
       
-      StringWriter sw = new StringWriter();
-      try {
-    	  final ScriptEngine rubyEngine = new ScriptEngineManager().getEngineByName("jruby");
-	      Bindings bindings = rubyEngine.createBindings();
-	      bindings.put("wga", _wga);
-	      bindings.put("wgaDesign", _design);
-	      bindings.put("wgaContext", _context);
-	      bindings.put("wgaResult", _ppr);
-	      bindings.put("wgaResourceRef", _ref);
-	      
-	      rubyEngine.getContext().setErrorWriter(new PrintWriter(sw));
-	      
-	      return rubyEngine.eval(buildUpdateScript(content), bindings).toString();
-      }
-      catch(ScriptException e){
-    	  StringReader reader = new StringReader(sw.toString());
-    	  List<String> errors = IOUtils.readLines(reader);
-	      _wga.getLog().error(errors.get(0), e);    
-	      throw new Exception("SASS ERROR");
-      }
-      catch (Exception e) {
-	      _wga.getLog().error("general SASS error", e);
-	      throw e;
-      }
-      //return StringUtils.EMPTY;
+	    StringWriter sw = new StringWriter();
+	    try {
+	    	synchronized (rubyEngine) {
+				
+			      Bindings bindings = rubyEngine.createBindings();
+			      bindings.put("wga", _wga);
+			      bindings.put("wgaDesign", _design);
+			      bindings.put("wgaContext", _context);
+			      bindings.put("wgaResult", _ppr);
+			      bindings.put("wgaResourceRef", _ref);
+			      
+			      rubyEngine.getContext().setErrorWriter(new PrintWriter(sw));
+			      
+			      return rubyEngine.eval(buildUpdateScript(content), bindings).toString();
+	    	}
+	    }
+	    catch(ScriptException e){
+	    	  StringReader reader = new StringReader(sw.toString());
+	    	  List<String> errors = IOUtils.readLines(reader);
+		      _wga.getLog().error("SASS ERROR: " + errors.get(0));
+		      throw new Exception("SASS Exception");
+	    }
+	    catch (Exception e) {
+		      _wga.getLog().error("general SASS error", e);
+		      throw e;
+	    }
       
     }    
 
