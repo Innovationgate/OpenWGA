@@ -28,13 +28,15 @@ public class SassFunctions {
         Ruby runtime = org.jruby.Ruby.getGlobalRuntime();
         Design design = (Design) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wgaDesign"));
         try{
-        	if(db==null)
-        		db = design.app().getDbKey();
+        	WGA wga = (WGA) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wga"));
+        	wga.getLog().info("wga_file_url: load: " + design.toString() + " ... " + db + "/" + container + "/" + name);
+        	/*if(db==null)
+        		db = design.app().getDbKey();*/
         	return design.resolve(db, container).fileURL(name);
         }
         catch(Exception e){
         	WGA wga = (WGA) options.get(org.jruby.RubySymbol.newSymbol(runtime, "wga"));
-        	wga.getLog().error("wga_file_url: file not found: " + db + "/" + container + "/" + name);
+        	wga.getLog().error("wga_file_url: file not found: " + db + "/" + container + "/" + name + " ... refered from " + design.toString());
         	return "/* file not found: " + db + "/" + container + "/" + name + " */";        	
         }
     }
