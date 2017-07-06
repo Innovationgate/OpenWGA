@@ -612,6 +612,7 @@ AFW.RTF.editor=function(id, config){
 			var info = AFW.RTF.getURLInfo(img);
 			var urltype=info.type;
 			var wgakey=info.key;
+			
 			switch(urltype){
 				case "file":
 				case "extfile":
@@ -650,13 +651,13 @@ AFW.RTF.editor=function(id, config){
 				case "intfile":
 					if(img.style){
 						if(img.style.width){
-							var i = img.style.width.indexOf("px");
-							if(i)
-								wgakey += "?width~"+img.style.width.substr(0, i);
+							var index = img.style.width.indexOf("px");
+							if(index)
+								wgakey += "?width~"+img.style.width.substr(0, index);
 						}
 						else if(img.style.height){
-							var i = img.style.height.indexOf("px");
-							wgakey += "?height~"+img.style.height.substr(0, i);
+							var index = img.style.height.indexOf("px");
+							wgakey += "?height~"+img.style.height.substr(0, index);
 						}
 					}
 					
