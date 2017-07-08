@@ -3322,11 +3322,14 @@ public class WGPDispatcher extends HttpServlet {
             
             HttpSession session = request.getSession();
             
+            // Parse request
             WGPRequestPath path = (WGPRequestPath) request.getAttribute(WGACore.ATTRIB_REQUESTPATH);
             if (path == null) {
-                return false;
+            	path = WGPRequestPath.parseRequest(this, request, response);
+                if(path==null)
+                	return false;
+                request.setAttribute(WGACore.ATTRIB_REQUESTPATH, path);
             }
-            
             
             // Again fetch the wrapped request and response created by the filter, as we are outside it here and we have again the raw request/response object
             HttpServletRequest wrappedRequest = (HttpServletRequest) request.getAttribute(WGAFilter.REQATTRIB_REQUEST_WRAPPER);
@@ -3337,7 +3340,8 @@ public class WGPDispatcher extends HttpServlet {
             if (wrappedResponse != null) {
                 response = wrappedResponse;
             }
-    
+            
+
             // Determine tml design for this request
             WGA wga = WGA.get(request, response, getCore());
             WGDatabase errorDatabase = getCore().getContentdbs().get(error.getCausingDatabase());
@@ -3350,7 +3354,7 @@ public class WGPDispatcher extends HttpServlet {
                 return false;
             }
     
-            WGContent content = errorDatabase.getDummyContent(path.getRequestLanguage());
+            WGContent content = errorDatabase.getDummyContent(path==null ? null : path.getRequestLanguage());
     
             // Personalize
             TMLUserProfile tmlUserProfile = null;
