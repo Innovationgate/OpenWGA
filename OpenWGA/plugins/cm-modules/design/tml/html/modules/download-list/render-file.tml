@@ -2,14 +2,14 @@
 	_filename = CMM.setting('filename');
 	_ext = _filename.split(".").pop();
 
-	var c;
+	_ctx = this;
 	if(!CMM.setting("source"))
-		c = CMM.settingSource()=="template" ? CMM.getTemplateContext() : this;
-	else c = context("docid:" + CMM.setting("parent"), false);
+		_ctx = CMM.settingSource()=="template" ? CMM.getTemplateContext() : this;
+	else _ctx = context("docid:" + CMM.setting("parent"), false);
 
-	if(_filename && c && c.content().hasFile(_filename)){
-		_url = c.fileurl(_filename)
-		_filesize = AFW.Util.renderFileSize(c.content().getFileSize(_filename))
+	if(_filename && _ctx && _ctx.content().hasFile(_filename)){
+		_url = _ctx.fileurl(_filename)
+		_filesize = AFW.Util.renderFileSize(_ctx.content().getFileSize(_filename))
 	}
 	else _url=null;		
 </tml:script>
@@ -21,7 +21,7 @@
 			title="Download <tml:item name="_filename"/> ..."
 		>
 			<div class="image">
-				<tml:script expression="AFW.content().attachment(_filename).getThumbnailURL({width:100})" var="_url"/>
+				<tml:script expression="AFW.content(_ctx.KEY).attachment(_filename).getThumbnailURL({width:100})" var="_url"/>
 				<tml:case condition="_url">
 					<img src="<tml:item name="_url"/>">
 				</tml:case>
@@ -30,14 +30,14 @@
 				<tml:script>
 					switch(CMM.setting('title_source')){
 						case "file_md":
-							return content().getFileMetaData(_filename).title
+							return _ctx.content().getFileMetaData(_filename).title
 							break;
 						case "filename":
 							return _filename;
 							break;
 						case "file_info":
-							var filemd = content().getFileMetaData(_filename)
-							var type = AFW.content().attachment(_filename).getType().name;
+							var filemd = _ctx.content().getFileMetaData(_filename)
+							var type = AFW.content(_ctx.KEY).attachment(_filename).getType().name;
 							var pages = filemd.getCustomFieldValue("pageCount");
 							return "<b>"+filemd.name + "</b>"
 								+ "<br>"
