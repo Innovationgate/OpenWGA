@@ -233,7 +233,7 @@ public class Database {
         
         // Enforce resultset limiting if the resultset does not enforce it itself
         Number maxResults = (Number) wgapiParams.get(WGDatabase.QUERYOPTION_MAXRESULTS);
-        if (maxResults != null && !set.isLimitingResultsInBackend()) {
+        if (maxResults != null && set!=null && !set.isLimitingResultsInBackend()) {
             set.limitResults(maxResults.intValue());
         }
         
