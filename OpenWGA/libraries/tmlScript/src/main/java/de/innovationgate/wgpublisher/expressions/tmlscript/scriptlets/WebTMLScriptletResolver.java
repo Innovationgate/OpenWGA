@@ -577,21 +577,20 @@ public class WebTMLScriptletResolver {
         }
         
         Design scriptletDesign = baseDesign.resolveSystemScriptModule(actionID, WGScriptModule.CODETYPE_TMLSCRIPT, true);
-        if (scriptletDesign != null) {
-            
-            GlobalExpressionScope globalScope = new GlobalExpressionScope() {
-                @SuppressWarnings("unchecked")
-                public Map<String, Object> getObjects() {
-                    return (Map<String,Object>) engineParams.get(RhinoExpressionEngine.SCRIPTLETOPTION_OBJECTS);
-                }
-            };
-            
-            return String.valueOf(wga.callAction(context, scriptletDesign.toString(), new ArrayList<Object>(params), null, globalScope));
+        if(scriptletDesign == null) {
+        	baseDesign = wga.design(context.getmaincontext().getDesignDBKey());
+        	scriptletDesign = baseDesign.resolveSystemScriptModule(actionID, WGScriptModule.CODETYPE_TMLSCRIPT, true);
         }
-        else {
-            return "";
-        }
-        
+        if(scriptletDesign == null)
+        	return "";
+            
+        GlobalExpressionScope globalScope = new GlobalExpressionScope() {
+            @SuppressWarnings("unchecked")
+            public Map<String, Object> getObjects() {
+                return (Map<String,Object>) engineParams.get(RhinoExpressionEngine.SCRIPTLETOPTION_OBJECTS);
+            }
+        };
+        return String.valueOf(wga.callAction(context, scriptletDesign.toString(), new ArrayList<Object>(params), null, globalScope));    
     }
 
     private TMLContext traceRemoteDocument(TMLContext context, String linkTargetContentKey) throws WGAPIException {
