@@ -46,6 +46,20 @@
 				<div class="data"><tml:meta type="[domain:{_domain.name}]" name="username"/></div>
 				<div class="clear"></div>
 				
+				<label>Groups:</label>
+				<div class="data" style="max-height:150px;overflow:auto">
+					<tml:script divider="<br>">
+						let none = WGA.createList(["- none -"])
+						let dbkeys = WGA.domain(_domain.name).getAppKeys();
+						if(dbkeys.size()){
+							var groups = context("db:"+dbkeys.get(0)).metaList("database", "usergroups");
+							return groups.size() ? groups : none;
+						}
+						else return none;
+					</tml:script>
+				</div>
+				<div class="clear"></div>
+				
 				<label>Username:</label>
 				<div class="data">
 					<tml:input name="username"/>
