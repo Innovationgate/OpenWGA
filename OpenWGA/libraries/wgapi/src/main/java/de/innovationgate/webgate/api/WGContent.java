@@ -1998,10 +1998,22 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	 * @throws WGAPIException 
 	 */
 	public void removeAllRelations() throws WGAPIException {
-	    Iterator names = getRelationNames().iterator();
+	    Iterator<String> names = getRelationNames().iterator();
         while (names.hasNext()) {
             String name = (String) names.next();
             removeRelation(name);
+        }
+    }
+
+	/**
+	 * Removes all incoming relations to this content from parents/sources
+	 * @throws WGAPIException 
+	 */
+	public void removeAllIncomingRelations() throws WGAPIException  {
+        for(WGRelationData rel: getIncomingRelations(true)){
+        	WGContent source = rel.getParentContent();
+        	source.removeRelation(rel.getName());
+        	source.saveQuiet();
         }
     }
 

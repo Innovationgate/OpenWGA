@@ -3181,9 +3181,11 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
             throw new ResourceIsLockedException("Unable to remove document. Child objects of the object you want to remove are locked.");
         }
 
-        // Look if we need to clear the query cache
+        // remove all relations pointing to me
+        // + look if we need to clear the query cache
         if (document instanceof WGContent) {
             WGContent content = (WGContent) document;
+            content.removeAllIncomingRelations();
             if (content.getRetrievalStatus().equals(WGContent.STATUS_RELEASE)) {
                 dropQueryCache = true;
             }
