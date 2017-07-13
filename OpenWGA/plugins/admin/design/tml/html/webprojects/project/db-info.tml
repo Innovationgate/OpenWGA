@@ -299,11 +299,12 @@
 	<legend>Effective Publisher Options</legend>
 
 	<tml:script>
+		_app = WGA.app(_wgadb);
 		_attributes = _wgadb.getAttributeNames();
 	</tml:script>	
 	<tml:foreach type="itemvalue" item="_attributes" currentvalue="_attribute">
 		<tml:script>
-			_value = _wgadb.getAttribute(_attribute)
+			_value = _app.getPublisherOption(_attribute)
 			_show = false;
 			if(typeof(_value) == "string")
 				_show = true;
