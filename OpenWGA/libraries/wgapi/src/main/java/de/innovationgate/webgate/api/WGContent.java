@@ -3086,6 +3086,22 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     }
     
     /**
+     * Returns the target documents of all relations that belong to the given relation group
+     * @param group The group to query
+     * @return List of target documents
+     */
+    public String getRelationGroupnameForTarget(String group, WGContent target) throws WGAPIException  {
+        
+        for (String relName : getRelationNamesOfGroup(group)) {
+            WGContent con = getRelation(relName);
+            if (con.equals(target)) {
+                return relName;
+            }
+        }
+        return null;
+    }
+    
+    /**
      * Returns the target documents of all relations that belong to the given relation group in a given order
      * @param group The group to query
      * @param orderExpression Order expression denoting the order in which to return relations, evaluated against their target content
@@ -3155,9 +3171,14 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
             throw new WGNotSupportedException("Relation groups are only supported in content stores of version 5 or higher");
         }
         
-        String relName = group + "#" + UIDGenerator.generateUID();
-        WGRelationData relation = new WGRelationData(getDatabase(), getContentKey(true), relName, target.getStructKey(), target.getLanguage().getName(), relType, group);
-        setRelation(relation); 
+        // check if relation group already exists for target
+        String relName = getRelationGroupnameForTarget(group, target);
+        if(relName==null){    
+        	// create new relation
+	        relName = group + "#" + UIDGenerator.generateUID();
+	        WGRelationData relation = new WGRelationData(getDatabase(), getContentKey(true), relName, target.getStructKey(), target.getLanguage().getName(), relType, group);
+	        setRelation(relation);
+        }
         return relName;
     }
     
