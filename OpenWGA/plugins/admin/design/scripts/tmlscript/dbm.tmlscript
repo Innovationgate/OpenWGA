@@ -117,29 +117,25 @@ this.database=function(dbobj){
 					return "No authentication";
 				}
 			}
-			var domainCore = domain.core;
-			return DBM.domain(domainCore).getAuthenticationSourceTitle();
+			return DBM.domain(domain.core).getAuthenticationSourceTitle();
 		}
 	} 
 }
 
 this.domain=function(obj){
-	var wgadomain;
-	if(obj instanceof Packages.de.innovationgate.wga.config.Domain)
-		wgadomain=obj;
-	else if(obj instanceof Packages.de.innovationgate.wgpublisher.WGADomain)
-		wgadomain=obj;
-	else wgadomain = WGA.domain(obj).core;	// must be a string otherwise
+	var name;
+
+	if(obj instanceof Packages.de.innovationgate.wgpublisher.WGADomain)
+		name = obj.name;
+	else if(obj instanceof Packages.de.innovationgate.wga.config.Domain)
+		name = obj.name;
+	else name=obj	// must be a string otherwise
+
+	var wgadomain = WGA.domain(name)
 
 	return{
 		getAuthenticationSourceTitle: function(){
-			if(wgadomain.authenticationSource){
-				var modDef = DBM.getModuleDefinition("AuthenticationSource", wgadomain.authenticationSource.implClassName)
-				if(modDef)
-					return modDef.getTitle(DBM.locale);
-				else return "Authentication Module Definition not found: " + wgadomain.authenticationSource.implClassName
-			}
-			else return "- none -"			
+			return wgadomain.auth().getModule().getAuthenticationSource()			
 		}
 	}
 }
