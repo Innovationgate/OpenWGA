@@ -196,7 +196,12 @@
 		<div class="clear"></div>
 		
 		<label>Language Behaviour:</label>
-		<div class="data"><tml:script expression="_info.languageBehaviour"/></div>
+		<div class="data">
+			<tml:script>
+				var mod = DBM.getModuleDefinition("LanguageBehaviour", _info.languageBehaviour);
+				return (mod && mod.getTitle(DBM.locale)) || _info.languageBehaviour;
+			</tml:script>
+		</div>
 		<div class="clear"></div>
 		
 		<label>Multi Language Support:</label>
@@ -315,7 +320,7 @@
 			_value = _value.toString();
 		</tml:script>
 		<tml:case istrue="_show">
-			<label><tml:item name="_attribute"/>:</label>
+			<label title="<tml:item name="_attribute"/>"><tml:item name="_attribute"/>:</label>
 			<div class="data">
 				<tml:item name="_value"/>
 			</div>
