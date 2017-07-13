@@ -900,10 +900,7 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
     }
 
     public String getAuthenticationSource() {
-    	String cs = "Content-Store-Authentication against database " + _dbkey;
-    	if(_scriptCollect!=null)
-    		return cs + ": custom script " + _scriptCollect;
-    	else return cs + (_internalConfiguration ? " (internally configured)" : " (user documents under '" + _userRootDoc + "')");
+    	return "Contentstore-Authentication against app '" + _dbkey + "'";
     }
 
     public void setCore(WGACore core) {
