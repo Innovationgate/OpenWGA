@@ -210,7 +210,7 @@ DBM.dialog = function(title, url, params, animel){
 	var w = new Ext.Window({
 		modal: true,
 		title: title,
-		width: 800,
+		width: 850,
 		y: 100,
 		height: 500,
 		autoScroll: true
