@@ -760,9 +760,9 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
         if (!url.contains("//") && !url.startsWith("/")) {
             
             Map<Object, DBLoginInfo> logins = WGACore.getSessionLogins(request.getSession());
-            if (!logins.containsKey(_core.getDomainForDatabase(db).getName())) { // If a login is stored on the session for the dbs domain we assume it accessible
-                
-               if (!db.isSessionOpen()) {
+            DBLoginInfo logininfo = logins.get(_core.getDomainForDatabase(db).getName());
+            if(logininfo==null || logininfo.isAnonymous()){
+            	if (!db.isSessionOpen()) {
                     try {
                         db.openSession(WGDatabase.ANONYMOUS_USER, null);
                     }

@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.innovationgate.utils.Base64;
+import de.innovationgate.webgate.api.WGDatabase;
 
 public class DBLoginInfo implements java.io.Serializable {
     
@@ -117,89 +118,93 @@ public class DBLoginInfo implements java.io.Serializable {
 	public String getUserName() {
 		return _userName;
 	}
-		/**
-		 * @param string
-		 */
-		public void setCredentials(Object credentials) {
-			_credentials = credentials;
-		}
+	/**
+	 * @param string
+	 */
+	public void setCredentials(Object credentials) {
+		_credentials = credentials;
+	}
 
-		/**
-		 * @param string
-		 */
-		public void setUserName(String string) {
-			_userName = string;
-		}
+	/**
+	 * @param string
+	 */
+	public void setUserName(String string) {
+		_userName = string;
+	}
 
-        public String getAccessFilter() {
-            return _accessFilter;
-        }
+    public String getAccessFilter() {
+        return _accessFilter;
+    }
 
-        public void setAccessFilter(String accessFilter) {
-            _accessFilter = accessFilter;
-        }
+    public void setAccessFilter(String accessFilter) {
+        _accessFilter = accessFilter;
+    }
 
-        public Map<String, String> getDbAccessFilters() {
-            return _dbAccessFilters;
-        }
+    public Map<String, String> getDbAccessFilters() {
+        return _dbAccessFilters;
+    }
 
-        public void setDbAccessFilters(Map<String, String> dbAccessFilters) {
-            _dbAccessFilters = dbAccessFilters;
-        }
+    public void setDbAccessFilters(Map<String, String> dbAccessFilters) {
+        _dbAccessFilters = dbAccessFilters;
+    }
 
-        public AuthType getAuthenticationType() {
-            return _authenticationType;
-        }
+    public AuthType getAuthenticationType() {
+        return _authenticationType;
+    }
 
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((_accessFilter == null) ? 0 : _accessFilter.hashCode());
-            result = prime * result + ((_authenticationType == null) ? 0 : _authenticationType.hashCode());
-            result = prime * result + ((_credentials == null) ? 0 : _credentials.hashCode());
-            result = prime * result + ((_dbAccessFilters == null) ? 0 : _dbAccessFilters.hashCode());
-            result = prime * result + ((_userName == null) ? 0 : _userName.hashCode());
-            return result;
-        }
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((_accessFilter == null) ? 0 : _accessFilter.hashCode());
+        result = prime * result + ((_authenticationType == null) ? 0 : _authenticationType.hashCode());
+        result = prime * result + ((_credentials == null) ? 0 : _credentials.hashCode());
+        result = prime * result + ((_dbAccessFilters == null) ? 0 : _dbAccessFilters.hashCode());
+        result = prime * result + ((_userName == null) ? 0 : _userName.hashCode());
+        return result;
+    }
 
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            DBLoginInfo other = (DBLoginInfo) obj;
-            if (_accessFilter == null) {
-                if (other._accessFilter != null)
-                    return false;
-            }
-            else if (!_accessFilter.equals(other._accessFilter))
-                return false;
-            if (_authenticationType != other._authenticationType)
-                return false;
-            if (_credentials == null) {
-                if (other._credentials != null)
-                    return false;
-            }
-            else if (!_credentials.equals(other._credentials))
-                return false;
-            if (_dbAccessFilters == null) {
-                if (other._dbAccessFilters != null)
-                    return false;
-            }
-            else if (!_dbAccessFilters.equals(other._dbAccessFilters))
-                return false;
-            if (_userName == null) {
-                if (other._userName != null)
-                    return false;
-            }
-            else if (!_userName.equals(other._userName))
-                return false;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
             return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        DBLoginInfo other = (DBLoginInfo) obj;
+        if (_accessFilter == null) {
+            if (other._accessFilter != null)
+                return false;
         }
+        else if (!_accessFilter.equals(other._accessFilter))
+            return false;
+        if (_authenticationType != other._authenticationType)
+            return false;
+        if (_credentials == null) {
+            if (other._credentials != null)
+                return false;
+        }
+        else if (!_credentials.equals(other._credentials))
+            return false;
+        if (_dbAccessFilters == null) {
+            if (other._dbAccessFilters != null)
+                return false;
+        }
+        else if (!_dbAccessFilters.equals(other._dbAccessFilters))
+            return false;
+        if (_userName == null) {
+            if (other._userName != null)
+                return false;
+        }
+        else if (!_userName.equals(other._userName))
+            return false;
+        return true;
+    }
 
+    public boolean isAnonymous(){
+    	return getUserName().equals(WGDatabase.ANONYMOUS_USER);
+    }
+    
 }
 

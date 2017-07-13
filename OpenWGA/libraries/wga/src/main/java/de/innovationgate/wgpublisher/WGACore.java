@@ -1221,8 +1221,8 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             return false;
         }
         else {
-            DBLoginInfo loginInfo = this.getSessionLogins(session).get(db.getAttribute(WGACore.DBATTRIB_DOMAIN));
-            return (loginInfo == null);
+            DBLoginInfo loginInfo = getSessionLogins(session).get(db.getAttribute(WGACore.DBATTRIB_DOMAIN));
+            return (loginInfo == null || loginInfo.isAnonymous());
         }
 
     }
