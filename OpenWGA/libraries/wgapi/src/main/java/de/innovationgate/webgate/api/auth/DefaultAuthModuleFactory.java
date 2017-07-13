@@ -94,7 +94,7 @@ public class DefaultAuthModuleFactory implements AuthModuleFactory {
         // Create a new module and initialize it.
         AuthenticationModule module = createAuthModule(type);
         if (module == null) {
-            throw new ConfigurationException("Unknown auth modúle type: " + type);
+            throw new ConfigurationException("Unknown auth module type: " + type);
         }
         
         module.init(settings, db);
