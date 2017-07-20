@@ -32,6 +32,7 @@ import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGTMLModule;
 import de.innovationgate.wgpublisher.DeployedLayout;
 import de.innovationgate.wgpublisher.DeployerException;
+import de.innovationgate.wgpublisher.webtml.portlet.TMLPortlet;
 import de.innovationgate.wgpublisher.webtml.utils.TMLException;
 import de.innovationgate.wgpublisher.webtml.utils.TMLOption;
 
@@ -94,7 +95,11 @@ public class Inline extends Option {
         
         WGTMLModule mod = getTMLContext().designdb().getTMLModule(getStatus().getTMLModuleName(), getStatus().getTMLModuleMediaKey());
         DeployedLayout layout = getCore().getDeployer().deployInlineTML(mod, "option \"" + this.getName() + "\" on line " + getSourceline(), String.valueOf(optionValue), Integer.parseInt(getSourceline()), getPageContext().getRequest());
-        return new Pointer("WebTML Option " + getName(), layout.getLayoutKey(), getTMLContext().getDesignDBKey(), getTMLContext().getportlet().getportletkey(), getTMLContext().option(Base.OPTION_MODULE_CONTROLLER));
+        TMLPortlet portlet = getTMLContext().getportlet();
+        return new Pointer("WebTML Option " + getName(), layout.getLayoutKey(), 
+        			getTMLContext().getDesignDBKey(), 
+        			portlet != null ? portlet.getportletkey() : null, 
+        			getTMLContext().option(Base.OPTION_MODULE_CONTROLLER));
         
     }
 

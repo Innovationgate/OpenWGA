@@ -1231,7 +1231,7 @@ public class WGPDispatcher extends HttpServlet {
         TMLUserProfile tmlUserProfile = null;
         try {
             tmlUserProfile = getCore().getPersManager().prepareUserProfileForRequest(request, response, content, database, formData, isAjax);
-            if (info != null) {
+            if (info != null && tmlUserProfile!=null) {
                 info.setProfile(tmlUserProfile);
             }
         } 
