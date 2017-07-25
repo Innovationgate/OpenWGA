@@ -80,7 +80,7 @@
 							</div>
 							<div>
 								<label>Titel</label>
-								<tml:input name="browsertitle" meta="true" html_maxlength="60"/>
+								<tml:input name="browsertitle" meta="true"/>
 								<div><tml:script expression="(BROWSERTITLE && BROWSERTITLE.length) || 0"/>/60 Zeichen</div>
 							</div>
 							<tml:script>
@@ -97,7 +97,7 @@
 							</tml:case>
 							<div>
 								<label>Beschreibung</label>
-								<tml:input name="description" meta="true" type="textarea" html_maxlength="160"/>
+								<tml:input name="description" meta="true" type="textarea"/>
 								<div><tml:script expression="DESCRIPTION.length"/>/160 Zeichen</div>
 							</div>
 						</div>
@@ -188,11 +188,13 @@
 													
 							$("#seo-searchengine textarea[name=description]").on("keyup", function(ev){
 								var value = $(this).val();
-								$(this).next().html(value.length + "/160 Zeichen");
+								$(this).next()[value.length>160 ? "addClass" : "removeClass"]("error")
+									.html(value.length + "/160 Zeichen");
 							})
 							$("#seo-searchengine input[name=browsertitle]").on("keyup", function(ev){
 								var value = $(this).val();
-								$(this).next().html(value.length + "/60 Zeichen");
+								$(this).next()[value.length>60 ? "addClass" : "removeClass"]("error")									
+									.html(value.length + "/60 Zeichen");
 							})
 				
 				

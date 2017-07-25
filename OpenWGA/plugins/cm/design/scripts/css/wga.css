@@ -1128,3 +1128,11 @@ a.drop-down-open{
 .dashboard a{
 	color: red;
 }
+
+/*
+	#seo-searchengine
+*/
+
+#seo-searchengine .error{
+	color: red;
+}
