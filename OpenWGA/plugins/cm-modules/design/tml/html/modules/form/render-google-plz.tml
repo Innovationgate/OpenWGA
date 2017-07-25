@@ -67,6 +67,9 @@
 			html_placeholder="PLZ oder Ort"
 		/>
 	</div>
+	<tml:input name="[{CMM.setting('fieldname')}_lat]"/>
+		/
+	<tml:input name="[{CMM.setting('fieldname')}_lng]"/>
 </div>
 <tml:case condition="tmlform.hasmessage(_fieldname)">
 	<div class="field-message">
@@ -88,6 +91,13 @@
 				types: ['(regions)']
 			}
 		);
+		autocomplete.addListener('place_changed', function(){
+			var lat = this.getPlace().geometry.location.lat()
+			$("#<tml:script expression="tmlform.formid"/> [name=<tml:item name="_fieldname"/>_lat]").val(lat);
+			var lng = this.getPlace().geometry.location.lng()
+			$("#<tml:script expression="tmlform.formid"/> [name=<tml:item name="_fieldname"/>_lng]").val(lng);
+			console.log("place changed", lat, lng); 
+		});
 	})
 	
 </script>
