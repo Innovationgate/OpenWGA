@@ -41,7 +41,7 @@
 {
 	id:				'cm_fieldset',
 	title:			'<tml:label key="module.fieldset"/>',
-	icon:			"<tml:url db="@afw" type="file" doc="icons" file="textfield.png"/>",
+	icon:			"<tml:url db="@afw" type="file" doc="icons" file="application_tile_vertical.png"/>",
 	type:			'container',
 	tml:			'modules:form:render_fieldset',
 	settingstml:	'plugin-cm-modules/modules:form:settings_fieldset',
