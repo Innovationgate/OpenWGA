@@ -138,6 +138,15 @@ public class ResourceRef {
 		else return getCode();
 	}
 
+	/*
+	 * Returns the code recursively calling other postProcessors
+	 */
+	public String getTMLScriptCode(Boolean compress) throws WGException, IOException{
+		if(_type==TYPE_TMLSCRIPT)
+			return _design.getTMLScriptCode();
+		else return getCode();
+	}
+
 	public WGDesignDocument getDesignDocument() throws WGException, IOException{
 		try{
 			switch (_type) {
