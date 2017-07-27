@@ -24,6 +24,7 @@ public class ResourceRef {
 	public static final String TYPE_CSS = "css";
 	public static final String TYPE_FILE = "file";
 	public static final String TYPE_STATIC = "static";
+	public static final String TYPE_TMLSCRIPT = "tmlscript";
 	
 	String _type;
 	String _db=null;
@@ -100,6 +101,7 @@ public class ResourceRef {
 		switch (_type) {
 			case TYPE_CSS:
 			case TYPE_JS:
+			case TYPE_TMLSCRIPT:
 				WGScriptModule mod = (WGScriptModule)getDesignDocument();
 				return mod!=null ? mod.getCode() : null;
 	
@@ -145,6 +147,9 @@ public class ResourceRef {
 				case TYPE_JS:
 					return _design.getScriptModule(WGScriptModule.CODETYPE_JS);
 	
+				case TYPE_TMLSCRIPT:
+					return _design.getScriptModule(WGScriptModule.CODETYPE_TMLSCRIPT);
+
 				case TYPE_FILE:
 					return _design.getFileContainer();
 	
