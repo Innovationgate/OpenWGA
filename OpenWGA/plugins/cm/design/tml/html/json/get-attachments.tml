@@ -42,6 +42,8 @@
 	}
 	
 	_filter = function(filename){
+		if(_type=="file")
+			return true;
 		var filter=request.getParameter("filter");
 		var Attachment = AFW.content(context(_context).content()).attachment(filename)	
 		switch(filter){
@@ -99,16 +101,16 @@
 		{
 			data:[
 				<tml:foreach type="itemvalue" item="_attachments" currentvalue="_filename" filter="_filter(_filename)">
-					<tml:script>
-						_Attachment = AFW.content().attachment(_filename);
-					</tml:script>
 					{
-						filetype: "<tml:script expression="label('filetype.'+_Attachment.getType().name)"/>",
 						id: "<tml:item name="_filename"/>",
 						primary: "<tml:script expression="_filename==_primary?'primary':''"/>",
 						name: "<tml:item name="_filename"/>",
 						<tml:if condition="_type=='content'">
 							<tml:then>
+								<tml:script>
+									_Attachment = AFW.content().attachment(_filename);
+								</tml:script>
+								filetype: "<tml:script expression="label('filetype.'+_Attachment.getType().name)"/>",
 								url: "<tml:url type="file" file="{_filename}"/>",
 								poster: "<tml:script expression="_Attachment.getPosterURL({checksum:true})"/>",
 								thumbnail: "<tml:script expression="_Attachment.getThumbnailURL({checksum:true})"/>",
@@ -119,7 +121,8 @@
 							</tml:then>
 							<tml:else>url: "<tml:url db="{_dbkey}" type="file" doc="{request.getParameter('key')}" file="{_filename}"/>",</tml:else>
 						</tml:if>					
-						size: "<tml:script format="0" expression="_Attachment.fileSize"/>"
+						<tml:comment>size: "<tml:script format="0" expression="_Attachment.fileSize"/>"</tml:comment>
+						size: <tml:script format="0">return document.getFileSize(_filename)</tml:script>
 					}
 					<tml:between>,</tml:between>
 				</tml:foreach>

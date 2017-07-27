@@ -47,6 +47,8 @@
 			})
 		</tml:case>
 		
+		grid.on("beforeedit", function(e){return false});	// no edit 
+		
 		grid.on("rowdblclick", function(thegrid, index, ev){
 			var selection=grid.getSelections()[0];
 			//console.log(ev);

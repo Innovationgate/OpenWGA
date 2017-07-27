@@ -468,9 +468,9 @@ BI.util.createAttachmentGrid=function(el, type, key, autoHeight, dragdrop, lazy_
     	},
 		{
 			id: "col-filename", header: $L.filename, width: 40, sortable: true, dataIndex: 'name',
-				editor: new Ext.grid.GridEditor(new Ext.form.TextField({
-	            	allowBlank: false
-	          	}))
+			editor: new Ext.grid.GridEditor(new Ext.form.TextField({
+            	allowBlank: false
+          	}))
 		},
 		{id: "col-size", header: $L.filesize, width: 50, resizable:false, align:"right", renderer: BI.util.renderFileSize, sortable: true, dataIndex: 'size'}
 	]);
