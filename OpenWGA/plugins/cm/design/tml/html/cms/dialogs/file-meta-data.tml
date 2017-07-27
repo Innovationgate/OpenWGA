@@ -152,17 +152,20 @@
 					    		</td>
 					    	</tr>
 							<tml:case condition="_derivates.size()">
-					    	<tr>
-					    		<td valign="top">Derivate:</td>
-					    		<td>
-					    			<tml:foreach item="_derivates" currentvalue="_derivate" sortexpression="_derivate.size" sortorder="ascending">
-					    				<div>
-						    			<tml:script expression="_derivate.displayWidth + ' x ' + _derivate.displayHeight"/> Pixel,
-										<tml:script expression="_derivate.size/1000" format="0"/> KB
-										</div>
-					    			</tml:foreach>
-					    		</td>
-					    	</tr>
+						    	<tr>
+						    		<td valign="top"><tml:label key="file-meta.derivates"/>:</td>
+						    		<td>
+						    			<tml:foreach item="_derivates" currentvalue="_derivate" sortexpression="_derivate.size" sortorder="descending">
+						    				<div>
+								    			<tml:script expression="_derivate.displayWidth"/>
+								    			x
+								    			<tml:script expression="_derivate.displayHeight"/>
+								    			Pixel,
+								    			<tml:script expression="AFW.Util.renderFileSize(_derivate.size)"/>
+											</div>
+						    			</tml:foreach>
+						    		</td>
+						    	</tr>
 					    	</tml:case>
 				    	</tml:case>
 				    	<tml:foreach item="_fields" currentvalue="_field">
