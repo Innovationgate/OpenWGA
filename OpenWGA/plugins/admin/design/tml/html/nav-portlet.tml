@@ -34,8 +34,6 @@
 	</script>
 </tml:form>
 
-<tml:range var="_navigation"><tml:include medium="xml" ref="navigation"/></tml:range>
-
 <tml:script>	
 	var xml=_navigation_modules;	// parseXML(_navigation);
 								
