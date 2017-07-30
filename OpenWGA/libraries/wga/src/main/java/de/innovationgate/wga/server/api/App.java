@@ -225,8 +225,23 @@ public class App extends Database {
         return createEvent(WGUtils.deserializeCollection(eventPathStr, "/", true));
     }
 
+    public ApplicationEventBuilder createEvent(String eventPathStr, Map<Object, Object> params) throws WGException {
+    	return createEvent(eventPathStr).params(params);
+    }
+    
+    public void fireEvent(String eventPathStr, Map<Object, Object> params) throws WGException {
+    	createEvent(eventPathStr, params).fire();
+    }
+    public void fireEvent(String eventPathStr) throws WGException {
+    	createEvent(eventPathStr).fire();
+    }
+    
     /**
      * Registers a managed TMLScript app global variable, which will get created on demand from the TMLScript module of this Designs current base reference.
+     * 
+     * When called from TMLScript this method is "wrapped" to the following signature:
+     * 		managedGlobal(String name, DesignLocator, JavaScriptObject)
+     * 
      * @param name
      * @param scope The creation scope which determines, for which scope entity individual global objects will be provided. For example: Scope {@link ObjectScope#PORTLET} creates individual global objects for every request.   
      * @throws WGException
