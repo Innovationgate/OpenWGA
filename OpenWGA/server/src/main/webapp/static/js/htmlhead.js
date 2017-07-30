@@ -1604,25 +1604,6 @@ WGA.portlet = function() {
 		delete objectReg[portletkey];
 	}
 
-	/*
-	 * #00004824:
-	 * Test, if browser support sessionStorage
-	 * Note that is't not enough to check window.sessionStorage
-	 * Safari doesn't have local storage in private surfing mode. window.sessionStorage returns an Object
-	 * but calling setItem() throws an exception "(DOM Exception 22): The quota has been exceeded".  
-	 */
-	function hasLocalStorage(){
-		var testKey = 'test', storage = window.sessionStorage;
-	    try {
-	        storage.setItem(testKey, '1');
-	        storage.removeItem(testKey);
-	        return true;
-	    } catch (error) {
-	    	//console.log("no local storage");
-	        return false;
-	    }				
-	}
-
 	return {
 
 		init: function(){
@@ -1752,7 +1733,7 @@ WGA.portlet = function() {
 						defaultState: (defaultState && defaultState == true)
 				});
 				
-				if (hasLocalStorage()) {
+				if (WGA.hasLocalStorage()) {
 					window.sessionStorage.setItem(PORTLETSTATE_PREFIX +  WGA.uriHash + "." + pKey, stateObject);
 					var parentKeys = parentRegistry[pKey];
 					if (parentKeys) {
@@ -1792,7 +1773,7 @@ WGA.portlet = function() {
 		}
 		
 		,fetchState : function(pKey) {
-			if (hasLocalStorage()){
+			if (WGA.hasLocalStorage()){
 				return JSON.parse(window.sessionStorage.getItem(PORTLETSTATE_PREFIX + WGA.uriHash + "." + pKey));
 			}
 			else if (portletStates[pKey]){
@@ -1803,7 +1784,7 @@ WGA.portlet = function() {
 		
 		// Remove state of a portlet that has been explicitly unregistered
 		,disposeState : function(pKey) {
-			if (hasLocalStorage()){
+			if (WGA.hasLocalStorage()){
 				window.sessionStorage.removeItem(PORTLETSTATE_PREFIX + WGA.uriHash + "." + pKey);
 			}
 			else {
@@ -1837,7 +1818,7 @@ WGA.portlet = function() {
 				states.push(pKey + "//" + state.data);
 			}
 			
-			if (hasLocalStorage()){
+			if (WGA.hasLocalStorage()){
 				var childrenStr = window.sessionStorage.getItem(CHILDPORTLETS_PREFIX + WGA.uriHash + "." + pKey);
 				var children = [];
 				if (childrenStr) {
@@ -2009,6 +1990,25 @@ WGA.onload.register(WGA.portlet.onload.executeAll);
 
 /* end portlet registry */
 
+/*
+ * #00004824:
+ * Test, if browser support sessionStorage
+ * Note that is't not enough to check window.sessionStorage
+ * Safari doesn't have local storage in private surfing mode. window.sessionStorage returns an Object
+ * but calling setItem() throws an exception "(DOM Exception 22): The quota has been exceeded".  
+ */
+WGA.hasLocalStorage = function(){
+	var testKey = 'test', storage = window.sessionStorage;
+    try {
+        storage.setItem(testKey, '1');
+        storage.removeItem(testKey);
+        return true;
+    } catch (error) {
+    	//console.log("no local storage");
+        return false;
+    }				
+}
+
 WGA.websocket = {
 		
 		WINDOWID: "de.innovationgate.wga.windowId",
@@ -2051,7 +2051,7 @@ WGA.websocket = {
 		
 		startService: function() {
 			
-			if (!hasLocalStorage()){
+			if (!WGA.hasLocalStorage()){
 				return false;
 			}
 			
@@ -2061,21 +2061,22 @@ WGA.websocket = {
 				windowId = this.pageId;
 				window.sessionStorage.setItem(this.WINDOWID, windowId);
 			}
+			urlParams.windowId = windowId;
+
 			urlParams.pageId = this.pageId;
-			urlParams.windowId = this.windowId;
 			urlParams.sessionId = this.sessionId;
 			
 			var completeUrl = this.url + (this.url.indexOf("?") != -1 ? "&" : "?") + WGA.toQueryString(urlParams);
 			
 
 			if ('WebSocket' in window) {
-				if (console && console.log) {
+				if (WGA.debug && console && console.log) {
 					console.log("Building socket connection, pageId: " + this.pageId);
 				}
 				this.socket = new WebSocket(completeUrl);
 			}
 			else if ('MozWebSocket' in window) {
-				if (console && console.log) {
+				if (WGA.debug && console && console.log) {
 					console.log("Building mozilla compatible socket connection, pageId: " + this.pageId);
 				}
 				this.socket = new MozWebSocket(completeUrl);
@@ -2089,6 +2090,7 @@ WGA.websocket = {
 			if (!this.noCloseHandler) {
 				this.socket.onclose = this.onClose;
 			}
+			
 			return true;
 			
 		},
@@ -2096,23 +2098,23 @@ WGA.websocket = {
 		onMessage: function(event) {
 			var msg = JSON.parse(event.data);
 			if (msg.type == 'firePortletEvent') {
-				if (console && console.log) {
+				if (WGA.debug && console && console.log) {
 					console.log("Execute portlet event from websocket, pageId: " + WGA.websocket.pageId, event.data);
 				}	
 				WGA.event.fireEvent(msg.event.name, "*", msg.event.params);
 			}
 			else if (msg.type == 'handshake') {
 				WGA.websocket.reconnectAttempts = 1;
-				if (console && console.log) {
+				if (WGA.debug && console && console.log) {
 					console.log("Connected WebSocket, pageId: " + WGA.websocket.pageId);
 				}
 			}
 			else if (msg.type == 'response') {
-				if (console && console.log) {
+				if (WGA.debug && console && console.log) {
 					console.log("Receiving response from websocket, pageId: " + WGA.websocket.pageId, event.data);
 				}
 				
-				if (msg.status != "SUCCESS" && console && console.log) {
+				if (msg.status != "SUCCESS" && WGA.debug && console && console.log) {
 					console.log("WebSocket response returned with non-success status", JSON.stringify(msg));
 				}
 				if (!msg.callId) {
@@ -2122,15 +2124,15 @@ WGA.websocket = {
 				var callback;
 				if (msg.status == "SUCCESS") {
 					callback = WGA.websocket.callbacks[msg.callId];
-					delete WGA.websocket.callbacks[msg.callId];
 				}
 				else {
 					callback = WGA.websocket.errorCallbacks[msg.callId];
-					delete WGA.websocket.errorCallbacks[msg.callId];			
 				}
+				delete WGA.websocket.callbacks[msg.callId];
+				delete WGA.websocket.errorCallbacks[msg.callId];
 				
 				if (callback && typeof(callback) == "function") {
-					if (console && console.log) {
+					if (WGA.debug && console && console.log) {
 						console.log("Executing callback for response: " + callback);
 					}
 					callback(msg);
@@ -2138,7 +2140,7 @@ WGA.websocket = {
 			}
 			else if (msg.type == 'custom') {
 				for (var idx=0; idx < WGA.websocket.messageListeners.length; idx++) {
-					if (console && console.log) {
+					if (WGA.debug && console && console.log) {
 						console.log("Execute custom message from websocket, pageId: " + WGA.websocket.pageId, event.data);
 					}
 					WGA.websocket.messageListeners[idx](msg.data);
@@ -2148,8 +2150,8 @@ WGA.websocket = {
 
 		onClose: function(event) {
 			
-			if (console && console.log) {
-				console.log("Socket connection closed, pageId: " + WGA.websocket.pageId, "event.code", event.code);
+			if (WGA.debug && console && console.log) {
+				console.log("Socket connection closed, pageId: " + WGA.websocket.pageId, event, "event.code", event.code);
 			}
 			
 			WGA.websocket.socket.onmessage = null;
@@ -2166,7 +2168,7 @@ WGA.websocket = {
 				return;
 			}
 			else if (event.code == 1008) {
-				if (console && console.log) {
+				if (WGA.debug && console && console.log) {
 					console.log("Lost connection to WebSocket bc. of violated policy. Will need to reload page to restart WebSocket", event.reason);
 					WGA.util.showReloadMessage(WGA.util.label(WGA.websocket.reloadMessages, "en"));
 				}
@@ -2174,7 +2176,7 @@ WGA.websocket = {
 			}
 			
 			if (WGA.websocket.reconnectAttempts >= 5) {
-				if (console && console.log) {
+				if (WGA.debug && console && console.log) {
 					console.log("Lost connection to WebSocket. Reason code: " + event.code + ", reason: '" + event.reason + "'. Cancelling service after 5 reconnect attempts.");
 				}
 				WGA.util.showReloadMessage(WGA.util.label(WGA.websocket.backendLostMessages, "en"));
@@ -2182,12 +2184,12 @@ WGA.websocket = {
 			}
 			
 			var time = WGA.util.generateInterval(WGA.websocket.reconnectAttempts, 5000);
-			if (console && console.log) {
-				console.log("Lost connection to WebSocket. Reason code: " + event.code + ", reason: '" + event.reason + "'. Will try to reconnect in " + time + " milliseconds.");
+			if (WGA.debug && console && console.log) {
+				console.log("Lost connection to WebSocket. Reason code: " + event.code + ", reason: '" + event.reason + "'. Will try to reconnect in " + parseInt(time) + " milliseconds.");
 			}
 			setTimeout(function() {
 				WGA.websocket.reconnectAttempts = WGA.websocket.reconnectAttempts + 1;
-				if (console && console.log) {
+				if (WGA.debug && console && console.log) {
 					console.log("Trying reconnect to WebSocket. Attempt: " + WGA.websocket.reconnectAttempts);
 				}
 				WGA.websocket.startService();
