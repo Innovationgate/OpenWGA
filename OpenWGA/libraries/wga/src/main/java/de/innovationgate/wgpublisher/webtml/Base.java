@@ -2078,7 +2078,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     	.append(WGUtils.encodeJS(pageConn.getPageId())).append("', '")
     	.append(getTMLContext().gethttpsession().getId()).append("', ")
     	.append(noCloseHandler)
-    	.append(");});");
+    	.append(")});");
     	
     	pageConn.setClientInited(true);
     }
