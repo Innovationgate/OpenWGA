@@ -121,10 +121,13 @@ public class PageConnectionManager {
     public void removeConnection(HttpSession session, PageConnection con) {
         _activeConnections.remove(con.getPageId());
         if (session != null) {
-            Map<String,PageConnection> activeConnections = getActiveConnectionsSessionMap(session);
-            activeConnections.remove(con.getPageId());
-            con.close();
+        	try{
+	            Map<String,PageConnection> activeConnections = getActiveConnectionsSessionMap(session);
+	            activeConnections.remove(con.getPageId());
+        	}
+        	catch(Exception e){}
         }
+        con.close();
     }
 
     @SuppressWarnings("unchecked")

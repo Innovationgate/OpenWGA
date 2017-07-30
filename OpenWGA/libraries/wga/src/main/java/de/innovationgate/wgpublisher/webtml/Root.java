@@ -702,12 +702,7 @@ public class Root extends Base {
             Status status = (Status) getStatus();
             AjaxInfo ajaxInfo = getCurrentPortletAjaxInfo(status);
             StringBuilder javaScript = new StringBuilder();
-            if (!status._isAjaxNoRefreshCall) {
-                javaScript.append("<script type=\"text/javascript\">\n");
-            }
-            
             boolean somethingDone = false;
-            
             
             // Write changed portlet states to the client when they are transient: On the absolute root when AJAX request, on first level portlet includes on Non-AJAX requests
             TMLPortletStateStorage stateStorage = getTMLContext().getPortletStateStorage();
@@ -750,11 +745,6 @@ public class Root extends Base {
 
             }
             
-            // Eventually init the page connection, if not already done
-            if (status._ajax == false) {
-                initPageConnectionClient(javaScript);
-            }
-
             // check for portlet events that were issued inside the call and render if present (once for absolute root only)
             if (ajaxInfo != null) {
                 @SuppressWarnings("unchecked")
@@ -770,12 +760,18 @@ public class Root extends Base {
                 }
             }
             
-            if (!status._isAjaxNoRefreshCall) {
-                javaScript.append("</script>");
-            }
-            
             if (somethingDone) {
-               this.setSuffix(this.getSuffix() + javaScript.toString());
+            	// Eventually init the page connection, if not already done
+                if (status._ajax == false) {
+                	initPageConnectionClient(javaScript);
+                }
+                
+                String suffix;
+                if (status._isAjaxNoRefreshCall)
+                	suffix = javaScript.toString();
+                else suffix = "<script type=\"text/javascript\">" + javaScript.toString() + "</script>";
+                
+                this.setSuffix(this.getSuffix() + suffix);
             }
         }
         catch (Exception e) {

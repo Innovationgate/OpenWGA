@@ -4290,16 +4290,6 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             // fire pre connect event
             fireCoreEvent(new WGACoreEvent(WGACoreEvent.TYPE_STARTUP_PRE_CONNECT, null, this));
 
-            // connect plugins
-            updatePlugins(newDomainConfigs);            
-            
-            // Log most important available modules
-            logCategoryInfo("Modules", 1);
-            logModuleRegistry();
-            
-            // Some tasks that adapt options in registry to those configured in the WGA configuration
-            adaptConfigurationToRegistry(configMigrated);
-            
             // Create server option readers
             _variousServerOptionReader = getConfigOptionReader(new OptionFetcher() {
                 @Override
@@ -4314,6 +4304,16 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
                     return config.getServerOptions();
                 }
             }, WGAServerOptionsModuleType.class, ServicesCollector.class);
+            
+            // connect plugins
+            updatePlugins(newDomainConfigs);            
+            
+            // Log most important available modules
+            logCategoryInfo("Modules", 1);
+            logModuleRegistry();
+            
+            // Some tasks that adapt options in registry to those configured in the WGA configuration
+            adaptConfigurationToRegistry(configMigrated);
             
                         
             // init cluster service
