@@ -1214,6 +1214,16 @@ public class WGA {
         return scoped(str, null);
     }
 
+    public Plugin plugin() throws WGException {
+        TMLContext cx = fetchTMLContext();
+        if (cx != null) {
+        	plugin(cx.db());
+        }
+        else {
+            throw new UnavailableResourceException("Cannot retrieve current plugin as we are outside WebTML environment");
+        }
+    	return null;
+    }
     
     /**
      * Returns a Plugin object for any OpenWGA plugin of the given unique nam.
@@ -2057,13 +2067,7 @@ public class WGA {
      * @throws WGAServerException
      */
     public App app(WGDatabase db) throws WGException {
-        PluginID id = (PluginID) db.getAttribute(WGACore.DBATTRIB_PLUGIN_ID);
-        if (id != null) {
-            return plugin(db);
-        }
-        else {
-            return new App(this, db);
-        }
+        return new App(this, db);
     }
     
     /**
