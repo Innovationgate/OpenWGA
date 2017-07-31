@@ -2170,7 +2170,7 @@ WGA.websocket = {
 			else if (event.code == 1008) {
 				if (WGA.debug && console && console.log) {
 					console.log("Lost connection to WebSocket bc. of violated policy. Will need to reload page to restart WebSocket", event.reason);
-					WGA.util.showReloadMessage(WGA.util.label(WGA.websocket.reloadMessages, "en"));
+					//WGA.util.showReloadMessage(WGA.util.label(WGA.websocket.reloadMessages, "en"));
 				}
 				return;
 			}
@@ -2179,7 +2179,7 @@ WGA.websocket = {
 				if (WGA.debug && console && console.log) {
 					console.log("Lost connection to WebSocket. Reason code: " + event.code + ", reason: '" + event.reason + "'. Cancelling service after 5 reconnect attempts.");
 				}
-				WGA.util.showReloadMessage(WGA.util.label(WGA.websocket.backendLostMessages, "en"));
+				//WGA.util.showReloadMessage(WGA.util.label(WGA.websocket.backendLostMessages, "en"));
 				return;
 			}
 			
