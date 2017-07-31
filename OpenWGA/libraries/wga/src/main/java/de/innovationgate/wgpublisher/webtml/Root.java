@@ -444,6 +444,7 @@ public class Root extends Base {
 			this.pageContext.getRequest().setAttribute(WGACore.ATTRIB_TAGIDS, null);
 		}
 		
+		/*
 		if (status.receptorTag == null && status._ajax == false) {
 		    TMLPageImpl page = (TMLPageImpl) WGA.get(getTMLContext()).tmlPage();
 		    PageConnection pageConn = page.getPageConnection(false);
@@ -451,6 +452,7 @@ public class Root extends Base {
 		        getTMLContext().addwarning("A WebSocket connection is needed by this page but was initialized too late, so it could not be established. Use Page.prepareSocket() either before <tml:htmlhead> is rendered or the last WebTML portlet ends.");
 		    }
 		}
+		*/
 		
 		recoverCurrentTMLAttributes();
         
