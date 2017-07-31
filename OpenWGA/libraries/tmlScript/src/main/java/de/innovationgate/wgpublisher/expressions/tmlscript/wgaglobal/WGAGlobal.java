@@ -899,9 +899,8 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
     
     public static Plugin plugin(Context cx, Scriptable thisObj, java.lang.Object[] args, Function funObj) throws WGException {
         
-        if (args.length != 1) {
-            throw new EvaluatorException("Method get(thisObj).getWga().plugin() needs a single parameter, either string or database");
-        }
+        if (args.length == 0)
+        	return get(thisObj).getWga().plugin();
         
         Object arg1 = Context.jsToJava(args[0], Object.class);
         
@@ -912,7 +911,7 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
             return get(thisObj).getWga().plugin((WGDatabase) arg1);
         }
         else {
-            throw new EvaluatorException("Method get(thisObj).getWga().plugin() needs a single parameter, either string or database");
+            throw new EvaluatorException("Method WGA.plugin() called with wrong parameter");
         }
         
         
