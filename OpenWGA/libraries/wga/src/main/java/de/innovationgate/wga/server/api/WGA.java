@@ -1217,12 +1217,11 @@ public class WGA {
     public Plugin plugin() throws WGException {
         TMLContext cx = fetchTMLContext();
         if (cx != null) {
-        	plugin(cx.db());
+        	return plugin(cx.db());
         }
         else {
             throw new UnavailableResourceException("Cannot retrieve current plugin as we are outside WebTML environment");
         }
-    	return null;
     }
     
     /**
