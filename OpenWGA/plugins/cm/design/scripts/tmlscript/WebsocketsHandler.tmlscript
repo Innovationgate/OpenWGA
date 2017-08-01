@@ -1,0 +1,7 @@
+function WebsocketsHandler(){}
+
+WebsocketsHandler.prototype.pageUpdated = function($websocket, $event){
+	$websocket.firePortletEvent("page-updated", {
+		structkey: $event.params.structkey
+	});
+}.listenToAppEvents("page-updated");

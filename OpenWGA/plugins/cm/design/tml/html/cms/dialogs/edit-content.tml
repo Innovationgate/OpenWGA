@@ -62,6 +62,8 @@
 	event=createEvent("CMS_dialog_closed");
 	portlet.fireEvent(event);
 
+	CM.firePageUpdated(_new_structkey);
+
 </tml:action>
 
 <tml:if istrue="_actionDone">

@@ -36,3 +36,7 @@ for (var accessLevel in Iterator(db().REAL_ACCESSLEVELS.values())) {
 db().setAttribute("CM.FilterUids", filterTable);
 
 WGA.design().registerGlobal("CM", createObject("api"));
+
+WGA.app().managedGlobal("Websockets", $.WebsocketsHandler, {
+	scope: WGA.Scopes.TMLPAGE
+})

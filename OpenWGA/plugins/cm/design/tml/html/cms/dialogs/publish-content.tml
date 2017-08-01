@@ -150,6 +150,13 @@
 		log.error(e);
 		tmlform.addMessage(e);
 	}
+	
+
+	/*WGA.app(WGA.design().db().getDbReference()).fireEvent("page-updated", {
+		structkey: STRUCTKEY
+	})*/
+	CM.firePageUpdated();
+	
 </tml:action>
 
 <tml:if istrue="_actionDone">

@@ -32,6 +32,8 @@ log.info("delete page " + structkey);
 
 var database = db(dbkey);	
 var sdoc=database.getStructEntryByKey(structkey);
+var parentStructKey = sdoc.getParentEntry() && sdoc.getParentEntry().getStructKey()
+
 
 // Calc new entry to be selected and then remove structentry
 
@@ -94,3 +96,5 @@ catch(e){
 	tmlform.addMessage(e.message);
 }
 
+if(parentStructKey)
+	CM.firePageUpdated(parentStructKey);

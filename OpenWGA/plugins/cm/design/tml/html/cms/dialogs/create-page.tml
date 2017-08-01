@@ -154,6 +154,8 @@
 		tmlform.addMessage(e);
 	}
 	
+	CM.firePageUpdated(structkey);
+	
 </tml:action>
 
 <tml:if istrue="_actionDone">

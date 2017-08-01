@@ -101,3 +101,9 @@ this.isPanelVisible = function(panel, dbkey){
 		return true
 	return Boolean(this.getConfigValue(val))
 }
+
+this.firePageUpdated = function(structkey){
+	WGA.app(WGA.design().db().getDbReference()).fireEvent("page-updated", {
+		structkey: structkey||STRUCTKEY
+	})
+}

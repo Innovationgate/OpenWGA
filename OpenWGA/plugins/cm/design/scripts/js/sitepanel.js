@@ -564,6 +564,7 @@ BI.sitepanel.monitorIframeOnLoad=function(){
 	BI.sitepanel.unmask();
 }
 
+/*
 WGA.event.register(
 	"portlet-website-observer",
 	"CMS_title_changed", 
@@ -571,6 +572,16 @@ WGA.event.register(
 		BI.selectContent(BI.contentkey, BI.structkey);
 	}
 );
+*/
+
+WGA.event.register(
+	"portlet-website-observer",
+	"page-updated", 
+	function(e){
+		BI.se.updateStruct(e.params.structkey)
+	}
+);
+
 
 WGA.event.addListener("portlet-website-observer", "CMS_attachments_changed", function(){		
 	var root = BI.sitepanel.iframe.window.document.body;

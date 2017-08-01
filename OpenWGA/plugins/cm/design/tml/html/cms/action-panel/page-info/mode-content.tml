@@ -94,6 +94,11 @@
 											content().save();
 											var event=createEvent("CMS_title_changed");
 											portlet.fireEvent(event);
+											
+											WGA.app(WGA.design().db().getDbReference()).fireEvent("page-updated", {
+												structkey: STRUCTKEY
+											})
+											
 										</tml:action>
 									</tml:option>
 								</tml:include>
