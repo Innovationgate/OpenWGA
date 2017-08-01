@@ -261,6 +261,9 @@ public class TMLPageWebSocket extends AbstractWebSocket implements WebSocket {
         return _pageConnection;
     }
     
+    public String getWindowId() {
+        return _pageConnection.getWindowId();
+    }
     
 }
 

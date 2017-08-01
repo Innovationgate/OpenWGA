@@ -43,10 +43,19 @@ public abstract class Event {
     private List<EventPath> _cascadingEventsPath = new ArrayList<>();
     private WGDatabaseRevision _databaseRevision;
     private String _sessionId; 
+    private String _source;
     
     public Event(WGDatabaseRevision revision, String sessionId) {
         _databaseRevision = revision;
         _sessionId = sessionId;
+    }
+    
+    public void setSource(String id){
+    	_source = id;
+    }
+    
+    public String getSource(){
+    	return _source;
     }
     
     public String getSessionId() {

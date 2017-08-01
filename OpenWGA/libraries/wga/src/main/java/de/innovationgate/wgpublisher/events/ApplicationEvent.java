@@ -41,6 +41,8 @@ import de.innovationgate.wga.server.api.DescriptificationConfig;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.api.Unlocker;
 import de.innovationgate.wgpublisher.events.EventManager.EventResultConsumer;
+import de.innovationgate.wgpublisher.websockets.PageConnection;
+import de.innovationgate.wgpublisher.webtml.utils.TMLPageImpl;
 
 public class ApplicationEvent extends Event implements Serializable {
     
@@ -51,11 +53,20 @@ public class ApplicationEvent extends Event implements Serializable {
         private Map<Object,Object> _params = new HashMap<Object, Object>();
         private WGA _wga;
         private List<String> _eventsToFireOnResult = new ArrayList<>();
-
+        private String _windowId;
+        
         public Builder(WGA wga, App app, ApplicationEventPath eventPath) {
             _wga = Unlocker.unlock(wga);
             _app = app;
             _eventPath = eventPath;
+
+            TMLPageImpl page = (TMLPageImpl) _wga.tmlPage();
+            PageConnection pageConn;
+			try {
+				pageConn = page.getPageConnection(false);
+	            if(pageConn!=null)
+	            	_windowId = pageConn.getWindowId();
+			} catch (WGException e) {}
         }
         
         /* (non-Javadoc)
@@ -115,6 +126,8 @@ public class ApplicationEvent extends Event implements Serializable {
             Map descriptifiedParams = _wga.tmlscript().descriptify(_params, Map.class, new DescriptificationConfig().convertObjectsToJSON());
             @SuppressWarnings("unchecked")
             final ApplicationEvent event = new ApplicationEvent(_eventPath.getApplicationEventHierarchy(), _app.getDbKey(), _app.db().getRevisionObject(), sessionId, descriptifiedParams, eventScope);
+          	event.setSource(_windowId);
+            
             Callable<Object> r = new Callable<Object>() {
                 @Override
                 public Object call() throws Exception {
@@ -163,7 +176,7 @@ public class ApplicationEvent extends Event implements Serializable {
         return _path;
     }
 
-    @Override
+	@Override
     public Scope getScope() {
         return _eventScope;
     }
