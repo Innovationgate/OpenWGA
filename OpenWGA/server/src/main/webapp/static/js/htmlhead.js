@@ -2195,23 +2195,25 @@ WGA.websocket = {
 				WGA.websocket.startService();
 			}, time);
 		},
-		
-		
-		callGlobal: function(global, method, params, callback, errorCallback) {
+					
+		callGlobal: function(global, method, options) {			
+			
+			if(!global || !method)
+				return;
 			
 			var uid = WGA.portlet.generateUUID();
-			if (callback) {
-				WGA.websocket.callbacks[uid] = callback;
+			if (options.onSuccess) {
+				WGA.websocket.callbacks[uid] = options.onSuccess;
 			}
-			if (errorCallback) {
-				WGA.websocket.errorCallbacks[uid] = errorCallback;
+			if (options.onError) {
+				WGA.websocket.errorCallbacks[uid] = options.onError;
 			}
 			var msg = {
 					type: "callGlobal",
 					callId: uid,
 					global: global,
 					method: method,
-					params: params
+					params: options.params || {}
 			};
 			WGA.websocket.socket.send(JSON.stringify(msg));
 		
