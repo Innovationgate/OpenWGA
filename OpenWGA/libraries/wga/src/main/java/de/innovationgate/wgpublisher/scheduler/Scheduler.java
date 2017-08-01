@@ -37,14 +37,11 @@ import java.util.Set;
 import org.quartz.JobExecutionContext;
 
 import de.innovationgate.utils.UIDGenerator;
+import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGFactory;
 import de.innovationgate.wga.config.Schedule;
+import de.innovationgate.wga.server.api.ApplicationEventBuilder;
 import de.innovationgate.wgpublisher.WGACore;
-import de.innovationgate.wgpublisher.problems.AdministrativeProblemType;
-import de.innovationgate.wgpublisher.problems.GlobalScope;
-import de.innovationgate.wgpublisher.problems.ProblemOccasion;
-import de.innovationgate.wgpublisher.problems.ProblemScope;
-import de.innovationgate.wgpublisher.problems.ProblemType;
 
 public class Scheduler {
     
@@ -57,11 +54,18 @@ public class Scheduler {
         private JobFailedException _exception;
         private boolean _finished = false;
 		
+        private ApplicationEventBuilder _event;
+        
 		public JobRunnerThread(String jobName, String executor, Map<String,Object> customOptions, JobExecutionContext quartzContext) {
+			this(jobName, executor, customOptions, quartzContext, null);
+		}
+
+		public JobRunnerThread(String jobName, String executor, Map<String,Object> customOptions, JobExecutionContext quartzContext, ApplicationEventBuilder event) {
 			_jobName = jobName;
 			_customOptions = customOptions;
 			_quartzContext = quartzContext;
 			_executor = executor;
+			_event = event;
 		}
 		
 		public void run() {
@@ -81,6 +85,14 @@ public class Scheduler {
 			}
 			finally {
 			    _finished = true;
+			    if(_event!=null){
+			    	try {
+						_event.fire();
+					} catch (WGException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			    }
 			    WGFactory.getInstance().closeSessions();
                 /*if (job != null && job.isTransient()) {
                     _jobs.remove(job.getName());
@@ -186,9 +198,13 @@ public class Scheduler {
 	}
 	
 	public void run(String name, String executor, Map<String,Object> customOptions, JobExecutionContext quartzContext) throws JobFailedException {
+		run(name, executor, customOptions, quartzContext, null);
+	}
+		
+	public void run(String name, String executor, Map<String,Object> customOptions, JobExecutionContext quartzContext, ApplicationEventBuilder event) throws JobFailedException {
     	Job job = (Job) _jobs.get(name);
     	if (job != null) {
-    		JobRunnerThread runnerThread = new JobRunnerThread(name, executor, customOptions, quartzContext);
+    		JobRunnerThread runnerThread = new JobRunnerThread(name, executor, customOptions, quartzContext, event);
     		runnerThread.start();
     		
     		// Ensure we return not before either the job has started or is already finished (#00003499)
