@@ -1,5 +1,9 @@
-//registerGlobal("DBM", createObject("dbm"), db());
+
 WGA.design().registerDbGlobal("DBM", createObject("dbm"));
 log.info("DBM global registered");
 
 db().setDefaultLanguage("en");
+
+WGA.app().managedGlobal("Websockets", $.Websockets, {
+	scope: WGA.Scopes.TMLPAGE
+})

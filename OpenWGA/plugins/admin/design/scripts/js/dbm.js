@@ -362,3 +362,12 @@ DBM.dbExplorer={}
 // Deprecated.
 // should be removed in final version	
 switchToObject = DBM.switchToObject
+
+window.addEventListener('load', function () {
+	Notification.requestPermission(function (status) {
+	    // This allows to use Notification.permission with Chrome/Safari
+	    if (Notification.permission !== status) {
+			Notification.permission = status;
+	    }
+	});
+});

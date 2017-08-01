@@ -1,0 +1,17 @@
+function Websockets(){}
+
+Websockets.prototype.message = function($websocket, $event){
+
+	if($event.path.length>1 && $event.path[1].value=="me"){
+		// only for me
+		//console.log($event.path[1].value, $event.source);
+		if($websocket.windowId != $event.source)
+			return;		// not fired by myself
+	}
+
+	$websocket.firePortletEvent("system-message", {
+		msg: $event.params.msg
+	});
+	
+}.listenToAppEvents("system-message");
+

@@ -24,6 +24,8 @@
 ## LICENSE END #################################################################
 var dbs = tmlparam1.split(",");
 WGA.server().reconnect(dbs);
-log.info("Admin-client: reconnected databases " + tmlparam1);
 
-_server_message = "reconnected database(s) " + tmlparam1;
+WGA.app().fireEvent("system-message", {
+	msg: String("App '" + tmlparam1 + "' has been reconnected.")
+})
+

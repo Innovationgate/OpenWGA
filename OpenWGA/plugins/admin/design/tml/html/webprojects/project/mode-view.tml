@@ -115,11 +115,13 @@
 		}
 	}
 
-</tml:action>
+	var msg = "App caches cleared: " + tmlform.fieldlist("caches");
+	WGA.app().fireEvent("system-message", {
+		msg: String(msg)
+	})
+	
 
-<tml:eventscript onevent="wga-server-message" ajax="true">
-	_server_message = portletEvent.getParameter("msg");
-</tml:eventscript>
+</tml:action>
 
 <tml:script>
 	_dbPatcheable = false;

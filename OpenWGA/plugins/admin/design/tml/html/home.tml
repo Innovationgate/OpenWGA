@@ -22,7 +22,7 @@
 ## along with OpenWGA in file COPYING.
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
-<tml:include ref="::build-navigation"/>	
+<tml:include ref="::build-navigation"/>
 <html>
 
 	<head>
@@ -64,7 +64,7 @@
 		
 	</head>
 
-	<body>
+	<body>		
 		<tml:if hasurlparameter="module">
 			<tml:then>
 				<tml:include ref="{request.getParameter('module')}"/>
@@ -82,6 +82,9 @@
 				</script>
 			</tml:then>
 		</tml:if>
+		
+		<tml:portlet name="notifier" ref="notifier-portlet" ajax="true"/>
+				
 	</body>
 
 </html>

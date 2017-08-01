@@ -1,0 +1,17 @@
+<tml:eventscript onevent="system-message">
+	var ev = portletEvent
+	_msg = ev.getParameter("msg") || "no message"
+</tml:eventscript>
+
+<script>
+	$(function(){
+		<tml:case isfilled="_msg">
+			if(Notification && Notification.permission=="granted"){
+				var n = new Notification("<tml:script expression="WGA.Brand.name" encode="javascript"/> Admin Client", {
+					body: "<tml:item name="_msg" encode="javascript"/>",
+					tag: "openwga"
+				});
+			}
+		</tml:case>
+	})
+</script>

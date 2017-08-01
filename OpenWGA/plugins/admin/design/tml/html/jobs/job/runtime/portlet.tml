@@ -25,7 +25,10 @@
 <tml:action id="runJob">
 	var jobname = tmlparam1;
 	log.info("starting job " + jobname); 
-	wgacore.getScheduler().run(jobname, "wga admin client", null, null);
+	var event = WGA.app().createEvent("system-message/receivers=me", {
+		msg: String("Job '" + jobname + "' finished")
+	})
+	wgacore.getScheduler().run(jobname, "wga admin client", null, null, event);
 	_show_log = true; 	
 </tml:action>
 
