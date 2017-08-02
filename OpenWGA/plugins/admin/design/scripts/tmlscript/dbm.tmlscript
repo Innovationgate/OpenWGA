@@ -135,7 +135,8 @@ this.domain=function(obj){
 
 	return{
 		getAuthenticationSourceTitle: function(){
-			return wgadomain.auth().getModule().getAuthenticationSource()			
+			var mod = wgadomain.auth().getModule();
+			return mod ? mod.getAuthenticationSource() : "- none -"			
 		}
 	}
 }
