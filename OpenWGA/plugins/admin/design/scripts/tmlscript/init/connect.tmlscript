@@ -4,6 +4,8 @@ log.info("DBM global registered");
 
 db().setDefaultLanguage("en");
 
-WGA.app().managedGlobal("Websockets", $.Websockets, {
-	scope: WGA.Scopes.TMLPAGE
-})
+if(WGA.server().getServerOption("Services.WebSockets.Enabled")){
+	WGA.app().managedGlobal("Websockets", $.Websockets, {
+		scope: WGA.Scopes.TMLPAGE
+	})
+}
