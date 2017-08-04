@@ -163,8 +163,17 @@ public abstract class AbstractWebSocket {
             String method = msg.get("method").getAsString();
             JsonObject params = msg.has("params") ? msg.get("params").getAsJsonObject() : null;
             
+            if(globalName.contains(":")){
+            	String[]parts = globalName.split(":");
+            	dbKey = parts[0];
+            	globalName = parts[1];
+            }
+            
             WGDatabase db = wga.db(dbKey);
-            if (!db.isSessionOpen()) {
+            if (db==null){
+            	return buildErrorResponse(callId, "Unable to find database: " + dbKey);
+            }
+            if(!db.isSessionOpen()) {
                 return buildErrorResponse(callId, "You have no access to this database: " + dbKey);
             }
             
@@ -196,6 +205,10 @@ public abstract class AbstractWebSocket {
             
             obj.beforeUsage();
             try {
+            	
+            	// ensure correct app context for script execution:
+            	wga = WGA.get(wga.createTMLContext(db));
+            	
                 Object result = wga.tmlscript().callMethod(obj.getObject(), method, namedParams, null, new CallMethodConfig().setDirectAccess(true));
                 if (result != null) {
                     result = wga.tmlscript().descriptify(result, Object.class, new DescriptificationConfig().convertObjectsToJSON().setForceDescriptification(true));
