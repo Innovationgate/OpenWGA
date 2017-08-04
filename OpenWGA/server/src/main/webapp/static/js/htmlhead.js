@@ -2197,26 +2197,51 @@ WGA.websocket = {
 			}, time);
 		},
 					
-		callGlobal: function(global, method, options) {			
+		callGlobal: function(global, method, params) {			
 			
 			if(!global || !method)
 				return;
 			
+			var state = "pending";
 			var uid = WGA.portlet.generateUUID();
-			if (options.onSuccess) {
-				WGA.websocket.callbacks[uid] = options.onSuccess;
+			var onSuccess, onError,
+				return_msg;
+			
+			WGA.websocket.callbacks[uid] = function(msg){
+				state = "success";
+				return_msg = msg;
+				if(onSuccess)
+					onSuccess(msg);
 			}
-			if (options.onError) {
-				WGA.websocket.errorCallbacks[uid] = options.onError;
+			WGA.websocket.errorCallbacks[uid] = function(msg){
+				state = "error";
+				return_msg = msg;
+				if(onError)
+					onError(msg);				
 			}
+			
 			var msg = {
 					type: "callGlobal",
 					callId: uid,
 					global: global,
 					method: method,
-					params: options.params || {}
+					params: params || {}
 			};
 			WGA.websocket.socket.send(JSON.stringify(msg));
+			
+			return {
+				
+				then: function(success, error){
+					onSuccess = success;
+					onError = error;
+					if(state=="success")
+						onSuccess(return_msg);
+					else if(state=="error")
+						onError(return_msg);
+				}
+				
+			}
+			
 		
 		},
 		
