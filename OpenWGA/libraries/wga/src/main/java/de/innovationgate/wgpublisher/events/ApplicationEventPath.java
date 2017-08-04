@@ -43,6 +43,10 @@ public class ApplicationEventPath implements EventPath {
         _path = path;
     }
     
+    public void setDbKey(String dbkey){
+    	_db = dbkey;
+    }
+    
     @Override
     public EventPathEntry[] getEventHierarchy() {
 

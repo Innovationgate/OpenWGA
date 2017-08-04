@@ -264,7 +264,9 @@ public class App extends Database {
         TMLScriptObjectMetadata metaData = ExpressionEngineFactory.getTMLScriptEngine().getTmlscriptObjectMetadata(_wga, design);
         if (config.getScope().isApplicationEventReceiver()) {
             for (Map.Entry<EventPath,String> entry : metaData.getAppEventListeners().entrySet()) {
-                _wga.getCore().getEventManager().registerEventReceiver(entry.getKey(), new ManagedGlobalEventReceiver(db().getDbReference(), name, entry.getValue()));
+            	ApplicationEventPath path = (ApplicationEventPath)entry.getKey();
+            	path.setDbKey(getDbKey());	// ensure correct app (dbkey) is used.
+                _wga.getCore().getEventManager().registerEventReceiver(path, new ManagedGlobalEventReceiver(getDbKey(), name, entry.getValue()));
             }
         }
         
