@@ -2056,18 +2056,19 @@ WGA.websocket = {
 			}
 			
 			var windowId = window.sessionStorage.getItem(this.WINDOWID);
-			var urlParams = {};
 			if (!windowId) {
 				windowId = this.pageId;
 				window.sessionStorage.setItem(this.WINDOWID, windowId);
 			}
-			urlParams.windowId = windowId;
-
-			urlParams.pageId = this.pageId;
-			urlParams.sessionId = this.sessionId;
+			this.windowId=windowId;
+			
+			var urlParams = {
+				windowId: this.windowId,
+				pageId: this.pageId,
+				sessionId: this.sessionId
+			}
 			
 			var completeUrl = this.url + (this.url.indexOf("?") != -1 ? "&" : "?") + WGA.toQueryString(urlParams);
-			
 
 			if ('WebSocket' in window) {
 				if (WGA.debug && console && console.log) {
@@ -2220,8 +2221,7 @@ WGA.websocket = {
 		},
 		
 		// Overwrite this to run some functionality if there is no WebSocket support
-		noSupport: function() {
-		}
+		noSupport: function() {}
 		
 };
 
