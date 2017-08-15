@@ -24,6 +24,8 @@
 ## LICENSE END #################################################################
 <tml:script>
 
+	_CM_MODULES = createObject("modules");
+
 	_mod = option("module-config");
 	
 	var title = _mod.selectSingleNode("@title");
