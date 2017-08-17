@@ -1051,10 +1051,13 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
         Map<String,Object> params = new HashMap<String, Object>(); 
         
         String orderClause;
-        if (order != null) {
+        if (order != null && getCsVersion().getPatchLevel()>4) {
             orderClause = buildHqlPageOrderClause(order, params);
         }
         else {
+        	if (order != null && getCsVersion().getPatchLevel()<=4) {
+        		WGFactory.getLogger().warn("Order clause not allowed for CS PL < 5. Using default order.");
+        	}
             orderClause = "struct.position asc, struct.title asc, struct.key asc";
         }
         
