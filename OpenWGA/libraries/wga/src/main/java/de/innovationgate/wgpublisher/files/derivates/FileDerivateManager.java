@@ -722,7 +722,7 @@ public class FileDerivateManager {
                         TemporaryFile  tempFile = new TemporaryFile("derivate.bin", null, WGFactory.getTempDir());
                         try {
                             OutputStream out = new BufferedOutputStream(new FileOutputStream(tempFile.getFile()));
-                            LOG.info(creator.getClass().getName() + ": creating " + derivateInfo.getUsage() + "/" + derivateInfo.getName() + " for " + md.getName() + " in " + md.getContext().getFileParent().getDocumentKey());
+                            LOG.debug(creator.getClass().getName() + ": creating " + derivateInfo.getUsage() + "/" + derivateInfo.getName() + " for " + md.getName() + " in " + md.getContext().getFileParent().getDocumentKey());
                             creator.createDerivate(_wga, content, md, derivateInfo, out);
                             out.flush();
                             out.close();
