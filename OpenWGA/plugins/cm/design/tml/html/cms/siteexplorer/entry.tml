@@ -53,7 +53,6 @@
 		_bestContent = langChooser.selectContentForPage(document, true)
 	}				
 	//console.log("_bestContent", _bestContent && _bestContent.title + ", " + _bestContent.getLanguage().getName())
-	//console.log("iswebenvironment", context(currentContextPath).iswebenvironment())
 </tml:script>
 
 
@@ -72,9 +71,16 @@
 					_status = "pending";
 					_valid_from = _bestContent.getValidFrom();
 				}
-				
-				if(!_bestContent || (!_bestContent.isVisibleNow() && !_Area.isSystemArea()))
-					_class += " not-visible";
+
+				if(_status=="p"){				
+					if(!_bestContent.isVisibleNow() && !_Area.isSystemArea())
+						_class += " not-visible";
+				}
+				else{
+					var published = document.getReleasedContent(_Database.getPreferedLanguage())
+					if(!published || (!published.isVisibleNow() && !_Area.isSystemArea()))
+						_class += " not-visible";
+				}
 				
 				if(_Struct.contentHasReaders())
 					_class += " content-has-readers";
