@@ -59,6 +59,7 @@ import de.innovationgate.wgpublisher.WGAServerException;
 import de.innovationgate.wgpublisher.WGPRequestPath;
 import de.innovationgate.wgpublisher.so.ManagedObject;
 import de.innovationgate.wgpublisher.websockets.PageConnection;
+import de.innovationgate.wgpublisher.websockets.TMLPageWebSocket;
 import de.innovationgate.wgpublisher.webtml.Base;
 import de.innovationgate.wgpublisher.webtml.BaseTagStatus;
 import de.innovationgate.wgpublisher.webtml.Include;
@@ -649,4 +650,12 @@ public class TMLPageImpl implements TMLPage {
 		renderDefault();
 	}
 
+	public TMLPageWebSocket getWebSocket() throws WGException{
+		PageConnection c = getPageConnection(false);
+		if(c!=null){
+			return c.getWebSocket();
+		}
+		return null;
+	}
+	
 }

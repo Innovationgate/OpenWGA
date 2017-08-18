@@ -201,6 +201,10 @@ public class TMLPageWebSocket extends AbstractWebSocket implements WebSocket {
         }
     }
 
+    public void firePortletEvent(String eventName) throws WGException {
+    	firePortletEvent(eventName, null);
+    }
+    
     @SuppressWarnings("unchecked")
     @Override
     public void firePortletEvent(String eventName, Map<String, Object> params) throws WGException {

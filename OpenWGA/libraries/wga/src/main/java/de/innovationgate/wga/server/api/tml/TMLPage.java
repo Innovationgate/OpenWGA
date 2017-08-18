@@ -34,6 +34,7 @@ import java.util.Map;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wga.server.api.Design;
+import de.innovationgate.wgpublisher.websockets.TMLPageWebSocket;
 
 /**
  * Represents the WebTML page being currently rendered
@@ -186,5 +187,6 @@ public interface TMLPage {
      */
     public Object removeVar(String name) throws WGException;
     
-
+    public TMLPageWebSocket getWebSocket() throws WGException;
+    
 }
