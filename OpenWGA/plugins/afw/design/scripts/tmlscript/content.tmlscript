@@ -170,8 +170,11 @@ this.mayEditContent=function(){
 
 	reason="";
 	
-	if(!content.mayEditContent())
-		return _false("")
+	if(!Struct.mayEditContent())
+		return _false(Struct.getReason());
+	
+	if(!content.getLanguage().mayCreateContent())
+		return _false(label("reason.language-settings-denies-edit"));
 	
 	// look for content in status review:
 	var contList=struct.getAllContent();

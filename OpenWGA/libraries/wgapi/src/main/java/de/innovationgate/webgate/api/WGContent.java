@@ -2121,41 +2121,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 		}
 	    
 	    if (db.hasFeature(WGDatabase.FEATURE_FULLCONTENTFEATURES)) {
-	    	/*
-			WGDocument document = this.getStructEntry().testEditPageHierarchyRights();
-			if (document != null) {
-				if (document instanceof WGArea) {
-					throw new WGAuthorisationException("User is not allowed to delete content in this area", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_AREA, document);
-				}
-				else {
-					WGStructEntry entry = (WGStructEntry) document;
-					throw new WGAuthorisationException(
-						"User is not allowed to delete this content, because struct entry '"
-							+ entry.getTitle()
-							+ "' (Key "
-							+ entry.getStructKey()
-							+ ") disallows it", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGE, entry);
-				}
 
-			}
-			*/
-
-	    	performSaveCheck();
-	    	
-	    	/*
-	         // Check edit rights from content type
-			WGContentType contentType = this.getStructEntry().getContentType();
-			if (contentType != null && !contentType.mayCreateContent()) {
-				throw new WGAuthorisationException("User is not allowed to delete content of this content type", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_CONTENTTYPE, contentType);
-			}
-			
-            // Check edit rights from language
-            WGLanguage language = getLanguage();
-            if (language != null && !language.mayCreateContent(getStructEntry())) {
-                throw new WGAuthorisationException("User is not allowed to delete content of this language", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_LANGUAGE, language);
-            }
-            */
-			
 			// Check restricted relations
             if (deepCheck) {
     			if (getDatabase().getContentStoreVersion() >= WGDatabase.CSVERSION_WGA5 && getDatabase().getSessionContext().isProtectedRelationsEnabled()) {
@@ -2181,6 +2147,43 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     			    }
     			}
             }
+
+            // Ask PageRightsFilter first end exit if ALLOWED_SKIP_DEFAULT_CHECKS
+    		Right right = this.db.getPageRightsFilter().mayEditContent(getStructEntry(), this.db.getSessionContext().getUserAccess(), getLanguage());
+    		if (right == Right.ALLOWED_SKIP_DEFAULT_CHECKS)
+    			return;		// cancel all other tests
+    		else if (right == Right.DENIED)
+    			throw new WGAuthorisationException("PageRightsFilter denies to edit content in this language", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGERIGHTSFILTER, getLanguage());            
+            
+			WGDocument document = this.getStructEntry().testEditPageHierarchyRights();
+			if (document != null) {
+				if (document instanceof WGArea) {
+					throw new WGAuthorisationException("User is not allowed to delete content in this area", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_AREA, document);
+				}
+				else {
+					WGStructEntry entry = (WGStructEntry) document;
+					throw new WGAuthorisationException(
+						"User is not allowed to delete this content, because struct entry '"
+							+ entry.getTitle()
+							+ "' (Key "
+							+ entry.getStructKey()
+							+ ") disallows it", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGE, entry);
+				}
+
+			}
+	    	
+	        // Check edit rights from content type
+			WGContentType contentType = this.getStructEntry().getContentType();
+			if (contentType != null && !contentType.mayCreateContent()) {
+				throw new WGAuthorisationException("User is not allowed to delete content of this content type", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_CONTENTTYPE, contentType);
+			}
+			
+            // Check edit rights from language
+            WGLanguage language = getLanguage();
+            if (language != null && !language.mayCreateContent(getStructEntry())) {
+                throw new WGAuthorisationException("User is not allowed to delete content of this language", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_LANGUAGE, language);
+            }
+            
 		}
     }
 	
@@ -2229,7 +2232,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	    }
 	    
 	    // If not released and may-not-edit author cannot use authoring mode
-	    if (!content.getStatus().equals(WGContent.STATUS_REVIEW) && !content.mayEditContent())
+	    if (!content.getStatus().equals(WGContent.STATUS_REVIEW) && !content.getStructEntry().mayEditPage())
 	    	isAuthoringMode = false;
 	    
 	    // Tests that are bypassed by authoring mode

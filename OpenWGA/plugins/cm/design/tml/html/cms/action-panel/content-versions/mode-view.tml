@@ -33,13 +33,15 @@
 	var langs={};
 	
 	var sdoc=content().getStructEntry();
+	
 	var contentlist=sdoc.getAllContent(true);
 	_versions = contentlist.size(); 
 	for(var i=0; i<contentlist.size(); i++){
 		var version=contentlist.get(i);
 		var status=version.getStatus();
 
-		if(status!=version.STATUS_RELEASE && !version.mayEditContent())
+
+		if(status!=version.STATUS_RELEASE && !sdoc.mayCreateContent(version.getLanguage()))
 			continue;			
 			
 		if(version.getLanguage().getName()!=LANGUAGE){
