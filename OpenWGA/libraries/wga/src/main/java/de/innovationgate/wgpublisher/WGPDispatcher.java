@@ -518,43 +518,44 @@ public class WGPDispatcher extends HttpServlet {
             String messageShown = (String) request.getSession().getAttribute(SESSION_AJAX_GENERAL_FAILURE_MESSAGE_SHOWN);
                     
             StringBuffer js = new StringBuffer();
+            String errorMsg = getCore().getSystemLabel("tml", exc.getLabelKey(), request);
             if (!"true".equals(messageShown)) {
                 request.getSession().setAttribute(SESSION_AJAX_GENERAL_FAILURE_MESSAGE_SHOWN, "true");
                 StringBuffer text = new StringBuffer();
                 text.append(getCore().getSystemLabel("tml", "ajax.failure.intro", request));
                 text.append("\n\n");
-                text.append(getCore().getSystemLabel("tml", exc.getLabelKey(), request));
+                text.append(errorMsg);
                 if (exc.getDetailMessage() != null) {
-                    text.append("\n\n").append(exc.getDetailMessage());
+                    text.append(":\n\n").append(exc.getDetailMessage());
                 }
                 text.append("\n\n");
                 text.append(getCore().getSystemLabel("tml", "ajax.failure.reload", request));
                 
                 WGA wga = WGA.get(request, response, getCore());
                 js.append("WGA.util.showReloadMessage(\"" + wga.encode("javascript", text.toString()) + "\");\n");
-            }
 
-            Writer writer = response.getWriter();
-            
-            if (exc.getAjaxType() == AjaxFailureException.AJAXTYPE_FORMPOST) {
-                // The formpost request only executes a single script tag without surroundings
-                writer.write("<script type=\"text/javascript\">\n");
-                writer.write(js.toString());
-                writer.write("\n</script>");
+	            Writer writer = response.getWriter();
+	            
+	            if (exc.getAjaxType() == AjaxFailureException.AJAXTYPE_FORMPOST) {
+	                // The formpost request only executes a single script tag without surroundings
+	                writer.write("<script type=\"text/javascript\">\n");
+	                writer.write(js.toString());
+	                writer.write("\n</script>");
+	            }
+	            else {
+	                // For AJAX norefresh. Protect from view via HTML Comment
+	                writer.write("//" + errorMsg + "\n<!--\n");
+	                writer.write(js.toString());
+	                writer.write("\n//-->\n");
+	                
+	                // For regular AJAX, protect from norefresh via JS comment
+	                writer.write("/*" + errorMsg + "<script type=\"text/javascript\">\n");
+	                writer.write(js.toString());
+	                writer.write("\n</script> */");
+	            }
+	            
+	            writer.flush();
             }
-            else {
-                // For AJAX norefresh. Protect from view via HTML Comment
-                writer.write("//<!--\n");
-                writer.write(js.toString());
-                writer.write("\n//-->\n");
-                
-                // For regular AJAX, protect from norefresh via JS comment
-                writer.write("/*\n<script type=\"text/javascript\">\n");
-                writer.write(js.toString());
-                writer.write("\n</script> */");
-            }
-            
-            writer.flush();
             
         }
         catch (Exception e) {
@@ -738,14 +739,6 @@ public class WGPDispatcher extends HttpServlet {
         WGARequestInformation reqInfo = (WGARequestInformation) request.getAttribute(WGARequestInformation.REQUEST_ATTRIBUTENAME);
 
         try {
-            
-            // Thread.currentThread().setContextClassLoader(WGACore.getLibraryLoader());
-
-            // Retrieve session
-//            javax.servlet.http.HttpSession session = request.getSession();
-//            if (session.isNew()) {
-//                session.setAttribute(SESSION_VARS, new HashMap());
-//            }
 
             // Parse request
             WGPRequestPath path = WGPRequestPath.parseRequest(this, request, response);
