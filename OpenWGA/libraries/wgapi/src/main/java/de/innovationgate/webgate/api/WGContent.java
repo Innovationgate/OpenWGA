@@ -1554,13 +1554,62 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	}
     
     /**
-     * Tests if the current user is allowed to edit (i.e. save modifications) the current document
+     * Tests if the current user is allowed to edit (i.e. create or save DRAFT) the current document
+     * @throws WGAPIException 
+     */
+    public void performEditCheck() throws WGAPIException {
+
+        // Ask PageRightsFilter first end exit if ALLOWED_SKIP_DEFAULT_CHECKS
+		Right right = this.db.getPageRightsFilter().mayEditContent(getStructEntry(), this.db.getSessionContext().getUserAccess(), getLanguage());
+		if (right == Right.ALLOWED_SKIP_DEFAULT_CHECKS)
+			return;		// cancel all other tests
+		else if (right == Right.DENIED)
+			throw new WGAuthorisationException("PageRightsFilter denies to edit content in this language", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGERIGHTSFILTER, getLanguage());
+
+        // Check (hierarchical) editor rights from struct
+    	WGDocument document= this.getStructEntry().testEditPageHierarchyRights();
+        if (document != null) {
+        	if (document instanceof WGArea) {
+        		throw new WGAuthorisationException("User is not allowed to edit content in this area", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_AREA, document);
+        	}
+        	else {
+        		WGStructEntry entry = (WGStructEntry) document;
+        		throw new WGAuthorisationException(
+        			"User is not allowed to edit this content, because struct entry '"
+        				+ entry.getTitle()
+        				+ "' (Key "
+        				+ entry.getStructKey()
+        				+ ") disallows it", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGE, document);
+        	}
+        }
+
+        // Check edit rights from content type 
+        WGContentType contentType = getStructEntry().getContentType();
+        if (contentType != null && !contentType.mayCreateContent())
+        	throw new WGAuthorisationException("User is not allowed to edit content of this content type", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_CONTENTTYPE, contentType);
+
+        // Check edit rights from language
+        WGLanguage language = getLanguage();
+        if (language != null && !language.mayCreateContent())
+        	throw new WGAuthorisationException("User is not allowed to edit content of this language", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_LANGUAGE, language);
+    
+        // Check author status
+        int accessLevel = db.getSessionContext().getAccessLevel(); 
+        if (accessLevel < WGDatabase.ACCESSLEVEL_AUTHOR)
+        	throw new WGAuthorisationException("You need at last AUTHOR access to this app", WGAuthorisationException.ERRORCODE_OP_NEEDS_AUTHOR_LEVEL);
+        else if (accessLevel < WGDatabase.ACCESSLEVEL_EDITOR && !isAuthorOrOwner())
+        	throw new WGAuthorisationException("You are no author or owner of this content", WGAuthorisationException.ERRORCODE_OP_NEEDS_EDITOR_LEVEL);
+
+    }
+    
+    /**
+     * Tests if the current user is allowed to edit (i.e. create or save DRAFT) the current document
      * @throws WGAPIException 
      */
     public boolean mayEditContent() throws WGAPIException {
         
         try {
-            performSaveCheck();
+            performEditCheck();
             return true;
         }
         catch (WGAuthorisationException e) {
@@ -1610,6 +1659,9 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
         // Checks only done on full content stores
         if (db.hasFeature(WGDatabase.FEATURE_FULLCONTENTFEATURES)) {
         
+        	performEditCheck();
+        	
+        	/*
             // Ask PageRightsFilter first end exit if ALLOWED_SKIP_DEFAULT_CHECKS
     		Right right = this.db.getPageRightsFilter().mayEditContent(getStructEntry(), this.db.getSessionContext().getUserAccess(), getLanguage());
     		if (right == Right.ALLOWED_SKIP_DEFAULT_CHECKS)
@@ -1653,7 +1705,8 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
             		throw new WGAuthorisationException("You are not authorized to save this document, because you are no author", WGAuthorisationException.ERRORCODE_OP_NEEDS_AUTHORING_RIGHTS);
             	}
             }
-            
+            */
+        	
             // Check workflow status and special dependencies related to them
             if (performStatusTests) {
                 if (getStatus().equals(WGContent.STATUS_REVIEW)) {
@@ -2232,7 +2285,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	    }
 	    
 	    // If not released and may-not-edit author cannot use authoring mode
-	    if (!content.getStatus().equals(WGContent.STATUS_REVIEW) && !content.getStructEntry().mayEditPage())
+	    if (!content.getStatus().equals(WGContent.STATUS_REVIEW) && !content.mayEditContent())
 	    	isAuthoringMode = false;
 	    
 	    // Tests that are bypassed by authoring mode

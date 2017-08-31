@@ -40,8 +40,7 @@
 		var version=contentlist.get(i);
 		var status=version.getStatus();
 
-
-		if(status!=version.STATUS_RELEASE && !sdoc.mayCreateContent(version.getLanguage()))
+		if(status!=version.STATUS_RELEASE && !version.mayEditContent())
 			continue;			
 			
 		if(version.getLanguage().getName()!=LANGUAGE){

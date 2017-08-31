@@ -116,16 +116,18 @@
 			_wf = content().getWorkflow();
 		</tml:script>
 		<div class="section">
-			<tml:if condition="content().isPendingRelease() && (_Database.isEditor()||_Content.isAuthorOrOwner()||_wf.workflowRole==_wf.ROLE_APPROVER)">
+			<tml:if condition="content().isPendingRelease()">
 				<tml:then>
-					<h1>{%label:actions.section.edit%}:</h1>
-					<div class="list edit-content"
-								onmouseover="Ext.get(this).addClass('selected')"
-								onmouseout="Ext.get(this).removeClass('selected')"
-								onclick="BI.dialog.show('reject-pending-content', this)"
-					>
-						<tml:label key="actions.edit-pending"/>
-					</div>
+					<tml:case condition="_Content.mayEditContent()">
+						<h1>{%label:actions.section.edit%}:</h1>
+						<div class="list edit-content"
+									onmouseover="Ext.get(this).addClass('selected')"
+									onmouseout="Ext.get(this).removeClass('selected')"
+									onclick="BI.dialog.show('reject-pending-content', this)"
+						>
+							<tml:label key="actions.edit-pending"/>
+						</div>
+					</tml:case>
 				</tml:then>
 				<tml:elseif condition="_Content.mayApprove()">
 					<h1>{%label:actions.section.workflow%}:</h1>

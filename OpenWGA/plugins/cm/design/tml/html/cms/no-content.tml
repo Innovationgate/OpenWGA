@@ -58,7 +58,13 @@
 				</tml:if>
 				
 				<tml:script>
-					_contentlist=WGA.sortList(document.getAllContent(document.mayEditPage()), "status", "down");
+					// other versions
+					var contentlist = WGA.createList()
+					for(let doc in Iterator(document.getAllContent(document.mayEditPage()))){
+						if(doc.mayEditContent())
+							contentlist.add(doc);
+					}
+					_contentlist=WGA.sortList(contentlist, "status", "down");
 					_mayCreateContent = document.mayCreateContent(document.getDatabase().getLanguage(_Database.getPreferedLanguage()))
 				</tml:script>
 				<tml:case condition="!_contentlist.isEmpty()">

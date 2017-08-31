@@ -169,13 +169,22 @@ this.mayApprove=function(){
 this.mayEditContent=function(){
 
 	reason="";
-	
-	if(!Struct.mayEditContent())
-		return _false(Struct.getReason());
-	
-	if(!content.getLanguage().mayCreateContent())
-		return _false(label("reason.language-settings-denies-edit"));
-	
+
+	try{
+		content.performEditCheck()
+	}
+	catch(e){
+		var errorCode = e.javaException.getErrorCode ? e.javaException.getErrorCode() : "unknown";
+		var cause;
+		if(e.javaException.getCauseDocument)
+			cause = e.javaException.getCauseDocument();
+		if(cause){
+			var causeTitle = cause.getTitle ? cause.getTitle() : cause.getName ? cause.getName() : "unknown";
+			return _false(label("reason."+errorCode, [causeTitle]))
+		}
+		else return _false(label("reason."+errorCode))
+	}
+
 	// look for content in status review:
 	var contList=struct.getAllContent();
 	if(contList!=null && contList.size()>0){
@@ -184,7 +193,7 @@ this.mayEditContent=function(){
 			if(doc.getStatus()==content.STATUS_REVIEW && doc.getLanguage().getName()==content.getLanguage().getName()){
 				if(doc.getVersion() == content.getVersion()){
 					if(doc.isPendingRelease())
-						return _false(label("reason.document-pending"));
+						return this.isAuthorOrOwner() || Database.isChiefEditor() || _false(label("reason.document-pending"));
 					else return _false(label("reason.document-is-in-workflow"));
 				}
 				else {
