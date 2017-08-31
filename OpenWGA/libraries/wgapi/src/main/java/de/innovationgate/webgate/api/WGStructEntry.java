@@ -1606,9 +1606,9 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
 
         // Ask PageRightsFilter first end stop other checks if ALLOWED_SKIP_DEFAULT_CHECKS
         PageRightsFilter.Right editRight = getDatabase().getPageRightsFilter().mayEditPage(this, getDatabase().getSessionContext().getUserAccess());
-        if (editRight == Right.DENIED) 
+        if (editRight == PageRightsFilter.Right.DENIED) 
         	return this;
-        else if (editRight == Right.ALLOWED_SKIP_DEFAULT_CHECKS)
+        else if (editRight == PageRightsFilter.Right.ALLOWED_SKIP_DEFAULT_CHECKS)
         	return null;
 
         // Retrieve the list of editors. If we have retrieved backend data we prefer that one
@@ -1620,14 +1620,13 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
             return null;
         }
 
-        // Case 2: regular struct-document - no editor is assigned, so lookup
-        // editors from parent-Struct
+        // Case 2: regular struct-document - no editor is assigned, so lookup editors from parent-Struct
         if (editors.isEmpty() || (editors.size() == 1 && (editors.get(0) == null || editors.get(0).toString().equals("")))) {
             return testInheritedEditRights();
         }
         
         // Case 3: nobody is allowed to edit children of this struct.
-        if (editors.size() == 1&& editors.get(0).toString().equals(WGStructEntry.NOONE_ALLOWED)) {
+        if (editors.size() == 1 && editors.get(0).toString().equals(WGStructEntry.NOONE_ALLOWED)) {
             return this;
         }
         
@@ -2814,7 +2813,7 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
     }
     
     /**
-     * Returns the list of currently effective page editors.. These may differ from the currently set editors in a yet unsaved document.
+     * Returns the list of currently effective page editors. These may differ from the currently set editors in a yet unsaved document.
      * @throws WGAPIException
      */
     public List<String> getEffectivePageEditors() throws WGAPIException {
@@ -2828,7 +2827,7 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
     }
     
     /**
-     * Returns the list of currently effective child editors.. These may differ from the currently set editors in a yet unsaved document.
+     * Returns the list of currently effective child editors. These may differ from the currently set editors in a yet unsaved document.
      * @throws WGAPIException
      */
     public List<String> getEffectiveChildEditors() throws WGAPIException {

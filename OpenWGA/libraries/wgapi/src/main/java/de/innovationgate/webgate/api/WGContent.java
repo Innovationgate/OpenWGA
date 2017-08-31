@@ -2238,24 +2238,24 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	    // Tests that are bypassed by authoring mode
 	    if (!isAuthoringMode) {
 	        
-	            // Workflow status: document must be released
-	            if (!content.getStatus().equals(WGContent.STATUS_RELEASE)) {
-	                return false;
-	            }
+            // Workflow status: document must be released
+            if (!content.getStatus().equals(WGContent.STATUS_RELEASE)) {
+                return false;
+            }
 
-	            // Visible flag
-	            if (content.isVisible() == false) {
-	                return false;
-	            }
+            // Visible flag
+            if (content.isVisible() == false) {
+                return false;
+            }
 
-    	        // Valid/From to dates
-    	        Date now = new Date();
-    	        if (content.getValidFrom() != null && content.getValidFrom().after(now)) {
-    	            return false;
-    	        }
-    	        if (content.getValidTo() != null && content.getValidTo().before(now)) {
-    	            return false;
-    	        }
+	        // Valid/From to dates
+	        Date now = new Date();
+	        if (content.getValidFrom() != null && content.getValidFrom().after(now)) {
+	            return false;
+	        }
+	        if (content.getValidTo() != null && content.getValidTo().before(now)) {
+	            return false;
+	        }
 	        
 	    }
 	    
