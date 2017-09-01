@@ -1661,52 +1661,6 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
         
         	performEditCheck();
         	
-        	/*
-            // Ask PageRightsFilter first end exit if ALLOWED_SKIP_DEFAULT_CHECKS
-    		Right right = this.db.getPageRightsFilter().mayEditContent(getStructEntry(), this.db.getSessionContext().getUserAccess(), getLanguage());
-    		if (right == Right.ALLOWED_SKIP_DEFAULT_CHECKS)
-    			return;		// cancel all other tests
-    		else if (right == Right.DENIED)
-    			throw new WGAuthorisationException("PageRightsFilter denies to edit content in this language", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGERIGHTSFILTER, getLanguage());            
-            
-            // Check (hierarchical) editor rights from struct
-
-        	WGDocument document= this.getStructEntry().testEditPageHierarchyRights();
-            if (document != null) {
-            	if (document instanceof WGArea) {
-            		throw new WGAuthorisationException("User is not allowed to edit content in this area", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_AREA, document);
-            	}
-            	else {
-            		WGStructEntry entry = (WGStructEntry) document;
-            		throw new WGAuthorisationException(
-            			"User is not allowed to edit this content, because struct entry '"
-            				+ entry.getTitle()
-            				+ "' (Key "
-            				+ entry.getStructKey()
-            				+ ") disallows it", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGE, document);
-            	}
-            }
-        	
-            // Check edit rights from content type
-            WGContentType contentType = getStructEntry().getContentType();
-            if (contentType != null && !contentType.mayCreateContent()) {
-            	throw new WGAuthorisationException("User is not allowed to edit content of this content type", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_CONTENTTYPE, contentType);
-            }
-    
-            // Check edit rights from language
-            WGLanguage language = getLanguage();
-            if (language != null && !language.mayCreateContent()) {
-            	throw new WGAuthorisationException("User is not allowed to edit content of this language", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_LANGUAGE, language);
-            }
-        
-            // Check author status
-            if (accessLevel == WGDatabase.ACCESSLEVEL_AUTHOR) {
-            	if (!isAuthorOrOwner()) {
-            		throw new WGAuthorisationException("You are not authorized to save this document, because you are no author", WGAuthorisationException.ERRORCODE_OP_NEEDS_AUTHORING_RIGHTS);
-            	}
-            }
-            */
-        	
             // Check workflow status and special dependencies related to them
             if (performStatusTests) {
                 if (getStatus().equals(WGContent.STATUS_REVIEW)) {
