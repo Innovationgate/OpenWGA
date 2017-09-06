@@ -102,9 +102,11 @@ public class WGACoreTimer {
                 
             }
             
+            /*
             if (count > 0) {
                 _core.getLog().info("Updated " + WGUtils.DECIMALFORMAT_STANDARD.format(count) + " sessions with active WebSocket connections to be kept alive");
             }
+            */
             
         }
         
