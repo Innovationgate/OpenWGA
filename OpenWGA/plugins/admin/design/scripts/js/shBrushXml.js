@@ -82,4 +82,4 @@ dp.sh.Brushes.Xml.prototype.ProcessRegexList = function()
 	{
 		push(this.matches, new dp.sh.Match(match[1], match.index + match[0].indexOf(match[1]), 'tag-name'));
 	}
-}
+};

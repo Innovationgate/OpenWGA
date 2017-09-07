@@ -4,4 +4,5 @@
 //@import shBrushCss
 //@import shBrushJs
 //@import shBrushXml
-//@import Chart.min
+
+//@import Chart.min.js
