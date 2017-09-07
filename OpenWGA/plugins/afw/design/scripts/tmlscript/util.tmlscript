@@ -590,7 +590,7 @@ this.csvWriter = function(config){
 							else value = doc.item(item);
 						}
 						else {
-							value = item.value(doc)
+							value = item.value.call(doc, doc)
 						}
 					}
 					catch(e){
