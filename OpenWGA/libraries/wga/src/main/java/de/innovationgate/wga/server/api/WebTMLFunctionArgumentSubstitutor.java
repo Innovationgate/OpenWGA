@@ -63,6 +63,11 @@ public class WebTMLFunctionArgumentSubstitutor implements FunctionArgumentSubsti
                 return _wga.tmlcontext();
             }
         }
+        else if (argumentName.equals("$pc")) {
+            if (_wga.isTMLContextAvailable()) {
+            	return _wga.tmlcontext().item("$pc");
+            }
+        }
         else if (argumentName.equals("$mainCx")) {
             if (_wga.isTMLContextAvailable()) {
                 return ((TMLContext) _wga.tmlcontext()).getmaincontext();
