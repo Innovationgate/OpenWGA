@@ -2256,7 +2256,7 @@ public class WGA {
      * Returns if a WebTML/TMLScript environment is available
      */
     public boolean isTMLContextAvailable() {
-        return (!isIsolated() && fetchTMLContext() != null);
+        return (_context!=null && !isIsolated() && fetchTMLContext() != null);
     }
 
     /**
