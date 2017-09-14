@@ -9334,13 +9334,18 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
      */
     public boolean isAnonymousAccessible() throws WGAPIException {
         // check if file is anonymous accessible
+        
+        WGACL acl = getACL();
+        if(acl==null)
+        	return true; 
+        
         boolean isAnonymousAccessible = false;
         // first check anonymous db access
-        WGACLEntry anonymousEntry = getACL().getEntry(WGDatabase.ANONYMOUS_USER);
+        WGACLEntry anonymousEntry = acl.getEntry(WGDatabase.ANONYMOUS_USER);
         if (anonymousEntry != null && anonymousEntry.getLevel() >= WGDatabase.ACCESSLEVEL_READER) {
             isAnonymousAccessible = true;
         } else if (anonymousEntry == null) {
-            WGACLEntry defaultEntry = getACL().getEntry("*");
+            WGACLEntry defaultEntry = acl.getEntry("*");
             if (defaultEntry != null && defaultEntry.getLevel() >= WGDatabase.ACCESSLEVEL_READER) {
                 isAnonymousAccessible = true;    
             }
