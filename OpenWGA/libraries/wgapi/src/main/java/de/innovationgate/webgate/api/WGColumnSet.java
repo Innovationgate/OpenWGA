@@ -26,7 +26,6 @@
 package de.innovationgate.webgate.api;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +44,9 @@ import de.innovationgate.webgate.api.WGIllegalArgumentException;
  */
 public class WGColumnSet {
     
-    public static final Pattern TERM_PATTERN = Pattern.compile("^([\\w\\-$ÄÖÜäöüß]+)\\s*(?:\\(([\\w\\-=,]*)\\))?+$");
+    //public static final Pattern TERM_PATTERN = Pattern.compile("^([\\w\\-$ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½]+)\\s*(?:\\(([\\w\\-=,]*)\\))?+$");
+    
+    public static final Pattern TERM_PATTERN = Pattern.compile("^([\\w\\-$Ã„Ã–ÃœÃ¤Ã¶Ã¼ÃŸ]+)\\s*(?:\\(([\\w\\-=,]*)\\))?+$");    
     
     public static final Pattern FLAG_PATTERN = Pattern.compile("^([\\w]+)(?:=([\\w]+))?+$");
     
