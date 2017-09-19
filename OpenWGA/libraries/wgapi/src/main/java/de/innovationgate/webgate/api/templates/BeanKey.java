@@ -78,7 +78,8 @@ public class BeanKey implements ImmutableObject {
 
 	public static String encodeKey(String key) {
 		
-		return WGUtils.strReplace(key, ".", "§", true);
+		//return WGUtils.strReplace(key, ".", "ï¿½", true);
+		return WGUtils.strReplace(key, ".", "Â§", true);
 		
 	}
 	
@@ -89,7 +90,8 @@ public class BeanKey implements ImmutableObject {
 	 */
 	public static String decodeKey(String key) {
 		
-		return WGUtils.strReplace(key, "§", ".", true);
+		//return WGUtils.strReplace(key, "ï¿½", ".", true);
+		return WGUtils.strReplace(key, "Â§", ".", true);
 		
 	}
 
