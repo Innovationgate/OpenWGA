@@ -52,7 +52,7 @@ public class PageConnectionManager {
         
     }
 
-    public PageConnection activateConnection(HttpSession session, String pageId, TMLPageWebSocket socket, String windowId) throws InvalidWebSocketSessionException {
+    public PageConnection activateConnection(HttpSession session, String pageId, TMLPageWebSocket socket, String windowId) throws WGException {
         
         // A reconnect (maybe from cluster failover)
         WeakReference<PageConnection> connRef = _activeConnections.get(pageId);
@@ -75,10 +75,16 @@ public class PageConnectionManager {
         
     }
 
-    private PageConnection doActivateConnection(PageConnection conn, HttpSession session, TMLPageWebSocket socket, String windowId) throws InvalidWebSocketSessionException {
+    private PageConnection doActivateConnection(PageConnection conn, HttpSession session, TMLPageWebSocket socket, String windowId) throws WGException {
         validateOrigin(socket, conn);
         conn.assignSocket(socket, windowId);
         putConnection(session, conn);
+        
+        WGA.get(session).app(conn.getDbKey()).createEvent("websocket=connect")
+        	.param("windowId", windowId)
+        	.param("pageId", conn.getPageId())
+        	.fireOnLocalServer();
+        
         return conn;
     }
     
@@ -119,6 +125,15 @@ public class PageConnectionManager {
     }
 
     public void removeConnection(HttpSession session, PageConnection con) {
+        try {
+			WGA.get(session).app(con.getDbKey()).createEvent("websocket=disconnect")
+				.param("windowId", con.getWindowId())
+				.param("pageId", con.getPageId())
+			    .fireOnLocalServer();
+		} catch (WGException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
         _activeConnections.remove(con.getPageId());
         if (session != null) {
         	try{
@@ -126,7 +141,7 @@ public class PageConnectionManager {
 	            activeConnections.remove(con.getPageId());
         	}
         	catch(Exception e){}
-        }
+        }        
         con.close();
     }
 
