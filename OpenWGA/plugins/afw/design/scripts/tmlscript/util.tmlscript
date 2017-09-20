@@ -556,8 +556,11 @@ this.csvWriter = function(config){
 			
 			var contentlist = config.contentlist
 			if(!contentlist){
-				if(config.query)
-					contentlist = WGA.database().query("hql", config.query, {max:0})
+				if(config.query){
+					if(typeof(config.query)=="function")
+						contentlist = config.query(config.searchterm);
+					else contentlist = WGA.database().query("hql", config.query, {max:0})
+				}
 				else contentlist = WGA.database().query("hql", "content.structentry.parententry.key=:structkey", {max:0}, {structkey:STRUCTKEY})
 			}
 			
