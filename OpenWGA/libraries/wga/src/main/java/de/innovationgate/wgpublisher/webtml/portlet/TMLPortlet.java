@@ -59,6 +59,7 @@ import de.innovationgate.wga.server.api.tml.Portlet;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGAVersion;
 import de.innovationgate.wgpublisher.design.DesignResourceReference;
+import de.innovationgate.wgpublisher.so.ScopeObjectRegistry.ScopeObject;
 import de.innovationgate.wgpublisher.webtml.Base;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 import de.innovationgate.wgpublisher.webtml.utils.TMLObject;
@@ -76,8 +77,7 @@ public class TMLPortlet implements TMLObject, Portlet {
     protected WGPortlet reg = null;
     public TMLContext tmlContext = null;
     private TMLPortletState _state;
-    
-
+        
     /**
      * Queue that stores the last 1000 fired portlet events, so portlets can
      * react on them with serverside code.
@@ -536,7 +536,13 @@ public class TMLPortlet implements TMLObject, Portlet {
        return _state;
     }
 
-
+    public Object getcontroller() throws WGAPIException, WGException{
+    	ScopeObject obj = getState().fetchController(WGA.get(tmlContext));
+    	if(obj!=null)
+    		return obj.getObject();
+    	else return null;
+    }
+    
     protected TMLPortletState createState(TMLPortletStateStorage storage) throws WGAPIException {
         
         // Determine the compliance version for this portlet

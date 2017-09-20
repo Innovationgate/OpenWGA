@@ -361,4 +361,7 @@ public interface Portlet {
     @CodeCompletion(preferredCase="unregisterPortletForName")
     public abstract void unregisterportletforname(String name) throws WGAPIException;
 
+    @CodeCompletion(preferredCase="getController")
+    public abstract Object getcontroller() throws WGAPIException, WGException;
+    
 }
