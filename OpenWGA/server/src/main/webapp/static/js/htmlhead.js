@@ -2070,6 +2070,9 @@ WGA.websocket = {
 			
 			var completeUrl = this.url + (this.url.indexOf("?") != -1 ? "&" : "?") + WGA.toQueryString(urlParams);
 
+			if(this.socket)
+				this.socket.close();
+
 			if ('WebSocket' in window) {
 				if (WGA.debug && console && console.log) {
 					console.log("Building socket connection, pageId: " + this.pageId);
@@ -2155,9 +2158,12 @@ WGA.websocket = {
 				console.log("Socket connection closed, pageId: " + WGA.websocket.pageId, event, "event.code", event.code);
 			}
 			
+			
 			WGA.websocket.socket.onmessage = null;
 			WGA.websocket.socket.onopen = null;
 			WGA.websocket.socket.onclose = null;
+			
+			this.socket=null;
 			
 			// Reason codes that should prevent reconnect.
 			if (event.code <= 1001) { // Normal closing
