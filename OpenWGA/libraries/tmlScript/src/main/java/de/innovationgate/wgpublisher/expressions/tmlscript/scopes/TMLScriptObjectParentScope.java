@@ -72,11 +72,13 @@ public abstract class TMLScriptObjectParentScope extends ScriptableObject {
         try {
             RhinoScope rhinoScope = RhinoExpressionEngineImpl.get().getSharedScope();
             if ("$".equals(name)) {
-                Design design = rhinoScope.getWgaGlobal().getWga().design(_objectDefinition.getModuleDatabase()).resolve(_objectDefinition.getDesignReference().getResourceOverlayReference());
+                //Design design = rhinoScope.getWgaGlobal().getWga().design(_objectDefinition.getModuleDatabase()).resolve(_objectDefinition.getDesignReference().getResourceOverlayReference());
+            	Design design = WGAGlobal.fetchWGA().design(_objectDefinition.getModuleDatabase()).resolve(_objectDefinition.getDesignReference().getResourceOverlayReference());
                 return new DesignLocator(WGAGlobal.fetchWGA(), design, this);
             }
             else if ("$$".equals(name)) {
-                Design design = rhinoScope.getWgaGlobal().getWga().design(_objectDefinition.getModuleDatabase()).resolve(_objectDefinition.getModuleName() + ":..");
+                //Design design = rhinoScope.getWgaGlobal().getWga().design(_objectDefinition.getModuleDatabase()).resolve(_objectDefinition.getModuleName() + ":..");
+                Design design = WGAGlobal.fetchWGA().design(_objectDefinition.getModuleDatabase()).resolve(_objectDefinition.getModuleName() + ":..");
                 return new DesignLocator(WGAGlobal.fetchWGA(), design, this);
             }
             
