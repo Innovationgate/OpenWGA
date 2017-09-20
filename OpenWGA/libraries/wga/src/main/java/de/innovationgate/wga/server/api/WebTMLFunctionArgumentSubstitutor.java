@@ -63,11 +63,6 @@ public class WebTMLFunctionArgumentSubstitutor implements FunctionArgumentSubsti
                 return _wga.tmlcontext();
             }
         }
-        else if (argumentName.equals("$pc")) {
-            if (_wga.isTMLContextAvailable()) {
-            	return _wga.tmlcontext().item("$pc");
-            }
-        }
         else if (argumentName.equals("$mainCx")) {
             if (_wga.isTMLContextAvailable()) {
                 return ((TMLContext) _wga.tmlcontext()).getmaincontext();
@@ -114,6 +109,16 @@ public class WebTMLFunctionArgumentSubstitutor implements FunctionArgumentSubsti
         else if (argumentName.startsWith("$itemList_")) {
             if (_wga.isTMLContextAvailable()) {
                 return _wga.tmlcontext().item(argumentName.substring(6));
+            }
+        }
+        else if (argumentName.startsWith("$portlet")) {
+            if (_wga.isTMLContextAvailable()) {
+                return  _wga.tmlcontext().getportlet();
+            }
+        }
+        else if (argumentName.equals("$pc")) {
+            if (_wga.isTMLContextAvailable()) {
+            	return  _wga.tmlcontext().getportlet().getcontroller();
             }
         }
         else if (argumentName.startsWith("$pMode") || argumentName.startsWith("$portletMode")) {
