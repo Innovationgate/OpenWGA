@@ -54,9 +54,12 @@ import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGDatabaseEventListener;
+import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGTMLModule;
 import de.innovationgate.wga.common.beans.csconfig.v1.MediaKey;
 import de.innovationgate.wga.config.DesignReference;
+import de.innovationgate.wga.server.api.Design;
+import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.design.WGADesignManager;
 
 public class WGPDeployer implements WGACoreEventListener {
@@ -240,6 +243,26 @@ public class WGPDeployer implements WGACoreEventListener {
             }
             else if (name.equals("label")) {
                 out.write("<tml:label key=\"" + params.get(0) + "\"/>");
+            }
+            else if (name.equals("include")) {
+                String refStr = (String)params.get(0);
+                try {
+                	Design design = WGA.get(_core).design(_db).resolve(refStr);
+                	WGTMLModule mod = design.getTMLModule("html");
+                	if(mod!=null){
+                        PPTagsPreProcessor preProcessor = new PPTagsPreProcessor(_core, mod);
+                        String code = WGUtils.strReplace(mod.getCode(), "{%", preProcessor, true);
+                		out.write(code);
+                	}
+                	else LOG.error("unable to %include " + refStr);
+				} catch (WGException e) {
+					LOG.error("unable to %include " + refStr);
+				}
+                
+            }
+            else{
+                out.write(text.substring(from, to));
+                return to;            	
             }
 
             return endPos + 2;
