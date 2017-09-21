@@ -70,7 +70,7 @@ public class LinkChecker extends HttpConnector {
 		     if (locationHeader != null) {
 		    	 String redirectLocation = locationHeader.getValue();
 		    	 targetGET.releaseConnection();
-		    	 return innerCheck(client, new URI(uri, redirectLocation, true), redirectCounter++);
+		    	 return innerCheck(client, new URI(uri, redirectLocation, true), redirectCounter+1);
 		     } else {
 		    	 targetGET.releaseConnection();
 		    	 return 404;
