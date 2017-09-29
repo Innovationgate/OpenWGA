@@ -71,11 +71,18 @@
 			<tml:foreach type="itemvalue" item="_relations" currentvalue="_relation">
 				<label><tml:script expression="_relation.name"/>:</label>
 				<div class="data">
-					<a href="javascript:DBM.switchToObject('tools.db-explorer', '<tml:meta type="db" name="dbkey"/>', 'db:<tml:meta type="db" name="dbkey"/>/docid:<tml:script expression="_relation.getParentContentKey()"/>')"
-						title="<tml:metadata name="title" context="[docid:{_relation.getParentContentKey()}]" encode="html,javascript"/>"
-					>
-						<tml:script expression="_relation.getParentContentKey()"/>						
-					</a>
+					<tml:if context="[docid:{_relation.getParentContentKey()}]" iscontextvalid="true">
+						<tml:then>
+							<a href="javascript:DBM.switchToObject('tools.db-explorer', '<tml:meta type="db" name="dbkey"/>', '<tml:script expression="path"/>')"
+								title="<tml:metadata name="title" encode="html,javascript"/>"
+							>
+								<tml:metadata name="key"/>						
+							</a>
+						</tml:then>
+						<tml:else>
+							<tml:script expression="_relation.getParentContentKey()"/>
+						</tml:else>
+					</tml:if>
 					<tml:case condition="_relation.getType()==content().RELATIONTYPE_PROTECTED">
 						&nbsp;(protected)
 					</tml:case>					
