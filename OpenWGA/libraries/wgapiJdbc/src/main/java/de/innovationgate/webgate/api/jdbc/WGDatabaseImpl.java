@@ -3825,6 +3825,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                             // Commit so we can read the file afterwards
                             commitHibernateTransaction();
                             
+                            /*
                             // Annotate the file
                             WGDocumentImpl doc = createDocumentImpl(meta.getParentcontent());
                             TemporaryFile tempFile = new TemporaryFile(meta.getName(), doc.getFileData(meta.getName()), WGFactory.getTempDir());
@@ -3840,6 +3841,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                                 tempFile.delete();
                             }
                             commitHibernateTransaction();
+                            */
                         }
                         catch (Throwable e) {
                             log.error("Exception upgrading file", e);
