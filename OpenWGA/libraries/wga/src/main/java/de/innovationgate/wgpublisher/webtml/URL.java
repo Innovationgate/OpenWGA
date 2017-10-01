@@ -389,7 +389,7 @@ public class URL extends ActionBase implements DynamicAttributes {
         url.append(requestURL.getPath());
         
         getStatus().keepParams = true;
-        getStatus().urlparams.put(this.getSourcetag() + "Page", (new Integer(targetPage)).toString());
+        getStatus().urlparams.put(this.getSourcetag() + "page", (new Integer(targetPage)).toString());
     }
     
     private void buildActionForeachURL(StringBuffer url, int targetPage) throws MalformedURLException, UnsupportedEncodingException, WGException, TMLException {
