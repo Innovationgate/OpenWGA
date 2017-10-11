@@ -66,7 +66,6 @@ public class ElementImplContext {
 	/**
 	 * Retrieves the tml context object of the element tag.
 	 * @return Returns a TMLContext.
-	 * @deprecated Use {@link #getContext()} to retrieve the server API interface object
 	 */
 	public TMLContext getTMLContext() {
 		return context;
@@ -74,7 +73,7 @@ public class ElementImplContext {
 	
 	/**
      * Retrieves the WebTML context of the element tag
-     * @return Returns a TMLContext.
+     * @return Returns a TMLContext as de.innovationgate.wga.server.api.tml.Context object
      */
     public Context getContext() {
         return context;
