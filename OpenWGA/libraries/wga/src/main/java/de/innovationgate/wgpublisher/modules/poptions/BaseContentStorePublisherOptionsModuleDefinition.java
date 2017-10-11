@@ -132,6 +132,11 @@ public class BaseContentStorePublisherOptionsModuleDefinition implements ModuleD
         expressionDefault.setExpert(true);
         expressionDefault.setDefaultValue(ExpressionEngineFactory.ENGINE_TMLSCRIPT);
         options.addOption(expressionDefault);
+
+        LocalizedOptionDefinition urlBuilder = new LocalizedOptionDefinition(WGACore.DBATTRIB_URLBUILDER, StringOptionType.INSTANCE, _bundleLoader);
+        urlBuilder.setOptional(true);
+        urlBuilder.setExpert(true);
+        options.addOption(urlBuilder);
         
         LocalizedOptionDefinition homePage = new LocalizedOptionDefinition(WGACore.DBATTRIB_HOME_PAGE, StringOptionType.INSTANCE, _bundleLoader);
         homePage.setOptional(true);
