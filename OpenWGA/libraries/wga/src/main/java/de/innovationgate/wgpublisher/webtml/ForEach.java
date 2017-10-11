@@ -900,23 +900,7 @@ public class ForEach extends Base implements IterationTag {
 	    if (currentObject instanceof WGDocument) {
 	        return getTMLContextForDocument((WGDocument) currentObject);
 	    }
-	    
-	    TMLScript tmlScript = WGA.get(getTMLContext()).tmlscript();
-	    if (tmlScript.isNativeObject(currentObject)) {
-	        try {
-	            if (tmlScript.hasProperty(currentObject, "context")) {
-	                Object contextObj = tmlScript.callMethod(currentObject, "context");
-	                if (contextObj instanceof TMLContext) {
-	                    return (TMLContext) contextObj;
-	                }
-	            }
-	            
-	            return (TMLContext) tmlScript.descriptify(currentObject, Context.class);
-	        }
-	        catch (WGException e) {
-	        }
-	    }
-	    
+	    	    
 	    return null;
 	    
     }
