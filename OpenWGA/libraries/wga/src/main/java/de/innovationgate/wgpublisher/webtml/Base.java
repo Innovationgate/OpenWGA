@@ -1016,6 +1016,9 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
                     this.getTMLContext().setSessionVar(this.getSessionvar(), optionallyReduceListValue(status.result), false, false);
                 }
                 
+                if (this.getPvar() != null) {
+                    this.getTMLContext().getportlet().setvar(this.getPvar(), optionallyReduceListValue(status.result));
+                }
                 if (this.getPsessionvar() != null) {
                     this.getTMLContext().getportlet().setsessionvar(this.getPsessionvar(), optionallyReduceListValue(status.result), false, false);
                 }
@@ -1311,23 +1314,6 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
      * @return Returns a String
      */
     public String getVar() {
-        
-        // Retrieve portlet variable name + prefix, if present
-        String pvar = getPvar();
-        if (pvar != null && getTMLContext() != null) {
-            TMLPortlet portlet;
-            try {
-                portlet = getTMLContext().getportlet();
-            }
-            catch (WGAPIException e) {
-                log.error("Exception retrieving portlet variable name", e);
-                return null;
-            }
-            if (portlet != null && !portlet.isroot()) {
-                return portlet.getVarPrefix() + pvar;
-            }
-        }
-        
         return this.getTagAttributeValue("var", var, null);
     }
 
