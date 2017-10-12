@@ -286,7 +286,7 @@ public class WGAFilter implements Filter {
     public class RequestWrapper extends HttpServletRequestWrapper {
 
 
-        
+    	private String _forwardedProtocol;
 
         private Map<String,String[]> _parameters = new HashMap<>();
 		
@@ -299,7 +299,8 @@ public class WGAFilter implements Filter {
 			super(request);
 			_wrappedRequest = request;
 			_response = reponse;
-		
+			_forwardedProtocol = request.getHeader("X-Forwarded-Proto");			
+
 			String queryString = request.getQueryString();
 			// decode query string parameters with wga character encoding
 			if (queryString != null) {
@@ -334,6 +335,31 @@ public class WGAFilter implements Filter {
 
 		}
 
+		@Override
+		public String getProtocol() {
+			if(_forwardedProtocol != null)
+				return _forwardedProtocol + "/1.0";
+			else return _wrappedRequest.getProtocol();
+		}
+
+		@Override
+		public String getScheme() {
+			if(_forwardedProtocol != null)
+				return _forwardedProtocol ;
+			else return _wrappedRequest.getScheme();
+		}
+
+		@Override
+		public StringBuffer getRequestURL(){
+			StringBuffer currentURL = _wrappedRequest.getRequestURL();
+			if(_forwardedProtocol != null){
+				int i = currentURL.indexOf("://");
+				if(i>0)
+					return new StringBuffer(_forwardedProtocol + "://" + currentURL.substring(i+3));
+			}
+			return currentURL;			
+		}
+		
         public String getParameter(String name) {
 			copyNoneExistingParams(_wrappedRequest.getParameterMap());
 			String values[] = (String[]) _parameters.get(name);
@@ -599,7 +625,8 @@ public class WGAFilter implements Filter {
 	        
 	        HttpServletRequest httpReq = (HttpServletRequest) request;
 	        request.setAttribute(REQATTRIB_ORIGINAL_URI, httpReq.getRequestURI());
-	        request.setAttribute(REQATTRIB_ORIGINAL_URL, httpReq.getRequestURL());
+	        // #00005078: don't store original URL. Store converted URL instead. See below.
+	        //request.setAttribute(REQATTRIB_ORIGINAL_URL, httpReq.getRequestURL());
 	        request.setAttribute(REQATTRIB_ORIGINAL_QUERYSTRING, httpReq.getQueryString());
 	       
 	        // add/ delete jvmRoute
@@ -620,6 +647,8 @@ public class WGAFilter implements Filter {
 	        
 	        RequestWrapper wrappedRequest = createRequestWrapper(response, httpReq);
 	        FinalCharacterEncodingResponseWrapper wrappedResponse =  createResponseWrapper(response, wrappedRequest);
+	        // #00005078: Store converted URL. Will be used in WGA.urlBuilder()
+	        request.setAttribute(REQATTRIB_ORIGINAL_URL, wrappedRequest.getRequestURL());
 	        
 	        // Probably mock request certificate
             if (WGACore.isDevelopmentModeEnabled()) {
