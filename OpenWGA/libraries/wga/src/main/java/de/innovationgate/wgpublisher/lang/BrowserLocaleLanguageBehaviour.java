@@ -106,7 +106,12 @@ public class BrowserLocaleLanguageBehaviour implements LanguageBehaviour, Initia
 	@Override
 	public WGLanguage webtmlSelectDatabaseLanguage(WGDatabase db, TMLContext context) throws WGAPIException {
 
-		return requestSelectDatabaseLanguage(db, context.getrequest());
+        if (context.iswebenvironment()) {
+            return requestSelectDatabaseLanguage(db, context.getrequest());
+        }
+        else {
+            return db.getLanguage(db.getDefaultLanguage());
+        }
 	}
 
 	@Override
