@@ -623,12 +623,6 @@ public class WGAFilter implements Filter {
 	            response.setCharacterEncoding(_core.getCharacterEncoding());            
 	        }
 	        
-	        HttpServletRequest httpReq = (HttpServletRequest) request;
-	        request.setAttribute(REQATTRIB_ORIGINAL_URI, httpReq.getRequestURI());
-	        // #00005078: don't store original URL. Store converted URL instead. See below.
-	        //request.setAttribute(REQATTRIB_ORIGINAL_URL, httpReq.getRequestURL());
-	        request.setAttribute(REQATTRIB_ORIGINAL_QUERYSTRING, httpReq.getQueryString());
-	       
 	        // add/ delete jvmRoute
 	        String lbRoute = _core.getClusterService().getLBRoute();
 	        if (lbRoute != null && !lbRoute.trim().equals("")) {
@@ -637,7 +631,7 @@ public class WGAFilter implements Filter {
     	        jvmRouteCookie.setMaxAge(-1);
     	        jvmRouteCookie.addCookieHeader((HttpServletResponse)response);
 	        } else {
-	           Cookie cookie = getCookie(httpReq, COOKIE_NAME_LBROUTE);
+	           Cookie cookie = getCookie((HttpServletRequest) request, COOKIE_NAME_LBROUTE);
 	           if (cookie != null) {
 	               WGCookie jvmRouteCookie = WGCookie.from(cookie);
 	               jvmRouteCookie.setMaxAge(0);
@@ -645,10 +639,16 @@ public class WGAFilter implements Filter {
 	           }
 	        }
 	        
-	        RequestWrapper wrappedRequest = createRequestWrapper(response, httpReq);
-	        FinalCharacterEncodingResponseWrapper wrappedResponse =  createResponseWrapper(response, wrappedRequest);
-	        // #00005078: Store converted URL. Will be used in WGA.urlBuilder()
+	        RequestWrapper wrappedRequest = createRequestWrapper(response, (HttpServletRequest) request);
+	        /*
+	         *  #00005078: don't store original URL. Store converted URL instead.
+	         *  Will be used in WGA.urlBuilder() and other sources 
+	         */	        
 	        request.setAttribute(REQATTRIB_ORIGINAL_URL, wrappedRequest.getRequestURL());
+	        request.setAttribute(REQATTRIB_ORIGINAL_URI, wrappedRequest.getRequestURI());
+	        request.setAttribute(REQATTRIB_ORIGINAL_QUERYSTRING, wrappedRequest.getQueryString());
+	        
+	        FinalCharacterEncodingResponseWrapper wrappedResponse =  createResponseWrapper(response, wrappedRequest);
 	        
 	        // Probably mock request certificate
             if (WGACore.isDevelopmentModeEnabled()) {
