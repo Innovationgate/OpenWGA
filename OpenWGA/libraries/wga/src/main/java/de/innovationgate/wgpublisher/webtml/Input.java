@@ -192,7 +192,7 @@ public class Input extends ActionBase implements DynamicAttributes {
         
         
         boolean readonlyMode = false;
-        String computedMode = "";
+        String computedMode = getMode();
         
         String cssClass = this.getCssclass();
         if (cssClass != null) {
@@ -334,13 +334,13 @@ public class Input extends ActionBase implements DynamicAttributes {
             }     
         }
         else {
-            WGDocument doc = this.getTMLContext().getdocument();
-            if (doc.hasItem(name)) {
-                values = this.getTMLContext().itemlist(name);    
-            } else {
-                values = new ArrayList<Object>();
-                values.add(defaultvalue);                
-            }
+        	values = new ArrayList<Object>();
+        	String[] params = this.getTMLContext().getrequest().getParameterValues(name);
+        	if(params!=null){        		
+        		for(String param: params)
+        			values.add(param);                
+        	}
+        	else values.add(defaultvalue);
         }
                   
         // Disable encoding, since this tag is in edit or readonly mode
