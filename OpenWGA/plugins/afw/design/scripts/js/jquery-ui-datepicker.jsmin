@@ -1,0 +1,20 @@
+/*
+ *	AMD jquery-ui-datepicker definition
+ *	loads datepicker JS and CSS 
+ *
+ *	usage: require(["jquery", "jquery-ui-datepicker"], function($, Picker){})
+ *
+ *	This script is part of the OpenWGA CMS plattform.
+ *	(c) Innovation Gate
+ */
+
+define("jquery-ui-datepicker", [
+		"jquery",
+		"jquery-ui-js/datepicker",		 
+		"css!jquery-ui-css",
+	], function($, Picker){
+		var lang = $("html").attr("lang");
+		if(lang)
+			require(["jquery-ui-js/i18n/datepicker-"+lang])
+		return Picker
+})

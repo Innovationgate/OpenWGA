@@ -16,6 +16,9 @@ require.config({
         "jquery-ui-css": 				"/plugin-wga-app-framework/file/jquery-ui-1.11/build/jquery-ui.min",
 		"cmm":							"/plugin-cm-modules/js/cmm",
         
+		// jquery-ui datepicker AMD interface
+		"jquery-ui-datepicker": 		"/plugin-wga-app-framework/js/jquery-ui-datepicker",
+		
 		// query plugins:        
         "jquery-columnslider": 			"/plugin-wga-app-framework/js/jquery-columnslider",        
         "jquery-input-placeholder": 	"/plugin-wga-app-framework/js/jquery-input-placeholder",
