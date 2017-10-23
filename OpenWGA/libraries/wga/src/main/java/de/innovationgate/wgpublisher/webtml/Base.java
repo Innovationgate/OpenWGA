@@ -436,7 +436,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
             // Set boolean flags
             this.setEvalBody(true);
 
-            if (this.getVar() != null || this.getSessionvar() != null || this.getAppendvar() != null) {
+            if (this.getVar() != null || this.getPvar() != null || this.getSessionvar() != null || this.getAppendvar() != null) {
                 if (this.getOutput() != null && this.stringToBoolean(this.getOutput()) == true) {
                     this.setResultOutput(true);
                 }
