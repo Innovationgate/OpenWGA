@@ -797,7 +797,7 @@ public class WGPRequestPath {
 	
 	public String expandToCompletePath(HttpServletRequest req) throws WGAPIException, UnsupportedEncodingException {
 		
-	    StringBuffer path = new StringBuffer(this.publisherURL);
+		StringBuffer path = new StringBuffer(WGPDispatcher.getPublisherURL(req, true));
 	    path.append("/").append(this.databaseKey).append("/");
 	    
 	    if (this.pathType != TYPE_TITLE_PATH && this.pathType != TYPE_TML) {
