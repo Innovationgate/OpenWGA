@@ -58,6 +58,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.mockito.Mockito;
 
 import de.innovationgate.utils.WGUtils;
+import de.innovationgate.utils.URLBuilder;
 import de.innovationgate.webgate.api.WGFactory;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGCookie;
@@ -349,6 +350,18 @@ public class WGAFilter implements Filter {
 			else return _wrappedRequest.getScheme();
 		}
 
+		@Override
+		public int getServerPort(){
+			int port = _wrappedRequest.getServerPort();
+			String protocol = _wrappedRequest.getProtocol();
+			
+			if(_forwardedProtocol != null && URLBuilder.isDefaultPortForProtocol(port, protocol)){
+				// we have default port in original request: set NEW default
+				return URLBuilder.getDefaultPortForProtocol(_forwardedProtocol.toLowerCase());
+			}
+			return port;
+		}
+		
 		@Override
 		public StringBuffer getRequestURL(){
 			StringBuffer currentURL = _wrappedRequest.getRequestURL();
