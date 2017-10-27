@@ -353,7 +353,7 @@ public class WGAFilter implements Filter {
 		@Override
 		public int getServerPort(){
 			int port = _wrappedRequest.getServerPort();
-			String protocol = _wrappedRequest.getProtocol();
+			String protocol = _wrappedRequest.getScheme().toLowerCase();
 			
 			if(_forwardedProtocol != null && URLBuilder.isDefaultPortForProtocol(port, protocol)){
 				// we have default port in original request: set NEW default
