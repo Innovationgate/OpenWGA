@@ -1561,7 +1561,15 @@ public class WGPDispatcher extends HttpServlet {
     protected void sendRedirect(javax.servlet.http.HttpServletResponse response, String virtualLink) throws IOException {
         // send redirect always via j2ee method
         // B00004862
-        response.sendRedirect(response.encodeRedirectURL(virtualLink));
+    	
+    	try {
+    		// #00005082: try to use absolute URLs for redirects if possible
+			String url = WGA.get().urlBuilder(virtualLink).build(true);
+			response.sendRedirect(response.encodeRedirectURL(url));
+		} catch (WGException e) {
+			response.sendRedirect(response.encodeRedirectURL(virtualLink));
+		}
+    	
     }
 
     /**
