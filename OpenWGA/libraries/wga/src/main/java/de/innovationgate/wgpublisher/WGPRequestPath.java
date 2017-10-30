@@ -449,12 +449,12 @@ public class WGPRequestPath {
         
         // Redirect to login facility
         if (request.getParameter("$ajaxInfo") == null) {
-            dispatcher.sendRedirect(response, dispatcher.getLoginURL(request, database, getCompleteURL()));
+            dispatcher.sendRedirect(request, response, dispatcher.getLoginURL(request, database, getCompleteURL()));
         } else {
             // this is an ajax call without login information - redirect to jsp and fire event LoginRequired
             String loginRequiredEvent = de.innovationgate.wgpublisher.webtml.portlet.PortletEvent.LOGIN_REQUIRED_EVENT.toJavaScriptObject();
             String encodedEvent = Base64.encodeWeb(loginRequiredEvent.getBytes());
-            dispatcher.sendRedirect(response, this.publisherURL + "/fireSystemEvent.jsp?event="  + encodedEvent);
+            dispatcher.sendRedirect(request,response, this.publisherURL + "/fireSystemEvent.jsp?event="  + encodedEvent);
         }
     }
 
@@ -1132,13 +1132,13 @@ public class WGPRequestPath {
             }
             catch (AdminLoginNeededException e) {
                 if (request.getParameter("$ajaxInfo") == null) {
-                    dispatcher.sendRedirect(response, dispatcher.getAdminLoginURL(request, path.getCompleteURL()));
+                    dispatcher.sendRedirect(request, response, dispatcher.getAdminLoginURL(request, path.getCompleteURL()));
                 }
                 else {
                     // this is an ajax call without login information - redirect to jsp and fire event LoginRequired
                     String loginRequiredEvent = de.innovationgate.wgpublisher.webtml.portlet.PortletEvent.SESSION_IS_NEW_EVENT.toJavaScriptObject();
                     String encodedEvent = Base64.encodeWeb(loginRequiredEvent.getBytes());
-                    dispatcher.sendRedirect(response, path.publisherURL + "/fireSystemEvent.jsp?event="  + encodedEvent);
+                    dispatcher.sendRedirect(request, response, path.publisherURL + "/fireSystemEvent.jsp?event="  + encodedEvent);
                 }
                 
                 path.proceedRequest = false;

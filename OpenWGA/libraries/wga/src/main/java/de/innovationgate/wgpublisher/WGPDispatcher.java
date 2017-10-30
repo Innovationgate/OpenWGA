@@ -477,7 +477,7 @@ public class WGPDispatcher extends HttpServlet {
 
                 String domain = request.getParameter("domain");
                 _core.logout(domain, request.getSession(), request, response, true);
-                sendRedirect(response, request.getParameter("redirect"));
+                sendRedirect(request, response, request.getParameter("redirect"));
 
             }
             else if (path.equals("/ajaxform")) {
@@ -685,13 +685,13 @@ public class WGPDispatcher extends HttpServlet {
         if (isLoginSuccessful) {
 
             if (redirect != null) {
-                sendRedirect(response, redirect);
+                sendRedirect(request, response, redirect);
             }
             else if (referer != null) {
                 request.setAttribute(WGACore.ATTRIB_LOGINERROR, "No redirect specified.");
                 de.innovationgate.utils.URLBuilder builder = new de.innovationgate.utils.URLBuilder(new java.net.URL(referer));
                 builder.setParameter("loginerror", "2");
-                sendRedirect(response, builder.build(false));
+                sendRedirect(request, response, builder.build(false));
             }
             else {
                 response.setStatus(HttpServletResponse.SC_OK);
@@ -713,7 +713,7 @@ public class WGPDispatcher extends HttpServlet {
             else if (referer != null) {
                 de.innovationgate.utils.URLBuilder builder = new de.innovationgate.utils.URLBuilder(new java.net.URL(referer));
                 builder.setParameter("loginerror", "1");
-                sendRedirect(response, builder.build(false).toString());
+                sendRedirect(request, response, builder.build(false).toString());
             }
             else {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid login");
@@ -841,7 +841,7 @@ public class WGPDispatcher extends HttpServlet {
                     sendPermanentRedirect(response, url);
                 }
                 else {
-                    sendRedirect(response, url);
+                    sendRedirect(request, response, url);
                 }
             }
             else if (iPathType != WGPRequestPath.TYPE_RESOURCE && iPathType != WGPRequestPath.TYPE_STATICTML && !_core.getContentdbs().containsKey(path.getDatabaseKey())) {
@@ -874,7 +874,7 @@ public class WGPDispatcher extends HttpServlet {
                                 lastRedirectCookie.setMaxAge(-1);
                                 lastRedirectCookie.setPath("/");
                                 ((WGCookie)lastRedirectCookie).addCookieHeader(response);
-                                sendRedirect(response, redirectPath);
+                                sendRedirect(request, response, redirectPath);
                                 break;
                             }
                         }
@@ -1162,14 +1162,14 @@ public class WGPDispatcher extends HttpServlet {
                     if (!content.getStatus().equals(WGContent.STATUS_DRAFT) && request.getParameter("forceVLink") == null) {
 
                         String url = getVirtualContentURL(request, database, path, content);
-                        sendRedirect(response, url);
+                        sendRedirect(request, response, url);
                         return;
                     }
                 }
                 else {
                     String vLink = buildVirtualLink(WGA.get(request, response, getCore()), content, path.getMediaKey(), path.getLayoutKey());
                     if (vLink != null) {
-                        sendRedirect(response, vLink);
+                        sendRedirect(request, response, vLink);
                         return;
                     }
                     else {
@@ -1502,13 +1502,13 @@ public class WGPDispatcher extends HttpServlet {
     private void sendNoContentNotification(WGPRequestPath path, javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, WGDatabase database, boolean mayRedirectToLogin)
             throws IOException, HttpErrorException, WGException {
         if (mayRedirectToLogin && request.getQueryString() != null && request.getQueryString().toLowerCase().indexOf("login") != -1 && (!database.isSessionOpen() || database.getSessionContext().isAnonymous())) {
-            sendRedirect(response, getLoginURL(request, database, path.getCompleteURL()));
+            sendRedirect(request, response, getLoginURL(request, database, path.getCompleteURL()));
         }
         else {
 
             if (isBrowserInterface(request.getSession()) && (path.getPathType() == WGPRequestPath.TYPE_TML || path.getPathType() == WGPRequestPath.TYPE_UNKNOWN_CONTENT)) {
                 String url = getNoContentNotificationURL(request, database, path);
-                sendRedirect(response, url);
+                sendRedirect(request, response, url);
             }
             else {
                 if (path.getTitlePathURL() != null) {
@@ -1528,7 +1528,7 @@ public class WGPDispatcher extends HttpServlet {
             throws IOException, HttpErrorException, WGException {
 
         if (request.getQueryString() != null && request.getQueryString().toLowerCase().indexOf("login") != -1) {
-            sendRedirect(response, getLoginURL(request, database, path.getCompleteURL()));
+            sendRedirect(request, response, getLoginURL(request, database, path.getCompleteURL()));
         }
         else {
             throw new HttpErrorException(404, "No file container of name " + path.getContainerKey(), path.getDatabaseKey());
@@ -1558,15 +1558,16 @@ public class WGPDispatcher extends HttpServlet {
 
     }
 
-    protected void sendRedirect(javax.servlet.http.HttpServletResponse response, String virtualLink) throws IOException {
+    protected void sendRedirect(HttpServletRequest request, javax.servlet.http.HttpServletResponse response, String virtualLink) throws IOException {
         // send redirect always via j2ee method
         // B00004862
     	
     	try {
     		// #00005082: try to use absolute URLs for redirects if possible
-			String url = WGA.get().urlBuilder(virtualLink).build(true);
+			String url = WGA.get(request, response, _core).urlBuilder(virtualLink).build(true);
 			response.sendRedirect(response.encodeRedirectURL(url));
 		} catch (WGException e) {
+			_core.getLog().warn("Unable to create absolute Redirect URL. Using relative URL", e);
 			response.sendRedirect(response.encodeRedirectURL(virtualLink));
 		}
     	
@@ -3012,7 +3013,7 @@ public class WGPDispatcher extends HttpServlet {
                 content = getContentByAnyKey(contentKey, database, request);
                 if (content == null) {
                     if (request.getQueryString() != null && request.getQueryString().toLowerCase().indexOf("login") != -1) {
-                        sendRedirect(response, getLoginURL(request, database, path.getCompleteURL()));
+                        sendRedirect(request, response, getLoginURL(request, database, path.getCompleteURL()));
                     }
                     else {
                         throw new HttpErrorException(404, "No content of name/id " + contentKey, path.getDatabaseKey());
