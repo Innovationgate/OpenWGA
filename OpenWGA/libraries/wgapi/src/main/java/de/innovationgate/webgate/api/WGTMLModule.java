@@ -52,6 +52,10 @@ public class WGTMLModule extends WGDesignResourceDocument implements PageHierarc
     
     public static final String META_CODEOFFSET = "CODEOFFSET";
     public static final MetaInfo METAINFO_CODEOFFSET = new MetaInfo(META_CODEOFFSET, Integer.class, new Integer(0));
+
+    public static final String META_PREPROCESS = "PREPROCESS";
+    public static final MetaInfo METAINFO_PREPROCESS = new MetaInfo(META_PREPROCESS, Boolean.class, Boolean.FALSE);
+    
     static {
         METAINFO_CODEOFFSET.setExtdata(true);
         METAINFO_CODEOFFSET.setMinCsVersion(WGDatabase.CSVERSION_WGA5);
@@ -143,6 +147,12 @@ public class WGTMLModule extends WGDesignResourceDocument implements PageHierarc
 	}
 
 
+	public boolean isPreprocess() throws WGAPIException {
+		return ((Boolean)this.getMetaData(META_PREPROCESS)).booleanValue();
+	}
+	public boolean setPreprocess(boolean value) throws WGAPIException {
+		return setMetaData(META_PREPROCESS, new Boolean(value));
+	}
 
 
 

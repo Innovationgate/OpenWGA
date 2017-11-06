@@ -51,6 +51,7 @@ public class TMLMetadata extends DesignMetadata {
    public void writeToDocument(WGTMLModule mod) throws WGAPIException {
        super.writeToDocument(mod); 
        mod.setDirectAccessAllowed(isDirectAccess());
+       mod.setPreprocess(isPreprocess());
        mod.setCacheable(isCacheable());
        if (mod.getDatabase().getContentStoreVersion() >= WGDatabase.CSVERSION_WGA5) {
            mod.setMetaData(WGTMLModule.META_CODEOFFSET, getHeaderLines());
@@ -81,6 +82,15 @@ public class TMLMetadata extends DesignMetadata {
     public void setDirectAccess(boolean directAccess) {
     	((TMLMetadataInfo)_info).setDirectAccess(directAccess);
     }
+
+    
+    public boolean isPreprocess() {
+    	return ((TMLMetadataInfo)_info).isPreprocess();
+    }
+    public void setPreprocess(boolean value) {
+    	((TMLMetadataInfo)_info).setPreprocess(value);
+    }
+
     
     /**
      * @return Returns the category.
