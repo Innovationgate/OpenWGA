@@ -1,0 +1,6 @@
+function Renderer() {
+}
+
+Renderer.prototype.render = function($cx, $option_body, AFW) {
+	WGA.TMLPage.write(AFW.Handlebars.stringTemplate($option_body, $cx))
+}
