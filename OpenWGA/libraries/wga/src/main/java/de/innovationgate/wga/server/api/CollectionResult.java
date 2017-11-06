@@ -41,9 +41,12 @@ import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.server.api.Nav.IndexCountingIterator;
 import de.innovationgate.wga.server.api.tml.Context;
 
+import de.innovationgate.wga.common.CodeCompletion;
+
 /**
  * Represents an object carrying all resulting data of a document collection.
  */
+@CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
 public abstract class CollectionResult implements Iterable<Context> {
     
     /**
@@ -274,6 +277,7 @@ public abstract class CollectionResult implements Iterable<Context> {
      * Returns the index of the last returned result document from the given iterator that this document had on the original collection result. Index 1 is the first document.
      * @param it The iterator. Must be an iterator returned from a {@link CollectionResult} object
      */
+    @CodeCompletion
     public int determineCurrentIndex(Iterator<?> it) {
 
         while (true) {
@@ -407,6 +411,7 @@ public abstract class CollectionResult implements Iterable<Context> {
      * @return The wrapping iterable
      * @throws WGException
      */
+    @CodeCompletion
     public <T> Iterable<T> wrap(final Wrapper<T> wrapper) throws WGException {
         
         return new Iterable<T>() {
@@ -418,6 +423,21 @@ public abstract class CollectionResult implements Iterable<Context> {
         
     }
  
+    public interface Function {
+        public void call(Context context) throws WGException;
+    }
+
+    /**
+     * Calls a JS-function for each element in the collection
+     * @param function
+     * @throws WGException
+     */
+    public void each(Function function) throws WGException{
+    	SkippingIterator<Context> it = iterator();
+    	while(it.hasNext()){
+    		function.call(it.next());
+    	}
+    }
 
 }
  
