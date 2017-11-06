@@ -2012,11 +2012,10 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      */
 	@Override
     public Object meta(String name) throws WGAPIException {
-
 		return this.meta("content", name);
 	}
 
-	private Object getContentMetaData(String name) throws WGAPIException {
+	private Object getContentMetaData(String name) throws WGException {
 
 		WGContent content = this.content();
 		if (content == null) {
@@ -2037,13 +2036,13 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		else if (name.equals("pagecreated")) {
             return content.getStructEntry().getCreated();
         }
+		else if (name.equals("url")) {
+			return contenturl();
+		}
         else if (name.equals("titlepath")) {
-            if (content.getStructEntry() != null) {
-            return content.getStructEntry().getTitlePath();
-        }
-            else {
-                return "";
-            }
+            if (content.getStructEntry() != null)
+	            return content.getStructEntry().getTitlePath();
+            else return "";
         }
         else if (name.equals("pagetitle")) {
             return content.getStructEntry().getTitle();
@@ -2052,17 +2051,14 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 			return content.getUniqueName();
 		}
 		else if (name.equals("pageuniquename") || name.equals("pagename") || name.equals("pagedocname")) {
-		    if (content.getStructEntry() != null) {
-            return content.getStructEntry().getUniqueName();
-        }
-		    else {
-		        return null;
-		    }
+		    if (content.getStructEntry() != null)
+		    	return content.getStructEntry().getUniqueName();
+		    else return null;
         }
 		else if (name.equals("position")) {
 		    if (content.getStructEntry() != null) {
-			return content.getStructEntry().getPosition();
-		}
+				return content.getStructEntry().getPosition();
+			}
 		    else {
 		        return 0;
 		    }
@@ -2124,8 +2120,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		}
         else if (name.equals("contenttypetitle")) {
             if (content.hasCompleteRelationships()) {
-            return content.getStructEntry().getContentType().getNameForLanguage(getpreferredlanguage());
-        }
+	            return content.getStructEntry().getContentType().getNameForLanguage(getpreferredlanguage());
+	        }
             else {
                 return "";
             }
