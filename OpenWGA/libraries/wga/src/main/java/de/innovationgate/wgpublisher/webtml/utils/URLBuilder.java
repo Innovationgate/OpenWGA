@@ -81,7 +81,7 @@ public class URLBuilder extends de.innovationgate.utils.URLBuilder implements Cl
         
         _wga = wga;
         
-        String varParam = _parameters.get(URLPARAM_VARS);
+        String varParam = (String)_parameters.get(URLPARAM_VARS);
         if (varParam != null) {
             
             VarParamsMap varParams = extractVarParameters(varParam, _wga.getCore());
@@ -180,6 +180,10 @@ public class URLBuilder extends de.innovationgate.utils.URLBuilder implements Cl
         _varParameters.put(name, value);
         return this;
     }
+    public URLBuilder setVarParameter(Map<String,Object> params) {
+        _varParameters.putAll(params);
+        return this;
+    }
     
     /**
      * Removes all var parameters
@@ -190,7 +194,7 @@ public class URLBuilder extends de.innovationgate.utils.URLBuilder implements Cl
     }
     
     @Override
-    protected Map<String, String> getRebuildParameters() {
+    protected Map<String, Object> getRebuildParameters() {
 
         try {
             if (_varParameters.size() > 0) {
@@ -201,7 +205,7 @@ public class URLBuilder extends de.innovationgate.utils.URLBuilder implements Cl
                 byte[] zipped = WGUtils.zipString(xml);
                 String encrypted = _wga.getCore().getSymmetricEncryptionEngine().encryptBase64Web(zipped);
                 
-                Map<String,String> allParameters = new HashMap<String, String>();
+                Map<String,Object> allParameters = new HashMap<String,Object>();
                 allParameters.putAll(super.getRebuildParameters());
                 allParameters.put(WGPDispatcher.URLPARAM_VARS, encrypted);
                 return allParameters;
