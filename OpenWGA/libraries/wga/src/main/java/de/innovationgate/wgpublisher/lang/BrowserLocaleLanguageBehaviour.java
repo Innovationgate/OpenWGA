@@ -99,8 +99,18 @@ public class BrowserLocaleLanguageBehaviour implements LanguageBehaviour, Initia
 	@Override
 	public WGContent webtmlSelectContentForName(WGDatabase db, TMLContext context, String name, boolean isBI) throws WGAPIException {
 
-		return requestSelectContentForName(db, context.getrequest(), name, isBI);
-		
+        if (context.iswebenvironment()) {
+        	return requestSelectContentForName(db, context.getrequest(), name, isBI);
+        }
+        else{
+            // Fifth try: Database default language
+            String defaultLangName = db.getDefaultLanguage();
+            WGContent content = db.getContentByName(name, defaultLangName);
+            if (content != null) {
+                return content;
+            }
+            else return null;
+        }
 	}
 
 	@Override
