@@ -52,6 +52,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.mail.internet.AddressException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -1508,6 +1509,23 @@ public class WGA {
     }
     
     /**
+     * creates a map. Same as createLookupTable() but naming is more intuitive.
+     * @param map
+     * @return New map
+     */
+    public Map<Object,Object> createMap(Map<Object,Object> map) {
+        return new HashMap<Object,Object>(map);
+    }
+    /**
+     * creates an empty map. Same as createLookupTable() but naming is more intuitive.
+     * @return New map
+     */
+    public Map<Object,Object> createMap() {
+        return new HashMap<Object,Object>();
+    }
+    
+    
+    /**
      * Creates a Mail object for sending e-mails.
      * This variant uses the mail configuration of the OpenWGA server.
      * @return A new Mail object
@@ -1525,7 +1543,71 @@ public class WGA {
         }
         
     }
-    
+
+    /**
+     * Creates a Mail object for sending e-mails.
+     * This variant uses the mail configuration of the OpenWGA server.
+     * @param config - a map containing config params for the mail object
+     * @return A new Mail object
+     * @throws UnsupportedEncodingException
+     * @throws UnavailableResourceException
+     */
+    public SmtpMail createMail(Map<String,Object> config) throws UnsupportedEncodingException, WGException {
+
+        WGAMailConfiguration mailConfig = getCore().getMailConfig();
+        if (mailConfig != null){
+        	SmtpMail mail = new SmtpMail(mailConfig);
+        	try{
+                
+                Boolean encodeText = (Boolean)config.get("encodeText");
+                if(encodeText!=null)
+                	mail.setEncodeText(encodeText);
+                else mail.setEncodeText(true);
+
+                String from = (String)config.get("from");
+                if(from!=null)
+                	mail.setFrom(from);
+                
+                Object to = config.get("to");
+                if(to!=null){
+		            if(to instanceof List)
+		            	mail.setTo((List<String>)to);
+		            else mail.setTo((String)to);
+                }
+                
+                Object cc = config.get("cc");
+                if(cc!=null){
+		            if(cc instanceof List)
+		            	mail.setCc((List<String>)cc);
+		            else mail.setCc((String)cc);
+                }
+                
+                Object bcc = config.get("bcc");
+                if(bcc!=null){
+		            if(bcc instanceof List)
+		            	mail.setBcc((List<String>)bcc);
+		            else mail.setBcc((String)bcc);
+                }
+                
+                if(config.get("mimeType")!=null)
+                	mail.setMimeType((String)config.get("mimeType"));
+                if(config.get("subject")!=null)
+                	mail.setSubject((String)config.get("subject"));
+                if(config.get("body")!=null)
+                	mail.setBody((String)config.get("body"));
+        	}
+        	catch(Exception e){
+        		getLog().error("Mail config error", e);
+        		return null;
+        	}
+            return mail;
+        }
+        else {
+            throw new UnavailableResourceException("No mail configuration available on this server");
+        }
+        
+    }
+
     /**
      * Creates a Mail object for sending e-mails.
      * This variant receives host, username and password of the SMTP account.
