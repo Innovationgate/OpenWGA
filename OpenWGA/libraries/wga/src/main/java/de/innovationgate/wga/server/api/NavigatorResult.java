@@ -26,10 +26,12 @@
 package de.innovationgate.wga.server.api;
 
 import de.innovationgate.webgate.api.WGException;
+import de.innovationgate.wga.common.CodeCompletion;
 
 /**
  * The collection result of a navigator
  */
+@CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
 public abstract class NavigatorResult extends CollectionResult {
     
     protected NavigatorResult(WGA wga, NavigatorResult parent) {
