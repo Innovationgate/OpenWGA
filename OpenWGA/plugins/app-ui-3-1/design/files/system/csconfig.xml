@@ -50,10 +50,10 @@
       <uniqueName>de.innovationgate.app-ui-3-1</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>4</minorVersion>
-        <maintenanceVersion>5</maintenanceVersion>
-        <patchVersion>1</patchVersion>
-        <buildVersion>664</buildVersion>
+        <minorVersion>5</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
+        <patchVersion>0</patchVersion>
+        <buildVersion>665</buildVersion>
       </version>
     </id>
     <title>OpenWGA Application UI Interface Library 3.1</title>

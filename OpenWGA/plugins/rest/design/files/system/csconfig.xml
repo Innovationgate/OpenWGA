@@ -19,10 +19,10 @@
       <uniqueName>de.innovationgate.wgaservices-rest</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>4</minorVersion>
-        <maintenanceVersion>5</maintenanceVersion>
-        <patchVersion>1</patchVersion>
-        <buildVersion>664</buildVersion>
+        <minorVersion>5</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
+        <patchVersion>0</patchVersion>
+        <buildVersion>665</buildVersion>
       </version>
     </id>
     <title>OpenWGA Services REST Server</title>
