@@ -133,7 +133,7 @@
 					            //console.log("lookup", data);
 					            if(data.length){
 					            	key_input.val(data[0].value);
-					            	bestValue = data[0].value;
+					            	bestValue = data[0].label;
 					            	surgestion.val(val + bestValue.substr(val.length));
 					            	if(data.length>1){
 					            		popup.html("");
