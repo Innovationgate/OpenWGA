@@ -118,6 +118,7 @@ public class CSConfig {
     public static final String VERSIONCOMPLIANCE_WGA72 = "wga7.2";
     public static final String VERSIONCOMPLIANCE_WGA73 = "wga7.3";
     public static final String VERSIONCOMPLIANCE_WGA74 = "wga7.4";
+    public static final String VERSIONCOMPLIANCE_WGA75 = "wga7.5";
     
     private String initScript = null;
     private String connectionScript = null;
