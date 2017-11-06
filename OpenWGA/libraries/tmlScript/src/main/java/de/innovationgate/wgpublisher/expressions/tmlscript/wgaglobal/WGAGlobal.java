@@ -1056,6 +1056,9 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
             if (args.length == 0) {
                 return get(thisObj).getWga().createMail();
             }
+            if (args.length == 1) {
+                return get(thisObj).getWga().createMail((Map<String,Object>)args[0]);
+            }
             else if (args.length == 3) {
                 Object arg1 = args[0];
                 Object arg2 = args[1];
@@ -1063,7 +1066,7 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
                 return get(thisObj).getWga().createMail(String.valueOf(arg1), String.valueOf(arg2), String.valueOf(arg3));
             }
             else {
-                throw new EvaluatorException("Method get(thisObj).getWga().createMail) needs either no parameters or three string parameters");
+                throw new EvaluatorException("Method WGA.createMail() needs either no parameter, one Map parameter or three string parameters");
             }
         }
         catch (WGException e) {
