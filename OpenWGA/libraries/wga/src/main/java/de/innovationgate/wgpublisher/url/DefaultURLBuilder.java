@@ -246,7 +246,7 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
         if (useLoginParameter && context.content().getDatabase().getSessionContext().isAnonymous() == false) {
             try {
                 de.innovationgate.wgpublisher.webtml.utils.URLBuilder builder = WGA.get(context).urlBuilder(completeUrl);
-                builder.setParameter("login", null);
+                builder.setParameter("login");
                 completeUrl = builder.buildLikeGiven();
             }
             catch (Exception e) {
