@@ -462,6 +462,14 @@ public class URLBuilder implements Cloneable {
 					paramString.append(key);
 					if(o==null)
 						continue;
+					
+					// special handling of INT values:
+					if(o instanceof Double){
+						Double _o = (Double)o;
+						if(_o == _o.intValue()){	// is Integer?
+							o = _o.intValue();
+						}
+					}
 					String v = o.toString();
 					if (_encoding != null)
 	                    v = URIUtil.encodeWithinQuery(v, _encoding);
