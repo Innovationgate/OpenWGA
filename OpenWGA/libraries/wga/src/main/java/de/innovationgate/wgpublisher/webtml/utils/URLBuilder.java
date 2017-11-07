@@ -27,7 +27,6 @@ package de.innovationgate.wgpublisher.webtml.utils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
@@ -38,11 +37,8 @@ import java.util.Map;
 import java.util.Set;
 
 import de.innovationgate.utils.DESEncrypter;
-import de.innovationgate.utils.security.SymmetricEncryptionEngine;
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.utils.XStreamUtils;
-import de.innovationgate.utils.Zipper;
-import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.config.VirtualHost;
 import de.innovationgate.wga.server.api.Database;
@@ -51,7 +47,6 @@ import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGPDispatcher;
 import de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
-import de.innovationgate.wgpublisher.webtml.Root;
 
 /**
  * WGA version of the URLBuilder from WGUtils, including control of some WGA-only features, especially var parameters.
@@ -111,6 +106,16 @@ public class URLBuilder extends de.innovationgate.utils.URLBuilder implements Cl
     public URLBuilder(TMLContext context, URL url) throws WGException, GeneralSecurityException, IOException {
         this(WGA.get(context), url);
     }
+
+    @Override
+ 	public URLBuilder setPath(String path) {
+    	try {
+			super.setPath(path, true);
+		} catch (UnsupportedEncodingException | MalformedURLException e) {
+			e.printStackTrace();
+		}
+    	return this;
+ 	}
     
     /**
      * Reades var parameters from an encrypted var parameter value

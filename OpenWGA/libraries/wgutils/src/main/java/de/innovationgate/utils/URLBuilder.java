@@ -15,6 +15,7 @@
  ******************************************************************************/
 package de.innovationgate.utils;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -314,6 +315,11 @@ public class URLBuilder implements Cloneable {
 	public URLBuilder setPath(String file) {
         _path = file;
 	    return this;
+	}
+	
+	public URLBuilder setPath(String path, boolean decode) throws UnsupportedEncodingException, MalformedURLException {
+		_path = (decode && _encoding!=null) ?  WGUtils.decodeURI(path, _encoding) : path;
+		return this;
 	}
 	
 	/**
