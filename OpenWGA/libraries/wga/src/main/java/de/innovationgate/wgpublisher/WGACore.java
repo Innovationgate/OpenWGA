@@ -1458,7 +1458,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         } 
         
         // Requestinfo based login
-        else if ((!forceRegular || forceRequestBased) && db.getAuthenticationModule() != null && db.getAuthenticationModule() instanceof RequestBasedAuthenticationModule) {
+        else if (request != null && (!forceRegular || forceRequestBased) && db.getAuthenticationModule() != null && db.getAuthenticationModule() instanceof RequestBasedAuthenticationModule) {
             return openContentDBRequestBased(db, request, accessFilter);
         }
         
@@ -1559,7 +1559,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
 
     /**
      * opens a content db based upon request.getRemoteUser and request.getUserPrincipal()
-     * if request.getRemoteUser is 'null', WGDatabase.UNKNOWN_REMOTE_USER is given to the authmodule
+     * if request.getRemoteUser is 'null' and request.getUserPrincipal()!=null, WGDatabase.UNKNOWN_REMOTE_USER is given to the authmodule
      * @param db
      * @param request
      * @return
@@ -1572,13 +1572,13 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         }           
         
         String user = request.getRemoteUser();
+        Principal credentials = request.getUserPrincipal();
+
         if (user == null) {
-        	user = WGDatabase.UNKNOWN_REMOTE_USER;        	
+        	user = credentials==null ? WGDatabase.ANONYMOUS_USER : WGDatabase.UNKNOWN_REMOTE_USER; 
         }
         
-        Principal credentials = request.getUserPrincipal();
-        
-        db.openSession(user, credentials, accessFilter, request);
+      	db.openSession(user, credentials, accessFilter, request);
         
         if (db.isSessionOpen()) {
             updateLoginInfo(db, request, DBLoginInfo.AuthType.REQUEST);
@@ -1586,8 +1586,6 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         
         return prepareDB(db, request);
 	}
-
-
 
     private WGDatabase openContentDBCertAuth(WGDatabase db, HttpServletRequest request, String accessFilter) throws WGException {
 
