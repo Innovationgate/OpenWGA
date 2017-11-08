@@ -28,6 +28,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletRequest;
+
 import org.dom4j.Node;
 
 import de.innovationgate.ext.org.mozilla.javascript.ConsString;
@@ -45,6 +47,8 @@ import de.innovationgate.wgpublisher.webtml.portlet.TMLPortlet;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 import de.innovationgate.wgpublisher.webtml.utils.TMLPageImpl;
 import de.innovationgate.wgpublisher.webtml.utils.TMLUserProfile;
+
+import de.innovationgate.wgpublisher.filter.WGAFilter.RequestWrapper;
 
 public class RhinoWrapFactory extends WrapFactory {
     
@@ -83,7 +87,16 @@ public class RhinoWrapFactory extends WrapFactory {
             }
             
         });
-        
+
+        _wrapMethods.put(RequestWrapper.class, new WrapMethod<RequestWrapper>() {
+
+            @Override
+            public Scriptable wrap(Object obj, Scriptable scope) {
+                return new ServletRequestWrapper(scope, (RequestWrapper) obj);
+            }
+            
+        });
+
         _wrapMethods.put(TMLPortlet.class, new WrapMethod<TMLPortlet>() {
 
             @Override
