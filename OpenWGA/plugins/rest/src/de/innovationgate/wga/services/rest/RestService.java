@@ -16,6 +16,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.DBLoginInfo;
+import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGPRequestPath;
 import de.innovationgate.wgpublisher.services.WGAWebService;
 
@@ -95,6 +96,7 @@ public class RestService implements WGAWebService {
             DBLoginInfo loginInfo = DBLoginInfo.createFromHttpCredentials(credentials);
             if (loginInfo != null) {
                 request.setAttribute(WGPRequestPath.REQATTRIB_HTTPLOGIN, loginInfo);
+                request.setAttribute(WGACore.ATTRIB_FORCEREGULARLOGIN, true);
             }
         }
         
