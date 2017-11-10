@@ -130,9 +130,6 @@ public class WGPDeployer implements WGACoreEventListener {
             out.write(" sourceline=\"");
             out.write(String.valueOf(lineNumber));
             out.write("\"");
-            out.write(" uid=\"");
-            out.write(UIDGenerator.generateUID());
-            out.write("\"");
             
             for (String att : additionalAtts) {
                 out.write(att);

@@ -83,8 +83,6 @@ public class Inline extends Option {
         
     }
     
-
-    
     protected Object retrieveOptionValue(Object tagResult) throws WGException {
         
         
@@ -100,62 +98,6 @@ public class Inline extends Option {
         			getTMLContext().getDesignDBKey(), 
         			portlet != null ? portlet.getportletkey() : null, 
         			getTMLContext().option(Base.OPTION_MODULE_CONTROLLER));
-        
-    }
-
-    @SuppressWarnings("unused")
-    private String getRawTagContent(WGTMLModule mod) throws WGException {
-        
-        //TODO: Not functional yet. Tried to extract the tag content from the module code, se we could set back bodycontent of this tag to JSP, therefor avoid cascading issues.
-        // However that would need to implement some JSP parsing functionality which is beyond trivial if it should work in all situations. Refraining from this for now. 
-        
-        String code = mod.getCode();
-        int uidPos = code.indexOf("uid=\"" + getUid() + "\"");
-        if (uidPos == -1) {
-            throw new TMLException("Could not localize inline tag content: UID of inline tag not found", true);
-        }
-        
-        int cascadeLevel = 0;
-        int endPos = -1;
-        
-        // Find end of start tag.
-        int startPos = -1;
-        
-        // Inside code: Find the correct tml:inline end tag
-        while (true) {
-            
-            uidPos = code.indexOf("tml:inline", uidPos);
-            if (uidPos == -1) {
-                break;
-            }
-            
-            // A cascaded tml:inline: Go up one cascadeLevel
-            if (uidPos > 0 && code.substring(uidPos - 1, uidPos).equals("<")) {
-                cascadeLevel++;
-            }
-            
-            // tml:inline close tag: Go down cascadeLevel or end search
-            else if (uidPos > 1 && code.substring(uidPos-2, uidPos).equals("</")) {
-                if (cascadeLevel > 0) {
-                    cascadeLevel--;
-                }
-                else {
-                    endPos = uidPos-2;
-                    break;
-                }
-            }
-            
-            uidPos++;
-            
-        }
-        
-        
-        
-        if (endPos == -1) {
-            throw new TMLException("Could not localize inline tag content: Unable to find end tag of inline tag", true);
-        }
-        return code.substring(startPos, endPos);
-                
         
     }
     

@@ -556,32 +556,31 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     private boolean mayExecute() throws WGException {
 
         String ifTerm = getIf();
+        String unlessTerm = getUnless();
+        
         if (ifTerm != null) {
             DynamicAttribute ifEquals = getStatus().dynamicOptions.get("if_equals");
             DynamicAttribute ifIn = getStatus().dynamicOptions.get("if_in");
-            if (!evaluateItemConditionAttribute(ifTerm, ifEquals, ifIn)) {
+            if (!evaluateItemConditionAttribute(ifTerm, ifEquals, ifIn))
                 return false;
-            }
-        }
+    	}
         
-        String unlessTerm = getUnless();
         if (unlessTerm != null) {
             DynamicAttribute unlessEquals = getStatus().dynamicOptions.get("unless_equals");
             DynamicAttribute unlessIn = getStatus().dynamicOptions.get("unless_in");
-            if (evaluateItemConditionAttribute(unlessTerm, unlessEquals, unlessIn)) {
+            if (evaluateItemConditionAttribute(unlessTerm, unlessEquals, unlessIn))
                 return false;
-            }
         }
         
         return true;
         
     }
 
-    /**
+	/**
      * @param condition
      * @param equalsAttribute
      * @param inAttribute
-     * @return
+     * @return true|false
      * @throws WGException
      * @throws WGIllegalArgumentException
      */
@@ -638,39 +637,6 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
         }
         
         // We want the items from the condition to evaluate to boolean true
-        else {
-            if (new BooleanItemExpression(condition).isTrue(getTMLContext()) == false) {
-                return false;
-            }
-        }
-        
-        return true;
-    }
-    
-    protected boolean evaluateItemInConditionAttribute(String condition, DynamicAttribute inAttribute) throws WGException, WGIllegalArgumentException {
-        
-        // We want to equal the items from the condition to values
-        if (inAttribute != null) {
-            
-            // Equality to a list of item expressions
-            if (inAttribute.getValueType() == DynamicAttributeValueType.ITEM_EXPRESSION) {
-                if (new BooleanItemExpression(condition, inAttribute.getValue()).isTrue(getTMLContext()) == false) {
-                    return false;
-                }
-            }
-            
-            // Equality to a constant string value
-            else {
-                if (new BooleanItemExpression(condition).equalsValue(getTMLContext(), inAttribute.getValue()) == false) {
-                    return false;
-                }
-            } 
-                
-            
-            
-        }
-        
-        // We want the items from the condition to be true
         else {
             if (new BooleanItemExpression(condition).isTrue(getTMLContext()) == false) {
                 return false;
@@ -2203,15 +2169,6 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
         this.appendvar = appendvar;
     }
 
-    public String getUid() {
-        return uid;
-    }
-
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-
     protected String buildDynamicHtmlAttributes() throws WGException {
         
         Map<String,DynamicAttribute> dynAtts = getStatus().dynamicOptions;
@@ -2333,7 +2290,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     public void setIf(String if1) {
         _if = if1;
     }
-
+    
     public String getUnless() {
         return getTagAttributeValue("unless", _unless, null);
     }
