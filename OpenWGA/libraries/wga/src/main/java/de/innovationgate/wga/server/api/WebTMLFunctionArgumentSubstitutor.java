@@ -215,7 +215,32 @@ public class WebTMLFunctionArgumentSubstitutor implements FunctionArgumentSubsti
             }
             
         }
-        
+        else if(argumentName.startsWith("$is_")) {
+
+            if (!_wga.isTMLContextAvailable() || !_wga.tmlcontext().iswebenvironment()) {
+                return null;
+            }
+
+        	String option = argumentName.substring(4);
+        	switch (option) {
+				case "selected":
+					return _wga.tmlcontext().isselected();
+				case "firstloop":
+					return _wga.tmlcontext().isfirstloop();
+				case "lastloop":
+					return _wga.tmlcontext().islastloop();
+				case "root":
+					return _wga.tmlcontext().isroot();
+				case "maindocument":
+					return _wga.tmlcontext().ismaindocument();
+				case "browserinterface":
+					return _wga.tmlcontext().isbrowserinterface();
+				case "anonymous":
+					return _wga.tmlcontext().isanonymous();
+				default:
+					return null;
+			}
+        }
         
         return null;
     }
