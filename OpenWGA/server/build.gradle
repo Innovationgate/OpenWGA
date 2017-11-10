@@ -24,6 +24,12 @@ task writeVersion << {
     ant.writeVersion(target:"server/build/extra/WEB-INF/wgabuild.properties", version: rootProject.version)
 }
 
+task createTld << {
+    ant.taskdef(name:"Tml2Tld", classname:"de.innovationgate.ant.Tml2TldTask", classpath: configurations.compileClasspath.asPath)
+    ant.Tml2Tld(tml:"tmlTagDefinitions.xml", tld:"build/extra/WEB-INF/tlds/webtml.tld")
+}
+
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -61,4 +67,4 @@ buildPlugins.dependsOn project(":plugin-rest").tasks.buildPlugin
 buildPlugins.dependsOn project(":plugin-cs-maintenance").tasks.buildPlugin
 buildPlugins.dependsOn project(":plugin-app-ui-3-1").tasks.buildPlugin
 
-war.dependsOn writeVersion, buildPlugins
+war.dependsOn writeVersion, buildPlugins, createTld
