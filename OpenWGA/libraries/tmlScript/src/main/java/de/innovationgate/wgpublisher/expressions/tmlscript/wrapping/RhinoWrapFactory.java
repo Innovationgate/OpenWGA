@@ -97,6 +97,16 @@ public class RhinoWrapFactory extends WrapFactory {
             
         });
 
+        _wrapMethods.put(HashMap.class, new WrapMethod<HashMap>() {
+
+            @Override
+            public Scriptable wrap(Object obj, Scriptable scope) {
+                return new MapWrapper(scope, (HashMap) obj);
+            }
+            
+        });
+
+        
         _wrapMethods.put(TMLPortlet.class, new WrapMethod<TMLPortlet>() {
 
             @Override
