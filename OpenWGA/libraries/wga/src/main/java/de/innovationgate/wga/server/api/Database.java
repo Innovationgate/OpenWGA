@@ -153,6 +153,7 @@ public class Database {
     public QueryResult query(String queryString, Map<String,Object> options) throws WGException {
     	Map<String,Object> params = new HashMap<String,Object>();
     	String queryType = _db.getAttribute(WGACore.DBATTRIB_QUERY_DEFAULT).toString();
+    	Context ctx = null;
     	if(options!=null){
 	    	for(String key: options.keySet()){
 	    		if(key.startsWith("p_")){
@@ -163,9 +164,17 @@ public class Database {
 	    			queryType = (String)options.get(key);
 	    			options.remove(key);
 	    		}
+	    		else if(key.equals("context")){
+	    			Object value = options.get(key);
+	    			if(value instanceof Context)
+	    				ctx = (Context)value;
+	    			else if(value instanceof String)
+	    				ctx = _wga.tmlcontext().context((String)value);
+	    			options.remove(key);
+	    		}
 	    	}
     	}
-        return query(queryType, queryString, options, params);
+        return query(queryType, queryString, options, params, ctx);
     }
 
     /**
