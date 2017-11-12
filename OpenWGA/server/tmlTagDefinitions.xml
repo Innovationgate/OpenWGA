@@ -456,6 +456,12 @@
       <name>base</name>
       <attributes>
         <attribute>
+        	<name>wrap</name>
+			<required>false</required>
+			<values/>
+			<valueHelpEnabled>false</valueHelpEnabled>
+        </attribute>
+        <attribute>
         	<name>if</name>
 			<required>false</required>
 			<values/>

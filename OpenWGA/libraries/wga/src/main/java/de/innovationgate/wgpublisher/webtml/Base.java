@@ -73,6 +73,7 @@ import de.innovationgate.wgpublisher.expressions.ExpressionEngineFactory;
 import de.innovationgate.wgpublisher.expressions.ExpressionResult;
 import de.innovationgate.wgpublisher.websockets.PageConnection;
 import de.innovationgate.wgpublisher.websockets.TMLPageWebSocket;
+import de.innovationgate.wgpublisher.webtml.Base.DynamicAttribute;
 import de.innovationgate.wgpublisher.webtml.actions.TMLAction;
 import de.innovationgate.wgpublisher.webtml.actions.TMLActionCallParameters;
 import de.innovationgate.wgpublisher.webtml.actions.TMLActionLink;
@@ -135,7 +136,9 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
                 String resolvedValue = getValue();
             
                 if (_valueType == DynamicAttributeValueType.ITEM_EXPRESSION) {
-                    return tmlContext.item(resolvedValue);
+                	if(resolvedValue.equals(resolvedValue.toUpperCase()))
+                		return tmlContext.meta(resolvedValue);
+                	else return tmlContext.item(resolvedValue);
                 }
                 else {
                     return resolvedValue;
@@ -248,8 +251,9 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     protected String encode = null;
     private String sourceline = null;
     private String trim = null;
-    private String uid = null;
+	private String _wrap = null;
 
+    
     // Tags environment
     
     public void setResult(Object result) {
@@ -1194,19 +1198,13 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
         
     }
 
-    public void tmlStartTag() throws TMLException, WGException {
-    }
+    public void tmlStartTag() throws TMLException, WGException {};
 
-;
+    public void tmlAfterBody() throws TMLException, WGException {};
 
-    public void tmlAfterBody() throws TMLException, WGException {
-    };
+    public void tmlInitBody() throws TMLException, WGException {};
 
-    public void tmlInitBody() throws TMLException, WGException {
-    };
-
-    public void tmlEndTag() throws TMLException, WGException {
-    };
+    public void tmlEndTag() throws TMLException, WGException {};
 
     /**
      * Gets the context
@@ -1309,8 +1307,16 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     public String getResultString(boolean includeFormatting) {
 
         BaseTagStatus status = getStatus();
-        return status.getResultString(includeFormatting, stringToBoolean(getTrim()));
-
+        String result = status.getResultString(includeFormatting, stringToBoolean(getTrim())); 
+        
+        if(result.length()>0 && _wrap!=null){
+        	try {
+        		return "<" + _wrap + buildDynamicHtmlAttributes("wrap") + ">" + result + "</" + _wrap + ">";
+			} catch (WGException e) {
+				e.printStackTrace();
+			}
+        }
+        return result;
     }
 
 
@@ -2170,6 +2176,10 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     }
 
     protected String buildDynamicHtmlAttributes() throws WGException {
+    	return buildDynamicHtmlAttributes("html");
+    }
+    
+    protected String buildDynamicHtmlAttributes(String prefix) throws WGException {
         
         Map<String,DynamicAttribute> dynAtts = getStatus().dynamicOptions;
         if (dynAtts == null) {
@@ -2178,7 +2188,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
         
         Map<String,String> htmlAtts = new HashMap<String,String>();
         for (DynamicAttribute att : dynAtts.values()) {
-            if (att.getPrefix().equals("html")) {
+            if (att.getPrefix().equals(prefix)) {
                 Object value = att.getDynamicValue(getTMLContext());
                 if (value != null) {
                     htmlAtts.put(att.getBaseName(), String.valueOf(value));
@@ -2257,7 +2267,6 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
 
     public void defaultSetDynamicAttribute(List<String> prefixes, String uri, String localName, Object value) throws JspException {
         
-        
         for (String prefix : prefixes) {
             if (localName.startsWith(prefix + "_") || localName.startsWith(prefix + "-")) {
 
@@ -2274,12 +2283,10 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
                 
                 dynAtts.put(prefix + "_" + baseName, new DynamicAttribute(localName, prefix, baseName, String.valueOf(value), divider == '-' ? DynamicAttributeValueType.ITEM_EXPRESSION : DynamicAttributeValueType.STRING));
                 return;
-
-                
             }
         }
         
-        getCore().getLog().error("WebTML-Attribute '" + localName + "' is unknown");
+        getCore().getLog().warn("Attribute '" + localName + "' is unknown for TML tag <tml:" + getTagName() + "> and will be ignored");
 
     }
 
@@ -2455,6 +2462,15 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     }
 
     protected List<String> getDynamicAttributePrefixes() {
-        return WGUtils.list("if", "unless");
+        return WGUtils.list("wrap", "if", "unless");
     }
+
+
+    public String getWrap(){
+		return _wrap;
+    }
+    public void setWrap(String wrap){
+    	_wrap = wrap;
+    }
+
 }
