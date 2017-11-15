@@ -702,7 +702,7 @@ public class SystemContainerManager implements WGDatabaseEventListener, WGDesign
                     File file = files[i];
                     if (file.getName().endsWith(".jar")) {
                         try {
-                            jars.add(file.toURL());
+                            jars.add(file.toURI().toURL());
                         }
                         catch (MalformedURLException e) {
                             _log.error("Error creating URL for custom jar", e);
