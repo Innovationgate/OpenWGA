@@ -2202,7 +2202,19 @@ WGA.websocket = {
 				WGA.websocket.startService();
 			}, time);
 		},
-					
+		
+		/**
+		 * Calls a method on a (managed) TMLScript global on the server via Websockets
+		 * Usage:
+		 * 	WGA.websocket.callGlobal(name, method, params).then(success_function, error_function)
+		 * 
+		 * Sample:
+		 * 	WGA.websocket.callGlobal("Chat", "post", {message: "Hello World"}).then(function(response){
+		 * 		console.log("response", response);
+		 * })
+		 * see #00005058
+		 */
+		
 		callGlobal: function(global, method, params) {			
 			
 			if(!global || !method)
