@@ -41,6 +41,7 @@ import de.innovationgate.webgate.api.WGHierarchicalDatabase;
 import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wgpublisher.webtml.portlet.PortletEvent;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
+import de.innovationgate.wgpublisher.webtml.utils.TagInfo;
 
 /**
  * The Context is the base object of the WebTML runtime. It combines two purposes:
@@ -697,12 +698,20 @@ public interface Context {
     /**
      * Retrieves a WebTML tag information
      * @param tagId id of the tag to retrieve the info from
-     * @param name Nmae of the info field
+     * @param name Name of the info field
      * @throws WGAPIException
      */
     @CodeCompletion(preferredCase="tagInfo")
     public abstract Object taginfo(String tagId, String name) throws WGAPIException;
     
+    /**
+     * Retrieves a WebTML tag information as Object
+     * @param tagId id of the tag to retrieve the info from
+     * @throws WGAPIException
+     */
+    @CodeCompletion(preferredCase="tagInfo")
+    public abstract TagInfo taginfo(String tagId) throws WGAPIException;
+
     /**
      * Returns a TMLForm object representing the WebTML form of the given ID
      * @param id id of the form

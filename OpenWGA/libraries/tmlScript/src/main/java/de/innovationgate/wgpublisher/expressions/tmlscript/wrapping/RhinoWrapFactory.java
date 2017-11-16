@@ -47,7 +47,7 @@ import de.innovationgate.wgpublisher.webtml.portlet.TMLPortlet;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 import de.innovationgate.wgpublisher.webtml.utils.TMLPageImpl;
 import de.innovationgate.wgpublisher.webtml.utils.TMLUserProfile;
-
+import de.innovationgate.wgpublisher.webtml.utils.TagInfo;
 import de.innovationgate.wgpublisher.filter.WGAFilter.RequestWrapper;
 
 public class RhinoWrapFactory extends WrapFactory {
@@ -106,6 +106,14 @@ public class RhinoWrapFactory extends WrapFactory {
             
         });
 
+        _wrapMethods.put(TagInfo.class, new WrapMethod<TagInfo>() {
+
+            @Override
+            public Scriptable wrap(Object obj, Scriptable scope) {
+                return new TagInfoWrapper(scope, (TagInfo) obj);
+            }
+            
+        });
         
         _wrapMethods.put(TMLPortlet.class, new WrapMethod<TMLPortlet>() {
 
