@@ -2409,26 +2409,25 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      * @see de.innovationgate.wgpublisher.webtml.utils.Context#taginfo(java.lang.String)
      */
 	@Override
-    public TagInfo taginfo(String tagId) throws WGAPIException {
+    public TagInfo tag(String tagId) throws WGAPIException {
 	    BaseTagStatus tag = _designContext.getTag();
-		if (tag == null) {
-			return null;
-		}
+	    
+		if (tag == null)
+			getlog().error("taginfo: no TML environment");
 
-		if (tagId == null) {
-			this.setLastError("taginfo: No WebTML tag environment available");
-			return null;
+		if (tag!=null && tagId != null) {
+			tag = tag.getTagStatusById(tagId);
+			if (tag == null) {
+				String msg = "taginfo: Could not find tag with id = " + tagId;
+				getlog().error(msg);
+				this.setLastError(msg);
+			}
 		}
-
-		BaseTagStatus refTag = tag.getTagStatusById(tagId);
-		if (refTag != null) {
-			return  new TagInfo(refTag);
-		}
-		else {
-			getlog().error("Could not find tag with id = " + tagId);
-			this.setLastError("Could not find tag with id = " + tagId);
-			return null;
-		}
+		return  new TagInfo(tag);
+	}
+	
+	public TagInfo tag() throws WGAPIException {
+		return tag(null);
 	}
 	
 	/* (non-Javadoc)

@@ -709,8 +709,8 @@ public interface Context {
      * @param tagId id of the tag to retrieve the info from
      * @throws WGAPIException
      */
-    @CodeCompletion(preferredCase="tagInfo")
-    public abstract TagInfo taginfo(String tagId) throws WGAPIException;
+    @CodeCompletion(preferredCase="tag")
+    public abstract TagInfo tag(String tagId) throws WGAPIException;
 
     /**
      * Returns a TMLForm object representing the WebTML form of the given ID
