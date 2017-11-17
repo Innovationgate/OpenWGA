@@ -2434,6 +2434,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      * @see de.innovationgate.wgpublisher.webtml.utils.Context#taginfo(java.lang.String, java.lang.String)
      */
 	@Override
+	@Deprecated
     public Object taginfo(String tagId, String name) throws WGAPIException {
 		
 	    BaseTagStatus tag = _designContext.getTag();

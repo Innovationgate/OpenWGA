@@ -697,11 +697,13 @@ public interface Context {
     
     /**
      * Retrieves a WebTML tag information
+     * @Deprecated use tag(id).getInfo() instead
      * @param tagId id of the tag to retrieve the info from
      * @param name Name of the info field
      * @throws WGAPIException
      */
     @CodeCompletion(preferredCase="tagInfo")
+    @Deprecated
     public abstract Object taginfo(String tagId, String name) throws WGAPIException;
     
     /**
@@ -711,6 +713,8 @@ public interface Context {
      */
     @CodeCompletion(preferredCase="tag")
     public abstract TagInfo tag(String tagId) throws WGAPIException;
+    @CodeCompletion(preferredCase="tag")
+    public abstract TagInfo tag() throws WGAPIException;
 
     /**
      * Returns a TMLForm object representing the WebTML form of the given ID
