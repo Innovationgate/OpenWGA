@@ -33,7 +33,7 @@ public class TagInfoWrapper extends NativeJavaObject {
 		}
 		else {
 			try {
-				return Context.javaToJS(_info.get(arg0), arg1);
+				return Context.javaToJS(_info.getInfo(arg0), arg1);
 			} catch (WGAPIException e) {
 				e.printStackTrace();
 				return null;
