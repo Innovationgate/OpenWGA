@@ -245,7 +245,7 @@
 				return doc.getContentKey(); 
 		</tml:script>",
 		key:structkey,
-		title:"xxx<tml:script>return _Struct.getContentTitleJsEncoded()</tml:script>",
+		title:"<tml:script>return _Struct.getContentTitleJsEncoded()</tml:script>",
 		parent: parentkey,
 		area: "<tml:script>return document.getArea().getName()</tml:script>",
 		isInTemplateArea: <tml:script expression="_Area.isTemplateArea()"/>,
