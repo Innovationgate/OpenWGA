@@ -90,7 +90,7 @@ public class App extends Database {
     public Object getGlobal(String name) throws WGException {
         TMLScriptGlobal global = _wga.getCore().getTmlscriptGlobalRegistry().getGlobal(name, db());
         if (global != null) {
-            return global.getRef();
+            return global.provide(_wga);
         }
         else {
             return null;
