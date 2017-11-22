@@ -71,7 +71,14 @@ public abstract class AbstractWebSocket {
     public static final String SESSIONPROP_SOCKET = ("socket");
     private Session _session;
     private ScopeObjectRegistry _scopeObjectRegistry;
+
+    private Queue<JsonObject> _bufferedMessages = new ConcurrentLinkedQueue<>();
+    private ScheduledExecutorService _bufferedMessagesSendingService = Executors.newSingleThreadScheduledExecutor();
     
+    public AbstractWebSocket() {
+        super();
+    }
+
     public static final AbstractWebSocket getFromSession(Session session) {
         return (AbstractWebSocket) session.getUserProperties().get(AbstractWebSocket.SESSIONPROP_SOCKET);
     }
@@ -86,13 +93,7 @@ public abstract class AbstractWebSocket {
         _scopeObjectRegistry = new ScopeObjectRegistry(ObjectScope.WEBSOCKET, "WebSocket session " + session.getId(), new NoopScopeObjectContextCreator());
     }
 
-    private Queue<Object> _bufferedMessages = new ConcurrentLinkedQueue<>();
-    private ScheduledExecutorService _bufferedMessagesSendingService = Executors.newSingleThreadScheduledExecutor();
-    public AbstractWebSocket() {
-        super();
-    }
-
-    protected String handleClientTextMessage(WGA wga, String dbKey, String messageStr) {
+    protected JsonObject handleClientTextMessage(WGA wga, String dbKey, String messageStr) {
         String callId = null;
         try {
         
@@ -118,11 +119,11 @@ public abstract class AbstractWebSocket {
         }
     }
 
-    protected String buildErrorResponse(String callId, String errorMsg) {
+    protected JsonObject buildErrorResponse(String callId, String errorMsg) {
         return buildErrorResponse(callId, errorMsg, null);
     }
 
-    protected String buildErrorResponse(String callId, String errorMsg, Throwable t) {
+    protected JsonObject buildErrorResponse(String callId, String errorMsg, Throwable t) {
         JsonObject rv = buildResponse(callId, false);
         rv.addProperty("message", errorMsg);
         if (t != null) {
@@ -133,7 +134,7 @@ public abstract class AbstractWebSocket {
             }
         }
         
-        return rv.toString();
+        return rv;
     }
 
     protected JsonObject buildResponse(String callId, boolean success) {
@@ -156,7 +157,7 @@ public abstract class AbstractWebSocket {
      */
     protected abstract List<ObjectScope> getAllowedGlobalScopes();
 
-    private String callGlobal(WGA wga, String callId, String dbKey, JsonObject msg) throws WGException {
+    private JsonObject callGlobal(WGA wga, String callId, String dbKey, JsonObject msg) throws WGException {
     
         try {
             String globalName = msg.get("global").getAsString();
@@ -219,7 +220,7 @@ public abstract class AbstractWebSocket {
                     else {
                         rv.add("data", new Gson().toJsonTree(result));
                     }
-                    return rv.toString();
+                    return rv;
                 }
                 return null;
             }
@@ -263,8 +264,7 @@ public abstract class AbstractWebSocket {
                 
     }
 
-    public synchronized void doSend(Object msgObj, boolean async) {
-        
+    public synchronized void doSend(JsonObject msgObj, boolean async) {
     
         try {
             if (!_session.isOpen()) {
@@ -304,7 +304,7 @@ public abstract class AbstractWebSocket {
     private void sendBufferedMessages() {
         
         while (true) {
-            Object msg = _bufferedMessages.poll();
+        	JsonObject msg = _bufferedMessages.poll();
             if (msg != null) {
                 doSend(msg, false);
                 Thread.yield();

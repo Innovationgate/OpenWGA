@@ -251,9 +251,15 @@ public class TMLPageWebSocket extends AbstractWebSocket implements WebSocket {
     
 
     @OnMessage
+    public void receiveMessage(String messageStr) {
+    	JsonObject result = handleClientTextMessage(WGA.get(getSession(), _httpSession), _pageConnection.getDbKey(), messageStr);
+        doSend(result, true);
+    }
+    /*
     public String receiveMessage(String messageStr) {
         return handleClientTextMessage(WGA.get(getSession(), _httpSession), _pageConnection.getDbKey(), messageStr);
     }
+    */
     
 
     @Override

@@ -219,8 +219,9 @@ public class IndependentWebSocket extends AbstractWebSocket implements WebSocket
     
 
     @OnMessage
-    public String receiveMessage(@PathParam("dbkey") String dbKey, String messageStr) {
-        return handleClientTextMessage(WGA.get(getSession()), dbKey, messageStr);
+    public void receiveMessage(@PathParam("dbkey") String dbKey, String messageStr) {
+    	JsonObject result = handleClientTextMessage(WGA.get(getSession()), dbKey, messageStr);
+        doSend(result,  true);
     }
 
     @Override
