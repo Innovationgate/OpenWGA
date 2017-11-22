@@ -473,7 +473,7 @@ public class WGPDeployer implements WGACoreEventListener {
             String completeCode = buildTMLCode(tmlLib, "Inline " + inlineName + " of " + tmlLib.getName() + " (" + tmlLib.getMediaKey() + ")", layoutKey, code);
 
             resourceName = tmlLib.getName().toLowerCase();
-            LOG.info("Deploying inline " + inlineName + " of tml " + mediaKey + "/" + resourceName + " (" + ref.getDesignProviderReference().toString() + ")");
+            LOG.debug("Deploying inline " + inlineName + " of tml " + mediaKey + "/" + resourceName + " (" + ref.getDesignProviderReference().toString() + ")");
             return mapAndDeployLayout(tmlLib, layoutKey, completeCode);
         }
         catch (Exception e) {
