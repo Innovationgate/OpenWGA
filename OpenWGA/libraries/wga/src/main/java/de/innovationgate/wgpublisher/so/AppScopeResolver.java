@@ -28,6 +28,7 @@ package de.innovationgate.wgpublisher.so;
 import java.util.Collections;
 import java.util.List;
 
+import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
@@ -40,7 +41,12 @@ public class AppScopeResolver implements ScopeResolver {
     
     @Override
     public ScopeObjectRegistry resolveObjectRegistry(final WGA wga, DesignResourceReference ref) throws WGException {
-        return ((ScopeObjectRegistry) wga.app().db().getAttribute(WGACore.DBATTRIB_SCOPEOBJECTREGISTRY));
+    	WGDatabase db;
+    	String appkey = ref.getDesignApp();
+    	if(appkey!=null)	// should normaly not happen bc. of the way the DesignResourceReference is created.
+    		db = wga.db(appkey);
+    	else db=wga.app().db();
+        return ((ScopeObjectRegistry) db.getAttribute(WGACore.DBATTRIB_SCOPEOBJECTREGISTRY));
     }
     
     
