@@ -82,7 +82,7 @@ public enum ObjectScope {
         CALL(new CallScopeResolver()),
         
         /**
-         * There will be one scope object for every individual WebTML portlet. The current portlet of the WebTML environment ist used.
+         * There will be one scope object for every individual WebTML portlet. The current portlet of the WebTML environment is used.
          */
         PORTLET(new PortletScopeResolver()),
         
@@ -92,7 +92,7 @@ public enum ObjectScope {
         PORTLETPATH(new PortletPathScopeResolver()),
         
         /**
-         * There will be one scope object for every individual WebTML form.  The current form of the WebTML environment ist used.
+         * There will be one scope object for every individual WebTML form.  The current form of the WebTML environment is used.
          */
         @CodeCompletion
         FORM(new FormScopeResolver()),
