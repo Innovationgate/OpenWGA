@@ -46,7 +46,9 @@ import de.innovationgate.wgpublisher.webtml.utils.TMLPageImpl;
 
 public class ApplicationEvent extends Event implements Serializable {
     
-    public static class Builder implements ApplicationEventBuilder {
+	private static final long serialVersionUID = 1L;
+
+	public static class Builder extends ApplicationEventBuilder {
         
         private ApplicationEventPath _eventPath;
         private App _app;
@@ -101,26 +103,26 @@ public class ApplicationEvent extends Event implements Serializable {
          */
         @Override
         public void fire() throws WGException {
-            doFire(Event.Scope.CLUSTER);
+            doFire(Event.Scope.CLUSTER, true);
         }
         
         /* (non-Javadoc)
          * @see de.innovationgate.wgpublisher.events.ApplicationEventBuilder#fireOnLocalServer()
          */
         @Override
-        public void fireOnLocalServer() throws WGException {
-            doFire(Event.Scope.SERVER);
+        public void fireOnLocalServer(boolean async) throws WGException {
+            doFire(Event.Scope.SERVER, async);
         }
         
         /* (non-Javadoc)
          * @see de.innovationgate.wgpublisher.events.ApplicationEventBuilder#fireOnSession()
          */
         @Override
-        public void fireOnSession() throws WGException {
-            doFire(Event.Scope.SESSION);
+        public void fireOnSession(boolean async) throws WGException {
+            doFire(Event.Scope.SESSION, async);
         }
         
-        private void doFire(final Event.Scope eventScope) throws WGException {
+        private void doFire(final Event.Scope eventScope, boolean async) throws WGException {
             
             String sessionId = _wga.session().isAvailable() ? _wga.session().getJavaHttpSession().getId() : null;
             Map descriptifiedParams = _wga.tmlscript().descriptify(_params, Map.class, new DescriptificationConfig().convertObjectsToJSON());
@@ -128,6 +130,11 @@ public class ApplicationEvent extends Event implements Serializable {
             final ApplicationEvent event = new ApplicationEvent(_eventPath.getApplicationEventHierarchy(), _app.getDbKey(), _app.db().getRevisionObject(), sessionId, descriptifiedParams, eventScope);
           	event.setSource(_windowId);
             
+          	if(!async){
+          		_wga.getCore().getEventManager().executeEvent(_eventPath, event, true);
+          		return;
+          	}
+          	
             Callable<Object> r = new Callable<Object>() {
                 @Override
                 public Object call() throws Exception {
@@ -138,14 +145,14 @@ public class ApplicationEvent extends Event implements Serializable {
                             @Override
                             public void consume(Event event, List<Object> results) throws WGException {
                                 for (String eventName : _eventsToFireOnResult) {
-                                    ((Builder) WGA.get().app(event.getDatabaseKey()).createEvent(eventName).param("results", results)).doFire(eventScope);
+                                    ((Builder) WGA.get().app(event.getDatabaseKey()).createEvent(eventName).param("results", results)).doFire(eventScope, true);
                                 }
                             }
                         };
                         
                     }
                     
-                    _wga.getCore().getEventManager().executeAsyncEvent(_eventPath, event, consumer);
+                   	_wga.getCore().getEventManager().executeAsyncEvent(_eventPath, event, consumer);
                     return null;
                 }
             };

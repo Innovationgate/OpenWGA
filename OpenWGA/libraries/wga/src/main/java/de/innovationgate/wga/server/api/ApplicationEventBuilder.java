@@ -29,7 +29,7 @@ import java.util.Map;
 
 import de.innovationgate.webgate.api.WGException;
 
-public interface ApplicationEventBuilder {
+public abstract class ApplicationEventBuilder {
 
     public abstract ApplicationEventBuilder params(Map<Object, Object> params);
 
@@ -39,8 +39,14 @@ public interface ApplicationEventBuilder {
 
     public abstract void fire() throws WGException;
 
-    public abstract void fireOnLocalServer() throws WGException;
-
-    public abstract void fireOnSession() throws WGException;
+    public abstract void fireOnLocalServer(boolean async) throws WGException;
+    public void fireOnLocalServer() throws WGException{
+    	fireOnLocalServer(true);
+    }
+    
+    public abstract void fireOnSession(boolean async) throws WGException;
+    public  void fireOnSession() throws WGException{
+    	fireOnSession(true);
+    }
 
 }

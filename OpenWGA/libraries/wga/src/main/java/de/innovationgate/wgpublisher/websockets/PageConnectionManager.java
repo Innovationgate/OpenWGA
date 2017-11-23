@@ -129,7 +129,7 @@ public class PageConnectionManager {
 			WGA.get(session).app(con.getDbKey()).createEvent("websocket=disconnect")
 				.param("windowId", con.getWindowId())
 				.param("pageId", con.getPageId())
-			    .fireOnLocalServer();
+			    .fireOnLocalServer(false);
 		} catch (WGException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
