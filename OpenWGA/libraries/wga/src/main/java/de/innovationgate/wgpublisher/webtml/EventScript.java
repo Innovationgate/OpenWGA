@@ -198,13 +198,10 @@ public class EventScript extends ActionBase {
         eventReg.append("</script>\n");
         setSuffix(eventReg.toString());
         
-        
     }
 
     private void executeEventScript() {
         
-        Status status = (Status) getStatus();
-        de.innovationgate.webgate.api.WGContent content = this.getTMLContext().content();
         ExpressionEngine engine;
         engine = ExpressionEngineFactory.getTMLScriptEngine();
         String expr = this.getResultString(false);
