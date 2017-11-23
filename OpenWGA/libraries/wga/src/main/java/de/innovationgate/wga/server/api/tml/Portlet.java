@@ -90,7 +90,7 @@ public interface Portlet {
      * @param params Parameters added to the event
      */
     @CodeCompletion(preferredCase="fireEvent")
-    void fireevent(String eventName, Map<String, Object> params);
+    public abstract void fireevent(String eventName, Map<String, Object> params);
 
     /**
      * Forces a state on a portlet
