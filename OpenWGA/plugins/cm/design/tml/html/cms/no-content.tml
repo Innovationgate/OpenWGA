@@ -61,7 +61,7 @@
 					// other versions
 					var contentlist = WGA.createList()
 					for(let doc in Iterator(document.getAllContent(document.mayEditPage()))){
-						if(doc.mayEditContent())
+						if(doc.mayEditContent() || doc.getStatus()==doc.STATUS_RELEASE)
 							contentlist.add(doc);
 					}
 					_contentlist=WGA.sortList(contentlist, "status", "down");
