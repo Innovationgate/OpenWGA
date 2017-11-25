@@ -192,7 +192,10 @@
 							<tr>
 								<td></td>
 								<td>
-									<tml:input name="copy_from_current" type="checkbox" options="{label('dialog.create-content.copy-from-current.options')}"/>
+									<tml:script>
+										_default = WGA.createList(["items", "metas", "attachments", "modules"])
+									</tml:script>
+									<tml:input name="copy_from_current" type="checkbox" defaultexpression="_default" options="{label('dialog.create-content.copy-from-current.options')}"/>
 								</td>
 							</tr>
 						</tml:case>
