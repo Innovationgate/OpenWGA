@@ -15,6 +15,8 @@
  ******************************************************************************/
 package de.innovationgate.wga.model;
 
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
 import de.innovationgate.utils.WGUtils;
 
 /**
@@ -37,6 +39,8 @@ public class TMLMetadataInfo extends DesignMetadataInfo {
 	private boolean directAccess = true;
 	private boolean cacheable = false;
 	private String category = "";
+	
+	@XStreamOmitField
 	private boolean preprocess=false;
 	
 	public boolean isPreprocess() {
