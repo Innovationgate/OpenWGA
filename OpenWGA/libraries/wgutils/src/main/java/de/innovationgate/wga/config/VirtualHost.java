@@ -80,7 +80,7 @@ public class VirtualHost extends IdentifiableConfigBean {
     private boolean hideHomepageURL = false;
 
     @Element(required=false)
-    private String robots_txt = "User-agent: *\nDisallow: /plugin-*";
+    private String robots_txt = "User-agent: *\nAllow: *";
 
     @Element(required=false)
     private String preferedLanguages = null;
