@@ -22,7 +22,7 @@
  * along with OpenWGA in file COPYING.
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package de.innovationgate.igutils;
+package de.innovationgate.contentmanager.modules;
 
 import java.io.IOException;
 
@@ -34,7 +34,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 
 import de.innovationgate.webgate.api.WGFactory;
 
-public class LinkChecker extends HttpConnector {
+public class LinkChecker{
 	
 	
 	private static final int DEFAULT_MAX_REDIRECTS = 10;

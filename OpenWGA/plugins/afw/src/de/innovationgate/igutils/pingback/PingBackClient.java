@@ -49,10 +49,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import de.innovationgate.igutils.HttpConnector;
 import de.innovationgate.webgate.api.WGFactory;
 
-public class PingBackClient extends HttpConnector {
+public class PingBackClient {
 	
 	private static final int DEFAULT_DOCUMENT_SIZE_LIMIT = 1024*1024*2;
 

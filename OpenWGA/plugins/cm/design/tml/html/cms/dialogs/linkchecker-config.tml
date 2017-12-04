@@ -73,51 +73,6 @@
 	
 	<table width="100%">
 
-		<tr><td colspan="2"><h1>{%label:linkchecker-config.proxy-settings%}:</h1></td></tr>
-		
-		<tr><td></td><td>
-			<tml:input name="useproxy" type="checkbox" options="{label('linkchecker-config.form.options.use-proxy')}" changeaction="$refresh" ajax="true"/>
-		</td></tr>
-
-		<tml:case condition="tmlform.useproxy=='true'">
-			
-			<tr>
-				<td valign="top">Host:Port</td>
-				<td>
-					<tml:input name="proxyhost">size="40"</tml:input>
-					:
-					<tml:input name="proxyport">size="5"</tml:input>
-				</td>
-			</tr>
-			
-			<tr>
-				<td valign="top">{%label:linkchecker-config.form.proxy-exceptions%}:</td>
-				<td>
-					<tml:input name="proxyexceptions" cssclass="textinput"/>
-				</td>
-			</tr>
-
-			<tr>
-				<td></td>
-				<td>
-					<tml:input name="useproxylogin" type="checkbox" options="{label('linkchecker-config.form.options.proxy-needs-password')}" changeaction="$refresh" ajax="true"/>
-				</td>
-			</tr>
-
-			<tml:case condition="tmlform.useproxylogin=='true'">
-				<tr>
-					<td><tml:label key="username"/>:</td>
-					<td><tml:input name="proxyusername"/></td>
-				</tr>
-				<tr>
-					<td><tml:label key="password"/>:</td>
-					<td><tml:input name="proxypassword" type="password"/></td>
-				</tr>
-			</tml:case>
-			
-		</tml:case>
-
-		<tr><td colspan="2"><hr size="1"></td></tr>
 		<tr><td colspan="2"><h1>{%label:linkchecker-config.publishing-settings%}:</h1></td></tr>
 
 		<tr>
@@ -146,8 +101,6 @@
 			<td>{%label:linkchecker-config.form.options%}:</td>
 			<td><tml:input name="options" type="select" options="{label('linkchecker-config.form.options.options')}"/></td>
 		</tr>
-
-		
 
 	</table>
 </tml:form>

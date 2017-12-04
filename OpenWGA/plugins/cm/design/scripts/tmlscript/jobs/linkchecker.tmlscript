@@ -34,7 +34,7 @@ var error = false;
 var log=this.jobContext.getLog();
 log.info("CM Linkchecker started");
 
-var checker = new Packages.de.innovationgate.igutils.LinkChecker();
+var checker = new Packages.de.innovationgate.contentmanager.modules.LinkChecker();
 
 var thequery="content.status='p' AND (content.items['_externallinks'].text!='' OR content.items['_internallinks'].text!='')";
 var queryoptions=createLookupTable();

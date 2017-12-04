@@ -38,32 +38,13 @@
 	tmlform._internallinks = deleteDoubles(tmlform.fieldlist("_internallinks"));
 	tmlform._externallinks = deleteDoubles(tmlform.fieldlist("_externallinks"));
 
+	if(tmlform.hasMessages())
+		return tmlform.validate();
+
 	if(tmlform.ignore_link_errors!="ignore"){
 
 		// check external links:	
-		var checker = new Packages.de.innovationgate.igutils.LinkChecker();
-		
-		// CM 1.2:
-		// set Proxy parameter from setup document
-		var checker_proxy = new Packages.de.innovationgate.igutils.LinkChecker();
-		var config=context("currentdocument/name:$linkchecker", false);
-		if(config && config.useproxy=="true"){
-			//log.info("use proxy settings " + config.proxyhost + ":"+ config.proxyport);
-			try{
-				if(config.useproxylogin=="true")
-					checker_proxy.setProxy(config.proxyhost, config.proxyport, config.proxyusername, config.proxypassword);
-				else checker_proxy.setProxy(config.proxyhost, config.proxyport);
-			}
-			catch(e){
-				tmlform.addMessage(e);
-			}
-			var proxyexceptions=createlist(config.proxyexceptions.replace(/ /g,""), ",");
-		}
-		else var proxyexceptions=createlist();
-	
-		if(tmlform.hasMessages())
-			return tmlform.validate();
-		// end linkchecker proxy setup
+		var checker = new Packages.de.innovationgate.contentmanager.modules.LinkChecker();
 		
 		var urls=tmlform.fieldlist("_externallinks").iterator();
 		while(urls.hasNext()){
@@ -78,10 +59,7 @@
 			var domain = relurl.split("/")[0]
 			domain=domain.split(":")[0]		// ignore port
 			try{
-				var code;			
-				if(proxyexceptions.contains(domain))
-					code = checker.check(url);
-				else code = checker_proxy.check(url);
+				var code = checker.check(url);
 			}catch(e){
 				_link_errors.add({url:url, msg:e.message});
 				tmlform.addMessage(url + ": " + e.message);
@@ -151,10 +129,6 @@
 		tmlform.addMessage(e);
 	}
 	
-
-	/*WGA.app(WGA.design().db().getDbReference()).fireEvent("page-updated", {
-		structkey: STRUCTKEY
-	})*/
 	CM.firePageUpdated();
 	
 </tml:action>
