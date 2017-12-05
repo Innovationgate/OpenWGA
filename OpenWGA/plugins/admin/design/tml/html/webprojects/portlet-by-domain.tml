@@ -60,9 +60,9 @@
 		<tml:case condition="portlet.getSessionVar('currentpage')<=0">
 			<tml:include designdb="@ui" ref="windowview">
 			
-				<tml:inline name="body" scope="local">
+				<tml:option name="body" scope="local">
 					<tml:include ref="::mod-view-by-domain"/>
-				</tml:inline>
+				</tml:option>
 
 				<tml:option name="config" scope="local">
 					tbar: [
