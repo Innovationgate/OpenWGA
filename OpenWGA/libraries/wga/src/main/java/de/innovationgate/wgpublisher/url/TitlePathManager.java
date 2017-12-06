@@ -131,7 +131,7 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
         }
 
         public WGDocument getDocument(WGDatabase db) throws WGAPIException {
-            return db.getDocumentByDocumentKey(_key.toString());
+        	return db.getDocumentByKey(_key);
         }
 
     }

@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.IDN;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
@@ -45,6 +46,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import de.innovationgate.utils.URLBuilder;
 import de.innovationgate.webgate.api.WGDatabase;
+import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.config.ConfigBean;
 import de.innovationgate.wga.config.ContentDatabase;
 import de.innovationgate.wga.config.VirtualHost;
@@ -56,6 +58,7 @@ import de.innovationgate.wgpublisher.WGPDispatcher.PathDispatchingOccasion;
 import de.innovationgate.wgpublisher.problems.Problem;
 import de.innovationgate.wgpublisher.problems.ProblemOccasion;
 import de.innovationgate.wgpublisher.problems.ProblemSeverity;
+import de.innovationgate.wgpublisher.url.TitlePathManager;
 import de.innovationgate.wgpublisher.url.WGAURLBuilder;
 
 public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProvider {
@@ -190,28 +193,56 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                     // normal db request
                     String requestedDBKey = pathElements[1];
                     if (vHost.isHideDefaultDatabaseInURL() && defaultDBKey != null) {
-                        if (requestedDBKey.equalsIgnoreCase(defaultDBKey)) {
-                            // if default db requested redirect to url without
-                            // dbkey
-                            URLBuilder builder = new URLBuilder(httpRequest, _core.getCharacterEncoding());
-                            builder.setEncoding(_core.getCharacterEncoding());
-                            String path = builder.getPath().substring(httpRequest.getContextPath().length());
-                            builder.setPath(httpRequest.getContextPath() + path.substring(defaultDBKey.length() + 1));
-                            httpResponse.sendRedirect(httpResponse.encodeRedirectURL(builder.build(true)));
-                            return;
-                        }
+                    	// we need to know if requestedDBKey really is a DBKEY or part of a content path in a title path url 
+                    	boolean hasValidTitlePath = false;
+                    	try{
+                        	WGDatabase database = _core.getContentdbs().get(defaultDBKey);
+	                    	database = _core.openContentDB(database, httpRequest, false);
+	                		TitlePathManager tpm = (TitlePathManager) database.getAttribute(WGACore.DBATTRIB_TITLEPATHMANAGER);
+	                		if (tpm != null && tpm.isGenerateTitlePathURLs()) {
+	                			ArrayList<String> elements = new ArrayList<String>(Arrays.asList(pathElements));
+	                			elements.remove(0); // remove empty first element produced by "/"
+	                			TitlePathManager.TitlePath title_path_url = tpm.parseTitlePathURL(elements);
+	                			if(title_path_url!=null && title_path_url.getStructKey()!=null && database.getStructEntryByKey(title_path_url.getStructKey())!=null){
+	                				// we have a structkey pointing to a content in this database
+	                				// requestedDBKey should be ignored in this case: it's part of the title path
+	                                hasValidTitlePath = true;
+	                			}
+	                		}
+						} catch (WGException e) {
+							_core.getLog().info("Unable to determine title path", e);
+						}
+                    	
+            		    if (hasValidTitlePath) {
+            		    	// valid title path for default db of this host
+            		    	//_core.getLog().info("valid title path: " + uri);
+            		    	requestedDBKey = defaultDBKey;
+            		    	httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
+            		    }
 
-                        // we have to check if requestedDBKey is a valid content database
-                        // - if not we use defaultDatabase
-                        if (!_core.getContentdbs().containsKey(requestedDBKey.toLowerCase())) {
-                            requestedDBKey = defaultDBKey;
-                            httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
-                        }
+            		    else {
+            		    	// requestedDBKey really is a dbkey
+            		    	if (requestedDBKey.equalsIgnoreCase(defaultDBKey)) {
+	                            // if default db requested redirect to url without dbkey
+	                            URLBuilder builder = new URLBuilder(httpRequest, _core.getCharacterEncoding());
+	                            builder.setEncoding(_core.getCharacterEncoding());
+	                            String path = builder.getPath().substring(httpRequest.getContextPath().length());
+	                            builder.setPath(httpRequest.getContextPath() + path.substring(defaultDBKey.length() + 1));
+	                            httpResponse.sendRedirect(httpResponse.encodeRedirectURL(builder.build(true)));
+	                            return;
+	                        }
+	            		    
+	                        // we have to check if requestedDBKey is a valid content database
+	                        // - if not we use defaultDatabase
+	                        if (!_core.getContentdbs().containsKey(requestedDBKey.toLowerCase())) {
+	                            requestedDBKey = defaultDBKey;
+	                            httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
+	                        }
+            		    }
 
                     }
                     if (!requestedDBKey.equalsIgnoreCase("login") && !httpRequest.getMethod().equalsIgnoreCase("post")) {
                     	if (!isDBAllowed(vHost, requestedDBKey)) {
-                        //if (!isDBKeyAllowed(_core.getWgaConfiguration(), vHost, requestedDBKey)) {                        	
                         	if(defaultDBKey != null)
                         		httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
                         	else{

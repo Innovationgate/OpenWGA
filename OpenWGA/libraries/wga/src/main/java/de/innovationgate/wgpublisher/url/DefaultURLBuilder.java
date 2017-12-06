@@ -147,7 +147,7 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
     	}
     	
     	ContentURL url = innerBuildContentURL(context, mediaKey, layoutKey, ignoreVirtualLink);
-        if (!url.isExternal()) { // Do not rewrite for external URLs (#00003853)
+        if (!url.isExternal() && !context.content().isVirtual()) { // Do not rewrite for external URLs (#00003853) or virtual links (they are already rewritten)
             return rewriteURL(url.getUrl(), context.getrequest(), context.getwgacore(), context.content().isVirtual());
         }
         else {

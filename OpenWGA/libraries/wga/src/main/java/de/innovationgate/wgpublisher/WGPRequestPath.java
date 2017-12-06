@@ -48,8 +48,10 @@ import de.innovationgate.webgate.api.WGScriptModule;
 import de.innovationgate.webgate.api.WGTMLModule;
 import de.innovationgate.webgate.api.WGUnavailableException;
 import de.innovationgate.wga.common.beans.csconfig.v1.MediaKey;
+import de.innovationgate.wga.config.VirtualHost;
 import de.innovationgate.wgpublisher.WGPDispatcher.URLID;
 import de.innovationgate.wgpublisher.filter.WGAFilter;
+import de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
 import de.innovationgate.wgpublisher.lang.LanguageBehaviour;
 import de.innovationgate.wgpublisher.lang.LanguageBehaviourTools;
 import de.innovationgate.wgpublisher.lang.RequestLanguageChooser;
@@ -796,13 +798,21 @@ public class WGPRequestPath {
     }
 	
 	public String expandToCompletePath(HttpServletRequest req) throws WGAPIException, UnsupportedEncodingException {
-		
-		StringBuffer path = new StringBuffer(this.publisherURL);
-	    path.append("/").append(this.databaseKey).append("/");
-	    
+
 	    if (this.pathType != TYPE_TITLE_PATH && this.pathType != TYPE_TML) {
 	        return null;
 	    }
+
+		String defaultDbKey=null;		
+		VirtualHost vhost = (VirtualHost) req.getAttribute(WGAVirtualHostingFilter.REQUESTATTRIB_VIRTUAL_HOST);
+		if(vhost!=null && vhost.isHideDefaultDatabaseInURL())
+			defaultDbKey = WGAVirtualHostingFilter.getDefaultDBKey(core, vhost);
+		
+		StringBuffer path = new StringBuffer(this.publisherURL);
+	    path.append("/");
+	    
+	    if(defaultDbKey==null || !defaultDbKey.equals(this.databaseKey))
+	    	path.append(this.databaseKey).append("/");
 	    
 	    // Determine the path to create from the title path configuration of the app (#00004183)
 	    TitlePathManager tpm = (TitlePathManager) this.database.getAttribute(WGACore.DBATTRIB_TITLEPATHMANAGER);
