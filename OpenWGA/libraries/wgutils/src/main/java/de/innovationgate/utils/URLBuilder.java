@@ -558,7 +558,7 @@ public class URLBuilder implements Cloneable {
     }
 	
 	/**
-     * Createds/modifies a parameter
+     * Create/modify a parameter
 	 * @param param The parameter name
 	 * @param value The parameter value
 	 */
