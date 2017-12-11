@@ -93,7 +93,9 @@ import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGExpressionException;
 import de.innovationgate.webgate.api.WGFactory;
+import de.innovationgate.webgate.api.WGFileAnnotations;
 import de.innovationgate.webgate.api.WGFileContainer;
+import de.innovationgate.webgate.api.WGFileDerivateMetaData;
 import de.innovationgate.webgate.api.WGHierarchicalDatabase;
 import de.innovationgate.webgate.api.WGIllegalArgumentException;
 import de.innovationgate.webgate.api.WGIllegalDataException;
@@ -127,6 +129,7 @@ import de.innovationgate.wga.server.api.UnavailableResourceException;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wga.server.api.tml.Context;
 import de.innovationgate.wga.server.api.tml.TMLPage;
+import de.innovationgate.wgpublisher.ClientHints;
 import de.innovationgate.wgpublisher.DBLoginInfo;
 import de.innovationgate.wgpublisher.PersonalisationManager;
 import de.innovationgate.wgpublisher.RenderServletRequest;
@@ -142,6 +145,7 @@ import de.innovationgate.wgpublisher.expressions.ExpressionEngine;
 import de.innovationgate.wgpublisher.expressions.ExpressionEngineFactory;
 import de.innovationgate.wgpublisher.expressions.ExpressionResult;
 import de.innovationgate.wgpublisher.expressions.tmlscript.RhinoExpressionEngine;
+import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager;
 import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager.DerivateQuery;
 import de.innovationgate.wgpublisher.files.derivates.WGInvalidDerivateQueryException;
 import de.innovationgate.wgpublisher.filter.WGAFilter;
@@ -4111,18 +4115,27 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         return fileurl(null, null, fileName);
     }
     
-    public String filedataurl(String containerName, String fileName) throws WGAPIException {
-        return filedataurl(containerName, fileName, null);
-    }
-    
     public String filedataurl(String fileName) throws WGAPIException {
-        return filedataurl(null, fileName, null);
+    	return filedataurl(null, null, fileName, null, null);
+    }
+
+    public String filedataurl(String containerName, String fileName) throws WGAPIException {
+        return filedataurl(null, containerName, fileName, null, null);
     }
     
+    @Deprecated
     public String filedataurl(String containerName, String fileName, String contentType) throws WGAPIException {
         return filedataurl(null, containerName, fileName, contentType);
     }
-    
+    @Deprecated
+    public String filedataurl(String dbKey, String containerName, String fileName, String contentType) throws WGAPIException {
+    	return filedataurl(dbKey, containerName, fileName, contentType, null);
+    }
+
+    public String filedataurl(String fileName, Map<String,String> config) throws WGAPIException {
+    	return filedataurl(config.get("designdb"), config.get("doc"), fileName, config.get("mimetype"), config.get("derivate"));
+    }
+
     /**
      * creates a RFC2397 data url from the given file
      * @param dbKey
@@ -4132,7 +4145,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      * @return The url
      * @throws WGAPIException 
      */
-    public String filedataurl(String dbKey, String containerName, String fileName, String contentType) throws WGAPIException {
+    public String filedataurl(String dbKey, String containerName, String fileName, String contentType, String derivate) throws WGAPIException {
         
         // retrieve input stream
         InputStream fileIn = null;
@@ -4144,6 +4157,17 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 
                 fileIn = content().getFileData(fileName);
                 fileSize = content().getFileSize(fileName);
+
+                if(derivate!=null){
+                	// search for derivate:
+                	FileDerivateManager fdm = getwgacore().getFileDerivateManager();
+	            	DerivateQuery derivateQuery = fdm.parseDerivateQuery(derivate);
+	                WGFileAnnotations md = fdm.queryDerivate(content(), fileName, derivateQuery, new ClientHints(), true);
+	                if(md!=null && md instanceof WGFileDerivateMetaData){
+	                	fileIn = content().getFileDerivateData(((WGFileDerivateMetaData)md).getId());
+	                	fileSize = (int)md.getSize();
+	                }
+                }
                 if (fileIn == null) {
                     addwarning("File '" + fileName + "' is not attached to content '" + content().getContentKey().toString() + "'.");
                     return null;

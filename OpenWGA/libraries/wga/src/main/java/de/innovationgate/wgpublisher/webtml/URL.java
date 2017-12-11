@@ -420,7 +420,7 @@ public class URL extends ActionBase implements DynamicAttributes {
             url.append(getTMLContext().getURLBuilder().buildFileURL(getTMLContext(), getDb(), getDoc(), getFile()));
         } else {
             //render data url (RFC 2397)
-            url.append(fileContext.filedataurl(getDb(), getDoc(), getFile(), null));
+            url.append(fileContext.filedataurl(getDb(), getDoc(), getFile(), null, getDerivate()));
             status.encodeURL = false;
         }
         return;
@@ -776,7 +776,7 @@ public class URL extends ActionBase implements DynamicAttributes {
         
         // Post processing
         String completeURL = url.toString();
-        boolean isPlainURL = !completeURL.startsWith("javascript:");
+        boolean isPlainURL = !completeURL.startsWith("javascript:") && getDataurl()==null;
 
         if (isPlainURL) {
             
