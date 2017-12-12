@@ -776,7 +776,7 @@ public class URL extends ActionBase implements DynamicAttributes {
         
         // Post processing
         String completeURL = url.toString();
-        boolean isPlainURL = !completeURL.startsWith("javascript:") && getDataurl()==null;
+        boolean isPlainURL = (!completeURL.startsWith("javascript:") && !stringToBoolean(getDataurl()));
 
         if (isPlainURL) {
             
