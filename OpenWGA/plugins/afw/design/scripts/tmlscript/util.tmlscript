@@ -610,3 +610,99 @@ this.csvWriter = function(config){
 		}
 	}
 }
+
+/*
+ *	CSV Reader (Importer)
+ *	Config options:
+ *		columns:				Array column definitions. Required.
+ *		dateFormat:				Optional date format. If empty yyyy-MM-dd HH:mm:SS is used.
+ *		numberFormat:			Optional number format. If empty # ist used.
+ *		skiplines:				Number of lines to skip. Default = 1.
+ *		divider:				Column divider. Default is Semicolon
+ *		process(data,line):		Function called for each line in input stream. Required.
+ *		onerror(line, id, msg):	Optional function called on errors. Set to null to ignore erors
+ *
+ *	Column Definition (config.columns):
+ *		Each column is either a Sting or Object. If it is Object !=null the following properties are assumed:
+ *			id:	The column id
+ *			type: Optional - text|date|number|boolean - defaults to text
+ *		null columns are ignored
+ *
+ *	Sampe usages:
+ *		AFW.Util.csvReader({
+ *			columns: ["title", {id:"created",type:"date"}, null, "ean", "price"],
+ *			onerror: null,	// ignore errors
+ *			process: function(data){...}
+ *		}).read(inputStreamOrFile [,encoding])
+ */
+this.csvReader = function(config){
+
+	var skiplines = config.skiplines || 1;
+	var divider = config.divider || ";";
+
+	if(typeof(config.onerror)=="undefined"){
+		config.onerror=function(line, id, msg){
+	 		console.error("line " + line, "[" + id + "]:", msg);
+	 	}
+	}
+	
+	return {
+
+		read: function(stream_or_file, encoding){
+	
+			var line;
+			var inputstream;
+			if(stream_or_file instanceof Packages.java.io.File)
+				inputstream = new Packages.java.io.FileInputStream(stream_or_file);
+			else inputstream = stream_or_file;
+			 
+			var reader = new Packages.java.io.BufferedReader(new Packages.java.io.InputStreamReader(inputstream, encoding || "UTF-8"));
+			
+			for(let i=0; i<skiplines; i++)
+				reader.readLine()
+				
+			for(let i=1; line = reader.readLine(); i++){
+				var values = line.split(divider);
+				var data = {}
+				
+				for(let [index, column] in config.columns){
+					
+					if(typeof(column)=="string")
+						column = {
+							id: column
+						}
+					if(!column.id)
+						continue;
+
+					var value = values[index]
+					if(typeof(value)=="undefined"){
+						if(config.onerror)
+							config.onerror(i, column.id, "unable to find column");
+						continue;
+					}
+					value = value.trim();
+					if(value.charAt(0)=="\"")
+						value = value.substring(1, value.length-1);
+					
+					try{
+						if(column.type=="date")
+							value = WGA.parseDate(value, config.dateFormat || "yyyy-MM-dd HH:mm:ss")
+						else if(column.type=="number")
+							value = WGA.parseNumber(value, config.numberFormat || "#")
+						else if(column.type=="boolean"){
+							value = (value.toLowerCase()=="true" || value=="1") ? true : false;
+						}
+						data[column.id]=value
+					}
+					catch(e){
+						if(config.onerror)
+							config.onerror(i, column.id, e);
+					}
+				
+				}
+				config.process(data, i);
+			}
+		}
+	}
+	
+}
