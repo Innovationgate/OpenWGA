@@ -57,19 +57,19 @@
 			return ret.split(";")[0];
 		</tml:script>
 	</tml:case>
-	<link><tml:item name="_url"/></link> 
+	<link><tml:item name="_url" encode="none"/></link> 
 	<description><tml:script expression="_config.description"/></description>
 	<copyright><tml:script expression="_config.copyright"/></copyright>
 	<generator>OpenWGA</generator>	
-	<lastBuildDate><tml:script expression="db().getLastChanged()"/></lastBuildDate>
+	<lastBuildDate><tml:script expression="db().getLastChanged().toGMTString()"/></lastBuildDate>
 	
 	<tml:collection>
 		
-		<tml:query max="10" alllanguages="true" context="{_config.query_context||_config.query_context||'name:home'}">
+		<tml:query max="25" alllanguages="true" context="{_config.query_context||_config.query_context||'name:home'}">
 			<tml:option name="query"/>
 		</tml:query>
 
-		<tml:foreach pagesize="10">
+		<tml:foreach pagesize="25">
 			<tml:eval var="_url">
 				ret = WGA.urlBuilder(contenturl("html", null)).build(true);
 				return ret.split(";")[0];
