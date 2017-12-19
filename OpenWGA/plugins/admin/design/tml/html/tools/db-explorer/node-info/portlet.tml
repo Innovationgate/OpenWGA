@@ -94,8 +94,6 @@
 	_key = a.join(":");
 	_wgakey = _type + "/" + a.join("/");
 	
-	console.log("key", portlet.getSessionVar('key'), "type", _type, "_key:", _key, "_wgakey:",  _wgakey);
-	
 	// check if document still exists
 	_exists = false;
 	if(_type=='root' || _type=="cssjs" || _type=="tml" || _type=="filecontainer")
