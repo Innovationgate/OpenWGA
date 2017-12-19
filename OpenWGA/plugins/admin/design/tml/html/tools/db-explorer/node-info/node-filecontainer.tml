@@ -23,34 +23,39 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 <tml:script>
+	_fc=null;
 	var fc = option("documentkey");
-	_fc = db(option("key")).getFileContainer(fc)
-	_filenames = _fc.getFileNames();
+	if(fc){
+		_fc = db(option("key")).getFileContainer(fc)
+		_filenames = _fc.getFileNames();
+	}
 </tml:script>
 
-<tml:include designdb="@ui" ref="windowview">
-	<tml:option name="title">Filecontainer</tml:option>	
-	<tml:inline name="body">
-		
-		<fieldset>		
-					
-			<label>Name:</label>		
-			<div class="data"><tml:script expression="_fc.name"/></div>
-			<div class="clear"></div>
-
-			<label>Files:</label>		
-			<div class="data">
-				<tml:foreach type="itemvalue" item="_filenames" currentvalue="_filename">
-					<a href="<tml:url db="{option('key')}" type="file" doc="{_fc.name}" file="{_filename}"/>" target="_blank">
-						<tml:script expression="_filename"/>
-					</a>
-					(<tml:script expression="_fc.getFileSize(_filename)/1000" format="0.0"/> KB)
-					<tml:between><br></tml:between>
-				</tml:foreach>
-			</div>
-			<div class="clear"></div>
-		
-		</fieldset>
-		
-	</tml:inline>
-</tml:include>
+<tml:case isfilled="_fc">
+	<tml:include designdb="@ui" ref="windowview">
+		<tml:option name="title">Filecontainer</tml:option>	
+		<tml:inline name="body">
+			
+			<fieldset>		
+						
+				<label>Name:</label>		
+				<div class="data"><tml:script expression="_fc.name"/></div>
+				<div class="clear"></div>
+	
+				<label>Files:</label>		
+				<div class="data">
+					<tml:foreach type="itemvalue" item="_filenames" currentvalue="_filename">
+						<a href="<tml:url db="{option('key')}" type="file" doc="{_fc.name}" file="{_filename}"/>" target="_blank">
+							<tml:script expression="_filename"/>
+						</a>
+						(<tml:script expression="_fc.getFileSize(_filename)/1000" format="0.0"/> KB)
+						<tml:between><br></tml:between>
+					</tml:foreach>
+				</div>
+				<div class="clear"></div>
+			
+			</fieldset>
+			
+		</tml:inline>
+	</tml:include>
+</tml:case>

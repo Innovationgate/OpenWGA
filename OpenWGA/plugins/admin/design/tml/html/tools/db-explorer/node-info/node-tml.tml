@@ -27,31 +27,30 @@
 	var med = dk.shift();
 	var tmlname = dk.join(":");
 	_tml = db(option("key")).getTMLModule(tmlname, med)
-	
-	//log.info(option("key") + ", tmlname=" + tmlname + ", medium=" + med + ", result: " + _tml);
-	
 </tml:script>
 
-<tml:include designdb="@ui" ref="windowview">
-	<tml:option name="title">TML Module <b><tml:script expression="_tml.name"/></b> for medium <b><tml:script expression="_tml.mediaKey"/></b></tml:option>	
-	<tml:inline name="body">
-		
-		<fieldset>		
-					
-			<label>Direct Access:</label>		
-			<div class="data"><tml:script expression="_tml.isDirectAccessAllowed()"/></div>
-			<div class="clear"></div>
-
-			<label>Cachable:</label>		
-			<div class="data"><tml:script expression="_tml.isCacheable()"/></div>
-			<div class="clear"></div>
-
-			<textarea style="display:none" id="tml-code" name="code" class="xml"><tml:script expression="_tml.code" encode="xml"/></textarea>
-			<script>
-				dp.SyntaxHighlighter.HighlightAll('code');
-			</script>
-
-		</fieldset>
-		
-	</tml:inline>
-</tml:include>
+<tml:case isfilled="_tml">
+	<tml:include designdb="@ui" ref="windowview">
+		<tml:option name="title">TML Module <b><tml:script expression="_tml.name"/></b> for medium <b><tml:script expression="_tml.mediaKey"/></b></tml:option>	
+		<tml:inline name="body">
+			
+			<fieldset>		
+						
+				<label>Direct Access:</label>		
+				<div class="data"><tml:script expression="_tml.isDirectAccessAllowed()"/></div>
+				<div class="clear"></div>
+	
+				<label>Cachable:</label>		
+				<div class="data"><tml:script expression="_tml.isCacheable()"/></div>
+				<div class="clear"></div>
+	
+				<textarea style="display:none" id="tml-code" name="code" class="xml"><tml:script expression="_tml.code" encode="xml"/></textarea>
+				<script>
+					dp.SyntaxHighlighter.HighlightAll('code');
+				</script>
+	
+			</fieldset>
+			
+		</tml:inline>
+	</tml:include>
+</tml:case>

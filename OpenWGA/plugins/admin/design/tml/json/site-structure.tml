@@ -130,7 +130,7 @@
 						
 						function outputDirs(node, icon){
 							var ret = "";
-							for(d in node.dirs){
+							for(let d in node.dirs){
 								var dir = node.dirs[d];
 								if(ret!="")
 									ret += ",";
@@ -138,7 +138,7 @@
 								ret += "{ text:'" + d + "',id:'tmlfolder."+dir.id+"'," + ic + "children:[" + outputDirs(dir) + "], leaf:false}"
 								
 							}
-							for(d in node.files){
+							for(let d in node.files){
 								var file = node.files[d];
 								if(ret!="")
 									ret += ",";
@@ -188,7 +188,7 @@
 						
 						function outputDirs(node, icon){
 							var ret = "";
-							for(d in node.dirs){
+							for(let d in node.dirs){
 								var dir = node.dirs[d];
 								if(ret!="")
 									ret += ",";
@@ -196,7 +196,7 @@
 								ret += "{ text:'" + d + "',id:'scriptfolder."+dir.id+"'," + ic + "children:[" + outputDirs(dir) + "]}"
 								
 							}
-							for(d in node.files){
+							for(let d in node.files){
 								var file = node.files[d];
 								if(ret!="")
 									ret += ",";

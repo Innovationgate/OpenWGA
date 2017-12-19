@@ -30,8 +30,6 @@
 	
 	_cssjs = db(option("key")).getCSSJSModule(mod, type);
 	
-	//log.info("type=" + type + ", mod=" + mod + ", result=" + _cssjs);
-	
 	switch(type){
 		case "js":
 		case "css":
@@ -46,26 +44,28 @@
 	
 </tml:script>
 
-<tml:include designdb="@ui" ref="windowview">
-	<tml:option name="title">Script Module <b><tml:script expression="_cssjs.name"/>.<tml:script expression="_cssjs.codeType"/></b></tml:option>	
-	<tml:inline name="body">
-		
-		<fieldset>		
-					
-			<label>Name:</label>		
-			<div class="data"><tml:script expression="_cssjs.name"/></div>
-			<div class="clear"></div>
-		
-			<label>Type:</label>		
-			<div class="data"><tml:script expression="_cssjs.codeType"/></div>
-			<div class="clear"></div>
-
-			<textarea style="display:none" id="tml-code" name="code" class="<tml:item name="_class"/>"><tml:script expression="_cssjs.code" encode="xml"/></textarea>
-			<script>
-				dp.SyntaxHighlighter.HighlightAll('code');
-			</script>
-		
-		</fieldset>
-		
-	</tml:inline>
-</tml:include>
+<tml:case isfilled="_cssjs">
+	<tml:include designdb="@ui" ref="windowview">
+		<tml:option name="title">Script Module <b><tml:script expression="_cssjs.name"/>.<tml:script expression="_cssjs.codeType"/></b></tml:option>	
+		<tml:inline name="body">
+			
+			<fieldset>		
+						
+				<label>Name:</label>		
+				<div class="data"><tml:script expression="_cssjs.name"/></div>
+				<div class="clear"></div>
+			
+				<label>Type:</label>		
+				<div class="data"><tml:script expression="_cssjs.codeType"/></div>
+				<div class="clear"></div>
+	
+				<textarea style="display:none" id="tml-code" name="code" class="<tml:item name="_class"/>"><tml:script expression="_cssjs.code" encode="xml"/></textarea>
+				<script>
+					dp.SyntaxHighlighter.HighlightAll('code');
+				</script>
+			
+			</fieldset>
+			
+		</tml:inline>
+	</tml:include>
+</tml:case>
