@@ -1442,8 +1442,8 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                         return id;
                     }
                 } 
-                    return Long.MIN_VALUE;                
-                }
+                return Long.MIN_VALUE;                
+            }
             else {
                 result = getSession().createQuery("select max(entry.logtime) from LogEntry as entry").list();
                 Date lcDate = null;
