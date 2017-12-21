@@ -33,14 +33,14 @@ public interface WGDatabaseCoreFeatureReturnHierarchyCount extends WGDatabaseCor
     /**
      * Retrieves the number of child entries of the given struct entry without actually retrieving them
      * @param structEntry The struct entry, whose children are to be retrieved
-     * @return An iterator of all child entries, ordered by their intended default order
+     * @return Number of child entries
      * @throws WGAPIException 
      */
     public int getChildEntryCount(WGStructEntry structEntry) throws WGAPIException;
     /**
      * Retrieves the root entries (i.e. entries without parents) of the given area.
      * @param area The area, whose root entries are to be retrieved
-     * @return An iterator of root entries in their intended default order
+     * @return Number of root entries
      * @throws WGAPIException 
      */
     public int getRootEntryCount(WGArea area) throws WGAPIException;
