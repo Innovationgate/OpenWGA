@@ -3348,10 +3348,8 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
     /**
      * Returns a struct entry by it's struct key
      * 
-     * @param structKey
-     *            The struct key to find a struct entry for.
-     * @return WGStructEntry The found struct entry, null if there is none with
-     *         that key.
+     * @param structKey			The struct key to find a struct entry for.
+     * @return WGStructEntry 	The found struct entry, null if there is none with that key.
      * @throws WGAPIException
      */
     public WGStructEntry getStructEntryByKey(Object structKey) throws WGAPIException {
