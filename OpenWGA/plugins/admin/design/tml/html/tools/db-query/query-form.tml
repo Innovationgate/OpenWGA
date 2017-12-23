@@ -90,7 +90,7 @@
 					<label>Query Type:</label>					
 					<div class="data">				
 						<div style="width:100%">	
-							<tml:input type="select" name="type" options="hql,sql,lucene"
+							<tml:input type="select" name="type" options="hql,fullhql,sql,lucene"
 								validation="$E_VALUE!=''"
 								message="Please select or enter a query type"
 							/>
