@@ -25,27 +25,21 @@
 package de.innovationgate.wgpublisher.url;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.httpclient.URIException;
-import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.log4j.Logger;
 
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGArea;
 import de.innovationgate.webgate.api.WGContent;
-import de.innovationgate.webgate.api.WGContentKey;
-import de.innovationgate.webgate.api.WGContentStoreVersionException;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGDatabaseConnectListener;
 import de.innovationgate.webgate.api.WGDatabaseEvent;
@@ -56,20 +50,15 @@ import de.innovationgate.webgate.api.WGLanguage;
 import de.innovationgate.webgate.api.WGLanguageChooser;
 import de.innovationgate.webgate.api.WGStructEntry;
 import de.innovationgate.webgate.api.WGStructEntryIterator;
-import de.innovationgate.webgate.api.WGStructEntryList;
 import de.innovationgate.wgpublisher.ManagedDBAttribute;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGPDispatcher;
 import de.innovationgate.wgpublisher.lang.LanguageBehaviourTools;
-import de.innovationgate.wgpublisher.lang.SingleLanguageChooser;
-import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 
 /**
- * Object that takes care of various tasks around the "title path URL" new in
- * WGA 4.1
+ * Object that takes care of various tasks around the "title path URL" new in WGA 4.1
  * <ul>
- * <li> Indicator that title path is active for a database, if it is present as
- * database attribute
+ * <li> Indicator that title path is active for a database, if it is present as database attribute
  * <li> Determine if a path is a title path URL
  * <li> Transforming normal titles to URL-compatible titles
  * </ul>
@@ -85,9 +74,6 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
     
     public class RemainingPathElementException extends Exception {
         
-        /**
-         * 
-         */
         private static final long serialVersionUID = 1L;
         private WGContent _content;
         private PathTitle _remainingElement;
@@ -551,7 +537,8 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
 
             // Modified chars
             if (c == ' ') {
-                name.append('_');
+                name.append(_includeKeys ? '-' : '_');
+                // In openwga 7.5.1 we changed this from '_' to '-'. But we only do it if keys are included to avoid 404s from search engines.
             }
             
             else if (c == 'ä' && !_allowUmlaute) {
@@ -756,13 +743,22 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
         // If we have a struct key (by tilde suffix) we just will load the doc by its content key
         if (titlePathURL.getStructKey() != null) {
             WGStructEntry entry = database.getStructEntryByKey(database.parseStructKey(titlePathURL.getStructKey()));
+            if(entry==null){
+            	// may be a sequence?
+            	try{
+	            	long seq = Long.parseLong(titlePathURL.getStructKey(), 16);
+	            	entry = database.getStructEntryBySequence(seq);
+            	}
+            	catch(Exception e){
+            		// may be unable to parse structkey as long. Ignore any errors here.
+            	}
+            }
             if (entry != null) {
                 WGContent content = LanguageBehaviourTools.getRelevantContent(entry, titlePathURL.getLanguage(), false);
                 if (content != null) {
                     return content;
                 }
             }
-            
             // We may not use the other information. We would eventually land on the wrong document by titlepaths.
             return null;
         }
@@ -964,7 +960,10 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
                 	if(hasCustomTitlepath){
                 		title = normalizeURLTitle(customTitlepath);
                 	}
-                    baseContentSuffix.append("~").append(String.valueOf(content.getStructKey()));
+                	long seq = content.getStructEntry().getPageSequence();
+                	if(seq!=0)
+                		baseContentSuffix.append("~").append(Long.toHexString(seq));
+                	else baseContentSuffix.append("~").append(String.valueOf(content.getStructKey()));
                 }
                 baseContentSuffix.append(".").append(language).append(".").append(mediaKey);
                 
