@@ -115,6 +115,7 @@ import de.innovationgate.webgate.api.WGContentType;
 import de.innovationgate.webgate.api.WGCreationException;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGDatabaseCore;
+import de.innovationgate.webgate.api.WGDatabaseCoreFeaturePageSequences;
 import de.innovationgate.webgate.api.WGDatabaseCoreFeatureReturnHierarchyCount;
 import de.innovationgate.webgate.api.WGDatabaseCoreFeatureSequenceProvider;
 import de.innovationgate.webgate.api.WGDatabaseRevision;
@@ -165,7 +166,9 @@ import de.innovationgate.wga.config.Database;
 import de.innovationgate.wga.config.DatabaseServer;
 
 
-public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabaseCore, WGDatabaseCoreFeatureReturnHierarchyCount, WGDatabaseCoreFeatureSequenceProvider, AuthenticationSourceListener {
+public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabaseCore, 
+		WGDatabaseCoreFeatureReturnHierarchyCount, WGDatabaseCoreFeatureSequenceProvider, WGDatabaseCoreFeaturePageSequences, 
+		AuthenticationSourceListener {
     
     @MXBean
     public interface StatisticsMXBean extends Statistics {
@@ -4076,5 +4079,19 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
         return _ddlVersion >= WGDatabase.CSVERSION_WGA5 ? WGDatabaseRevision.forValue(logEntry.getLog_id()) : WGDatabaseRevision.forValue(logEntry.getLogtime());
     }
 
+	@Override
+	public WGDocumentCore getStructEntryBySequence(long seq) throws WGAPIException {
+
+		Query q = getSession().createQuery("select entity from ExtensionData ed where ed.name='page-sequence' and ed.number=:seq");
+		q.setParameter("seq", (double)seq);
+		List results = q.list();
+		if (results.size() > 0) {
+			Object struct = results.get(0);
+			if(struct instanceof StructEntry)
+				return createDocumentImpl((StructEntry)struct);
+		}
+		return null;
+		
+	}
    
 }

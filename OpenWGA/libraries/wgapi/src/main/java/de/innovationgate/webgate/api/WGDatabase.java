@@ -3346,6 +3346,30 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
     }
 
     /**
+     * Returns a struct entry by it's page sequence
+     * 
+     * @param seq				The page sequence number
+     * @return WGStructEntry 	The found struct entry, null if there is none with that key.
+     * @throws WGAPIException
+     */    
+    public WGStructEntry getStructEntryBySequence(long seq) throws WGAPIException{
+    	
+        if (!isSessionOpen()) {
+            throw new WGClosedSessionException();
+        }
+        if(!(getCore() instanceof WGDatabaseCoreFeaturePageSequences))
+        	throw new WGNotSupportedException("Page sequences are not supported for this database");
+        
+        WGDocumentCore struct = ((WGDatabaseCoreFeaturePageSequences)getCore()).getStructEntryBySequence(seq);
+        if (struct != null && !struct.isDeleted()) {
+            return this.getOrCreateStructEntryObject(struct, new WGDocumentObjectFlags());
+        }
+
+        return null;
+
+    }
+    
+    /**
      * Returns a struct entry by it's struct key
      * 
      * @param structKey			The struct key to find a struct entry for.

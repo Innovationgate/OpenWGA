@@ -395,6 +395,9 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
         METAINFO_ALLOWED_CHILDTYPES.setExtdata(true);
     }
 
+    public static final String META_PAGESEQUENCE = "PAGESEQUENCE";
+    public static final MetaInfo METAINFO_PAGESEQUENCE = new MetaInfo(META_PAGESEQUENCE, Long.class, 0L);
+
     /**
      * No content has yet been fetched for this struct entry.
      */
@@ -3049,5 +3052,8 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
         return getCache().getReleasedContentCache();
     }
 
+    public long getPageSequence() throws WGAPIException{
+    	return (long)getMetaData(META_PAGESEQUENCE);
+    }
     
 }

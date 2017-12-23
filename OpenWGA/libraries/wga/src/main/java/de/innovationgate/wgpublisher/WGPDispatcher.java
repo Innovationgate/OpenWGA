@@ -1796,7 +1796,21 @@ public class WGPDispatcher extends HttpServlet {
                 }
             }
         }
-
+        
+        // Try sequence (hex)
+    	try{
+        	long seq = Long.parseLong(completeId, 16);
+        	if(seq!=0){
+        		entry = database.getStructEntryBySequence(seq);
+            	if(entry!=null){
+                    content = languageChooser.selectContentForPage(entry, isBI);
+                    if (content != null)
+                        return content;
+            	}
+        	}
+    	}
+    	catch(NumberFormatException e){}	// ignore format errors
+    
         // Try to use key as name only
         content = languageChooser.selectContentForName(database, completeId, isBI);
         if (content != null) {

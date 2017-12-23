@@ -70,6 +70,7 @@ import de.innovationgate.webgate.api.WGClosedSessionException;
 import de.innovationgate.webgate.api.WGColumnSet;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGDatabase;
+import de.innovationgate.webgate.api.WGDatabaseCoreFeatureSequenceProvider;
 import de.innovationgate.webgate.api.WGDatabaseRevision;
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGDocumentCore;
@@ -562,49 +563,52 @@ public class WGDocumentImpl implements WGDocumentCore {
         
         try {
 
-        // Special metas
-        if (name.equals(WGDocument.META_PASTAUTHORS)) {
-            return getPastAuthors();
-        }
-        else if (name.equals(WGDocument.META_PASTEDITDATES)) {
-            return getPastEditDates();
-        }
-        else if (name.equals(WGDocument.META_REVISION)) {
-            return new Integer(getRevision());
-        }
-        else if (_entity instanceof StructEntry && name.equals(WGStructEntry.META_WORKFLOW_NAME)) {
-            return getStructWorkflowName();
-        }
-        else if (name.equals(WGUserProfile.META_PORTLETREGISTRY)) {
-            return _portletRegistry;
-        }
-        else if (name.equals(WGUserProfile.META_PORTLETITEMSTORAGE)) {
-            return _portletItemStorage;
-        }
-        
-        Object value = getBeanMap().get(name.toLowerCase());;
-        
-        // Return keys to entities
-        if (value instanceof MainEntity) {
-            if (name.equals(WGStructEntry.META_AREA)) {
-                value = ((Area) value).getName();
-            }
-            else if (name.equals(WGStructEntry.META_CONTENTTYPE)) {
-                value = ((ContentType) value).getName();
-            }
-            else if (name.equals(WGContent.META_STRUCTENTRY)) {
-                value = ((StructEntry) value).getKey();
-            }
-            else if (name.equals(WGContent.META_LANGUAGE)) {
-                value = ((Language) value).getName();
-            }
-        }
-        
-        // Convert SQL-special date derivates to a standard date
-        else if (value instanceof Date) {
-            value = new Date(((Date) value).getTime());
-        }
-        return value;
+	        // Special metas
+	        if (name.equals(WGDocument.META_PASTAUTHORS)) {
+	            return getPastAuthors();
+	        }
+	        else if (name.equals(WGDocument.META_PASTEDITDATES)) {
+	            return getPastEditDates();
+	        }
+	        else if (name.equals(WGDocument.META_REVISION)) {
+	            return new Integer(getRevision());
+	        }
+	        else if (_entity instanceof StructEntry && name.equals(WGStructEntry.META_WORKFLOW_NAME)) {
+	            return getStructWorkflowName();
+	        }
+	        else if (_entity instanceof StructEntry && name.equals(WGStructEntry.META_PAGESEQUENCE)) {
+	            return getPageSequence();
+	        }
+	        else if (name.equals(WGUserProfile.META_PORTLETREGISTRY)) {
+	            return _portletRegistry;
+	        }
+	        else if (name.equals(WGUserProfile.META_PORTLETITEMSTORAGE)) {
+	            return _portletItemStorage;
+	        }
+	        
+	        Object value = getBeanMap().get(name.toLowerCase());;
+	        
+	        // Return keys to entities
+	        if (value instanceof MainEntity) {
+	            if (name.equals(WGStructEntry.META_AREA)) {
+	                value = ((Area) value).getName();
+	            }
+	            else if (name.equals(WGStructEntry.META_CONTENTTYPE)) {
+	                value = ((ContentType) value).getName();
+	            }
+	            else if (name.equals(WGContent.META_STRUCTENTRY)) {
+	                value = ((StructEntry) value).getKey();
+	            }
+	            else if (name.equals(WGContent.META_LANGUAGE)) {
+	                value = ((Language) value).getName();
+	            }
+	        }
+	        
+	        // Convert SQL-special date derivates to a standard date
+	        else if (value instanceof Date) {
+	            value = new Date(((Date) value).getTime());
+	        }
+	        return value;
         
         }
         catch (HibernateException e) {
@@ -919,6 +923,8 @@ public class WGDocumentImpl implements WGDocumentCore {
             session.flush();
             
             // Save or update object
+            if(getType()==WGDocument.TYPE_STRUCTENTRY)
+            	setPageSequence();
             if (getCreated() == null) {
                 setCreated(lastModified);
                 setLastModified(lastModified);
@@ -1003,9 +1009,20 @@ public class WGDocumentImpl implements WGDocumentCore {
     
     }
 
+    private void setPageSequence() throws WGAPIException, InstantiationException, IllegalAccessException {
+    	if(getExtensionData("page-sequence")==null){
+	    	long seq = _parent.incrementSystemSequence("page-sequence");        	
+	    	writeExtensionData("page-sequence", seq);
+    	}
+	}
+    private long getPageSequence() throws WGAPIException{
+    	Object seq = getExtensionData("page-sequence");
+    	if(seq==null)
+    		return 0;
+    	return ((Double)seq).longValue();
+	}
 
-    
-    private void enforcePortletItemDeletions() {
+	private void enforcePortletItemDeletions() {
 
         if (!(_entity instanceof UserProfile)) {
             return;
@@ -1239,12 +1256,6 @@ public class WGDocumentImpl implements WGDocumentCore {
     public void setWGDocument(WGDocument doc) {
         _document = doc;
     }
-
-    
-
-
-
-
 
     private void setCreated( Date date) {
         getBeanMap().put(WGDocument.META_CREATED.toLowerCase(), date);

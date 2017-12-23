@@ -540,18 +540,31 @@ public class TMLContextExpression {
             }
     
         }
-    
+        
+        // Retrieve context by sequence (hex)
+        else if (contextFunction.equals("seq")) {
+        	try{
+	        	long seq = Long.parseLong(contextExpression, 16);
+        		WGStructEntry struct = context.db().getStructEntryBySequence(seq);
+	        	if(struct!=null){
+	        		WGContent content = getOriginContextLanguageChooser().selectContentForPage(struct, context.isbrowserinterface());
+	                if (content != null) {
+	                	return context.getTMLContextForDocument(content);
+	                }
+	        	}
+        	}
+        	catch(NumberFormatException e){}	// ignore errors
+        	return errorReturnContext;
+        }
+        
+        // Retrieve context by name
         else if (contextFunction.equals("name")) {
-            
-    
             WGContent content = getOriginContextLanguageChooser().selectContentForName(context.content().getDatabase(), contextExpression, context.isbrowserinterface());
             if (content != null) {
                 return context.getTMLContextForDocument(navigator.chooseRelevantContent(content, mainContent));
             }
-        
             context.setLastError("Could not retrieve content for name: " + contextExpression);
             return errorReturnContext;
-            
         }
     
         // Retrieve the context of another tag
