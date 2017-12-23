@@ -924,7 +924,7 @@ public class WGDocumentImpl implements WGDocumentCore {
             
             // Save or update object
             if(getType()==WGDocument.TYPE_STRUCTENTRY)
-            	setPageSequence();
+            	createPageSequence();
             if (getCreated() == null) {
                 setCreated(lastModified);
                 setLastModified(lastModified);
@@ -1009,8 +1009,8 @@ public class WGDocumentImpl implements WGDocumentCore {
     
     }
 
-    private void setPageSequence() throws WGAPIException, InstantiationException, IllegalAccessException {
-    	if(getExtensionData("page-sequence")==null){
+    public void createPageSequence() throws WGAPIException, InstantiationException, IllegalAccessException {
+    	if(getType()==WGDocument.TYPE_STRUCTENTRY && getExtensionData("page-sequence")==null){
 	    	long seq = _parent.incrementSystemSequence("page-sequence");        	
 	    	writeExtensionData("page-sequence", seq);
     	}

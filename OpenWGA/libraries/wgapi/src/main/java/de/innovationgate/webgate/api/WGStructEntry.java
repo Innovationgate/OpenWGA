@@ -3055,5 +3055,9 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
     public long getPageSequence() throws WGAPIException{
     	return (long)getMetaData(META_PAGESEQUENCE);
     }
-    
+
+    public void createPageSequence() throws WGAPIException, InstantiationException, IllegalAccessException{
+    	getDatabase().createPageSequence(this);
+    }
+
 }

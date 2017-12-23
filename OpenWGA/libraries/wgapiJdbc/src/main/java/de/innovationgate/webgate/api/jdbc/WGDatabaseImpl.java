@@ -4093,5 +4093,11 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
 		return null;
 		
 	}
+
+	@Override
+	public void createPageSequence(WGDocumentCore struct) throws WGAPIException, InstantiationException, IllegalAccessException{
+		if(struct instanceof WGDocumentImpl)
+			((WGDocumentImpl)struct).createPageSequence();
+	}
    
 }

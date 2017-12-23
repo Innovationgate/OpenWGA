@@ -9826,5 +9826,17 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
     public WGFileConverter getFileConverter(){
     	return this.fileConverter;
     }
+
+	public void createPageSequence(WGStructEntry struct) throws WGAPIException, InstantiationException, IllegalAccessException {
+		
+        if (!isSessionOpen()) {
+            throw new WGClosedSessionException();
+        }
+        if(!(getCore() instanceof WGDatabaseCoreFeaturePageSequences))
+        	throw new WGNotSupportedException("Page sequences are not supported for this database");
+        
+        ((WGDatabaseCoreFeaturePageSequences)getCore()).createPageSequence(struct.getCore());
+		struct.save();
+	}
     
 }
