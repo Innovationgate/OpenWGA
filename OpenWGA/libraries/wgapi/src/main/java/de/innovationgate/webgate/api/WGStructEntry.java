@@ -54,6 +54,11 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
      */
     public static final String EDITORS_INHERIT_AND_REDUCE = "#inherit-and-reduce";
 
+    /**
+     * extension data field which stores the page sequence for this document in CS Versions > 5
+     */
+    public static final String EXT_PAGE_SEQUENCE = "page-sequence";
+    
     public class SessionData {
         
         private boolean _performUserRightsTestsOnSave = true;
@@ -2079,6 +2084,13 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
 
     }
 
+    public boolean mayPushExtData(String extName){
+    	if(extName.equals(EXT_PAGE_SEQUENCE))
+    		return false;
+    	return super.mayPushExtData(extName);
+    }
+
+    
     /**
      * Initializes empty published fields on page level by the first released content versions' creation date
      * This is a tool method that can be used to init given published field from non CS5 sources, on migration for example.
@@ -3057,7 +3069,10 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
     }
 
     public void createPageSequence() throws WGAPIException, InstantiationException, IllegalAccessException{
-    	getDatabase().createPageSequence(this);
+    	createPageSequence(false);
+    }
+    public void createPageSequence(boolean forceCreate) throws WGAPIException, InstantiationException, IllegalAccessException{
+    	getDatabase().createPageSequence(this, forceCreate);
     }
 
 }

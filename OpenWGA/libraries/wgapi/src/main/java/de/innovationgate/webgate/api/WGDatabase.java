@@ -9827,15 +9827,19 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
     	return this.fileConverter;
     }
 
-	public void createPageSequence(WGStructEntry struct) throws WGAPIException, InstantiationException, IllegalAccessException {
+	public void createPageSequence(WGStructEntry struct, boolean forceCreate) throws WGAPIException, InstantiationException, IllegalAccessException {
 		
         if (!isSessionOpen()) {
             throw new WGClosedSessionException();
         }
         if(!(getCore() instanceof WGDatabaseCoreFeaturePageSequences))
         	throw new WGNotSupportedException("Page sequences are not supported for this database");
-        
-        ((WGDatabaseCoreFeaturePageSequences)getCore()).createPageSequence(struct.getCore());
+
+        if (getSessionContext().getAccessLevel() < ACCESSLEVEL_MANAGER) {
+            throw new WGAuthorisationException("You are not authorized to create page sequences in this database", WGAuthorisationException.ERRORCODE_OP_NEEDS_AUTHOR_LEVEL);
+        }
+
+        ((WGDatabaseCoreFeaturePageSequences)getCore()).createPageSequence(struct.getCore(), forceCreate);
 		struct.save();
 	}
     

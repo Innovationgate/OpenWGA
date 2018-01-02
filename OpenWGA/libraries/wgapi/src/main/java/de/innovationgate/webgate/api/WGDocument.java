@@ -2539,6 +2539,8 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
             String extDataName;
             while (extDataNames.hasNext()) {
                 extDataName = (String) extDataNames.next();
+                if(!mayPushExtData(extDataName))
+                	continue;
                 try {
                     Object value = getExtensionData(extDataName);
                     if (value instanceof List) {
@@ -2554,6 +2556,15 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
         
     }
 
+    /**
+     * checks if extension data may be "pushed". Returns true per default but may be overwritten by implementations
+     * @param extName
+     * @return true
+     */
+    public boolean mayPushExtData(String extName){
+    	return true;
+    }
+    
     /**
      * @param b
      */
