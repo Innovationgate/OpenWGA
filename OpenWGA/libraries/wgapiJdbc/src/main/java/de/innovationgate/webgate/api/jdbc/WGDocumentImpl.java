@@ -1010,7 +1010,9 @@ public class WGDocumentImpl implements WGDocumentCore {
     }
 
     public void createPageSequence() throws WGAPIException, InstantiationException, IllegalAccessException {
-    	if(getType()==WGDocument.TYPE_STRUCTENTRY && getExtensionData("page-sequence")==null){
+    	if(_parent.getContentStoreVersion()>=WGDatabase.CSVERSION_WGA5	// must support sequences
+    			&& getType()==WGDocument.TYPE_STRUCTENTRY 
+    			&& getExtensionData("page-sequence")==null){
 	    	long seq = _parent.incrementSystemSequence("page-sequence");        	
 	    	writeExtensionData("page-sequence", seq);
     	}
