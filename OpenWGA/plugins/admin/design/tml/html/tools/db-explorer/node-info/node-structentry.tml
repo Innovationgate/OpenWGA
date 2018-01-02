@@ -127,6 +127,17 @@
 			<div class="data"><tml:script expression="_Struct.getKey()"/></div>		
 			<div class="clear"></div>		
 			
+			<tml:case condition="_Struct.WGObject.getPageSequence()">
+				<label>Page Sequence (hex):</label>		
+				<div class="data">
+					<tml:script>
+						var seq = _Struct.WGObject.getPageSequence()
+						return "0x"+seq.toString(16)
+					</tml:script>
+				</div>		
+				<div class="clear"></div>
+			</tml:case>
+
 			<tml:case condition="_Struct.WGObject.getUniqueName()">
 				<label>Unique Name:</label>		
 				<div class="data"><tml:script expression="_Struct.WGObject.getUniqueName()"/></div>		
@@ -149,19 +160,19 @@
 				</tml:else>
 			</tml:if>
 					
-			<tml:case condition="_Struct.WGObject.getReaders().size()">
+			<tml:case condition="_Struct.WGObject.getReaders().size() && _Struct.WGObject.getReaders().get(0)">
 				<label>Readers:</label>		
 				<div class="data"><tml:script expression="_Struct.WGObject.getReaders()" divider=", "/></div>		
 				<div class="clear"></div>
 			</tml:case>
 
-			<tml:case condition="_Struct.WGObject.getPageEditors().size()">
+			<tml:case condition="_Struct.WGObject.getPageEditors().size() && _Struct.WGObject.getPageEditors().get(0)">
 				<label>Page Editors:</label>		
 				<div class="data"><tml:script expression="_Struct.WGObject.getPageEditors()" divider=", "/></div>		
 				<div class="clear"></div>
 			</tml:case>
 
-			<tml:case condition="_Struct.WGObject.getChildEditors().size()">
+			<tml:case condition="_Struct.WGObject.getChildEditors().size() && _Struct.WGObject.getChildEditors().get(0)">
 				<label>Child Editors:</label>		
 				<div class="data"><tml:script expression="_Struct.WGObject.getChildEditors()" divider=", "/></div>		
 				<div class="clear"></div>

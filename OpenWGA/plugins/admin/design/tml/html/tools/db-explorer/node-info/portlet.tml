@@ -94,10 +94,12 @@
 	_key = a.join(":");
 	_wgakey = _type + "/" + a.join("/");
 	
+	//console.log(_type, "_key:", _key, "_wgakey:", _wgakey);
+	
 	// check if document still exists
 	_exists = false;
 	if(_type=='root' || _type=="cssjs" || _type=="tml" || _type=="filecontainer")
-		_exists = true;
+		_exists = _key;
 	else if(_key){	
 		if(db(option("key")).getDocumentByKey(_wgakey))
 			_exists = true;
@@ -106,22 +108,18 @@
 </tml:script>
 
 <tml:case condition="_exists">
-
-	<tml:case condition="portlet.getSessionVar('currentpage')<0" var="_html">
-		<tml:include ref="{'::node-'+_type}" o_documentkey="{_key}" o_wgakey="{_wgakey}" trim="true"/>
-	</tml:case>
-
-	<tml:case condition="_html.replace(/[\n\s]/g, '')">
 	
-		<tml:include designdb="@ui" ref="tabview_dynamic">
+	<tml:include designdb="@ui" ref="tabview_dynamic">
+	
+		<tml:option name="title"><tml:label key="{'db-explorer.node.'+_type}"/></tml:option>	
 		
-			<tml:option name="title"><tml:label key="{'db-explorer.node.'+_type}"/></tml:option>	
+		<tml:inline name="body">			
+	
+			<tml:case condition="portlet.getSessionVar('currentpage')<0">
+				<tml:include ref="{'::node-'+_type}" o_documentkey="{_key}" o_wgakey="{_wgakey}"/>
+			</tml:case>
+		</tml:inline>
 			
-			<tml:inline name="body">			
-				<tml:item name="_html" encode="none"/>
-			</tml:inline>
-				
-		</tml:include>
-	</tml:case>
+	</tml:include>
 
 </tml:case>
