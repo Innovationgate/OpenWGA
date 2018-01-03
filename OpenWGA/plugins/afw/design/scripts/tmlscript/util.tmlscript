@@ -641,8 +641,8 @@ this.csvReader = function(config){
 	var divider = config.divider || ";";
 
 	if(typeof(config.onerror)=="undefined"){
-		config.onerror=function(line, id, msg){
-	 		console.error("line " + line, "[" + id + "]:", msg);
+		config.onerror=function(line, key, msg){
+	 		console.error("line " + line, "[" + key + "]:", msg);
 	 	}
 	}
 	
@@ -669,15 +669,15 @@ this.csvReader = function(config){
 					
 					if(typeof(column)=="string")
 						column = {
-							id: column
+							key: column
 						}
-					if(!column.id)
+					if(!column.key)
 						continue;
 
 					var value = values[index]
 					if(typeof(value)=="undefined"){
 						if(config.onerror)
-							config.onerror(i, column.id, "unable to find column");
+							config.onerror(i, column.key, "unable to find column");
 						continue;
 					}
 					value = value.trim();
@@ -692,11 +692,11 @@ this.csvReader = function(config){
 						else if(column.type=="boolean"){
 							value = (value.toLowerCase()=="true" || value=="1") ? true : false;
 						}
-						data[column.id]=value
+						data[column.key]=value
 					}
 					catch(e){
 						if(config.onerror)
-							config.onerror(i, column.id, e);
+							config.onerror(i, column.key, e);
 					}
 				
 				}
