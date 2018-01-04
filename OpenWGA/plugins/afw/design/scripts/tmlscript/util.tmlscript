@@ -619,18 +619,18 @@ this.csvWriter = function(config){
  *		numberFormat:			Optional number format. If empty # ist used.
  *		skiplines:				Number of lines to skip. Default = 1.
  *		divider:				Column divider. Default is Semicolon
- *		process(data,line):		Function called for each line in input stream. Required.
- *		onerror(line, id, msg):	Optional function called on errors. Set to null to ignore erors
+ *		process(data, line):		Function called for each line in input stream. Required.
+ *		onerror(line, key, msg):	Optional function called on errors. Set to null to ignore erors
  *
  *	Column Definition (config.columns):
  *		Each column is either a Sting or Object. If it is Object !=null the following properties are assumed:
- *			id:	The column id
- *			type: Optional - text|date|number|boolean - defaults to text
+ *			key:	The column id
+ *			type: 	optional - text|date|number|boolean - defaults to text
  *		null columns are ignored
  *
  *	Sampe usages:
  *		AFW.Util.csvReader({
- *			columns: ["title", {id:"created",type:"date"}, null, "ean", "price"],
+ *			columns: ["title", {key:"created",type:"date"}, null, "ean", "price"],
  *			onerror: null,	// ignore errors
  *			process: function(data){...}
  *		}).read(inputStreamOrFile [,encoding])
@@ -663,14 +663,23 @@ this.csvReader = function(config){
 				
 			for(let i=1; line = reader.readLine(); i++){
 				var values = line.split(divider);
-				var data = {}
+				var data = {};
 				
 				for(let [index, column] in config.columns){
 					
-					if(typeof(column)=="string")
-						column = {
+					if(typeof(column)=="string"){
+						// check for "key(type)" format:
+						var match = /(\w+)\s*\(\s*(\w+)\s*\)/.exec(column)
+						if(match && match.length>2){
+							column={
+								key: match[1],
+								type: match[2].toLowerCase()
+							}
+						}
+						else column = {
 							key: column
 						}
+					}
 					if(!column.key)
 						continue;
 
