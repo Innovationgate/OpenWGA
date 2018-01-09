@@ -63,7 +63,7 @@
 		]
 	</tml:option>
 
-	<tml:inline name="body">
+	<tml:option name="body">
 
 		<tml:case istrue="_uploadPlugin">
 			<tml:include designdb="@ui" ref="message">
@@ -426,5 +426,6 @@
 			
 		</tml:foreach>
 		
-	</tml:inline>
+	</tml:option>
+	
 </tml:include>
