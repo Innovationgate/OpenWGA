@@ -1242,12 +1242,19 @@ AFW.RTF.editor=function(id, config){
 			case "JustifyFull":
 			case "RemoveFormat":
 				editor.doc.execCommand(cmd, false, null);
+				
+				// #00005128
+				// In case of "select all" IE11 seams to _clone_ this.spanElement and create a new one.
+				// As a workaround we update the reference after the block operation
+				editor.spanElement = editor.editelement.parentElement;
+				
 				_updateToolbar();
 				break;
 		
 			case "InsertUnorderedList":
 			case "InsertOrderedList":
 				editor.doc.execCommand(cmd, false, null);
+				editor.spanElement = editor.editelement.parentElement;
 				var el = this.getParagraph();
 				if(el && !WGA.isIE){
 					this.selection.save();
