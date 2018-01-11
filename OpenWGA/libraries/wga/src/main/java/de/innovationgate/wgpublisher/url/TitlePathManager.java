@@ -621,18 +621,12 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
             return null;
         }
         
-        /*
-         * Why do we need this ???
-         * The effect is that parseTitlePathURL() needs an open db session - just to parse some text.
-         * -> Removed: #00005129
-         *
         if (urlid.isCompleteFormat()) {
             WGLanguage lang = _db.getLanguage(urlid.getLanguage());
             if (lang == null) {
                 urlid.setCompleteFormat(false);
             }
         }
-        */
         
         // Look if an extra key is provided. If so we must skip the whole rest, as there is no need for a (valid) trigger title
         if (urlid.getResourceExtraKey() != null) {

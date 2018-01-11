@@ -47,6 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 import de.innovationgate.utils.URLBuilder;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGException;
+import de.innovationgate.webgate.api.WGStructEntry;
 import de.innovationgate.wga.config.ConfigBean;
 import de.innovationgate.wga.config.ContentDatabase;
 import de.innovationgate.wga.config.VirtualHost;
@@ -199,14 +200,28 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                         	WGDatabase database = _core.getContentdbs().get(defaultDBKey);
 	                    	database = _core.openContentDB(database, httpRequest, false);
 	                		TitlePathManager tpm = (TitlePathManager) database.getAttribute(WGACore.DBATTRIB_TITLEPATHMANAGER);
-	                		if (tpm != null && tpm.isGenerateTitlePathURLs()) {
+	                		if (tpm != null && tpm.isGenerateTitlePathURLs() && database.isSessionOpen()) {
 	                			ArrayList<String> elements = new ArrayList<String>(Arrays.asList(pathElements));
 	                			elements.remove(0); // remove empty first element produced by "/"
 	                			TitlePathManager.TitlePath title_path_url = tpm.parseTitlePathURL(elements);
-	                			if(title_path_url!=null && title_path_url.getStructKey()!=null && database.getStructEntryByKey(title_path_url.getStructKey())!=null){
-	                				// we have a structkey pointing to a content in this database
-	                				// requestedDBKey should be ignored in this case: it's part of the title path
-	                                hasValidTitlePath = true;
+	                			if(title_path_url!=null && title_path_url.getStructKey()!=null){
+	                				String key = title_path_url.getStructKey();
+	                				WGStructEntry entry = database.getStructEntryByKey(key);
+	                				if(entry==null){
+	                					// may be a sequence?
+		                            	try{
+		                	            	long seq = Long.parseLong(key, 16);
+		                	            	entry = database.getStructEntryBySequence(seq);
+		                            	}
+		                            	catch(Exception e){
+		                            		// may be unable to parse structkey as long. Ignore any errors here.
+		                            	}
+	                				}
+	                				if(entry!=null){
+		                				// we have a structkey or sequence pointing to a content in this database
+		                				// requestedDBKey should be ignored in this case: it's part of the title path
+		                                hasValidTitlePath = true;
+	                				}
 	                			}
 	                		}
 						} catch (WGException e) {
