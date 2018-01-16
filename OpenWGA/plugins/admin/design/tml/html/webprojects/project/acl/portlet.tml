@@ -187,7 +187,7 @@
 	DBM.openDBSession(dbKey);
 	var type = 1;
 	var acl = db(dbKey).getACL();
-		if (acl) {
+	if (acl) {
 		var defaultEntry = acl.getEntry('*');
 		var anonymousEntry = acl.getEntry('anonymous');
 		if (defaultEntry) {
