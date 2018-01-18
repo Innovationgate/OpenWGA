@@ -1125,7 +1125,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                     clauseTerm.append(".").append(columnMeta.getMetaName().toLowerCase());
                         
                     // Metas with special data structures
-                    if (loc == WGStructEntry.class && term.getName().equals(WGStructEntry.META_PUBLISHED)) {
+                    if (loc == WGStructEntry.class && term.getName().equals("PAGEPUBLISHED")) {
                         params.put("lang", contentLanguage);
                         clauseTerm.append("[:lang]");
                     }
