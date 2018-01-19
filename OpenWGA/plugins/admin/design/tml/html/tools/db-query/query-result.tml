@@ -78,7 +78,7 @@
 								<tml:script>
 									if(tmlform.type=="sql" && isEmptyValue(tmlform.items))
 										itemNames = content().getItemNames();
-									else itemNames = WGA.createList(tmlform.items, ",");
+									else itemNames = Packages.de.innovationgate.utils.WGUtils.deserializeCollection(tmlform.items, ",", true);
 								</tml:script>
 								<tr class="collection-title">
 									<tml:foreach type="itemvalue" item="itemNames" currentvalue="itemName">
