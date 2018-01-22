@@ -79,9 +79,7 @@ this.database=function(dbobj){
 		},
 
 		openSession: function(){
-			if (!wgadb.isSessionOpen()) {
-				wgadb.openSession();
-			}
+			wgadb.openSession();
 		},
 		
 		getDomainName: function(){
