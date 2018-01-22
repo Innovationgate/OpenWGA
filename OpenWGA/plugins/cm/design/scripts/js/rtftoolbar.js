@@ -609,20 +609,6 @@ BI.rtftoolbar=function(){
 			}
 			,editNode: function(ev, i, tag){
 				showContentMenu(ev, i, tag);
-				return;
-			
-			
-				BI.dialog.show("rtf:edit-rtf-node", null, {nodeindex:i,tag:tag})
-				if(ev){
-					//console.log(ev);
-					ev.preventDefault();
-					ev.stopPropagation();
-				}
-				else{	// IE
-					ev = window.event;
-					ev.cancelBubble = true;
-					ev.returnValue = false;
-				}
 			}
 		},
 

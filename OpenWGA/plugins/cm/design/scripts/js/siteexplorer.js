@@ -646,38 +646,6 @@ BI.se.reloadParent=function(structkey, selectKeyAfterReload, callback){
 		selectKeyAfterReload:selectKeyAfterReload
 	});
 	
-	/**************/
-	
-	//console.log("reload parent", structkey);
-	var structkey=structkey;
-	if(BI.se.structs["struct:"+structkey].isRoot)
-		return BI.se.reload(selectKeyAfterReload);		// reload whole siteexplorer
-		
-	var parentkey=BI.se.structs["struct:"+structkey].parent;
-	var parent=BI.se.structs[parentkey];	
-	var parentEl=Ext.get(parentkey);
-	
-	BI.se.closeStruct(parentEl, null, false);	// DON'T USE ANIMATION HERE beauce we will reopen this in a moment
-	
-	removeChildren(parent);
-	
-	if(BI.se.currentEntry)
-		BI.se.currentEntry.toggleClass("selected");
-	BI.se.currentEntry=null;
-	BI.se.selectEntryByKey(selectKeyAfterReload);
-
-	function removeChildren(struct){
-		//console.log("removeChildren", struct.title, struct.children)
-		for(var s=0; s<struct.children.length; s++){
-			var childkey=struct.children[s];
-			var child=BI.se.structs[childkey];
-			removeChildren(child);
-			delete BI.se.structs[childkey];
-		}
-		struct.children=[];
-		struct.isloaded=false;
-	}
-	
 }
 
 BI.se.reloadStruct=function(structkey, options){
