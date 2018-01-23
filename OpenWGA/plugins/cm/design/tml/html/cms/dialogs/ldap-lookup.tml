@@ -89,7 +89,11 @@
 				    		}
 				    	</tml:script>
 				    </td>    
-				    <td><tml:script divider=", ">return _current.getAliasNames();</tml:script></td>
+				    <td>
+				    	<tml:case condition="_current.isUser()">
+				    		<tml:script divider=", ">return _current.getAliasNames();</tml:script>
+				    	</tml:case>
+				    </td>
 			   </tr> 
 			</tml:foreach>
 		</table>
