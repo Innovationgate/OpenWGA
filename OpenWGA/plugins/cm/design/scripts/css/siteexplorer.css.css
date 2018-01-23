@@ -129,10 +129,10 @@
 	background:url(../../plugin-wga-app-framework/file/icons/page.png) no-repeat 0px 0px;
 }
 .siteexplorer .struct .has-access-rights{
-	color:red;
+	color:blue;
 }
 .siteexplorer .struct .content-has-readers{
-	font-style: italic;
+	color:red;
 }
 
 .siteexplorer .struct .not-visible{

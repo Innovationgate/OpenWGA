@@ -82,11 +82,9 @@
 						_class += " not-visible";
 				}
 				
-				if(_Struct.contentHasReaders())
+				if(_Struct.contentHasReaders() || (db().isPageReadersEnabled() && document.getReaders().size()))
 					_class += " content-has-readers";
-				if(_Struct.hasAccessRights() || (db().isPageReadersEnabled() && document.getReaders().size()))
-					_class += " has-access-rights";
-					
+				
 				_struct_wf = document.getMetaData(document.META_WORKFLOW_NAME);
 				
 				_preferendLanguage = document.getDatabase().getLanguage(_Database.getPreferedLanguage())
