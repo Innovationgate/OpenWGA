@@ -617,7 +617,7 @@ this.csvWriter = function(config){
  *		columns:				Array column definitions. Required.
  *		dateFormat:				Optional date format. If empty yyyy-MM-dd HH:mm:SS is used.
  *		numberFormat:			Optional number format. If empty # ist used.
- *		skiplines:				Number of lines to skip. Default = 1.
+ *		skiplines:				Number of lines to skip. Default = 0.
  *		divider:				Column divider. Default is Semicolon
  *		process(data, line):		Function called for each line in input stream. Required.
  *		onerror(line, key, msg):	Optional function called on errors. Set to null to ignore erors
@@ -638,7 +638,7 @@ this.csvWriter = function(config){
  */
 this.csvReader = function(config){
 
-	var skiplines = config.skiplines || 1;
+	var skiplines = config.skiplines || 0;
 	var divider = config.divider || ";";
 
 	if(typeof(config.onerror)=="undefined"){
