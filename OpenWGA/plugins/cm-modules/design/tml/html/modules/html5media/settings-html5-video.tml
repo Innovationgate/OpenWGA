@@ -81,18 +81,3 @@
 	</div>
 	
 </tml:case>
-
-	<tml:comment><hr>
-	<label><tml:label key="html5media.mp4-video-file"/>:</label>
-	<tml:include ref="util:select-file" o_fieldname="mp4" o_file-extensions="mov,m4v,mp4"/>
-	
-	<label><tml:label key="html5media.webm-video-file"/>:</label>
-	<tml:include ref="util:select-file" o_fieldname="webm" o_file-extensions="webm"/>
-
-	<label><tml:label key="html5media.posterimage"/>:</label>
-	<tml:include ref="util:select-image" o_empty-text="{_hasPoster ? 'Aus Video':VOID}"/>
-	
-	<label><tml:label key="html5media.autoplay"/>:</label>
-	<div style="margin:10">
-		<tml:input name="{scoped:autoplay}" type="boolean" mode="{option:mode}"/>
-	</div></tml:comment>
