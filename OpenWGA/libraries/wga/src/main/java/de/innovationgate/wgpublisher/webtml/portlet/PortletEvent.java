@@ -117,7 +117,7 @@ public class PortletEvent implements Serializable {
      * @param value parameter value
      */
     @CodeCompletion
-    public void addParameter(String name, Object value) {
+    public void setParameter(String name, Object value) {
         if (name.indexOf(" ") != -1) {
             throw new IllegalArgumentException("Spaces in event parameter names are not supported.");
         } else if (name.indexOf("\"") != -1) {
@@ -140,6 +140,12 @@ public class PortletEvent implements Serializable {
         else {
             _parameters.put(name, String.valueOf(value));
         }
+    }
+    
+    @Deprecated
+    // use setParameter instead
+    public void addParameter(String name, Object value) {
+    	setParameter(name, value);
     }
     
     /**
