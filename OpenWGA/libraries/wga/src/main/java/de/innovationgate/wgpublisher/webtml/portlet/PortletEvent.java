@@ -268,6 +268,7 @@ public class PortletEvent implements Serializable {
         _targetPortletKey = targetPortletKey;
     }
 
+    @CodeCompletion
     public void setParameters(Map<String,Object> parameters) {
         _parameters = parameters;
     }
