@@ -70,9 +70,9 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>5</minorVersion>
-        <maintenanceVersion>1</maintenanceVersion>
+        <maintenanceVersion>2</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>666</buildVersion>
+        <buildVersion>667</buildVersion>
       </version>
     </id>
     <title>OpenWGA Content Management Modules</title>
