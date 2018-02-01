@@ -4200,7 +4200,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
                 	
                 	if (container == null) {
                 		// third try - use container name as key and try to find a content document
-                		container = WGPDispatcher.getContentByAnyKey(containerRef.getResourceName(), db(), new WebTMLLanguageChooser(db(), this), isbrowserinterface());
+                		container = WGPDispatcher.getContentByAnyKey(containerName, db(), new WebTMLLanguageChooser(db(), this), isbrowserinterface());
                 	}
                 }
                     
