@@ -23,7 +23,9 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:comment><tml:include ref="cmm-styles"/></tml:comment>
+<tml:script>
+	WGA.accessLogging().setLoggingEnabled(false);
+</tml:script>
 
 <tml:include designdb="@afw" medium="stylesheet" ref="jquery-plugins">
 	<tml:option name="jquery-plugins" expression="jquery_plugin_css"/>

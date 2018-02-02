@@ -23,6 +23,10 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
+<tml:script>
+	WGA.accessLogging().setLoggingEnabled(false);
+</tml:script>
+
 if(typeof(require)==="undefined"){
 	// create dummy require():
 	window.require = function(deps, callback){
