@@ -4209,8 +4209,21 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
                     return null;                    
                 }
                 
-                fileIn = container.getFileData(fileName);
-                fileSize = container.getFileSize(fileName);
+                if(derivate!=null && container instanceof WGContent){
+                	// search for derivate:
+                	FileDerivateManager fdm = getwgacore().getFileDerivateManager();
+	            	DerivateQuery derivateQuery = fdm.parseDerivateQuery(derivate);
+	                WGFileAnnotations md = fdm.queryDerivate(container, fileName, derivateQuery, new ClientHints(), true);
+	                if(md!=null && md instanceof WGFileDerivateMetaData){
+	                	fileIn = container.getFileDerivateData(((WGFileDerivateMetaData)md).getId());
+	                	fileSize = (int)md.getSize();
+	                }
+                }
+                if (fileIn == null){
+	                fileIn = container.getFileData(fileName);
+	                fileSize = container.getFileSize(fileName);
+                }
+                
                 if (fileIn == null) {
                     addwarning("File '" + fileName + "' not found in filecontainer '" + containerName + "'.");
                     return null;

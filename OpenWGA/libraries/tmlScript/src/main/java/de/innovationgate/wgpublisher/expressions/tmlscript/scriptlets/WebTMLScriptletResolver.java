@@ -401,7 +401,9 @@ public class WebTMLScriptletResolver {
         
         String url = null;
         if (generateDataURL.booleanValue() && command.equalsIgnoreCase("imgurl")) {
-        	url = context.filedataurl(containerName, fileName);
+        	if (derivates == null)
+        		derivates = (String) context.option(Base.OPTION_IMAGE_DERIVATES);
+            return context.filedataurl(null, containerName, fileName, null, derivates);
         } else {
         	url = context.fileurl(containerName, fileName);
         }
