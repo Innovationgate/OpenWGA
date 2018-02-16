@@ -78,6 +78,9 @@
 			<tml:case condition="CMM.setting('fieldtype')=='date'">
 				data-year-range="<tml:[setting] o_name="year_range" o_default="-10:+10"/>"
 			</tml:case>
+			<tml:case condition="CMM.setting('placeholder')">
+				placeholder="<tml:[setting] o_name="placeholder"/>"
+			</tml:case>
 		</tml:input>
 	</div>
 </div>

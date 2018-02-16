@@ -42,6 +42,13 @@
 	/>	
 </div>
 
+<tml:case condition="createlist(['text', 'textarea', 'number', 'date']).contains(tmlform.field(WGA.scoped('fieldtype')))">
+	<label><tml:label key="form.settings.placeholder"/>:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:placeholder}" mode="{option('mode')}" cssstyle="width:100%"/> 
+	</div>	
+</tml:case>
+
 <tml:case condition="createlist(['text', 'number', 'radio', 'date', 'password']).contains(tmlform.field(WGA.scoped('fieldtype')))">
 	<label><tml:label key="form.settings.validation"/>:</label>
 	<div style="margin:10px">
