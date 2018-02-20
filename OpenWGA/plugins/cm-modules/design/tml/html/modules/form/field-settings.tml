@@ -65,10 +65,7 @@
 	<tml:case condition="tmlform.field(WGA.scoped('validation'))">
 		<label><tml:label key="form.settings.validationmessage"/>:</label>
 		<div style="margin:10px">
-			<tml:input name="{scoped:validationmessage}" type="textarea" cssstyle="height:auto;width:100%;overflow:hidden" mode="{option('mode')}">
-				onkeyup="this.rows=this.value.split('\n').length"
-				rows="<tml:script expression="item(WGA.scoped('validationmessage')) ? item(WGA.scoped('validationmessage')).split('\n').length : 1"/>"
-			</tml:input>
+			<tml:input name="{scoped:validationmessage}" type="textarea" cssstyle="width:100%" mode="{option('mode')}"/>
 		</div>
 	</tml:case>
 </tml:case>
@@ -83,10 +80,7 @@
 <tml:case condition="createlist(['select', 'checkbox','radio']).contains(tmlform.field(WGA.scoped('fieldtype')))">
 	<label><tml:label key="form.settings.options"/>:</label>
 	<div style="margin:10px">
-		<tml:input name="{scoped:options}" type="textarea" multiple="true" cssstyle="height:auto;width:100%;overflow:hidden" mode="{option('mode')}">
-			onkeyup="this.rows=this.value.split('\n').length"
-			rows="<tml:script expression="tmlform.field(WGA.scoped('options')) ? tmlform.fieldList(WGA.scoped('options')).size() : 1"/>"
-		</tml:input>
+		<tml:input name="{scoped:options}" type="textarea" multiple="true" cssstyle="width:100%" mode="{option('mode')}"/>
 	</div>
 </tml:case>
 
@@ -102,3 +96,6 @@
 	<tml:input name="{scoped:defaultvalue}" type="text" cssstyle="width:100%" mode="{option('mode')}"/>
 </div>
 
+<script>
+	BI.makeTextareasResizable("<tml:script expression="tmlform.formid"/>");
+</script>
