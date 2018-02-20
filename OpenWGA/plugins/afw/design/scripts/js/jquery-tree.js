@@ -298,7 +298,7 @@
 			node.find(".link-text").html(data.html||data.title)
 	}
 	
-	function removeNode(node){
+	function removeNode(node, select_parent){
 		var parent = node.parents('.node').first();
 		node.remove();
 		var children = parent.find(".node")
@@ -306,6 +306,8 @@
 			parent.attr("data-haschildren", false)
 			collapseNode(parent);
 		}
+		if(select_parent)
+			selectNode(parent, true);
 	}
 
 	var exports={
@@ -331,8 +333,8 @@
 		updatenode: function(node_or_id, data){
 			return updateNode(findNode(this, node_or_id), data)
 		},
-		removenode: function(node_or_id, data){
-			return removeNode(findNode(this, node_or_id))
+		removenode: function(node_or_id, select_parent){
+			return removeNode(findNode(this, node_or_id), select_parent)
 		},
 		
 		reload: reload
