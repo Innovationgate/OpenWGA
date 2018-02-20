@@ -36,6 +36,17 @@
 		display: inline;
 	}
 
+	&.rtf, &.textblock{
+		.WGA-Item-Label{
+			display: block;
+		}
+	}
+	&.rtf{
+		.WGA-Item-Label{
+			padding: 30px 5px;
+		}
+	}
+
 	.WGA-Item-Edit {
 		display: inline-block;
 		padding:0;
