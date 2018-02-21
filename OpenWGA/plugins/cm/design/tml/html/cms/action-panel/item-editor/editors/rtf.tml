@@ -381,7 +381,7 @@
 		<div id="rtf-table-form">
 			<table width="100%">
 				<tr id="rtf-table-format-tableStyles">
-					<td><tml:label key="rtf.table"/>:</td>
+					<td width="70"><tml:label key="rtf.table"/>:</td>
 					<td><div id="rtf-toolbar-table-tableStyles-button"></div></td>
 				</tr>
 				<tr id="rtf-table-format-trStyles">
