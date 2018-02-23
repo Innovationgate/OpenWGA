@@ -4082,7 +4082,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
 	@Override
 	public WGDocumentCore getStructEntryBySequence(long seq) throws WGAPIException {
 
-		Query q = getSession().createQuery("select entity from ExtensionData ed where ed.name='page-sequence' and ed.number=:seq");
+		Query q = getSession().createQuery("select struct as struct from StructEntry as struct where struct.extensionData['page-sequence'].number=:seq");
 		q.setParameter("seq", (double)seq);
 		List results = q.list();
 		if (results.size() > 0) {
