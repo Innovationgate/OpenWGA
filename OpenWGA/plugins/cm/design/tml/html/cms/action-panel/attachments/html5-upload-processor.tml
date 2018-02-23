@@ -27,7 +27,8 @@
 	var so=AFW.Util.deserializeJsObject(request.getParameter("so"));
 
 	var url_builder = new Packages.de.innovationgate.utils.URLBuilder(request);
-	var filename = decodeURIComponent(url_builder.getParameter("filename")).toLowerCase();
+	var file_title = decodeURIComponent(url_builder.getParameter("filename"))	
+	var filename = file_title.toLowerCase();
 	
 	filename = WGA.Utils.normalizeUnicode(filename);	// normalize file names
 	
@@ -49,10 +50,15 @@
 					log.info("file " + filename + " replaced.");
 				}
 				doc.attachFile(reader, filename);
+				
+				var file_md = doc.getFileMetaData(filename);
+				file_md.setTitle(file_title)
+
 				doc.save();
+				
 				WGA.Core.getFileDerivateManager().runUpdateProcess()
 				
-			}, doc)(doc, reader, filename);
+			}, doc)(doc, reader, filename, file_title);
 		}
 		catch(e){
 			_msg = e.message;
