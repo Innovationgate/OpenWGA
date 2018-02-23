@@ -1,5 +1,5 @@
 <div class="caption clearfix download">
-	<div class="filename"><tml:label key="download-list.filename"/></div>
 	<div class="filesize"><tml:label key="download-list.filesize"/></div>
+	<div class="filename"><tml:label key="download-list.filename"/></div>
 </div>
 <tml:include ref="system:include-child-modules" o_section-margin="0"/>

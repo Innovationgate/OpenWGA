@@ -19,8 +19,8 @@
 		},
 		
 		".filename": {
-			//margin_left: 60,
-			"float": "left"
+			margin_left: 60,
+			//"float": "left"
 		},
 		
 		".filesize": {

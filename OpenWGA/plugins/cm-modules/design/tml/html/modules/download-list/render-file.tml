@@ -20,6 +20,9 @@
 			href="<tml:item name="_url"/>?forcedownload=true"
 			title="Download <tml:item name="_filename"/> ..."
 		>
+			<div class="filesize">
+				<tml:script format="#,##0.0" expression="_filesize"/>
+			</div>
 			<div class="image">
 				<tml:script expression="AFW.content(_ctx.KEY).attachment(_filename).getThumbnailURL({width:100})" var="_url"/>
 				<tml:case condition="_url">
@@ -30,17 +33,17 @@
 				<tml:script>
 					switch(CMM.setting('title_source')){
 						case "file_md":
-							return _ctx.content().getFileMetaData(_filename).title
+							return "<p>" + _ctx.content().getFileMetaData(_filename).title + "</p>"
 							break;
 						case "filename":
-							return _filename;
+							return "<p>" + _filename + "</p>";
 							break;
 						case "file_info":
 							var filemd = _ctx.content().getFileMetaData(_filename)
 							var type = AFW.content(_ctx.KEY).attachment(_filename).getType().name;
 							var pages = filemd.getCustomFieldValue("pageCount");
-							return "<b>"+filemd.name + "</b>"
-								+ "<br>"
+							return "<p>"+filemd.name + "</p>"
+								//+ "<br>"
 								+ (filemd.title ? filemd.title + "<br>" : "") 
 								+ (type=="other" ? filemd.mimeType : label("filetype."+type))
 								+ (type=="images" ? ", " + filemd.displayWidth + " &times; " + filemd.displayHeight + " Pixel" : "")
@@ -48,15 +51,12 @@
 								+ (filemd.copyright ? ", &copy;" + filemd.copyright : "")
 							break;
 						default:
-							return option("title")
+							return "<p>" + option("title") + "</p>"
 					}
 				</tml:script>
-				<div class="description">
+				<p class="description">
 					<tml:[setting] o_name="description" encode="html"/>
-				</div>
-			</div>
-			<div class="filesize">
-				<tml:script format="#,##0.0" expression="_filesize"/>
+				</p>
 			</div>
 		</a>
 	</tml:then>
