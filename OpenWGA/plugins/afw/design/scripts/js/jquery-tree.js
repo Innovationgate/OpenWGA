@@ -288,7 +288,7 @@
 
 	function findNode(root, node_or_id){		
 		if(typeof(node_or_id)=="string")
-			return root.find("[data-id=" + node_or_id + "]")
+			return root.find("[data-id='" + node_or_id + "']")
 		else return $(node_or_id);
 	}
 
@@ -354,7 +354,7 @@
 					return f.apply($this, args);
 				}
 				catch(e){
-					throw("jquery plugin wga_tree: method " + config + " not found: " + e)
+					throw("jquery plugin wga_tree: method " + config + " failed: " + e)
 					return null;
 				}
 			}
