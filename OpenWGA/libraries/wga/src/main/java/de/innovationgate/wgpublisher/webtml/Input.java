@@ -263,7 +263,52 @@ public class Input extends ActionBase implements DynamicAttributes {
                 // clear results
                 this.clearResult();
                 // display optionText not optionValues
-                if (type.equals("select") || type.equals("checkbox") || type.equals("radio") || type.equals("boolean")) {
+                
+                if (type.equals("boolean")) {
+                	String ret="";
+                    List<InputOption> opts = this.retrieveInputOptions();
+                	
+                    Boolean boolValue = Boolean.FALSE;
+                    if (values.size() >= 1) {
+                        Object theValue = values.get(0);
+                        if (theValue instanceof String) {
+                            boolValue = Boolean.valueOf((String) theValue);
+                        }
+                        else if (theValue instanceof Boolean) {
+                            boolValue = (Boolean) theValue;
+                        }
+                    }
+                    
+                    if(opts.size()==0){
+                    	getStatus().encode = "none";
+                    	ret = "<img align=\"bottom\" src=\"" + getWGPPath() + "/static/images/" + boolValue.toString() + ".png\"> ";
+                    }
+                    else if(opts.size()==1){
+                    	getStatus().encode = "none";
+                        ret = "<span";
+                        if(!boolValue)
+                        	ret += " style=\"text-decoration:line-through\"";
+                        ret += ">";
+                		InputOption opt = opts.get(0);
+                		ret += opt.getText();
+                		ret += "</span>";
+                	}
+                    else{
+                        Iterator<InputOption> options = opts.iterator();
+                        while (options.hasNext()) {
+                            InputOption option = (InputOption) options.next();
+                            List<String> stringValues = WGUtils.toString(values);
+                            if (stringValues.contains(option.getValue())) {
+                                ret = option.getText();
+                                break;
+                            }
+                        }
+                    }
+                	
+                	this.setResult(ret);
+                }
+                
+                else if (type.equals("select") || type.equals("checkbox") || type.equals("radio")) {
                     List<String> textValues = new ArrayList<String>();
                     Iterator<InputOption> options = this.retrieveInputOptions().iterator();
                     if (options.hasNext()) { 
@@ -276,26 +321,7 @@ public class Input extends ActionBase implements DynamicAttributes {
                             }
                         }
                     }
-                    
-                    // Special view output for booleans without options: Display true/false images as suffix (so the do not get encoded)
-                    else if (type.equals("boolean")) {
-                        Boolean boolValue = Boolean.FALSE;
-                        if (values.size() >= 1) {
-                            Object theValue = values.get(0);
-                            if (theValue instanceof String) {
-                                boolValue = Boolean.valueOf((String) theValue);
-                            }
-                            else if (theValue instanceof Boolean) {
-                                boolValue = (Boolean) theValue;
-                            }
-                        }
-                                           
-                        getStatus().encode = "none";
-                        textValues.add("<img align=\"bottom\" src=\"" + getWGPPath() + "/static/images/" + boolValue.toString() + ".png\">");
-                    
-                    }
-                    
-                    
+                                        
                     if (textValues.size() > 0) {
                         this.setResult(textValues);
                         getStatus().divider = getMultiValueDivider();
