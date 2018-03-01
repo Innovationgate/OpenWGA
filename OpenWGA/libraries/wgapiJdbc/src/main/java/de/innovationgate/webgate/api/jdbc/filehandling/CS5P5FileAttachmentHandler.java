@@ -174,28 +174,30 @@ public class CS5P5FileAttachmentHandler extends CS5P4FileAttachmentHandler {
         // Also push all derivates, so they are immediately available (#00003749). They may be recreated on run of the derivate update process.
         if (_doc.getParent() == docCopy.getParent()) {
             
-            for (WGFileDerivateMetaData derivateMd : getFileDerivates(fileName)) {
-                
-                ContentFileDerivate cfd = new ContentFileDerivate();
-                cfd.setName(derivateMd.getName());
-                cfd.setParentMeta((ContentFileMeta) op.getEntity());
-                cfd.setCreated(derivateMd.getCreated());
-                cfd.setLastmodified(derivateMd.getLastModified());
-                cfd.setCreator(derivateMd.getCreator());
-                cfd.setDerivateSha512(derivateMd.getSha512Checksum());
-                cfd.setParentSha512(derivateMd.getParentSha512Checksum());
-                cfd.setSize(derivateMd.getSize());
-                
-                for (String name : derivateMd.getExtensionDataNames()) {
-                    cfd.writeExtensionData(_handling.getParent(), docCopy, name, derivateMd.getExtensionData(name));
-                }
-                
-                if (_handling.getParent().isSaveIsolationActive()) {
-                    docCopy.addAdditionalEntityToSave(cfd);
-                }
-                
-            }
-            
+        	List<WGFileDerivateMetaData> derivates = getFileDerivates(fileName);
+        	if(derivates!=null){
+	            for (WGFileDerivateMetaData derivateMd : derivates) {
+	                
+	                ContentFileDerivate cfd = new ContentFileDerivate();
+	                cfd.setName(derivateMd.getName());
+	                cfd.setParentMeta((ContentFileMeta) op.getEntity());
+	                cfd.setCreated(derivateMd.getCreated());
+	                cfd.setLastmodified(derivateMd.getLastModified());
+	                cfd.setCreator(derivateMd.getCreator());
+	                cfd.setDerivateSha512(derivateMd.getSha512Checksum());
+	                cfd.setParentSha512(derivateMd.getParentSha512Checksum());
+	                cfd.setSize(derivateMd.getSize());
+	                
+	                for (String name : derivateMd.getExtensionDataNames()) {
+	                    cfd.writeExtensionData(_handling.getParent(), docCopy, name, derivateMd.getExtensionData(name));
+	                }
+	                
+	                if (_handling.getParent().isSaveIsolationActive()) {
+	                    docCopy.addAdditionalEntityToSave(cfd);
+	                }
+	                
+	            }
+        	}
         }
         
         return op;
