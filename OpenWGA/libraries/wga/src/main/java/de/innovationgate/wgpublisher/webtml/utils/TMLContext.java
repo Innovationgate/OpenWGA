@@ -2771,8 +2771,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	@Override
     public boolean istrue(String varname) throws WGAPIException {
 
-		Object value = this.item(varname);
-
+		Object value = varname.equals(varname.toUpperCase()) ? this.meta(varname) : this.item(varname);
+		
 		// Enhanced "true", using JavaScript rules to determine true/false.
 		if (isEnhancedItemExpressions()) {
 		    
