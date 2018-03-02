@@ -412,6 +412,37 @@ this.timeElapsed = function(d){
 	}
 }
 
+this.dateRange = function(start_date, end_date){
+	
+	var start = WGA.createCalendar(start_date)
+	var end = WGA.createCalendar(end_date)
+	
+	if(start.get(start.YEAR)==end.get(end.YEAR)){
+		if(start.get(start.MONTH)==end.get(end.MONTH)){
+			if(start.get(start.DAY_OF_MONTH)==end.get(end.DAY_OF_MONTH)){
+				// same day
+				return WGA.format(start.time, "dd. MMM yyyy, HH:mm")
+					+ " " + WGA.design(this).label("date-range.to") + " "
+					+ WGA.format(end.time, "HH:mm")
+					+ " " + WGA.design(this).label("date-range.h")
+			}
+			else{	// same month
+				return WGA.format(start.time, "dd.")
+					+ " " + WGA.design(this).label("date-range.to") + " "
+					+ WGA.format(end.time, "dd. MMM yyyy")
+			}
+		}
+		else{	// same year
+			return WGA.format(start.time, "dd.MM.")
+				+ " " + WGA.design(this).label("date-range.to") + " "
+				+ WGA.format(end.time, "dd.MM.yyyy")
+			
+		}
+	}
+	else return WGA.format(start.time, "dd.MM.yyyy")
+		+ " " + WGA.design(this).label("date-range.to") + " "
+		+ WGA.format(end.time, "dd.MM.yyyy") 
+}
 
 this.renderFileSize = function(value) {
 	// start with GB and work way down to kB
