@@ -1,0 +1,54 @@
+<tml:action id="login">
+
+	var dbkey=request.db;
+	var database=wgacore.getContentdbs().get(dbkey)
+	if(!database)
+		return tmlform.addmessage(label("login.database-not-found", createlist([encode("html", dbkey)])));
+	//var domain = WGA.database(database).domain().name
+		
+	if(WGA.app(dbkey).domain().auth().login(tmlform.username, tmlform.password)){
+		try{
+			if(!AFW.database(dbkey).isAuthor()){
+				tmlform.addMessage(label("login.user-is-no-author", WGA.createList([tmlform.username, dbkey])));
+				return;
+			}
+		}
+		catch(e){
+			tmlform.addmessage(e.message)
+		}
+	}
+	else {
+		// is login blocked?
+		if(WGACore.getBruteForceLoginBlocker().isLoginBlocked(domain, tmlform.username))
+			tmlform.addmessage(label("login.login-blocked", [tmlform.username]))
+		else tmlform.addmessage(label("login.login-error"))
+	}
+
+</tml:action>
+
+<tml:form source="none" id="login" defaultaction="login">
+	<tml:script>
+		if(option("msg"))
+			tmlform.addmessage(option('msg'))
+	</tml:script>
+	<h1>Anmelden an Website <tml:script expression="request.db"/></h1>
+	<tml:case condition="tmlform.hasmessages()">
+		<div class="alert alert-danger">
+			<h4><tml:label key="login.error-message"/></h4>
+			<ul><li>
+				<tml:formmessages divider="</li><li>"/>
+			</li></ul>
+		</div>
+	</tml:case>
+	<div class="form-group">
+		<label>Benutzername:</label>
+		<tml:input name="username" cssclass="form-control" html_placeholder="Ihr Benutzername ..." focus="true"/>
+	</div>
+	<div class="form-group">
+		<label>Kennwort:</label>
+		<tml:input name="password" type="password" cssclass="form-control" html_placeholder="Ihr Kennwort ..."/>
+	</div>
+	<div class="form-group">
+		<tml:button cssclass="btn btn-primary" clickaction="login" html_type="submit">Anmelden ...</tml:button>
+	</div>
+</tml:form>

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title><tml:option name="page-title"/></title>
+		
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name = "viewport" content = "initial-scale = 1.0, user-scalable = no">
+		
+		<script src="<tml:url type="js" name="app"/>"></script>
+		
+		<tml:htmlhead scripts="false" metaoutput="false"/>
+		
+		<script>
+			require.config({
+				baseUrl: "<tml:meta type="request" name="wgaurl"/>/<tml:metadata name="dbkey" type="database" context="main"/>/js",
+				paths: {
+					"bootstrap": "<tml:url type="file" doc="bootstrap" file="javascripts/bootstrap.min.js"/>"
+				},
+				shim: {
+					"bootstrap": { "deps": ["jquery"] }
+				}
+			})
+		</script>
+		
+		<link rel="stylesheet" href="<tml:url type="css" name="styles"/>">
+		
+	</head>
+	
+	<body>
+		<tml:option name="body"/>
+	</body>
+	
+</html>

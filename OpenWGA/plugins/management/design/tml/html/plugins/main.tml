@@ -23,30 +23,21 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 <html>
-<head>
-<tml:htmlhead/>
-
-<link rel="stylesheet" href="<tml:url type="css" name="main"/>"/>
-
-<script type="text/javascript" src="<tml:url type="js" name="::main"/>"></script>
-
-</head>
-
-<body>
-<tml:if condition="!wgacore.dispatcher.isAdminLoggedIn(request)">
-	<tml:then>
-		<h4>You must be logged in as WGA administrator to use this</h4>
-	</tml:then>
-	<tml:else>
-		<tml:include ref="::workspace-plugins"/>
-		<tml:include ref="::installed-plugins"/>
-	</tml:else>
-</tml:if>
-
-</body>
-
-<!--
-<tml:warnings/>
--->
-
+	<head>
+		<tml:htmlhead/>
+		<link rel="stylesheet" href="<tml:url type="css" name="::main"/>"/>
+		<script type="text/javascript" src="<tml:url type="js" name="::main"/>"></script>
+	</head>
+	
+	<body>
+		<tml:if condition="!wgacore.dispatcher.isAdminLoggedIn(request)">
+			<tml:then>
+				<h4>You must be logged in as WGA administrator to use this page</h4>
+			</tml:then>
+			<tml:else>
+				<tml:include ref="::workspace-plugins"/>
+				<tml:include ref="::installed-plugins"/>
+			</tml:else>
+		</tml:if>
+	</body>
 </html>

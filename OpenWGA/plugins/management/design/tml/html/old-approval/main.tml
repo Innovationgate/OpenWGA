@@ -1,0 +1,96 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+<tml:range labelcontainer="approval">
+	<tml:script>
+	callAction("::initPage");
+	</tml:script>
+	<html>
+		<head>
+			<tml:case isfilled="con">
+				<title><tml:label key="title" param1="{con.title}"/></title>
+			</tml:case>
+			
+			<tml:select>
+			
+				<tml:case istrue="redirectToLogin">
+				
+					<tml:script>
+						loginURL = meta("request", "wgaurl") + "/" + condbkey + "/login?redirect=" + encode("urlquery", meta("request", "url"));
+					</tml:script>
+				
+					<meta http-equiv="refresh" content="1; URL=<tml:item name="loginURL"/>"/>
+				</tml:case>
+				
+				<tml:case istrue="redirectToCM">
+				
+					<tml:script>
+						cmURL = cmurl = callAction("::buildCMURL");
+					</tml:script>
+					
+					<meta http-equiv="refresh" content="1; URL=<tml:item name="cmURL"/>"/>
+				
+				</tml:case>
+				
+				<tml:caseelse>
+					<tml:range var="showBody">true</tml:range>
+				</tml:caseelse>
+				
+			</tml:select>
+		
+			<tml:htmlhead/>
+			
+			<link rel="stylesheet" href="<tml:url type="css" doc="approval:main"/>"/>
+			<script language="javascript" src="<tml:url type="js" doc="::main"/>"></script>
+		</head>
+	
+		<body style="margin:0px;padding:0px">
+			<tml:if isdefined="errorMsg">
+			
+				<tml:then>
+					<div class="message">
+						<b><tml:label key="errorTitle"/>:</b><br/>
+						<p>
+							<tml:item name="errorMsg"/>
+						</p>
+					</div>
+				</tml:then>
+			
+				<tml:elseif istrue="showBody">
+					<tml:include ref="::body"/>
+				</tml:elseif>
+
+				<tml:else>
+					<div>
+						<h4>Redirecting....</h4>
+					</div>
+				</tml:else>
+			</tml:if>
+		
+		
+		<tml:warnings autohide="true"/>
+		
+		</body>
+	</html>
+</tml:range>

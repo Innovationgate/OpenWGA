@@ -1,0 +1,16 @@
+<div id="page" <tml:case hasoptions="appnav">class="appnav"</tml:case>>
+	<div id="header" _class="btn-primary">
+		<tml:option name="header"/>
+		<tml:case hasoptions="title">
+			<div class="title"><tml:option name="title"/></div>
+		</tml:case>
+	</div>
+	<tml:case hasoptions="appnav">
+		<div id="appnav">
+			<tml:option name="appnav"/>
+		</div>
+	</tml:case>
+	<div id="content">			
+		<tml:option name="body"/>
+	</div>
+</div>

@@ -1,0 +1,5 @@
+//@import type=static js/htmlhead.js
+
+//@import db=plugin-wga-app-framework amd:require
+//@import db=plugin-wga-app-framework amd:require-config
+//@import db=plugin-wga-app-framework amd:css

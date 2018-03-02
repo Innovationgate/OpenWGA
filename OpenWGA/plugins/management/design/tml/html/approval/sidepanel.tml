@@ -1,0 +1,74 @@
+##MDSET preprocess=true
+<div class="panel panel-default">
+
+	<div class="panel-heading">
+		@{TITLE}
+	</div>
+
+	<div class="panel-body">
+
+		<div>
+			<label>Status</label>
+			<p><tml:label key="[status.{STATUS}]"/></p>
+		</div>
+
+		<tml:{div} if="VALIDFROM | VALIDTO">
+			<label>Geplante Veröffentlichung</label>
+			<p style="color:red">
+				<tml:script expression="VALIDFROM && VALIDTO ? AFW.Util.dateRange(VALIDFROM, VALIDTO) : VALIDFROM || VALIDTO" format="dd. MMMMM yyyy"/>
+				
+				<tml:comment>@{VALIDFROM format="dd. MMMMM yyyy"}
+				<tml:{div} if="VALIDTO">
+					bis
+					@{VALIDTO format="dd. MMMMM yyyy"}
+				</tml:{div}></tml:comment>
+			</p>
+		</tml:{div}>
+
+		<div>
+			<label>Autor</label>
+			<p>@{AUTHOR}</p>
+		</div>
+
+		<tml:{div} if="WORKFLOW">
+			<label>Workflow</label>
+			<p>
+				@{WORKFLOW}
+				<tml:script>
+					try{
+						return '/ ' + content().getWorkflow().getWorkflowLevel().getName()
+					}
+					catch(e){}
+				</tml:script>
+			</p>
+		</tml:{div}>
+
+		<tml:{div} if="ersetzungsgrund">
+			<label>Grund der Ersetzung</label>
+			<p>@{ersetzungsgrund}</p>
+		</tml:{div}>
+		
+		<fieldset>
+			<legend>Inhaltsversion</legend>
+			<div>
+				<label>Erstellt</label>
+				<p>@{CREATED format="dd. MMM yyyy, HH:mm"} Uhr</p>
+			</div>
+			
+			<div>
+				<label>Zuletzt geändert</label>
+				<p>@{MODIFIED format="dd. MMM yyyy, HH:mm"} Uhr</p>
+			</div>
+		
+		</fieldset>
+		
+		<tml:{fieldset} if="PAGEPUBLISHED">
+			<legend>Seite</legend>
+			<div>
+				<label>Veröffentlicht seit</label>
+				<p>@{PAGEPUBLISHED format="dd. MMM yyyy, HH:mm"} Uhr</p>
+			</div>
+		</tml:{fieldset}>
+		
+	</div>
+</div>

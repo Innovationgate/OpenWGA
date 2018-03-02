@@ -1,213 +1,36 @@
-## LICENSE START ###############################################################
-## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
-## 
-## This file is part of the OpenWGA server platform.
-## 
-## OpenWGA is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-## 
-## In addition, a special exception is granted by the copyright holders
-## of OpenWGA called "OpenWGA plugin exception". You should have received
-## a copy of this exception along with OpenWGA in file COPYING.
-## If not, see <http://www.openwga.com/gpl-plugin-exception>.
-## 
-## OpenWGA is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-## 
-## You should have received a copy of the GNU General Public License
-## along with OpenWGA in file COPYING.
-## If not, see <http://www.gnu.org/licenses/>.
-## LICENSE END #################################################################
-<tml:range labelfile="info" context="{item:contextPath}">
+<tml:action id="logout">
+	WGA.app().domain().auth().logout()
+	WGA.redirectTo(WGA.urlBuilder().build());
+</tml:action>
 
-	<table width="98%" height="98%" cellpadding="0" cellspacing="0">
-		<tr>
-			<!-- INFO PANEL -->
-			
-			<td style="align: left; vertical-align: top">
-			
-				<div class="approvalHeader"><tml:label key="headline"/></div>
-				
-				<div class="wfInfoPanel">
-			
-					<div class="wfInfoHeader"><tml:label key="title"/></div>
-					<div class="wfInfo"><tml:meta name="title"/></div>
-					
-					<div class="wfInfoHeader"><tml:label key="author"/></div>
-					<div class="wfInfo"><tml:meta name="author"/></div>
-					
-					<div class="wfInfoHeader"><tml:label key="contenttype"/></div>
-					<div class="wfInfo"><tml:meta name="contenttypetitle"/></div>
-	
-					<div class="wfInfoHeader"><tml:label key="position"/></div>
-					<div class="wfInfo">
-						<tml:script>
-							if (content().structEntry.isRoot()) {
-								var paramList = createList();
-								paramList.add(content().structEntry.area.name);
-								return label("rootDocPosition", paramList);
-							}
-							else {
-								var paramList = createList();
-								var parentStruct = content().structEntry.parentEntry;
-								var parentContent = parentStruct.getReleasedContent(LANGUAGE);
-								if (parentContent != null) {
-									paramList.add(parentContent.getTitle()); 
-								}
-								else {
-									paramList.add(parentStruct.getTitle());
-								}
-								return label("childDocPosition", paramList);
-							}
-						</tml:script>
-					</div>
-					
-					<div class="wfInfoHeader"><tml:label key="wfstatus"/></div>
-					<div class="wfInfo"><tml:label key="{'wfstatus_' + STATUS}"/></div>
-					
-					<tml:script var="visibility">
-						
-						var out = createList();
-						var df = "dd.MM.yyyy";
-						
-						if (!isEmptyValue(con.validFrom) || !isEmptyValue(con.validTo)) {
-							var labelParms = createList();
-															
-							if (!isEmptyValue(con.validFrom) && !isEmptyValue(con.validTo)) {
-								labelParms.add(format(con.validFrom, df));
-								labelParms.add(format(con.validTo, df));
-								out.add(label("visFromTo", labelParms)); 
-							}
-							else if (!isEmptyValue(con.validFrom)) {
-								labelParms.add(format(con.validFrom, df));
-								out.add(label("visFrom", labelParms));
-							}
-							else {
-								labelParms.add(format(con.validTo, df));
-								out.add(label("visTo", labelParms));
-							}
-						}
-						
-						var hiddenIn = createList();
-						if (con.isHiddenFrom().contains(con.DISPLAYTYPE_NAVIGATOR)) {
-							hiddenIn.add(label("visHiddenNav"));  
-						}
-						if (con.isHiddenFrom().contains(con.DISPLAYTYPE_SEARCH)) {
-							hiddenIn.add(label("visHiddenSearch"));  
-						}
-						if (con.isHiddenFrom().contains(con.DISPLAYTYPE_SITEMAP)) {
-							hiddenIn.add(label("visHiddenSitemap"));  
-						}
-						
-						if (hiddenIn.size() > 0) {
-							var hiddenInStr = Packages.de.innovationgate.utils.WGUtils.serializeCollection(hiddenIn, ", ");
-							out.add(label("visHidden") + ":<br/><i>" + hiddenInStr + "</i>");
-						}
-						
-						if (!isEmptyValue(con.readers) && !con.readers.get(0) == "*") {
-							var readersStr = Packages.de.innovationgate.utils.WGUtils.serializeCollection(con.readers, ", ");
-							out.add(label("visReaders") + ":<br/><i>" + readersStr + "</i>");;
-						}
-						
-						return out;						
-						
-					</tml:script>
-					
-					<tml:case isfilled="visibility">
-						<div class="wfInfoHeader"><tml:label key="visibility"/></div>
-						<div class="wfInfo">
-							<ul style="line-height: 150%">
-								<li><tml:item name="visibility" divider="<li>" encode="none"/>
-							</ul>
-						</div>
-					</tml:case>
-						
-					<tml:select>
-						<tml:case condition="STATUS == 'g'">
-							<div class="wfInfoHeader"><tml:label key="publishingDate"/></div>
-							<div class="wfInfo"><tml:item name="{Packages.de.innovationgate.webgate.api.workflow.WGStraightWorkflowBase.ITEM_PUBLISHINGDATE}"/></div>
-						</tml:case>
-						<tml:case condition="STATUS == 'p'">
-							<div class="wfInfoHeader"><tml:label key="releaseDate"/></div>
-							<div class="wfInfo"><tml:item name="{Packages.de.innovationgate.webgate.api.workflow.WGStraightWorkflowBase.ITEM_RELEASEDATE}"/></div>
-						</tml:case>
-						<tml:case condition="STATUS == 'a'">
-							<div class="wfInfoHeader"><tml:label key="archivingDate"/></div>
-							<div class="wfInfo"><tml:item name="{Packages.de.innovationgate.webgate.api.workflow.WGStraightWorkflowBase.ITEM_ARCHIVINGDATE}"/></div>
-						</tml:case>
-					</tml:select>
-					
-					<tml:case isfilled="{Packages.de.innovationgate.webgate.api.workflow.WGStraightWorkflowBase.ITEM_COMMENT}">
-						<div class="wfInfoHeader"><tml:label key="comment"/></div>
-						<div class="wfInfo"><tml:item name="{Packages.de.innovationgate.webgate.api.workflow.WGStraightWorkflowBase.ITEM_COMMENT}"/></div>
-					</tml:case>
-					
-					<tml:case isfilled="{Packages.de.innovationgate.webgate.api.WGContent.ITEM_REPLACEREASON}">
-						<div class="wfInfoHeader"><tml:label key="replacementReason"/></div>
-						<div class="wfInfo"><tml:item name="{Packages.de.innovationgate.webgate.api.WGContent.ITEM_REPLACEREASON}"/></div>
-					</tml:case>
-					
+<div class="content sidebar">
+	<div class="sidebar">	
+		<tml:include ref="::sidepanel"/>
+	</div>
+	<div class="body">
+		<tml:if condition="STATUS==content().STATUS_REVIEW">
+			<tml:then>
+				<tml:if condition="content().getWorkflow().isApprovableByUser()">
+					<tml:then>
+						<iframe src="<tml:url/>"></iframe>
+						<tml:include ref="::actions"/>
+					</tml:then>
+					<tml:else>
+						<div class="loading">
+							<h1>Genehmigung für Sie nicht möglich</h1>
+							Sie sind kein Genehmiger dieser Seite in diesem Workflow.
+							<p>
+								<tml:button cssclass="btn btn-primary" clickaction="logout">Abmelden</tml:button>
+						</div>						
+					</tml:else>
+				</tml:if>
+			</tml:then>
+			<tml:else>
+				<div class="loading">
+					<h1><tml:item name="_msg"/></h1>
+					Die Seite befindet sich im Status <tml:label key="[status.{STATUS}]"/>.
 				</div>
-				
-				<hr/>
-
-				<tml:select>
-					<tml:case condition="con.status != con.STATUS_REVIEW">
-						<div class="info"><tml:label file="actions" key="approveFalseStatus" param1="{con.title}"/></div>
-					</tml:case>
-					<tml:case condition="con.getWorkflowRole() < Packages.de.innovationgate.webgate.api.workflow.WGWorkflow.ROLE_APPROVER">
-						<div class="info"><tml:label file="actions" key="approveNoApprover" param1="{con.title}"/></div>
-					</tml:case>
-					<tml:case condition="con.getDatabase().getWorkflowEngine().getWorkflow(con).isAlreadyApprovedByUser()">
-						<div class="info"><tml:label file="actions" key="alreadyApproved" param1="{con.title}"/></div>
-					</tml:case>
-					<tml:caseelse>
-						<a class="action" id="a_approve" href="javascript:loadActionPage('approve', '<tml:url context="main" layout="::action"/>?action=approve&db=<tml:urlparam name="db"/>&key=<tml:urlparam name="key"/>')">
-							<tml:image context="main" doc="images" file="function.zip/accepted_48.png">class="action"</tml:image>
-							<b><tml:label key="actionApprove"/></b><br/>
-							<tml:label key="actionApproveDescription"/>
-						</a>
-						<hr/>
-						<a class="action" id="a_reset" href="javascript:loadActionPage('reset', '<tml:url context="main" layout="::action"/>?action=reset&db=<tml:urlparam name="db"/>&key=<tml:urlparam name="key"/>')">
-							<tml:image context="main" doc="images" file="function.zip/cancel_48.png">class="action"</tml:image>
-							<b><tml:label key="actionReset"/></b><br/>
-							<tml:label key="actionResetDescription"/>
-						</a>
-						<hr/>
-					</tml:caseelse>
-				</tml:select>
-				
-
-				<tml:script>
-						cmurl = callAction("::buildCMURL");
-				</tml:script>
-				
-				
-				<a class="action" href="<tml:item name="cmurl"/>">
-					<tml:image context="main" doc="images" file="function.zip/app_48.png">class="action" align="left"</tml:image>
-					<b><tml:label key="actionBI"/></b><br/>
-					<tml:label key="actionBIDescription"/>
-				</a>
-
-				<br/>
-	
-				
-				<tml:comment>
-				<!-- Currently not needed -->
-				<tml:form context="main" id="approvalFlags" source="profile" cssstyle="font-family: Arial,Verdana,Helvetia;	font-size: 11px;">
-					<tml:input name="approvalFlags" type="checkbox" changeaction="$store" options="{label:approvalFlags}"/> 
-				</tml:form>
-				</tml:comment>
-			</td>
-			
-			<!-- PREVIEW PANEL -->
-			<td style="width:75%; vertical-align:top">
-				<iframe id="preview" name="preview" width="100%" height="100%" src="<tml:url/>"></iframe>
-			</td>
-		</tr>
-	</table>
-</tml:range>
+			</tml:else>
+		</tml:if>
+	</div>
+</div>

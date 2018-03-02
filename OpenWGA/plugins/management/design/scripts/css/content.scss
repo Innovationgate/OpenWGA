@@ -1,0 +1,56 @@
+$sidebar_width: 280px;
+
+#content {
+	background: white;
+	overflow: auto;
+	.content {
+		.body {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			overflow: auto;
+			transition: right .3s ease-in;
+
+			iframe {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				border: none;
+			}
+
+			.loading {
+				font-size: 2em;
+				margin: 100px;
+			}
+
+		}
+
+		.sidebar {
+			font-size: .9em;
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			overflow: auto;
+			width: $sidebar_width;
+			padding: 10px;
+			background: #EBEBEB;
+			transition: width .3s ease-in;
+			border-left: solid silver 1px;
+		}
+
+		&.sidebar {
+			.body {
+				right: $sidebar_width;
+			}
+		}
+
+	}
+
+	.splash {
+		width: 600px;
+		margin: 50px auto
+	}
+}

@@ -1,0 +1,19 @@
+<div class="toolbar">
+	
+	<tml:case condition="AFW.database(request.db).isEditor() && STATUS==content().STATUS_REVIEW && content().getWorkflow().isApprovableByUser()" context="[db:{request.db}/docid:{request.key}]" iscontextvalid="true">
+		<a class="btn button" href="#approve" data-modal="show">
+			<span class="icon glyphicon glyphicon-cloud-upload"></span>
+			<div class="text">Genehmigen</div>
+		</a>
+		<a class="btn button" href="#reject" data-modal="show" style="margin-right:100px">
+			<span class="icon glyphicon glyphicon-cloud-download"></span>
+			<div class="text">Ablehnen</div>
+		</a>
+	</tml:case>
+
+	<a class="btn button" href="<tml:script expression="CM.getAuthoringURL(request.db, request.key)"/>">
+		<span class="icon glyphicon glyphicon-open"></span>
+		<div class="text">Im Content Manager öffnen</div>
+	</a>
+
+</div>

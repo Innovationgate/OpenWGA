@@ -1,0 +1,61 @@
+<tml:action id="approve-content">
+	content().approve(tmlform.comment);
+	_msg = "Seite wurde genehmigt"
+</tml:action>
+
+<tml:action id="reject-content">
+	content().reject(tmlform.comment);
+	_msg = "Genehmigung der Seite wurde ablehnt"
+</tml:action>
+
+<div id="approve" class="modal-popup">
+	<tml:form id="form-approve">
+		<div class="header">
+			Seite genehmigen
+			<a data-modal="hide">&times;</a>
+		</div>
+		<div class="content">
+			<div class="form-group">
+				<label>Ihr Kommentar:</label>
+				<tml:input name="comment" type="textarea" cssclass="form-control"/>
+			</div>
+			<p>
+				Der Autor wird über die Freigabe benachrichtigt.
+				Der optionale Kommentar wird per Mail an den Autor gesendet.
+			</p> 
+		</div>
+		<div class="footer">
+			<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+			<tml:button cssclass="btn btn-primary" clickaction="approve-content">Freigeben</tml:button>
+		</div>
+	</tml:form>
+</div>
+
+<div id="reject" class="modal-popup">
+	<tml:form id="form-reject">
+		<div class="header">
+			Seite ablehnen
+			<a data-modal="hide">&times;</a>
+		</div>
+		<div class="content">
+			<div class="form-group">
+				<label>Ihr Kommentar:</label>
+				<tml:input name="comment" type="textarea" cssclass="form-control"/>
+			</div>
+			<p>
+				Der Autor wird über die Ablehnung benachrichtigt.
+				Der optionale Kommentar wird per Mail an den Autor gesendet.
+			</p> 
+		</div>
+		<div class="footer">
+			<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+			<tml:button cssclass="btn btn-primary" clickaction="reject-content">Ablehnen</tml:button>
+		</div>
+	</tml:form>
+</div>
+
+<script>
+	require(["jquery", "jquery-modal", "jquery-textarea-autogrow"], function($){
+		$("textarea").autogrow();
+	});
+</script>
