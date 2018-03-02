@@ -177,7 +177,8 @@ public class URLBuilder implements Cloneable {
             }
              
             if (query != null) {
-                _query = decode != null ? WGUtils.decodeURI(query, decode) : query;
+                _query = query;
+                //_query = decode != null ? WGUtils.decodeURI(query, decode) : query;
                 addQueryString(getQuery(), decode);
             }
             
