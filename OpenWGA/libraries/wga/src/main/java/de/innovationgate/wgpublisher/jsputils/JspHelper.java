@@ -25,7 +25,6 @@
 package de.innovationgate.wgpublisher.jsputils;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.NumberFormat;
 import java.util.Collection;
@@ -283,11 +282,11 @@ public class JspHelper {
      * This is meant to be used on WGA error pages to provide minimal information about the requested content to WGA Content Manager.
      * @throws IOException
      */
-    public void writeContentInfo() throws IOException {
+    public String getContentInfoScript() throws IOException {
         
         WGPRequestPath requestPath = (WGPRequestPath) _pageContext.getRequest().getAttribute(WGACore.ATTRIB_REQUESTPATH);
         if (requestPath == null) {
-            return;
+            return "";
         }
        
         String quote = "\"";
@@ -310,18 +309,19 @@ public class JspHelper {
             // Fail silently. Better to display info of the originating error than to show info of internal error in error handling
         }
         
-        PrintWriter out = _pageContext.getResponse().getWriter();
-        out.println("<script type=\"text/javascript\">");
-        out.println("WGA = {");
-        out.println("    contentinfo: {");
-        out.println("        dbkey:" + dbKeyStr + ",");
-        out.println("        contentkey:" + contentKeyStr + ",");
-        out.println("        structkey:" + structKeyStr + ",");
-        out.println("        title: " + titleStr);
-        out.println("    }");
-        out.println("}");
-        out.println("</script>");
+        StringBuffer writer = new StringBuffer();
+        writer.append("<script>");
+        writer.append("WGA = {");
+        writer.append("contentinfo: {");
+        writer.append("dbkey:" + dbKeyStr + ",");
+        writer.append("contentkey:" + contentKeyStr + ",");
+        writer.append("structkey:" + structKeyStr + ",");
+        writer.append("title: " + titleStr);
+        writer.append("}");
+        writer.append("}");
+        writer.append("</script>");
         
+        return writer.toString();
     }
 
     /**
