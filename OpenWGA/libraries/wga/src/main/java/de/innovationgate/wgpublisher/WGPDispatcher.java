@@ -784,7 +784,7 @@ public class WGPDispatcher extends HttpServlet {
             }
 
             if (iPathType == WGPRequestPath.TYPE_UNDEFINED_HOMEPAGE) {
-                throw new HttpErrorException(HttpServletResponse.SC_NOT_FOUND, "No home page was defined for database '" + path.getDatabaseKey() + "'. Please specify an explicit content path.", path
+                throw new HttpErrorException(HttpServletResponse.SC_NOT_FOUND, "No home page was defined for app '" + path.getDatabaseKey() + "'. Please specify an explicit content path.", path
                         .getDatabaseKey());
             }
 
