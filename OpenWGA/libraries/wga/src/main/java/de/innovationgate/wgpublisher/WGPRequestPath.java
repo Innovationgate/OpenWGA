@@ -68,7 +68,6 @@ public class WGPRequestPath {
     public static final String PATHCMD_ADMIN_TML = "admintml";
     public static final String PATHCMD_STATIC_TML = "statictml";
     public static final String PATHCMD_STATIC_RESOURCE = "static";
-    public static final String PATHCMD_BROWSER_INTERFACE = "bi";
     public static final String PATHCMD_STARTPAGE = "start";
     public static final String PATHCMD_TMLFORM = "tmlform";
     public static final int TYPE_INVALID = -1;
@@ -474,7 +473,7 @@ public class WGPRequestPath {
                 this.pathType = TYPE_INVALID;
             }
         }
-        else if (this.pathCommand.equalsIgnoreCase(PATHCMD_STARTPAGE)) {
+        else if (this.pathCommand.equalsIgnoreCase(PATHCMD_STARTPAGE) && core.getWgaConfiguration().isStartPageEnabled()) {
         	this.pathType = TYPE_REDIRECT;
         	this.resourcePath = this.publisherURL + core.getStartPageURL();
         }
@@ -486,7 +485,7 @@ public class WGPRequestPath {
             this.pathType = TYPE_REDIRECT;
             this.resourcePath = this.publisherURL + "/wgadmin.jsp";
         }
-        else if (this.pathCommand.equals(PATHCMD_BROWSER_INTERFACE) || this.pathCommand.equals(PATHCMD_STATIC_RESOURCE) || this.pathCommand.equals(PATHCMD_TEMP_DOWNLOAD)) {
+        else if (this.pathCommand.equals(PATHCMD_STATIC_RESOURCE) || this.pathCommand.equals(PATHCMD_TEMP_DOWNLOAD)) {
         	this.pathType = TYPE_RESOURCE;
         	this.resourcePath = this.basePath;
         }
