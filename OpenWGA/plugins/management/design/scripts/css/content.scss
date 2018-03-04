@@ -53,4 +53,17 @@ $sidebar_width: 280px;
 		width: 600px;
 		margin: 50px auto
 	}
+	
+	.info{
+		text-align: left;
+		label {
+			width: 150px;
+			text-align: right;			
+			float: left;
+		}
+		.data{
+			margin-left: 170px;
+		}
+	}
+	
 }

@@ -1,0 +1,70 @@
+##MDSET preprocess=true
+<tml:script>
+	var core = WGACore;
+	var system = java.lang.System;
+	var maxHeap = Packages.de.innovationgate.utils.WGUtils.getMaxHeap();
+	var runtime = java.lang.Runtime.getRuntime();
+
+	_server = request.getSession().getServletContext().getServerInfo()
+	_locale = java.util.Locale.getDefault().toString();
+	_configFile = core.getConfigFilePath();
+	_logDirectory = core.getLoggingDir() != null ? core.getLoggingDir().getPath() : "(none)";
+	_os = system.getProperty("os.name")+" Version "+system.getProperty("os.version")+ " (" + system.getProperty("os.arch") + ")";
+	
+	_javaVersion = system.getProperty("java.version");
+	_javaFileEncoding = system.getProperty("file.encoding") == null ? "(not set)" : system.getProperty("file.encoding");
+	
+	_maxHeapString = maxHeap != -1 ? (WGA.format(maxHeap / 1024,"#,##0")) + " KB" : "(Not determinable in this Java VM. Must be Version 1.4 or higher)";	
+	_currentHeapSize = WGA.format(runtime.totalMemory() / 1024,"#,##0")+ " KB";
+	_unusedMemory = WGA.format(runtime.freeMemory() / 1024,"#,##0")+ " KB";
+</tml:script>
+
+<div class="info" style="margin-top:30px">
+
+	<fieldset>
+		<legend>Server</legend>
+
+		<tml:[::field] o_label="OS:">
+			@{_os}
+		</tml:[::field]>
+		
+		<tml:[::field] o_label="Application Server:">
+			@{_server}
+		</tml:[::field]>
+
+		<tml:[::field] o_label="Locale:">
+			@{_locale}
+		</tml:[::field]>
+
+		<tml:[::field] o_label="Configuration file:">
+			@{_configFile}
+		</tml:[::field]>
+
+		<tml:[::field] o_label="Logfile:">
+			@{_logDirectory}
+		</tml:[::field]>
+		
+	</fieldset>		
+
+	<fieldset>
+		<legend>Java</legend>
+		
+		<tml:[::field] o_label="Version:">
+			@{_javaVersion}
+		</tml:[::field]>
+		
+		<tml:[::field] o_label="File Encoding:">
+			@{_javaFileEncoding}
+		</tml:[::field]>
+		
+		<tml:[::field] o_label="Maximum heap size:">
+			@{_maxHeapString}
+		</tml:[::field]>
+		
+		<tml:[::field] o_label="Current heap size:">
+			@{_currentHeapSize}
+		</tml:[::field]>
+		
+	</fieldset>
+
+</div>

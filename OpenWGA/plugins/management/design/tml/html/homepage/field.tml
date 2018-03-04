@@ -1,0 +1,4 @@
+<div class="clearfix" style="margin: 10px 0">
+	<label><tml:option name="label"/></label>
+	<div class="data"><tml:option name="body"/></div>
+</div>
