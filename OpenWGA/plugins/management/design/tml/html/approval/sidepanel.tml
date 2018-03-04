@@ -52,12 +52,12 @@
 			<legend>Inhaltsversion</legend>
 			<div>
 				<label>Erstellt</label>
-				<p>@{CREATED format="dd. MMM yyyy, HH:mm"} Uhr</p>
+				<p>@{CREATED format="d. MMMMM yyyy, HH:mm"} Uhr</p>
 			</div>
 			
 			<div>
 				<label>Zuletzt geändert</label>
-				<p>@{MODIFIED format="dd. MMM yyyy, HH:mm"} Uhr</p>
+				<p>@{MODIFIED format="d. MMMMM yyyy, HH:mm"} Uhr</p>
 			</div>
 		
 		</fieldset>
@@ -66,7 +66,7 @@
 			<legend>Seite</legend>
 			<div>
 				<label>Veröffentlicht seit</label>
-				<p>@{PAGEPUBLISHED format="dd. MMM yyyy, HH:mm"} Uhr</p>
+				<p>@{PAGEPUBLISHED format="d. MMMMM yyyy, HH:mm"} Uhr</p>
 			</div>
 		</tml:{fieldset}>
 		

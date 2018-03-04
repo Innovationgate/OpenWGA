@@ -2,25 +2,35 @@
 	<tml:[layout:page] o_title="[{WGA.Brand.name} Freigabeworkflow]">
 
 		<tml:option name="header">
-			<tml:[::toolbar]/>
+				<tml:[::toolbar]/>
+			<tml:case condition="request.db && request.key">
+			</tml:case>
 		</tml:option>
 
 		<tml:option name="body">
 		
-			<tml:if condition="AFW.database(request.db).isEditor()">
+			<tml:if condition="!request.db || !request.key">
 				<tml:then>
+					<div class="splash">
+						<h1>Fehlerhafte URL</h1>
+						Es fehlen notwendige URL-Parameter. Bitte wenden Sie sich an Ihren Administrator.
+					</div>
+				</tml:then>
+		
+				<tml:elseif condition="AFW.database(request.db).isEditor()">
 				
 					<tml:if context="[db:{request.db}/docid:{request.key}]" iscontextvalid="true">
 						<tml:then><tml:include ref="::body"/></tml:then>
 						<tml:else>
 							<div class="splash">
 								<h1>Dokument nicht gefunden</h1>
-								Dokument mit Key <tml:script expression="request.key"/> konnte in Website <tml:script expression="request.db"/> nicht gefunden werden.
+								Das Dokument mit Schlüssel <tml:script expression="request.key"/> konnte in Website <tml:script expression="request.db"/> nicht gefunden werden.
 							</div>
 						</tml:else>
 					</tml:if>
 				
-				</tml:then>
+				</tml:elseif>
+				
 				<tml:else>
 					<div class="splash">
 						<tml:include ref="::login"/>
