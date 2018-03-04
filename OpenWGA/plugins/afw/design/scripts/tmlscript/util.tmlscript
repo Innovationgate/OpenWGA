@@ -421,15 +421,15 @@ this.dateRange = function(start_date, end_date){
 		if(start.get(start.MONTH)==end.get(end.MONTH)){
 			if(start.get(start.DAY_OF_MONTH)==end.get(end.DAY_OF_MONTH)){
 				// same day
-				return WGA.format(start.time, "dd. MMM yyyy, HH:mm")
+				return WGA.format(start.time, "d. MMM yyyy, HH:mm")
 					+ " " + WGA.design(this).label("date-range.to") + " "
 					+ WGA.format(end.time, "HH:mm")
 					+ " " + WGA.design(this).label("date-range.h")
 			}
 			else{	// same month
-				return WGA.format(start.time, "dd.")
+				return WGA.format(start.time, "d.")
 					+ " " + WGA.design(this).label("date-range.to") + " "
-					+ WGA.format(end.time, "dd. MMM yyyy")
+					+ WGA.format(end.time, "d. MMM yyyy")
 			}
 		}
 		else{	// same year
