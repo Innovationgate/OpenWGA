@@ -194,10 +194,12 @@ public class WebTMLScriptletResolver {
                 metaType = metaName.substring(0, colonPos);
                 metaName = metaName.substring(colonPos + 1);
             }
-            return String.valueOf(context.meta(metaType, metaName));
+            Object result = context.meta(metaType, metaName);
+            return result != null ? String.valueOf(result) : "";
         }
         else if (scriptletToken.startsWith("#")) {
-            return String.valueOf(context.item(scriptletToken.substring(1)));
+        	Object result = context.item(scriptletToken.substring(1));
+            return result != null ? String.valueOf(result) : "";
         }
         else if (scriptletToken.startsWith("!")) {
             return executeCommandMacro(context, scriptletToken.substring(1), params);
