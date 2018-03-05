@@ -47,6 +47,12 @@ this.init = function(){
 				return ret;
 			},
 		
+			meta: function(type, metaname){
+				if(this instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)
+					return this.meta(type, metaname);
+				else return "";
+			},
+		
 			url: function(ctx, options){
 				var url;
 				if(ctx instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)
