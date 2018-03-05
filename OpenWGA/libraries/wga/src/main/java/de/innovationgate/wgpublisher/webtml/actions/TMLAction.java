@@ -119,6 +119,8 @@ public class TMLAction implements Serializable {
 
     public static final String DEFAULTACTION_LOGIN = "login";
 
+    public static final String DEFAULTACTION_LOGOUT = "logout";
+
     public static final String DEFAULTACTION_SETSESSIONVAR = "setsessionvar";
 
     public static final String DEFAULTACTION_SETPSESSIONVAR = "setpsessionvar";
@@ -262,6 +264,14 @@ public class TMLAction implements Serializable {
         };
         _defaultActions.put(action.getName(), action);
         
+        action = new DefaultAction(DEFAULTACTION_LOGOUT, FLAG_DEBOUNCED) {
+            public Object call(TMLAction action, TMLContext context, TMLActionLink link, Map<String, Object> objects) throws WGException, IOException {
+                TMLAction.defaultActionLogout(context, link.getUnnamedParams());
+                return null;
+            }
+        };
+        _defaultActions.put(action.getName(), action);
+
         action = new DefaultAction(DEFAULTACTION_FIREEVENT, FLAG_DEBOUNCED) {
             public Object call(TMLAction action, TMLContext context, TMLActionLink link, Map<String, Object> objects) throws TMLException, WGAPIException, IOException, WGIllegalStateException, TMLScriptException, LoginException {
                 TMLAction.defaultActionFireEvent(context, link.getUnnamedParams());
@@ -390,6 +400,35 @@ public class TMLAction implements Serializable {
         
     }
 
+    protected static void defaultActionLogout(TMLContext context, List<Object> params) throws WGException, IOException {
+    	String domain=null;;
+    	String redirect = null;
+        TMLForm form = context.gettmlform();
+        if (form != null){
+            if (form.hasfield("domain")) {
+                domain = (String) form.field("domain");
+            }
+            if (form.hasfield("redirect")) {
+                redirect = (String) form.field("redirect");
+            }
+        }
+        if (domain == null && params.size() >= 1 && params.get(0) != null) {
+            domain = String.valueOf(params.get(0));
+        }
+        else domain = (String) context.meta("db", "domain");
+        
+        if (redirect == null && params.size() >= 2 && params.get(1) != null) {
+            redirect = String.valueOf(params.get(1));
+        }
+        
+        if (context.logout(domain)) {
+            if (redirect != null) {
+                context.redirectto(redirect);
+            }
+            else context.redirectto(WGA.get().urlBuilder().build());
+        }
+    }
+
     protected static void defaultActionLogin(TMLContext context, List<Object> params) throws WGException, IOException {
 
         String username = null;
@@ -431,7 +470,7 @@ public class TMLAction implements Serializable {
 
         if (domain == null && params.size() >= 3 && params.get(2) != null) {
             domain = String.valueOf(params.get(2));
-        }
+        }        
 
         if (redirect == null && params.size() >= 4 && params.get(3) != null) {
             redirect = String.valueOf(params.get(3));
