@@ -1100,6 +1100,7 @@
             <string>$setpvar</string>
             <string>$attach</string>
 			<string>$login</string>
+			<string>$logout</string>
             <string>$delete</string>
             <string>$fireevent</string>            
           </values>
@@ -1455,6 +1456,7 @@
             <string>$setpvar</string>
             <string>$attach</string>
 			<string>$login</string>
+			<string>$logout</string>
             <string>$delete</string>
             <string>$fireevent</string>            
           </values>
@@ -2048,6 +2050,7 @@
             <string>$setpvar</string>
             <string>$attach</string>
 			<string>$login</string>
+			<string>$logout</string>
             <string>$delete</string>
             <string>$fireevent</string>           
           </values>
@@ -2675,6 +2678,7 @@
             <string>$setpvar</string>
             <string>$attach</string>
 			<string>$login</string>
+			<string>$logout</string>
             <string>$delete</string>
             <string>$fireevent</string>           
           </values>
@@ -2933,6 +2937,7 @@
             <string>$setpvar</string>
             <string>$attach</string>
 			<string>$login</string>
+			<string>$logout</string>
             <string>$delete</string>
             <string>$fireevent</string>            
           </values>
@@ -3113,6 +3118,7 @@
             <string>$setpvar</string>
             <string>$attach</string>
 			<string>$login</string>
+			<string>$logout</string>
             <string>$delete</string>
             <string>$fireevent</string>            
           </values>
@@ -3927,6 +3933,7 @@
             <string>$setpvar</string>
             <string>$attach</string>
 			<string>$login</string>
+			<string>$logout</string>
             <string>$delete</string>
             <string>$fireevent</string>         
           </values>
@@ -4277,6 +4284,7 @@
             <string>$setpvar</string>
             <string>$attach</string>
 			<string>$login</string>
+			<string>$logout</string>
             <string>$delete</string>
             <string>$fireevent</string>         
           </values>
@@ -4469,6 +4477,7 @@
             <string>$setpvar</string>
             <string>$attach</string>
 			<string>$login</string>
+			<string>$logout</string>
             <string>$delete</string>
             <string>$fireevent</string>           
           </values>
