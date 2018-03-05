@@ -1,8 +1,3 @@
-<tml:action id="logout">
-	WGA.app().domain().auth().logout()
-	WGA.redirectTo(WGA.urlBuilder().build());
-</tml:action>
-
 <div class="content sidebar">
 	<div class="sidebar">	
 		<tml:include ref="::sidepanel"/>
@@ -20,7 +15,8 @@
 							<h1>Genehmigung für Sie nicht möglich</h1>
 							Sie sind kein Genehmiger dieser Seite in diesem Workflow.
 							<p>
-								<tml:button cssclass="btn btn-primary" clickaction="logout">Abmelden</tml:button>
+								<tml:button cssclass="btn btn-primary" clickaction="$logout">Abmelden</tml:button>
+							</p>
 						</div>						
 					</tml:else>
 				</tml:if>
