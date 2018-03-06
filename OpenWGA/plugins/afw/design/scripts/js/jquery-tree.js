@@ -396,7 +396,7 @@
 						drag_el.addClass("dragging");
 						mayDrop=true;
 						
-						//e.originalEvent.dataTransfer.effectAllowed = "link"
+						//e.originalEvent.dataTransfer.effectAllowed = "copyLink"
 						e.originalEvent.dataTransfer.setDragImage(drag_img, 0, 0);
 						e.originalEvent.dataTransfer.setData("wga/link", JSON.stringify({
 							title: drag_el.data("title"),
@@ -489,12 +489,12 @@
 						expand_timer=null;
 					},
 					dragend: function(e){
-						console.log("dragend");
+						//console.log("dragend");
 						if(!drag_el)
 							return;
 						drag_el.removeClass("dragging");
 						var el = $(e.target).parents("li").first()
-						console.log($(e.target), el);
+						//console.log($(e.target), el);
 						el.removeClass("drop-add-children");
 						placeholder.remove();
 						drag_el=null;
