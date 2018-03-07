@@ -39,7 +39,7 @@
 			complete: function(){
 				$("body").removeClass("modal-open");
 				if(onclose){
-					onclose();
+					onclose.call(currentModal);
 					onclose=null
 				}
 				$(this).trigger("modal-closed", currentModal);
@@ -56,7 +56,7 @@
 		var el = $(id);
 		if(!el.length){
 			if(callback)
-				callback();
+				callback.call(el);
 			return alert("Modal with ID " + id + " not found");
 		}
 		if(!el.hasClass("modal-popup"))
@@ -71,7 +71,7 @@
 			complete: function(){
 				$("body").addClass("modal-open");
 				if(onload){
-					onload();
+					onload.call(el);
 					onload=null;
 				}
 				$(this).trigger("modal-shown", el);
