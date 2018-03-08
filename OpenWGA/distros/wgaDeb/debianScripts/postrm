@@ -22,13 +22,6 @@ set -e
 case "$1" in
     remove|purge)	
 	update-rc.d -f openwga remove
-	case "$1" in
-		purge)
-			rm -r /etc/openwga || true			
-			deluser openwga || true
-        	delgroup openwga || true
-		;;
-	esac
     ;;
  
     upgrade)
@@ -37,7 +30,7 @@ case "$1" in
 	if [ -e $TOMCAT_WORK ] ; then	
 		rm -r $TOMCAT_WORK
 	fi
-        if [ -e $ROOT_DEPLOYMENT ] ; then
+    if [ -e $ROOT_DEPLOYMENT ] ; then
 		rm -r $ROOT_DEPLOYMENT
 	fi	
     ;;
