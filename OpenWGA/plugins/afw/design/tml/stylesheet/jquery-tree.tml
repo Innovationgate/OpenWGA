@@ -46,9 +46,9 @@
 			
 			"&.dragging": {
 				".entry": {
-					background_color: "red !important",
-					opacity: ".2",
-					color: "white"
+					background_color: "rgba(255,80,0, .1) !important"
+					<tml:comment>opacity: ".2",
+					color: "white"</tml:comment>
 				}
 			},
 			<tml:comment>"&.drag-over": {
