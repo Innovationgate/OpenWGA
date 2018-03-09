@@ -4,6 +4,8 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Iterator;
 
+import javax.json.JsonObject;
+
 import org.apache.commons.io.IOUtils;
 
 import de.innovationgate.webgate.api.WGDesignDocument;
@@ -11,6 +13,7 @@ import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.additional_script_langs.ResourceRef;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.WGA;
+import de.innovationgate.wga.server.api.tml.Context;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessData;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessResult;
@@ -39,21 +42,40 @@ public class JSMinPostProcessor implements PostProcessor{
 			Iterator<String> lines = IOUtils.readLines(new StringReader(code)).iterator();
 			while(lines.hasNext()){
 				String line = lines.next();
-				convertedCode.append(line + "\n");
-				if(line.trim().startsWith(IMPORT_SCRIPT)){
+				int index = line.indexOf(IMPORT_SCRIPT);
+				if(index>=0){
+					convertedCode.append(line.substring(0, index));
+					line = line.substring(index);
+				}
+				else convertedCode.append(line + "\n");
+				
+				if(line.startsWith(IMPORT_SCRIPT)){
 					String path = line.substring(IMPORT_SCRIPT.length()).trim();
 					ResourceRef ref = new ResourceRef(base_ref, path);
-					String mod_code = ref.getJavaScriptCode(false);
-					if(mod_code!=null){
-						convertedCode.append("// @imported " + ref.toString() + "\n");
-						convertedCode.append(mod_code + "\n");
-						if(ref.getDesignDocument()!=null)
-							result.addIntegratedResource(ref.getDesignDocument());
+					if(ref.getType().equals(ResourceRef.TYPE_TMLSCRIPT)){
+						Context ctx = wga.createTMLContext(data.getDocument().getDatabase(), design);
+		                Object tmlscript_result = wga.tmlscript().runScript(ctx, ref.getCode());
+						if(tmlscript_result!=null){
+							if (wga.tmlscript().isNativeObject(tmlscript_result)) {
+								JsonObject json = (JsonObject) wga.tmlscript().importJsonData(tmlscript_result);
+								convertedCode.append(json.toString());
+							}
+							else convertedCode.append(tmlscript_result.toString());
+							convertedCode.append("\n");
+						}
 					}
 					else{
-						convertedCode.append("// JS Module '" + ref.toString() + "' not found.\n");
-						wga.getLog().error("jsmin: unable to find JS module '" + ref.toString() + "'");
+						String mod_code = ref.getJavaScriptCode(false);
+						if(mod_code!=null){
+							convertedCode.append(mod_code + "\n");
+						}
+						else{
+							convertedCode.append("// JS Module '" + ref.toString() + "' not found.\n");
+							wga.getLog().error("jsmin: unable to find JS module '" + ref.toString() + "'");
+						}
 					}
+					if(ref.getDesignDocument()!=null)
+						result.addIntegratedResource(ref.getDesignDocument());
 				}
 			}
 		} catch (Exception e) {
