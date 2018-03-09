@@ -320,6 +320,8 @@ public class Version implements Comparable<Version>, Serializable {
             return comp;
         }
         
+        // The following line does make no sense since builds are independent from versions.
+        // Anyway: It should never happen since we compare via equals at the beginning
         comp = getBuildVersion() - otherVersion.getBuildVersion();
         if (comp != 0) {
             return comp;
@@ -367,6 +369,14 @@ public class Version implements Comparable<Version>, Serializable {
      */
     public boolean isAtLeast(int major, int minor) {
         Version compVersion = new Version(major, minor, 0);
+        return (compareTo(compVersion) >= 0);
+    }
+    public boolean isAtLeast(int major, int minor, int maintenance) {
+        Version compVersion = new Version(major, minor, maintenance);
+        return (compareTo(compVersion) >= 0);
+    }
+    public boolean isAtLeast(int major, int minor, int maintenance, int patchlevel) {
+        Version compVersion = new Version(major, minor, maintenance, patchlevel, 0);
         return (compareTo(compVersion) >= 0);
     }
     
