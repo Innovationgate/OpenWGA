@@ -94,6 +94,22 @@ WGA = function() {
 
 }();
 
+WGA.contextpath = WGA.contextpath || ""; 
+WGA.getUriHash = function(){
+	/*
+	 * not sure why we need this. Just in case we do ;-)
+	 * for hashCode() see https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0 
+	 */
+	function hashCode(s) {
+		var h = 0, l = s.length, i = 0;
+		if ( l > 0 )
+			while (i < l)
+				h = (h << 5) - h + s.charCodeAt(i++) | 0;
+		return h;
+	};
+	return hashCode(location.href);
+}
+
 WGA.responsive = {
 	breakpoints:{
 		medium: 0,
@@ -118,15 +134,7 @@ WGA.responsive = {
 	}
 }
 
-WGA.util = /**
- * @author oliver
- *
- */
-/**
- * @author oliver
- *
- */
-{
+WGA.util = {
 	showException : function(msg, e) {
 		msg += "\n";
 		if (e.fileName)
@@ -519,32 +527,6 @@ WGA.util.label = function(labels, defaultLanguage) {
 	return null;
 	
 }
-
-/**
- * Generates content urls, for usage by other js functions
- * 
- * @param {String}
- *            key
- */
-WGA.buildContentURL = function(key) {
-
-	if (requestType == 'statictml' || requestType == 'null') {
-		return "";
-	}
-	if (mediaKeyMode == 1) {
-		if (key != null) {
-			return WGPPath + "/" + myLayout + "/" + key + "." + myMedium;
-		} else {
-			return WGPPath + "/" + myLayout + "." + myMedium;
-		}
-	} else {
-		if (key != null) {
-			return WGPPath + "/" + myMedium + "/" + myLayout + "/" + key;
-		} else {
-			return WGPPath + "/" + myMedium + "/" + myLayout;
-		}
-	}
-};
 
 /**
  * Module to register onload functions in WGA. onload-s are attached to the
@@ -1734,14 +1716,14 @@ WGA.portlet = function() {
 				});
 				
 				if (WGA.hasLocalStorage()) {
-					window.sessionStorage.setItem(PORTLETSTATE_PREFIX +  WGA.uriHash + "." + pKey, stateObject);
+					window.sessionStorage.setItem(PORTLETSTATE_PREFIX +  WGA.getUriHash() + "." + pKey, stateObject);
 					var parentKeys = parentRegistry[pKey];
 					if (parentKeys) {
 						
 						var parentKey = parentKeys[0];
 						if (parentKey) {
 							var children = [];
-							var childrenStr = window.sessionStorage.getItem(CHILDPORTLETS_PREFIX +  WGA.uriHash + "." + parentKey);
+							var childrenStr = window.sessionStorage.getItem(CHILDPORTLETS_PREFIX +  WGA.getUriHash() + "." + parentKey);
 							if (childrenStr) {
 								children = childrenStr.split(",");
 							}
@@ -1758,7 +1740,7 @@ WGA.portlet = function() {
 							if (!foundChild) {
 								children.push(pKey);
 							}
-							window.sessionStorage.setItem(CHILDPORTLETS_PREFIX +  WGA.uriHash + "." + parentKey, children.join(","));
+							window.sessionStorage.setItem(CHILDPORTLETS_PREFIX +  WGA.getUriHash() + "." + parentKey, children.join(","));
 						}
 					}
 				}
@@ -1774,7 +1756,7 @@ WGA.portlet = function() {
 		
 		,fetchState : function(pKey) {
 			if (WGA.hasLocalStorage()){
-				return JSON.parse(window.sessionStorage.getItem(PORTLETSTATE_PREFIX + WGA.uriHash + "." + pKey));
+				return JSON.parse(window.sessionStorage.getItem(PORTLETSTATE_PREFIX + WGA.getUriHash() + "." + pKey));
 			}
 			else if (portletStates[pKey]){
 				return JSON.parse(portletStates[pKey]);
@@ -1785,7 +1767,7 @@ WGA.portlet = function() {
 		// Remove state of a portlet that has been explicitly unregistered
 		,disposeState : function(pKey) {
 			if (WGA.hasLocalStorage()){
-				window.sessionStorage.removeItem(PORTLETSTATE_PREFIX + WGA.uriHash + "." + pKey);
+				window.sessionStorage.removeItem(PORTLETSTATE_PREFIX + WGA.getUriHash() + "." + pKey);
 			}
 			else {
 				delete portletStates[pKey];
@@ -1819,7 +1801,7 @@ WGA.portlet = function() {
 			}
 			
 			if (WGA.hasLocalStorage()){
-				var childrenStr = window.sessionStorage.getItem(CHILDPORTLETS_PREFIX + WGA.uriHash + "." + pKey);
+				var childrenStr = window.sessionStorage.getItem(CHILDPORTLETS_PREFIX + WGA.getUriHash() + "." + pKey);
 				var children = [];
 				if (childrenStr) {
 					children = childrenStr.split(",");
