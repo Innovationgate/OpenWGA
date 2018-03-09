@@ -1966,31 +1966,26 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     	}
     	if(includeHTMLHeadScript)
     		this.appendResult(includeScript("htmlhead"));
-    	this.appendResult("<script type=\"text/javascript\" id=\"wga-htmlhead\">");
-    	this.appendResult("WGA.contextpath=\"" + getWGPPath() + "\";");    // used by htmlhead.js since wga-4
-    	this.appendResult("WGA.uriHash =\"" + getTMLContext().getUriHash() + "\";");
+
+    	StringBuilder jscodeBuilder = new StringBuilder();
     	
-    	StringBuilder out = new StringBuilder();
-    	initPageConnectionClient(out);
-    	this.appendResult(out.toString());
+    	if(!getWGPPath().isEmpty())
+    		jscodeBuilder.append("WGA.contextpath=\"" + getWGPPath() + "\";");    // used by htmlhead.js since wga-4
+
+    	//jscodeBuilder.append("WGA.uriHash =\"" + getTMLContext().getUriHash() + "\";");
+    	
+    	initPageConnectionClient(jscodeBuilder);
     	
     	if (getStatus().debugNode != null) {
-    	    this.appendResult("WGA.debug = true;");
+    		jscodeBuilder.append("WGA.debug = true;");
     	}
     	
-        this.appendResult("</script>\n");
-    
-    	// optional includes for input fields	
-        //	no longer supported since ... a long time. Removed Code.
-        /*
-         * 	We don't have any includeble scripts anymore in 2016
-    	if (scripts!=null && !scripts.equalsIgnoreCase("none")){
-    		java.util.StringTokenizer options = new java.util.StringTokenizer(scripts, ",");
-    		while (options.hasMoreTokens()) {
-    			this.appendResult(includeScript(options.nextToken().trim()));
-    		}
+    	String jscode = jscodeBuilder.toString();
+    	if(!jscode.isEmpty()){
+    		this.appendResult("<script id=\"wga-htmlhead\">");
+    		this.appendResult(jscode);
+    		this.appendResult("</script>\n");
     	}
-    	*/
     	
     	// Process HTML head inclusion modules
     	for (HTMLHeadInclusion inc : getCore().getHtmlHeadInclusions()) {
