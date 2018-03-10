@@ -42,16 +42,11 @@ public class JSMinPostProcessor implements PostProcessor{
 			Iterator<String> lines = IOUtils.readLines(new StringReader(code)).iterator();
 			while(lines.hasNext()){
 				String line = lines.next();
-				int index = line.indexOf(IMPORT_SCRIPT);
-				if(index>=0){
-					convertedCode.append(line.substring(0, index));
-					line = line.substring(index);
-				}
-				else convertedCode.append(line + "\n");
 				
-				if(line.startsWith(IMPORT_SCRIPT)){
+				if(line.trim().startsWith(IMPORT_SCRIPT)){
 					String path = line.substring(IMPORT_SCRIPT.length()).trim();
 					ResourceRef ref = new ResourceRef(base_ref, path);
+					convertedCode.append("//@import " + ref.toString() + "\n");
 					if(ref.getType().equals(ResourceRef.TYPE_TMLSCRIPT)){
 						Context ctx = wga.createTMLContext(data.getDocument().getDatabase(), design);
 		                Object tmlscript_result = wga.tmlscript().runScript(ctx, ref.getCode());
@@ -77,6 +72,7 @@ public class JSMinPostProcessor implements PostProcessor{
 					if(ref.getDesignDocument()!=null)
 						result.addIntegratedResource(ref.getDesignDocument());
 				}
+				else convertedCode.append(line + "\n");
 			}
 		} catch (Exception e) {
 			convertedCode.append("// unable to read JSMin module\n");
