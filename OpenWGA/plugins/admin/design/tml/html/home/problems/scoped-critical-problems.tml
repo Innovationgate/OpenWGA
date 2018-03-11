@@ -22,7 +22,7 @@
 <tml:foreach item="_problems" currentvalue="problem">
 	<tml:script var="isConfirmed" expression="WGA.Server.getProblemRegistry().isConfirmedProblem(problem.getPath())"/>
 
-	<tr>
+	<tr <tml:case condition="problem.getSeverity()=='high'">style="background:yellow"</tml:case>>
 		<td class="indent">
 			<a href="#" style="display:block;font-weight:bold; <tml:script expression="isTrue('isConfirmed') ? 'color:darkred; font-style:italic;' : 'color:red;'"/>"
 					title = "Click to show more info" 

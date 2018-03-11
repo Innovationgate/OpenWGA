@@ -2,7 +2,7 @@
 
 	<tml:option name="config" scope="local">
 		tbar: [
-			<tml:if istrue="showConfirmed">
+			<tml:if condition="showConfirmed=='true'">
 				<tml:then>
 					{
 						text: "Hide confirmed problems",
