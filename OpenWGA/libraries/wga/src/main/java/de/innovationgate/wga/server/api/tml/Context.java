@@ -455,8 +455,18 @@ public interface Context {
     public abstract boolean istagidvalid(String tagid);
 
     /**
+     *  Returns if the contents of an item or WebTML variable is regarded "false".
+     * @param varname The name of the item or WebTML variable
+     * @throws WGAPIException
+     */
+    @CodeCompletion(preferredCase="isFalse")
+    public abstract boolean isfalse(String varname) throws WGAPIException;
+
+    /**
      *  Returns if the contents of an item or WebTML variable is regarded "true".
-     *  Values that are regarded true: JavaScript/Java boolean value of true, the string "true", a numeric value of 1 or -1
+     *  Values that are regarded true depends on version complience:
+     *  before 7.2: JavaScript/Java boolean value of true, the string "true", a numeric value of 1 or -1
+     *  7.2 and later: like in javascript
      * @param varname The name of the item or WebTML variable
      * @throws WGAPIException
      */
