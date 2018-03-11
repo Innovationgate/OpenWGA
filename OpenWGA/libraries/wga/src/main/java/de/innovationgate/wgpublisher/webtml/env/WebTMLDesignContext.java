@@ -96,14 +96,21 @@ public class WebTMLDesignContext implements TMLDesignContext {
 
     public Version getVersionCompliance() {
 
-        Version complianceVersion = WGAVersion.VERSION;
+    	TMLOption complianceVersionOption = getOption("$complianceVersion");
+        if(complianceVersionOption!=null){
+        	Object value = complianceVersionOption.getValue();
+        	if(value instanceof Version)
+        		return (Version)value;
+        	else if (value instanceof String)
+        		return CSConfig.getComplianceVersion((String)value);
+        }
         
         WGDatabase db = getDesignDB();
         if (db != null) {
             return db.getComplianceVersion();
         }
         
-        return complianceVersion;
+        return WGAVersion.VERSION;
     }
 
     @Override
