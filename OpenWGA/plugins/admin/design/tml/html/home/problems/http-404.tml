@@ -28,9 +28,9 @@
 			reg.updateRegistry();
 			problems = reg.getProblems(Packages.de.innovationgate.wgpublisher.problems.HTTPProblemType);
 			
-			if (sortBy == "uri") {
+			if (sortBy == "url") {
 				WGA.sortList(problems, function(a,b) {
-					return javaObject(a.getUri()).compareTo(b.getUri());
+					return javaObject(a.getUrl()).compareTo(b.getUrl());
 				});		
 			}
 			else if (sortBy == "times") {
@@ -55,7 +55,7 @@
 		<table class="collection" width="100%">
 			<tr class="collection-title">	
 				<td>
-					<a title="Sort by URI" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="uri"/>">URI</a>
+					<a title="Sort by URL" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="url"/>">URL</a>
 				</td>
 				<td>
 					<a title="Sort by error type" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="errorType"/>">Error type</a>
@@ -81,7 +81,7 @@
 					<td>
 						<span title="<tml:script expression="problem.getUri()"/>">
 							<tml:script>
-							  var uri = problem.getUri();
+							  var uri = problem.getUrl();
 							  if (uri.length > 80) {
 							  	return uri.substring(0, 80) + "...";
 							  }

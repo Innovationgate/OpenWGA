@@ -922,7 +922,7 @@ public class WGPDispatcher extends HttpServlet {
         catch (HttpErrorException exc) {
             request.setAttribute(WGACore.ATTRIB_EXCEPTION, exc);
             ProblemOccasion occ = new PathDispatchingOccasion(request, exc.getDbHint());
-            _core.getProblemRegistry().addProblem(Problem.create(occ, "dispatching.http404#" + request.getRequestURI(), ProblemSeverity.LOW));
+            _core.getProblemRegistry().addProblem(Problem.create(occ, "dispatching.http404#" + request.getRequestURL(), ProblemSeverity.LOW));
             if (!response.isCommitted()) {
                 // throw exception to display errorpage - with senderror() the
                 // applicationserver use the buildin errorpage
