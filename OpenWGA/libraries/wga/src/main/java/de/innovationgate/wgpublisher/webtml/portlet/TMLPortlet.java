@@ -553,7 +553,7 @@ public class TMLPortlet implements TMLObject, Portlet {
                 complianceVersion = WGA.get(tmlContext).design(reg.getDesignDb()).getVersionCompliance();
             }
             catch (Exception e) {
-                tmlContext.getlog().error("Exception determining design compliance version of app '" + reg.getDesignDb() + "', e");
+                tmlContext.getlog().error("Exception determining design compliance version of app '" + reg.getDesignDb() + "'", e);
             }
         }
         Design controllerDesign = getControllerDesign();
