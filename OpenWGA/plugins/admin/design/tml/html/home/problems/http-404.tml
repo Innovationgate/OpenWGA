@@ -80,16 +80,19 @@
 				<tr class="List">
 					<td>
 						<span title="<tml:script expression="problem.getUri()"/>">
-							<tml:script>
-							  var uri = problem.getUrl();
-							  if (uri.length > 80) {
-							  	return uri.substring(0, 80) + "...";
-							  }
-							  else {
-							  	return uri; 
-							  }
-							</tml:script>
+						<tml:script>
+							var url = problem.getUrl();
+							if (url.length > 120) {
+								return url.substring(0, 120) + "...";
+							}
+							else {
+								return url; 
+							}
+						</tml:script>
 						</span>
+						<tml:comment><br><tml:script expression="problem.getMessage(java.util.Locale.getDefault())"/>
+						<br><tml:script expression="problem.getDescription(java.util.Locale.getDefault())"/>
+						<br><tml:script expression="problem.getSolution(java.util.Locale.getDefault())"/></tml:comment>
 					</td>
 					<td><tml:script expression="label('httpProblemType.' + problem.getClass().getSimpleName())"/></td>
 					<td><tml:script expression="problem.getLastCall()" format="dd.MM.yyyy HH:mm:ss"/></td>
