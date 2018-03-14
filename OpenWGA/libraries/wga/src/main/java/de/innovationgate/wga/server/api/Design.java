@@ -365,6 +365,24 @@ public class Design {
      */
     public String label(String containerName, String fileName, String key, List<? extends Object> params, boolean usePlaceholder) throws WGException {
         
+    	HashMap<String,Object> config = new HashMap<String,Object>();
+    	config.put("container", containerName);
+    	config.put("file", fileName);
+    	config.put("params", params);
+    	config.put("placeholder", usePlaceholder);
+    	
+    	return label(key, config);
+    	
+    }
+    
+    /**
+     * Returns a WebTML label from the current design and accepts label parameters
+     * @param config map with keys container, file, params, placeholder, language
+     * @return Label text
+     * @throws WGException
+     */
+    public String label(String key, Map<String,Object> config) throws WGException {
+        
         if (key == null) {
             return null;
         }
@@ -372,6 +390,7 @@ public class Design {
         // Eventually get defaults for label information
         WGDatabase designDB = _designContext.getDesignDB();
         
+        String containerName = (String)config.get("container");
         if (containerName == null) {
             if (_wga.isTMLContextAvailable()) {
                 containerName = (String) _wga.tmlcontext().option(Base.OPTION_DEFAULT_LABELCONTAINER + designDB.getDbReference());
@@ -381,6 +400,7 @@ public class Design {
             }
         }
         
+        String fileName = (String)config.get("file");
         if (fileName == null) {
             if (_wga.isTMLContextAvailable()) {
                 fileName = (String) _wga.tmlcontext().option(Base.OPTION_DEFAULT_LABELFILE + designDB.getDbReference());
@@ -418,7 +438,9 @@ public class Design {
         WGAResourceBundleManager manager = _wga.getCore().getResourceBundleManager(designDB);
         
         String label = null;
-        String forceLanguage = (String) designDB.getAttribute(WGACore.DBATTRIB_FORCE_LABEL_LANGUAGE);
+        String forceLanguage = (String)config.get("language");
+        if(forceLanguage==null)
+        	forceLanguage = (String) designDB.getAttribute(WGACore.DBATTRIB_FORCE_LABEL_LANGUAGE);
         if (forceLanguage != null) {
             Locale prefLangLocale = WGLanguage.languageNameToLocale(forceLanguage);
             try {
@@ -428,13 +450,28 @@ public class Design {
                 throw new WGAServerException("Exception retrieving label " + containerRef.getResourceName() + "/" + fileName + "/" + key + " for language " + prefLangLocale.toString() + " from DB " + manager.getDb().getDbReference(), e);
             }
         }
-        else {
+        else if(_wga.isRequestAvailable()){
             LanguageBehaviour langBehaviour = LanguageBehaviourTools.retrieve(designDB);
             label = langBehaviour.webtmlFetchLabel(manager, (TMLContext) _wga.tmlcontext(), containerRef.getResourceName(), fileName, key);
         }
-     
+        else{
+            Locale prefLangLocale = WGLanguage.languageNameToLocale(designDB.getDefaultLanguage());
+            try {
+                label = LanguageBehaviourTools.fetchLabelForLanguage(manager, containerRef.getResourceName(), fileName, key, prefLangLocale);
+            }
+            catch (IOException e) {
+                throw new WGAServerException("Exception retrieving label " + containerRef.getResourceName() + "/" + fileName + "/" + key + " for language " + prefLangLocale.toString() + " from DB " + manager.getDb().getDbReference(), e);
+            }
+        	
+        }
         // If no label available we return the key prefixed with "#"
+        
+        Boolean usePlaceholder = (Boolean)config.get("placeholder");
+        if(usePlaceholder==null)
+        	usePlaceholder=true;
+        
         if (label != null) {
+        	List<Object> params = (List<Object>)config.get("params");
             return applyLabelParams(label, params);
         }
         else if (usePlaceholder) {
@@ -582,7 +619,9 @@ public class Design {
         WGAResourceBundleManager manager = _wga.getCore().getResourceBundleManager(_designContext.getDesignDB());
         
         if (container == null) {
-            container = WGAResourceBundleManager.CONTAINER_DEFAULT;
+            //container = WGAResourceBundleManager.CONTAINER_DEFAULT;
+            DesignResourceReference containerRef = resolveReference(WGAResourceBundleManager.CONTAINER_DEFAULT);
+            container = containerRef.getResourceName();
         }
         
         if (file == null) {

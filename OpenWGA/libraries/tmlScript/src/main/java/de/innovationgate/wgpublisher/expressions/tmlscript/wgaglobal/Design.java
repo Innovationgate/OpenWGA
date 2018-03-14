@@ -27,7 +27,9 @@ package de.innovationgate.wgpublisher.expressions.tmlscript.wgaglobal;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.PropertyResourceBundle;
 
 import de.innovationgate.ext.org.mozilla.javascript.Context;
@@ -214,8 +216,14 @@ public class Design extends ScriptableObject implements Wrapper {
     public static String label(Context cx, Scriptable thisObj, java.lang.Object[] args, Function funObj) throws JavaScriptException, WGException {
         
         Design design = unwrapThisObj(thisObj);
-        Arguments parsedArgs = WGAGlobal._localLabelVarargs.parse(args);
         
+        if(args.length==2 && args[1] instanceof NativeObject){
+        	// called as label(key, {config_object})
+        	// ignore this fucking varAgrs parsing ...
+        	return design._apiDesign.label((String) args[0], (NativeObject)args[1]);
+        }
+        
+        Arguments parsedArgs = WGAGlobal._localLabelVarargs.parse(args);        
         return design._apiDesign.label((String) parsedArgs.get("container"), (String) parsedArgs.get("file"), (String) parsedArgs.get("key"), (List) parsedArgs.get("params")); 
         
     }
