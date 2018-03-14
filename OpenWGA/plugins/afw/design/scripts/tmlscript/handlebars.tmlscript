@@ -17,6 +17,11 @@ this.init = function(){
 				}
 				return ret;
 			},
+
+			json: function(obj, options){
+				var data = JSON.parse(obj);
+				return options.fn(data)
+			},
 			
 			context: function(ctx, options){
 				if(typeof(ctx)=="string" || (ctx instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)){
