@@ -107,8 +107,11 @@ WGA.getUriHash = function(){
 				h = (h << 5) - h + s.charCodeAt(i++) | 0;
 		return h;
 	};
-	return hashCode(location.href);
+	if(!WGA.urihash)
+		WGA.urihash = hashCode(location.href)
+	return WGA.urihash;
 }
+WGA.urihash = WGA.getUriHash();		// init with current location.href
 
 WGA.responsive = {
 	breakpoints:{
