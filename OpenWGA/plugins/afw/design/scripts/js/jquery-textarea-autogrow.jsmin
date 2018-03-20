@@ -75,6 +75,9 @@
 		
 		return this.each(function(){
 			ta = $(this);
+			if(typeof(config)=="string" && config=="update"){
+				return initShadow({});
+			}
 			ta.css({
 				overflow: "hidden",
 	    		resize: 'none',
