@@ -260,7 +260,7 @@ public class WebTMLScriptletResolver {
             return macroFileURL(context, command, param, engineParams);            
         }
         else if (command.equalsIgnoreCase("srcset")) {
-            return macroSrcset(context, param);
+            return macroSrcset(context, param, engineParams);
         }
         else if (command.equalsIgnoreCase("link")) {
             return macroLink(context, param);
@@ -355,6 +355,8 @@ public class WebTMLScriptletResolver {
         if (generateDataURL == null) {
             generateDataURL = Boolean.FALSE;
         }
+
+        Integer level = (Integer) engineParams.get(RhinoExpressionEngine.SCRIPTLETOPTION_LEVEL);
         
         List<String> parms = WGUtils.deserializeCollection(param, ",", true);
         String fileName = null;
@@ -384,6 +386,9 @@ public class WebTMLScriptletResolver {
         if(parts.length>1){
         	fileName = parts[0];        	
         	derivates = parts[1];
+        	if (level.equals(RhinoExpressionEngine.LEVEL_SYSTEM_MACROS)) {
+        		derivates = null;
+        	}
         }
         
         if (containerName != null) {                
@@ -500,8 +505,10 @@ public class WebTMLScriptletResolver {
         return out.toString();
     }
 
-    private String macroSrcset(TMLContext context, String param) throws WGException {
-    
+    private String macroSrcset(TMLContext context, String param, Map<String,Object> engineParams) throws WGException {
+    	
+    	Integer level = (Integer) engineParams.get(RhinoExpressionEngine.SCRIPTLETOPTION_LEVEL);
+    	
         WGA wga = WGA.get(context);
         boolean useNonfinalFeatures = (Boolean) wga.database(context.db()).getPublisherOption(WGACore.DBATTRIB_USE_NONFINAL_HT_FEATURES);
         if (!useNonfinalFeatures) {
@@ -517,6 +524,9 @@ public class WebTMLScriptletResolver {
         if(parts.length>1){
         	fileName = parts[0];        	
         	derivates = parts[1];
+        	if (level.equals(RhinoExpressionEngine.LEVEL_SYSTEM_MACROS)) {
+        		derivates = null;	// ignore derivates
+        	}
         }
         
         TMLContext targetContext = context;
