@@ -1,12 +1,12 @@
-<div>
+<h1>
 	Your customization directory has been successfully upgraded.
-</div>
+</h1>
 
 <tml:case istrue="conflicts">
-<div>
-	Conflicts have been detected on overlay resources which have been modified in the customization but also in the new base design version. For these conflicts conflict files have been created in the customization directory.
-</div>
-<div>
-	You can use these conflict files to manually take over the changes from the new base version into your customized version. See the OpenWGA documentation about "Upgrading a customization directory" for details.
-</div>
+	<p>
+		Conflicts have been detected on overlay resources which have been modified in the customization but also in the new base design version. For these conflicts conflict files have been created in the customization directory.
+	</p>
+	<p>
+		You can use these conflict files to manually take over the changes from the new base version into your customized version. See the OpenWGA documentation about "Upgrading a customization directory" for details.
+	</p>
 </tml:case>
