@@ -462,7 +462,6 @@ public class OverlayDesignProvider implements WGADesignProvider {
             return false;
         }
         
-        FileSystemDesignProvider fsProvider = getOverlayFSProvider();
         if (!isOverlayWriteable()) {
             return false;
         }
