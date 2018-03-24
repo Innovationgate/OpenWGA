@@ -40,12 +40,16 @@ public class LongRequestProblem extends Problem implements AdditiveProblem<LongR
     private long _longestDuration;
     private long _timesExceedingDuration;
     private String _uri;
+    private String _url;
+    private String _host;
     private Date _lastExceeding;
 
     public LongRequestProblem(ProblemPath path, ProblemText text, ProblemSeverity severity, ProblemOccasion occasion, Throwable throwable, List<MessageVariableProvider> providers) {
         super(path, text, severity, occasion, throwable, providers);
         _longestRequestInfo = (WGARequestInformation) getVariable("reqinfo");
         _uri = (String) getVariable("uri");
+        _url = (String) getVariable("completeurl");
+        _host = (String) getVariable("host");
         _longestDuration = _longestRequestInfo.getEndTime() - _longestRequestInfo.getStartTime();
         _timesExceedingDuration = 1;
         _lastExceeding = new Date();
@@ -83,6 +87,14 @@ public class LongRequestProblem extends Problem implements AdditiveProblem<LongR
 
     public String getUri() {
         return _uri;
+    }
+
+    public String getUrl() {
+        return _url;
+    }
+
+    public String getHost() {
+        return _host;
     }
 
 }

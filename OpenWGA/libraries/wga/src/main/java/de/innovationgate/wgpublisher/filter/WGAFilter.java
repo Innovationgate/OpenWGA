@@ -708,6 +708,8 @@ public class WGAFilter implements Filter {
 	           String uri = ((HttpServletRequest) request).getRequestURI();
 	           Problem.Vars vars = Problem
 	                   .var("reqinfo", info)
+	                   .var("completeurl", ((HttpServletRequest) request).getRequestURL().toString())
+	                   .var("host", ((HttpServletRequest) request).getServerName())
 	                   .var("uri", uri);
 	           
 	           String problemKey = "requestProblem.longRequest#" + uri;
