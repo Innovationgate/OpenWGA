@@ -256,7 +256,17 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
             		    }
 
                     }
-                    if (!requestedDBKey.equalsIgnoreCase("login") && !httpRequest.getMethod().equalsIgnoreCase("post")) {
+                    
+                    // Bug #00005171
+                    //if (!requestedDBKey.equalsIgnoreCase("login") && !httpRequest.getMethod().equalsIgnoreCase("post")) {
+                    // I believe the above code is logically meant as
+                    //	if (!(requestedDBKey.equalsIgnoreCase("login") && httpRequest.getMethod().equalsIgnoreCase("post")))
+                    //	-> if not a post to /login
+                    // as effect ALL post requests are not handled here wich leads to unwanted behaviour.
+                    // however this case is already testet at the beginning of the method so it's not nessessarry to test it again here.
+                    // We leave the test to /login
+                    
+                    if (!requestedDBKey.equalsIgnoreCase("login")) {
                     	if (!isDBAllowed(vHost, requestedDBKey)) {
                         	if(defaultDBKey != null)
                         		httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
