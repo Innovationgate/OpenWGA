@@ -518,6 +518,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		
         if (getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
             Object value = getDesignContext().retrieveLocalVar(name);
+            if(value instanceof ListVarContainer)
+            	return ((ListVarContainer) value).getList();
             if (!(value instanceof NullPlaceHolder)) {
                 return value;
             }
@@ -525,7 +527,10 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		
 		Map vars = _environment.getPageVars();
 		if (vars.containsKey(name)) {
-			return vars.get(name);
+			Object value = vars.get(name);
+            if(value instanceof ListVarContainer)
+            	return ((ListVarContainer) value).getList();
+            else return value;
 		}
 		return null;
 	}
@@ -543,7 +548,10 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		if (sessionVars.containsKey(name)) {
 			TransientObjectWrapper<Object> wrapper = sessionVars.get(name);
 			if (wrapper != null) {
-			    return wrapper.get();
+				Object value = wrapper.get();
+				if(value instanceof ListVarContainer)
+					return ((ListVarContainer) value).getList();
+			    return value;
 			}
 		}
 		return null;
