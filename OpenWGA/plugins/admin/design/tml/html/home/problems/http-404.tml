@@ -30,7 +30,7 @@
 			
 			if (sortBy == "url") {
 				WGA.sortList(problems, function(a,b) {
-					return javaObject(a.getUrl()).compareTo(b.getUrl());
+					return javaObject(a.getUrl()||a.getUri()).compareTo(b.getUrl()||b.getUri());
 				});		
 			}
 			else if (sortBy == "times") {
@@ -55,19 +55,19 @@
 		<table class="collection" width="100%">
 			<tr class="collection-title">	
 				<td>
-					<a title="Sort by URL" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="url"/>">URL</a>
+					<a title="Sort by URL" <tml:case condition="sortBy=='url'">class="selected"</tml:case> href="<tml:url action="$setpsessionvar" param1="sortBy" param2="url"/>">URL</a>
 				</td>
 				<td>
-					<a title="Sort by error type" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="errorType"/>">Error type</a>
+					<a title="Sort by error type" <tml:case condition="sortBy=='errorType'">class="selected"</tml:case> href="<tml:url action="$setpsessionvar" param1="sortBy" param2="errorType"/>">Error type</a>
 				</td>
 				<td>
-					<a title="Sort by last call (descending)" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="lastCall"/>">Last call</a>
+					<a title="Sort by last call (descending)" <tml:case condition="sortBy=='lastCall'">class="selected"</tml:case> href="<tml:url action="$setpsessionvar" param1="sortBy" param2="lastCall"/>">Last call</a>
 				</td>
 				<td>
-					<a title="Sort by called times (descending)" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="times"/>">Called times</a>
+					<a title="Sort by called times (descending)" <tml:case condition="sortBy=='times'">class="selected"</tml:case> href="<tml:url action="$setpsessionvar" param1="sortBy" param2="times"/>">Called times</a>
 				</td>
 				<td>
-					<a title="Sort by scope" href="<tml:url action="$setpsessionvar" param1="sortBy" param2="scope"/>">Scope</a></a>
+					<a title="Sort by scope" <tml:case condition="sortBy=='scope'">class="selected"</tml:case> href="<tml:url action="$setpsessionvar" param1="sortBy" param2="scope"/>">Scope</a></a>
 				</td>
 			</tr>
 		
@@ -81,7 +81,7 @@
 					<td>
 						<span title="<tml:script expression="problem.getUri()"/>">
 						<tml:script>
-							var url = problem.getUrl();
+							var url = problem.getUrl() || problem.getUri();
 							if (url.length > 120) {
 								return url.substring(0, 120) + "...";
 							}
@@ -90,9 +90,11 @@
 							}
 						</tml:script>
 						</span>
-						<tml:comment><br><tml:script expression="problem.getMessage(java.util.Locale.getDefault())"/>
-						<br><tml:script expression="problem.getDescription(java.util.Locale.getDefault())"/>
-						<br><tml:script expression="problem.getSolution(java.util.Locale.getDefault())"/></tml:comment>
+						<tml:case condition="!(problem instanceof Packages.de.innovationgate.wgpublisher.problems.HTTP404Problem)">
+							<br><tml:script expression="problem.getMessage(java.util.Locale.getDefault())"/>
+							<tml:comment><br><tml:script expression="problem.getDescription(java.util.Locale.getDefault())"/>
+							<br><tml:script expression="problem.getSolution(java.util.Locale.getDefault())"/></tml:comment>
+						</tml:case>
 					</td>
 					<td><tml:script expression="label('httpProblemType.' + problem.getClass().getSimpleName())"/></td>
 					<td><tml:script expression="problem.getLastCall()" format="dd.MM.yyyy HH:mm:ss"/></td>
