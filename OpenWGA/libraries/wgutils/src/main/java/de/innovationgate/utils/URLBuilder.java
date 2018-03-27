@@ -568,11 +568,6 @@ public class URLBuilder implements Cloneable {
 		return this;
 	}
 	
-	public URLBuilder setParameter(String param, String paramValue) {
-		_parameters.put(param, paramValue);
-		return this;
-	}
-	
 	public URLBuilder setParameter(String param) {
 		_parameters.put(param, null);
 		return this;
