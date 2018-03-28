@@ -218,7 +218,7 @@ public class Call {
             StringBuffer originalURL = (StringBuffer) _wga.getRequest().getAttribute(WGAFilter.REQATTRIB_ORIGINAL_URL);
             String originalQS  = (String) _wga.getRequest().getAttribute(WGAFilter.REQATTRIB_ORIGINAL_QUERYSTRING);
             if (originalURL != null) {
-                return WGPDispatcher.getCompleteRequestURL(originalURL, originalQS);
+                return WGPDispatcher.getCompleteRequestURL(new StringBuffer(originalURL), originalQS);
             }
             else {
                 return null;
