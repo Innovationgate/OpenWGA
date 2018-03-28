@@ -335,7 +335,7 @@ public class WGAFilter implements Filter {
 			}
 
 		}
-
+		
 		@Override
 		public String getProtocol() {
 			if(_forwardedProtocol != null)
@@ -370,7 +370,7 @@ public class WGAFilter implements Filter {
 				if(i>0)
 					return new StringBuffer(_forwardedProtocol + "://" + currentURL.substring(i+3));
 			}
-			return currentURL;			
+			return new StringBuffer(currentURL);
 		}
 		
         public String getParameter(String name) {
