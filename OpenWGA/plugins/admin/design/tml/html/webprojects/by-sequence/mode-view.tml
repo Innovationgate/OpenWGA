@@ -24,7 +24,10 @@
 
 		<ul id="cs-list" class="sortable">
 			<tml:foreach item="_dbs" currentvalue="_db">
-				<li class="ui-state-default"><tml:script expression="_db.title"/></li>
+				<li class="ui-state-default">
+					<div style="display:inline-block;width:30%"><tml:script expression="_db.key"/></div>
+					<tml:script expression="_db.title"/>
+				</li>
 			</tml:foreach>
 		</ul>
 		

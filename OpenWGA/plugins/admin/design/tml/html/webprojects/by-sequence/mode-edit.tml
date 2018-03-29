@@ -23,7 +23,31 @@
 		<tml:option name="title">Databases by connection sequence</tml:option>	
 	
 		<tml:option name="config" scope="local">
-			buttonAlign: "left"
+			buttonAlign: "left",
+			tbar: [
+				{
+					cls:'x-btn-text-icon',						
+					//icon: '<tml:url type="file" db="@afw" doc="icons" file="save.png"/>',
+					iconCls: 'action-save-icon',		                
+					text: "<tml:label key="btn.save"/>",
+					handler: function(){
+						var dbs = []
+						$("#cs-list li").each(function(el){
+							dbs.push($(this).data("uid"))
+						})
+						document.forms["<tml:script expression="tmlform.formid"/>"].uids.value = dbs.join(",")
+						DBM.callAction("<tml:action ref="saveConfig"/>", "<tml:script expression="portlet.portletkey"/>", "updating config");
+					}
+				},
+				{
+					cls:'x-btn-text-icon',						
+					icon: '<tml:url type="file" db="@afw" doc="icons" file="cancel.png"/>',		                
+					text: "<tml:label key="btn.cancel-edit"/>",
+					handler: function(){
+						DBM.callAction("<tml:action ref="actions:cancelEditMode"/>", "<tml:script expression="portlet.portletkey"/>", "cancel editing");
+					}
+				}
+			]
 			,buttons: [
 				{
 					cls:'x-btn-text-icon',						
