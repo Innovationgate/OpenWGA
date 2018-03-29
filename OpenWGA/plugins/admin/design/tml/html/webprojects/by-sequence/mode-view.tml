@@ -24,7 +24,7 @@
 
 		<ul id="cs-list" class="sortable">
 			<tml:foreach item="_dbs" currentvalue="_db">
-				<li class="ui-state-default">
+				<li class="ui-state-default" <tml:case condition="!_db.enabled">style="color:silver;font-style:italic"</tml:case>>
 					<div style="display:inline-block;width:30%"><tml:script expression="_db.key"/></div>
 					<tml:script expression="_db.title"/>
 				</li>
