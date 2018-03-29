@@ -396,7 +396,7 @@ public class WGPRequestPath {
     public static URL buildCompleteURL(HttpServletRequest request) throws MalformedURLException, URIException {
         
         StringBuffer url = new StringBuffer();
-        url.append(((StringBuffer) request.getAttribute(WGAFilter.REQATTRIB_ORIGINAL_URL)).toString());
+        url.append((String) request.getAttribute(WGAFilter.REQATTRIB_ORIGINAL_URL));
         String qs = request.getQueryString();
         if (qs != null) {
             url.append("?").append(qs);

@@ -657,7 +657,7 @@ public class WGAFilter implements Filter {
 	         *  #00005078: don't store original URL. Store converted URL instead.
 	         *  Will be used in WGA.urlBuilder() and other sources 
 	         */	        
-	        request.setAttribute(REQATTRIB_ORIGINAL_URL, wrappedRequest.getRequestURL());
+	        request.setAttribute(REQATTRIB_ORIGINAL_URL, wrappedRequest.getRequestURL().toString());
 	        request.setAttribute(REQATTRIB_ORIGINAL_URI, wrappedRequest.getRequestURI());
 	        request.setAttribute(REQATTRIB_ORIGINAL_QUERYSTRING, wrappedRequest.getQueryString());
 	        
