@@ -414,6 +414,27 @@ this.timeElapsed = function(d){
 
 this.dateRange = function(start_date, end_date){
 	
+	if(!start_date && !end_date)
+		return ""
+	if(!start_date){
+		// output end date
+		var h = WGA.format(end_date, "HH:mm")
+		var ret = WGA.design(this).label("date-range.to") 
+			+ " " + WGA.format(end_date, "d. MMM yyyy")
+		if(h!="23:59")
+			ret += ", " + h + WGA.design(this).label("date-range.h") 
+		return ret
+	}
+	if(!end_date){
+		// output start date
+		var h = WGA.format(start_date, "HH:mm")
+		var ret = WGA.design(this).label("date-range.from") 
+			+ " " + WGA.format(start_date, "d. MMM yyyy")
+		if(h!="00:00")
+			ret += ", " + h + WGA.design(this).label("date-range.h") 
+		return ret
+	}
+	
 	var start = WGA.createCalendar(start_date)
 	var end = WGA.createCalendar(end_date)
 	
@@ -474,6 +495,10 @@ this.fileSizeText = function(value) {
 		return value + ' bytes';		
 }
 
+/*
+ * @deprecated
+ * Use csvWriter instead.
+ */
 this.csvExporter = function(divider, encoding){
 
   	var out = new Packages.java.io.PrintWriter(new Packages.java.io.OutputStreamWriter(response.getOutputStream(), encoding||"UTF-8"));
