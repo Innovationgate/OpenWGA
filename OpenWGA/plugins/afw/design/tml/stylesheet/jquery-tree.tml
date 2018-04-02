@@ -76,6 +76,9 @@
 					text_overflow: "ellipsis",
 					".link-text": {
 						margin_left: 20
+					},
+					".symbol": {
+						float: "right"
 					}
 				}
 			},

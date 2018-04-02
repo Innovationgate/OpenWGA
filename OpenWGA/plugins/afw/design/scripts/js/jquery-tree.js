@@ -116,12 +116,17 @@
 		link.append(icon)
 		link.attr("draggable", true);
 		
+		var symbol = $("<div/>", {
+			"class": "symbol " + (data.symbolclass||"")
+		})
+		link.append(symbol);			
+		
 		var link_text = $("<div/>", {
 			"class": "link-text",
 			html: data.html || data.title
 		})
 		link.append(link_text);
-		
+				
 		entry.append(link)
 
 		if(data.children)
@@ -293,9 +298,16 @@
 	}
 
 	function updateNode(node, data){
-		node.find(".entry").attr("class", "clearfix entry " + (data.cssclass||""))
+		if(typeof(data.cssclass)=="string")
+			node.find(".entry").attr("class", "clearfix entry " + data.cssclass)
+		if(typeof(data.symbolclass)=="string")
+			node.find(".symbol").attr("class", "symbol " + data.symbolclass)
 		if(data.html||data.title)
 			node.find(".link-text").html(data.html||data.title)
+		if(data.title)
+			node.data("title", data.title)
+		if(data.context)
+			node.data("context", data.context)
 	}
 	
 	function removeNode(node, select_parent){
