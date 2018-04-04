@@ -48,7 +48,6 @@ import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 import de.innovationgate.wgpublisher.webtml.utils.TMLPageImpl;
 import de.innovationgate.wgpublisher.webtml.utils.TMLUserProfile;
 import de.innovationgate.wgpublisher.webtml.utils.TagInfo;
-import de.innovationgate.wgpublisher.filter.WGAFilter.RequestWrapper;
 
 public class RhinoWrapFactory extends WrapFactory {
     
@@ -88,11 +87,11 @@ public class RhinoWrapFactory extends WrapFactory {
             
         });
 
-        _wrapMethods.put(RequestWrapper.class, new WrapMethod<RequestWrapper>() {
+        _wrapMethods.put(ServletRequest.class, new WrapMethod<ServletRequest>() {
 
             @Override
             public Scriptable wrap(Object obj, Scriptable scope) {
-                return new ServletRequestWrapper(scope, (RequestWrapper) obj);
+                return new ServletRequestWrapper(scope, (ServletRequest) obj);
             }
             
         });
@@ -211,6 +210,9 @@ public class RhinoWrapFactory extends WrapFactory {
 	    // Custom wrapping
 	    if (obj != null) {
     	    Class<?> lookupClass = (obj instanceof Date ? Date.class : obj.getClass());
+    	    if(obj instanceof ServletRequest)
+    	    	lookupClass = ServletRequest.class;
+    	    
     	    WrapMethod<? extends Object> method = _wrapMethods.get(lookupClass);
     	    if (method != null) {
     	        return method.wrap(obj, scope);
