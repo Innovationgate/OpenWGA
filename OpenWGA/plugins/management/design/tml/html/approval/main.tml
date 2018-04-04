@@ -1,15 +1,17 @@
+<tml:script>
+	_dbkey = request.getParameter("db");
+	_key = request.getParameter("key");
+</tml:script>
 <tml:[layout:html] o_page-title="[{WGA.Brand.name} Freigabeworkflow]">
 	<tml:[layout:page] o_title="[{WGA.Brand.name} Freigabeworkflow]">
 
 		<tml:option name="header">
-				<tml:[::toolbar]/>
-			<tml:case condition="request.db && request.key">
-			</tml:case>
+				<tml:[::toolbar] o_dbkey="{_dbkey}" o_key="{_key}"/>
 		</tml:option>
 
 		<tml:option name="body">
 		
-			<tml:if condition="!request.db || !request.key">
+			<tml:if condition="!_dbkey || !_key">
 				<tml:then>
 					<div class="splash">
 						<h1>Fehlerhafte URL</h1>
@@ -17,14 +19,14 @@
 					</div>
 				</tml:then>
 		
-				<tml:elseif condition="AFW.database(request.db).isEditor()">
+				<tml:elseif condition="AFW.database(_dbkey).isEditor()">
 				
-					<tml:if context="[db:{request.db}/docid:{request.key}]" iscontextvalid="true">
+					<tml:if context="[db:{_dbkey}/docid:{_key}]" iscontextvalid="true">
 						<tml:then><tml:include ref="::body"/></tml:then>
 						<tml:else>
 							<div class="splash">
 								<h1>Dokument nicht gefunden</h1>
-								Das Dokument mit Schlüssel <tml:script expression="request.key"/> konnte in Website <tml:script expression="request.db"/> nicht gefunden werden.
+								Das Dokument mit Schlüssel <tml:item name="_key"/> konnte in Website <tml:item name="_dbkey"/>nicht gefunden werden.
 							</div>
 						</tml:else>
 					</tml:if>
