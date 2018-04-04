@@ -454,15 +454,15 @@ this.dateRange = function(start_date, end_date){
 			}
 		}
 		else{	// same year
-			return WGA.format(start.time, "dd.MM.")
+			return WGA.format(start.time, "d. MMM")
 				+ " " + WGA.design(this).label("date-range.to") + " "
-				+ WGA.format(end.time, "dd.MM.yyyy")
+				+ WGA.format(end.time, "d. MMM yyyy")
 			
 		}
 	}
-	else return WGA.format(start.time, "dd.MM.yyyy")
+	else return WGA.format(start.time, "d. MMM yyyy")
 		+ " " + WGA.design(this).label("date-range.to") + " "
-		+ WGA.format(end.time, "dd.MM.yyyy") 
+		+ WGA.format(end.time, "d. MMM yyyy") 
 }
 
 this.renderFileSize = function(value) {
