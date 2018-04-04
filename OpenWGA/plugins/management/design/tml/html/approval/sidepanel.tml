@@ -15,13 +15,7 @@
 		<tml:{div} if="VALIDFROM | VALIDTO">
 			<label>Geplante Veröffentlichung</label>
 			<p style="color:red">
-				<tml:script expression="VALIDFROM && VALIDTO ? AFW.Util.dateRange(VALIDFROM, VALIDTO) : VALIDFROM || VALIDTO" format="dd. MMMMM yyyy"/>
-				
-				<tml:comment>@{VALIDFROM format="dd. MMMMM yyyy"}
-				<tml:{div} if="VALIDTO">
-					bis
-					@{VALIDTO format="dd. MMMMM yyyy"}
-				</tml:{div}></tml:comment>
+				<tml:script expression="AFW.Util.dateRange(VALIDFROM, VALIDTO)"/>
 			</p>
 		</tml:{div}>
 
