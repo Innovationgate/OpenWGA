@@ -30,7 +30,7 @@
 		if(option("msg"))
 			tmlform.addmessage(option('msg'))
 	</tml:script>
-	<h1>Anmelden an Website <tml:script expression="request.getParaeter('db')"/></h1>
+	<h1>Anmelden an Website <tml:script expression="request.getParameter('db')"/></h1>
 	<tml:case condition="tmlform.hasmessages()">
 		<div class="alert alert-danger">
 			<h4><tml:label key="login.error-message"/></h4>
