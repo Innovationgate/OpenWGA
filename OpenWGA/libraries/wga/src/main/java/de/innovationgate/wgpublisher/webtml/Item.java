@@ -133,7 +133,7 @@ public class Item extends FormBase implements DynamicAttributes {
                 if (this.stringToBoolean(this.getScriptlets())) {
                     addWarning("Highlighting cannot be used with scriptlets - skipped.");                    
                 } else if (this.getAliases() != null) {
-                        addWarning("Highlighting cannot be used with aliases - skipped.");    
+                	addWarning("Highlighting cannot be used with aliases - skipped.");    
                 } else if (getXpath() != null) {
                     addWarning("Highlighting cannot be used together with xpath - skipped.");
                 } else {
@@ -224,8 +224,8 @@ public class Item extends FormBase implements DynamicAttributes {
 		if( attribEdit != null 
 			&& getEditor() != null
 			&& attribEdit.equals(this.getTMLContext().getcontent().getContentKey().toString()) ){
-		    buildEditor(itemName, result);
-            setResult(result);  
+			    buildEditor(itemName, result);
+	            setResult(result);  
 		}
 		else {			            
             // if aliases are defined, replace values with aliases
