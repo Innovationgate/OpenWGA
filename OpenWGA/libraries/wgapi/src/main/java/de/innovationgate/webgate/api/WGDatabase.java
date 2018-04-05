@@ -7488,6 +7488,7 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         if (hasFeature(FEATURE_FULLCONTENTFEATURES)) {
             newContent.setStatus(WGContent.STATUS_DRAFT);
             newContent.setMetaData(WGContent.META_AUTHOR, getSessionContext().getUser());
+            newContent.setValidity(null, null);
         }
 
         // Initialize by workflow engine
@@ -7507,7 +7508,6 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         // Save and return
         newContent.save();
         return newContent;
-        
 
     }
 
