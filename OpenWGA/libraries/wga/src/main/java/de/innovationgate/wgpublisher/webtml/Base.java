@@ -1309,9 +1309,10 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
         BaseTagStatus status = getStatus();
         String result = status.getResultString(includeFormatting, stringToBoolean(getTrim())); 
         
-        if(result.length()>0 && _wrap!=null){
+        if(result.length()>0 && _wrap!=null && includeFormatting){
         	try {
-        		return "<" + _wrap + buildDynamicHtmlAttributes("wrap") + ">" + result + "</" + _wrap + ">";
+        		String _w = getWrap();
+        		return "<" + _w + buildDynamicHtmlAttributes("wrap") + ">" + result + "</" + _w + ">";
 			} catch (WGException e) {
 				e.printStackTrace();
 			}
@@ -2462,7 +2463,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
 
 
     public String getWrap(){
-		return _wrap;
+    	return getTagAttributeValue("wrap", _wrap, null);
     }
     public void setWrap(String wrap){
     	_wrap = wrap;
