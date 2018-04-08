@@ -2526,9 +2526,18 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
         
         // Push extension data fields
         if (getDatabase().getContentStoreVersion() >= WGDatabase.CSVERSION_WGA5 && doc.getDatabase().getContentStoreVersion() >= WGDatabase.CSVERSION_WGA5) {
-            // Clear all extension data
+            // Clear all extension data with exception of !mayPushExtData
+        	// See #00005182
             if (doc.getExtensionDataNames().size() > 0) {
-                doc.removeAllExtensionData();
+
+                Iterator<String> names = getExtensionDataNames().iterator();
+                while (names.hasNext()) {
+                    String name = (String) names.next();
+                    if(!mayPushExtData(name))
+                    	continue;
+                    doc.removeExtensionData(name);
+                }
+                
                 if (!doc.getDatabase().hasFeature(WGDatabase.FEATURE_DIRECT_ENTITY_READDING)) {
                     doc.save();
                 }
@@ -2733,20 +2742,6 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
             removeItem(name);
         }
     }
-    
-    /**
-     * Convenience method to remove all extension data fields from the document at once
-     * @throws WGAPIException 
-     */
-    public void removeAllExtensionData() throws WGAPIException {
-        Iterator<String> names = getExtensionDataNames().iterator();
-        while (names.hasNext()) {
-            String name = (String) names.next();
-            removeExtensionData(name);
-        }
-    }
-    
-
     
     /**
      * Sets the given dates as created and modified dates of the document and saved it with them
