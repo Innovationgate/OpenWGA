@@ -64,7 +64,7 @@
 </tml:script>
 
 <div style="width:<tml:item name="_width"/>">
-	<div style="<tml:item name="{scoped:style}"/>" class="inner-column <tml:item name="{scoped:class}"/>">
+	<div style="<tml:[setting] o_name="style"/>" class="inner-column <tml:[setting] o_name="class"/>">
 		<tml:range imagederivates="{_imagederivates ? 'width~'+WGA.format(_imagederivates, '0') : VOID}">
 			<tml:include ref="system:include-child-modules">
 				<tml:option name="margins" expression="true" scope="local"/>
