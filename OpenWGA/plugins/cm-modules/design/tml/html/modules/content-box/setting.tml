@@ -52,7 +52,7 @@
 	<tml:input name="{scoped:show_title}" type="checkbox" options="{label('content-box.settings.title-options')}" changeaction="$refresh" ajax="true" mode="{option('mode')}"/>
 </div>
 
-<tml:case condition="tmlform.field('show_title_'+option('ns'))=='show'">
+<tml:case condition="tmlform.fieldList(WGA.scoped('show_title')).contains('show')">
 	<label><tml:label key="content-box.settings.title-as-link"/>:</label>
 	<div style="margin:10px">
 		<tml:input name="[url_{option('ns')}]" cssstyle="width:100%" mode="{option('mode')}"/>
