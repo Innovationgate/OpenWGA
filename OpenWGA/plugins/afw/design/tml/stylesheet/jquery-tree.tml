@@ -78,7 +78,10 @@
 						margin_left: 20
 					},
 					".symbol": {
-						float: "right"
+						width: 20,
+						text_align: "center",
+						float: "right",
+						line_height: "inherit"						
 					}
 				}
 			},
