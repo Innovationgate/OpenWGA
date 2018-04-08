@@ -1308,10 +1308,10 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
 
         BaseTagStatus status = getStatus();
         String result = status.getResultString(includeFormatting, stringToBoolean(getTrim())); 
+        String _w = getWrap();
         
-        if(result.length()>0 && _wrap!=null && includeFormatting){
-        	try {
-        		String _w = getWrap();
+        if(result.length()>0 && _w!=null && !_w.isEmpty() && includeFormatting){
+        	try {        		
         		return "<" + _w + buildDynamicHtmlAttributes("wrap") + ">" + result + "</" + _w + ">";
 			} catch (WGException e) {
 				e.printStackTrace();
