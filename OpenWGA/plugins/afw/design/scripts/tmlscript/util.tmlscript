@@ -420,18 +420,18 @@ this.dateRange = function(start_date, end_date){
 		// output end date
 		var h = WGA.format(end_date, "HH:mm")
 		var ret = WGA.design(this).label("date-range.to") 
-			+ " " + WGA.format(end_date, "d. MMM yyyy")
+			+ " " + WGA.format(end_date, "d. MMMMM yyyy")
 		if(h!="23:59")
-			ret += ", " + h + WGA.design(this).label("date-range.h") 
+			ret += ", " + h + " " + WGA.design(this).label("date-range.h") 
 		return ret
 	}
 	if(!end_date){
 		// output start date
 		var h = WGA.format(start_date, "HH:mm")
 		var ret = WGA.design(this).label("date-range.from") 
-			+ " " + WGA.format(start_date, "d. MMM yyyy")
+			+ " " + WGA.format(start_date, "d. MMMMM yyyy")
 		if(h!="00:00")
-			ret += ", " + h + WGA.design(this).label("date-range.h") 
+			ret += ", " + h + " " + WGA.design(this).label("date-range.h") 
 		return ret
 	}
 	
