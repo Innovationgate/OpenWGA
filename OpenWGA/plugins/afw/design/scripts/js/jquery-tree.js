@@ -299,11 +299,11 @@
 
 	function updateNode(node, data){
 		if(typeof(data.cssclass)=="string")
-			node.find(".entry").attr("class", "clearfix entry " + data.cssclass)
+			$("> .entry", node).attr("class", "clearfix entry " + data.cssclass)
 		if(typeof(data.symbolclass)=="string")
-			node.find(".symbol").attr("class", "symbol " + data.symbolclass)
+			$("> .entry .symbol", node).attr("class", "symbol " + data.symbolclass)
 		if(data.html||data.title)
-			node.find(".link-text").html(data.html||data.title)
+			$("> .entry .link-text", node).html(data.html||data.title)
 		if(data.title)
 			node.data("title", data.title)
 		if(data.context)
