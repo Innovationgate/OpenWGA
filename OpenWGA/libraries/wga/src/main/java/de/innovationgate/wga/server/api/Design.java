@@ -937,7 +937,12 @@ public class Design {
     public boolean isCustomable() throws WGException {
         if (_customizable == null) {
             WGDesignProvider designProvider = _designContext.getDesignDB().getDesignProvider();
-            PublisherOption po = getConfig().findPublisherOption(PublisherOption.OPTION_OVERLAY_SUPPORT);
+            CSConfig config = getConfig();
+            if(config==null){
+            	_wga.getLog().error("Unable to find csconfig.xml for design " + _designContext.getDesignDB().getDbReference());
+            	return false;
+            }
+            PublisherOption po = config.findPublisherOption(PublisherOption.OPTION_OVERLAY_SUPPORT);
             _customizable = new Boolean(po != null && !OverlaySupport.NONE.equals(po.getValue()));
         }
         return _customizable;
