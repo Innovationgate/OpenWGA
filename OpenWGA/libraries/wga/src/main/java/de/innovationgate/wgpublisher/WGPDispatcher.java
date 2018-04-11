@@ -3251,6 +3251,10 @@ public class WGPDispatcher extends HttpServlet {
     public synchronized String addTemporaryDownload(HttpSession session, TemporaryFile file) {
         String name = UIDGenerator.generateUID();
         TemporaryDownloadsMap temporaryDownloads = (TemporaryDownloadsMap) session.getAttribute(SESSION_TEMPORARYDOWNLOADS);
+        if(temporaryDownloads==null){
+        	temporaryDownloads = new WGPDispatcher.TemporaryDownloadsMap();
+        	session.setAttribute(SESSION_TEMPORARYDOWNLOADS, temporaryDownloads);
+        }
         TemporaryDownload tempDownload = new TemporaryDownload(name, file);
         temporaryDownloads.put(name, tempDownload);
         return name;
