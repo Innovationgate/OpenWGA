@@ -4892,7 +4892,12 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     }
 
     public static ProcessContextRegistration fetchProcessContextRegistration(HttpSession session) {
-        return (ProcessContextRegistration) session.getAttribute(SESSIONATTRIB_PROCESSCONTEXTS);
+    	ProcessContextRegistration reg = (ProcessContextRegistration) session.getAttribute(SESSIONATTRIB_PROCESSCONTEXTS);
+    	if(reg==null){
+    		reg = new ProcessContextRegistration();
+    		session.setAttribute(TMLContext.SESSIONATTRIB_PROCESSCONTEXTS, reg);
+    	}
+        return reg;
     }
 
     public static Map<String, TMLAction> fetchActionRegistration(HttpSession session) {
@@ -4937,7 +4942,12 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 
     @SuppressWarnings("unchecked")
     public static Map<String,TMLForm> fetchPersistentForms(HttpSession session) {
-        return (Map<String,TMLForm>) session.getAttribute(WGACore.ATTRIB_TMLFORM);
+    	Map<String,TMLForm> forms = (Map<String,TMLForm>) session.getAttribute(WGACore.ATTRIB_TMLFORM);
+        if (forms == null) {
+            forms = new HashMap<String,TMLForm>();
+            session.setAttribute(WGACore.ATTRIB_TMLFORM, forms);
+        }
+        return forms;
     }
 
     public WGUserAccess getoriginaluserdata() {
