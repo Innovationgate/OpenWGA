@@ -1,0 +1,60 @@
+<de.innovationgate.wga.common.beans.csconfig.v5.CSConfig>
+  <anonymousAccessLevel>-1</anonymousAccessLevel>
+  <defaultAccessLevel>-1</defaultAccessLevel>
+  <versionCompliance>wga7.1</versionCompliance>
+  <publisherOptions/>
+  <encoderMappings/>
+  <elementMappings/>
+  <remoteActions/>
+  <mediaKeys/>
+  <roles/>
+  <jobDefinitions/>
+  <pluginConfig class="de.innovationgate.wga.common.beans.csconfig.v5.PluginConfig">
+    <id>
+      <uniqueName>de.innovationgate.xfire-server</uniqueName>
+      <version>
+        <majorVersion>7</majorVersion>
+        <minorVersion>5</minorVersion>
+        <maintenanceVersion>3</maintenanceVersion>
+        <patchVersion>1</patchVersion>
+        <buildVersion>670</buildVersion>
+      </version>
+    </id>
+    <title>OpenWGA xFire Server</title>
+    <description>xFire-Server</description>
+    <vendor>Innovation Gate</vendor>
+    <webHomepage>http://innovationgate.com</webHomepage>
+    <minimumWGAVersion>
+      <majorVersion>4</majorVersion>
+      <minorVersion>0</minorVersion>
+      <maintenanceVersion>0</maintenanceVersion>
+      <patchVersion>0</patchVersion>
+      <buildVersion>0</buildVersion>
+    </minimumWGAVersion>
+    <minimumJavaVersion>
+      <majorVersion>1</majorVersion>
+      <minorVersion>7</minorVersion>
+      <maintenanceVersion>0</maintenanceVersion>
+      <patchVersion>0</patchVersion>
+      <buildVersion>0</buildVersion>
+    </minimumJavaVersion>
+    <dependencies/>
+    <personalisationMode>4</personalisationMode>
+    <usageAsDesignProvider>false</usageAsDesignProvider>
+    <usageAsAuthSource>false</usageAsAuthSource>
+    <usageAsContentStore>false</usageAsContentStore>
+    <showOnStartPage>false</showOnStartPage>
+    <clearDatabaseOnUpdate>false</clearDatabaseOnUpdate>
+    <disablePluginInit>false</disablePluginInit>
+    <options/>
+  </pluginConfig>
+  <shortcuts/>
+  <staticClasspath>false</staticClasspath>
+  <minimumWGAVersion>
+    <majorVersion>7</majorVersion>
+    <minorVersion>2</minorVersion>
+    <maintenanceVersion>0</maintenanceVersion>
+    <patchVersion>0</patchVersion>
+    <buildVersion>0</buildVersion>
+  </minimumWGAVersion>
+</de.innovationgate.wga.common.beans.csconfig.v5.CSConfig>

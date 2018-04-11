@@ -1,0 +1,57 @@
+dependencies {
+    
+    // @jar: don't add dependend JARs to war file
+	compile 'wsdl4j:wsdl4j:1.6.3@jar'
+	compile 'org.codehaus.xfire:xfire-all:1.2.6@jar'
+
+	//compile 'wsdl4j:wsdl4j:1.6.3'
+	//compile 'org.codehaus.xfire:xfire-all:1.2.6'
+    
+    compileClasspath project(":wga");
+    compileClasspath project(":wgaBuildTools");
+	compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
+	compileClasspath 'javax.servlet.jsp:jsp-api:2.2'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir 'src'
+		}
+		resources {
+			srcDir 'src'
+		}
+	}
+} 
+
+task cleanupPluginJars(type: Delete) {
+	println "Delete old *.jar-s ..."
+	delete fileTree(dir: "design/files/system/jars", include: "*.jar")
+}
+
+task buildPluginJars(type: Copy, dependsOn: [cleanupPluginJars,jar]) {
+	println "Copy *.jar-s ..."
+    from(configurations.runtime.files)
+   	into 'design/files/system/jars'
+}
+
+task updatePluginVersion << {
+	def version = "${openwga_version_major}.${openwga_version_minor}.${openwga_version_maintenance}.${openwga_version_patch}"
+	def build = "${openwga_version_build}"
+	println "Update ${project.name} to version ${version} Build ${openwga_version_build}"
+
+    ant.taskdef(name:"UpdatePluginVersion", classname:"de.innovationgate.ant.UpdatePluginVersion", classpath: configurations.compileClasspath.asPath)
+    ant.UpdatePluginVersion(designDir: "design", version: "${version}", build: "${build}")
+
+}
+
+task buildPlugin(type: Zip, dependsOn: [buildPluginJars, updatePluginVersion]){
+    archiveName = "de.innovationgate.xfire-server-${project.version}.wgaplugin"    
+    from('design') {
+        into '/'
+        exclude 'java'
+    }
+    from (tasks.jar.archivePath){
+   		into 'files/system'
+   	}
+}
