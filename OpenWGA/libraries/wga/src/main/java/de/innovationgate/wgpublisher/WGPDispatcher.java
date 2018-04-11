@@ -492,14 +492,12 @@ public class WGPDispatcher extends HttpServlet {
             handleAjaxFailure(exc, request, response);
         }
         catch (Exception exc) {
-            if (!(exc instanceof HttpErrorException)) {
-                _log.error("Error in request processing", exc);
-            }
+            _log.error("Exception in processing of request URL " + String.valueOf(request.getRequestURL()), exc);
             request.setAttribute(WGACore.ATTRIB_EXCEPTION, exc);
             throw new ServletException(exc);
         }
         catch (Error err) {
-            _log.error("Error in request processing", err);
+            _log.error("Error in processing of request URL " + String.valueOf(request.getRequestURL()), err);
             request.setAttribute(WGACore.ATTRIB_EXCEPTION, err);
             throw new ServletException(err);
         }
