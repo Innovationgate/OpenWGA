@@ -24,10 +24,10 @@
 	}
 
 	function activate(el, index){
-		var header = el.find(".accordion-header").eq(index)
+		var header = $("> .accordion-header", el).eq(index)
 		var isActive = header.hasClass("active");
 		var speed = el.data("accordion-effect-speed") || "fast"
-		el.find(".accordion-header").removeClass("active").next().slideUp(speed);
+		$("> .accordion-header", el).removeClass("active").next().slideUp(speed);
 		if(!isActive)
 			expand(header, speed)
 		
@@ -58,16 +58,16 @@
 				if(config.active!=undefined){
 					if(config.delay){
 						setTimeout(function(){
-							expand(el.find(".accordion-header").eq(config.active), speed)
+							expand($("> .accordion-header", el).eq(config.active), speed)
 						}, config.delay);
 					}
-					else expand(el.find(".accordion-header").eq(config.active), speed)
+					else expand($("> .accordion-header", el).eq(config.active), speed)
 				}
-				el.find(".accordion-header").click(function(ev){
+				$("> .accordion-header", el).click(function(ev){
 					ev.preventDefault();
 					var $this = $(this);
 					var isActive = $this.hasClass("active");
-					el.find(".accordion-header").removeClass("active").next().slideUp(speed);
+					$("> .accordion-header", el).removeClass("active").next().slideUp(speed);
 					if(!isActive)
 						expand($this, speed);
 				})
