@@ -3277,20 +3277,20 @@ public class WGPDispatcher extends HttpServlet {
                 Iterator<String> browserETags = WGUtils.deserializeCollection(browserETagsStr, ",", true, new Character('"')).iterator();
                 while (browserETags.hasNext()) {
                     String rawETag = (String) browserETags.next();
-                        if (rawETag.trim().equals("*")) {
-                            return true;
-                        }
-                        
-                        int startETag = rawETag.indexOf('"');
-                        int endETag = rawETag.lastIndexOf('"');
-                        if (startETag != -1 && endETag != -1) {
-                            String eTag = rawETag.substring(startETag + 1, endETag);
-                    if (eTag.equals(currentETag)) {
+                    if (rawETag.trim().equals("*")) {
                         return true;
                     }
+                    
+                    int startETag = rawETag.indexOf('"');
+                    int endETag = rawETag.lastIndexOf('"');
+                    if (startETag != -1 && endETag != -1 && startETag!=endETag) {
+                        String eTag = rawETag.substring(startETag + 1, endETag);
+	                    if (eTag.equals(currentETag)) {
+	                        return true;
+	                    }
+	                }
                 }
             }
-                }
     
             // Handle If-Modified-Since
             if (lastModified != null) {
