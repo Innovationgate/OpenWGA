@@ -26,7 +26,7 @@
 <%@ page import="de.innovationgate.wgpublisher.webtml.utils.HttpErrorException,de.innovationgate.wgpublisher.jsputils.*" %>
 <%@ page import="de.innovationgate.wgpublisher.*" %>
 <%@ page import="de.innovationgate.wga.server.api.*" %>
-<%@ page language="java" pageEncoding="ISO-8859-1"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
 ErrorPageManager manager = new ErrorPageManager(pageContext);
 if (manager.isDisplayDefaultErrorPage()) {
