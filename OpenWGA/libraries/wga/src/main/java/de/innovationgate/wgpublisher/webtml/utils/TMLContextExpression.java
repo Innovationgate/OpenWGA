@@ -526,7 +526,8 @@ public class TMLContextExpression {
             content =
                     WGPDispatcher.getContentByAnyKey(
                         contextExpression,
-                        context.content().getDatabase(),
+                        //context.content().getDatabase(),
+                        context.getdocument().getDatabase(),
                         getOriginContextLanguageChooser(),
                         context.isbrowserinterface());
     
