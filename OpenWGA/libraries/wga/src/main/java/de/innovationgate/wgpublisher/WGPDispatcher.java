@@ -928,6 +928,7 @@ public class WGPDispatcher extends HttpServlet {
                     response.sendError(exc.getCode(), exc.getMessage());
                 }
                 else {
+                	_log.error("Exception in processing of request URL " + String.valueOf(request.getRequestURL()), exc);
                     throw new ServletException(exc);
                 }
             }
