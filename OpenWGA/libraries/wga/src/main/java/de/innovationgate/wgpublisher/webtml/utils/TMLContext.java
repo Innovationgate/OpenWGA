@@ -4021,6 +4021,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
                 }
             }
             ref = ref.substring(2);
+            if(ref.equals(""))
+            	return startPath;
         }
         
         // Process path parts;
