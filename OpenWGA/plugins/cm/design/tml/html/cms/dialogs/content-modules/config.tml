@@ -535,7 +535,7 @@ WGA.portlet.onload.register("<tml:script expression="portlet.portletkey"/>", fun
 								doc = doc.document;
 								var template;
 								if(doc instanceof Packages.de.innovationgate.webgate.api.WGStructEntry){							
-									template = struct.getReleasedContent(LANGUAGE);
+									template = doc.getReleasedContent(LANGUAGE);
 									if(!template)
 										log.info("struct on clipboard has no released contens in language " + LANGUAGE);
 								}
