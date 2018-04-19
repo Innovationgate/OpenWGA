@@ -304,6 +304,8 @@
 			$("> .entry .symbol", node).attr("class", "symbol " + data.symbolclass)
 		if(data.html||data.title)
 			$("> .entry .link-text", node).html(data.html||data.title)
+		if(data.iconurl)
+			$("> .entry .icon", node).css("background-image", "url('"+data.iconurl+"')")
 		if(data.title)
 			node.data("title", data.title)
 		if(data.context)
