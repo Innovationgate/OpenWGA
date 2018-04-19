@@ -30,15 +30,14 @@ import de.innovationgate.wgpublisher.webtml.Navigator.Status;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 import de.innovationgate.wgpublisher.webtml.utils.TMLException;
 
-public class Children extends Navigator {	/**
-     * 
-     */
+public class Children extends Navigator {
+	
     private static final long serialVersionUID = 1L;
 
-/**
-	 * @throws WGAPIException 
- * @see Navigator#tmlStartTag(TMLContext)
-	 */
+    /**
+     * @throws WGAPIException 
+     * @see Navigator#tmlStartTag(TMLContext)
+     */
 	public void tmlStartTag() throws WGException {
         Status status = (Status) getStatus();
         status.navType = "children";
