@@ -2093,7 +2093,13 @@ public class WGA {
      * @throws WGException
      */
     public Design design(String dbKey) throws WGException {
-        return new Design(this, dbKey);
+    	try{
+    		return new Design(this, dbKey);
+    	}
+    	catch(Exception e){
+    		getLog().error("Unable to determine design for dbkey '" + dbKey + "'");
+    		throw e;
+    	}
     }
     
     /**
