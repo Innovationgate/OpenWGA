@@ -8,7 +8,8 @@ Controller.prototype.prepare = function($option_section, $cx, CMM){
 	var parts = section.split("|");
 	this.section = parts[0];
 	this.sectionTitle = parts[1] || parts[0];
-	this.mods = CMM.getContentModulesAsXML($cx.content()).selectNodes("/modules/section[@id='"+this.section+"']/mod");
+	this.template = CMM.getTemplate($cx.content());
+	this.mods = CMM.getContentModulesAsXML(this.template || $cx.content()).selectNodes("/modules/section[@id='"+this.section+"']/mod");
 }.nonIsolated();
 
 Controller.prototype.allowedModules = function($cx, $option_modules, CMM){

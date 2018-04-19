@@ -161,11 +161,13 @@ this.getModulesSettingsMap = function(source, forModule){
 	return map;	
 }
 
-this.getTemplate = function(){
-	var db = content().getDatabase();
+this.getTemplate = function(doc){
+	if(!doc)
+		doc = content();
+	var db = doc.getDatabase();
 	if(db.getContentStoreVersion() < db.CSVERSION_WGA5)
 		return null;
-	var template = content().getRelation("created-from-template");
+	var template = doc.getRelation("created-from-template");
 	if(template && template.getStructEntry().hasReleasedContent(LANGUAGE))
 		template = template.getStructEntry().getReleasedContent(LANGUAGE);
 	return template;
