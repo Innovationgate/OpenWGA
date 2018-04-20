@@ -75,7 +75,7 @@ public class LanguageBehaviourTools {
                 
         }
         
-        public Integer getStatusValue(String status) {
+        private Integer getStatusValue(String status) {
             
             if (status.equals(WGContent.STATUS_DRAFT)) {
                 return new Integer(10);
@@ -196,8 +196,8 @@ public class LanguageBehaviourTools {
         }
         
         // Non-BI mode: Just return released content
-        if (!isBI /*|| !page.mayEditPage()*/) {
-            return page.getReleasedContent(language);
+        if (!isBI) {
+        	return page.getReleasedContent(language);
         }
         
         
