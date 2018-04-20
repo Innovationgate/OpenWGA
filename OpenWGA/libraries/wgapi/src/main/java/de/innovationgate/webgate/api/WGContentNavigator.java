@@ -25,6 +25,7 @@
 package de.innovationgate.webgate.api;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import de.innovationgate.utils.PrefetchingIterator;
@@ -205,15 +206,15 @@ public class WGContentNavigator {
 	   	WGContent content = this.chooser.selectContentForPage(entry, !onlyPublished);    
         if (content != null && content.mayBePublished(!onlyPublished, displayType)) {
 
-        	if(!content.isVisibleNow()){
-        		// #00005189
-        		// If not authoring mode isVisibleNow() is already checked in mayBePublished()  
-        		// BUT we may be in authoring mode here and may got a not released content.
-        		// get and check the released content in this case.
-        		content = this.chooser.selectContentForPage(entry, false);
-        	}
-        	if(content!=null && content.isVisibleNow())
-        		return content;
+    		// #00005189
+	        // Validto date in the past?
+    		// If not authoring mode isVisibleNow() is already checked in mayBePublished()  
+    		// BUT we may be in authoring mode here and may got a not released content.
+	        Date now = new Date();
+	        if (content.getValidTo() != null && content.getValidTo().before(now)) {
+	            return null;
+	        }
+	        return content;
         }
 	                    
 		return null;
