@@ -939,7 +939,12 @@ public class Design {
             WGDesignProvider designProvider = _designContext.getDesignDB().getDesignProvider();
             CSConfig config = getConfig();
             if(config==null){
-            	_wga.getLog().error("Unable to find csconfig.xml for design " + _designContext.getDesignDB().getDbReference());
+            	/*
+            	 * #00005190
+            	 * Not all content stores support csconfig.xml - e. E. Custom-Domino-Databases.
+            	 * Simply return false in this case.
+            	 */
+            	//_wga.getLog().error("Unable to find csconfig.xml for design " + _designContext.getDesignDB().getDbReference());
             	return false;
             }
             PublisherOption po = config.findPublisherOption(PublisherOption.OPTION_OVERLAY_SUPPORT);
