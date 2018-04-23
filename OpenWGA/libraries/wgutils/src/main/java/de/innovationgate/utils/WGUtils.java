@@ -2868,6 +2868,9 @@ public abstract class WGUtils {
         // Carriage return is removed
         str = str.replaceAll("\r", "");
         
+        // Tabs
+        str = str.replaceAll("\t", "\\\\t");
+        
         return str;
         
     }
