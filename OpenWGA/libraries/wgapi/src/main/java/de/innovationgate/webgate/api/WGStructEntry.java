@@ -320,8 +320,6 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
     public static final MetaInfo METAINFO_KEY = new MetaInfo(META_KEY, Object.class, null);
     
     public static final String META_TITLE = "TITLE";
-    
-    public static final String META_UNIQUENAME = "UNIQUENAME";
     public static final MetaInfo METAINFO_TITLE = new MetaInfo(META_TITLE, String.class, "");
     static {
     	METAINFO_TITLE.setInputConverter(TITLE_CONVERTER);
@@ -368,6 +366,7 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
     public static final String META_WORKFLOW_NAME = "OVERRIDE_WORKFLOW";
     public static final MetaInfo METAINFO_WORKFLOW_NAME = new MetaInfo(META_WORKFLOW_NAME, String.class, null);
     
+    public static final String META_UNIQUENAME = "UNIQUENAME";
     public static final MetaInfo METAINFO_UNIQUENAME = new MetaInfo(META_UNIQUENAME, String.class, null);
     static  {
         METAINFO_UNIQUENAME.setMinCsVersion(WGDatabase.CSVERSION_WGA5);
