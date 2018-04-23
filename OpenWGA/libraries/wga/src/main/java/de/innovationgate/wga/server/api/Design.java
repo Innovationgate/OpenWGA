@@ -1155,11 +1155,11 @@ public class Design {
         try {
             PostProcessResult result = null;
             WGPDispatcher dispatcher = _wga.getCore().getDispatcher();
-            if (dispatcher != null) {
+            if (dispatcher != null && _wga.isRequestAvailable() && _wga.isResponseAvailable()) {
                 result = dispatcher.postProcessDesignResource(
                     mod, 
-                    _wga.isRequestAvailable() ? _wga.getRequest() :  null, 
-                    _wga.isResponseAvailable() ? _wga.getResponse() : null,
+                    _wga.getRequest(), 
+                    _wga.getResponse(),
                     compress
                 );
             }
