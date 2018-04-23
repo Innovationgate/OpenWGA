@@ -24,7 +24,7 @@
 ## LICENSE END #################################################################
 
 <tml:action id="setImage">
-	var filename = request.getParameter("filename")
+	var filename = request.getParameter("filename").toLowerCase()
 	var dbkey = request.getParameter("dbkey")
 	var container = request.getParameter("container")
 
