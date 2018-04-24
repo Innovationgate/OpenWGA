@@ -30,7 +30,9 @@
 
 <label><tml:label key="form.settings.fieldname"/>:</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:fieldname}" mode="{option('mode')}" cssstyle="width:100%"/> 
+	<tml:input name="{scoped:fieldname}" mode="{option('mode')}" cssstyle="width:100%"/>
+	<br>
+	(Empfohlen: a-Z und _. Keine Leerzeichen oder Umlaute)
 </div>
 
 <label><tml:label key="form.settings.field-type"/>:</label>
