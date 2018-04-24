@@ -28,7 +28,7 @@
 	_divider = CMM.setting('divider')=="single-line" ? " " : null;
 	
 	_message = CMM.setting('validationmessage');
-	_fieldname = CMM.setting('fieldname');
+	_fieldname = CMM.setting('fieldname').trim();
 	_label = CMM.setting("label");
 
 	var validation = CMM.setting('validation')
@@ -64,7 +64,7 @@
 		<tml:[setting] o_name="label"/>
 	</label>
 	<div class="data">
-		<tml:input name="{CMM.setting('fieldname')}"
+		<tml:input name="{_fieldname}"
 			focus="{isFirstLoop() && CMM.setting('fieldtype')!='date'}"
 			validation="{_validation||true}"
 			message="{_message}"

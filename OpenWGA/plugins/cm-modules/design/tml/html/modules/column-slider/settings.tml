@@ -16,11 +16,11 @@
 		</div>
 		<div style="margin:10px">
 			<label><tml:label key="column-slider.settings.responsive.small-medium-large"/>:</label>
-			<tml:input name="{scoped:cols_s}" type="number" default="1" cssstyle="width:30px" mode="{option('mode')}"/>
+			<tml:input name="{scoped:cols_s}" type="number" default="1" cssstyle="width:30px;display:inline" mode="{option('mode')}"/>
 			/
-			<tml:input name="{scoped:cols_m}" type="number" default="2" cssstyle="width:30px" mode="{option('mode')}"/>
+			<tml:input name="{scoped:cols_m}" type="number" default="2" cssstyle="width:30px;display:inline" mode="{option('mode')}"/>
 			/
-			<tml:input name="{scoped:cols_l}" type="number" default="3" cssstyle="width:30px" mode="{option('mode')}"/>
+			<tml:input name="{scoped:cols_l}" type="number" default="3" cssstyle="width:30px;display:inline" mode="{option('mode')}"/>
 		</div>
 	</tml:then>
 	<tml:else>
