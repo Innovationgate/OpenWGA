@@ -111,7 +111,21 @@
 
 		var link = $("<a/>", {
 			href: data.href
-		}).on("click", selectEntry)
+		}).on({
+			"click": selectEntry,
+			"dblclick": function(){
+				var node = $(this)
+				node.trigger("editnode", {
+					node: node,
+					id: node.data("id"),
+					href: node.data("href"),
+					level: node.data("level"),
+					title: node.data("title"),
+					context: node.data("context"),
+					haschildren: node.data("haschildren")
+				})
+			}
+		})
 		
 		link.append(icon)
 		link.attr("draggable", true);
