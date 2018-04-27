@@ -3010,7 +3010,7 @@ public class WGA {
                 optionText = alias.substring(0, divider).trim();
                 optionValue = alias.substring(divider + 1).trim();
             }
-            if (optionValue.equals(str)) {
+            if (optionValue.equals(str) || (str==null && optionValue.equals(""))) {
                 return optionText;
             }
         }

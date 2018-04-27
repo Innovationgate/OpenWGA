@@ -50,6 +50,7 @@ import de.innovationgate.utils.FormattingException;
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGException;
+import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.RTFEncodingFormatter;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.expressions.ExpressionEngineFactory;
@@ -84,33 +85,6 @@ public class Item extends FormBase implements DynamicAttributes {
 
 	public static final String OPTION_EDITOR_FIELD = SYSTEMOPTION_PREFIX + "editorField";
     
-     /**
-     * represents an Alias like options on tml:input 
-     */
-    private class Alias {
-        private String _value;
-        private String _text;
-        
-        public Alias(String text, String value) {
-            _value = value;
-            _text = text;
-        }
-
-        public String getText() {
-            return _text;
-        }
-
-        public String getValue() {
-            return _value;
-        }
-        
-    }
-    
-
-    
-
-    
-
 
 	public void tmlEndTag() throws WGException, TMLException {
 		
@@ -170,7 +144,7 @@ public class Item extends FormBase implements DynamicAttributes {
 		
         // The item does not exist or is empty. Treat as empty list.
 		if (result == null) {
-			result = new ArrayList();;
+			result = new ArrayList();
 		}
 		
 		// Eventually execute xpath
@@ -229,60 +203,43 @@ public class Item extends FormBase implements DynamicAttributes {
 		}
 		else {			            
             // if aliases are defined, replace values with aliases
-            ArrayList aliasResults = new ArrayList();
-            Iterator aliases = this.retrieveAliases().iterator();
-            while (aliases.hasNext()) {
-                Alias alias = (Alias) aliases.next();
-                if (result.contains(alias.getValue()) || result.contains(alias.getText())) {
-                    aliasResults.add(alias.getText());
+			
+            List aliases = this.retrieveAliases();
+            if(aliases.size()>0){
+            	WGA wga = WGA.get();
+                ArrayList<String> aliasResults = new ArrayList<String>();
+                
+                if(result.isEmpty()){
+                	aliasResults.add(wga.alias("", aliases));
                 }
-            }            
-            if (aliasResults.size() > 0) {
+                else{	                
+	                List<String> stringValues = WGUtils.toString(result);
+	                for(String value: stringValues){
+	                	aliasResults.add(wga.alias(value, aliases));
+	                }
+                }
                 this.setResult(aliasResults);
-            } else {
-                this.setResult(result);
-            }                        
+            }
+            else this.setResult(result);
+
 		}
 	}
-    
+
     private List retrieveAliases() throws WGAPIException {
         
-     // Fetch aliases, either directly from item (Attribute aliasesitem) or as comma-separated string (Attribute aliases)
-        String aliasesItem = getAliasesitem();
-        List rawAliasesList;
-        if (aliasesItem != null) {
-            rawAliasesList = getTMLContext().itemlist(aliasesItem);
-        }
-        else {
-            String aliases = this.getAliases();
-            if (aliases == null) {
-                return new ArrayList();
-            }
-            rawAliasesList = WGUtils.deserializeCollection(aliases, ",");
-        }
-        
-        // Process raw aliases. Divide up value and text and create aliases objects by them
-        List aliasesList = new ArrayList();
-        String token;
-        String aliasText;
-        String aliasValue;
-        Iterator options = rawAliasesList.iterator();
-        while (options.hasNext()) {
-            token = (String) options.next();
-            // Get value and text
-            int divider = token.indexOf("|");
-            if (divider != -1) {
-                aliasText = token.substring(0, divider).trim();
-                aliasValue = token.substring(divider + 1).trim();
-            }
-            else {
-                aliasText = token.trim();
-                aliasValue = token.trim();
-            }
-            aliasesList.add(new Alias(aliasText, aliasValue));
-        }
-        return aliasesList;
-    }    
+        // Fetch aliases, either directly from item (Attribute aliasesitem) or as comma-separated string (Attribute aliases)
+       String aliasesItem = getAliasesitem();
+       if (aliasesItem != null) {
+           return WGUtils.toString(getTMLContext().itemlist(aliasesItem));
+       }
+       else {
+           String aliases = this.getAliases();
+           if (aliases == null) {
+               return new ArrayList();
+           }
+           return WGUtils.deserializeCollection(aliases, ",");
+       }
+    }
 
 	private void buildEditor(String itemName, List result) throws WGException {
 

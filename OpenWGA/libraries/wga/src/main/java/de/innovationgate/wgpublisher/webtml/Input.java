@@ -310,25 +310,44 @@ public class Input extends ActionBase implements DynamicAttributes {
                 
                 else if (type.equals("select") || type.equals("checkbox") || type.equals("radio")) {
                     List<String> textValues = new ArrayList<String>();
-                    Iterator<InputOption> options = this.retrieveInputOptions().iterator();
-                    if (options.hasNext()) { 
-                        while (options.hasNext()) {
-                            InputOption option = (InputOption) options.next();
-                            List<String> stringValues = WGUtils.toString(values);
-                            
-                            if (stringValues.contains(option.getValue()) || (values.size() == 0 && TMLForm.RELATION_NULLPLACE_HOLDER.equals(option.getValue()))) {
-                                textValues.add(option.getText());
-                            }
-                        }
-                    }
-                                        
-                    if (textValues.size() > 0) {
+                    
+                    List<InputOption> options = this.retrieveInputOptions();
+                    if(options.size()>0){
+                        // prepare regular list so we can use WGA.alias()
+                    	ArrayList<String> optionsValues = new ArrayList<String>();
+                    	String relationNullPlaceholderOptionValue=null;
+                    	String emptyOptionValue=null;
+                    	for(InputOption o: options){
+                    		optionsValues.add(o.getText()+"|"+o.getValue());
+                    		if(TMLForm.RELATION_NULLPLACE_HOLDER.equals(o.getValue())){
+                    			relationNullPlaceholderOptionValue = o.getText();
+                    		}
+                    		if(o.getValue().equals(""))
+                    			emptyOptionValue = o.getText();
+                    	}
+                    	if(values.size()==0){                    		
+                    		if(relationNullPlaceholderOptionValue!=null){
+                    			textValues.add(relationNullPlaceholderOptionValue);
+                    		}
+                    		else if(emptyOptionValue!=null){
+                    			textValues.add(emptyOptionValue);
+                    		}
+                    	}
+                    	else{
+	                    	WGA wga = WGA.get();
+	                        List<String> stringValues = WGUtils.toString(values);
+	                        
+	                        for(String value: stringValues){
+	                        	textValues.add(wga.alias(value, optionsValues));
+	                        }
+                    	}
                         this.setResult(textValues);
                         getStatus().divider = getMultiValueDivider();
                     }
                     else {
                         this.setResult(values);
                     }
+
                 }
                 else {
                     // do not render original value if type is password
@@ -470,7 +489,7 @@ public class Input extends ActionBase implements DynamicAttributes {
 
     private List<InputOption> retrieveInputOptions() throws WGAPIException {
         
-        // Fetch options. Possible sources: 1. directly from item (Attribute optionslist) 2. comma-separated string (Attribute options) 3. HDBModel relation targets
+        // Fetch options. Possible sources: 1. directly from item (Attribute optionsitem) 2. comma-separated string (Attribute options) 3. HDBModel relation targets
         String optionsItem = getOptionsitem();
         List<String> rawOptionsList = null;
         if (!WGUtils.isEmpty(optionsItem)) {
