@@ -443,6 +443,14 @@
 						var el = $(e.target).parents("li").first()
 						var parent = el.parents("li").first()
 						
+						/*
+						console.log("el", el)
+						console.log("parent", parent)						
+						console.log("is-children", el.parents("li").index(drag_el))
+						*/
+						if(el.parents("li").index(drag_el)>=0)
+							return;		// don't drag to children
+						
 						if(el.hasClass("placeholder") || el.data("id")==drag_el_id)
 							return;
 
@@ -542,6 +550,9 @@
 						
 						var el = $(e.target).parents("li").first()
 						dragged_el.removeClass("dragging");
+
+						if(el.parents("li").index(drag_el)>=0)
+							return;		// don't drag to children
 
 						if(el.data("id")!=dragged_el.data("id")){
 							

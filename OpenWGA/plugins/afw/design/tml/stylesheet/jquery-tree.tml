@@ -32,11 +32,11 @@
 				}
 			},
 			"&.drop-add-children > .entry": {
-				color: "red",
+				color: "red !important",
 				".icon": {
 					background_:{
-						image: "url('<tml:url type="file" doc="icons" file="add.png"/>')",
-						position: "center center"
+						image: "url('<tml:url type="file" doc="icons" file="add.png"/>') !important",
+						position: "center center !important"
 					}
 				}<tml:comment>,
 				".icon": {
@@ -105,7 +105,7 @@
 		width: 20,
 		background_:{
 			repeat: "no-repeat",
-			position: "0 center"
+			position: "center center"
 		}
 	},
 	
