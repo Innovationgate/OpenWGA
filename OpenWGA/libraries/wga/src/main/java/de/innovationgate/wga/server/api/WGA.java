@@ -3001,22 +3001,56 @@ public class WGA {
      * @return The found alias or the original string value if no alias was found
      */
     public String alias(String str, List<String> aliases) {
-       
+    	ArrayList<String> values = new ArrayList<String>();
+    	values.add(str);
+    	return this.aliases(values, aliases).get(0);
+    }
+    
+    /**
+     * Returns a list of alias for a string list
+     * The list of aliases given as parameter is expected to contain elements of value plus corresponding alias, divided by a pipe symbol: alias|value
+     * If values is null or empty the alias for an empty string is returned (if found)
+     * @param values The list of value
+     * @param aliasesStr The aliases string
+     * @return The found aliases or the original string value if no alias was found
+     */
+    public ArrayList<String> aliases(List<String> values, String aliasesStr) {
+    	return aliases(values, WGUtils.deserializeCollection(aliasesStr, ",", true));
+    }
+
+    /**
+     * Returns a list of alias for a string list
+     * The list of aliases given as parameter is expected to contain elements of value plus corresponding alias, divided by a pipe symbol: alias|value
+     * If values is null or empty the alias for an empty string is returned (if found)
+     * @param values The list of value
+     * @param aliases The list of aliases
+     * @return The found aliases or the original string value if no alias was found
+     */
+    public ArrayList<String> aliases(List<String> values, List<String> aliases) {
+    	ArrayList<String> result = new ArrayList<String>();
+    	HashMap<String,String> options = new HashMap<String,String>();
         for (String alias : aliases) {
             String optionText = alias;
             String optionValue = alias;
             int divider = alias.indexOf("|");
             if (divider != -1) {
-                optionText = alias.substring(0, divider).trim();
-                optionValue = alias.substring(divider + 1).trim();
+                optionText = alias.substring(0, divider);
+                optionValue = alias.substring(divider + 1);
             }
-            if (optionValue.equals(str) || (str==null && optionValue.equals(""))) {
-                return optionText;
-            }
+            options.put(optionValue.trim(), optionText.trim());
         }
-        
-        return str;
-       
+        if(values==null)
+        	values = new ArrayList<String>();
+        if(values.isEmpty()){
+        	values.add("");
+        }
+        for(String value: values){
+        	String alias = options.get(value);
+        	if(alias!=null)
+        		result.add(alias);
+        	else result.add(value); 
+        }
+        return result;
     }
     
     /**

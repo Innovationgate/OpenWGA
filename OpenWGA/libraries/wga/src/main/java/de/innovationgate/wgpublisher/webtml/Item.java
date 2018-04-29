@@ -203,24 +203,13 @@ public class Item extends FormBase implements DynamicAttributes {
 		}
 		else {			            
             // if aliases are defined, replace values with aliases
-			
             List aliases = this.retrieveAliases();
-            if(aliases.size()>0){
+            if(aliases.isEmpty())
+            	this.setResult(result);
+            else {
             	WGA wga = WGA.get();
-                ArrayList<String> aliasResults = new ArrayList<String>();
-                
-                if(result.isEmpty()){
-                	aliasResults.add(wga.alias("", aliases));
-                }
-                else{	                
-	                List<String> stringValues = WGUtils.toString(result);
-	                for(String value: stringValues){
-	                	aliasResults.add(wga.alias(value, aliases));
-	                }
-                }
-                this.setResult(aliasResults);
+            	this.setResult(wga.aliases(WGUtils.toString(result), aliases));
             }
-            else this.setResult(result);
 
 		}
 	}
@@ -235,7 +224,7 @@ public class Item extends FormBase implements DynamicAttributes {
        else {
            String aliases = this.getAliases();
            if (aliases == null) {
-               return new ArrayList();
+               return new ArrayList<String>();
            }
            return WGUtils.deserializeCollection(aliases, ",");
        }

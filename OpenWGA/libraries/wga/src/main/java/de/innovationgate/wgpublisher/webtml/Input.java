@@ -316,30 +316,19 @@ public class Input extends ActionBase implements DynamicAttributes {
                         // prepare regular list so we can use WGA.alias()
                     	ArrayList<String> optionsValues = new ArrayList<String>();
                     	String relationNullPlaceholderOptionValue=null;
-                    	String emptyOptionValue=null;
                     	for(InputOption o: options){
                     		optionsValues.add(o.getText()+"|"+o.getValue());
                     		if(TMLForm.RELATION_NULLPLACE_HOLDER.equals(o.getValue())){
                     			relationNullPlaceholderOptionValue = o.getText();
                     		}
-                    		if(o.getValue().equals(""))
-                    			emptyOptionValue = o.getText();
                     	}
-                    	if(values.size()==0){                    		
-                    		if(relationNullPlaceholderOptionValue!=null){
-                    			textValues.add(relationNullPlaceholderOptionValue);
-                    		}
-                    		else if(emptyOptionValue!=null){
-                    			textValues.add(emptyOptionValue);
-                    		}
-                    	}
+                    	if(values.size()==0 && relationNullPlaceholderOptionValue!=null){
+                			textValues.add(relationNullPlaceholderOptionValue);
+                		}
                     	else{
 	                    	WGA wga = WGA.get();
 	                        List<String> stringValues = WGUtils.toString(values);
-	                        
-	                        for(String value: stringValues){
-	                        	textValues.add(wga.alias(value, optionsValues));
-	                        }
+	                        textValues.addAll(wga.aliases(stringValues, optionsValues));
                     	}
                         this.setResult(textValues);
                         getStatus().divider = getMultiValueDivider();
