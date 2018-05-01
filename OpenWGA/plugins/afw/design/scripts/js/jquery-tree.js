@@ -578,7 +578,7 @@
 										id: dragged_el.data("id"),
 										href: dragged_el.data("href"),
 										parent_id: el.data("id"),
-										index: el.find("li:not(.placeholder)").index(dragged_el) 
+										index: el.find("> ul > li:not(.placeholder)").index(dragged_el) 
 									})
 									
 								});
@@ -587,13 +587,15 @@
 								dragged_el.insertAfter(placeholder);
 								recalcLevels(dragged_el)
 
+								var index = dragged_el.parents("li").first().find("> ul > li:not(.placeholder)").index(dragged_el)
+
 								if(parent.find("li").length==0)
 									parent.attr("data-haschildren", "false");
 								dragged_el.trigger("moved", {
 										id: dragged_el.data("id"),
 										href: dragged_el.data("href"),
 										parent_id: dragged_el.parents("li").first().data("id"),
-										index: dragged_el.parents("li").first().find("li:not(.placeholder)").index(dragged_el)
+										index: index
 								})
 							}
 
