@@ -2587,12 +2587,12 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
         return getSiblingEntries().getIndexOfEntry(this);
     }
 
-    public Class getChildNodeType() {
+    public Class<?> getChildNodeType() {
         return WGStructEntry.class;
     }
 
-    public List getChildNodes() throws WGAPIException {
-        return new ArrayList(getChildEntries());
+    public List<PageHierarchyNode> getChildNodes() throws WGAPIException {
+        return new ArrayList<PageHierarchyNode>(getChildEntries());
     }
     
     @Override

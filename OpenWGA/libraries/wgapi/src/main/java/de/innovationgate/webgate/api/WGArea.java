@@ -154,12 +154,21 @@ public class WGArea extends WGSchemaDocument implements PageHierarchyNode {
 	}
 	
 	/**
+	 * Returns a list of all (root) entries in this area.
+	 * Synonym for getRootEntries()
+	 * @return WGStructEntryList
+	 * @throws WGSystemException 
+	 * @throws WGBackendException 
+	 */
+    public WGStructEntryList getChildEntries() throws WGAPIException {
+		return getRootEntries();
+	}
+	/**
 	 * Returns a list of all root entries in this area.
 	 * @return WGStructEntryList
 	 * @throws WGSystemException 
 	 * @throws WGBackendException 
 	 */
-	@SuppressWarnings("unchecked")
     public WGStructEntryList getRootEntries() throws WGAPIException {
 
 	    // Double checked cache (un-synchronized and synchronized)
@@ -647,7 +656,7 @@ public class WGArea extends WGSchemaDocument implements PageHierarchyNode {
 		return createContent(null, "");
 	}
 
-    public Class getChildNodeType() {
+    public Class<?> getChildNodeType() {
         return WGStructEntry.class;
     }
 
