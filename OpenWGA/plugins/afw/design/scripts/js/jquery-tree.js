@@ -586,8 +586,12 @@
 							else {
 								dragged_el.insertAfter(placeholder);
 								recalcLevels(dragged_el)
-
-								var index = dragged_el.parents("li").first().find("> ul > li:not(.placeholder)").index(dragged_el)
+								
+								var index;
+								var new_parent = dragged_el.parentsUntil(".wga_tree", "li").first();
+								if(new_parent.length)
+									index = new_parent.find("> ul > li:not(.placeholder)").index(dragged_el)
+								else index = dragged_el.parents(".wga_tree").first().find("> ul > li:not(.placeholder)").index(dragged_el)
 
 								if(parent.find("li").length==0)
 									parent.attr("data-haschildren", "false");
