@@ -149,7 +149,10 @@
 										struct.append('<div class="outline-error tag tag-H' + i + '">fehlt</div>');
 								}
 								currentLevel = level
-								struct.append('<div class="tag tag-' + this.tagName + '">' + ($(this).text().trim() || "(leer)") + "</div>");			
+								// be carefull not to add <script>s or other tag>s
+								var tn = document.createTextNode($(this).text().trim() || "(leer)");
+								struct.append($("<div/>", {class:"tag tag-"+this.tagName}).append(tn));
+								//struct.append('<div class="tag tag-' + this.tagName + '">' + ($(this).text().trim() || "(leer)") + "</div>");			
 							})
 							var h1 = $(el).find("h1").length
 							if(h1!=1)
@@ -169,7 +172,7 @@
 							 */
 							if(!$("#seo-searchengine .anzeige .title").html()){
 								var title = doc.title;
-								$("#seo-searchengine .anzeige .title").html(title.substr(0,60));
+								$("#seo-searchengine .anzeige .title").text(title.substr(0,60));
 							}
 							if(!$("#seo-searchengine .anzeige .description").html()){					
 								var description = ""
@@ -182,7 +185,7 @@
 								})
 								if(description.length>=160)
 									description = description.substr(0,160) + " ..."
-								$("#seo-searchengine .anzeige .description").html(description);
+								$("#seo-searchengine .anzeige .description").text(description);
 								$("#seo-searchengine .alert").show();
 							}
 													
