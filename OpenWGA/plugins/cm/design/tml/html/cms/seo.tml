@@ -150,9 +150,7 @@
 								}
 								currentLevel = level
 								// be carefull not to add <script>s or other tag>s
-								var tn = document.createTextNode($(this).text().trim() || "(leer)");
-								struct.append($("<div/>", {class:"tag tag-"+this.tagName}).append(tn));
-								//struct.append('<div class="tag tag-' + this.tagName + '">' + ($(this).text().trim() || "(leer)") + "</div>");			
+								struct.append($("<div/>", {class:"tag tag-"+this.tagName}).text($(this).text().trim() || "(leer)"));
 							})
 							var h1 = $(el).find("h1").length
 							if(h1!=1)
