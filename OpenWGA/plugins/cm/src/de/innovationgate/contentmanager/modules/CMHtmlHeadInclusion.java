@@ -78,7 +78,7 @@ public class CMHtmlHeadInclusion implements HTMLHeadInclusion {
     			result.append("\n<link rel=\"stylesheet\" type=\"text/css\" href=\"" + 
 						WGA.get().design("plugin-contentmanager").resolve("bi-style-injection").scriptURL("css") +
 						"\">");
-				result.append("\n<script id=\"wga-cm-contentinfo\" type=\"text/javascript\">");
+				result.append("\n<script id=\"wga-cm-contentinfo\">");
 	        	result.append("\nWGA.contentinfo={");
 	        	result.append("\n\tdbkey:\"" + content.getDatabase().getDbReference() + "\"");
 	    		if(!content.isDummy()){
@@ -91,7 +91,7 @@ public class CMHtmlHeadInclusion implements HTMLHeadInclusion {
 	    		}
 	    		result.append("\n};");
 	    		result.append("\n</script>\n");
-	    		result.append("\n<script type=\"text/javascript\">");
+	    		result.append("\n<script>");
 	    		result.append("WGA.CMM={sections:{},hasSections:false}");
 	    		result.append("</script>\n");
         	
