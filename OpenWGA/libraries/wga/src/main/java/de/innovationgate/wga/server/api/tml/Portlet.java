@@ -133,6 +133,12 @@ public interface Portlet {
     public abstract String getname();
 
     /**
+     * Returns the key of the portlet
+     */
+    @CodeCompletion(preferredCase="portletkey",isProperty=true)
+    public abstract String getportletkey();
+    
+    /**
      * Returns the absolute path of this portlet, consisting of a path of from names of all portlets up to the root 
      * @throws WGAPIException
      */
