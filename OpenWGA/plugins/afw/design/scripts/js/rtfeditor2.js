@@ -426,7 +426,7 @@ AFW.RTF.editor=function(id, config){
 	//-------- end Constructor----------------
 	
 	this.cleanHTML = function(){
-		var html = AFW.RTF.getCleanInnerHTML(editor.editelement);
+		var html = getCleanInnerHTML(editor.editelement);
 		editor.editelement.innerHTML = html;
 		editor.doc.defaultView.focus();
 	}
@@ -862,7 +862,7 @@ AFW.RTF.editor=function(id, config){
 			if(html){
 				var div = document.createElement("div");
 				div.innerHTML = html
-				var html = AFW.RTF.getCleanInnerHTML(div, editor.toolbar==null)
+				var html = getCleanInnerHTML(div, editor.toolbar==null)
 				if(html){
 					editor.insertHTML(html);
 				}
@@ -1889,7 +1889,7 @@ AFW.RTF.editor=function(id, config){
 
 			,clean: function(){
 				var node = this.expand().cloneContents();
-				var html = AFW.RTF.getCleanInnerHTML(node);
+				var html = getCleanInnerHTML(node);
 				editor.insertHTML(html);
 				editor.doc.defaultView.focus();
 			}
@@ -1985,7 +1985,7 @@ AFW.RTF.editor=function(id, config){
 
 			window.setTimeout(function(){
 				var pasted_body = doc.body;
-				var html = AFW.RTF.getCleanInnerHTML(doc.body, editor.toolbar==null)
+				var html = getCleanInnerHTML(doc.body, editor.toolbar==null)
 				if(html)
 					editor.insertHTML(html);
 					
@@ -2002,160 +2002,164 @@ AFW.RTF.editor=function(id, config){
 		}
 	}
 
-}
-
-AFW.RTF.getCleanInnerHTML = function(node, isTextBlock){
-
-	//console.log("cleanHTML", node, node.childNodes);
-
-	var good_els = "#h1#h2#h3#h4#h5#h6#a#img#p#pre#br#ul#ol#li#blockquote#div#table#tbody#tr#td#b#i#u#sub#sup#";
-	var good_els_textblock = "#br#p#";
-	var bad_els = "#head#script#style#"
-
-	var el = document.createElement("div");
-	var children = node.childNodes;
-	for(var i=0; i<children.length; i++){
-		copyElement(children[i], el, isTextBlock?good_els_textblock:good_els);
-	}
-	return el.innerHTML;
-
-	function hasToolbarClass(classes, cls){
-		for(var i=0; i<classes.length; i++){
-			var c = classes[i].split("|");
-			if(c[1]==cls)
-				return true;
+	function getCleanInnerHTML(node, isTextBlock){
+	
+		//console.log("cleanHTML", node, node.childNodes);
+	
+		var good_els = "#h1#h2#h3#h4#h5#h6#a#img#p#pre#br#ul#ol#li#blockquote#div#table#tbody#tr#td#b#i#u#sub#sup#";
+		var good_els_textblock = "#br#p#";
+		var bad_els = "#head#script#style#"
+	
+		var el = document.createElement("div");
+		var children = node.childNodes;
+		for(var i=0; i<children.length; i++){
+			copyElement(children[i], el, isTextBlock?good_els_textblock:good_els);
 		}
-		return false;
-	}
-
-	function copyElement(source, dest, good_els){
-
-		if(source.nodeType==source.TEXT_NODE){				// text node 
-			var txt = source.nodeValue.replace(/\xA0/g, " ");	// removes &nbsp;
-			dest.appendChild(document.createTextNode(txt));
-		}
-		else if(source.nodeType==source.ELEMENT_NODE || source.nodeType==source.DOCUMENT_FRAGMENT_NODE){		// dom element
-
-			if(source.style && source.style.display=="none")
-				return;						// don't copy hidden elements
-
-			var el = dest;
-			var tagname=source.nodeName.toLowerCase();
-			
-			/*
-			 * filter good and bad tags
-			 */
-			if(bad_els.indexOf("#"+tagname+"#")>=0){
-				//console.log("ignoring bag tag " + tagname);
-				return;		// we don't want this tag and it's contents
+		return el.innerHTML;
+	
+		function hasToolbarClass(classes, cls){
+			if(!classes)
+				return false;
+			for(var i=0; i<classes.length; i++){
+				var c = classes[i].split("|");
+				if(c[1]==cls)
+					return true;
 			}
-			else if(good_els.indexOf("#"+tagname+"#")>=0){
-				
-				/* special handling for pasted images in Safari: */
-				if(tagname=="img" && source.src.indexOf("webkit-fake-url://")==0)
-					return;		// image is useless so ignore this image
-				
-				/* 
-				 * special tags attribute handling 
-				 */
-				var attributes=[];
-				switch(tagname){
-					case "a":
-						attributes = ["href"]
-						break;
-					case "img":
-						attributes = ["src", "width", "height", "title", "alt", "data-wga-urlinfo", "wga:urlinfo"];
-						break;
-					case "table":
-						attributes = ["width"]
-						break;
-					case "td":
-						attributes = ["colspan", "rowspan", "width"]
-						break;
-					case "div":
-						attributes = ["align"]
-					case "p":
-					case "pre":
-					case "h1":
-					case "h2":
-					case "h3":
-					case "h4":
-					case "h5":
-					case "h6":
-						if(!source.innerHTML.trim())
-							return;		// ignore empty block elements
-						break;
-				}
-
-				/* create element */
-				el = dest.appendChild(document.createElement(tagname));
-
-				// copy attributes
-				for(var i=0; i<attributes.length; i++){
-					var attribute = attributes[i];
-					var val = source.getAttribute(attribute);
-					if(val)
-						el.setAttribute(attribute, val);
-				}
-				//console.log("good tag " + tagname, attributes);
+			return false;
+		}
+	
+		function copyElement(source, dest, good_els){
+	
+			if(source.nodeType==source.TEXT_NODE){				// text node 
+				var txt = source.nodeValue.replace(/\xA0/g, " ");	// removes &nbsp;
+				dest.appendChild(document.createTextNode(txt));
+			}
+			else if(source.nodeType==source.ELEMENT_NODE || source.nodeType==source.DOCUMENT_FRAGMENT_NODE){		// dom element
+	
+				if(source.style && source.style.display=="none")
+					return;						// don't copy hidden elements
+	
+				var el = dest;
+				var tagname=source.nodeName.toLowerCase();
 				
 				/*
-				 * special handling for wga-urltype classes
+				 * filter good and bad tags
 				 */
-				var cn = source.className.split(" ");
-				var wga_classes=[];
-				for(var i=0; i<cn.length; i++){
-					var cls = cn[i];
-					if(!cls)
-						continue;
-					if(cn[i] && cn[i].indexOf("wga-urltype")==0){
-						// this is a WGA-URL. We need to check 
-						// 1) if this is on the same server
-						// 2) if the URL is a file url that points the the same content
-						
-						var urlinfo = AFW.RTF.getURLInfo(source);
-						if(urlinfo.domain != document.domain)
-							continue;
-						
-						if(cls=="wga-urltype-intfile"){
-							var container = urlinfo.path[urlinfo.path.length-2]
-							if(container!=editor.contentkey){
-								cls = "wga-urltype-extfile";		// better use extfile because we don't know the destination
-								urlinfo.type="extfile";
-								urlinfo.key = container+"/"+urlinfo.key;
-							}
-						}
-						wga_classes.push(cls);
-						AFW.RTF.setURLInfo(el, {type:urlinfo.type, key:urlinfo.key})
-					}
-					else if(editor.toolbar){
-						if((tagname=="a" && hasToolbarClass(editor.toolbar.linkStyleList, cls))
-							|| (tagname=="div" && hasToolbarClass(editor.toolbar.sectionStyleList, cls))
-							|| (tagname=="p" && hasToolbarClass(editor.toolbar.paragraphStyleList, cls))
-							|| (tagname=="table" && hasToolbarClass(editor.toolbar.tableStyleList, cls))
-							|| (tagname=="tr" && hasToolbarClass(editor.toolbar.trStyleList, cls))
-							|| (tagname=="td" && hasToolbarClass(editor.toolbar.tdStyleList, cls))
-							|| (tagname=="img" && hasToolbarClass(editor.toolbar.imageStyleList, cls))
-						)
-							wga_classes.push(cls); 
-					}
+				if(bad_els.indexOf("#"+tagname+"#")>=0){
+					//console.log("ignoring bag tag " + tagname);
+					return;		// we don't want this tag and it's contents
 				}
-				if(wga_classes.length)
-					el.className = wga_classes.join(" ");
+				else if(good_els.indexOf("#"+tagname+"#")>=0){
+					
+					/* special handling for pasted images in Safari: */
+					if(tagname=="img" && source.src.indexOf("webkit-fake-url://")==0)
+						return;		// image is useless so ignore this image
+					
+					/* 
+					 * special tags attribute handling 
+					 */
+					var attributes=[];
+					switch(tagname){
+						case "a":
+							attributes = ["href"]
+							break;
+						case "img":
+							attributes = ["src", "title", "alt", "data-wga-urlinfo", "wga:urlinfo"];
+							break;
+						case "table":
+							attributes = ["width"]
+							break;
+						case "td":
+							attributes = ["colspan", "rowspan", "width"]
+							break;
+						case "div":
+							attributes = ["align"]
+						case "p":
+						case "pre":
+						case "h1":
+						case "h2":
+						case "h3":
+						case "h4":
+						case "h5":
+						case "h6":
+							if(!source.innerHTML.trim())
+								return;		// ignore empty block elements
+							break;
+					}
+	
+					/* create element */
+					el = dest.appendChild(document.createElement(tagname));
+	
+					// copy attributes
+					for(var i=0; i<attributes.length; i++){
+						var attribute = attributes[i];
+						var val = source.getAttribute(attribute);
+						if(val)
+							el.setAttribute(attribute, val);
+					}
+					//console.log("good tag " + tagname, attributes);
+					
+					/*
+					 * special handling for wga-urltype classes
+					 */
+					var cn = source.className.split(" ");
+					var wga_classes=[];
+					for(var i=0; i<cn.length; i++){
+						var cls = cn[i];
+						if(!cls)
+							continue;
+						if(cn[i] && cn[i].indexOf("wga-urltype")==0){
+							// this is a WGA-URL. We need to check 
+							// 1) if this is on the same server
+							// 2) if the URL is a file url that points the the same content
+							
+							var urlinfo = AFW.RTF.getURLInfo(source);
+							if(urlinfo.domain != document.domain)
+								continue;
+							
+							if(cls=="wga-urltype-intfile"){
+								var container = urlinfo.path[urlinfo.path.length-2]
+								if(container!=editor.contentkey){
+									cls = "wga-urltype-extfile";		// better use extfile because we don't know the destination
+									urlinfo.type="extfile";
+									urlinfo.key = container+"/"+urlinfo.key;
+								}
+							}
+							wga_classes.push(cls);
+							AFW.RTF.setURLInfo(el, {type:urlinfo.type, key:urlinfo.key})
+						}					
+						else if(editor.toolbar){
+							//console.log("editor.toolbar.paragraphStyleList", editor.toolbar, editor.toolbar.paragraphStyleList)
+							if((tagname=="a" && hasToolbarClass(editor.toolbar.linkStyleList, cls))
+								|| (tagname=="div" && hasToolbarClass(editor.toolbar.sectionStyleList, cls))
+								//|| (tagname=="p" && hasToolbarClass(editor.toolbar.paragraphStyleList, cls))
+								|| ("p,h1,h2,h3,h4,h5,h6,pre".indexOf(tagname)>=0  && hasToolbarClass(editor.toolbar.paragraphStyleList, cls))
+								|| (tagname=="table" && hasToolbarClass(editor.toolbar.tableStyleList, cls))
+								|| (tagname=="tr" && hasToolbarClass(editor.toolbar.trStyleList, cls))
+								|| (tagname=="td" && hasToolbarClass(editor.toolbar.tdStyleList, cls))
+								|| (tagname=="img" && hasToolbarClass(editor.toolbar.imageStyleList, cls))
+							)
+								wga_classes.push(cls); 
+						}
+					}
+					if(wga_classes.length)
+						el.className = wga_classes.join(" ");
+					
+				}
+				// else console.log("filtering: " + tagname);	// ignore this tag but copy it's contents
+				
+				/*
+				 * copy child nodes
+				 */
+				var children = source.childNodes;
+				for(var i=0; i<children.length; i++){
+					copyElement(children[i], el, good_els);
+				}
 				
 			}
-			// else console.log("filtering: " + tagname);	// ignore this tag but copy it's contents
-			
-			/*
-			 * copy child nodes
-			 */
-			var children = source.childNodes;
-			for(var i=0; i<children.length; i++){
-				copyElement(children[i], el, good_els);
-			}
-			
 		}
 	}
+
 }
 
 // old RTF Interface:
