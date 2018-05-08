@@ -184,6 +184,8 @@
 	}
 
 	function selectNode(node, trigger_selected){
+		if(!node.length)
+			return;		// node not found
 		node.parents(".wga_tree").first().find(".node").removeClass("selected");
 		node.addClass("selected")
 		node.parents(".node").removeClass("collapsed");
@@ -204,6 +206,8 @@
 	}
 
 	function scrollIntoView(element) {
+		if(!element.length)
+			return;	// element not found
 		var container = element.offsetParent();
 		
 		var containerScrollTop = container.scrollTop();
