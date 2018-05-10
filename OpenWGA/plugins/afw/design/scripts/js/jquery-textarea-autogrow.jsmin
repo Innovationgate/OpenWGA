@@ -40,10 +40,10 @@
 			if(WGA.isMobile)
 				width -= 2;		// Keine Ahnung warum, aber das iPad braucht das.
 			shadow.css("width", width)
-			//shadow.html(ta.val().replace(/\n$/, '\n&nbsp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>') || " ")
 			var content = ta.val().replace(/\n$/, '\n&nbsp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
 			if(!content){
 				content = ta.attr("placeholder") || " ";
+				content = content.replace(/\n$/, '\n&nbsp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')
 			}
 			shadow.html(content);
 			ta.css("height", shadow.outerHeight(true));
