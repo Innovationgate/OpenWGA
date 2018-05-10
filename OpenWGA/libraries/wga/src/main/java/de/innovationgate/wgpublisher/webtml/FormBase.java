@@ -389,7 +389,7 @@ public abstract class FormBase extends Base {
             throw new TMLException("Exception serializing form render info", e, true);
         }
         
-        buf.append("<script type=\"text/javascript\">if (typeof(WGA) != 'undefined') {WGA.b4submit.reset(\"" + this.getId() + "\")};</script>");
+        buf.append("<script>if (typeof(WGA) != 'undefined') {WGA.b4submit.reset(\"" + this.getId() + "\")};</script>");
         return buf.toString();
     }
     

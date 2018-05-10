@@ -645,7 +645,7 @@ public class Include extends Base implements DynamicAttributes, PreferredOptionR
         prefix.append("<div id=\"$ajaxDiv_").append(uniquePortletID).append("\">");
         prefix.append("<div id=\"$ajaxContentDiv_").append(uniquePortletID).append("\">");
 
-        prefix.append("<script type=\"text/javascript\">");
+        prefix.append("<script>");
         
         // javascript variable ajaxInfo
         prefix.append("var $ajaxInfo_").append(uniquePortletID).append(" = '").append(encryptedAjaxInfo + "';");

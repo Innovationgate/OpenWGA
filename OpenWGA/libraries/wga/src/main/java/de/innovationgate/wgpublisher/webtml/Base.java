@@ -1890,7 +1890,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
 
 
         if (script.equals("htmlhead")) {
-            scriptresult.append("<script type=\"text/javascript\" src=\"" + getWGPPath() + "/static/js/htmlhead.js" + URL_VERSION_PARAMETER + "\"></script>\n");
+            scriptresult.append("<script src=\"" + getWGPPath() + "/static/js/htmlhead.js" + URL_VERSION_PARAMETER + "\"></script>\n");
         }
 
         if (includedscripts == null) {

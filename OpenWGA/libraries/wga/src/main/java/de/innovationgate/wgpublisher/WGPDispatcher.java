@@ -536,7 +536,7 @@ public class WGPDispatcher extends HttpServlet {
 	            
 	            if (exc.getAjaxType() == AjaxFailureException.AJAXTYPE_FORMPOST) {
 	                // The formpost request only executes a single script tag without surroundings
-	                writer.write("<script type=\"text/javascript\">\n");
+	                writer.write("<script>\n");
 	                writer.write(js.toString());
 	                writer.write("\n</script>");
 	            }
@@ -547,7 +547,7 @@ public class WGPDispatcher extends HttpServlet {
 	                writer.write("\n//-->\n");
 	                
 	                // For regular AJAX, protect from norefresh via JS comment
-	                writer.write("/*" + errorMsg + "<script type=\"text/javascript\">\n");
+	                writer.write("/*" + errorMsg + "<script>\n");
 	                writer.write(js.toString());
 	                writer.write("\n</script> */");
 	            }
@@ -620,7 +620,7 @@ public class WGPDispatcher extends HttpServlet {
                 // render response
                 response.setContentType("text/html");
                 PrintWriter out = response.getWriter();
-                out.write("<script type=\"text/javascript\">");
+                out.write("<script>");
                 out.write("parent.WGA.ajax.formCallback(" + actionDef.toJavaScriptObject() + ");");
                 out.write("</script>");
                 
@@ -1084,7 +1084,7 @@ public class WGPDispatcher extends HttpServlet {
         Writer out = response.getWriter();
         out.write("<HTML><HEAD>");
 
-        out.write("\n<script type=\"text/javascript\">\nvar running=" + Boolean.valueOf(job.isRunning()).toString() + ";\n</script>\n");
+        out.write("\n<script>\nvar running=" + Boolean.valueOf(job.isRunning()).toString() + ";\n</script>\n");
 
         /*
          * if (job.isRunning()) {

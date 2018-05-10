@@ -467,7 +467,7 @@ public class Root extends Base {
             StringBuffer javaScript = new StringBuffer();
             
             if (!status._isAjaxNoRefreshCall) {
-                javaScript.append("<script type=\"text/javascript\">");
+                javaScript.append("<script>");
             }
             
             if (!getTMLContext().isbotrequest()) {
@@ -499,7 +499,7 @@ public class Root extends Base {
     				String serializedInfo = FormBase.serializeFormInfo(form.getforminfo(), getTMLContext());
     	            StringBuffer javaScript = new StringBuffer();
     	            if (!status._isAjaxNoRefreshCall) {
-    	                javaScript.append("<script type=\"text/javascript\">");
+    	                javaScript.append("<script>");
     	            }
     			    javaScript.append("var form = document.forms['").append(form.getformid()).append("'];");
     			    javaScript.append("if( form ) {");
@@ -523,7 +523,7 @@ public class Root extends Base {
         if (redirectURL != null) {
             StringBuffer javaScript = new StringBuffer();
             if (!status._isAjaxNoRefreshCall) {
-                javaScript.append("<script type=\"text/javascript\">");
+                javaScript.append("<script>");
             }
             
             javaScript.append("location.href=\"" + WGUtils.encodeJS(redirectURL) + "\";");
@@ -771,7 +771,7 @@ public class Root extends Base {
                 String suffix;
                 if (status._isAjaxNoRefreshCall)
                 	suffix = javaScript.toString();
-                else suffix = "<script type=\"text/javascript\">" + javaScript.toString() + "</script>";
+                else suffix = "<script>" + javaScript.toString() + "</script>";
                 
                 this.setSuffix(this.getSuffix() + suffix);
             }
@@ -814,7 +814,7 @@ public class Root extends Base {
         
         // create javascript block for registration
         if (!skipScriptTags) {
-            javaScript.append("<script type=\"text/javascript\">");
+            javaScript.append("<script>");
         }
         
         Map<String,Object> regParams = new HashMap<String,Object>();
