@@ -13,6 +13,8 @@ compileJava.options.encoding = 'ISO-8859-1'
 dependencies {
     compile project(":wga");
     compile project(":tmlScript");    
+
+	compile 'org.slf4j:slf4j-log4j12:1.7.25'
     
     compileClasspath project(":wgaBuildTools");
 }
