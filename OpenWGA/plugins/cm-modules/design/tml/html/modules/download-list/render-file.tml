@@ -26,7 +26,7 @@
 			<div class="image">
 				<tml:script expression="AFW.content(_ctx.KEY).attachment(_filename).getThumbnailURL({width:100})" var="_url"/>
 				<tml:case condition="_url">
-					<img src="<tml:item name="_url"/>">
+					<img src="<tml:item name="_url"/>" alt="<tml:script expression="_ctx.content().getFileMetaData(_filename).title || _filename"/>">
 				</tml:case>
 			</div>
 			<div class="filename">
