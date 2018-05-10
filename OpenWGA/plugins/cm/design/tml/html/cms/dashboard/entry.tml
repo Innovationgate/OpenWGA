@@ -25,12 +25,12 @@
 
 <li style="margin:10px 0">
 	<a href="#" data-wgakey="<tml:metadata name="key"/>">
-		<tml:metadata name="title"/> - <tml:metadata name="languagetitle"/>
+		<tml:metadata name="title" encode="html"/> - <tml:metadata name="languagetitle"/>
 	</a>
 	<p>
 		Version <tml:metadata name="version"/>,
 		<tml:label key="dashboard.last-modified-on" param1="{AFW.Util.timeElapsed(MODIFIED)}" param2="{WGA.format(MODIFIED,label('format.date.short'))}"/>
 	</p>
 	<tml:option name="body"/>
-	<p><tml:label key="dashboard.location"/>: [<tml:meta name="area"/>] / <tml:navigator type="path" divider=" / "><tml:metadata name="title"/></tml:navigator></p>
+	<p><tml:label key="dashboard.location"/>: [<tml:meta name="area"/>] / <tml:navigator type="path" divider=" / "><tml:metadata name="title" encode="html"/></tml:navigator></p>
 </li>
