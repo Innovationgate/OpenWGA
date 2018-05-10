@@ -89,8 +89,8 @@
 	<tml:case value="redirect">
 		<label><tml:label key="form.settings.redirect-page"/>:</label>
 		<div style="margin:10px">
-		<tml:input type="hidden" name="{scoped:redirect}" mode="{option('mode')}"/>
-		<div id="link-view"></div>
+			<tml:input type="hidden" name="{scoped:redirect}" mode="{option('mode')}"/>
+			<div id="link-view"></div>
 			<script>
 				var combotree = new BI.ComboTree({
 				    width: 265,
