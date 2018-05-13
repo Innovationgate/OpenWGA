@@ -336,6 +336,7 @@
 		var children = parent.find(".node")
 		if(!children.length){
 			parent.attr("data-haschildren", false)
+			parent.find("ul").remove();
 			collapseNode(parent);
 		}
 		if(select_parent)
