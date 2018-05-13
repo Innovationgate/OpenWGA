@@ -159,7 +159,11 @@
 					<div class="clear"></div>		
 				</tml:else>
 			</tml:if>
-					
+
+			<label>Position:</label>
+			<div class="data"><tml:script expression="_Struct.WGObject.getPosition()"/></div>		
+			<div class="clear"></div>
+
 			<tml:case condition="_Struct.WGObject.getReaders().size() && _Struct.WGObject.getReaders().get(0)">
 				<label>Readers:</label>		
 				<div class="data"><tml:script expression="_Struct.WGObject.getReaders()" divider=", "/></div>		
