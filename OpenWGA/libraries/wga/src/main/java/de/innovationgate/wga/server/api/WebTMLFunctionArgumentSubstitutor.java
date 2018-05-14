@@ -94,6 +94,11 @@ public class WebTMLFunctionArgumentSubstitutor implements FunctionArgumentSubsti
                 return _wga.tmlcontext().item(argumentName.substring(6));
             }
         }
+        else if (argumentName.equals("$request")) {
+            if (_wga.isTMLContextAvailable()) {
+                return _wga.tmlcontext().getrequest();
+            }
+        }
         else if (argumentName.startsWith("$request_")) {
             if (_wga.isTMLContextAvailable()) {
                 String requestMeta = argumentName.substring(9);
