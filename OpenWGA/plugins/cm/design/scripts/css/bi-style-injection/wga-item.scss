@@ -36,12 +36,12 @@
 		display: inline;
 	}
 
-	&.rtf, &.textblock{
+	&.rtf, &.textblock, &.image{
 		.WGA-Item-Label{
 			display: block;
 		}
 	}
-	&.rtf{
+	&.rtf, &.image{
 		.WGA-Item-Label{
 			padding: 30px 5px;
 		}
