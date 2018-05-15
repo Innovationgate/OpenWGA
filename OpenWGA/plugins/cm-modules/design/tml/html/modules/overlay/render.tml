@@ -63,7 +63,8 @@
 		
 		$(document).on('click.<tml:option name="ns"/>', "a[href='#<tml:[setting] o_name="id"/>']", function(e){
 			e.preventDefault();
-			$.wga_modal.show(this.hash);
+			if(!$(this).parents("[contenteditable]").length)
+				$.wga_modal.show(this.hash);
 		}).on({
 
 			"modal-shown.<tml:option name="ns"/>": function(ev, el){				
