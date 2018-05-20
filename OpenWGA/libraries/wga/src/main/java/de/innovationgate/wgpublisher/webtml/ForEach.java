@@ -845,7 +845,10 @@ public class ForEach extends Base implements IterationTag {
             }
 			
 			try {
-                this.getTMLContext().setvar("index", new Integer(this.getIteration()), false);
+				if (getTMLContext().getDesignContext().getVersionCompliance().isAtLeast(7,2)) {
+					getTMLContext().setLocalVar("index", new Integer(this.getIteration()));
+				}
+				else this.getTMLContext().setvar("index", new Integer(this.getIteration()), false);
             }
             catch (WGAPIException e) {
                 this.addWarning("Unable to set var 'index': " + e.getMessage(), false);
