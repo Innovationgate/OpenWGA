@@ -40,30 +40,23 @@ public class TMLScriptIsolatedParentScope extends TMLScriptModernObjectParentSco
         super(action, rhinoScope);
     }
 
-
     private static final long serialVersionUID = 1L;
-    
 
     public String getClassName() {
         return "TMLScriptControllerParentScope";
     }
 
-
     public static boolean isIsolated(Scriptable object) {
 
-        Scriptable objectParentScope = null;
         while (object.getClass() != RhinoScope.class) {
             if (object instanceof TMLScriptObjectParentScope) {
-                objectParentScope = object;
                 break;
             }
             object = object.getParentScope();
         }
         
         return (object instanceof TMLScriptIsolatedParentScope);
-        
-        
-    }
 
+    }
 
 }
