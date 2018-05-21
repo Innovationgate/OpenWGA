@@ -2376,6 +2376,12 @@ public class WGA {
         }
     }
 
+    /*
+     * More intuitive alias for tmlcontext()
+     */
+    public Context context() throws WGException{
+    	return tmlcontext();
+    }
     public Context context(String expression) throws WGException{
     	return tmlcontext().context(expression);
     }
