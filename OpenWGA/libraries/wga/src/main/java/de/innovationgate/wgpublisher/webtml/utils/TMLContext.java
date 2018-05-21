@@ -5409,7 +5409,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     
     public TMLContext toIsolatedVersion() {
         if (!(_environment instanceof IsolatedTMLContextEnvironment)) {
-            TMLContext isolatedContext =  new TMLContext(getcontent(), getwgacore(), getprofile(), gettmlform(), getrequest(), getresponse(), gethttpsession());
+        	TMLContext isolatedContext =  new TMLContext(this.document, getwgacore(), getprofile(), gettmlform(), getrequest(), getresponse(), gethttpsession());
             isolatedContext.isolate();
             return isolatedContext;
         }
@@ -5421,7 +5421,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     private TMLContext toUnlockedVersion() {
         if (_environment instanceof IsolatedTMLContextEnvironment) {
             TMLContextEnvironment unlockedEnv = ((IsolatedTMLContextEnvironment) _environment).getParentEnvironment();
-            return new TMLContext(getcontent(), getwgacore(), getprofile(), unlockedEnv.getForm(), unlockedEnv.getRequest(), unlockedEnv.getResponse(), unlockedEnv.getSession());
+            return new TMLContext(this.document, getwgacore(), getprofile(), unlockedEnv.getForm(), unlockedEnv.getRequest(), unlockedEnv.getResponse(), unlockedEnv.getSession());
         }
         else {
             return this;
