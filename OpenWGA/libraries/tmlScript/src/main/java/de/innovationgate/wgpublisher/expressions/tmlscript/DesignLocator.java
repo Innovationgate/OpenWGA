@@ -107,28 +107,25 @@ public class DesignLocator implements Scriptable, Wrapper {
             if (dotPos != -1) {
                 nameAfterDot = name.substring(dotPos + 1);
             }
-            
+
+            int colonPos = name.indexOf(":");
+            // Some function
+            if (colonPos != -1) {
+                String function = name.substring(0, colonPos).trim();
+                String param = name.substring(colonPos + 1).trim();
+                return executeLocatorFunction(function, param);
+            }
+
             // Retrieving a constructor
             if (Character.isUpperCase(nameAfterDot.charAt(0))) {
-                int colonPos = name.indexOf(":");
-                
-                // Some function
-                if (colonPos != -1) {
-                    String function = name.substring(0, colonPos).trim();
-                    String param = name.substring(colonPos + 1).trim();
-                    return executeLocatorFunction(function, param);
-                }
-                
                 // Retrieving a constructor
+                Function c = getConstructor(_baseName + name);
+                if (c != null) {
+                    return c;
+                }
                 else {
-                    Function c = getConstructor(_baseName + name);
-                    if (c != null) {
-                        return c;
-                    }
-                    else {
-                    	_wga.getLog().warn("DesignLocator: Constructor '" + name + "' not found in " + _design + " file " + name + ".tmlscript");
-                        return Scriptable.NOT_FOUND;
-                    }
+                	_wga.getLog().warn("DesignLocator: Constructor '" + name + "' not found in " + _design + " file " + name + ".tmlscript");
+                    return Scriptable.NOT_FOUND;
                 }
             }
             
