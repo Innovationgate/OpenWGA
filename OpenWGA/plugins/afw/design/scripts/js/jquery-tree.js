@@ -243,21 +243,28 @@
 					selectpath(path, expandedNode)	// try again
 				// else not found.
 			})
-			return;
 		}
-				
-		var node = $(".node[data-id='"+id+"']", node);
-		if(!node.length){
-			//console.log("not found", id);
-			return;		// not found
-		}	
-		
-		parts.shift()
-		if(parts.length==0){
-			// last path element: just select it:
-			selectNode(node)
+		else{
+			var id_node = $(".node[data-id='"+id+"']", node);
+			if(!id_node.length){
+				// not found: try reloading
+				node.find("ul").remove();
+				expandNode(node, function(expandedNode){
+					// we should find id now. else give up.
+					var node = $(".node[data-id='"+id+"']", expandedNode);
+					if(node.length)
+						selectpath(path, expandedNode)	// try again
+				})
+			}
+			else{			
+				parts.shift()
+				if(parts.length==0){
+					// last path element: just select it:
+					selectNode(id_node)
+				}
+				else selectpath(parts.join("/"), id_node)
+			}
 		}
-		else selectpath(parts.join("/"), node)
 	}
 
 	function reload(config){
@@ -284,7 +291,7 @@
 	}
 
 	function handleDragStart(e){
-		console.log("handleDragStart", this, e.dataTransfer, e);
+		//console.log("handleDragStart", this, e.dataTransfer, e);
 		if(e.originalEvent.type=="mousedown")
 			e.preventDefault();
 	}
