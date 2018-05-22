@@ -250,7 +250,7 @@
 				// not found: try reloading
 				node.find("ul").remove();
 				expandNode(node, function(expandedNode){
-					// we should find id now. else give up.
+					// we should find id now. Else give up.
 					var node = $(".node[data-id='"+id+"']", expandedNode);
 					if(node.length)
 						selectpath(path, expandedNode)	// try again
