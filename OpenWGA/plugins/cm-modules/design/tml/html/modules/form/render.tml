@@ -1,2 +1,2 @@
 
-<tml:portlet name="cm-modules-form" ref="::portlet-form" ajax="true"/>
+<tml:portlet name="[cm-modules-form{option('ns')}]" ref="::portlet-form" ajax="true" portletmode="view" />

@@ -204,7 +204,7 @@
 				<tml:option name="module-class">section</tml:option>
 			</tml:include>
 			
-			<div class="buttons">
+			<div class="buttons clearfix">
 				<tml:script>
 					var action = CMM.setting('action');
 					if(action=="mail")

@@ -35,6 +35,11 @@
 	(Empfohlen: a-Z und _. Keine Leerzeichen oder Umlaute)
 </div>
 
+<label>Focus:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:focus}" mode="{option('mode')}" type="boolean" options="Focus wenn Seite geladen wird|true"/>
+</div>
+
 <label><tml:label key="form.settings.field-type"/>:</label>
 <div style="margin:10px">
 	<tml:input name="{scoped:fieldtype}" type="select" options="{label('form.settings.field-type.options')}"

@@ -65,7 +65,7 @@
 	</label>
 	<div class="data">
 		<tml:input name="{_fieldname}"
-			focus="{isFirstLoop() && CMM.setting('fieldtype')!='date'}"
+			focus="{CMM.setting('focus')||false}"
 			validation="{_validation||true}"
 			message="{_message}"
 			labeled="true"
