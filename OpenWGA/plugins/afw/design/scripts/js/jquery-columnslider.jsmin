@@ -126,14 +126,16 @@
 			$wrapper.find("> .column").outerWidth(columnWidth);
 			scroll();
 		}
-		function scroll(){
+		function scroll(autoslide){
 			var new_left = -col*(columnWidth+margin);
-			
-			if(config.effect=="fade"){
-				effect_fade(new_left);
+
+			if(new_left==0 && autoslide){
+				effect_fade(new_left);	// allways fade to pos 0 if autoslide.
 			}
-			else {
-				effect_slide(new_left);
+			else{			
+				if(config.effect=="fade")
+					effect_fade(new_left);
+				else effect_slide(new_left);
 			}
 			
 			$cols.find(".control a").removeClass("active").each(function(i){
@@ -178,7 +180,7 @@
 					if(col>=cols_total){
 						col=0
 					}
-					scroll();
+					scroll(true);
 				}, config.autoslide||3000)
 			}
 			function stopTimer(){
@@ -196,7 +198,7 @@
 				return;
 			if(supportsTransition){
 				$wrapper.css("transition", "opacity .2s ease");
-				$wrapper.on("transitionend", function(){
+				$wrapper.one("transitionend", function(){
 					$wrapper.css({
 						left: new_left,
 						opacity: 1
