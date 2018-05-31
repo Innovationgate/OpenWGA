@@ -333,6 +333,10 @@
 			$("> .entry .icon", node).css("background-image", "url('"+data.iconurl+"')")
 		if(data.title)
 			node.data("title", data.title)
+		if(data.href){
+			node.data("href", data.href)
+			$("> .entry .a", node).attr("href", data.href)
+		}
 		if(data.context)
 			node.data("context", data.context)
 	}
