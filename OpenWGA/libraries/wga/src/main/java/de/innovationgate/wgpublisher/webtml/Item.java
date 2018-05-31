@@ -238,9 +238,14 @@ public class Item extends FormBase implements DynamicAttributes {
 
 		StringBuffer prefix = createItemEditorDeclaration(itemName, editor, rawLabel);
 		
+		prefix.append("<div class=\"WGA-Item-Format\" style=\"display:none\">");
+		if(getFormat()!=null)
+			prefix.append(getFormat());
+		prefix.append("</div>");
+		
 		prefix.append("<div class=\"WGA-Item-Value\" id=\"item_"+itemName+"\">");
 		
-		// item content will be inserted here
+		// <-- item content will be inserted here between prefix and suffix
 		
 		StringBuffer suffix = new StringBuffer("</div>\n");
 		
@@ -259,6 +264,18 @@ public class Item extends FormBase implements DynamicAttributes {
                 }
             }
             suffix.append("</div>\n");
+		}
+		else if (editor.equalsIgnoreCase("date")) {
+			suffix.append("<div class=\"WGA-Item-Value-Unencoded\" style=\"display:none\" >");
+			if (result.size() > 0)
+				suffix.append(WGA.get(getTMLContext()).format(result.get(0), "dd.MM.yyyy"));
+			suffix.append("</div>\n");
+		}
+		else if (editor.equalsIgnoreCase("number")) {
+			suffix.append("<div class=\"WGA-Item-Value-Unencoded\" style=\"display:none\" >");
+			if (result.size() > 0)
+				suffix.append(WGA.get(getTMLContext()).format(result.get(0), "decimal"));
+			suffix.append("</div>\n");
 		}
 		else if (editor.equalsIgnoreCase("custom")) {
 		    suffix.append(getCustomEditorCode());
