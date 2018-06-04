@@ -91,3 +91,8 @@ Controller.prototype.addImageModule = function(
 	console.log("add image module", section, filename);
 	
 }.nonIsolated();
+
+
+Controller.prototype.isCleanMode = function($request){
+	return $request.getParameter("$clean")!=null;
+}

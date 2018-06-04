@@ -37,7 +37,7 @@
 
 <tml:if condition="$mc.mods.isEmpty()">
 	<tml:then>
-		<tml:case if="$mc.mayEdit">
+		<tml:case if="$mc.mayEdit & !$mc.isCleanMode">
 			<a class="WGA-Item-Edit no-modules" style="display:none" href="#" id="no-modules-<tml:item name="$mc.uid"/>"
 				title = "<tml:label key="cm.click-to-add-modules"/>"
 			>
