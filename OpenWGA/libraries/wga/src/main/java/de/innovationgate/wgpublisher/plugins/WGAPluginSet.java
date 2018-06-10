@@ -604,7 +604,7 @@ public class WGAPluginSet {
         
     }
 
-    private boolean isPluginDeactivated(String uniqueName) {
+    public boolean isPluginDeactivated(String uniqueName) {
         
         List<WGAPlugin> plugins = getPluginsByUniqueName(uniqueName);
         if (plugins.size() == 0) {

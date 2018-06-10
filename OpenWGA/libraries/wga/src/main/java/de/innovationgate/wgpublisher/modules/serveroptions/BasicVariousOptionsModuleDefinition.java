@@ -47,6 +47,7 @@ import de.innovationgate.wga.modules.options.TextEncodingOptionType;
 import de.innovationgate.wga.modules.options.WorkflowEngineOptionType;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.events.EventManager;
+import de.innovationgate.wgpublisher.modules.AuthoringAppOptionType;
 import de.innovationgate.wgpublisher.modules.DatabasesOptionType;
 
 public class BasicVariousOptionsModuleDefinition implements ModuleDefinition, RegistryAwareModuleDefinition {
@@ -70,6 +71,10 @@ public class BasicVariousOptionsModuleDefinition implements ModuleDefinition, Re
 
         OptionDefinitionsMap options = new OptionDefinitionsMap();
         
+        LocalizedOptionDefinition defaultAutoringApp = new LocalizedOptionDefinition(WGACore.SERVEROPTION_DEFAULT_AUTHORING_APP, AuthoringAppOptionType.INSTANCE, _bundleLoader);
+        defaultAutoringApp.setDefaultValue("plugin-contentmanager");
+        options.addOption(defaultAutoringApp);
+
         LocalizedOptionDefinition outputEncoding = new LocalizedOptionDefinition(WGAConfiguration.SERVEROPTION_ENCODING_OUTPUT, TextEncodingOptionType.INSTANCE, _bundleLoader);
         outputEncoding.setDefaultValue("UTF-8");
         options.addOption(outputEncoding);

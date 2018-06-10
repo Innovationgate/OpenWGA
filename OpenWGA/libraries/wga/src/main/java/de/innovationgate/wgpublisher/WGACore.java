@@ -1070,6 +1070,9 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
     
     
     public static final String SYSTEMLABEL_BASE_PATH = "de.innovationgate.wgpublisher.labels.";
+
+    public static final String SERVEROPTION_DEFAULT_AUTHORING_APP = "DefaultAuthoringApp";
+
     
     public class ValidateDefaultLanguageAction implements ConnectAction {
 

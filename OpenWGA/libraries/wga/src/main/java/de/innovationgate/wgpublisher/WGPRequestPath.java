@@ -518,7 +518,10 @@ public class WGPRequestPath {
         }
         else if (this.pathCommand.equalsIgnoreCase("contentmanager")) {
             this.pathType = TYPE_REDIRECT;
-            this.resourcePath = this.publisherURL + "/plugin-contentmanager";
+            String defaultAuthoringApp = core.getWgaConfiguration().getServerOptions().get(WGACore.SERVEROPTION_DEFAULT_AUTHORING_APP);
+            if(defaultAuthoringApp==null)
+            	defaultAuthoringApp = "plugin-contentmanager";
+            this.resourcePath = this.publisherURL + "/" + defaultAuthoringApp;
         }
         else {
             this.databaseKey = this.pathCommand;
