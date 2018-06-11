@@ -31,6 +31,7 @@
 
 	setOption("debug", request.getParameter("debug"));
 
+	request.getSession().setAttribute("CM.appid", "cm-classics");
 	request.getSession().setAttribute(WGACore.ATTRIB_BROWSERINTERFACE, true);
 	request.getSession().setAttribute(WGACore.ATTRIB_BI_VERSION4, true);
 	

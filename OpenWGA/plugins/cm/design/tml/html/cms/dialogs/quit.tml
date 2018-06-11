@@ -25,6 +25,8 @@
 
 <tml:action id="quit">
 
+	request.getSession().removeAttribute("CM.appid");
+
 	request.getSession().removeAttribute(WGACore.ATTRIB_BROWSERINTERFACE);
 	request.getSession().removeAttribute(WGACore.ATTRIB_BI_VERSION4);
 	request.getSession().removeAttribute(wgacore.ATTRIB_NO_CONTENT_NOTIFCATION_URL);

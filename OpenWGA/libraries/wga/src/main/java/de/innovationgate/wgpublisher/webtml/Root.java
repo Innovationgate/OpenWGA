@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -292,14 +293,16 @@ public class Root extends Base {
         					
         	List<String> userNamesList = new ArrayList<String>();
         	userNamesList.add(content.getAuthor());
-        	 
+        	
         	if ( content.getStatus().equals(WGContent.STATUS_DRAFT)
         		&& content.mayEditContent()
-        		&& content.getDatabase().isMemberOfUserList( userNamesList )
+        		&& content.getDatabase().isMemberOfUserList(userNamesList)
         		&& !content.hasItem("remote_info")
+        		&& request.getParameter(WGACore.URL_PARAM_CLEAN)==null
+        		&& !(content.hasCompleteRelationships() && content.getStructEntry().getArea().getName().equals("$trash"))
         		) {			        		
-        			pageContext.getRequest().setAttribute(WGACore.ATTRIB_EDITDOCUMENT, content.getContentKey().toString());
-        	}
+        			request.setAttribute(WGACore.ATTRIB_EDITDOCUMENT, content.getContentKey().toString());
+        		}
         }
         
         // Eventually load WGA error object as variable

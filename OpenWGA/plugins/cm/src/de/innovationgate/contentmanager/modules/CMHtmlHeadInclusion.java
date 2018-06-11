@@ -25,12 +25,8 @@
 
 package de.innovationgate.contentmanager.modules;
 
-import javax.servlet.ServletRequest;
-
-import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGException;
-import de.innovationgate.webgate.api.WGStructEntry;
 import de.innovationgate.wga.model.BrowsingSecurity;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
@@ -39,71 +35,39 @@ import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 
 public class CMHtmlHeadInclusion implements HTMLHeadInclusion {
 
-    public CharSequence processInclusion(TMLContext context) {
-        // Determine, which (if any) document can be edited in this request
+    private static final Object CM_APP_ID = "cm-classics";
 
-		Boolean isAuthoringMode=false;
+    public CharSequence processInclusion(TMLContext context) {
+
+    	// Determine, which (if any) document can be edited in this request
+    	// then inject CSS-Inclusion
+
+    	if(context.getEnvironment().getPageContext().getSession().getAttribute("CM.appid")!=CM_APP_ID)
+    		return null;
+
 		try {
 			WGACore wgacore = WGA.get().getCore();
 			if(wgacore.getDispatcher().getBrowsingSecurity(context.content().getDatabase())>BrowsingSecurity.NO_AUTHORING
 					&& context.isbrowserinterface()
 				){
-				isAuthoringMode=true;
-			}
-				
-		} catch (WGException e) {}
-    	
-        if (isAuthoringMode){
-
-        	StringBuffer result = new StringBuffer();
-        	WGContent content;
-    		WGStructEntry structentry;
-        	
-        	try{
-            	content = context.content();
-        		structentry = content.getStructEntry();
+	        	StringBuffer result = new StringBuffer();
+	        	WGContent content = context.content();
 
                 String dbkey = content.getDatabase().getDbReference();
                 String prefLanguage = content.getLanguage().getName();
                 context.getEnvironment().getPageContext().getSession().setAttribute("AFW."+dbkey+".PreferredLanguage", prefLanguage);
 
                 context.getEnvironment().getPageContext().getSession().setAttribute("CM.currentContextPath", context.getpath());
-
-        		ServletRequest request = context.getEnvironment().getPageContext().getRequest();
-        		if(request.getParameter(WGACore.URL_PARAM_CLEAN)!=null 
-        				|| (content.hasCompleteRelationships() && content.getStructEntry().getArea().getName().equals("$trash"))
-        		)
-        			request.removeAttribute(WGACore.ATTRIB_EDITDOCUMENT);
-        		
     			result.append("\n<link rel=\"stylesheet\" type=\"text/css\" href=\"" + 
 						WGA.get().design("plugin-contentmanager").resolve("bi-style-injection").scriptURL("css") +
 						"\">");
-				result.append("\n<script id=\"wga-cm-contentinfo\">");
-	        	result.append("\nWGA.contentinfo={");
-	        	result.append("\n\tdbkey:\"" + content.getDatabase().getDbReference() + "\"");
-	    		if(!content.isDummy()){
-	    			result.append(",");
-	    			result.append("\n\tstructkey:\"" + structentry.getStructKey() + "\",");
-	    			result.append("\n\tcontentkey:\"" + content.getContentKey(true) + "\",");			
-	    			result.append("\n\ttitle:\"" +  WGUtils.strReplace(WGUtils.strReplace(content.getTitle(), "\"", "\\\"", true), "script", "sc\"+\"ript", true));
-	    			result.append("\",");
-	    			result.append("\n\tlanguage:\"" + content.getLanguage().getName() + "\"");
-	    		}
-	    		result.append("\n};");
-	    		result.append("\n</script>\n");
-	    		result.append("\n<script>");
-	    		result.append("WGA.CMM={sections:{},hasSections:false}");
-	    		result.append("</script>\n");
-        	
-        	} catch (WGException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return null;
+    			return result.toString();
 			}
-        	
-            return result.toString();
-        }        
-        else return null;
+				
+		} catch (WGException e) {}
+    	
+		return null;
+		
     }
 
 }

@@ -62,6 +62,7 @@ import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGExpressionException;
 import de.innovationgate.webgate.api.WGIllegalArgumentException;
+import de.innovationgate.wga.model.BrowsingSecurity;
 import de.innovationgate.wga.server.api.TMLScript;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.DeployedLayout;
@@ -1987,6 +1988,26 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     		this.appendResult(jscode);
     		this.appendResult("</script>\n");
     	}
+
+		// Authoring mode Scripts
+		try {
+			WGACore wgacore = WGA.get().getCore();
+			if(wgacore.getDispatcher().getBrowsingSecurity(context.content().getDatabase())>BrowsingSecurity.NO_AUTHORING && context.isbrowserinterface()){
+				this.appendResult("\n<script id=\"wga-cm-contentinfo\">");
+				this.appendResult("\nWGA.contentinfo={");
+				this.appendResult("\n\tdbkey:\"" + content.getDatabase().getDbReference() + "\"");
+	    		if(!content.isDummy()){
+	    			this.appendResult(",");
+	    			this.appendResult("\n\tstructkey:\"" + content.getStructKey() + "\",");
+	    			this.appendResult("\n\tcontentkey:\"" + content.getContentKey(true) + "\",");			
+	    			this.appendResult("\n\ttitle:\"" +  WGUtils.strReplace(WGUtils.strReplace(content.getTitle(), "\"", "\\\"", true), "script", "sc\"+\"ript", true) + "\",");
+	    			this.appendResult("\n\tlanguage:\"" + content.getLanguage().getName() + "\"");
+	    		}
+	    		this.appendResult("\n};");
+	    		this.appendResult("\n</script>\n");
+	    		this.appendResult("\n<script>WGA.CMM={sections:{},hasSections:false}</script>\n");				
+			}
+		} catch (WGException e) {}
     	
     	// Process HTML head inclusion modules
     	for (HTMLHeadInclusion inc : getCore().getHtmlHeadInclusions()) {
