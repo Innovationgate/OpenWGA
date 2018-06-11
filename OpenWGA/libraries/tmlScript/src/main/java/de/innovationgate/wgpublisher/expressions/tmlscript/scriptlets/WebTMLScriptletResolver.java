@@ -299,6 +299,7 @@ public class WebTMLScriptletResolver {
         String dbKey = null;
         String contentKey = null;
     	String defaultMediaKey;
+    	String anker = "";
 
         if (parms.size() == 2) {
             dbKey = (String) parms.get(0);
@@ -307,6 +308,13 @@ public class WebTMLScriptletResolver {
         else {
             contentKey = (String) parms.get(0);
         }
+
+        String[] parts = contentKey.split("#");
+        if(parts.length>1){
+        	contentKey = parts[0];        	
+        	anker = "#"+parts[1];
+        }
+        
         
         // First try to fetch target context. When found we return the content url of it
         // If current doc is a remote doc we try a "roundtrip" to see which doc in the current
@@ -315,7 +323,7 @@ public class WebTMLScriptletResolver {
             TMLContext remoteTargetContext = traceRemoteDocument(context, contentKey);
             if (remoteTargetContext != null) {
             	defaultMediaKey = (String) context.getwgacore().readPublisherOptionOrDefault(remoteTargetContext.db(), WGACore.DBATTRIB_DEFAULT_MEDIAKEY);
-            	return remoteTargetContext.contenturl(defaultMediaKey, null);
+            	return remoteTargetContext.contenturl(defaultMediaKey, null)+anker;
             }
         }
         else {
@@ -323,12 +331,11 @@ public class WebTMLScriptletResolver {
             TMLContext targetContext = context.context(contextExpr, false);
             if (targetContext != null) {
             	defaultMediaKey = (String) context.getwgacore().readPublisherOptionOrDefault(targetContext.db(), WGACore.DBATTRIB_DEFAULT_MEDIAKEY);
-                return targetContext.contenturl(defaultMediaKey, null);
+                return targetContext.contenturl(defaultMediaKey, null)+anker;
             }
         }
         
-        return createFallBackContentURL(context, dbKey, contentKey);
-        
+        return createFallBackContentURL(context, dbKey, contentKey+anker);
     
     }
 
