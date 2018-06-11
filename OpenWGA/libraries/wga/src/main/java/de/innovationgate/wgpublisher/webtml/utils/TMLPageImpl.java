@@ -285,8 +285,17 @@ public class TMLPageImpl implements TMLPage {
         if (controller != null) {
             controller.beforeUsage();
             try {
+            	
+            	TMLContext prepare_context = outerLayoutContext;
+            	AjaxInfo ajaxinfo = (AjaxInfo) _wga.getRequest().getAttribute(WGACore.ATTRIB_AJAXINFO);
+            	if(parentTag==null && ajaxinfo!=null){
+            		// if ajax request correct TMLContext to portlet context
+            		String contextPath = ajaxinfo.getContextPath();
+            		prepare_context = (TMLContext) cx.context(contextPath);
+            	}
+            	
                 preserver.preserve(Base.OPTION_MODULE_CONTROLLER, controller, TMLOption.SCOPE_LOCAL);
-                TMLScript tmlscript = WGA.get(outerLayoutContext).tmlscript();
+                TMLScript tmlscript = WGA.get(prepare_context).tmlscript();
                 if (tmlscript.hasProperty(controller.getObject(), "prepare")) {
                     Object result = tmlscript.callMethod(controller.getObject(), "prepare", null, null);
                     if (result != null) {
