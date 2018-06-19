@@ -54,9 +54,9 @@
 
 				<div style="margin-top:10px; margin-right:200px;">
 					<tml:case condition="problem.occasion.clearedAutomatically">
-						This problem entry will be removed automatically once the problem is solved.
+						This problem entry will be removed automatically once the problem is solved.<br>
 					</tml:case>
-					<a href="<tml:url action="clearProblem" param1="{WGA.serializeObject(problem.path)}"/>">Remove the problem</a> from this view now.
+					<a href="<tml:url action="clearProblem" param1="{WGA.serializeObject(problem.path)}"/>">Remove the problem</a> from this view to hide it temporary.
 				</div>
 				
 				<div style="text-align:right">
