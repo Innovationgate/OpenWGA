@@ -53,26 +53,21 @@
 				</tml:case>
 
 				<div style="margin-top:10px; margin-right:200px;">
-					<tml:if condition="!problem.occasion.clearedAutomatically">
-						<tml:then>
-							<tml:button clickaction="clearProblem" param1="{WGA.serializeObject(problem.path)}">Dismiss</tml:button>
-						</tml:then>
-						<tml:else>
-							This problem entry will be removed automatically once the problem is solved.
-							<a href="<tml:url action="clearProblem" param1="{WGA.serializeObject(problem.path)}"/>">Click here to dismiss anyway</a>
-						</tml:else>
-					</tml:if>
+					<tml:case condition="problem.occasion.clearedAutomatically">
+						This problem entry will be removed automatically once the problem is solved.
+					</tml:case>
+					<a href="<tml:url action="clearProblem" param1="{WGA.serializeObject(problem.path)}"/>">Remove the problem</a> from this view now.
 				</div>
 				
-				<div style="text-align:right;">
-				<tml:if isfalse="isConfirmed">
-					<tml:then>
-						<tml:button confirm="This will hide the problem persistently. Do this if the problem is to be assumed normal and unproblematic. Sure to confirm?" clickaction="confirmProblem" param1="{WGA.serializeObject(problem.path)}">Confirm problem</tml:button>
-					</tml:then>
-					<tml:else>
-						<tml:button clickaction="unconfirmProblem" param1="{WGA.serializeObject(problem.path)}">Remove confirmation</tml:button>
-					</tml:else>
-				</tml:if>
+				<div style="text-align:right">
+					<tml:if isfalse="isConfirmed">
+						<tml:then>
+							<tml:button confirm="This will hide the problem persistently. Do this if the problem is to be assumed normal and unproblematic. Sure to confirm?" clickaction="confirmProblem" param1="{WGA.serializeObject(problem.path)}">Confirm problem</tml:button>
+						</tml:then>
+						<tml:else>
+							<tml:button clickaction="unconfirmProblem" param1="{WGA.serializeObject(problem.path)}">Remove confirmation</tml:button>
+						</tml:else>
+					</tml:if>
 				</div>
 
 			</fieldset>
