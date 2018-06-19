@@ -30,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,13 +49,13 @@ public class ProblemRegistry {
     
     public static final String CONFIRMED_PROBLEMS_FILE = "confirmed-problems.xml";
 
-    private static final int MAX_SCOPE_SIZE = 10000;
+    private static final int MAX_SCOPE_SIZE = 1000;
 
     private Map<Class<? extends ProblemType>,Map<ProblemScope,Map<String,Problem>>> _problems = new ConcurrentHashMap<Class<? extends ProblemType>, Map<ProblemScope,Map<String,Problem>>>();
     
     private ConfirmedProblems _confirmedProblems;
     
-    private Set<ProblemOccasion> _occasionsWithProblems = new HashSet<ProblemOccasion>();
+    //private Set<ProblemOccasion> _occasionsWithProblems = new HashSet<ProblemOccasion>();
     
     private Queue<ProblemQueueEvent> _problemEvents = new ConcurrentLinkedQueue<ProblemQueueEvent>();
 
@@ -206,9 +207,11 @@ public class ProblemRegistry {
 
     private void performClearOccasion(ProblemOccasion occ, Map<Class<? extends ProblemType>, Set<Problem>> addedProblems, Set<ProblemPath> clearedProblemPaths) {
         
+    	/*
         if (!_occasionsWithProblems.contains(occ)) {
             return;
         }
+        */
         
         for (Map<ProblemScope,Map<String,Problem>> problemsByScope : _problems.values()) {
             
@@ -232,7 +235,7 @@ public class ProblemRegistry {
             
         }
         
-        _occasionsWithProblems.remove(occ);
+        //_occasionsWithProblems.remove(occ);
         
     }
     
@@ -275,9 +278,12 @@ public class ProblemRegistry {
                 problems.add(problem);
             }
             
-            if (problem.getOccasion() != null) {
-                _occasionsWithProblems.add(problem.getOccasion());
+            /*
+            ProblemOccasion occ = problem.getOccasion();
+            if (occ != null && !_occasionsWithProblems.contains(occ)) {
+                _occasionsWithProblems.add(occ);
             }
+            */
         }
         
         
@@ -300,10 +306,26 @@ public class ProblemRegistry {
         _timer.cancel();
     }
     
+    public long size(){
+    	java.util.Iterator<Map<ProblemScope, Map<String, Problem>>> problems = _problems.values().iterator();
+    	long size = 0;
+    	while(problems.hasNext()){
+    		Collection<Map<String, Problem>> problem_set = problems.next().values();
+    		java.util.Iterator<Map<String, Problem>> it = problem_set.iterator();
+    		while(it.hasNext())
+    			size += it.next().values().size();
+    	}
+    	return size;
+    }
+    
+    public synchronized Map getProblems() {
+        return _problems;
+    }
+    
     public synchronized List<Problem> getProblems(Class<? extends ProblemType> type) {
         return getProblems(type, false);
     }
-    
+
     public synchronized List<Problem> getProblems(Class<? extends ProblemType> type, boolean includeConfirmed) {
         
         Map<ProblemScope,Map<String,Problem>> problemsByScope = _problems.get(type);        
@@ -440,9 +462,14 @@ public class ProblemRegistry {
     
     public synchronized void clear() {
         _problems.clear();
-        _occasionsWithProblems.clear();
+        //_occasionsWithProblems.clear();
     }
     
+    /*
+    public Set<ProblemOccasion> getOccasionsWithProblems(){
+    	return _occasionsWithProblems;
+    }
+    */
         
 }
  
