@@ -89,7 +89,8 @@
 				if(!BI)
 					return;	// No Content Manager
 			    var file = files[0];
-				el.src="<tml:url db="plugin-contentmanager" type="file" doc="images" file="ajax-loader-2.gif"/>";
+			    el.srcset="";
+				el.src="<tml:url type="file" doc="images" file="ajax-loader.gif"/>";
 				<tml:case condition="CMM.setting('onclick')=='zoom'">
 					$(this).lightbox({remove:true});
 				</tml:case>

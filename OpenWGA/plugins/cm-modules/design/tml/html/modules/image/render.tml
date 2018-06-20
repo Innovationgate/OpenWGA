@@ -25,7 +25,7 @@
 
 <tml:if condition="AFW.content().isDraft() && AFW.content().isMine()">
 	<tml:then>
-		<tml:portlet name="[{option('ns')}-image]" ref="::image" ajax="true" o_mode="edit"/>
+		<tml:portlet name="[{option('ns')}-image]" ref="::image" ajax="true" o_mode="edit" portletmode="view"/>
 	</tml:then>
 	<tml:else>
 		<tml:include ref="::image"/>
