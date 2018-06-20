@@ -31,11 +31,6 @@ public class AuthoringAppOptionType implements OptionType {
 	private WGACore _core;
 	
 	private AuthoringAppOptionType(){
-		/*
-        super(null, null);
-        addValue("plugin-contentmanager");
-        addValue("plugin-cm-next");
-        */
 		try {
 			_core = WGA.get().getCore();
 		} catch (WGException e) {
