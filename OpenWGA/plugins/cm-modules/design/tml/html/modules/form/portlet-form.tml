@@ -93,15 +93,12 @@
 			var field = fieldinfo.get("name").trim();
 			var label = fieldinfo.get("label");
 			
-			console.log("["+field+"]", tmlform.field(field));
-			
 			var values = tmlform.fieldList(field).iterator();
 			mailbody += "<b>" + label + "</b> (" + field + "):<br>";
 			while(values.hasNext())
 				mailbody += (encode("html", values.next()) +"<br>");
 			mailbody += "<br>";
 		}
-		return;
 		
 		if(tmlform.getfilenames().size()){
 			mailbody += "<hr>"
