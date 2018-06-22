@@ -1,4 +1,4 @@
-<tml:include designdb="@ui" ref="windowview" o_title="The following problems occured">
+<tml:include designdb="@ui" ref="windowview" o_title="The following administrative problems occured">
 
 	<tml:option name="config" scope="local">
 		tbar: [

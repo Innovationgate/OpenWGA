@@ -1,16 +1,52 @@
-<tml:include designdb="@ui" ref="tabview_js">
-	<tml:option name="tabnames">Problems|problems,URL Dispatching|http,Long requests|longrequests</tml:option>
+<tml:action id="clearProblems">
+	WGACore.getProblemRegistry().clear();
+</tml:action>
+
+<tml:include designdb="@ui" ref="windowview">
+
+	<tml:option name="config" scope="local">
+		tbar: [
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_white_delete.png"/>',		                
+				text: "Clear Problem Registry",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action>_query_clear_problems=true</tml:action>");
+				}
+			}
+		]
+	</tml:option>
+	
+	<tml:option name="title">Problem Registry (<tml:script expression="WGACore.getProblemRegistry().size()"/> Entries)</tml:option>
 	
 	<tml:inline name="body">
-		<div class="x-hidden" id="problems">
-			<tml:include ref="::critical-problems"/>
-		</div>
-		<div class="x-hidden" id="http">
-			<tml:include ref="::http-404"/>
-		</div>
-		<div class="x-hidden" id="longrequests">
-			<tml:include ref="::longrequests"/>
-		</div>
-	</tml:inline>
-</tml:include>
 
+		<tml:case istrue="_query_clear_problems">
+			<tml:include designdb="@ui" ref="message">
+				<tml:option name="title">Clear Problem Registry</tml:option>
+				<tml:option name="body">
+					Are you sure to clear the problem registry and remove all registered problems?
+					<br>
+					<tml:button clickaction="clearProblems">Yes please</tml:button>
+				</tml:option>
+			</tml:include>			
+		</tml:case>
+
+		<tml:include designdb="@ui" ref="tabview">
+			<tml:option name="pages">Administrative Problems,URL Dispatching Problems,Long Requests</tml:option>
+			<tml:select switch="portlet.getSessionVar('currentpage')">
+				<tml:case value="1">
+					<tml:include ref="::critical-problems"/>
+				</tml:case>
+				<tml:case value="2">
+					<tml:include ref="::http-404"/>
+				</tml:case>
+				<tml:case value="3">
+					<tml:include ref="::longrequests"/>
+				</tml:case>
+			</tml:select>
+		</tml:include>
+	
+	</tml:inline>
+	
+</tml:include>
