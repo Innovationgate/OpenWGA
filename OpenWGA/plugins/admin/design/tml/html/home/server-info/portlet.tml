@@ -243,7 +243,7 @@
 	
 	<tml:inline name="body">
 
-	<tml:case isdefined="_upgrade_dbs">
+		<tml:case isdefined="_upgrade_dbs">
 			<tml:include designdb="@ui" ref="message">
 				<tml:option name="title"><tml:label key="upgrade-dbs"/></tml:option>
 				<tml:option name="body">
