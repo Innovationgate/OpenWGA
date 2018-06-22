@@ -2,6 +2,12 @@
 	WGACore.getProblemRegistry().clear();
 </tml:action>
 
+<tml:script>
+	if(!portlet.getSessionVar('currentpage')){
+		portlet.setSessionVar('currentpage', 1);
+	}
+</tml:script>
+
 <tml:include designdb="@ui" ref="windowview">
 
 	<tml:option name="config" scope="local">
