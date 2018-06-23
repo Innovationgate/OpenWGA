@@ -44,7 +44,7 @@ public class JSMinPostProcessor implements PostProcessor{
 				String line = lines.next();
 				
 				if(line.trim().startsWith(IMPORT_SCRIPT)){
-					String path = line.substring(IMPORT_SCRIPT.length()).trim();
+					String path = line.trim().substring(IMPORT_SCRIPT.length()).trim();
 					ResourceRef ref = new ResourceRef(base_ref, path);
 					convertedCode.append("//@import " + ref.toString() + "\n");
 					if(ref.getType().equals(ResourceRef.TYPE_TMLSCRIPT)){
@@ -76,7 +76,7 @@ public class JSMinPostProcessor implements PostProcessor{
 			}
 		} catch (Exception e) {
 			convertedCode.append("// unable to read JSMin module\n");
-			wga.getLog().error("jsmin: unable to read module: " + e.getMessage());
+			wga.getLog().error("jsmin: unable to read module: " + e);
 			data.setCacheable(false);
 		}
 
