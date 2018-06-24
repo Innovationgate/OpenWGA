@@ -140,7 +140,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
             // determine default database key
             String defaultDBKey = getDefaultDBKey(_core, vHost);
 
-            String uri = httpRequest.getRequestURI();
+            String uri = httpRequest.getServletPath();		//getRequestURI();
             int semiPos = uri.indexOf(";");
             if (semiPos != -1) {
                 uri = uri.substring(0, semiPos);
@@ -165,8 +165,10 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                         	if(vHost.isHideHomepageURL()){
 								try {
 		                            WGDatabase db = (WGDatabase) _core.getContentdbs().get(defaultDBKey);
-		                            WGAURLBuilder urlBuilder = _core.retrieveURLBuilder(httpRequest, db);	                            
-									String homepage = "/" + defaultDBKey + urlBuilder.buildHomepageURL(db, httpRequest);
+		                            WGAURLBuilder urlBuilder = _core.retrieveURLBuilder(httpRequest, db);	 
+		                            String homepage = urlBuilder.buildHomepageURL(db, httpRequest);
+		                            homepage = homepage.substring(httpRequest.getContextPath().length());
+									homepage = "/" + defaultDBKey + homepage;
 	                                httpRequest.getRequestDispatcher(homepage).forward(request, response);
 	                                return;
 								} catch (Exception e) {
@@ -179,7 +181,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 							
                         }
                         else {
-                            httpResponse.sendRedirect(httpResponse.encodeRedirectURL(uri + defaultDBKey));
+                            httpResponse.sendRedirect(httpResponse.encodeRedirectURL(httpRequest.getContextPath() + uri + defaultDBKey));
                             return;
                         }
                     }

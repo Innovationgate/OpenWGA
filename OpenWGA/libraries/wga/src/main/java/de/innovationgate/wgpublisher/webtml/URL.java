@@ -198,15 +198,16 @@ public class URL extends ActionBase implements DynamicAttributes {
         if(vHost!=null){
         	String defaultDBKey = WGAVirtualHostingFilter.getDefaultDBKey(_core, vHost);
 	        if(vHost.isHideHomepageURL() && dbKey.equalsIgnoreCase(defaultDBKey)){
-	        	url.append("/" + getTMLContext().getrequest().getContextPath());
+	        	String path = getTMLContext().getrequest().getContextPath();
+	        	if(path.isEmpty())
+	        		path = "/";
+	        	url.append(path);
 	        	return;
 	        }
         }
         url.append(getTMLContext().getURLBuilder().buildHomepageURL(getTMLContext().db(dbKey), getTMLContext().getrequest()));
         
     }
-
-
 
     public void createActionURL(StringBuffer url, String actionID) throws UnsupportedEncodingException, WGException, TMLException {
         

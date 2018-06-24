@@ -1,0 +1,59 @@
+var baseURL = meta("request", "wgaurl");
+var afw_base_url = baseURL + "/plugin-wga-app-framework"
+var cmm_base_url = baseURL + "/plugin-cm-modules"
+
+return{
+    paths: {
+
+		"afw":							afw_base_url+"/js",
+
+    	// requirejs plugins:
+		"css": 							afw_base_url+"/js/amd:css",
+		"async": 						afw_base_url+"/js/amd:async",
+		
+		// AMD modules:
+        "jquery": 						afw_base_url+"/js/jquery-1.12.0.min",
+        "bootstrap-js": 				afw_base_url+"/file/bootstrap/all/js/bootstrap.min",
+        "bootstrap-base": 				afw_base_url+"/file/bootstrap/base/js/bootstrap.min",
+        "jquery-ui": 					afw_base_url+"/file/jquery-ui-1.11/build/jquery-ui.min",
+        "jquery-ui-js": 				afw_base_url+"/file/jquery-ui-1.11/source",
+        "jquery-ui-css": 				afw_base_url+"/file/jquery-ui-1.11/build/jquery-ui.min",
+		"cmm":							cmm_base_url+"/js/cmm",
+        
+		// jquery-ui datepicker AMD interface
+		"jquery-ui-datepicker": 		afw_base_url+"/js/jquery-ui-datepicker",
+		
+		// query plugins:        
+        "jquery-columnslider": 			afw_base_url+"/js/jquery-columnslider",        
+        "jquery-input-placeholder": 	afw_base_url+"/js/jquery-input-placeholder",
+        "jquery-lightbox": 				afw_base_url+"/js/jquery-lightbox",
+        "jquery-lookup-surgestions": 	afw_base_url+"/js/jquery-lookup-surgestions",
+        "jquery-modal": 				afw_base_url+"/js/jquery-modal",
+        "jquery-scrollintoview": 		afw_base_url+"/js/jquery-scrollintoview",
+        "jquery-swipehandler": 			afw_base_url+"/js/jquery-swipehandler",
+        "jquery-tabhandler": 			afw_base_url+"/js/jquery-tabhandler",
+        "jquery-textarea-autogrow": 	afw_base_url+"/js/jquery-textarea-autogrow",
+        "jquery-tree": 					afw_base_url+"/js/jquery-tree",
+        "jquery-wga-drophandler": 		afw_base_url+"/js/jquery-wga-drophandler",
+        "jquery-slideshow": 			afw_base_url+"/js/jquery-slideshow",
+        "jquery-accordion": 			afw_base_url+"/js/jquery-accordion"
+        
+	},
+	
+    shim: {
+    	
+    	"bootstrap-js": 				["jquery"],
+    	"bootstrap-base": 				["jquery", "css!" + afw_base_url+ "/file/bootstrap/base/css/bootstrap.min.css?noext"],
+    	"jquery-ui": 					["css!jquery-ui-css"],
+
+		"jquery-modal":					["css!" + afw_base_url+"/css/jquery-modal"],
+		"jquery-lightbox": 				["css!" + afw_base_url+"/css/jquery-lightbox"],
+		"jquery-columnslider":			["css!" + afw_base_url+"/css/jquery-columnslider"],
+		"jquery-accordion":				["css!" + afw_base_url+"/css/jquery-accordion"],
+		
+		"jquery-lookup-surgestions": 	["css!" + afw_base_url+"/stylesheet/jquery-lookup-surgestions.int.stylesheet?noext"],
+		"jquery-tree": 					["css!" + afw_base_url+"/stylesheet/jquery-tree.int.stylesheet?noext"]
+
+    }
+
+}

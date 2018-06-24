@@ -667,7 +667,7 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
                         String defaultDBKey = WGAVirtualHostingFilter.getDefaultDBKey(core, vHost);
                         if (defaultDBKey != null && targetDBKey.equalsIgnoreCase(defaultDBKey)) {
                             // default db requested - remove from path
-                            builder.setPath(path.substring(defaultDBKey.length()));
+                            builder.setPath(request.getContextPath() + path.substring(defaultDBKey.length()));
                             return builder.build(false);
                         }
                     }
@@ -681,7 +681,7 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
                                 String defaultDBKey = WGAVirtualHostingFilter.getDefaultDBKey(core, preferredHost);
                                 if (defaultDBKey != null && targetDBKey.equalsIgnoreCase(defaultDBKey)) {
                                  // default db requested - remove from path
-                                    builder.setPath(path.substring(defaultDBKey.length()));
+                                    builder.setPath(request.getContextPath() + path.substring(defaultDBKey.length()));
                                 }
                             }
                             return builder.build(true);

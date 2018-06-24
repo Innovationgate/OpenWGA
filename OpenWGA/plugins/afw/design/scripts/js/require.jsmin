@@ -1,0 +1,5 @@
+//@import amd:require
+require.config(	
+	//@import type=tmlscript require-config
+)
+//@import amd:css
