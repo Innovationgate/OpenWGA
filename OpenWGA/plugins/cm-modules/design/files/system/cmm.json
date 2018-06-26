@@ -1,4 +1,5 @@
 [
+	{ configtml:"modules:anker:config" },
 	{ configtml:"modules:download-list:config" },
 	{ configtml:"modules:column-slider:config" },
 	{ configtml:"modules:accordion:config" },

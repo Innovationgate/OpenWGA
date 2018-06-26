@@ -67,6 +67,12 @@ Controller.prototype.prepare = function($cx, CMM){
 	}
 	this.request_module_css_reg = $cx.request.getAttribute("CMM_module_css_reg");
 	
+	return {
+		$options: {
+			raw: this.mod_config.raw
+		}
+	}
+	
 }.nonIsolated();
 
 

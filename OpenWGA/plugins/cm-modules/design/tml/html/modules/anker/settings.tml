@@ -1,0 +1,4 @@
+<label>Name des Ankers</label>
+<div style="padding:20px">
+	<tml:input name="{scoped:name}" mode="{$option_mode}"/>
+</div>
