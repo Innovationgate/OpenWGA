@@ -47,6 +47,8 @@ import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.services.WGAWebServicesFilter;
 
 public class WGAFilterChain implements FilterChain {
+
+	public static String FORWARD_URL = "de.innovationgate.wga.filter.forward_url";
 	
     private static class FilterInfo {
         private Filter _filter;
@@ -278,11 +280,12 @@ public class WGAFilterChain implements FilterChain {
 				doFilter(request, response);
 			}
 			
-			
-			
 		} else {
 			// last filter reached - dispatch to parent chain
-			((FilterChain)request.getAttribute("de.innovationgate.wga.filter.parentChain")).doFilter(request, response);
+			String forward_url = (String)request.getAttribute(FORWARD_URL);
+			if(forward_url!=null)
+				request.getRequestDispatcher(forward_url).forward(request, response);
+			else ((FilterChain)request.getAttribute("de.innovationgate.wga.filter.parentChain")).doFilter(request, response);
 		}
 	}
 

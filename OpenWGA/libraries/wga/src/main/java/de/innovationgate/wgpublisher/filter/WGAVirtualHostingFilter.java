@@ -160,8 +160,6 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                     if (defaultDBKey != null) {
                     	
                         if (vHost.isHideDefaultDatabaseInURL()) {
-                        	//httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
-                        	
                         	if(vHost.isHideHomepageURL()){
 								try {
 		                            WGDatabase db = (WGDatabase) _core.getContentdbs().get(defaultDBKey);
@@ -169,8 +167,13 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 		                            String homepage = urlBuilder.buildHomepageURL(db, httpRequest);
 		                            homepage = homepage.substring(httpRequest.getContextPath().length());
 									homepage = "/" + defaultDBKey + homepage;
-	                                httpRequest.getRequestDispatcher(homepage).forward(request, response);
-	                                return;
+									/*
+									 * #00005217
+									 * forwarding must be done after all filters had a change to get the request.
+									 * Otherwise we might have problems f. e. with request based authentications. 
+									 * Therefore we put an attribute to the request and let WGAFilterChain.doFilter() do the job. 
+									 */
+									httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, homepage);
 								} catch (Exception e) {
 									_core.getLog().error("v-host: unable to proxy homepage", e);
 									// fallback:
@@ -189,8 +192,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                 else if (pathElements.length == 2 && isRootResource(vHost, pathElements[1])) {
                     // handle root resource request
                     VirtualResource resource = findVirtualResource(vHost, pathElements[1]);
-                    httpRequest.getRequestDispatcher(resource.getPath()).forward(request, response);
-                    return;
+                    httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, resource.getPath());
                 }
                 else {
                     // normal db request
