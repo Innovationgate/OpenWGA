@@ -623,13 +623,13 @@ AFW.RTF.editor=function(id, config){
 
 					if(img.style){
 						if(img.style.width){
-							var i = img.style.width.indexOf("px");
-							if(i)
-								filename += "?width~"+img.style.width.substr(0, i);
+							var w = img.style.width.indexOf("px");
+							if(w)
+								filename += "?width~"+img.style.width.substr(0, w);
 						}
 						else if(img.style.height){
-							var i = img.style.height.indexOf("px");
-							filename += "?height~"+img.style.height.substr(0, i);
+							var h = img.style.height.indexOf("px");
+							filename += "?height~"+img.style.height.substr(0, h);
 						}
 					}
 					
