@@ -16,8 +16,8 @@
         <majorVersion>7</majorVersion>
         <minorVersion>5</minorVersion>
         <maintenanceVersion>6</maintenanceVersion>
-        <patchVersion>0</patchVersion>
-        <buildVersion>673</buildVersion>
+        <patchVersion>1</patchVersion>
+        <buildVersion>674</buildVersion>
       </version>
     </id>
     <title>OpenWGA Additional Script Languages</title>
