@@ -1,6 +1,6 @@
 function Controller(){}
 
-Controller.prototype.prepare = function($cx, CMM, $option_raw){
+Controller.prototype.prepare = function($cx, CMM){
 
 	this.mod = $cx.option("module-config");
 
@@ -66,14 +66,6 @@ Controller.prototype.prepare = function($cx, CMM, $option_raw){
 		$cx.request.setAttribute("CMM_module_css_reg", WGA.createList());
 	}
 	this.request_module_css_reg = $cx.request.getAttribute("CMM_module_css_reg");
-	
-	
-	return {
-		$options: {
-			raw: $option_raw || this.mod_config.raw
-		}
-	}
-	
 	
 }.nonIsolated();
 
