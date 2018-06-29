@@ -14,10 +14,10 @@
       <uniqueName>de.innovationgate.additional-script-langs</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>5</minorVersion>
-        <maintenanceVersion>6</maintenanceVersion>
-        <patchVersion>2</patchVersion>
-        <buildVersion>675</buildVersion>
+        <minorVersion>6</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
+        <patchVersion>0</patchVersion>
+        <buildVersion>676</buildVersion>
       </version>
     </id>
     <title>OpenWGA Additional Script Languages</title>
