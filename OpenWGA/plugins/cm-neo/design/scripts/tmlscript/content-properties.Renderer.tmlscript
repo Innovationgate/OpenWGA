@@ -31,7 +31,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 			pageworkflow: c.content().getStructEntry().getWorkflowName(), 
 
 			created: c.STATUS==c.content().STATUS_DRAFT ? WGA.format(c.CREATED, "d. MMMMM yyyy, HH:mm") + " Uhr" : "",
-			modified: (c.PUBLISHED && c.PUBLISHED==c.MODIFIED) || c.MODIFIED==c.CREATED ? '' : WGA.format(c.MODIFIED, 'd. MMMMM yyyy, HH:mm') + " Uhr",
+			modified: c.STATUS==c.content().STATUS_ARCHIVE || (c.PUBLISHED && c.PUBLISHED==c.MODIFIED) || c.MODIFIED==c.CREATED ? '' : WGA.format(c.MODIFIED, 'd. MMMMM yyyy, HH:mm') + " Uhr",
 			published: getPublished(c),
 
 			pagepublished: c.content().getStructEntry().getReleasedContent(c.LANGUAGE) && c.PAGEPUBLISHED 

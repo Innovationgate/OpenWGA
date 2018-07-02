@@ -40,8 +40,8 @@
 						var tpm = db().getAttribute(WGA.getCore().DBATTRIB_TITLEPATHMANAGER);
 						if(tpm && url.getPath()!="/"){
 							var langChooser = new Packages.de.innovationgate.wgpublisher.lang.WebTMLLanguageChooser(db(), this)
-							var path = tpm.buildTitlePath(content(), "html", langChooser); 
-							url.setPath("/" + path.toArray().join("/"));
+							var path = tpm.buildTitlePath(content(), "html", langChooser);
+							path && url.setPath("/" + path.toArray().join("/"));
 						}
 						return url.build(true);						
 					</tml:script></div>
