@@ -23,7 +23,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package de.innovationgate.cm.modules;
+package de.innovationgate.cm_neo.modules;
 
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.model.BrowsingSecurity;

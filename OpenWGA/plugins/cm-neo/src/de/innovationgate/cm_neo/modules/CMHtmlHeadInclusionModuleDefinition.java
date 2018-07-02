@@ -23,14 +23,43 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package de.innovationgate.cm.modules;
-import de.innovationgate.wga.modules.ModuleRegistrar;
-import de.innovationgate.wga.modules.ModuleRegistry;
+package de.innovationgate.cm_neo.modules;
 
-public class CMRegistrar implements ModuleRegistrar {
+import java.util.Locale;
 
-    public void registerModules(ModuleRegistry registry) {
-        registry.addModuleDefinition(new CMHtmlHeadInclusionModuleDefinition());
+import de.innovationgate.wga.modules.ModuleDefinition;
+import de.innovationgate.wga.modules.ModuleDependencyException;
+import de.innovationgate.wga.modules.ModuleType;
+import de.innovationgate.wga.modules.OptionDefinitionsMap;
+import de.innovationgate.wga.modules.types.HTMLHeadInclusionModuleType;
+
+public class CMHtmlHeadInclusionModuleDefinition implements ModuleDefinition {
+
+    public String getDescription(Locale locale) {
+        return "Adds HTML head functionalities for Content Manager";
+    }
+
+    public Class<? extends Object> getImplementationClass() {
+        return CMHtmlHeadInclusion.class;
+    }
+
+    public Class<? extends ModuleType> getModuleType() {
+        return HTMLHeadInclusionModuleType.class;
+    }
+
+    public OptionDefinitionsMap getOptionDefinitions() {
+        return null;
+    }
+
+    public Object getProperties() {
+        return null;
+    }
+
+    public String getTitle(Locale locale) {
+        return "Content Manager HTML head inclusion";
+    }
+
+    public void testDependencies() throws ModuleDependencyException {
     }
 
 }

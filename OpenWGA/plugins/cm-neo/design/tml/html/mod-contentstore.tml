@@ -16,7 +16,7 @@
 
 <tml:case isfalse="_exit">
 	<tml:script>
-		request.getSession().setAttribute("CM.appid", Packages.de.innovationgate.cm.modules.CMHtmlHeadInclusion.CM_APP_ID);
+		request.getSession().setAttribute("CM.appid", Packages.de.innovationgate.cm_neo.modules.CMHtmlHeadInclusion.CM_APP_ID);
 		request.getSession().setAttribute(WGACore.ATTRIB_BROWSERINTERFACE, true);
 	
 		request.getSession().setAttribute(wgacore.ATTRIB_VIRTUAL_CONTENT_URL, 

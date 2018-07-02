@@ -23,7 +23,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package de.innovationgate.cm.filter;
+package de.innovationgate.cm_neo.filter;
 
 import de.innovationgate.webgate.api.Privilege;
 import de.innovationgate.webgate.api.UserAccessFilter;
