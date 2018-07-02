@@ -72,7 +72,7 @@
 	</tml:then>
 	<tml:else>
 		<div class="content-modules" id="content-modules-<tml:item name="$mc.uid"/>" <tml:case condition="option('animate')===true || option('animate')=='true'">style="opacity:0;transition:opacity .2s"</tml:case>>
-			<tml:case if="$mc.mayEdit">
+			<tml:case if="$mc.mayEdit & !$mc.isCleanMode">
 				<div style="position:relative">
 					<a style="display:none" class="WGA-Item-Edit edit-modules-button" href="#">
 						<div>
@@ -118,7 +118,7 @@
 	</tml:else>
 </tml:if>
 
-<tml:case isbrowserinterface="true">
+<tml:case isbrowserinterface="true" if="$mc.mayEdit & !$mc.isCleanMode">
 	<script>
 		require(["jquery"], function(){
 			if(window.name=="wga-contentmanager-iframe"){		
