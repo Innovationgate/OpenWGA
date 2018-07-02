@@ -1,0 +1,108 @@
+<tml:action id="publish">
+
+	var validfrom = tmlform.validfrom && WGA.createCalendar(WGA.dateOnly(tmlform.validfrom))
+	if(validfrom && tmlform.validfrom_time){
+		var time = WGA.createCalendar(tmlform.validfrom_time)
+		validfrom.set(validfrom.HOUR_OF_DAY, time.get(validfrom.HOUR_OF_DAY));
+		validfrom.set(validfrom.MINUTE, time.get(validfrom.MINUTE));
+	}
+	//console.log("validfrom", validfrom && validfrom.time);
+
+	var validto = tmlform.validto && WGA.createCalendar(WGA.dateOnly(tmlform.validto))
+	if(validto && tmlform.validto_time){
+		var time = WGA.createCalendar(tmlform.validto_time)
+		validto.set(validto.HOUR_OF_DAY, time.get(validto.HOUR_OF_DAY));
+		validto.set(validto.MINUTE, time.get(validto.MINUTE));
+	}
+	//console.log("validto", validto && validto.time);
+	
+	content().setValidity(validfrom && validfrom.time, validto && validto.time);
+	content().publish(tmlform.comment, tmlform.reasonForReplacement)
+			
+	portlet.fireevent("close-dialog", {
+		redirectto: contenturl("html", null, true)
+	})
+
+	portlet.fireevent("struct-updated", App.getStructData(content()))
+	
+	_dialog_closed=true;
+</tml:action>
+
+<tml:form id="form-publish-page" unless="_dialog_closed">
+	<div class="header">
+		Seite veröffentlichen
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content form-horizontal">
+	
+		<tml:script>
+			var script = WGA.design(db()).resolveSystemScriptModule("content-manager:validate", "tmlscript")
+			if(script){
+				var mod = script.getTMLScriptModule()
+				try{
+					var msg = mod && WGA.tmlscript().runScript(this, mod.getCode())
+					if(msg){
+						for(let message in Iterator(msg))
+							tmlform.addmessage(message)
+					}
+				}
+				catch(e){
+					logException(e);
+					tmlform.addmessage("Es ist ein Fehler beim Ausführen des Validierungs-Scripts aufgetreten:<br><br>"+e.message)
+				}
+			}
+		</tml:script>
+		<tml:if condition="tmlform.hasmessages()">
+			<tml:then>
+				<tml:[form-messages] o_title="Die Seite kann nicht veröffentlicht werden"/>
+			</tml:then>
+			<tml:else>
+
+				<tml:[form-field] o_label="Sichtbar ab">
+					<div class="clear-field-wrapper<tml:case condition="VALIDFROM"> col-sm-8</tml:case>">
+						<tml:input type="date" name="validfrom" meta="true" cssclass="date form-control" html_placeholder="sofort" format="dd.MM.yyyy"/>
+						<a class="clear-field" style="display:none">&times;</a>
+					</div>
+					<tml:script>
+						if(!tmlform.validfrom_time)
+							tmlform.validfrom_time = WGA.format(VALIDFROM, "HH:mm") || "00:00"
+					</tml:script>
+					<div class="input-group col-sm-4" <tml:case condition="!VALIDFROM">style="display:none"</tml:case>>			
+						<tml:input type="date" name="validfrom_time" cssclass="form-control" store="false" format="HH:mm"/>
+						<div class="input-group-addon">Uhr</div>
+					</div>
+				</tml:[form-field]>
+				
+				<tml:[form-field] o_label="Sichtbar bis">
+					<div class="clear-field-wrapper<tml:case condition="VALIDTO"> col-sm-8</tml:case>">
+						<tml:input type="date" name="validto" meta="true" cssclass="date form-control" html_placeholder="unbegrenzt" format="dd.MM.yyyy"/>
+						<a class="clear-field" style="display:none">&times;</a>
+					</div>
+					<tml:script>
+						if(!tmlform.validto_time)
+							tmlform.validto_time = WGA.format(VALIDTO, "HH:mm") || "23:59"
+					</tml:script>
+					<div class="input-group col-sm-4" <tml:case condition="!VALIDTO">style="display:none"</tml:case>>			
+						<tml:input type="date" name="validto_time" cssclass="form-control" store="false" format="HH:mm"/>
+						<div class="input-group-addon">Uhr</div>
+					</div>
+				</tml:[form-field]>
+				
+				<tml:case condition="VERSION!=1">
+					<tml:[form-field] o_label="Grund der Ersetzung" o_type="textarea" o_field="reasonForReplacement" o_placeholder="Warum wurde der Inhalt ersetzt?"/>
+				</tml:case>				
+			</tml:else>
+		</tml:if>
+
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:case condition="!tmlform.hasmessages()">
+			<tml:button cssclass="btn btn-primary" clickaction="publish">Veröffentlichen</tml:button>
+		</tml:case>
+	</div>
+
+</tml:form>	
+

@@ -1,0 +1,19 @@
+<tml:form id="form-edit-workflow-level" cssclass="form-horizontal" source="none">
+
+	<div class="header">Workflow Level bearbeiten ...</div>
+	
+	<div class="content">
+		<tml:{div} html_class="alert alert-danger clearfix" if="_query_delete">
+			<p style="margin:0 0 20px">Diesen Workflow-Level wirklich löschen?</p>
+			<tml:button cssclass="btn btn-default _pull-right" clickaction="$pc.removeWorkflowLevel" portletmode="edit">Level löschen</tml:button>
+		</tml:{div}>
+		<tml:include ref="::form-level"/>
+	</div>
+	
+	<div class="footer">
+		<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="edit">Abbrechen</tml:button>
+		<tml:button cssclass="btn btn-primary" clickaction="$pc.updateWorkflowLevel" portletmode="edit">Speichern</tml:button>
+		<tml:button cssclass="btn btn-danger pull-right" clickaction="$setvar" param1="_query_delete" param2="{true}">Löschen</tml:button>
+	</div>
+
+</tml:form>

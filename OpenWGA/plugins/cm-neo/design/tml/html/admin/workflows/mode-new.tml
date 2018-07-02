@@ -1,0 +1,14 @@
+<tml:form id="form-create-workflow" cssclass="form-horizontal" source="none">
+
+	<div class="header">Neuer Workflow ...</div>
+	
+	<div class="content">
+		<tml:include ref="::form"/>
+	</div>
+	
+	<div class="footer">
+		<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="view">Abbrechen</tml:button>
+		<tml:button cssclass="btn btn-primary" clickaction="$pc.createWorkflow" portletmode="view">Speichern</tml:button>
+	</div>
+	
+</tml:form>

@@ -1,0 +1,86 @@
+<tml:[template] o_id="sidepannel-content-attachments">
+
+	{{#context}}
+	<div class="panel panel-default">
+		<div class="panel-body">
+
+			{{#filetypes}}
+				<h1 style="clear:left">{{filetype}}</h1>
+				<div class="clearfix filetype">
+					{{#files}}
+						<div class="thumb{{#isPrimary}} primary{{/isPrimary}}" draggable="true" 
+								title="{{filetitle}}"
+								data-filetitle="{{filetitle}}"
+								data-filename="{{filename}}"
+								data-filesize="{{filesize}}"
+								data-fileurl="{{url}}"
+								data-poster="{{poster}}"
+								data-mimetype="{{mimetype}}"
+								data-waiting="{{waiting_for_derivates}}"
+								data-isVideo="{{isVideo}}"
+								data-isPrimary="{{isPrimary}}"
+						>
+							<div class="attachment" style="background-image:
+								{{#waiting_for_derivates}}
+									url(<tml:url type="file" doc="images" file="ajax-loader-bar.gif"/>),
+								{{/waiting_for_derivates}}
+								url('{{thumbnail}}')
+							"></div>
+							<span>{{filename}}</span>
+						</div>
+					{{/files}}
+				</div>
+			{{/filetypes}}
+		
+			{{^filetypes}}
+				<div class="no-files">
+					Keine Dateien vorhanden
+				</div>
+				<div class="drop-here">
+					Dateien zum Hochladen hier hinschieben ...
+				</div>
+			{{/filetypes}}
+		
+			<div class="file-upload-queue" id="file-upload-queue"
+				data-context="{{context}}" 
+				data-url="<tml:url type="tml" medium="json" name="attach-to-document" absolute="true"/>">
+				
+				<tml:comment><div class="queued-file">
+					<div class="info">uploading xxxx ... </div>
+					<div class="progress">
+					  <div class="progress-bar" style="width: 60%">
+					    	60%
+					  </div>
+					</div>
+				</div>
+		
+				<div class="queued-file">
+					<div class="info">uploading noch was ... </div>
+					<div class="progress">
+					  <div class="progress-bar" style="width: 0%">
+					    	0%
+					  </div>
+					</div>
+				</div></tml:comment>
+				
+			</div>
+		
+			<div class="sidebar-toolbar">
+				<a href="#" data-action="upload-file" title="Neue Datei hochladen">
+					<span class="fas fa-plus"></span>
+				</a>
+				
+				<tml:comment><a href="#" class="disabled" data-action="set-primary" title="Primäre Datei setzen">
+					<i class="fas fa-file-powerpoint"></i>
+				</a></tml:comment>
+				
+				<a class="pull-right disabled" href="#" data-action="delete">
+					<span class="glyphicon glyphicon-trash"></span>
+				</a>					
+			</div>
+			
+		</div>
+	</div>
+	{{/context}}
+		
+</tml:[template]>

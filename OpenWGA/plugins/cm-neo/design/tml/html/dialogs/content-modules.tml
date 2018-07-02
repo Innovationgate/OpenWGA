@@ -1,0 +1,16 @@
+<tml:form id="module-settings">
+
+	<tml:script>
+		//var settings_map = CMM.getModulesSettingsMap("content", tmlform.mod_id);
+		var settings_map = CMM.getModulesSettingsMap("content");
+		for(let setting in Iterator(settings_map.keySet())){
+			if(!tmlform.hasfield(setting))
+				tmlform.setField(setting, settings_map.get(setting))
+		}
+	</tml:script>
+
+	<tml:include ref="::content-modules:main">
+		<tml:option name="mode" expression="STATUS==content().STATUS_DRAFT ? 'edit':'view'"/>
+	</tml:include>
+	
+</tml:form>

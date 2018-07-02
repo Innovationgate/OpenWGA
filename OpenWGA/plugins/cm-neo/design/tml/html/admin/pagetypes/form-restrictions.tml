@@ -1,0 +1,44 @@
+<tml:[form-field] o_mode="{$pc.getMode('authoring')}" 
+	o_name="authoring" o_meta="true" o_type="boolean" o_default="true"
+	o_options="Verwendbar für Autoren|true"
+/>
+
+<tml:[form-field] o_label="Editoren" o_type="textarea" o_mode="{$pc.getMode('editors')}" o_meta="true" o_name="editors" o_multiple="true"/>
+
+<tml:[form-field] o_label="Erlaubte Positionen" o_type="select" o_name="positioning"
+	o_meta="true" 
+	o_mode="{$pc.getMode('positioning')}"
+	o_options="Überall|all,nur Hauptseiten|root,nur Unterseiten|child,nur Seiten mit festem Parent:|fixParentDocs,Nur Seiten folgender Seitentypen:|fixDocTypes"
+	o_changeaction="$refresh"
+/>
+<tml:case condition="tmlform.positioning=='fixParentDocs'">
+	<tml:[form-field] o__label="Erlaubte Parents" o_type="textarea" o_field="allowedpositions" o_meta="true" o_multiple="true"
+		o_mode="{$pc.getMode('allowedpositions')}"
+	/>
+</tml:case>
+<tml:case condition="tmlform.positioning=='fixDocTypes'">
+	<tml:[form-field] o__label="Erlaubte Seitentypen" o_type="textarea" o_field="allowedpositions" o_meta="true" o_multiple="true"
+		o_mode="{$pc.getMode('allowedpositions')}"
+	/>
+</tml:case>
+
+<tml:[form-field] o_label="Erlaubte Unterseiten" o_type="select" o_field="childpagerestrictions" 
+	o_options="Beliebig|any,Keine|none,Nur Seiten folgender Seitentypen:|fixDocTypes"
+	o_meta="true"
+	o_mode="{$pc.getMode('childpagerestrictions')}"
+	o_changeaction="$refresh"
+/>
+
+<tml:case condition="tmlform.field('childpagerestrictions')=='fixDocTypes'">
+	<tml:[form-field] o__label="Erlaubte Seitentypen für Unterseiten" o_type="textarea" o_field="allowedchildtypes" o_meta="true" o_multiple="true"
+		o_mode="{$pc.getMode('allowedchildtypes')}"
+	/>
+</tml:case>
+
+<tml:[form-field] o_label="Bevorzugter Parent" o_meta="true" o_name="preferredparent"/>
+
+<script>
+	require(["jquery", "bootstrap", "jquery-textarea-autogrow"], function($){
+		$("#<tml:script expression="tmlform.formid"/> textarea").autogrow();
+	})
+</script>

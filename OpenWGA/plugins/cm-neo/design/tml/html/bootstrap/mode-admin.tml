@@ -1,0 +1,1 @@
+<tml:portlet name="site-admin" ref="admin:main" o_dbkey="{portlet.dbkey}"/>

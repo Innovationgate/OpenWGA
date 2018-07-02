@@ -1,0 +1,162 @@
+<tml:eventscript onevent="save-modules">
+	var mods = portletEvent.getParameter("mods")
+	var deleted_mods = portletEvent.getParameter("deleted_mods")
+	
+	if(deleted_mods)
+		deleted_mods = JSON.parse(deleted_mods);
+	//console.log("deleted_mods", deleted_mods, typeof(deleted_mods))
+
+	portlet.last_selected_module = portletEvent.getParameter("selected");
+	
+	var forminfo = tmlform.formInfo;
+	var settings = CMM.getContentModulesSettingsData()||WGA.createLookupTable()
+	for(let field in Iterator(tmlform.fieldnames)){
+		var reg = forminfo.getFieldRegistration(field);
+		if(reg){
+			if(reg.isStore() && reg.mode==reg.EDIT_MODE){
+				settings.put(field, tmlform.fieldlist(field))
+				//console.log("add setting", field, tmlform.fieldlist(field))
+			}
+			else {
+				settings.remove(field)
+				//console.log("remove setting", field, reg.isStore(), reg.mode==reg.EDIT_MODE)
+			}
+		}
+		else {
+			//settings.remove(field)
+			//console.log("no reg", field);
+		}
+	}
+
+	if(!CMM.hasTemplate()){
+		CMM.writeContentModulesData(mods);
+	}
+
+	var module_ids = CMM.getContentModuleScopes(content());
+	//console.log("module_ids", module_ids);
+
+	function hasModule(setting){
+		for(let id in Iterator(module_ids)){
+			if(endsWith(setting, id))
+				return true
+		}
+		return false;
+	}
+	function endsWith(s1, s2){
+		var i = s1.indexOf(s2);
+		return i>=0 && (i + s2.length == s1.length)
+	}
+
+	// remove not used settings
+	var fields = WGA.createList();
+	fields.addAll(settings.keySet())
+	for(let setting in Iterator(fields)){
+		if(!hasModule(setting)){
+			//console.log("setting not used", setting);
+			settings.remove(setting);
+		}
+	}
+	
+	// delete items from content:
+	if(deleted_mods && deleted_mods.length){
+		for(let itemname in Iterator(content().getItemNames())){
+			for(let [index, id] in deleted_mods){
+				if(endsWith(itemname, id)){
+					content().removeItem(itemname)
+					console.log("item " + itemname + " deleted");
+				}
+			} 
+		}
+	}
+	
+	CMM.writeContentModulesSettingsData(settings)	
+	content().save();
+
+	var ev = createevent("close-dialog")
+	ev.addParameter("redirectto", contenturl("html", null, true))		
+	portlet.fireevent(ev)
+	
+	_dialog_closed=true;
+	
+</tml:eventscript>
+
+<tml:case isfalse="_dialog_closed">
+
+	<div class="header">
+		<div class="title">Inhaltsmodule</div>
+		<div class="module"></div>
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content">
+		<div class="clearfix" style="min-height:300px">
+			<div style="width:30%;position:absolute;top:0;left:0;bottom:0;overflow:auto" id="module-tree"></div>
+			<div style="width:70%;position:absolute;border-left: solid #efefef 1px;top:0;bottom:0;left:30%;overflow:auto">
+				<div style="padding:10px">
+					<tml:portlet name="module-settings" ref="::settings"/>
+				</div>
+			</div>
+		</div>
+	
+		<tml:script>
+			_mod_structure = CMM.getContentModulesData(CMM.getModulesSource())||"{}";		
+		</tml:script>
+		
+		<script>
+			require(["content-modules"], function(M){
+				var modules = {};
+				<tml:script>
+					_mods = CMM.getConfigTMLs();
+				</tml:script>
+				<tml:foreach type="itemvalue" item="_mods" currentvalue="_mod">
+					var mods = [<tml:include designdb="{_mod.dbkey}" ref="{_mod.configtml}"/>]
+					for(var i=0; i<mods.length; i++){
+						var mod = mods[i];
+						var id = mod.id;
+						mod.designdb="<tml:script expression="_mod.dbkey"/>";
+						modules[id]=mod;
+					}
+				</tml:foreach>
+				M.init(modules, '<tml:item name="_mod_structure" encode="none"/>', 
+					"<tml:option name="mode"/>", 
+					"<tml:script expression="request.section"/>",
+					"<tml:item name="last_selected_module" type="portlet"/>"
+				)
+				
+			})
+		</script>
+		
+	</div>
+	
+	<div class="footer clearfix">
+	
+		<div class="content-modules-toolbar">
+			<tml:case condition="$option_mode=='edit'">
+				<div class="btn-group dropup">
+					<button class="btn btn-default dropdown-toggle disabled" data-toggle="dropdown" data-button="add" title="Modul einfügen">
+						<i class="fas fa-plus"></i>
+					</button>
+					<div class="dropdown-menu content-module-list"></div>
+				</div>
+				<button class="btn btn-default disabled" data-button="delete" title="Modul löschen">
+					<i class="far fa-trash-alt"></i>
+				</button>
+				<button class="btn btn-default disabled" data-button="duplicate" title="Modul duplizieren">
+					<i class="far fa-copy"></i>
+				</button>
+			</tml:case>
+			<button class="btn btn-default"
+					title="Alle Bereiche ausklappen" 
+					data-button="expand-all" <tml:case condition="$option_mode=='edit'">style="margin-left:30px"</tml:case>>
+				<i class="fas fa-arrows-alt-v" style="transform: rotate(135deg)"></i>
+			</button>
+		</div>
+		
+		<div class="pull-right">
+			<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+			<tml:case condition="$option_mode=='edit'">
+				<button class="btn btn-primary" data-action="save-modules">Speichern</button>
+			</tml:case>
+		</div>
+	</div>
+</tml:case>

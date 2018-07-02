@@ -1,0 +1,159 @@
+function Controller() {}
+
+Controller.prototype.prepare = function($cx) {
+
+	/*
+	 * The following code needs wga 7.6 to work.
+	 * this bc. $cx is not correctly initialised in ajax portlet requests
+	 * We leaf it anywhere here - but don't use the $options on 7.5.5
+	 */ 
+
+	// Areas
+	var areas = WGA.createList()
+	for(let area in Iterator($cx.db().getAreas().values())){
+		if(area.systemArea)
+			continue;
+		if(area.name=="hdb-content" && !WGA.app($cx).isManager())
+			continue;
+		var visiblefor = area.getExtensionData("CM_area_visible")
+		if(visiblefor && visiblefor.size() && !$cx.db().isMemberOfUserList(visiblefor))
+			continue;
+		if(!area.mayEditPages())
+			continue;
+		if(area.mayReadContent())
+			areas.add(area.name)
+	}
+
+	return {
+		$options: {
+			root_or_child: [
+				"unter Seite '" + $cx.TITLE + "'|child",
+				"Als Hauptseite|root"
+			],
+			areas: areas
+		}
+	}
+
+}
+
+Controller.prototype.pageType = function($cx, $item__CM_clipboard_context) {
+	var source = $cx.context($item__CM_clipboard_context).content().structEntry;
+	return source.getContentType().name;
+}
+
+Controller.prototype.isAllowedPageType = function(AFW, $cx, $item__CM_clipboard_context) {
+	
+	var source = $cx.context($item__CM_clipboard_context).content().structEntry;
+	var dest = $cx.content().structEntry;
+	
+	var ct = source.getContentType();
+	var Contenttype = AFW.contenttype(ct);
+	
+	if(!Contenttype.isValid()){
+		return false;
+	}
+	if(!Contenttype.isAllowed(dest)){
+		return false;
+	}
+	return true;
+}
+
+Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context, $form) {
+	
+	var source = $cx.context($item__CM_clipboard_context).content().structEntry;
+	var dest = $cx.content().structEntry;
+	
+	if($form.root_or_child=="root")
+		dest = $cx.content().structEntry.getArea();
+
+	try{
+		var struct = copyStruct(source, dest, $form.recursive, $form.publish)
+		return {
+			"$portletEvents": {
+				"close-dialog": {
+					redirectto: struct && $cx.context("docid:"+struct.structKey).contenturl()
+				}
+			},
+			"$vars": {
+				_dialog_closed: true
+			}
+		}
+	}
+	catch(e){
+		$form.addMessage(e.message);
+		logException(e);
+	}
+
+	function copyStruct(source, dest, recursive, publish){
+		//console.log("copy", source.title, "to", dest.title, recursive, publish)
+
+		var ct = source.getContentType();
+		var Contenttype = AFW.contenttype(ct);
+
+		if(!Contenttype.isValid()) throw{
+			message: "Seitentyp nicht gefunden"
+		}
+
+		if(!Contenttype.isAllowed(dest)) throw{
+			message: "Seitentyp nicht erlaubt"
+		}
+		
+		if(source.getAllReleasedContent().isEmpty()){
+			console.warn("no published versions in page '" + source.title + "'", source.structKey);
+			return false;
+		}
+
+		// copy struct
+		var struct;
+		
+		if(dest instanceof Packages.de.innovationgate.webgate.api.WGArea)
+			struct = dest.createRootEntry(ct, source.getTitle())
+		else struct = dest.createChildEntry(ct, source.getTitle())
+		
+		struct.setReaders(source.getReaders())
+		struct.setPageEditors(source.getPageEditors())
+		
+		if(dest instanceof Packages.de.innovationgate.webgate.api.WGArea){
+			var rootEntries = dest.getRootEntries();
+			if(rootEntries.size())
+				struct.setPosition(rootEntries.getByIndex(rootEntries.size()-1).getPosition()+100);	// APPEND TO END
+		}
+		else if(dest.hasChildren()){
+			var children = dest.getChildEntries();
+			struct.setPosition(children.getByIndex(children.size()-1).getPosition()+100);	// APPEND TO END
+		}
+		struct.save();
+		
+		// copy contents
+		var docs=source.getAllReleasedContent().values();
+		for(let doc in Iterator(docs)){
+		
+			var lang = doc.getLanguage();
+			var newdoc = struct.createContent(lang, doc.title);
+
+			// copy all items
+			var Content = AFW.content(newdoc);
+
+			Content.copyItems(doc);
+			Content.copyMetas(doc);
+			Content.copyModules(doc);
+			Content.copyAttachments(doc)
+
+			newdoc.save();
+
+			if(publish && doc.status==doc.STATUS_RELEASE){
+				newdoc.publish("copied from " + doc.title);
+			}
+		}
+		
+		if(recursive){
+			var children=source.getChildEntries();
+			for(let child in Iterator(children)){
+				copyStruct(child, struct, recursive, publish);
+			}	
+
+		}
+		
+		return struct;
+	}
+}

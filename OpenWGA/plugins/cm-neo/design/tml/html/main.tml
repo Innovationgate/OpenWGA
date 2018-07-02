@@ -1,0 +1,38 @@
+<tml:include ref="html">
+
+	<tml:portlet name="cm-main" ref="bootstrap:portlet" ajax="true"/>
+
+	<div id="heading-helper-css" style="display:none">
+
+		h1:before,h2:before,h3:before,h4:before,h5:before,h6:before{
+			background: #286090;
+			color: white;
+			padding: 0 2px;
+			margin-right: 2px;
+			border-radius: 5px;
+			border: 1px solid white;
+		    box-sizing: border-box;			
+		}
+	
+		h1:before{
+			content: "H1";
+		}
+		h2:before{
+			content: "H2";
+		}
+		h3:before{
+			content: "H3";
+		}
+		h4:before{
+			content: "H4";
+		}
+		h5:before{
+			content: "H5";
+		}
+		h6:before{
+			content: "H6";
+		}
+
+	</div>
+
+</tml:include>

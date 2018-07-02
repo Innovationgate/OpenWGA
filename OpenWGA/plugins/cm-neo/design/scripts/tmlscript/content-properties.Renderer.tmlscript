@@ -1,0 +1,102 @@
+function Renderer() {}
+
+Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey, $urlParam_structkey ) {
+	
+	var result = {}
+
+	var c = context("db:" + $urlParam_dbkey + "/docid:" + $urlParam_contentkey, false)
+	if(c){
+	
+		var pagereaders = [];
+		for(let name in Iterator(c.content().structEntry.readers))
+			pagereaders.push({
+				name: name
+			});
+			
+		result = {
+			title: WGA.encode("html", c.TITLE),
+			pagetype: c.CONTENTTYPE,
+			pagename: c.PAGENAME,
+			version: c.VERSION,
+			language: c.LANGUAGE,
+			languagetitle: WGA.encode("JSON", c.LANGUAGETITLE),
+			status: label("content-properties.status." + (c.content().isPendingRelease() ? 'pending' : c.STATUS)),
+			author: WGA.encode("JSON", c.AUTHOR),
+
+			pagereaders: WGA.app($urlParam_dbkey).isManager() ? pagereaders : null,
+
+			workflow: c.STATUS==c.content().STATUS_REVIEW && c.WORKFLOW 
+					&& (c.WORKFLOW + " / " + c.content().getWorkflow().getWorkflowLevel().getName()),
+					
+			pageworkflow: c.content().getStructEntry().getWorkflowName(), 
+
+			created: c.STATUS==c.content().STATUS_DRAFT ? WGA.format(c.CREATED, "d. MMMMM yyyy, HH:mm") + " Uhr" : "",
+			modified: (c.PUBLISHED && c.PUBLISHED==c.MODIFIED) || c.MODIFIED==c.CREATED ? '' : WGA.format(c.MODIFIED, 'd. MMMMM yyyy, HH:mm') + " Uhr",
+			published: getPublished(c),
+
+			pagepublished: c.content().getStructEntry().getReleasedContent(c.LANGUAGE) && c.PAGEPUBLISHED 
+				? WGA.format(c.PAGEPUBLISHED, 'd. MMMMM yyyy, HH:mm') + " Uhr" 
+				: "",
+			
+			
+			geplant: c.STATUS!=c.content().STATUS_ARCHIVE && c.VALIDFROM && c.VALIDFROM.after(now()),
+			abgelaufen: c.STATUS!=c.content().STATUS_ARCHIVE && c.VALIDTO && c.VALIDTO.before(now()) ? WGA.format(c.VALIDTO, "d. MMMMM yyyy") : "",
+			
+			wirdablaufen: c.STATUS!=c.content().STATUS_ARCHIVE && c.VALIDTO && c.VALIDTO.after(now()) ? WGA.format(c.VALIDTO, "d. MMMMM yyyy") : "",
+			
+			pending: c.content().isPendingRelease(),
+			validfromto: c.STATUS==c.content().STATUS_ARCHIVE ? "" : AFW.Util.dateRange(c.VALIDFROM, c.VALIDTO)
+		}
+
+		var script = WGA.design($urlParam_dbkey).resolveSystemScriptModule("content-manager:validate", "tmlscript")
+		if(script){
+			var mod = script.getTMLScriptModule()
+			try{
+				var validations = mod && WGA.tmlscript().runScript(c, mod.getCode())	// returns a List
+				if(validations){
+					result.validations=[];
+					for(let msg in Iterator(validations))
+						result.validations.push(msg);
+				}
+			}
+			catch(e){
+				logException(e);
+			}
+		}
+		var script = WGA.design($urlParam_dbkey).resolveSystemScriptModule("content-manager:content-info", "tmlscript")
+		if(script){
+			var mod = script.getTMLScriptModule()
+			try{
+				result.custom = mod && WGA.tmlscript().runScript(c, mod.getCode())
+			}
+			catch(e){
+				logException(e);
+			}
+		}
+		
+	}
+	else{
+		var c = context("db:" + $urlParam_dbkey + "/$struct:" + $urlParam_structkey, false)
+		if(c){
+			result = {
+				title: WGA.encode("JSON", c.TITLE),
+				pagetype: c.CONTENTTYPE,
+				pagename: c.PAGENAME
+			}
+		}	
+	}
+
+	WGA.TMLPage.write(JSON.stringify(result))
+	
+
+	/*------------*/
+	
+	function getPublished(c){
+		if(c.STATUS==c.content().STATUS_ARCHIVE)
+			return AFW.Util.dateRange(c.PUBLISHED, c.MODIFIED)
+		else if(c.STATUS==c.content().STATUS_RELEASE)
+			return WGA.format(c.PUBLISHED, "d. MMMMM yyyy, HH:mm") + " Uhr"
+		else return ""
+	}
+	
+}

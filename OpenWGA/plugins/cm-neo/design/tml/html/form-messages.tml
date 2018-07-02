@@ -1,0 +1,20 @@
+<tml:case condition="tmlform.hasmessages()">
+	<div class="alert alert-danger">
+		<tml:case hasoptions="close">
+			<button type="button" class="close" data-dismiss="alert">&times;</button>
+		</tml:case>
+		<tml:case hasoptions="title">
+			<h4><tml:option name="title"/></h4>
+		</tml:case>
+		<tml:if condition="tmlform.messages.size()>1">
+			<tml:then>
+				<ul>
+					<li><tml:formmessages divider="</li><li>"/></li>
+				</ul>
+			</tml:then>
+			<tml:else>
+				<tml:formmessages/>
+			</tml:else>
+		</tml:if>
+	</div>
+</tml:case>

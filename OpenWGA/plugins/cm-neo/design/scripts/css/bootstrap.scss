@@ -1,0 +1,28 @@
+
+/*
+ * Bootstrap.css overwrites
+ */
+input[type=radio], input[type=checkbox] {
+	margin: 4px 4px 4px 0;
+}
+
+a:focus, .btn:focus, .btn:active:focus, .btn.active:focus {
+	outline: none;
+}
+
+.modal-popup .form-group {
+	&.error {
+		color: red;
+		input {
+			border-color: red;
+		}
+	}
+}
+
+form .tab-content .tab-pane{
+	padding: 20px 0 0;
+}
+
+.panel{
+	margin-bottom: 10px;
+}

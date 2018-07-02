@@ -1,0 +1,45 @@
+<div class="header">
+	<tml:metadata name="username" type="database" var="_username" output="true"/>
+	<a data-modal="hide">&times;</a>
+</div>
+
+<div class="content">
+
+	<tml:script>
+		_auth = WGA.app().domain().auth()		
+	</tml:script>
+
+ 	<tml:form id="change-user" cssclass="form-horizontal">
+		
+		<tml:[form-field] o_label="Gruppen">
+			<tml:script expression="AFW.database().getUserGroups()" divider="<br>"/>
+		</tml:[form-field]>	
+	
+		<tml:[form-field] o_label="Berechtigung">
+			<div class="btn-group">
+				<a href="#" data-toggle="dropdown">
+					Chiefeditor
+					<span class="caret"></span>
+				</a>
+				<ul class="dropdown-menu">
+					<li><a href="#">Manager</a></li>
+				</ul>
+			</div>		
+		</tml:[form-field]>	
+
+		<hr>
+		
+		<tml:[form-field] o_label="Benutzername">
+		</tml:[form-field]>
+
+		<tml:[form-field] o_label="Kennwort">
+		</tml:[form-field]>
+	 	
+ 	</tml:form>
+ 
+</div>
+
+<div class="footer">
+	<a class="btn btn-default" data-modal="hide">Schließen</a>
+	<a class="btn btn-default" data-modal="hide">Login</a>
+</div>

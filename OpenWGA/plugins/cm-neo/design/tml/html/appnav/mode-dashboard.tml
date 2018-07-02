@@ -1,0 +1,55 @@
+<div class="dashboard">
+
+	<tml:comment><fieldset>
+		<legend>Von mir zu Genehmigen</legend>
+	</fieldset></tml:comment>
+
+	<tml:[template] o_id="appnav-dashboard">
+		{{#waiting.length}}
+			<fieldset>
+				<legend>Warte auf Genehmigung</legend>
+				{{#waiting}}
+					<div class="entry {{cssclass}}">
+						<a href="{{href}}">
+							{{{title}}}
+						</a>
+						<div class="info">
+							zur Genehmigung vorgelegt <b>{{modified}}</b>
+							<br>
+							Workflow: {{workflow}}
+							<br>
+							Genehmiger: {{approver}}
+						</div>
+					</div>
+				{{/waiting}}
+			</fieldset>
+		{{/waiting.length}}
+
+		<fieldset>
+			<legend>In Arbeit</legend>
+			{{#drafts}}
+				<div class="entry {{cssclass}}">
+					<a href="{{href}}">
+						{{{title}}}
+					</a>
+					<div class="info">
+						<tml:comment>Version {{version}} / {{language}}
+						<br></tml:comment>
+						zuletzt geändert <b>{{modified}}</b> 
+					</div>
+				</div>
+			{{/drafts}}
+			{{^drafts}}
+				- nichts -
+			{{/drafts}}
+		</fieldset>
+
+	</tml:[template]>
+
+</div>
+
+<script>
+	require(["dashboard"], function(Dashboard){
+		Dashboard.init();
+	})
+</script>

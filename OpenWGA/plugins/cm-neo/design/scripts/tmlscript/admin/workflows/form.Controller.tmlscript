@@ -1,0 +1,12 @@
+function Controller() {}
+
+Controller.prototype.prepare = function($pMode, $form, $pc, $option_dbkey, $portlet_wfname) {
+	if($pMode=="new")
+		return;
+	
+	var wf = $pc.workflow($option_dbkey, $portlet_wfname);
+
+	$form.name=wf.getName();
+	$form.description=wf.getDescription();
+	$form.adminapprovers=wf.getAdminReviewers();
+}

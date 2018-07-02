@@ -1,0 +1,33 @@
+<tml:action id="upload-file">
+	if(!tmlform.filename)
+		tmlform.addmessage("Bitte wählen Sie eine Datei aus")
+	else{
+		try{
+			tmlform.attach(content());
+			content().save();
+			portlet.fireevent("close-dialog")
+			portlet.fireevent("attachments-updated");
+			_dialog_closed=true
+		}
+		catch(e){
+			logException(e);
+		}
+	}
+</tml:action>
+
+<tml:form id="upload" source="none" unless="_dialog_closed">
+	<div class="header">
+		Datei Upload ...
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content">
+		<tml:[form-messages]/>
+		<tml:input name="filename" type="file"/>
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:button cssclass="btn btn-primary" clickaction="upload-file" param1="{_filename}">Datei hochladen</tml:button>
+	</div>
+</tml:form>

@@ -1,0 +1,2 @@
+
+<tml:[form-field] o_label="Workflow" o_name="workflow" o_meta="true" o_type="select" o_optionsitem="$pc.workflowOpts"/>

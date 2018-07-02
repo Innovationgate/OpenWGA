@@ -1,0 +1,23 @@
+function Renderer() {}
+
+Renderer.prototype.render = function($urlParam_dbkey) {
+
+	var dbkey = $urlParam_dbkey
+	var database = db(dbkey);
+	var areas = []; 
+	for(let area in Iterator(database.getAreas().values())){
+		if(area.systemArea)
+			continue;
+		if(area.name=="hdb-content" && !WGA.app().isManager())
+			continue;
+		var visiblefor = area.getExtensionData("CM_area_visible")
+		if(visiblefor && visiblefor.size() && !database.isMemberOfUserList(visiblefor))
+			continue;
+		if(area.mayReadContent())	
+			areas.push(area.name);
+	}
+
+
+	WGA.TMLPage.write(JSON.stringify(areas))
+	//WGA.TMLPage.renderDefault();
+}

@@ -33,6 +33,9 @@ project(":plugin-admin").projectDir = file("plugins/admin")
 include ":plugin-cm"
 project(":plugin-cm").projectDir = file("plugins/cm")
 
+include ":plugin-cm-neo"
+project(":plugin-cm-neo").projectDir = file("plugins/cm-neo")
+
 include ":plugin-cmm"
 project(":plugin-cmm").projectDir = file("plugins/cm-modules")
 

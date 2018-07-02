@@ -1,0 +1,21 @@
+<tml:action id="save">
+	portlet.fireevent("close-dialog")
+	_dialog_closed=true;
+</tml:action>
+
+<tml:case isfalse="_dialog_closed">
+
+	<div class="header">
+		Sprachen
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content">
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:button cssclass="btn btn-primary" clickaction="save">Speichern</tml:button>
+	</div>
+	
+</tml:case>	

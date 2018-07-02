@@ -1,0 +1,31 @@
+<tml:include ref="page" o_title="{db($option_dbkey).title}">
+
+	<tml:option name="header">
+		<tml:include ref="::toolbar"/>
+	</tml:option>
+
+	<tml:option name="appnav">
+		<ul class="nav nav-pills nav-stacked" style="padding:10px">
+			<tml:foreach item="$mc.settings" currentvalue="_settings">
+				<li <tml:case condition="portlet.settings==_settings">class="active"</tml:case>>
+					<a href="<tml:url action="$mc.setSettings" a-settings="_settings" portletmode="view"/>">
+						<tml:label key="[admin.{_settings}]"/>
+					</a>
+				</li>
+			</tml:foreach>
+		</ul>
+	</tml:option>
+
+	<tml:inline name="body">
+		<tml:{div} html_class="admin" if="$portlet_settings">
+			<tml:portlet ref="[::{portlet.settings}:portlet]" name="[admin-{portlet.settings}]" portletmode="view"/>
+		</tml:{div}>
+	</tml:inline>
+	
+</tml:include>
+
+<script>
+	require(["jquery"], function($){
+		$("#appnav").show();
+	})
+</script>

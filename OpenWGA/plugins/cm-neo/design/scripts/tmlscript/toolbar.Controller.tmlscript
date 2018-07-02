@@ -1,0 +1,28 @@
+function Controller() {}
+
+Controller.prototype.prepare = function() {}
+
+Controller.prototype.dbkeys = function(AFW, $portlet, $request) {
+	var _dbkeys = WGA.createList();
+	var dbkeys = WGA.app($portlet.dbkey).domain().getAppKeys();
+	
+	var vHost = null;
+	if($request){
+		var wgaconfig = WGA.Core.getWgaConfiguration()
+		var vhost_filter = Packages.de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
+		vHost = vhost_filter.findMatchingHost(wgaconfig, $request);
+	}
+	
+	for(let dbkey in Iterator(dbkeys)){
+		var Database = AFW.database(dbkey);
+		if(!Database.isAuthoringAllowed())
+			continue;
+
+		if(vHost && !vhost_filter.isDBKeyAllowed(wgaconfig, vHost, dbkey))
+			continue;
+
+		if(WGA.app(dbkey).isAuthor())
+			_dbkeys.add(dbkey);
+	}
+	return WGA.sortList(_dbkeys);
+}.nonIsolated();	// request is only available if non-isolated :-(

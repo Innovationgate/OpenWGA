@@ -1,0 +1,159 @@
+<tml:[template] o_id="sidepannel-content-properties">
+
+	{{#title}}
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<a href="#" title="Seite neu laden" data-action="reload">
+				<i class="fas fa-sync"></i>
+			</a>
+			{{{title}}}
+		</div>
+	
+		<div class="panel-body">
+		
+			{{#version}}
+				<fieldset class="clip">
+					<legend>Inhaltsversion</legend>
+
+					<div class="form-group">
+						<label>Version {{version}} / {{languagetitle}}</label>
+						<p class="data">
+							{{{status}}}
+						</p>
+					</div>
+				
+					{{#workflow}}
+						<div class="form-group">
+							<label>Workflow / Level</label>
+							<p class="data">{{workflow}}</p>
+						</div>
+					{{/workflow}}
+					
+					<div class="form-group">
+						<label>Autor</label>
+						<p class="data">{{author}}</p>
+					</div>
+					
+					{{#created}}
+						<div class="form-group">
+							<label>Erstellt</label>
+							<p class="data">{{created}}</p>
+						</div>
+					{{/created}}
+					
+					{{#published}}
+						<div class="form-group">
+							<label>Veröffentlicht</label>
+							<p class="data">
+								{{published}}
+							</p>
+						</div>
+						
+						{{#wirdablaufen}}
+							<div class="form-group" style="color:red">
+								<label>geplante Veröffentlichung bis</label>
+								<p class="data">
+									{{wirdablaufen}}
+								</p>
+							</div>
+						{{/wirdablaufen}}
+						
+					{{/published}}
+
+					{{#abgelaufen}}
+						<div class="form-group" style="color:red">
+							<label>
+								Abgelaufen seit								
+							</label>
+							<p class="data">
+								{{abgelaufen}}
+							</p>
+						</div>
+					{{/abgelaufen}}
+
+					{{#modified}}
+						<div class="form-group">
+							<label>Zuletzt geändert</label>
+							<p class="data">{{modified}}</p>
+						</div>
+					{{/modified}}
+
+					{{#geplant}}
+						<div class="form-group" style="color:red">
+							<label>
+								Veröffentlichung geplant 
+							</label>
+							<p class="data">{{validfromto}}</p>
+						</div>
+					{{/geplant}}
+
+				</fieldset>
+			{{/version}}
+			
+			<fieldset>
+				<legend>Seite</legend>
+				<div class="form-group">
+					<p class="data">{{pagetype}}</p>
+				</div>
+				{{#pageworkflow}}
+					<div class="form-group">
+						<label>Workflow</label>
+						<p class="data">{{pageworkflow}}</p>
+					</div>
+				{{/pageworkflow}}
+
+				{{#pagename}}
+					<div class="form-group">
+						<label>Eindeutiger Name</label>
+						<p class="data">{{pagename}}</p>
+					</div>
+				{{/pagename}}
+				
+				{{#pagereaders.length}}
+					<div class="form-group" style="color:red">
+						<label>Leser</label>
+						<p class="data">
+						{{#pagereaders}}
+							{{name}}<br>
+						{{/pagereaders}}
+						</p>
+					</div>
+				{{/pagereaders.length}}
+				
+				{{#pagepublished}}
+					<div class="form-group">
+						<label>Veröffentlicht seit</label>
+						<p class="data">{{pagepublished}}</p>
+					</div>
+				{{/pagepublished}}
+			</fieldset>
+			
+			{{#validations.length}}
+				<fieldset>
+					<legend>Hinweise</legend>
+					<div class="form-group" style="color:red">
+						{{#validations}}
+							<p class="data">{{{.}}}</p>
+						{{/validations}}
+					</div>
+				</fieldset>
+			{{/validations.length}}
+
+			{{#custom}}
+				<fieldset>
+					<legend>{{legend}}</legend>
+					{{#fields}}
+						<div class="form-group" {{#important}}style="color:red"{{/important}}>
+							<label>{{label}}</label>
+							<p class="data">{{{value}}}</p>
+						</div>
+					{{/fields}}
+				</fieldset>
+			{{/custom}}
+			
+		</div>
+	</div>
+	{{/title}}
+	
+</tml:[template]>
+

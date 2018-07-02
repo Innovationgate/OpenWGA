@@ -1,0 +1,45 @@
+<tml:action id="save-page-settings">
+
+	if(!tmlform.validate())
+		return;
+
+	tmlform.store();
+
+	try{
+		callAction("settings-saved")
+	}
+	catch(e){
+		console.log(e);
+	}
+
+	portlet.fireevent("close-dialog");
+	portlet.fireevent("content-metas-changed", {
+		structkey: STRUCTKEY,
+		contentkey: KEY,
+		dbkey: meta("db", "dbkey")
+	});
+	_dialog_closed=true;
+</tml:action>
+
+<tml:form id="form-user-defined-settings" mode="{STATUS==content().STATUS_DRAFT ? 'edit':'view'}" html_data-context="{path}" unless="_dialog_closed">
+
+	<div class="header">
+		Benutzerdefinierte Eigenschaften
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content form-horizontal">
+		<tml:include ref="{AFW.content().getUserdefinedMetasTML()}" designdb="{meta('db', 'dbkey')}">
+			<tml:option name="cm_dbkey" expression="context('main').meta('db', 'dbkey')"/>
+			<tml:option name="label-width">250</tml:option>
+		</tml:include>
+	</div>
+
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:case condition="tmlform.mode()=='edit'">
+			<tml:button clickaction="save-page-settings" cssclass="btn btn-primary">Aktualisieren</tml:button>
+		</tml:case>
+	</div>
+	
+</tml:form>	

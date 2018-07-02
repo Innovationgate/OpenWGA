@@ -1,0 +1,5 @@
+<tml:eventscript onevent="appnav-view-change">
+	var view = portletEvent.getParameter("view")
+	portlet.setmode(view);
+</tml:eventscript>
+<tml:include ref="{'::mode-' + portlet.mode}"/>

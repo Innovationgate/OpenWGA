@@ -1,0 +1,15 @@
+<div class="header"><tml:label key="admin.workflows"/></div>
+
+<div class="content">
+	<ul>
+		<tml:foreach item="$pc.workflows" currentvalue="_wf">
+			<li>
+				<a href="<tml:url action="$pc.setWorkflow" a-name="_wf.name" portletmode="edit"/>"><tml:item name="_wf.name"/></a>
+			</li>			
+		</tml:foreach>
+	</ul>
+</div>
+
+<div class="footer">
+	<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="new">Neuer Workflow</tml:button>
+</div>

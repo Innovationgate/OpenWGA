@@ -1,0 +1,53 @@
+#app-siteexplorer{
+
+	.area-menu {
+		display: block;
+		height: 40px;
+		line-height: 40px;
+		border-bottom: solid silver 1px;
+		background: white;
+		padding: 0 15px;
+		font-size: 1.2em;
+	}
+	.dropdown-menu {
+		margin-left: 10px;
+	}
+
+	#explorer {
+		position: absolute;
+		width: 100%;
+		top: 40px;
+		bottom: 0px;
+		overflow: auto;
+		-ms-overflow-style: none;
+		
+		.entry {
+			.symbol {
+				font-size: .9em
+			}
+			/*
+			&.w {
+				//color: brown;
+			}
+			&.a {
+				font-style: italic;
+				color: gray;
+			}
+			*/
+			&.not-visible {
+				color: silver;
+			}
+			&.hidden-in-nav .link-text{
+				//font-style: italic;
+				&:before{
+					content: "("
+				}
+				&:after{
+					content: ")"
+				}
+			}
+	
+		}
+	}
+	
+}

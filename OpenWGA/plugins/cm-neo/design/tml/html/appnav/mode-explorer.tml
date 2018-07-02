@@ -1,0 +1,16 @@
+<div id="app-siteexplorer">
+	<div class="dropdown" id="area-dropdown">
+		<a class="area-menu" href="#" data-toggle="dropdown">
+			<span class="area-title"></span>
+		    <span class="caret"></span>
+	  	</a>
+		<ul class="dropdown-menu"></ul>
+	</div>
+	<div id="explorer"></div>
+</div>
+
+<script>
+	require(["siteexplorer"], function(Explorer){
+		Explorer.init("<tml:url type="tml" medium="json" name="siteexplorer"/>", "<tml:url type="tml" medium="json" name="areas"/>");
+	})
+</script>

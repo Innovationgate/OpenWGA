@@ -1,0 +1,77 @@
+function Renderer() {}
+
+Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $urlParam_structkey) {
+
+	var contentkey = $urlParam_contentkey
+	var structkey = $urlParam_structkey
+	var dbkey = $urlParam_dbkey
+	
+	var docs = [];
+	var struct = db(dbkey).getStructEntryByKey(structkey);
+	if(struct){
+		var children = struct.getChildEntries();
+		for(let doc in Iterator(children)){
+			var c = context("db:"+dbkey+"/docid:"+doc.getStructKey(), false)
+			if(c){
+				docs.push({
+					"title": WGA.encode("html", c.TITLE),
+					"id": c.STRUCTKEY,
+					"href": c.contenturl('html', null, true),
+					"cssclass": c.STATUS
+				})
+			}
+			else docs.push({
+				title: doc.title,
+				href: WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
+							.setParameter({
+								dbkey: dbkey,
+								structkey: doc.getStructKey(),
+								lang: "de"
+							})
+							.build()
+			})
+		}
+	}
+
+	var current = null
+	if(struct){
+		current = {
+			title: struct.title
+		};
+		var c = context("db:"+dbkey+"/docid:"+struct.getStructKey(), false)
+		if(c){
+			current = {
+				"title": c.TITLE,
+				"id": c.STRUCTKEY,
+				"href": c.contenturl('html', null, true),
+				"cssclass": c.STATUS
+			}
+		}
+	}
+
+	var parent = null
+	struct = struct.getParentEntry();
+	if(struct){
+		parent = {
+			title: struct.title
+		};
+		var c = context("db:"+dbkey+"/docid:"+struct.getStructKey(), false)
+		if(c){
+			parent = {
+				"title": c.TITLE,
+				"id": c.STRUCTKEY,
+				"href": c.contenturl('html', null, true),
+				"cssclass": c.STATUS
+			}
+		}
+	}
+	
+	//console.log(JSON.stringify(docs));
+	
+	WGA.TMLPage.write(JSON.stringify({
+		parent: parent,
+		current: current,
+		children: docs
+	}))
+	
+}

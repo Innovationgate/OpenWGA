@@ -1,0 +1,100 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<html>
+	<head>
+		<script>
+			WGA={
+				contentinfo:{
+					dbkey: "<tml:item name="$urlParam_dbkey"/>",
+					structkey: "<tml:item name="$urlParam_structkey"/>",
+					language: "<tml:item name="$urlParam_lang"/>"
+				}
+			}
+		</script>
+		<link rel="stylesheet" href="<tml:url type="css" name="styles"/>">
+	</head>
+	
+	<body style="padding:20px">
+		
+		<tml:if context="[db:{$urlParam_dbkey}/$struct:{$urlParam_structkey}]" iscontextvalid="true">
+			<tml:then>
+			
+				<tml:script>
+					_Struct = AFW.structentry(document);
+				</tml:script>
+			
+				<tml:if condition="_Struct.hasContent($urlParam_lang, false)">
+					<tml:then>
+						<h1>{%label:no-content.no-reader-title%}</h1>
+						<tml:label key="no-content.no-reader-message" param1="{$urlParam_lang}"/>
+					</tml:then>
+					<tml:else>
+						<h1>{%label:no-content.title%}</h1>
+						<tml:label key="no-content.message" param1="{TITLE}" param2="{$urlParam_lang}"/>
+					</tml:else>
+				</tml:if>
+				
+				<tml:comment><tml:script>
+					// other versions
+					_contentlist = WGA.createList()
+					for(let doc in Iterator(document.getAllContent(document.mayEditPage()))){
+						if(doc.mayEditContent() || doc.getStatus()==doc.STATUS_RELEASE)
+							_contentlist.add(doc);
+					}
+				</tml:script>
+				<tml:case condition="!_contentlist.isEmpty()">
+					<hr>
+					{%label:no-content.other-versions%}:
+					<ul>
+					<tml:foreach item="_contentlist" sortexpression="STATUS+VERSION" sortorder="descending">
+					
+						<tml:groupchange expression="STATUS" id="gc">
+							</ul><h2><tml:label key="{'content-properties.status.'+STATUS}"/></h2><ul>
+						</tml:groupchange>
+					
+						<li>
+							<a href="<tml:script expression="contenturl('html', null, true)"/>">
+								Version <tml:meta name="version"/>						
+								(
+									<tml:case condition="STATUS==content().STATUS_ARCHIVE">
+										<tml:script expression="AFW.Util.dateRange(PUBLISHED, MODIFIED)"/>,
+									</tml:case> 
+									<tml:meta name="languagetitle"/>
+								)								
+							</a>
+						</li>
+					</tml:foreach>
+					</ul>
+				</tml:case></tml:comment>
+			</tml:then>
+			<tml:else>
+				<h1>{%label:no-content-found.title%}</h1>
+				<tml:label key="no-content-found.message" param1="{$urlParam_structkey}"/>
+			</tml:else>
+		</tml:if>
+		
+	</body>
+</html>

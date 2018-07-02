@@ -1,0 +1,29 @@
+<tml:action id="create">
+
+	if(!tmlform.validate())
+		return false;
+
+	// check for valid name:	
+	var check = /[^a-zA-Z0-9_\.\-\:\$]/g	
+	if(check.test(tmlform.name)){
+		tmlform.addMessage("Der Name enthält unerlaubte Zeichen");
+		return false;
+	}
+
+	var document = db($option_dbkey).createLanguage(tmlform.name, tmlform.title);
+	tmlform.storeInDocument(document)	
+</tml:action>
+
+<tml:form id="form-create-lang" cssclass="form-horizontal" source="none">
+	<div class="header">Neue Sprache ...</div>
+	
+	<div class="content">
+		<tml:[form-messages] o_title="Sprache kann nicht erstellt werden"/>
+		<tml:include ref="::form"/>
+	</div>
+	
+	<div class="footer">
+		<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="view">Abbrechen</tml:button>
+		<tml:button cssclass="btn btn-primary" clickaction="create" portletmode="view">Speichern</tml:button>
+	</div>
+</tml:form>

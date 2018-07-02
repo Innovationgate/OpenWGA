@@ -1,0 +1,25 @@
+function Controller() {}
+
+// inherit from Utils
+Controller.prototype = Object.create($$.Utils.prototype)
+
+Controller.prototype.workflowOpts = function($option_dbkey) {
+
+	var opts = WGA.createList(["- kein Workflow -|"])
+	var workflows = WGA.db($option_dbkey).getWorkflowEngine().getWorkflowDefinitions();
+
+	opts.addAll(workflows.keySet())
+
+	return opts
+	
+}
+
+Controller.prototype.pagetypes = function($option_dbkey) {
+
+	var values = WGA.createList()
+	var pagetypes = WGA.db($option_dbkey).getContentTypes();
+	for(let pagetype in Iterator(pagetypes))
+		values.add(pagetype.name);
+	return values
+	
+}

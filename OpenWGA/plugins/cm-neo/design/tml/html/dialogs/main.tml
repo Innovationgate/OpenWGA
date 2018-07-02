@@ -1,0 +1,68 @@
+<tml:case portletmode="show">
+	<tml:script>
+		_id = portlet.dialog.replace(/:/g, "_")
+		_js = WGA.design().resolve("dialogs:"+_id).getScriptModule("js")
+		_ctx = context("db:" + portlet.parent().dbkey + "/docid:" + portlet.parent().contentkey, false)
+		if(!_ctx)
+			_ctx = context("db:" + portlet.parent().dbkey + "/$struct:" + portlet.parent().structkey, false)
+	</tml:script>
+	<div class="modal-popup" style="<tml:script expression="portlet.style"/>" id="dialog-<tml:item name="_id"/>">		
+		<tml:portlet name="curent-dialog" ref="[::{portlet.dialog}]" portletmode="view" context="{_ctx}">
+			<tml:option name="dialog_options" expression="portlet.options"/>
+		</tml:portlet>
+	</div>
+	<script>
+		require([
+				"jquery", 
+				"jquery-modal", 
+				"jquery-textarea-autogrow", 
+				"jquery-ui-js/datepicker", 
+				"jquery-ui-js/i18n/datepicker-de",
+				"css!jquery-ui-css"
+			], function($, Modal){
+				Modal.show("#dialog-<tml:item name="_id"/>", function(){
+					$("textarea", this).autogrow()
+					$(".date", this).datepicker({
+						changeMonth: true,
+						changeYear: true
+					})
+					$("[data-focus]", this).first().focus();
+					<tml:case condition="_js">
+						require(["dialogs/<tml:item name="_id"/>"], function(Module){
+							Module()
+						})
+					</tml:case>
+				});
+			})
+	</script>
+</tml:case>
+
+<script>
+	require(["jquery", "sitepanel", "jquery-modal"], function($, Sitepanel, Modal){
+		WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "open-dialog", function(ev){
+			WGA.ajax.action({
+				action: "<tml:action>
+					portlet.dialog = request.getParameter("dialog")
+					portlet.style = request.getParameter("style")
+					portlet.options=WGA.createMap()
+					var names = request.getParameterNames()
+					while(names.hasMoreElements()){
+						var name = names.nextElement()
+						if(name.indexOf("$")==0)
+							continue;
+						portlet.options.put(name, request.getParameter(name))
+					}
+					portlet.setmode("show")
+				</tml:action>",
+				params: ev.params
+			})
+		})
+		WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "close-dialog", function(ev){
+			Modal.hide()
+			if(ev.params.redirectto){
+				Sitepanel.load(ev.params.redirectto);
+			}
+			//WGA.ajax.callAction("<tml:action ref="$refresh" portletmode="view"/>");
+		});
+	})
+</script>

@@ -1,0 +1,7 @@
+<script>
+	require(["cm"], function(CM){
+		var code = "<tml:script expression="option('body').replace(/\n/g, '')" encode="javascript"/>";
+		CM.template("<tml:option name="id"/>").register(code);
+	})
+</script>
+<div id="<tml:option name="id"/>"></div>

@@ -1,0 +1,4 @@
+function Controller() {}
+
+// inherit from Utils
+Controller.prototype = Object.create($$.Utils.prototype)

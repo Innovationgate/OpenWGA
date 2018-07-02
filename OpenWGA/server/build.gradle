@@ -49,6 +49,7 @@ war {
 task buildPlugins(type: Copy) {
 	from (project(":plugin-admin").tasks.buildPlugin.archivePath)
 	from (project(":plugin-cm").tasks.buildPlugin.archivePath)
+	from (project(":plugin-cm-neo").tasks.buildPlugin.archivePath)
 	from (project(":plugin-cmm").tasks.buildPlugin.archivePath)
 	from (project(":plugin-afw").tasks.buildPlugin.archivePath)
 	from (project(":plugin-additional-script-langs").tasks.buildPlugin.archivePath)
@@ -60,6 +61,7 @@ task buildPlugins(type: Copy) {
    	into 'build/extra/WEB-INF/default-plugins'
 }
 buildPlugins.dependsOn project(":plugin-cm").tasks.buildPlugin
+buildPlugins.dependsOn project(":plugin-cm-neo").tasks.buildPlugin
 buildPlugins.dependsOn project(":plugin-cmm").tasks.buildPlugin
 buildPlugins.dependsOn project(":plugin-afw").tasks.buildPlugin
 buildPlugins.dependsOn project(":plugin-admin").tasks.buildPlugin

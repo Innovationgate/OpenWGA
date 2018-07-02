@@ -1,0 +1,111 @@
+function Controller() {}
+
+Controller.prototype.prepare = function() {}
+
+Controller.prototype.isValidName = function(name) {
+	// check for valid name:	
+	var check = /[^a-zA-Z0-9_\.\-\:\$]/g	
+	if(check.test(name)){
+		return false;
+	}
+	return true;
+}
+
+Controller.prototype.workflowengine = function($option_dbkey) {
+	var database=WGA.db($option_dbkey);
+	return database.getWorkflowEngine();
+}
+
+Controller.prototype.workflowdefinitions = function($option_dbkey) {
+	return this.workflowengine($option_dbkey).getWorkflowDefinitions();
+}
+
+Controller.prototype.workflows = function($option_dbkey) {
+	return this.workflowdefinitions($option_dbkey).values();
+}
+
+Controller.prototype.workflow = function($option_dbkey, $portlet_wfname) {
+	return this.workflowdefinitions($option_dbkey).get($portlet_wfname)
+}
+
+Controller.prototype.workflowlevels = function($option_dbkey, $portlet_wfname) {
+	return this.workflow($option_dbkey, $portlet_wfname).getLevels();
+}
+
+Controller.prototype.workflowlevel = function($option_dbkey, $portlet_wfname, $portlet_levelindex) {
+	return this.workflowlevels($option_dbkey, $portlet_wfname).get($portlet_levelindex);
+}
+
+Controller.prototype.setWorkflow = function($option_dbkey, $portlet, name) {
+	$portlet.wfname = name
+}
+
+Controller.prototype.setWorkflowLevel = function($option_dbkey, $portlet, index){
+	$portlet.levelindex = index
+}
+
+Controller.prototype.createWorkflowLevel = function($option_dbkey, $form, $portlet_wfname){
+	if(!$form.validate()){
+		return false;
+	}
+	var wf = this.workflow($option_dbkey, $portlet_wfname);
+	var wflevel = wf.createLevel($form.name, $form.position||0);
+	wflevel.setDescription($form.description);
+	wflevel.setReviewers($form.fieldlist("reviewer"));
+	wflevel.setReviewerCount($form.reviewercount||1);
+	this.workflowengine($option_dbkey).saveWorkflowDefinition(wf);	
+}
+
+
+Controller.prototype.updateWorkflowLevel = function($option_dbkey, $form, $portlet_wfname, $portlet_levelindex){
+	if(!$form.validate()){
+		return false;
+	}
+	var wf = this.workflow($option_dbkey, $portlet_wfname);
+	var wflevel = this.workflowlevel($option_dbkey, $portlet_wfname, $portlet_levelindex)
+	
+	wflevel.setPosition($form.position);
+	wflevel.setDescription($form.description);
+	wflevel.setReviewers($form.fieldlist("reviewer"));
+	wflevel.setReviewerCount($form.reviewercount||1);
+
+	this.workflowengine($option_dbkey).saveWorkflowDefinition(wf);	
+}
+
+
+Controller.prototype.removeWorkflowLevel = function($option_dbkey, $portlet_wfname, $portlet_levelindex){
+	this.workflowlevels($option_dbkey, $portlet_wfname).remove($portlet_levelindex);
+}
+
+Controller.prototype.createWorkflow = function($option_dbkey, $form){
+	if(!$form.validate()){
+		return false;
+	}
+	/*
+	if(!this.isValidName($form.name)){
+		$form.addMessage("Der Name enthält unerlaubte Zeichen");
+		return false;
+	}*/
+	var wfE = this.workflowengine($option_dbkey)
+	var wf = wfE.createWorkflowDefinition($form.name);
+	wf.setDescription($form.description);
+	wf.setAdminReviewers($form.fieldlist("adminapprovers"));
+	wfE.saveWorkflowDefinition(wf);
+}
+
+Controller.prototype.removeWorkflow = function($option_dbkey, $portlet_wfname){
+	var wf = this.workflow($option_dbkey, $portlet_wfname);
+	this.workflowengine($option_dbkey).removeWorkflowDefinition(wf);
+}
+
+Controller.prototype.updateWorkflow = function($option_dbkey, $portlet_wfname, $form){
+	if(!$form.validate()){
+		return false;
+	}
+	var wf = this.workflow($option_dbkey, $portlet_wfname)
+	wf.setDescription($form.description);
+	wf.setAdminReviewers($form.fieldlist("adminapprovers"));
+	
+	this.workflowengine($option_dbkey).saveWorkflowDefinition(wf);	
+	
+}

@@ -1,0 +1,62 @@
+<tml:script>
+
+	_pagetypes = WGA.createList()
+	for(let ct in Iterator(db().getContentTypes())){
+		if($option_page=="root"){
+			if(AFW.contenttype(ct).isAllowed(document.getArea()))
+				_pagetypes.add(ct.name)
+		}
+		else if(AFW.contenttype(ct).isAllowed(document))
+			_pagetypes.add(ct.name)
+	}
+	if($option_dialog_options.pagetype && _pagetypes.contains($option_dialog_options.pagetype))
+		tmlform.contenttype=$option_dialog_options.pagetype
+	else if(_pagetypes.size()==1)
+		tmlform.contenttype = _pagetypes.get(0);
+	WGA.TMLPage.setVar("_pagetypes", _pagetypes)
+	
+	_languages = WGA.createList()
+	for(let lang in Iterator(db().getLanguages().values())){
+		if(lang.mayCreateContent())
+			_languages.add(lang.title + "|" + lang.name)
+	}
+	WGA.TMLPage.setVar("_languages", _languages)
+	if(_languages.size()==1)
+		tmlform.language = _languages.get(0).split("|")[1];
+	
+	if(_pagetypes.size() && _languages.size())
+		WGA.TMLPage.setVar("_isValid", true)
+	else{
+		WGA.TMLPage.setVar("_isValid", false)
+		tmlform.addmessage("Es steht kein erlaubter Seitentyp oder keine erlaubte Sprache für diese Position zur Verfügung")
+	}
+	
+</tml:script>
+
+<tml:[form-messages]/>
+
+<tml:case istrue="_isValid">
+	<tml:[form-field] o_label="Titel" o_field="title"
+		o_validation="$E_VALUE!=''"
+		o_message="Bitte geben Sie einen Titel ein"
+		o_focus="true"
+		o_store="false"
+	/>
+	<tml:[form-field] o_label="Sprache" o_type="select" o_field="language" o_optionsitem="_languages" o_mode="{_languages.size()>1?'edit':'view'}"/>
+
+	<tml:[form-field] o_label="Seitentyp" o_type="select" o_field="contenttype" o_optionsitem="_pagetypes" o_mode="{$option_dialog_options.pagetype || _pagetypes.size()==1 ? 'view':'edit'}"/>	
+	
+	
+	<tml:comment><tml:if condition="_pagetypes.size()>1">
+		<tml:then>
+			<tml:[form-field] o_label="Seitentyp" o_type="select" o_field="contenttype" o_optionsitem="_pagetypes" o_mode="{$option_dialog_options.pagetype ? 'view':'edit'}"/>
+		</tml:then>
+		<tml:else>
+			<tml:script>
+				tmlform.contenttype = _pagetypes.get(0);
+			</tml:script>
+			<tml:[form-field] o_label="Seitentyp" o_type="text" o_field="contenttype" o_mode="view"/>
+		</tml:else>
+	</tml:if></tml:comment>
+	
+</tml:case>	

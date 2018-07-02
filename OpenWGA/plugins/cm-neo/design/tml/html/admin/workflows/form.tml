@@ -1,0 +1,15 @@
+<tml:[form-messages] o_title="Workflow kann nicht gespeichert werden"/>
+
+<tml:[form-field] o_label="Name des Workflows" o_field="name"
+	o_validation="$E_VALUE!=''"
+	o_message="Kein Name angegeben"
+	o_mode="{portlet.mode=='new'?'edit':'view'}"
+/>
+<tml:[form-field] o_label="Beschreibung" o_field="description" o_type="textarea"/>
+<tml:[form-field] o_label="Admin-Genehmiger" o_field="adminapprovers" o_type="textarea" o_multiple="true"/>
+
+<script>
+	require(["jquery", "jquery-textarea-autogrow"], function($){
+		$("#<tml:script expression="tmlform.formid"/> textarea").autogrow();
+	})
+</script>

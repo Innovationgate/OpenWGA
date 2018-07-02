@@ -1,0 +1,218 @@
+<div id="toolbars">
+	<div class="toolbar" style="left:10px">
+		
+		<div class="btn-group">
+			<a class="btn button" href="#" data-toggle="dropdown">
+				<tml:comment><span class="icon fas fa-globe"></span></tml:comment>
+				<img class="icon" src="/static/images/brand/icon_32.png">
+				<div class="text">
+					Website
+					<span class="caret"></span>
+				</div>
+			</a>
+			<ul class="dropdown-menu">
+				<tml:case condition="WGA.app(portlet.dbkey).isChiefEditor()">
+					<li><a href="<tml:url action="$refresh" portletmode="admin"/>">Einstellungen</a></li>
+					<li class="divider"></li>
+				</tml:case>
+				<li class="dropdown-header">Webssite wechseln</li>
+				<tml:foreach item="$mc.dbkeys" currentvalue="_dbkey">
+					<li><a href="<tml:url u-dbkey="_dbkey"/>">
+						<span class="far <tml:script expression="_dbkey==portlet.dbkey ? 'fa-check-square':'fa-square'"/>"></span> 
+						<tml:item name="_dbkey"/>
+					</a></li>
+				</tml:foreach>
+				<li class="divider"></li>
+				<li><a href="#" data-action="exit">Abmelden und Content Manager beenden</a></li>
+			</ul>
+		</div>
+		
+		<div class="btn-group">
+			<a class="btn button" href="#" data-toggle="dropdown">
+				<span class="icon"><tml:script expression="profile.scale||100"/>%</span>
+				<div class="text">
+					Zoom
+					<span class="caret"></span>
+				</div>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a data-action="scale" data-scale="100" href="#">100%</a></li>
+				<li><a data-action="scale" data-scale="80" href="#">80%</a></li>
+				<li><a data-action="scale" data-scale="50" href="#">50%</a></li>
+			</ul>
+		</div>
+
+		<div class="btn-group">
+			<a class="btn button" href="#" data-toggle="dropdown" id="tb-button-copy-cb">
+				<span class="icon far fa-clipboard"></span>
+				<div class="text">
+					Ablage
+					<span class="caret"></span>
+				</div>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a data-action="clipboard-copy" href="#">
+					<span class="far fa-copy"></span>
+					In die Zwischenablage kopieren
+				</a></li>
+				<li class="divider"></li>
+				<li <tml:case isempty="_CM_clipboard_context">class="disabled"</tml:case>><a data-action="clipboard-paste" href="#">
+					<span class="fas fa-paste"></span>
+					Aus der Zwischenablage einfügen ...
+				</a></li>
+			</ul>
+		</div>
+
+
+	</div>
+	<div class="toolbar" data-toolbar="content">
+		<div class="btn-group">
+			<a class="btn button" href="#" data-toggle="dropdown">
+				<span class="icon glyphicon glyphicon-plus"></span>
+				<div class="text">
+					Erstellen
+					<span class="caret"></span>
+				</div>
+			</a>
+			<ul class="dropdown-menu">
+				<tml:case condition="db(portlet.dbkey).getLanguages().size()>1">
+					<li><a data-action="create-content" href="#">Neue Sprachversion</a></li>
+					<li class="divider"></li>
+				</tml:case>
+				<li><a data-action="create-child-page" href="#">Neue Unterseite</a></li>
+				<li><a data-action="create-root-page" href="#">Neue Hauptseite</a></li>
+				<tml:script>
+					_fixparents=WGA.createList();
+					var pagetypes=db(portlet.dbkey).getContentTypes()
+					for(let pagetype in Iterator(pagetypes)){
+						var preferedParent=pagetype.getPreferredParent();
+						if(preferedParent && pagetype.mayCreateContent()){
+							var ParentStruct=AFW.structentry(preferedParent)
+							if(ParentStruct.mayCreatePage())
+								_fixparents.add(pagetype.getName() + "|" + ParentStruct.getStructKey());
+						}
+					}
+				</tml:script>
+				<tml:case condition="_fixparents.size()">
+					<li class="divider"></li>
+					<tml:foreach item="_fixparents" currentvalue="_entry">
+						<tml:script>
+							var parts = _entry.split("|");
+							_pagetype = parts[0];
+							_parent = parts[1];
+						</tml:script>
+						<li><a data-action="create-child-page"
+							data-pagetype="<tml:item name="_pagetype"/>" 
+							data-parent="<tml:item name="_parent"/>" href="#">
+								<tml:item name="_pagetype"/>
+						</a></li>
+					</tml:foreach>
+				</tml:case>
+			</ul>
+		</div>
+
+		<div class="btn-group" _style="margin-right:50px">
+			<a class="btn button" href="#" data-toggle="dropdown">
+				<span class="icon glyphicon glyphicon-trash"></span>
+				<div class="text">
+					Löschen
+					<span class="caret"></span>
+				</div>
+			</a>
+			<ul class="dropdown-menu">
+				<li><a data-action="delete-version" href="#">Inhaltsversion löschen</a></li>
+				<li><a data-action="archive-version" href="#">Inhaltsversion archivieren</a></li>
+				<li class="divider"></li>
+				<li><a data-action="delete-page" href="#">Seite inkl. aller Unterseiten löschen</a></li>
+			</ul>
+		</div>
+
+		<div class="spacer"></div>
+
+		<a class="btn button" style="display:none" href="#" data-action="create-draft">
+			<span class="icon glyphicon glyphicon-edit"></span>
+			<div class="text">Bearbeiten</div>
+		</a>
+		<a class="btn button" style="display:none" href="#" data-action="publish-page">
+			<span class="icon glyphicon glyphicon-cloud-upload"></span>
+			<div class="text">Veröffentlichen</div>
+		</a>
+		<a class="btn button" style="display:none" href="#" data-action="approve-content">
+			<span class="icon glyphicon glyphicon-cloud-upload"></span>
+			<div class="text">Genehmigen</div>
+		</a>
+		<a class="btn button" style="display:none" href="#" data-action="reject-content">
+			<span class="icon glyphicon glyphicon-cloud-download"></span>
+			<div class="text">Ablehnen</div>
+		</a>
+		
+		<div class="pull-right">
+			<a class="btn button" href="#" data-action="seo">
+				<span class="icon glyphicon glyphicon-education"></span>
+				<div class="text">SEO</div>
+			</a>
+			<a class="btn button" href="#" data-action="content-modules">
+				<span class="icon glyphicon glyphicon-modal-window"></span>
+				<div class="text">Inhaltsmodule</div>
+			</a>
+
+
+			<div class="btn-group">
+				<a class="btn button" href="#" data-toggle="dropdown">
+					<span class="icon glyphicon glyphicon-cog"></span>
+					<div class="text">
+						Eigenschaften
+						<span class="caret"></span>
+					</div>
+				</a>
+				<ul class="dropdown-menu">
+					<li><a data-action="settings-user-defined" href="#">Benutzerdefinierte Eigenschaften</a></li>
+					<li class="divider"></li>
+					<li><a data-action="settings-content" href="#">Inhaltseigenschaften</a></li>
+					<li><a data-action="settings-page" href="#">Seiteneigenschaften</a></li>					
+				</ul>
+			</div>
+
+		</div>
+	</div>
+	
+	<div class="toolbar" data-toolbar="edit" style="display:none;right:10px">
+		<span class="item-edit-info">Feld in Bearbeitung ...</span>
+		<div class="pull-right">
+			<a class="btn button" href="#" data-action="remove-item" data-toggle="popover" data-trigger="focus" style="margin-right:100px">
+				<span class="icon glyphicon glyphicon-trash"></span>
+				<div class="text">Feld löschen</div>
+			</a>
+			<a class="btn button" href="#" data-action="cancel-edit">
+				<span class="icon glyphicon glyphicon-remove"></span>
+				<div class="text">Bearbeitung abbrechen</div>
+			</a>
+			<a class="btn button" href="#" data-action="save-item" data-toggle="popover" data-trigger="focus">
+				<span class="icon glyphicon glyphicon-save"></span>
+				<div class="text">Speichern</div>
+			</a>
+			<a class="btn button" href="#" data-action="save-item-cancel-edit">
+				<span class="icon highlight glyphicon glyphicon-saved"></span>
+				<div class="text">Speichern und schließen</div>
+			</a>
+		</div>
+	</div>
+	
+	<div class="toolbar" data-toolbar="user" style="right:10px;left:auto">
+		<a class="btn button" href="#" data-action="search">
+			<i class="icon fas fa-search"></i>
+			<div class="text">Suchen</div>
+		</a>
+		<a class="btn button" href="#" data-action="userinfo">
+			<tml:script>
+				_iconClass = context('db:'+portlet.dbkey).meta("db","useraccess") == 90 ? "fa-user-plus" : "fa-user";  
+			</tml:script>
+			<span class="icon fa <tml:item name="_iconClass"/>"></span>
+			<div class="text"><tml:meta type="database" name="username" context="[db:{portlet.dbkey}]"/></div>
+		</a>
+	</div>
+</div>
+
+<script>
+	require(["toolbar"])
+</script>

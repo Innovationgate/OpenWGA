@@ -1,0 +1,74 @@
+function Renderer() {}
+
+Renderer.prototype.render = function(App, $urlParam_id, $urlParam_dbkey, $urlParam_area, $urlParam_language) {
+
+	var ret = []
+
+	var structs = WGA.createList()
+	if($urlParam_id=="root"){
+		var area = db($urlParam_dbkey).getArea($urlParam_area);
+		var visiblefor = area.getExtensionData("CM_area_visible")
+		//console.log($urlParam_area, ""+visiblefor)
+		if(!visiblefor || visiblefor.size()==0 || db($urlParam_dbkey).isMemberOfUserList(visiblefor))
+			structs = db($urlParam_dbkey).getArea($urlParam_area).getRootEntries()
+	}
+	else{
+		var parent = db($urlParam_dbkey).getStructEntryByKey($urlParam_id);
+		if(parent){
+			structs = parent.getChildEntries();
+		}
+	}
+
+	for(let struct in Iterator(structs)){
+		if(!struct.mayReadContent())
+			continue;
+
+		var allowedPositions = [];
+		for(let key in Iterator(struct.getContentType().getAllowedPositions()))
+			allowedPositions.push(key);
+		
+		var struct_context = {
+			contenttype: struct.getContentType().getName(),
+			ctPositioning: struct.getContentType().getPositioning(),
+			allowedPositions: allowedPositions,
+			mayEditChildren: struct.mayEditChildren()==null
+		}
+
+		var c = context("db:"+$urlParam_dbkey + "/docid:" + struct.getStructKey() + "<" + $urlParam_language + ">", false);
+		if(c){
+			ret.push({
+				title: WGA.encode("html", c.TITLE),
+				//title: c.TITLE + " (" + c.POSITION + ")",
+				id: c.STRUCTKEY,
+				cssclass: App.getCssClass(c),
+				symbolclass: App.getSymbolIcon(c),
+				iconurl: App.getIconURL(c),
+				href: c.contenturl("html", null, true),
+				context: JSON.stringify(struct_context),
+				hasChildren: struct.hasChildren()
+			})
+		}
+		else if(struct.title) {
+			ret.push({
+				title: struct.title,
+				href: WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
+					.setParameter({
+						dbkey: $urlParam_dbkey,
+						structkey: struct.structKey,
+						lang: $urlParam_language
+					}).build(),
+				id: struct.structKey,
+				iconurl: "/plugin-wga-app-framework/file/icons/page_white_error.png",
+				cssclass: "not-visible",
+				context: JSON.stringify(struct_context),
+				hasChildren: struct.hasChildren()
+			})
+		}
+	}
+	
+	//console.log("ret", JSON.stringify(ret));
+
+	WGA.TMLPage.write(JSON.stringify(ret))
+
+	//WGA.TMLPage.renderDefault();
+}

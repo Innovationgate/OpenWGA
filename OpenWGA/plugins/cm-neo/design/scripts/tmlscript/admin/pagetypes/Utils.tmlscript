@@ -1,0 +1,9 @@
+function Utils() {}
+
+Utils.prototype.getMode = function(metaname){
+	var ctx = WGA.context();
+	if(ctx.document.isMetaDeterminedInSchema && ctx.document.isMetaDeterminedInSchema(metaname)){
+		return "readonly"
+	}
+	else return ctx.tmlform.mode();	
+}

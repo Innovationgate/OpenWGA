@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+
+	<head>
+		<title><tml:script expression="WGA.Brand.name"/> Content Manager</title>
+		
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name = "viewport" content = "initial-scale = 1.0, user-scalable = no">
+		
+		<script src="<tml:url type="js" name="::app"/>"></script>
+		
+		<tml:htmlhead scripts="false"/>
+		
+		<script>
+			require.config({
+				baseUrl: "<tml:meta type="request" name="wgaurl"/>/<tml:metadata name="dbkey" type="database" context="main"/>/js",
+				paths: {
+					"bootstrap": "<tml:url type="file" doc="bootstrap" file="javascripts/bootstrap.min.js"/>?noext",
+					"bootstrap-multiselect": "<tml:url type="file" doc="bootstrap-multiselect" file="js/bootstrap-multiselect.js"/>?noext",
+					"select2":	"<tml:url type="file" doc="select2-dist:js" file="select2.min.js"/>?noext"
+				},
+				shim: {
+					"bootstrap": { "deps": ["jquery"] },
+					"bootstrap-multiselect": ["css!<tml:url type="file" doc="bootstrap-multiselect" file="css/bootstrap-multiselect.css"/>?noext"],
+					"select2":	["css!<tml:url type="file" doc="select2-dist:css" file="select2.min.css"/>?noext"]					
+				}
+			})
+		</script>
+		
+		<link rel="stylesheet" href="<tml:url type="css" name="styles"/>">
+		<link rel="icon" href="/static/images/brand/icon_32.png"/>	
+		
+	</head>
+	
+	<body>
+		<tml:option name="body"/>
+	</body>
+	
+</html>

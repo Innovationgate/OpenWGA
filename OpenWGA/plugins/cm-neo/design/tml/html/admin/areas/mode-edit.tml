@@ -1,0 +1,29 @@
+<tml:action id="save">
+	//
+	if (document.getDatabase().getContentStoreVersion() >= 5) {
+		document.writeExtensionData("CM_area_visible", tmlform.fieldlist("visiblefor"))
+	}
+	tmlform.store()
+</tml:action>
+
+<tml:action id="delete">
+	document.remove();
+</tml:action>
+
+<tml:form id="form-edit-area" cssclass="form-horizontal" context="[db:{$option_dbkey}/$area:{portlet.areaname}]">
+	<div class="header"><tml:item name="areaname" type="portlet"/> ...</div>
+	
+	<div class="content">
+		<tml:{div} html_class="alert alert-danger clearfix" if="_query_delete">
+			<p style="margin:0 0 20px">Diesen Bereich wirklich löschen?</p>
+			<tml:button cssclass="btn btn-default _pull-right" clickaction="delete" portletmode="view">Bereich löschen</tml:button>
+		</tml:{div}>
+		<tml:include ref="::form"/>
+	</div>
+	
+	<div class="footer">
+		<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="view">Abbrechen</tml:button>
+		<tml:button cssclass="btn btn-primary" clickaction="save" portletmode="view">Speichern</tml:button>
+		<tml:button cssclass="btn btn-danger pull-right" clickaction="$setvar" param1="_query_delete" param2="{true}">Löschen</tml:button>
+	</div>
+</tml:form>

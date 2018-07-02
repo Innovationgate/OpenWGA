@@ -1,0 +1,20 @@
+<div id="app-outline">
+	<h1>Outline</h1>
+
+	<input type="checkbox" id="outline_in_doc_flag"><label for="outline_in_doc_flag">Outline im Dokument anzeigen</label>
+
+	<div class="alert alert-danger"></div>
+	<div class="struct"></div>
+</div>
+
+<script>
+	require(["outline"], function(Outline){
+		Outline.init();
+		WGA.portlet.registerObject("<tml:script expression="portlet.portletkey"/>", {
+			destroy: function(){
+				Outline.showHeadings(false);
+			}
+		})
+	});
+</script>
+

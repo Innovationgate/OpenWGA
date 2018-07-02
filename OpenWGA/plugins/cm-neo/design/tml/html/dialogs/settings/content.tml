@@ -1,0 +1,130 @@
+<tml:action id="save-settings">
+
+	if(!tmlform.validate())
+		return;
+
+	var validfrom = tmlform.validfrom && WGA.createCalendar(WGA.dateOnly(tmlform.validfrom))
+	if(validfrom && tmlform.validfrom_time){
+		var time = WGA.createCalendar(tmlform.validfrom_time)
+		validfrom.set(validfrom.HOUR_OF_DAY, time.get(validfrom.HOUR_OF_DAY));
+		validfrom.set(validfrom.MINUTE, time.get(validfrom.MINUTE));
+		tmlform.validfrom = validfrom.time;
+	}
+	//console.log("validfrom", tmlform.validfrom);
+
+	var validto = tmlform.validto && WGA.createCalendar(WGA.dateOnly(tmlform.validto))
+	if(validto && tmlform.validto_time){
+		var time = WGA.createCalendar(tmlform.validto_time)
+		validto.set(validto.HOUR_OF_DAY, time.get(validto.HOUR_OF_DAY));
+		validto.set(validto.MINUTE, time.get(validto.MINUTE));
+		tmlform.validto = validto.time;
+	}
+	//console.log("validto", tmlform.validto);
+
+	tmlform.store()
+	portlet.fireevent("close-dialog");
+	portlet.fireevent("content-metas-changed", {
+		contentkey: KEY,
+		dbkey: meta("db", "dbkey")
+	});
+	
+	portlet.fireevent("struct-updated", App.getStructData(content()))
+	
+	_dialog_closed=true;
+</tml:action>
+
+<tml:form unless="_dialog_closed" id="form-settings" mode="{App.mayUpdateContent(this) ? 'edit':'view'}" html_data-context="{path}" html_autocomplete="off">
+
+	<div class="header">
+		Inhaltseigenschaften
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content form-horizontal">
+	
+		<ul class="nav nav-tabs">
+			<li class="active"><a data-toggle="tab" href="#basic">Eigenschaften</a></li>
+			<li><a data-toggle="tab" href="#link">Link</a></li>
+			<li><a data-toggle="tab" href="#items">Items</a></li>
+			<li><a data-toggle="tab" href="#validity">Sichbarkeit</a></li>
+		</ul>
+
+		<div class="tab-content">
+			<div class="tab-pane active" id="basic">
+			
+				<tml:[form-field] o_label="Titel des Inhalts" o_field="title" o_meta="true"
+					o_validation="$E_VALUE!=''"
+					o_message="Bitte geben Sie einen Titel ein"
+					o_placeholder="Bitte einen Titel eingeben"
+				/>
+				<tml:[form-field] o_label="Fenstertitel (max 60 Zeichen)" o_field="browsertitle" o_meta="true"
+					o_placeholder="Alternativer Titel der Seite im Browser"
+				/>
+				<tml:[form-field] o_label="Beschreibung (max 160 Zeichen)" o_field="description" o_meta="true" o_type="textarea" o_encode="html"
+					o_placeholder="Kurze Beschreibung des Inhalts für Suchmaschinen"
+				/>
+		
+				<tml:if condition="tmlform.mode()=='edit'">
+					<tml:then>
+						<tml:script>
+							WGA.TMLPage.setVar("_opts", WGA.createList())
+							if(tmlform.keywords)
+								_opts.addAll(tmlform.fieldlist("keywords"))
+							else _opts.addAll(metalist("keywords"))
+						</tml:script>
+						<tml:[form-field] o_label="Schlüsselwörter" o_field="keywords" o_meta="true" o_type="select" o_multiple="true"
+							o_divider=", "
+							o_optionsitem="_opts"
+						/>
+					</tml:then>
+					<tml:elseif condition="metalist('keywords').size()">
+						<tml:[form-field] o_label="Schlüsselwörter">
+							<tml:meta name="keywords" divider=", "/>
+						</tml:[form-field]>
+					</tml:elseif>
+				</tml:if>
+						
+				<tml:if condition="tmlform.mode()=='edit'">
+					<tml:then>
+						<tml:[form-field] o_label="Inhalt verstecken in" o_type="checkbox" o_name="ishiddenfrom" o_meta="true"
+							o_options="Navigation|nav,Suche|search,Sitemap|sitemap"
+						/>
+					</tml:then>
+					<tml:elseif condition="metalist('ishiddenfrom').size()">
+						<tml:[form-field] o_label="Inhalt verstecken in">
+							<tml:input name="ishiddenfrom" type="checkbox" meta="true"
+								divider= ", "
+								options="Navigation|nav,Suche|search,Sitemap|sitemap"
+							/>						
+						</tml:[form-field]>
+					</tml:elseif>
+				</tml:if>
+			</div>
+			<div class="tab-pane" id="link">
+				<tml:portlet name="form-link" ref="::form-link"/>
+			</div>
+
+			<div class="tab-pane" id="items">
+				<tml:include ref="::items"/>
+			</div>
+			
+			<div class="tab-pane" id="validity">
+				<tml:include ref="::form-validity"/>
+			</div>
+		</div>
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:case condition="tmlform.mode()=='edit'">
+			<tml:button clickaction="save-settings" cssclass="btn btn-primary">Aktualisieren</tml:button>
+		</tml:case>
+	</div>
+	
+</tml:form>
+
+<script>
+	require(["<tml:url type="js" name="::settings-content"/>"], function(Module){
+		Module()
+	})
+</script>

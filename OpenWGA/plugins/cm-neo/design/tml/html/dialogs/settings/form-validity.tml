@@ -1,0 +1,50 @@
+<tml:script>
+	if(!tmlform.submitted){
+		tmlform.validfrom = VALIDFROM
+		tmlform.validfrom_time = WGA.format(VALIDFROM, "HH:mm") || "00:00"
+		tmlform.validto = VALIDTO
+		tmlform.validto_time = WGA.format(VALIDTO, "HH:mm") || "23:59"
+	}
+</tml:script>
+
+<tml:[form-field] o_label="Sichtbar ab">
+	<tml:if condition="tmlform.mode()=='edit'">
+		<tml:then>
+			<div class="clear-field-wrapper<tml:case condition="tmlform.validfrom"> col-sm-8</tml:case>">
+				<tml:input type="date" name="validfrom" meta="true" cssclass="form-control" html_placeholder="sofort" format="dd.MM.yyyy"/>
+				<a class="clear-field" style="display:none">&times;</a>
+			</div>
+			<div class="input-group col-sm-4" <tml:case condition="!tmlform.validfrom">style="display:none"</tml:case>>			
+				<tml:input type="date" name="validfrom_time" cssclass="form-control" format="HH:mm" store="false"/>
+				<div class="input-group-addon">Uhr</div>
+			</div>
+		</tml:then>
+		<tml:elseif condition="VALIDFROM">
+			<tml:meta name="validfrom" format="d. MMMMM yyyy, HH:mm"/> Uhr
+		</tml:elseif>
+		<tml:else>
+			sofort
+		</tml:else>
+	</tml:if>
+</tml:[form-field]>
+
+<tml:[form-field] o_label="Sichtbar bis">
+	<tml:if condition="tmlform.mode()=='edit'">
+		<tml:then>
+			<div class="clear-field-wrapper<tml:case condition="tmlform.validto"> col-sm-8</tml:case>">
+				<tml:input type="date" name="validto" meta="true" cssclass="form-control" html_placeholder="unbegrenzt" format="dd.MM.yyyy"/>
+				<a class="clear-field" style="display:none">&times;</a>
+			</div>
+			<div class="input-group col-sm-4" <tml:case condition="!tmlform.validto">style="display:none"</tml:case>>
+				<tml:input type="date" name="validto_time" cssclass="form-control" format="HH:mm" store="false"/>
+				<div class="input-group-addon">Uhr</div>
+			</div>
+		</tml:then>
+		<tml:elseif condition="VALIDTO">
+			<tml:meta name="validto" format="d. MMMMM yyyy, HH:mm"/> Uhr
+		</tml:elseif>
+		<tml:else>
+			unbegrenzt
+		</tml:else>
+	</tml:if>		
+</tml:[form-field]>		

@@ -1,0 +1,20 @@
+<div id="toolbars" style="display:block">
+	<div class="toolbar" style="left:10px">
+		<a class="btn button" data-action="back-to-website" href="#">
+			<img class="icon" src="/static/images/brand/icon_32.png">
+			<div class="text">
+				Zurück zur Website ...
+			</div>
+		</a>
+	</div>
+</div>
+
+<script>
+	require(["jquery"], function($){
+		$("#toolbars [data-action=back-to-website]").click(function(){
+			WGA.event.fireEvent("setMainPortletMode", "*", {
+				mode: "select-db"
+			})
+		})
+	})
+</script>

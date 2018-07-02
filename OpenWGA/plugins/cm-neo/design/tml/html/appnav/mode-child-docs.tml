@@ -1,0 +1,30 @@
+<div id="app-child-docs">
+
+	<tml:[template] o_id="appnav-child-docs">
+	
+		{{#parent}}
+			<a class="parent" href="{{href}}">
+				<i class="fas fa-arrow-up"></i>
+				{{{title}}}
+			</a>
+		{{/parent}}
+		
+		<fieldset>
+			<legend>{{current.title}}</legend>
+			
+			{{#children}}
+				<a href="{{href}}">				
+					{{{title}}}
+				</a>
+			{{/children}}
+		</fieldset>
+		
+	</tml:[template]>
+	
+</div>
+
+<script>
+	require(["child-docs"], function(CD){
+		CD.init();
+	})
+</script>

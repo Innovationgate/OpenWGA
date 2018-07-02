@@ -1,0 +1,76 @@
+<tml:action id="save-page-settings">
+
+	if(!tmlform.validate())
+		return;
+
+	tmlform.store();
+
+	portlet.fireevent("close-dialog");
+	portlet.fireevent("content-metas-changed", {
+		contentkey: KEY,
+		dbkey: meta("db", "dbkey")
+	});
+</tml:action>
+
+<tml:form id="form-page-settings" context="[$struct:{document.structKey}]">
+
+	<tml:script>
+		setoption("mode", tmlform.mode())
+
+		var pagetypes = WGA.createList()
+		for(let ct in Iterator(db().getContentTypes())){
+			pagetypes.add(ct.name)
+		}
+		WGA.TMLPage.setVar("_pagetypes", pagetypes)
+	</tml:script>
+
+	<div class="header">
+		<a data-modal="hide">&times;</a>
+		Seiteneigenschaften
+	</div>
+	
+	<div class="content form-horizontal">
+
+		<ul class="nav nav-tabs">
+			<li class="active"><a data-toggle="tab" href="#basic">Eigenschaften</a></li>
+			<li><a data-toggle="tab" href="#access">Berechtigungen</a></li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane active" id="basic" _style="padding:10px 0">
+				<tml:case condition="WGA.app().isManager()">
+					<tml:[form-field] o_label="Eindeutiger Name" o_name="UNIQUENAME" o_meta="true" o_mode="{WGA.app().isManager() ? 'edit':'view'}"/>
+					<tml:[form-field] o_label="Seitentitel" o_name="title" o_meta="true" o_mode="{WGA.app().isManager() ? 'edit':'view'}"/>
+				</tml:case>
+				<tml:[form-field] o_label="Seitentyp" o_name="contenttype" o_meta="true" o_type="select" o_optionsitem="_pagetypes"
+					o_mode="{WGA.app().isManager() ? 'edit':'view'}" 
+					o_changeaction="$refresh"/>
+				
+				<tml:script>
+					var workflows=WGA.createList();
+					var ct_workflow = db().getContentType(tmlform.contenttype).getWorkflow() || "kein Workflow"
+					workflows.add("aus Seitentyp: " + ct_workflow + "|");
+					workflows.addAll(db().getWorkflowEngine().getWorkflowDefinitions().keySet());
+					WGA.TMLPage.setVar("_workflows", workflows)
+				</tml:script>
+				<tml:[form-field] o_label="Workflow" o_name="OVERRIDE_WORKFLOW" o_meta="true" o_type="select"
+					o_mode="{WGA.app().isChiefEditor() ? 'edit':'view'}" 
+					o_optionsitem="_workflows"
+				/>
+			</div>
+			<div class="tab-pane" id="access" _style="padding:10px 0">
+				<tml:comment><tml:[form-field] o_label="Wer darf Unterseiten erstellen" o_name="x"/>
+				<tml:[form-field] o_label="Wer darf diese Seite bearbeiten" o_name="x"/>
+				<tml:[form-field] o_label="Wer darf diese Seite und Unterseiten lesen" o_name="x"/></tml:comment>
+			</div>
+		</div>
+				
+	</div>
+
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:case condition="WGA.app().isChiefEditor()">
+			<tml:button clickaction="save-page-settings" cssclass="btn btn-primary">Aktualisieren</tml:button>
+		</tml:case>
+	</div>
+	
+</tml:form>	

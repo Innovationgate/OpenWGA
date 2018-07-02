@@ -1,0 +1,14 @@
+var filterTable = WGA.createLookupTable();
+for (var accessLevel in Iterator(db().REAL_ACCESSLEVELS.values())) {
+	if (accessLevel.getCode() > db().ACCESSLEVEL_READER && accessLevel.getCode() <= db().ACCESSLEVEL_MANAGER) {
+		log.info("Creating access level filter for level \"" + accessLevel.getName() + "\""); 
+		var filter = new Packages.de.innovationgate.cm.filter.AccessLevelFilter(accessLevel.getCode());
+		var filterUid = Packages.de.innovationgate.webgate.api.WGFactory.getInstance().addUserAccessFilter(filter);	
+		filterTable.put(accessLevel.getCode(), filterUid);
+	}
+}
+
+db().setAttribute("CM.FilterUids", filterTable);
+//WGA.design().registerGlobal("CM", createObject("api"));
+
+WGA.app().managedGlobal("App", $.app);

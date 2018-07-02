@@ -1,0 +1,46 @@
+<tml:include ref="page" o_title="[{WGA.Brand.name} Content Manager]">
+	<div class="splash">
+	
+		<img class="logo" src="<tml:url type="static" file="images/brand/logo_600.png"/>">
+	
+		<form id="select-db-form" onsubmit="return selectDb(this)">
+			<h1>Website auswählen</h1>
+			<tml:case condition="option('msg')">
+				<div class="alert alert-warning">
+					<tml:option name="msg"/>
+				</div>
+			</tml:case>
+			<div class="form-group">
+				<label style="display:none" class="control-label">Bitte geben Sie den Namen der Wesbite ein ...</label>
+				<input name="dbkey" class="form-control" placeholder="Name (Schlüssel) der Website" value="<tml:item name="dbkey" type="portlet"/>">
+			</div>
+			<div class="form-group">
+				<button type="submit" class="btn btn-primary">Weiter ...</button>
+			</div>
+		</form>
+	</div>
+</tml:include>
+
+<script>
+	function selectDb(form){
+		var dbkey = form.elements["dbkey"].value
+		if(!dbkey){
+			$(form).find("[name=dbkey]").closest(".form-group").addClass("has-error")
+				.find("label").show();
+			return false;
+		}
+		location.hash=form.elements["dbkey"].value
+		WGA.ajax.action({
+			action: "<tml:action>
+				portlet.dbkey = request.getParameter("dbkey")
+			</tml:action>",
+			params: {
+				dbkey: form.elements["dbkey"].value
+			}
+		})
+		return false
+	}
+	require(["jquery"], function($){
+		$("#select-db-form input[name=dbkey]").focus();
+	})
+</script>

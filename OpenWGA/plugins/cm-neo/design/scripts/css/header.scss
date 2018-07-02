@@ -1,0 +1,95 @@
+#header {
+	background-color: $base_blue;
+	color: white;
+	.logo {
+		position: absolute;
+		z-index: 1;
+		width: 69px;
+		left: 44px;
+		transition: width .3s ease-in;
+	}
+
+	.title {
+		font-size: 200%;
+		margin: 0px 10px;
+		float: right;
+	}
+
+	#toolbars{
+		display: none;
+		
+		.toolbar {
+	
+			position: absolute;
+			right: 250px;
+			left: $appnav_width;
+			top: -1px;
+			.button {
+				color: white;
+				padding: 0 5px;
+				.icon {
+					background: #ebebeb;
+					border: solid 1px #337ab7;
+					color: #337ab7;
+					border-radius: 5px;
+					font-size: 125%;
+					padding: 0px 20px;
+					height: 30px;
+					line-height: 30px;
+					display: inline-block;
+					&.highlight {
+						background: green;
+						color: white;
+					}
+				}
+				&:focus .icon {
+					background: silver;
+					border-color: yellow;
+					color: white;
+				}
+				&:hover .icon {
+					border-color: yellow;
+				}
+				.text {
+	 				font-size: 80%;	 				
+					margin-top: 5px;
+				}
+			}
+			
+			.spacer{
+				display: inline-block;
+				width: 50px;
+				@media screen and (max-width: 1050px){
+					width: 00px;
+				}
+			}
+			
+			.item-edit-info:{
+				font-size: 2em;
+				line-height: 1em;
+			}
+			
+		}
+
+		@media screen and (max-width: $width_breakpoint){
+			.toolbar{
+				left: $appnav_width - 50px;
+				right: 220px;
+				.button{
+					.icon{
+						padding: 0 10px;
+					}
+					.text{
+						font-size: 63%;
+					}
+				}				
+			}
+		}
+
+	}
+
+}
+
+#page.appnav #header .logo {
+	width: 110px;
+}

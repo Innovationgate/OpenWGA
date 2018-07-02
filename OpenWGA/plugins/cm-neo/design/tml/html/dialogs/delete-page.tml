@@ -1,0 +1,71 @@
+<tml:action id="delete-page">
+
+	var struct = content() ? content().getStructEntry() : document;
+
+	portlet.fireevent("page-deleted", {
+		id: struct.getStructKey() 
+	})
+
+	var parent = struct.getParentEntry()
+	portlet.fireevent("close-dialog", {
+		redirectto: parent ? WGA.app().getBaseURL() + "/html/default/" + parent.getStructKey() : WGA.app().getHomepageURL()
+	})
+
+	struct.remove()
+	portlet.setmode("hidden");
+
+</tml:action>
+
+<tml:case portletmode="view">
+
+	<tml:script>
+		var struct = content() ? content().getStructEntry() : document;
+		var Struct = AFW.structentry(struct)
+		_mayDelete = Struct.mayDeletePage(true);
+		if(!_mayDelete){
+			_reason = Struct.getReason();
+		}
+		_isHomepage = WGA.app().getHomepage() && WGA.app().getHomepage().STRUCTKEY==struct.getStructKey()
+	</tml:script>
+	
+	<tml:if istrue="_mayDelete">
+		<tml:then>
+			<div class="header">
+				Seite löschen
+				<a data-modal="hide">&times;</a>
+			</div>
+			
+			<div class="content">
+				<tml:case istrue="_isHomepage">
+					<div class="alert alert-danger">
+						<h4>Dies ist die Homepage der Website.</h4>
+						Die Website wird nicht mehr korrekt funktionieren, wenn Sie diese Seite löschen.
+					</div> 
+				</tml:case>
+				Möchten Sie die Seite "<tml:meta name="title"/>" inklusiver aller Inhlatsversionen und Unterseiten wirklich löschen?
+			</div>
+			
+			<div class="footer">
+				<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+				<tml:button cssclass="btn btn-primary" clickaction="delete-page">Löschen</tml:button>
+			</div>
+		</tml:then>
+		<tml:else>
+			<div class="header">
+				Löschen der Seite nicht möglich
+				<a data-modal="hide">&times;</a>
+			</div>
+			
+			<div class="content">
+				Die Prüfung Ihrer Berechtigung zum Löschen der Seite "<tml:meta name="title"/>" ergab:
+				<div style="color:red"><tml:item name="_reason"/></div>
+			</div>
+			
+			<div class="footer">
+				<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+			</div>
+			
+		</tml:else>
+	</tml:if>
+	
+</tml:case>

@@ -1,0 +1,24 @@
+form{
+	input[type=text].form-control, textarea.form-control{
+		padding: 5px;
+	}
+
+	select.form-control{
+		padding: 5px 2px;
+	}
+	
+	.clear-field-wrapper {
+		position: relative;
+		.clear-field {
+			cursor: pointer;
+		    position: absolute;
+		    right: 18px;
+		    top: 6px;
+		    z-index: 1
+		}
+		&.col-sm-8 {
+			padding: 0 10px 0 0
+		}
+	}
+	
+}

@@ -1,0 +1,18 @@
+<table class="table">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Typ</th>
+			<th>Wert</th>
+		</tr>
+	</thead>
+	<tbody>
+	<tml:foreach item="$mc.itemnames" currentvalue="_itemname" sortexpression="_itemname" sortorder="ascending">
+		<tr>
+			<td><tml:item name="_itemname"/></td>
+			<td nowrap><tml:item name="$mc.type" a-itemname="_itemname"/></td>
+			<td><tml:item name="$mc.value" a-itemname="_itemname" encode="html"/></td>
+		</tr>
+	</tml:foreach>
+	</tbody>
+</table>

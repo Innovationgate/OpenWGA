@@ -1,0 +1,80 @@
+#app-outline {
+
+	padding: 10px;
+
+	.alert{
+		display: none;
+	}
+
+	.struct {
+		margin: 10px 0;
+		
+		.loading{
+			font-style: italic;
+			color: silver;
+		}
+		
+		.tag {
+			padding: 2px 0;
+			margin-left: 30px;
+			font-size: .9em;
+			border-bottom: solid silver 1px;
+			&.error {
+				color: red;
+				font-style: italic;
+				&:before {
+					background: red;
+				}
+			}
+			&:before {
+				float: left;
+				color: white;
+				background: $base_blue;
+				padding: 0 4px;
+				border-radius: 5px;
+				margin-left: -30px;
+			}
+		}
+		.tag-H1 {
+			font-weight: bold;
+			&:before {
+				content: "H1";
+			}
+		}
+		.tag-H2 {
+			padding-left: 30px;
+			&:before {
+				content: "H2";
+			}
+		}
+		.tag-H3 {
+			padding-left: 60px;
+			color: gray;
+			&:before {
+				content: "H3";
+			}
+		}
+		.tag-H4 {
+			padding-left: 90px;
+			color: gray;
+			&:before {
+				content: "H4";
+			}
+		}
+		.tag-H5 {
+			padding-left: 120px;
+			color: gray;
+			&:before {
+				content: "H5";
+			}
+		}
+		.tag-H6 {
+			padding-left: 150px;
+			color: gray;
+			&:before {
+				content: "H6";
+			}
+		}
+	}
+
+}

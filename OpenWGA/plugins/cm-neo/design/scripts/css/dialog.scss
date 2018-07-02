@@ -1,0 +1,309 @@
+#dialog-attachment-metas {
+	width: 800px;
+	margin-left: -400px;
+	.poster {
+		float: left;
+		width: 200px;
+		text-align: center;
+		img {
+			max-width: 100%;
+			box-layout: border-box;
+			padding: 10px;
+			border: solid silver 1px;
+		}
+		.info {
+			margin-top:10px;
+			color: gray;
+		}
+	}
+	.metas {
+		margin-left: 200px;
+		overflow: hidden;
+	}
+}
+
+@mixin split-view{
+	width: 60%;
+	margin-left: -30%;
+	height: 80%;
+	.header {
+		position: absolute;
+		height: 70px;
+		top: 0;
+		left: 0;
+		right: 0;
+	}
+
+	.content {
+		min-height: 300px;
+		position: absolute;
+		top: 70px;
+		bottom: 65px;
+		left: 0;
+		right: 0;
+		.nav{
+			width:30%;
+			position:absolute;
+			top:0;
+			left:0;
+			bottom:0;
+			overflow:auto;
+			.nav-link{
+				display: block;
+				margin: 5px 0;
+				padding: 2px 5px;
+				border: solid silver 1px;
+				border-radius: 4px;
+				&.selected{
+					background: #efefef;
+				}
+			}
+		}
+		.data{
+			width:70%;
+			position:absolute;
+			border-left: solid #efefef 1px;
+			top:0;
+			bottom:0;
+			left:30%;
+			overflow:auto;
+		}
+	}
+
+	.footer {
+		position: absolute;
+		height: 65px;
+		bottom: 0;
+		left: 0;
+		right: 0;
+	}
+}
+
+#dialog-pagetypes{
+	@include split-view;
+}
+
+#dialog-content-modules{
+	width: 60%;
+	margin-left: -30%;
+	height: 80%;
+
+	.header {
+		position: absolute;
+		height: 70px;
+		top: 0;
+		left: 0;
+		right: 0;
+		.title{
+			float:left;
+			width: 30%;
+		}
+		.module{
+			float:left;
+			margin-left: 5px;
+		}
+	}
+
+	.content {
+		position: absolute;
+		top: 70px;
+		bottom: 65px;
+		left: 0;
+		right: 0;
+	}
+
+	.footer {
+		position: absolute;
+		height: 65px;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		text-align: left;
+	}
+
+	.content-modules-toolbar {
+		float: left;
+	}
+
+	#module-tree{
+		.section{
+			//background: black;
+			//color: white;
+			margin: 5px;
+			padding: 5px 0;
+			border: solid silver 1px;
+			border-radius: 4px;
+		}
+		.icon{
+			filter: grayscale(100%);
+		}
+		.entry.error{
+			color: red;
+			.icon{
+				filter: none;
+			}
+		}
+	}
+
+	.content-module-list {
+		max-height: 450px;
+		width: 300px;
+		overflow: auto;
+
+		a {
+			cursor: pointer;
+			display: block;
+			padding: 5px 10px;
+			&:hover {
+				background: #efefef;
+				text-decoration: none;
+			}
+		}
+		.container-toggle {
+			background: #337ab7;
+			color: white;
+			margin-bottom: 1px;
+			&:hover {
+				background: gray;
+			}
+			&:after {
+				float: right;
+				content: "+";
+			}
+			&.open:after {
+				content: "-";
+			}
+		}
+		ul.module-list {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+			max-width: 300px;
+		}
+	}
+}
+.select2-img {
+	img {
+		height: 40px;
+		float: left;
+		margin-top: 2px;
+	}
+	.title {
+		float: right;
+		margin-right: 10px;
+	}
+}
+
+#dialog-settings_content, #dialog-settings_user-defined {
+	width: 900px;
+	margin-left: -450px;
+}
+
+#dialog-settings_content {
+	.content{
+		visibility: hidden;
+	}
+}
+
+#dialog-seo {
+	width: 800px;
+	margin-left: -400px;
+	.tab-pane {
+		padding: 10px 0;
+	}
+
+	.nav-tabs a.error {
+		color: red;
+	}
+	#seo-doc-struct {
+		.struct {
+			margin: 10px 0;
+		}
+		.tag {
+			padding: 2px 0;
+			&.error {
+				color: red;
+				font-style: italic;
+			}
+		}
+		.tag-H1 {
+			font-weight: bold;
+		}
+		.tag-H2 {
+			padding-left: 20px;
+		}
+		.tag-H3 {
+			padding-left: 40px;
+			color: gray;
+		}
+		.tag-H4 {
+			padding-left: 60px;
+			color: gray;
+		}
+		.tag-H5 {
+			padding-left: 80px;
+			color: gray;
+		}
+		.tag-H6 {
+			padding-left: 100px;
+			color: gray;
+		}
+	}
+
+	#seo-searchengine {
+		.anzeige {
+			margin: 20px 0;
+			padding: 20px;
+			border: solid silver 1px;
+			.title, [name=browsertitle] {
+				color: #1a0dab;
+				font-size: 1.5em;
+				margin: 0;
+				border: none;
+				width: 100%;
+				outline: none;
+			}
+			.url {
+				color: #006621;
+				margin: 5px 0;
+			}
+			.description, [name=description] {
+				color: ​​#545454;
+				margin: 0;
+				border: none;
+				width: 100%;
+				outline: none;
+			}
+		}
+	}
+
+	#seo-w3c {
+		.error {
+			color: red;
+		}
+	}
+	
+	.sitemap label{
+		display:inline-block;
+		width: 200px;
+		font-weight: normal;
+	}
+}
+
+#dialog-userinfo{
+	.row-wrapper {
+		margin: 5px 0;
+		label {
+			float: left;
+			width: 100px;
+		}
+		div {
+			margin-left: 110px;
+		}
+	}
+}
+
+#dialog-edit-html {
+	width: 800px;
+	margin-left: -400px;
+}

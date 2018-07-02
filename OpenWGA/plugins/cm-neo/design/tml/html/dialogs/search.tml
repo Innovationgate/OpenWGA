@@ -1,0 +1,29 @@
+<tml:action id="search">
+	var ctx = context("docid:"+tmlform.name_or_key, false);
+	if(ctx){
+		portlet.fireevent("close-dialog", {
+			redirectto: ctx.contenturl()
+		})
+		_dialog_closed=true;
+	}
+	else tmlform.addmessage("Seite nicht gefunden")
+</tml:action>
+
+<tml:form id="form-create-content" source="none" unless="_dialog_closed">
+
+	<div class="header">
+		Seite auswählen
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content form-horizontal">
+		<tml:[form-messages]/>
+		<tml:[form-field] o_label="Name oder Schlüssel" o_name="name_or_key" o_focus="true"/>		
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:button cssclass="btn btn-primary" html_type="submit" clickaction="search">Suchen</tml:button>
+	</div>
+	
+</tml:form>

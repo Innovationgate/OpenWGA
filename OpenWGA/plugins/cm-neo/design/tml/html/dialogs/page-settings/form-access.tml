@@ -1,0 +1,71 @@
+<tml:script>
+
+	var childEditors=document.getChildEditors();
+	var value="";
+	if(!childEditors.isEmpty()){
+		value=childEditors.get(0);	
+		if(value!="" && value!="*" && value!="%none")
+			value="custom";
+	}
+	if(tmlform.child_editors==null)
+		tmlform.child_editors=value;
+	if(value=="custom" && !tmlform.custom_child_editors){
+		tmlform.custom_child_editors=childEditors;
+	}
+
+	var pageEditors=document.getPageEditors();
+	var value="";
+	if(!pageEditors.isEmpty()){
+		value=pageEditors.get(0);
+		if(value!="" && value!="*" && value!="%none")
+			value="custom";
+	}
+	if(tmlform.page_editors==null)
+		tmlform.page_editors = value;
+	if(value=="custom" && !tmlform.custom_page_editors){
+		tmlform.custom_page_editors=pageEditors;
+	}
+
+	if(tmlform.page_readers==null)
+		tmlform.page_readers = (document.getReaders().size() ? "custom":"")
+	if(tmlform.page_readers=="custom" && !tmlform.custom_page_readers)
+		tmlform.custom_page_readers = document.getReaders();
+
+</tml:script>
+
+<tml:[form-field] o_label="Unterseiten erstellen" o_name="child_editors" o_store="false"
+	o_type="select"
+	o_options="vererbt|,jeder|*,nur definierte Benutzer|custom,nur Chief-Editoren|%none"
+	o_changeaction="$refresh"
+/>
+<tml:case condition="tmlform.child_editors=='custom'">
+	<tml:[form-field] o_name="custom_child_editors" o_store="false" o_type="textarea" o_multiple="true"/>
+	<hr>
+</tml:case>
+	
+<tml:[form-field] o_label="Diese Seite bearbeiten" o_name="page_editors" o_store="false"
+	o_type="select"
+	o_options="vererbt|,jeder|*,nur definierte Benutzer|custom,nur Chief-Editoren|%none"
+	o_changeaction="$refresh"
+/>
+<tml:case condition="tmlform.page_editors=='custom'">
+	<tml:[form-field] o_name="custom_page_editors" o_store="false" o_type="textarea" o_multiple="true"/>
+	<hr>
+</tml:case>
+				
+<tml:[form-field] o_label="Diese Seite lesen" o_name="page_readers" o_store="false"
+	o_type="select"
+	o_options="vererbt|,nur definierte Benutzer|custom"
+	o_changeaction="$refresh"
+/>
+<tml:case condition="tmlform.page_readers=='custom'">
+	<tml:[form-field] o_name="custom_page_readers" o_store="false" o_type="textarea" o_multiple="true"/>
+</tml:case>
+
+<script>
+	require(["jquery"], function($){
+		$("#<tml:script expression="tmlform.formid"/> [name=custom_child_editors]").autogrow()
+		$("#<tml:script expression="tmlform.formid"/> [name=custom_page_editors]").autogrow()
+		$("#<tml:script expression="tmlform.formid"/> [name=custom_page_readers]").autogrow()
+	})
+</script>

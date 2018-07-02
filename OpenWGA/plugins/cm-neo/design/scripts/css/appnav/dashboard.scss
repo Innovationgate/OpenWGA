@@ -1,0 +1,32 @@
+#appnav .dashboard {
+
+	padding: 10px;
+
+	fieldset{
+		legend{
+			margin: 15px 10px 5px 5px;
+		}
+		&:first-child legend{
+			margin-top: 0;
+		}
+	}
+	
+	.entry{
+		margin: 5px 0;
+		padding: 2px 5px;
+		overflow: hidden;
+		&.selected{
+			border: solid silver 1px;
+			border-radius: 4px;
+			background: #efefef;
+		}
+		.info{
+			font-size: 0.8em;
+			color: gray;
+		}
+		a {
+			display: block;
+		}
+	}
+	
+}

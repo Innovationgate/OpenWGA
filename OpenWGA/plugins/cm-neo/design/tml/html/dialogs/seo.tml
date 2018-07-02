@@ -1,0 +1,91 @@
+<tml:action id="save-seo">
+	
+	tmlform.store();
+	
+	portlet.fireevent("close-dialog", {
+		redirectto: contenturl("html", null, true)
+	});
+	_dialog_closed=true;
+</tml:action>
+
+<tml:action id="open-content-settings">
+	portlet.fireevent("open-dialog", {
+		dialog: "settings:content"
+	})
+	_dialog_closed=true
+</tml:action>
+
+<tml:form id="seo" unless="_dialog_closed" mode="{App.mayUpdateContent(this) ? 'edit':'view'}">
+
+	<div class="header">
+		SEO
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content">
+		<ul class="nav nav-tabs">
+			<li class="active"><a data-toggle="tab" href="#seo-searchengine">Suchmaschinen</a></li>
+			<li><a data-toggle="tab" href="#seo-word-cloud">Inhalt</a></li>
+			<li><a data-toggle="tab" href="#seo-w3c">W3C Validierung</a></li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane active" id="seo-searchengine">
+				<div class="anzeige">
+					<tml:input name="browsertitle" meta="true" html_data-focus="true" html_placeholder="{WGA.encode('html', TITLE)}"/>
+					<div class="url"><tml:script>
+						var url = WGA.urlBuilder(this);
+						url.setHost("meine-domain.com");
+						url.setPort(80);
+						// check titlePath
+						var tpm = db().getAttribute(WGA.getCore().DBATTRIB_TITLEPATHMANAGER);
+						if(tpm && url.getPath()!="/"){
+							var langChooser = new Packages.de.innovationgate.wgpublisher.lang.WebTMLLanguageChooser(db(), this)
+							var path = tpm.buildTitlePath(content(), "html", langChooser); 
+							url.setPath("/" + path.toArray().join("/"));
+						}
+						return url.build(true);						
+					</tml:script></div>
+					<tml:input name="description" type="textarea" meta="true"/>
+				</div>
+				
+				<div class="clearfix">
+					<div style="width:50%;float:left">
+						<h4>Robots</h4>
+						<tml:input meta="true" name="seo_robots_index" type="boolean" options="index|true"/>
+						<br>
+						<tml:input meta="true" name="seo_robots_follow" type="boolean" options="follow|true"/>
+					</div>
+					<div style="width:50%;float:left" class="sitemap">
+						<h4>Sitemap</h4>
+						<label>Updatehäufigkeit:</label>
+						<tml:input meta="true" name="seo_sitemap_changefreq" type="select" options="stündlich|hourly,täglich|daily,wöchentlich|weekly,monatlich|monthly,jährlich|yearly" default="monthly"/>
+						<br>
+						<label>Relative Priorität (1-10):</label>
+						<tml:input meta="true" name="seo_sitemap_priority" type="select" options="1 (niedrig)|0.1,2|0.2,3|0.3,4|0.4,5 (normal)|0.5,6|0.6,7|0.7,8|0.8,9|0.9,10 (hoch)|1" default="0.5"/>						
+					</div>
+				</div>
+			</div>
+			
+			<div class="tab-pane clearfix" id="seo-word-cloud">
+				<div class="content-words" style="width:50%;float:left">
+					<h4>TOP 10 Begriffe</h4>
+				</div>
+				<div class="stats" style="width:50%;float:left">
+					<h4>Statistik</h4>
+				</div>
+			</div>
+			<div class="tab-pane" id="seo-w3c">
+				<a class="btn btn-primary" href="#w3c-validate">HTML Validieren ...</a>
+			</div>
+		</div>
+		
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Schließen</a>
+		<tml:case condition="tmlform.mode()=='edit'">
+			<tml:button clickaction="save-seo" cssclass="btn btn-primary">Aktualisieren</tml:button>
+		</tml:case>
+	</div>
+	
+</tml:form>

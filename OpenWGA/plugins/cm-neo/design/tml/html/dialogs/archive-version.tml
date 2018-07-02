@@ -1,0 +1,60 @@
+<tml:action id="archive-content">
+	
+	var lang = LANGUAGE;
+	var structkey = STRUCTKEY;
+	var dbkey = meta("db", "dbkey");
+	var struct = content().structEntry;
+
+	content().archive("");
+	//console.log("archived");
+	
+	var clist=AFW.structentry(structkey).getAllContent(lang, false);
+	if(clist.isEmpty()){
+		var url = WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL())
+		url.setParameter({
+			dbkey: dbkey,
+			structkey: structkey,
+			lang: lang
+		})
+		portlet.fireevent("close-dialog", {
+			redirectto: url.build()
+		})
+		portlet.fireevent("struct-updated", App.getStructData(struct))
+	}
+	else {
+		var doc = context(clist.get(0));
+		//console.log("redirct to version", doc.VERSION);
+		portlet.fireevent("close-dialog", {
+			redirectto: doc.contenturl("html", null, true)
+		})
+		portlet.fireevent("struct-updated", App.getStructData(doc))
+	}
+	_dialog_closed=true
+</tml:action>
+
+<tml:case isfalse="_dialog_closed">
+	<div class="header">
+		Inhaltsversion archivieren
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content form-horizontal">
+		<tml:[form-field] o_label="Titel">
+			<tml:metadata name="title"/>
+		</tml:[form-field]>
+		<tml:[form-field] o_label="Sprache">
+			<tml:metadata name="language"/>
+		</tml:[form-field]>
+		<tml:[form-field] o_label="Status">
+			<tml:label key="[content-properties.status.{STATUS}]"/>
+		</tml:[form-field]>
+		<tml:[form-field] o_label="Version">
+			<tml:metadata name="version"/>
+		</tml:[form-field]>
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:button cssclass="btn btn-primary" clickaction="archive-content">Archivieren</tml:button>
+	</div>
+</tml:case>

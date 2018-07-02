@@ -1,0 +1,19 @@
+<tml:[form-messages] o_title="Workflow-Level kann nicht gespeichert werden"/>
+
+<tml:[form-field] o_label="Workflow-Level für Workflow" o_mode="view"><tml:item name="$pc.workflow.name"/></tml:[form-field]>
+
+<tml:[form-field] o_label="Name des Levels" o_field="name" o_mode="{portlet.mode=='new-level'?'edit':'view'}"
+	o_validation="$E_VALUE!=''"
+	o_message="Kein Name angegeben"
+/>
+
+<tml:[form-field] o_label="Position" o_field="position" o_type="number" o_default="0"/>
+<tml:[form-field] o_label="Optionale Beschreibung" o_field="description" o_type="textarea"/>
+<tml:[form-field] o_label="Liste der Genehmiger" o_field="reviewer" o_multiple="true" o_type="textarea"/>
+<tml:[form-field] o_label="# notwendige Genehmigungen" o_field="reviewercount" o_type="number" o_default="1"/>
+
+<script>
+	require(["jquery", "jquery-textarea-autogrow"], function($){
+		$("#<tml:script expression="tmlform.formid"/> textarea").autogrow();
+	})
+</script>

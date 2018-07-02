@@ -1,0 +1,27 @@
+function Renderer() {}
+
+Renderer.prototype.render = function($urlParam_context, $urlParam_query, $urlParam_pagesize, $urlParam_page) {
+
+	var json = {
+		results: [],
+		pagination: {
+			more: false
+		}	
+	}
+	
+	var ctx = WGA.context($urlParam_context, false);
+	if(ctx){
+		var query = "select distinct(name) from content_keywords where name!='' and name like '" + $urlParam_query + "%' order by name"		
+		var page = WGA.app(ctx).query("sql", query).getPage($urlParam_pagesize*($urlParam_page-1)+1, $urlParam_pagesize)
+		for(let keyword in Iterator(page)){
+			json.results.push({
+				text: keyword.column1,
+				id: keyword.column1
+			})
+		}
+		json.pagination.more = !page.endReached
+	}
+
+	//console.log(JSON.stringify(json));
+	WGA.TMLPage.write(JSON.stringify(json))
+}

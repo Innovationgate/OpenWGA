@@ -1,0 +1,15 @@
+function Controller() {}
+
+Controller.prototype.prepare = function($pMode, $form, $pc, $option_dbkey, $portlet_wfname, $portlet_levelindex) {
+	if($pMode=="new-level")
+		return;
+
+	var wflevel = $pc.workflowlevel($option_dbkey, $portlet_wfname, $portlet_levelindex); 
+	
+	$form.name=wflevel.getName();
+	$form.description=wflevel.getDescription();
+	$form.position=wflevel.getPosition();
+	$form.reviewer=wflevel.getReviewers();
+	$form.reviewercount=wflevel.getReviewerCount();
+
+}

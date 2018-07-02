@@ -1,0 +1,28 @@
+<tml:script>
+	_getMode = function(metaname){	
+		if(document.isMetaDeterminedInSchema && document.isMetaDeterminedInSchema(metaname)){
+			return "view"
+		}
+		else return tmlform.mode();
+	}
+</tml:script>
+
+<tml:[form-field] o_label="Name" o_field="name" o_meta="true"
+	o_validation="$E_VALUE!=''"
+	o_message="Kein Name angegeben"
+	o_mode="{portlet.mode=='new'?'edit':'view'}"
+/>
+
+<tml:[form-field] o_label="Titel" o_field="title" o_meta="true"
+	o_validation="$E_VALUE!=''"
+	o_message="Kein Titel angegeben"
+	o_mode="{_getMode('title')}"
+/>
+
+<tml:[form-field] o_label="Editoren" o_mode="{_getMode('editors')}" o_type="textarea" o_meta="true" o_name="editors" o_multiple="true"/>
+
+<script>
+	require(["jquery", "jquery-textarea-autogrow"], function($){
+		$("#<tml:script expression="tmlform.formid"/> textarea").autogrow();
+	})
+</script>

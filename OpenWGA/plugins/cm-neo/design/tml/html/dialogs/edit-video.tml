@@ -1,0 +1,143 @@
+<tml:action id="update-poster">
+	portlet.fireevent("close-dialog")
+	portlet.fireevent("attachments-updated")
+	_closed=true;
+</tml:action>
+
+<tml:action id="edit-metas">
+	portlet.fireevent("open-dialog", {
+		dialog: "attachment-metas",
+		filename: portlet.filename
+	})
+	_closed=true;
+</tml:action>
+
+<tml:case condition="!_closed">
+	
+	<tml:script>
+		var filename = request.getParameter("filename")
+		if(filename)
+			portlet.filename = filename
+		_file_md = content().getFileMetaData(portlet.filename)
+		_Attachment = AFW.content().attachment(portlet.filename)
+
+		// used as URL parameter for file uploads
+		_so=AFW.Util.serializeJsObject({
+			dbkey: meta("database", "dbkey"),
+			contentkey: KEY,
+			filename: filename
+		})				
+	
+		// poster:
+		_poster=null;
+		_time=_file_md.getCustomFieldValue("time");
+		var d = WGA.selectDerivate(portlet.filename, "usage=poster")
+		if(d){
+			var url = WGA.urlBuilder(fileurl(portlet.filename))
+			var cs = d.getSha512Checksum()
+			url.setParameter("derivate", "usage=poster");
+			url.setParameter("cs", cs);
+			_poster = url.build();
+		}
+		//console.log("poster", _time, _poster);
+	
+	</tml:script>
+	
+	<div class="header">
+		Video Poster bearbeeiten
+	</div>
+	
+	<div class="content" style="text-align:center">
+		<video preload="metadata" controls="controls" style="max-width:100%"
+			<tml:case condition="_poster">
+				poster="<tml:item name="_poster"/>"
+			</tml:case>
+		>
+			<source src="<tml:url file="{portlet.filename}"/>" type="<tml:script expression="_file_md.mimeType"/>"/>
+		</video>
+	</div>
+	
+	<div class="footer">
+		<div class="pull-left">
+			<tml:button cssclass="btn btn-default" clickaction="edit-metas">
+				<i class="fa fa-arrow-left"></i>
+				Datei Metadaten
+			</tml:button>
+		</div>
+		
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<button class="btn btn-primary" data-action="update">Aktualisieren</button>
+	</div>
+
+	<script>
+		require(["jquery", "sitepanel", "afw/file-uploader"], function($, SitePanel){
+			var video = $("#dialog-edit-video video");
+			var video_el = video[0]
+			<tml:case condition="_time">
+				try{
+					video_el.currentTime = <tml:item name="_time"/>;
+				}
+				catch(e){
+					console.log(e);
+				}
+				video.on("loadedmetadata", function(){
+					video_el.currentTime = <tml:item name="_time"/>;
+				});
+			</tml:case>			
+			$("#dialog-edit-video [data-action=update]").click(function(){
+				var canvas = document.createElement("canvas");
+				canvas.width=video_el.videoWidth;
+				canvas.height=video_el.videoHeight;
+				var ctx = canvas.getContext('2d');
+				ctx.drawImage(video_el, 0, 0);
+				if(canvas.toBlob){
+					canvas.toBlob(uploadFile, "image/jpeg", .95)
+				}
+				else{
+					dataURItoBlob(canvas.toDataURL("image/jpeg", .95), uploadFile)
+				}
+				$.wga_modal.hide();
+			})
+			
+			function uploadFile(file){
+				new AFW.FileUploader(file, "<tml:url type="tml" medium="json" name="upload-video-poster"/>", {
+					urlparams: {
+						context: "<tml:item name="_so"/>",
+						time: video_el.currentTime
+					},
+					onSuccess: function(){
+						WGA.event.fireEvent("attachments-updated", "<tml:script expression="portlet.portletkey"/>",{});
+						if(SitePanel.getWindow() && SitePanel.getWindow().WGA){
+							SitePanel.getWindow().WGA.event.fireEvent("derivates-updated", "<tml:script expression="portlet.portletkey"/>",{
+								filename: "<tml:item name="filename" type="portlet"/>"
+							});
+						}
+					}
+				})
+			}
+
+			// helper function needed for webkit
+
+			function dataURItoBlob(dataURI, callback) {
+			    // convert base64 to raw binary data held in a string
+			    var byteString = atob(dataURI.split(',')[1]);
+			
+			    // separate out the mime component
+			    var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+			
+			    // write the bytes of the string to an ArrayBuffer
+			    var arrayBuffer = new ArrayBuffer(byteString.length);
+			    var _ia = new Uint8Array(arrayBuffer);
+			    for (var i = 0; i < byteString.length; i++) {
+			        _ia[i] = byteString.charCodeAt(i);
+			    }
+			
+			    var dataView = new DataView(arrayBuffer);
+			    var blob = new Blob([dataView], { type: mimeString });
+			    callback(blob);
+			}
+
+		})
+	</script>
+	
+</tml:case>

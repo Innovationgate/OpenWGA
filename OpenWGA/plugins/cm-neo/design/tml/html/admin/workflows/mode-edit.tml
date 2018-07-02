@@ -1,0 +1,36 @@
+<tml:form id="form-edit-workflow" cssclass="form-horizontal" source="none">
+	<div class="header">Worfkow '<tml:item name="$pc.workflow.name"/>' bearbeiten ...</div>
+	
+	<div class="content">
+		<tml:{div} html_class="alert alert-danger clearfix" if="_query_delete">
+			<p style="margin:0 0 20px">Diesen Workflow wirklich löschen?</p>
+			<tml:button cssclass="btn btn-default _pull-right" clickaction="$pc.removeWorkflow" portletmode="view">Workflow löschen</tml:button>
+		</tml:{div}>
+		<tml:include ref="::form"/>
+
+		<fieldset>
+			<legend>Workflow-Level</legend>
+			<ol>
+				<tml:foreach item="$pc.workflowlevels" currentvalue="_wflevel" id="workflowlevels-loop">
+					<li><a href="<tml:url action="$pc.setWorkflowLevel" a-index="index" portletmode="edit-level"/>">
+						<tml:item name="_wflevel.name"/>
+						<tml:case condition="_wflevel.description">
+							- <tml:item name="_wflevel.description"/>
+						</tml:case>
+					</a></li>
+				</tml:foreach>
+			</ol>
+		</fieldset>
+		
+	</div>
+	
+	<div class="footer">
+		<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="view">Abbrechen</tml:button>
+		<tml:button cssclass="btn btn-primary" clickaction="$pc.updateWorkflow" portletmode="view">Speichern</tml:button>
+		<tml:button cssclass="btn btn-default" cssstyle="margin-left:30px" clickaction="$refresh" portletmode="new-level">
+			<i class="fas fa-plus"></i>
+			Neuer Workflow Level
+		</tml:button>
+		<tml:button cssclass="btn btn-danger pull-right" clickaction="$setvar" param1="_query_delete" param2="{true}">Löschen</tml:button>
+	</div>
+</tml:form>

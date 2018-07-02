@@ -1,0 +1,104 @@
+<tml:eventscript onevent="exit">
+	//console.log("exit CM");
+	request.getSession().removeAttribute(WGACore.ATTRIB_BROWSERINTERFACE);
+	request.getSession().removeAttribute(WGAcore.ATTRIB_VIRTUAL_CONTENT_URL);
+	request.getSession().removeAttribute(WGAcore.ATTRIB_NO_CONTENT_NOTIFCATION_URL);
+	request.getSession().removeAttribute("CM.appid");
+	
+	WGA.app(portlet.dbkey).domain().auth().logout()
+	
+	portlet.dbkey=null;
+	
+	//console.log("removed CM session attributes", WGACore.ATTRIB_BROWSERINTERFACE);
+	WGA.redirectTo(WGA.app().getHomepageURL())
+	_exit=true
+</tml:eventscript>
+
+<tml:case isfalse="_exit">
+	<tml:script>
+		request.getSession().setAttribute("CM.appid", Packages.de.innovationgate.cm.modules.CMHtmlHeadInclusion.CM_APP_ID);
+		request.getSession().setAttribute(WGACore.ATTRIB_BROWSERINTERFACE, true);
+	
+		request.getSession().setAttribute(wgacore.ATTRIB_VIRTUAL_CONTENT_URL, 
+			"/"+meta("db", "dbkey")+"/html/virtual-doc.int.html?contentkey=#CONTENTKEY_UNIQUE_MODE#&structkey=#STRUCTKEY#&dbkey=#DBKEY#");
+	
+		request.getSession().setAttribute(wgacore.ATTRIB_NO_CONTENT_NOTIFCATION_URL, 
+			"/"+meta("db", "dbkey")+"/html/no-content.int.html?dbkey=#DBKEY#&structkey=#KEY#");
+
+		var app = WGA.app(portlet.dbkey);
+		var auth = app.domain().auth()
+		if(!auth.getAccessFilter(app))
+			auth.applyAccessFilter(db().getAttribute("CM.FilterUids").get(db().ACCESSLEVEL_CHIEF_EDITOR), app);
+	
+	</tml:script>
+	
+	<tml:include ref="page" o_title="[{WGA.Brand.name} Content Manager]">
+	
+		<tml:option name="header">
+			<tml:include ref="toolbar"/>
+		</tml:option>
+	
+		<tml:option name="view-toolbar">
+			<a href="#" title="Explorer" data-view="explorer" class="selected">
+				<i class="icon fas fa-sitemap"></i>
+			</a>
+			<a href="#" title="Outline" data-view="outline">
+				<i class="icon fas fa-heading"></i>
+			</a>
+			<a href="#" title="Unterseiten" data-view="child-docs">
+				<i class="icon fas fa-clone"></i>
+			</a>
+			
+			<a href="#" title="Dashboard" data-view="dashboard">
+				<i class="icon fas fa-tachometer-alt">
+					<tml:comment><span class="badge" style="color:red;background:white">10</span></tml:comment>
+				</i>
+			</a>
+			
+		</tml:option>
+	
+		<tml:option name="appnav">
+			<tml:portlet name="appnav" ref="appnav:portlet" portletmode="explorer"/>
+		</tml:option>
+	
+		<tml:option name="body">
+			<div class="content sidebar">
+				<div class="sidebar">	
+					<tml:include ref="sidebar:main" context="[db:{portlet.dbkey}]"/>
+				</div>
+				<div class="body">
+					<div id="loading" class="loading">
+						Lade Website <span class="dots">...</span>
+						<div class="progress">
+						  <div class="progress-bar progress-bar-striped active" style="width:100%">
+						  </div>
+						</div>					
+					</div>
+					<div class="sitepanel-wrapper <tml:script expression="profile.scale ? 'scale'+profile.scale : ''"/>">
+						<iframe
+							id="site-panel"
+							<tml:if context="[db:{portlet.dbkey}/docid:{portlet.contentkey}]" iscontextvalid="true">
+								<tml:then>
+									src="<tml:script expression="contenturl('html', null, true)"/>"								
+								</tml:then>
+								<tml:else>
+									src="<tml:url type="homepage" context="[db:{portlet.dbkey}]"/>"
+								</tml:else>
+							</tml:if>
+						></iframe>
+					</div>
+				</div>
+			</div>
+		</tml:option>
+		
+	</tml:include>
+	
+	<tml:portlet ref="dialogs:main" name="dialogs" portletmode="view"/>
+	<tml:include ref="content-changed-observer"/>
+	
+	<script>
+		require(["api", "cm"], function(API, CM){
+			CM.setImageRoot("<tml:url type="file" doc="images" file=""/>");
+		})
+	</script>
+</tml:case>

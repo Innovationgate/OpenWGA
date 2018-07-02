@@ -1,0 +1,69 @@
+<div id="sidepanel-content">
+	
+	<div _style="text-align:center" class="panel-set">
+		<ul class="pagination" id="panel-set-content">
+			<li>
+				<a href="#section-content-properties" data-toggle="tab">
+					Dokument
+				</a>
+			</li>
+			<li>
+				<a href="#section-content-attachments" data-toggle="tab">
+					Dateien
+				</a>
+			</li>
+		</ul>
+		<ul class="pagination" id="panel-set-edit">
+			<li>
+				<a href="#section-edit" data-toggle="tab">
+					Format
+				</a>
+			</li>
+			<li>
+				<a href="#section-content-attachments" data-toggle="tab">
+					Dateien
+				</a>
+			</li>
+		</ul>
+	</div>
+	
+	<div class="tab-content">
+		<div id="section-content-properties" class="tab-pane">
+
+			<tml:include ref="sidebar:content-properties"/>
+			
+			<div class="panel panel-default" style="display:none">
+				<div class="panel-heading">
+					<a data-toggle="collapse" href="#pannel-content-versions">
+						Versionen
+						<span class="badge pull-right"></span>
+					</a>
+				</div>
+				<div class="panel-body collapse" id="pannel-content-versions">
+					<tml:include ref="sidebar:content-versions"/>
+				</div>
+			</div>
+		</div>
+		
+		<div id="section-content-attachments" class="tab-pane">
+			<tml:include ref="sidebar:content-attachments"/>
+		</div>
+
+		<div id="section-edit" class="tab-pane">
+		
+			<div id="editor-panel-rtf" data-editor="true" style="display:none">
+				<tml:include ref="::editor-tool-panels:rtf"/>				
+			</div>
+
+			<div id="editor-panel-date" data-editor="true" style="display:none"></div>
+
+		</div>
+		
+	</div>
+	
+</div>
+
+<script>
+	require(["action-panel"]);
+</script>
+

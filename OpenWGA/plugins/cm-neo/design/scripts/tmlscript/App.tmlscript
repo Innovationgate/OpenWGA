@@ -1,0 +1,108 @@
+function App() {}
+
+App.prototype.getIconURL = function(doc) {
+	if(doc instanceof Packages.de.innovationgate.wga.server.api.tml.Context)
+		doc = doc.content();
+
+	var AFW = WGA.design("plugin-wga-app-framework").getGlobal("AFW")
+	doc = AFW.structentry(doc.getStructEntry()).getBestContent(doc.language.name)
+	//doc=WGA.context("db:"+ doc.database.dbReference + "/docid:"+doc.structKey+"<"+doc.language.name+">").content()
+	
+	return doc.getMetaData("VIRTUALLINK") ? "/plugin-wga-app-framework/file/icons/page_white_link.png" : "/plugin-wga-app-framework/file/icons/page_white_text.png"
+}
+
+App.prototype.getCssClass = function(doc) {
+	var classes = [];
+	
+	if(doc instanceof Packages.de.innovationgate.wga.server.api.tml.Context){
+		doc = doc.content();
+	}
+	var AFW = WGA.design("plugin-wga-app-framework").getGlobal("AFW")
+	doc = AFW.structentry(doc.getStructEntry()).getBestContent(doc.language.name)
+	//doc=WGA.context("db:"+ doc.database.dbReference + "/docid:"+doc.structKey+"<"+doc.language.name+">").content()
+
+	var published = doc.structEntry && doc.structEntry.getReleasedContent(doc.language.name)
+	if(!published || !published.isVisibleNow())
+		classes.push("not-visible");
+	
+	if(doc.hiddenFrom.contains("nav"))
+		classes.push("hidden-in-nav")
+
+	return classes.join(" ")
+}
+
+App.prototype.getSymbolIcon = function(doc) {
+
+	if(doc instanceof Packages.de.innovationgate.wga.server.api.tml.Context)
+		doc = doc.content();
+	
+	var AFW = WGA.design("plugin-wga-app-framework").getGlobal("AFW")
+	doc = AFW.structentry(doc.getStructEntry()).getBestContent(doc.language.name)
+	//doc=WGA.context("db:"+ doc.database.dbReference + "/docid:"+doc.structKey+"<"+doc.language.name+">").content()
+	
+	var icons = {
+		draft: "fas fa-pencil-alt",
+		pending: "far fa-clock",
+		review: "fas fa-sync"
+	}
+	
+	if(doc.isPendingRelease())
+		return icons["pending"];
+
+	var status = doc.getStatus()
+	
+	if(status==doc.STATUS_DRAFT)
+		return icons["draft"];
+		
+	if(status==doc.STATUS_REVIEW)
+		return icons["review"];
+	
+	return ""
+}
+
+App.prototype.getStructData = function(doc, lang) {
+
+	if(doc instanceof Packages.de.innovationgate.wga.server.api.tml.Context)
+		doc = doc.content();
+
+	if(doc instanceof Packages.de.innovationgate.webgate.api.WGContent){
+		return {
+			id: doc.structKey,
+			title: WGA.encode("html", doc.title),
+			symbolclass: this.getSymbolIcon(doc),
+			cssclass: this.getCssClass(doc),
+			iconurl: this.getIconURL(doc),
+			href: WGA.context(doc).contenturl("html", null, true)
+		}
+	}
+	else if(doc instanceof Packages.de.innovationgate.webgate.api.WGStructEntry){
+		var href = WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
+				.setParameter({
+					dbkey: doc.getDatabase().getDbReference(),
+					structkey: doc.structKey,
+					lang: lang
+				}).build();
+	
+		return {
+			id: doc.structKey,
+			title: doc.title,
+			symbolclass: "",
+			cssclass: "not-visible",
+			iconurl: "/plugin-wga-app-framework/file/icons/page_white_error.png",
+			href: href
+		}
+	}
+	else throw({
+		message: "App.getStructData() called with wrong arguments"
+	})
+}
+
+App.prototype.mayUpdateContent = function(ctx) {
+
+	if(WGA.app(ctx.meta("db", "dbkey")).isChiefEditor())
+		return true;
+
+	var ismine = (ctx.AUTHOR==ctx.meta("db", "username"))
+	return ctx.STATUS==ctx.content().STATUS_DRAFT && ismine;
+
+}

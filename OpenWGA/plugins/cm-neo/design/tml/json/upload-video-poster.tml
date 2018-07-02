@@ -1,0 +1,71 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:script>
+	var so=AFW.Util.deserializeJsObject(request.getParameter("context"));
+
+	var url_builder = new Packages.de.innovationgate.utils.URLBuilder(request);
+	var time = decodeURIComponent(url_builder.getParameter("time")).toLowerCase();
+	
+	_msg = "";
+	
+	var c_exp = "db:" + so.dbkey + "/docid:" + so.contentkey;
+	var c = context(c_exp, false)
+	if(c){
+		var doc = c.content();
+		log.info("html5 create poster for file '" + so.filename + "' in document '" + so.dbkey+"/"+c.TITLE + "'");
+		var reader = request.getInputStream();
+
+		try{		
+			synchronizedFunction(function (doc, reader, filename, time){
+				
+				var file_md = doc.getFileMetaData(filename)
+				file_md.setManualDerivate("video_poster", "poster", reader);
+				file_md.setCustomFieldValue("time", time);
+				doc.save();
+				var p = WGA.Core.getFileDerivateManager().runUpdateProcess()
+				//console.log("started derivate update process ...", p);
+				
+			}, doc)(doc, reader, so.filename, time);
+		}
+		catch(e){
+			_msg = e.message;
+			logException(e);
+		}
+
+	}
+	else {
+		log.info("HTML5 file-upload context not valid: "+ c_exp);
+		_msg = "HTML5 file-upload context not valid: "+ c_exp;
+	}
+	
+</tml:script>
+
+{
+	msg: "<tml:item name="_msg"/>",
+	filename: "video poster image"
+}
+
+

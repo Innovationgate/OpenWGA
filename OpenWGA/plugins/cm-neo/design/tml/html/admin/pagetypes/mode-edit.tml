@@ -1,0 +1,45 @@
+<tml:action id="save">
+	tmlform.store()
+</tml:action>
+
+<tml:action id="delete">
+	document.remove();
+</tml:action>
+
+<tml:action id="query-delete">
+	_query_delete=true;
+	_may_delete = true;
+	try{
+		document.performRemoveCheck();
+	}
+	catch(e){
+		_may_delete = false;
+		_reason = e.javaException.message;
+	}
+</tml:action>
+
+<tml:form id="form-edit-area" cssclass="form-horizontal" context="[db:{$option_dbkey}/$contenttype:{portlet.ctname}]">
+	<div class="header"><tml:script expression="document.name"/> ...</div>
+	
+	<div class="content">
+		<tml:{div} html_class="alert alert-danger clearfix" if="_query_delete">
+			<tml:if istrue="_may_delete">
+				<tml:then>
+					<p style="margin:0 0 20px">Diesen Seitentype wirklich löschen?</p>
+					<tml:button cssclass="btn btn-default _pull-right" clickaction="delete" portletmode="view">Sprache löschen</tml:button>
+				</tml:then>
+				<tml:else>
+					<p>Dieser Seitentyp kann nicht gelöscht werden.</p>
+					<p><tml:item name="_reason"/></p>
+				</tml:else>
+			</tml:if>
+		</tml:{div}>
+		<tml:include ref="::form"/>
+	</div>
+	
+	<div class="footer">
+		<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="view">Abbrechen</tml:button>
+		<tml:button cssclass="btn btn-primary" clickaction="save" portletmode="view">Speichern</tml:button>
+		<tml:button cssclass="btn btn-danger pull-right" clickaction="query-delete">Löschen</tml:button>
+	</div>
+</tml:form>

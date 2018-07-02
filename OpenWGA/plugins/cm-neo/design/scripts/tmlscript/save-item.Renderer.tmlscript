@@ -1,0 +1,69 @@
+function Renderer() {}
+
+Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $urlParam_item, $urlParam_format, $urlParam_value, $urlParam_data_type) {
+
+	var value = $urlParam_value;
+	var result = {
+		success: true,
+		value: value
+	}
+
+	var doc = db($urlParam_dbkey).getContentByKey($urlParam_contentkey);
+
+	switch($urlParam_data_type){
+
+		case "date":
+			try{
+				if(value){
+					value = WGA.parseDate(value, "d.M.y")
+					result.value = WGA.format(value, "dd.MM.yyyy")	// internal editor format
+					result.value_encoded = WGA.format(value, $urlParam_format || "mediumDate")
+				}
+				else value=null;
+			}
+			catch(e){
+				result = {
+					success: false,
+					message: "Wert kann nicht als Datum interpretiert werden:\n" + value
+				}
+			}
+			break;
+
+		case "number":
+			try{
+				if(value.trim()!=""){
+					value = WGA.parseNumber(value, "decimal");
+					result.value = WGA.format(value, "decimal");	// internal editor format
+					result.value_encoded = WGA.format(value, $urlParam_format || "decimal");
+				}
+				else value=null;
+			}
+			catch(e){
+				result = {
+					success: false,
+					message: "Wert kann nicht als Zahl interpretiert werden:\n" + value
+				}
+			}
+			break;
+
+		case "rtf":
+			result.value = WGA.encode("rtfsystem", value, WGA.context(doc))
+			result.value_encoded = WGA.encode("rtf", value, WGA.context(doc)) 
+			break;
+			
+		case "text":
+		case "textarea":
+			value = WGA.encode("crlf", value);
+			result.value = WGA.encode("html", value)
+			break;
+	}
+
+	if(result.success){
+		doc.setItem($urlParam_item, value).save();
+	}
+
+	//console.log($urlParam_data_type, JSON.stringify(result))
+
+	WGA.TMLPage.write(JSON.stringify(result))
+	//WGA.TMLPage.renderDefault();
+}

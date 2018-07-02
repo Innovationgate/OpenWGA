@@ -1,0 +1,40 @@
+<tml:action id="reject-content">
+
+	content().reject(tmlform.comment);
+	
+	portlet.fireevent("struct-updated", {
+		id: STRUCTKEY,
+		symbolclass: App.getSymbolIcon(content()),
+		cssclass: App.getCssClass(content())
+	})
+	
+	portlet.fireevent("close-dialog", {
+		redirectto: contenturl("html", null, true)
+	})
+	
+</tml:action>
+
+<tml:form id="form-approve-content">
+	<div class="header">
+		Inhaltsversion ablehnen
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content form-horizontal">
+		<tml:[form-field] o_label="Titel" o_mode="view">
+			<tml:metadata name="title"/>
+		</tml:[form-field]>
+		<tml:[form-field] o_label="Author" o_mode="view">
+			<tml:metadata name="author"/>
+		</tml:[form-field]>
+		<tml:[form-field] o_label="Kommentar" o_field="comment" o_type="textarea">
+			Der Autor wird über die Ablehnung benachrichtigt.
+			Der optionale Kommentar wird per Mail an den Autor gesendet. 
+		</tml:[form-field]>
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:button cssclass="btn btn-primary" clickaction="reject-content">Ablehnen</tml:button>
+	</div>
+</tml:form>

@@ -1,0 +1,73 @@
+function Renderer() {}
+
+Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey) {
+
+	var result = {}
+
+	var c = context("db:" + $urlParam_dbkey + "/docid:" + $urlParam_contentkey, false)
+	if(c){
+
+		var attachments = WGA.createList()
+		attachments.addAll(c.content().getFileNames());
+		WGA.sortList(attachments, function(a,b){
+			var A = AFW.content(c).attachment(a);
+			var B = AFW.content(c).attachment(b);
+			if(A.getType().pos == B.getType().pos)
+				return a < b ? -1 : 1
+			else return (A.getType().pos < B.getType().pos ? -1 : 1)
+		});
+		
+		var filetypes = WGA.createMap();
+		for(let filename in Iterator(attachments)){
+			var attachment = AFW.content(c).attachment(filename);
+			var type = attachment.getType().name
+			if(!filetypes.get(type)){
+				filetypes.put(type, WGA.createList());
+			}
+			filetypes.get(type).add(filename);
+		}
+		var primary = c.content().getPrimaryFileName();
+		
+		// loop
+		result.filetypes = []
+		for(let type in Iterator(filetypes.keySet())){
+		
+			let files = [];
+			for(let filename in Iterator(filetypes.get(type))){
+				var Attachment = AFW.content(c).attachment(filename);
+				files.push({
+					filename: WGA.encode("JSON", filename),
+					isPrimary: filename==primary,
+					filetitle: WGA.encode("JSON", c.content().getFileMetaData(filename).getTitle() || filename),
+					url: c.fileurl(filename),
+					filesize: WGA.format(Attachment.fileSize, "0"),
+					poster: Attachment.getPosterURL({checksum:true}),
+					thumbnail: Attachment.getThumbnailURL({width:200,checksum:true}),
+					mimetype: Attachment.mimeType,
+					isImage: Attachment.isImage(),
+					isVideo: Attachment.isVideo(),
+					waiting_for_derivates: Attachment.waitingForDerivates()
+				})
+			}
+		
+			result.filetypes.push({
+				filetype: label("filetype." + type),
+				files: files
+			})
+			
+		}
+
+		// used for drag&drop File uploads:
+		result.context = AFW.Util.serializeJsObject({
+			dbkey: $urlParam_dbkey,
+			contentkey: $urlParam_contentkey
+		})
+
+	}
+
+	//console.log(JSON.stringify(result))
+
+	//WGA.TMLPage.renderDefault()
+
+	WGA.TMLPage.write(JSON.stringify(result))
+}

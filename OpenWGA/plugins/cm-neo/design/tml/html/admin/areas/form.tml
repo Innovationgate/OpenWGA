@@ -1,0 +1,31 @@
+<tml:script>
+	_getMode = function(metaname){	
+		if(portlet.mode=="edit" && document.isMetaDeterminedInSchema && document.isMetaDeterminedInSchema(metaname)){
+			return "view"
+		}
+		else return tmlform.mode();
+	}
+</tml:script>
+
+<tml:[form-field] o_label="Name" o_field="name" o_meta="true"
+	o_validation="$E_VALUE!=''"
+	o_message="Kein Name angegeben"
+	o_mode="{portlet.mode=='new'?'edit':'view'}"
+/>
+
+<tml:[form-field] o_label="Leser" o_type="textarea" o_mode="{_getMode('readers')}" o_meta="true" o_name="readers" o_multiple="true"/>
+<tml:[form-field] o_label="Editoren" o_type="textarea" o_mode="{_getMode('editors')}" o_meta="true" o_name="editors" o_multiple="true"/>
+
+<tml:case condition="db().getContentStoreVersion()>=5">
+	<tml:script>
+		if(!tmlform.visiblefor)
+			tmlform.visiblefor = document.getExtensionData("CM_area_visible")
+	</tml:script>
+	<tml:[form-field] o_label="Sichtbar für" o_type="textarea" o_name="visiblefor" o_multiple="true" o_store="false"/>
+</tml:case>
+
+<script>
+	require(["jquery", "jquery-textarea-autogrow"], function($){
+		$("#<tml:script expression="tmlform.formid"/> textarea").autogrow();
+	})
+</script>

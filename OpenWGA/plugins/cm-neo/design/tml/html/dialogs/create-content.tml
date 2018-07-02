@@ -1,0 +1,75 @@
+<tml:action id="create-content">
+
+	if(tmlform.validate()){
+		var doc;
+		if(content()){
+			doc = content().getStructEntry().createContent(tmlform.language, tmlform.title)
+			AFW.content(doc).copyElements(tmlform.fieldlist("elements_to_copy"), content());
+		}
+		else{
+			doc = document.createContent(tmlform.language, tmlform.title)
+		}				
+		doc.save();
+		portlet.fireevent("close-dialog", {
+			redirectto: context(doc).contenturl()
+		})
+		portlet.fireevent("struct-updated", App.getStructData(doc))
+	}
+	
+</tml:action>
+
+<tml:form id="form-create-content" source="none">
+	<div class="header">
+		Neue Inhaltsversion
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content form-horizontal">
+		<tml:script>
+			
+			var structentry = content() ? content().getStructEntry() : document;
+			var WGContent = Packages.de.innovationgate.webgate.api.WGContent;				
+	
+			// get languages:		
+			var langs = db().getLanguages().values().iterator();;
+			var opts = WGA.createList();
+			while(langs.hasNext()){
+				var lang=langs.next();
+				var langname=lang.getName().toLowerCase();
+				
+				if(!lang.mayCreateContent())
+					continue;
+				if(structentry.hasContent(langname, WGContent.STATUS_RELEASE)
+						|| structentry.hasContent(langname, WGContent.STATUS_REVIEW)
+						|| structentry.hasContent(langname, WGContent.STATUS_DRAFT))
+					continue;
+		
+				opts.add(lang.getTitle() + "|" + lang.getName());
+				WGA.TMLPage.setVar("_languages", opts)
+			}
+			
+		</tml:script>
+		<tml:[form-field] o_label="Titel" o_field="title"
+			o_validation="$E_VALUE!=''"
+			o_message="Bitte geben Sie einen Titel ein"
+		/>
+		<tml:[form-field] o_label="Sprache" o_type="select" o_field="language" o_optionsitem="_languages"/>
+
+		<tml:case condition="content()">
+			<hr>
+			<p>Inhaltselemente aus aktuellem Dokument übernehmen:</p>
+			<tml:[form-field]>
+				 <tml:input name="elements_to_copy" type="checkbox" 
+				 	options="Inhalte|items,Eigenschaften|metas,Dateianhänge|attachments,Inhaltsmodule|modules" 
+				 	defaultexpression="WGA.createList(['items', 'metas', 'attachments', 'modules'])"/>
+			</tml:[form-field]>
+		</tml:case>
+		
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:button cssclass="btn btn-primary" clickaction="create-content">Erstellen</tml:button>
+	</div>
+	
+</tml:form>

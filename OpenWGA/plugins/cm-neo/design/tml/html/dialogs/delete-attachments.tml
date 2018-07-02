@@ -1,0 +1,36 @@
+<tml:action id="delete-attachments">
+
+	var filenames = tmlparam1.split(",")
+	//console.log("delete", filenames);
+	for(let [i, filename] in filenames)
+		content().removeFile(filename)
+	content().save();
+	
+	portlet.fireevent("close-dialog");
+	portlet.fireevent("attachments-updated", {
+		dbkey: "<tml:metadata type="database" name="dbkey"/>",
+		contentkey: "<tml:metadata name="key"/>"
+	})
+</tml:action>
+
+<div class="header">
+	Dateianhänge löschen
+	<a data-modal="hide">&times;</a>
+</div>
+
+<div class="content">
+	Möchten Sie die folgenden Dateianhänge löschen?
+	<tml:script>
+		_filenames = (request.getParameter("filenames")||"").split(",")
+	</tml:script>
+	<ul>
+		<tml:foreach item="_filenames" currentvalue="_filename">
+			<li><tml:item name="_filename"/></li>
+		</tml:foreach>
+	</ul>
+</div>
+
+<div class="footer">
+	<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+	<tml:button cssclass="btn btn-danger" clickaction="delete-attachments" param1="{request.getParameter('filenames')}">Löschen</tml:button>
+</div>

@@ -1,0 +1,48 @@
+<tml:action id="create-page">
+	if(tmlform.validate()){
+		var ct = db().getContentType(tmlform.contenttype)
+
+		var children = document.getChildEntries();
+		var position = (children.size() && children.getByIndex(0).getPosition()-100) || 0;
+
+		var doc = document.createChildPage(ct, tmlform.title, tmlform.language)
+		var struct = doc.getStructEntry()
+		struct.setPosition(position)
+		struct.save();
+		
+		portlet.fireevent("close-dialog", {
+			redirectto: context(doc).contenturl()
+		})
+	}
+</tml:action>
+
+<tml:script>
+	_opts = option("dialog_options")
+</tml:script>
+
+<tml:form id="form-create-page" source="portlet" context="[$struct:{_opts.parent || document.getStructKey()}]">
+
+	<div class="header">
+		Neue Unterseite
+		<a data-modal="hide">&times;</a>
+	</div>
+
+	<div class="content form-horizontal">
+
+		<tml:[::form]/>
+		<tml:[form-field] o_label="Erstellen unter" o_mode="view">
+			<tml:script>
+				var c = context("docid:"+document.getStructKey(), false)
+				if(c)
+					return c.TITLE;
+				else return document.title
+			</tml:script>			
+		</tml:[form-field]>
+	</div>
+
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:button html_type="submit" cssclass="btn btn-primary" clickaction="create-page" if="_isValid">Erstellen</tml:button>
+	</div>
+	
+</tml:form>	

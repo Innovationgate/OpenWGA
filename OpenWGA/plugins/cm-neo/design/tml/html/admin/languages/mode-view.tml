@@ -1,0 +1,28 @@
+<tml:action id="edit">
+	portlet.langname = tmlparam1;
+</tml:action>
+
+<div class="header"><tml:label key="admin.languages"/></div>
+
+<div class="content">
+	<tml:script>
+		_langs = WGA.createList()
+		var langs = db($option_dbkey).getLanguages().values();
+		for(let lang in Iterator(langs))
+			_langs.add({
+				name: lang.name,
+				title: lang.title
+			});
+	</tml:script>
+	<ul>
+		<tml:foreach item="_langs" currentvalue="_lang">
+			<li>
+				<a href="<tml:url action="edit" param1="{_lang.name}" portletmode="edit"/>"><tml:item name="_lang.title"/></a>
+			</li>			
+		</tml:foreach>
+	</ul>
+</div>
+
+<div class="footer">
+	<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="new">Neue Sprache</tml:button>
+</div>

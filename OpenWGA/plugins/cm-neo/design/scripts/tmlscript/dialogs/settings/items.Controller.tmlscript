@@ -1,0 +1,26 @@
+function Controller() {}
+
+Controller.prototype.prepare = function() {}
+
+Controller.prototype.itemnames = function($cx) {
+	return $cx.content().getItemNames()
+}
+
+Controller.prototype.type = function($cx, itemname) {
+	var res = $cx.itemList(itemname);		
+	var firstElement = (res.size() >= 1 ? res.get(0) : null);		
+	var type = (firstElement == null ? "" : javaObject(firstElement).getClass().getName());		
+	type = type.split(".").pop();
+	if(type=="Double")
+		type="Number"						
+	if (res.size() > 1) {		
+		type += "-Liste"
+	}		
+	return type;
+}
+
+Controller.prototype.value = function($cx, itemname) {
+	var res = $cx.itemList(itemname);
+	var firstElement = (res.size() >= 1 ? res.get(0) : null);
+	return res.size()>1 ? res.toString() : firstElement==null ? "null" : res
+}

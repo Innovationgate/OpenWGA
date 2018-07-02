@@ -1,0 +1,72 @@
+<tml:form unless="_dialog_closed" id="form-copy-pages" cssclass="form-horizontal">
+
+	<div class="header">
+		<a data-modal="hide">&times;</a>
+		Seite duplizieren ...
+	</div>
+	
+	<div class="content">
+		
+		<tml:[form-messages] o_title="Seite konnte nicht dupliziert werden"/>
+		
+		<tml:[form-field] o_label="Kopie der Seite" o_mode="view">
+			<tml:range context="{_CM_clipboard_context}">
+				<b><tml:meta name="title" encode="html"/></b>
+				<br>
+				Seitentyp: <tml:item name="$mc.pageType"/>			
+			</tml:range>
+		</tml:[form-field]>	
+		
+		<tml:script>
+		
+			var root_or_child = WGA.createList([
+				"unter Seite '" + TITLE + "'|child",
+				"Als Hauptseite|root"
+			])
+			WGA.TMLPage.setVar("_root_or_child", root_or_child)
+
+			// Areas
+			var areas = WGA.createList()
+			for(let area in Iterator(db().getAreas().values())){
+				if(area.systemArea)
+					continue;
+				if(area.name=="hdb-content" && !WGA.app().isManager())
+					continue;
+				var visiblefor = area.getExtensionData("CM_area_visible")
+				if(visiblefor && visiblefor.size() && !db().isMemberOfUserList(visiblefor))
+					continue;
+				if(!area.mayEditPages())
+					continue;
+				if(area.mayReadContent())
+					areas.add(area.name)
+			}
+			WGA.TMLPage.setVar("_areas", areas)
+			if(!tmlform.submitted && areas.contains(AREA))
+				tmlform.area = AREA
+		</tml:script>
+		<tml:[form-field] o_label="Einfügen" o_field="root_or_child" o_type="select" o_default="child" o_optionsitem="_root_or_child" o_changeaction="$refresh"/>
+		
+		<tml:case condition="tmlform.root_or_child=='root'">
+			<tml:[form-field] o_label="Bereich" o_field="area" o_type="select" o_optionsitem="_areas"/>
+		</tml:case>
+		
+		<tml:{div} html_class="alert alert-danger" unless="$mc.isAllowedPageType">
+			Der Seitentyp '<tml:item name="$mc.pageType"/>' ist an dieser Stelle nicht erlaubt.
+		</tml:{div}>
+		
+		<tml:case if="$mc.isAllowedPageType">
+			<hr>
+			<tml:[form-field]>
+				<tml:input labeled="true" name="publish" type="boolean" options="Seite(n) veröffentlichen|true"/>
+				<br>
+				<tml:input labeled="true" name="recursive" type="boolean" options="Unterseiten kopieren|true"/>
+			</tml:[form-field]>
+		</tml:case>
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:button cssclass="btn btn-primary" clickaction="$mc.copyPages" if="$mc.isAllowedPageType">Erstellen</tml:button>
+	</div>
+	
+</tml:form>

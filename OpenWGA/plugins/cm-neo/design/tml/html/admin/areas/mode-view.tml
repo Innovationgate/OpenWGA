@@ -1,0 +1,26 @@
+<tml:action id="edit">
+	portlet.areaname = tmlparam1;
+	portlet.setMode("edit");
+</tml:action>
+
+<div class="header"><tml:label key="admin.areas"/></div>
+
+<div class="content">
+	<tml:script>
+		_areas = WGA.createList()
+		var areas = db($option_dbkey).getAreas().values();
+		for(let area in Iterator(areas))
+			area.name.indexOf("$")!=0 && _areas.add(area.name);
+	</tml:script>
+	<ul>
+		<tml:foreach item="_areas" currentvalue="_area">
+			<li>
+				<a href="<tml:url action="edit" param1="{_area}"/>"><tml:item name="_area"/></a>
+			</li>			
+		</tml:foreach>
+	</ul>
+</div>
+
+<div class="footer">
+	<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="new">Neuer Bereich</tml:button>
+</div>

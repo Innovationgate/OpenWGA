@@ -1,0 +1,28 @@
+<tml:action id="select-db">
+	var dbkey = request.getParameter("dbkey")
+	var contentkey = request.getParameter("contentkey")
+	portlet.dbkey=dbkey;
+	portlet.contentkey=contentkey;
+	portlet.setmode("select-db")
+</tml:action>
+
+<script>
+
+	<tml:if hasurlparameter="dbkey">
+		<tml:then>
+			location.href = "<tml:url/>#<tml:urlparameter name="dbkey"/><tml:case hasurlparameter="contentkey">/<tml:urlparameter name="contentkey"/></tml:case>";
+		</tml:then>
+		<tml:else>
+			var hash = location.hash.substr(1).split("/");
+			var dbkey = hash[0] || "<tml:script expression="request.dbkey"/>";
+			var contentkey = hash[1];
+			WGA.ajax.action({
+				action: "<tml:action ref="select-db"/>",
+				params: {
+					dbkey: dbkey,
+					contentkey: contentkey
+				}
+			})
+		</tml:else>
+	</tml:if>
+</script>

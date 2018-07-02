@@ -1,0 +1,37 @@
+<tml:[template] o_id="sidepannel-content-versions">
+
+	{{#current.length}}
+		<fieldset>
+			<legend>Aktuelle Versionen</legend>
+			{{#current}}
+				<a class="{{cssclass}}" href="{{url}}" data-wgakey="{{key}}">Version {{version}} ({{{status}}})</a>
+			{{/current}}
+		</fieldset>
+	{{/current.length}}
+	
+	{{#archive.length}}
+		<fieldset data-type="archive">
+			<legend>Archiv</legend>
+			{{#archive}}		
+				<a class="{{cssclass}}" href="{{url}}" data-wgakey="{{key}}">
+					Version {{version}}
+					<br>
+					<span style="color:silver">{{published}}</span>
+				</a>
+			{{/archive}}
+			<a class="show-all" href="#"></a>
+		</fieldset>
+	{{/archive.length}}
+	
+	{{#languages.length}}
+		<fieldset>
+			{{#current_lang}}
+				<legend>Andere Sprachen</legend>
+			{{/current_lang}}
+			{{#languages}}
+				<a href="{{url}}" data-wgakey="{{key}}">{{language}}</a>
+			{{/languages}}
+		</fieldset>
+	{{/languages.length}}
+	
+</tml:[template]>

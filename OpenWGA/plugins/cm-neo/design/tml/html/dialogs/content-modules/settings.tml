@@ -1,0 +1,115 @@
+<tml:action id="refresh">
+	var fields = tmlform.getfieldnames().iterator()
+	while(fields.hasNext()){
+		var field = fields.next();
+		tmlform.setField(field, tmlform.fieldList(field));
+	}
+</tml:action>
+
+<tml:input name="designdb" type="hidden" store="false"/>
+<tml:input name="settingstml" type="hidden" store="false"/>
+<tml:input name="title" type="hidden" store="false"/>
+
+<tml:input name="mod_title" type="hidden" store="false"/>
+<tml:input name="mod_id" type="hidden" store="false"/>
+<tml:input name="parent_mod_id" type="hidden" store="false"/>
+<tml:input name="ids_to_duplicate" type="hidden" store="false"/>
+
+<script>
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "content-module-selected", function(ev){
+		var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+		var module = ev.params.module;
+		var config = ev.params.config;
+		//console.log(module, config);
+
+		if(config){
+			form.designdb.value = config.designdb;
+			form.settingstml.value = config.settingstml||"none";
+			form.title.value=config.title;
+		}
+		else if(module.level==1){
+			form.title.value="Bereich '" + module.title + "'";
+			form.settingstml.value = "root";
+		}
+		else {
+			form.title.value=module.context;
+			form.settingstml.value = "error";
+		}
+
+		if(module){
+			//form.mod_title.value=module.title;
+			form.mod_id.value=module.id;
+		}
+
+		WGA.ajax.callAction("<tml:action ref="refresh"/>");
+	})
+	
+	$("#<tml:script expression="tmlform.formid"/> input[type=text],input[type=number],input[type=password],textarea").addClass("form-control");
+	$("#<tml:script expression="tmlform.formid"/> textarea").autogrow()
+	
+</script>
+
+<tml:case condition="tmlform.title">
+
+	<script>
+		require(["jquery"], function($){
+			$("#dialog-content-modules .header .module").html("<tml:item name="title" type="tmlform"/>")
+		})
+	</script>
+
+<tml:comment>	<div style="font-size:2em;margin-bottom:10px;color:gray"><tml:item name="title" type="tmlform"/></div>
+	<hr size="1">
+</tml:comment>
+	
+	<tml:if condition="tmlform.settingstml=='none'">
+	
+		<tml:then>
+			Dieses Modul besitzt keine Einstellungsmöglichkeiten.
+		</tml:then>
+	
+		<tml:elseif condition="tmlform.settingstml=='error'">
+			<div class="alert alert-danger">
+				<h4>Dieses Modul ist nicht (mehr) verfügbar.</h4>
+				<p>Bitte wenden Sie sich an Ihren Administrator oder löschen Sie dieses Modul.</p>
+			</div>
+			<button class="btn btn-default" data-button="delete" title="Modul löschen">
+				<i class="glyphicon glyphicon-trash"></i>
+				Modul löschen
+			</button>
+			
+		</tml:elseif>
+	
+		<tml:elseif condition="tmlform.settingstml=='root'">
+			<div class="alert alert-info">
+				Wählen Sie ein Inhaltsmodul im linken Modulbaum aus oder fügen Sie ein neues Inhaltsmodul ein.
+			</div> 
+		</tml:elseif>
+		
+		<tml:else>
+			<tml:script>
+				var parts = tmlform.settingstml.split("/");	
+				if(parts.length>1){
+					_designdb = parts[0];
+					_tml = parts[1];
+				}
+				else{
+					_tml = tmlform.settingstml
+					_designdb = tmlform.designdb;
+				} 
+				// calculate edit mode:
+				if(tmlform.field("setting_source_"+tmlform.mod_id)=="template")
+					_mode = "view";
+				else _mode = option("mode");
+			</tml:script>
+	
+			<div>
+				<tml:include designdb="{_designdb}" ref="{_tml}" o_ns="{tmlform.mod_id}" tmlscope="{tmlform.mod_id}">
+					<tml:option name="parent-scope" expression="tmlform.parent_mod_id"/>
+					<tml:option name="cm_dbkey" expression="context('main').meta('db', 'dbkey')"/>
+				</tml:include>
+			</div>
+		
+		</tml:else>
+	</tml:if>
+
+</tml:case>

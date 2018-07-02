@@ -1,0 +1,131 @@
+<tml:action id="update-file-metas">
+
+	try{
+
+		if(tmlform.filename != portlet.filename){
+			content().renameFile(portlet.filename, tmlform.filename);
+			content().save();
+		}
+
+		var file_md = content().getFileMetaData(tmlform.filename)
+		file_md.title = tmlform.title
+		file_md.description = tmlform.description
+		file_md.copyright = tmlform.copyright
+		
+		if(tmlform.primary_file)
+			content().setPrimaryFileName(tmlform.filename)
+		else if(content().getPrimaryFileName()==tmlform.filename)
+			content().setPrimaryFileName(null)
+		
+		content().save()
+
+		portlet.fireevent("close-dialog")
+		portlet.fireevent("attachments-updated", {
+			filename: tmlform.filename
+		})
+		
+		_dialog_closed=true
+	}
+	catch(e){
+		logException(e);
+		_error_msg = (e.javaException && e.javaException.message) || e.message  
+	}
+	
+</tml:action>
+
+<tml:action id="edit-video">
+	portlet.fireevent("open-dialog", {
+		dialog: "edit-video",
+		filename: portlet.filename
+	})
+	_dialog_closed=true
+</tml:action>
+
+<tml:form id="form-edit-filemetas" source="none" unless="_dialog_closed" mode="{App.mayUpdateContent(this) ? 'edit':'view'}">
+
+	<tml:script>
+		var filename = request.getParameter("filename")
+		if(filename)
+			portlet.filename = filename
+		_file_md = content().getFileMetaData(portlet.filename)
+		_Attachment = AFW.content().attachment(portlet.filename)
+		_derivates = content().getFileDerivates(filename)
+		_isPrimary = (content().getPrimaryFileName()==filename)
+	</tml:script>
+
+	<div class="header">
+		Dateianhang
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content clearfix">
+
+		<div class="poster">
+			<tml:script>
+				_url = _Attachment.getThumbnailURL({width:200,checksum:true})
+				var ssc = WGA.service(Packages.de.innovationgate.wgpublisher.webtml.utils.SrcSetCreator);
+				if(_file_md && ssc.getMaxAvailablePosterSize){
+					var fileOriginalSize = ssc.getMaxAvailablePosterSize(content(), _file_md);
+					if (fileOriginalSize != null) {
+						_srcset = ssc.createSrcSet(_url, fileOriginalSize);
+					}
+				}
+			</tml:script>
+			<img src="<tml:item name="_url"/>" srcset="<tml:item name="_srcset"/>">
+			<div class="info">
+				<tml:script expression="_file_md.mimeType"/>
+				-
+				<tml:script expression="AFW.Util.renderFileSize(_file_md.size)"/>
+				<tml:case condition="_file_md && _file_md.displayWidth>0">
+					<br>
+					<tml:script expression="_file_md.displayWidth"/>
+					x
+					<tml:script expression="_file_md.displayHeight"/>
+					Pixel
+				</tml:case>
+				<tml:case condition="_file_md.usage=='poster' && _derivates.size()">
+					<p style="margin-top:20px">Derivate:</p>
+	    			<tml:foreach item="_derivates" currentvalue="_derivate" sortexpression="_derivate.size" sortorder="descending">
+	    				<div>
+			    			<tml:script expression="_derivate.displayWidth"/>
+			    			x
+			    			<tml:script expression="_derivate.displayHeight"/>
+			    			Pixel,
+			    			<tml:script expression="AFW.Util.renderFileSize(_derivate.size)"/>
+						</div>
+	    			</tml:foreach>
+				</tml:case>
+			</div>
+		</div>
+		
+		<div class="metas form-horizontal">
+			<tml:[form-field] o_label="Dateiname" o_name="filename" o_default="{_file_md.name}"/>
+			<tml:[form-field] o_label="Titel" o_name="title" o_default="{_file_md.title}"/>
+			<tml:[form-field] o_label="Copyright" o_name="copyright" o_default="{_file_md.copyright}"/>
+			<tml:[form-field] o_label="Beschreibung" o_name="description" o_default="{_file_md.description}" o_type="textarea"/>
+			<tml:[form-field] o_label="Primäre Datei" o_name="primary_file" o_type="boolean" o_labeled="true" o_default="{_isPrimary}" o_options="Diese Datei ist primäre Datei dieser Inhaltsversion|true"/>
+		</div>
+		
+	</div>
+	
+	<div class="footer">
+		<div class="pull-left">
+			<a class="btn btn-default" href="<tml:url type="file" file="{portlet.filename}" u_forcedownload="true"/>">
+				<i class="glyphicon glyphicon-download-alt"></i>
+				Download
+			</a>
+			<tml:case condition="_Attachment.isVideo()">
+				<tml:button cssclass="btn btn-default" clickaction="edit-video">
+					<i class="glyphicon glyphicon-edit"></i>
+					Video bearbeiten
+				</tml:button>
+			</tml:case>
+		</div>
+		
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:case condition="tmlform.iseditable()">
+			<tml:button cssclass="btn btn-primary" clickaction="update-file-metas">Aktualisieren</tml:button>
+		</tml:case>
+	</div>
+	
+</tml:form>

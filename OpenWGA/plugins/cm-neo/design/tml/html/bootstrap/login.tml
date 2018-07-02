@@ -1,0 +1,89 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="login">
+	var dbkey=portlet.dbkey;
+	var database=wgacore.getContentdbs().get(dbkey)
+	if(!database)
+		return tmlform.addmessage(label("login.database-not-found", createlist([encode("html", dbkey)])));
+	var domain = WGA.database(database).domain().name
+	
+	if(login(tmlform.username, tmlform.password, domain)){
+		log.info(WGA.Brand.name + "Contentmanager: user '" + tmlform.username + "' logged in to database '" + dbkey + "' in domain '" + domain + "' from IP " + request.getRemoteAddr());
+
+		try{
+			var wgdb = db(dbkey);	// opens a db session
+			if(!wgdb.isSessionOpen()){
+				tmlform.addMessage(label("login.user-is-no-author", WGA.createList([tmlform.username, dbkey])));
+				tmlform.addMessage(label("login.please-login-as-author"));
+				return;
+			}
+			log.info("user '" + tmlform.username + "' is logged in as " + AFW.database(database).getAccessLevelText())
+		}
+		catch(e){
+			tmlform.addmessage(e.message)
+		}
+	}
+	else {
+		// is logon blocked?
+		if(WGACore.getBruteForceLoginBlocker().isLoginBlocked(domain, tmlform.username))
+			tmlform.addmessage(label("login.login-blocked", [tmlform.username]))
+		else tmlform.addmessage(label("login.login-error"))
+	}
+</tml:action>
+
+<tml:include ref="page" o_title="[{WGA.Brand.name} Content Manager Login]">
+	<div class="splash">
+
+		<img class="logo" src="<tml:url type="static" file="images/brand/logo_600.png"/>">
+	
+		<tml:form source="none" id="login" defaultaction="login">
+			<tml:script>
+				if(option("msg"))
+					tmlform.addmessage(option('msg'))
+			</tml:script>
+			<h1>Anmelden an Website <tml:item name="dbkey" type="portlet"/></h1>
+			<tml:case condition="tmlform.hasmessages()">
+				<div class="alert alert-danger">
+					<h4>Die Anmeldung konnte nicht durchgeführt werden:</h4>
+					<ul><li>
+						<tml:formmessages divider="</li><li>"/>
+					</li></ul>
+				</div>
+			</tml:case>
+			<div class="form-group">
+				<label _class="control-label col-sm-2">Benutzername:</label>
+				<tml:input name="username" cssclass="form-control" html_placeholder="Ihr Benutzername ..." focus="true"/>
+			</div>
+			<div class="form-group">
+				<label>Kennwort:</label>
+				<tml:input name="password" type="password" cssclass="form-control" html_placeholder="Ihr Kennwort ..."/>
+			</div>
+			<div class="form-group">
+				<tml:button cssclass="btn btn-primary" clickaction="login" ajax="true" html_type="submit">Anmelden ...</tml:button>
+			</div>
+		</tml:form>
+	</div>
+</tml:include>

@@ -1,0 +1,60 @@
+<tml:action id="insert-link">
+	tmlform.VIRTUALLINKTYPE="int"
+	var ctx = context(_CM_clipboard_context, false);
+	if(ctx)
+		tmlform.VIRTUALLINK=ctx.STRUCTKEY
+	else _msg = "Internes Linkziel konnte nicht aufgelöst werden: " + _CM_clipboard_context; 
+	_link_inserted=true
+</tml:action>
+
+<tml:action id="reset-link">
+	tmlform.VIRTUALLINK="";
+	tmlform.LINKTARGET="";
+</tml:action>
+
+<tml:script>
+	if(!tmlform.submitted && !VIRTUALLINK)
+		tmlform.VIRTUALLINKTYPE="";
+</tml:script>
+
+<tml:item name="_msg" wrap="div" wrap_class="alert alert-danger"/>
+
+<tml:[form-field] o_label="Art" o_name="VIRTUALLINKTYPE" o_type="select" o_meta="true"
+	o_options="Kein Link|,Interner Link|int,Externer Link|exturl"
+	o_changeaction="reset-link"
+/>
+
+<tml:select switch="tmlform.VIRTUALLINKTYPE">
+	<tml:case value="exturl">
+		<tml:[form-field] o_label="URL" o_name="VIRTUALLINK" o_meta="true" o_placeholder="URL des Link-Ziels"/> 	
+	</tml:case>
+	<tml:case value="int">
+		<tml:input name="VIRTUALLINK" type="hidden" meta="true" changeaction=""/>
+		<tml:[form-field] o_mode="view">
+			<tml:if condition="tmlform.VIRTUALLINK">
+				<tml:then>
+					<i class="fas fa-arrow-right"></i>
+					<tml:path context="[docid:{tmlform.VIRTUALLINK}]" divider="/">
+						<tml:meta name="title"/>
+					</tml:path>
+				</tml:then>
+				<tml:else>
+					Verwenden Sie die Zwischenablage, um einen Link einzufügen.
+				</tml:else>
+			</tml:if>
+		</tml:[form-field]> 	
+	</tml:case>
+</tml:select>
+
+<tml:case condition="tmlform.VIRTUALLINKTYPE">
+	<tml:[form-field] o_label="Zielfenster" o_name="LINKTARGET" o_meta="true" o_placeholder="optionaler Name eines neuen Fensters"/>
+</tml:case>
+
+<tml:case condition="!_link_inserted && tmlform.mode()=='edit'" context="{_CM_clipboard_context}" iscontextvalid="true">
+	<tml:[form-field] o_mode="view">
+		<tml:button clickaction="insert-link" cssclass="btn btn-default">
+			<i class="fas fa-paste"></i>
+			internen Link aus Zwischenablage einfügen ...
+		</tml:button>
+	</tml:[form-field]> 	
+</tml:case>

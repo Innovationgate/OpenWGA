@@ -1,0 +1,16 @@
+<tml:action id="create">
+	//
+</tml:action>
+
+<tml:form id="form-create-workflow-level" cssclass="form-horizontal" source="none">
+	<div class="header">Neuer Workflow Level ...</div>
+	
+	<div class="content">
+		<tml:include ref="::form-level"/>
+	</div>
+	
+	<div class="footer">
+		<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="edit">Abbrechen</tml:button>
+		<tml:button cssclass="btn btn-primary" clickaction="$pc.createWorkflowLevel" portletmode="edit">Speichern</tml:button>
+	</div>
+</tml:form>

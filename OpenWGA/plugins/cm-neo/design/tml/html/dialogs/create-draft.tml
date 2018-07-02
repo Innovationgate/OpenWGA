@@ -1,0 +1,89 @@
+<tml:action id="create-draft">
+
+	var cdoc=content();
+	var draftdoc=cdoc.getStructEntry().getContent(cdoc.getLanguage().getName(), cdoc.STATUS_DRAFT)
+	if(!draftdoc){
+		if(content().isPendingRelease()){
+			content().reject("");
+			draftdoc = content();
+		}
+		else draftdoc = content().createDraftCopy()
+	}
+	else draftdoc.setMeta("author", meta("db", "username")).save();		// in case I'm not the author.
+
+	portlet.fireevent("struct-updated", App.getStructData(draftdoc))
+	portlet.fireevent("close-dialog", {
+		redirectto: context(draftdoc).contenturl("html", null, true)
+	})
+	_dialog_closed=true;
+</tml:action>
+
+<tml:script>
+	// try to find draft copy
+	var cdoc=content();
+	_draftdoc=cdoc.getStructEntry().getContent(cdoc.getLanguage().getName(), cdoc.STATUS_DRAFT)
+	_username=meta("db", "username")
+</tml:script>		
+<tml:if condition="_draftdoc" unless="_dialog_closed">
+	<tml:then>
+		<tml:script>
+			_action_title = "Zur Arbeitskopie wechseln"
+			if(_username!=_draftdoc.getAuthor())
+				_action_title = "Arbeitskopie übernehmen"
+		</tml:script>
+		<div class="header">
+			<tml:item name="_action_title"/> ...
+			<a data-modal="hide">&times;</a>
+		</div>
+		<div class="content">
+			Es existiert bereits ein in Arbeit befindliches Dokument.
+			
+			<tml:case condition="_username!=_draftdoc.getAuthor()">
+				Das Dokument ist in Bearbeitung von <b style="color:red"><tml:script expression="_draftdoc.getAuthor()"/></b>.
+				Die letzte Bearbeitung liegt 
+				<b style="color:red"><tml:script format="0">
+					var milis=now().time - _draftdoc.getLastModified().time;
+					return milis/1000/60/60/24;
+				</tml:script></b> Tag(e) zurück.
+			</tml:case> 
+			
+			<p>Möchten Sie dieses Dokument bearbeiten ?</p>
+		</div>
+		<div class="footer">
+			<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+			<tml:button cssclass="btn btn-primary" clickaction="create-draft"><tml:item name="_action_title"/></tml:button>
+		</div>
+	</tml:then>
+	<tml:elseif condition="content().isPendingRelease()">
+		<div class="header">
+			Veröffentlichung zurücknehmen
+			<a data-modal="hide">&times;</a>
+		</div>
+		
+		<div class="content">
+			Das Inhalsdokument wartet auf Veröffentlichung am <tml:metadata name="validfrom" format="dd. MMMMM yyyy"/>.
+			Möchten Sie die Veröffentlichung stoppen und das Dokument erneut bearbeiten?  
+		</div>
+		
+		<div class="footer">
+			<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+			<tml:button cssclass="btn btn-primary" clickaction="create-draft">In Arbeit setzen</tml:button>
+		</div>		
+	</tml:elseif>
+	<tml:else>
+		<div class="header">
+			Arbeitskopie erstellen
+			<a data-modal="hide">&times;</a>
+		</div>
+		
+		<div class="content">
+			Durch diese Aktion wird eine neue Arbeitskopie erzeugt. 
+			Diese Arbeitskopie ist für die "Öffentlichkeit" erst nach Veröffentlichung und Freigabe sichtbar. 
+		</div>
+		
+		<div class="footer">
+			<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+			<tml:button cssclass="btn btn-primary" clickaction="create-draft">Erstellen</tml:button>
+		</div>
+	</tml:else>
+</tml:if>

@@ -1,0 +1,60 @@
+<tml:script>
+	_field = option("name")||option("field");
+	_wrap = null;
+	_mode = option('mode') || (tmlform && tmlform.mode()) || "view"
+	_divider = option('divider')
+	if(_mode!="view" && option('type') && (option('type')=="checkbox" || option('type')=="boolean")){
+		_wrap = 'div'
+		_wrap_class = "checkbox-inline"
+		_divider = _divider ? _divider : '</div><div class="' + _wrap_class + '">'
+	}
+	else if(_mode!="view" && option('type') && option('type')=="radio"){
+		_wrap = 'div'
+		_wrap_class = "radio-inline"
+		_divider = _divider ? _divider : '</div><div class="' + _wrap_class + '">'
+	}
+</tml:script>
+<div class="form-group<tml:case condition="_field && tmlform.hasmessage(_field)"> error</tml:case>">
+    <label class="col-sm-4 control-label"><tml:option name="label"/></label>
+    <div class="col-sm-8<tml:case condition="_mode=='view'"> form-control-static</tml:case>">
+    	<tml:case condition="_field">
+	    	<tml:input name="{_field}"
+
+				type=				"{option('type')||'text'}"
+				labeled=			"{option('labeled') || VOID}"
+				options=			"{option('options')==null ? VOID : option('options')}"
+				optionsitem=		"{option('optionsitem')==null ? VOID : option('optionsitem')}"
+				optionstitle=		"{option('optionstitle')==null ? VOID : option('optionstitle')}"
+				meta=				"{option('meta')||'false'}"
+				store=				"{option('store')||(_mode=='edit'?'true':'false')}"
+				default=			"{option('default')==null ? VOID : option('default')}"
+				defaultexpression=	"{option('defaultexpression')==null ? VOID : option('defaultexpression')}"
+				validation=			"{option('validation')==null ? VOID : option('validation')}"
+				message=			"{option('message')==null ? VOID : option('message')}"
+				multiple=			"{option('multiple')==null ? VOID : option('multiple')}"
+				focus=				"{option('focus')==null ? VOID : option('focus')}"
+				divider=			"{_divider==null ? VOID : _divider}"
+				encode=				"{option('encode')==null ? VOID : option('encode')}"
+				format=				"{option('format') || (option('type')=='date' ? label('format.date') : '')}"
+				changeaction=		"{option('changeaction')==null ? VOID : option('changeaction')}"
+				mode=				"{_mode}"
+
+	    		cssclass="[{option('type')=='date' || _wrap ? '' : 'form-control'}]"
+	    		
+	    		wrap="{_wrap}"
+	    		wrap_class="{_wrap_class}"
+	    	>
+	    		placeholder="<tml:option name="placeholder"/>"
+	    		<tml:case hasoptions="focus">data-focus="true"</tml:case>
+	    	</tml:input>
+	    	
+	    	<tml:case condition="tmlform.hasmessage(_field)">
+	    		<tml:script expression="tmlform.getmessage(_field)"/>
+	    	</tml:case>
+    	</tml:case>
+    	<tml:option name="body"/>
+    	<tml:comment><tml:case condition="option('body') && option('body').replace(/\s/g, '')">
+	    	<div _class="form-control-static"><tml:option name="body"/></div>
+    	</tml:case></tml:comment>
+    </div>
+</div>			

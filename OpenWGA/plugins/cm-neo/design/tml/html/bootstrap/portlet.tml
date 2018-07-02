@@ -1,0 +1,5 @@
+<tml:eventscript onevent="setMainPortletMode">
+	portlet.setmode(portletEvent.getParameter("mode"))
+</tml:eventscript>
+
+<tml:include ref="{'::mode-' + portlet.mode}"/>

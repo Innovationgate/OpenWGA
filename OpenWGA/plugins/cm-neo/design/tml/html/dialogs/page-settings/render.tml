@@ -1,0 +1,100 @@
+<tml:action id="save-page-settings">
+
+	if(!tmlform.validate())
+		return;
+
+	if(tmlform.UNIQUENAME.trim()==""){
+		document.setUniqueName(null);
+		tmlform.removefield("UNIQUENAME")
+	}
+	
+	if(tmlform.child_editors=="custom")
+		document.setChildEditors(tmlform.fieldlist("custom_child_editors"));
+	else document.setChildEditors(tmlform.fieldlist("child_editors"));
+
+	if(tmlform.page_editors=="custom")
+		document.setPageEditors(tmlform.fieldlist("custom_page_editors"));
+	else document.setPageEditors(tmlform.fieldlist("page_editors"));
+
+	if(tmlform.page_readers=="custom")		
+		document.setReaders(tmlform.fieldList("custom_page_readers"));
+	else document.setReaders(WGA.createList());
+
+	tmlform.store();
+
+	portlet.fireevent("close-dialog");
+	portlet.fireevent("content-metas-changed", {
+		contentkey: KEY,
+		dbkey: meta("db", "dbkey")
+	});
+	
+	_dialog_closed=true
+	
+</tml:action>
+
+<tml:form id="form-page-settings" context="[$struct:{document.structKey}]" unless="_dialog_closed" mode="{WGA.app().isChiefEditor()?'edit':'view'}">
+
+	<tml:script>
+		var pagetypes = WGA.createList()
+		for(let ct in Iterator(db().getContentTypes())){
+			pagetypes.add(ct.name)
+		}
+		WGA.TMLPage.setVar("_pagetypes", pagetypes)
+	</tml:script>
+
+	<div class="header">
+		<a data-modal="hide">&times;</a>
+		Seiteneigenschaften
+	</div>
+	
+	<div class="content form-horizontal">
+
+		<ul class="nav nav-tabs">
+			<li class="active"><a data-toggle="tab" href="#basic">Eigenschaften</a></li>
+			<li><a data-toggle="tab" href="#access">Wer darf was ...</a></li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane active" id="basic">
+				<tml:if condition="WGA.app().isManager()">
+					<tml:then>
+						<tml:[form-field] o_label="Eindeutiger Name" o_name="UNIQUENAME" o_meta="true" o_mode="{WGA.app().isManager() ? 'edit':'view'}"/>
+						<tml:[form-field] o_label="Seitentitel" o_name="title" o_meta="true" o_mode="{WGA.app().isManager() ? 'edit':'view'}"/>
+					</tml:then>
+					<tml:elseif condition="UNIQUENAME">
+						<tml:[form-field] o_label="Eindeutiger Name" o_mode="view">
+							<tml:meta name="UNIQUENAME"/>
+						</tml:[form-field]>						
+					</tml:elseif>
+				</tml:if>
+				
+				<tml:[form-field] o_label="Seitentyp" o_name="contenttype" o_meta="true" o_type="select" o_optionsitem="_pagetypes"
+					o_mode="{WGA.app().isManager() ? 'edit':'view'}" 
+					o_changeaction="$refresh"/>
+				
+				<tml:script>
+					var workflows=WGA.createList();
+					var ct_workflow = db().getContentType(tmlform.contenttype).getWorkflow() || "kein Workflow"
+					workflows.add("aus Seitentyp: " + ct_workflow + "|");
+					workflows.addAll(db().getWorkflowEngine().getWorkflowDefinitions().keySet());
+					WGA.TMLPage.setVar("_workflows", workflows)
+				</tml:script>
+				<tml:[form-field] o_label="Workflow" o_name="OVERRIDE_WORKFLOW" o_meta="true" o_type="select"
+					o_mode="{WGA.app().isChiefEditor() ? 'edit':'view'}" 
+					o_optionsitem="_workflows"
+				/>
+			</div>
+			<div class="tab-pane" id="access">
+				<tml:portlet name="access" ref="::form-access"/>
+			</div>
+		</div>
+				
+	</div>
+
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:case condition="WGA.app().isChiefEditor()">
+			<tml:button clickaction="save-page-settings" cssclass="btn btn-primary">Aktualisieren</tml:button>
+		</tml:case>
+	</div>
+	
+</tml:form>	

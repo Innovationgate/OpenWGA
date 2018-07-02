@@ -1,0 +1,25 @@
+#app-child-docs {
+
+	padding: 10px;
+
+	#appnav-child-docs{
+	
+		.current{
+			margin: 20px 5px 10px;
+			font-size: 1.5em;
+		}
+	
+		legend{
+			margin: 15px 0 5px;
+		}
+	
+		a {
+			display: block;
+			margin: 5px 0;
+			padding: 2px 5px;
+			border: solid silver 1px;
+			border-radius: 4px;
+			background: #efefef;
+		}
+	}
+}

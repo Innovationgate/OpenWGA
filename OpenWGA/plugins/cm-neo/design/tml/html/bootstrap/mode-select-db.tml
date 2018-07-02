@@ -1,0 +1,53 @@
+<tml:script>
+
+    var Request = AFW.request();
+    
+	if(!Request.isIE && !Request.isGecko && !Request.isSafari){
+		_browser_not_supported = Request.userAgent;
+		return;
+	}
+
+	if(portlet.dbkey){
+		var App = WGA.app(portlet.dbkey);
+		_Database = AFW.database(portlet.dbkey);
+		if(!_Database.isValid()){
+			_msg = "Website '" + portlet.dbkey + "' konnte nicht gefunden werden. Bitte geben Sie den Namen (Schlüssel) der Website ein, die Sie bearbeiten möchten."
+			return;
+		}
+		else if(!_Database.isAuthoringAllowed()){
+			_msg = "Diese Website ist nicht zur Bearbeitung vorgesehen."
+			return;
+		}
+		else if(!_Database.isAuthor() && App.isOpen() && !App.isAnonymous()){
+			if(custom_login_url){
+				var b = WGA.urlBuilder(custom_login_url)
+				b.setParameter("dbkey", portlet.dbkey)
+				b.setParameter("contentkey", request.getParameter("contentkey"))
+				redirectto(b.build(true));
+			}
+			else{
+				_msg = "Der angemeldete User <b>" + context("db:"+portlet.dbkey).meta("db", "username") + "</b> ist kein Autor dieser Website. Bitte melden Sie sich als Autor an."
+			}
+		}
+	}
+</tml:script>
+
+<tml:if isdefined="_browser_not_supported">
+
+	<tml:then>
+		Browser not supported: <tml:item name="_browser_not_supported"/>
+	</tml:then>
+
+	<tml:elseif condition="!_Database || !_Database.isValid() || !_Database.isAuthoringAllowed()">
+		<tml:include ref="::select-db" o_msg="{_msg}"/>
+	</tml:elseif>
+	
+	<tml:elseif condition="!_Database.isAuthor() || (!_Database.hasDesign() && !_Database.isManager())">
+		<tml:include ref="::login" o_msg="{_msg}"/>
+	</tml:elseif>
+
+	<tml:else>
+		<tml:include ref="mod-contentstore"/>
+	</tml:else>
+
+</tml:if>

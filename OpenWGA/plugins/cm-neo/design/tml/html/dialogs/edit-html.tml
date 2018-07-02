@@ -1,0 +1,39 @@
+<tml:form id="edit-html">
+
+	<div class="header">
+		HTML bearbeiten
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content form-horizontal">
+		<tml:script>
+			var doc = Packages.org.jsoup.Jsoup.parseBodyFragment($option_dialog_options.html);
+			var settings = new Packages.org.jsoup.nodes.Document.OutputSettings();
+			settings.indentAmount​(4);
+			doc.outputSettings(settings);
+			_html = doc.body().html()
+			//_html = Packages.org.jsoup.Jsoup.parseBodyFragment($option_dialog_options.html).body().html();
+		</tml:script>
+		<tml:input name="html" cssstyle="font-family:Monospace" type="textarea" defaultexpression="_html" cssclass="form-control" html_spellcheck="false" html_data-focus="true"/>
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>	
+		<a class="btn btn-primary" data-action="save" data-modal="hide">Aktualisieren</a>
+	</div>
+
+</tml:form>
+
+<script>
+	require(["jquery", "jquery-tabhandler"], function($){
+		$("#edit-html textarea").tabhandler();
+		$("#edit-html [data-action=save]").on("click", function(ev){
+			ev.preventDefault();
+			var html = $("#edit-html [name=html]").val()
+			require(["toolpanels/rtf"], function(RTF){
+				RTF.getEditor().setHTML(html);
+			})
+		})
+	})
+</script>
+

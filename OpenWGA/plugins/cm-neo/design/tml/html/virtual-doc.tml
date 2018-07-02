@@ -1,0 +1,82 @@
+<tml:script>
+	_contentkey=request.getParameter("contentkey");
+	_structkey=request.getParameter("structkey");
+	_dbkey=request.getParameter("dbkey");
+</tml:script>
+
+<tml:{html} context="{'db:'+_dbkey+'/docid:'+_contentkey}">
+	<head>
+		<style>
+			body{
+				padding: 0;
+				margin: 0;
+				font-family: sans-serif;
+				position: absolute;
+				width: 100%;
+				height: 100%;
+			}
+			.info{
+				position: absolute;
+				width: 100%;
+				height: 40px;
+				box-sizing: border-box;
+				border-bottom: 1px solid silver;
+				
+				padding: 0; 
+				margin: 0; 
+				 
+				background: white;
+			}
+			.info p{
+				padding: 0 10px;
+				margin: 0;
+				line-height: 45px;
+				font-size: 16px;
+			}
+			.iframe-wrapper{
+				position: absolute;
+				top: 40px;
+				bottom: 0;
+				left: 0;
+				right: 0;
+			}
+			iframe{
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				width: 100%;
+				height: 100%;
+				border: 0 none;
+			}
+		</style>
+		<script>
+			WGA={};
+			WGA.contentinfo={
+				dbkey: "<tml:meta name="dbkey" type="db"/>",
+				contentkey: "<tml:meta name="key"/>",
+				structkey: "<tml:meta name="structkey"/>",
+				title: "<tml:script>return TITLE.replace(/"/g, "\\\"");</tml:script>",
+				language: "<tml:meta name="language"/>"
+			}
+		</script>		
+	</head>
+	
+	<body>
+		<div class="info">
+			<p>
+				Virtuelles Dokument:
+				<a href="<tml:script>return contenturl("html", null)</tml:script>">
+					<tml:if context="vlinktarget" iscontextvalid="true">
+						<tml:then><tml:metadata name="title"/></tml:then>
+						<tml:else><tml:metadata name="virtuallink"/></tml:else>
+					</tml:if>
+				</a>
+			</p>
+		</div>
+		
+		<div class="iframe-wrapper">
+			<iframe src="<tml:script>return contenturl("html", null)</tml:script>"></iframe>
+		</div>
+		
+	</body>
+</tml:{html}>

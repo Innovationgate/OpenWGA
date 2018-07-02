@@ -1,0 +1,196 @@
+<tml:comment><div class="_panel-heading">
+	RTF Editor ...
+</div></tml:comment>
+
+<fieldset style="margin-top:0">
+	<legend>Absatz</legend>
+
+	<div>
+		<select name="para" style="width:100%">
+			<option value="">Kein Absatz
+			<option data-role="divider"></option>
+			<option value="pre">PRE
+			<option value="p">Normaler Absatz
+			<option data-role="divider"></option>
+			<option value="h1">Überschrift 1
+			<option value="h2">Überschrift 2
+			<option value="h3">Überschrift 3
+			<option value="h4">Überschrift 4
+			<option value="h5">Überschrift 5
+			<option value="h6">Überschrift 6			
+		</select> 
+	</div>
+	
+	<div style="margin-top:10px">
+		<select name="text-style" style="width:100%" multiple="multiple"></select> 
+	</div>
+	
+</fieldset>
+
+<fieldset>
+	<legend>Text</legend>
+	<div class="btn-group" style="display:block">
+		<a style="width:33.333%" href="#" data-cmd="Bold" class="btn btn-default btn-sm"><b>B</b></a>
+		<a style="width:33.333%" href="#" data-cmd="Italic" class="btn btn-default btn-sm"><i>I</i></a>
+		<a style="width:33.333%" href="#" data-cmd="Underline" class="btn btn-default btn-sm"><u>U</u></a>
+	</div>
+</fieldset>
+	
+<fieldset>
+	<legend>Ausrichtung</legend>
+	<div class="btn-toolbar">
+		<div class="btn-group">
+			<a data-cmd="JustifyLeft" href="#" class="btn btn-default btn-sm">
+				<span class="fas fa-align-left"></span>
+			</a>
+			<a data-cmd="JustifyCenter" href="#" class="btn btn-default btn-sm">
+				<span class="fas fa-align-center"></span>
+			</a>
+			<a data-cmd="JustifyRight" href="#" class="btn btn-default btn-sm">
+				<span class="fas fa-align-right"></span>
+			</a>
+			<a data-cmd="JustifyFull" href="#" class="btn btn-default btn-sm">
+				<span class="fas fa-align-justify"></span>
+			</a>
+		</div>
+
+		<div class="btn-group pull-right">
+			<a data-cmd="Indent" href="#" class="btn btn-default btn-sm">
+				<tml:comment><span class="glyphicon glyphicon-indent-left"></span></tml:comment>
+				<span class="fa fa-indent"></span>
+			</a>
+			<a data-cmd="Outdent" href="#" class="btn btn-default btn-sm">
+				<tml:comment><span class="glyphicon glyphicon-indent-right"></span></tml:comment>
+				<i class="fa fa-outdent"></i>
+			</a>
+		</div>
+	</div>
+</fieldset>
+
+<fieldset>
+	<legend>Liste</legend>
+	<div class="btn-group" style="display:block">
+		<a data-cmd="InsertUnorderedList" style="width:50%" href="#" class="btn btn-default btn-sm">
+			<i class="fa fa-list-ul"></i>
+		</a>
+		<a data-cmd="InsertOrderedList" style="width:50%" href="#" class="btn btn-default btn-sm">
+			<i class="fa fa-list-ol"></i>
+		</a>
+	</div>
+</fieldset>
+
+<fieldset>
+	<legend>Objekte</legend>
+	<div role="tabpanel">
+		<ul class="nav nav-tabs">
+			<li class="active">
+				<a href="#rtf-tab-link" data-toggle="tab">Link</a>
+			</li>
+			<li>
+				<a href="#rtf-tab-image" data-toggle="tab">Bild</a>
+			</li>
+			<tml:comment><li>
+				<a href="#rtf-tab-table" data-toggle="tab">Tabelle</a>
+			</li>
+			<li>
+				<a href="#rtf-tab-section" data-toggle="tab">Abschnitt</a>
+			</li></tml:comment>
+		</ul>
+		<div class="tab-content" style="padding:10px;background:white;border:1px solid #ddd;porder-radius:0 4px 4px 4px;margin-top:-1px">
+			<div class="tab-pane active" id="rtf-tab-link">
+				<tml:comment><div style="margin-bottom:10px">
+					<label>Linkart:</label>
+					<div data-id="link-type">Extern</div>
+				</div></tml:comment>
+				<div style="margin-bottom:10px" data-id="url-wrapper">
+					<label>URL:</label>
+					<input type="text" name="url" class="form-control input-sm" placeholder="externe URL ...">
+				</div>
+				<div style="margin-bottom:10px" data-id="anker-wrapper">
+					<label>Sprungmarke (Anker):</label>
+					<input type="text" name="anker" class="form-control input-sm" placeholder="- keine -">
+				</div>
+				<div style="margin-bottom:10px">
+					<label>Titel:</label>
+					<input type="text" name="title" class="form-control input-sm" placeholder="Titel des Links ...">
+				</div>
+				<div style="margin-bottom:10px">
+					<label>Zielfenster:</label>
+					<input type="text" name="target" class="form-control input-sm" placeholder="Name des Zielfensters ...">
+				</div>
+
+				<div style="margin:10px 0" class="link-options">
+					<label>Stil:</label>
+					<select name="link-style" style="width:100%" multiple="multiple"></select> 
+				</div>
+
+				<div class="btn-group">
+					<a class="btn btn-sm btn-default" data-action="create-link" href="#">
+						<i class="fa fa-plus"></i>
+						einfügen
+					</a>
+					<a class="btn btn-sm btn-default" data-action="update-link" href="#">
+						<i class="fa fa-external-link"></i>
+						aktualisieren
+					</a>
+					<a class="btn btn-sm btn-default" data-action="delete-link" href="#">
+						<i class="fa fa-trash"></i>
+						löschen
+					</a>
+				</div>
+			</div>
+			<div class="tab-pane" id="rtf-tab-table">
+				<a href="#" class="btn btn-primary btn-sm">Tabelle einfügen ...</a>
+			</div>
+			<div class="tab-pane" id="rtf-tab-image">
+				<div style="margin-bottom:10px">
+					<label>URL:</label>
+					<textarea name="url" class="form-control input-sm" placeholder="externe Bild-URL ..."></textarea>
+				</div>			
+				<div style="margin-bottom:10px">
+					<label>Titel:</label>
+					<input type="text" name="title" class="form-control input-sm" placeholder="Titel des Bildes ...">
+				</div>
+				
+				<div class="img-options">
+					<div style="margin-bottom:10px">
+						<label>Breite x Höhe:</label>
+						<br>
+						<input type="text" name="width" class="form-control input-sm" style="display:inline;width:50px">
+						x
+						<input type="text" name="height" class="form-control input-sm" style="display:inline;width:50px">
+					</div>
+	
+					<div style="margin:10px 0">
+						<label>Stil:</label>
+						<select name="image-style" style="width:100%" multiple="multiple"></select> 
+					</div>
+				</div>
+				
+				<a class="btn btn-sm btn-default" data-action="create-image" href="#">
+					<i class="fa fa-plus"></i>
+					einfügen
+				</a>
+				<a class="btn btn-sm btn-default" data-action="update-image" href="#">
+					<i class="fa fa-external-link"></i>
+					aktualisieren
+				</a>
+			</div>
+		</div>
+	</div>
+</fieldset>
+
+
+<fieldset>
+	<legend>HTML</legend>
+	<div class="btn-group" style="display:block">
+		<a data-action="clean-html" style="width:50%" href="#" class="btn btn-default btn-sm">
+			<i class="fas fa-code"></i>
+			bereinigen
+		</a>
+		<a data-action="edit-html" style="width:50%" href="#" class="btn btn-default btn-sm">
+			<i class="fas fa-edit"></i>
+			bearbeiten
+		</a>
+	</div>
+</fieldset>

@@ -1,0 +1,15 @@
+function Controller() {}
+
+Controller.prototype.settings = function($option_dbkey) {
+	var modes = WGA.createList(["pagetypes", "areas", "languages"])
+	var wfe = WGA.db($option_dbkey).getWorkflowEngine();
+	if(wfe instanceof Packages.de.innovationgate.webgate.api.workflow.WGDefaultWorkflowEngine){
+		// no workflows
+	}
+	else modes.add("workflows")
+	return modes;
+}
+
+Controller.prototype.setSettings = function($portlet, settings){
+	$portlet.settings = settings
+}

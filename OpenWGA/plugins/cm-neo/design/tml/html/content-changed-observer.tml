@@ -1,0 +1,224 @@
+<tml:action id="content-changed">	
+	var structkey = request.getParameter("structkey")
+	var contentkey = request.getParameter("contentkey");
+	var dbkey = request.getParameter("dbkey")
+	var language = request.getParameter("language")
+	
+	if(!structkey || !dbkey)
+		return;
+	
+	portlet.dbkey=dbkey;
+	portlet.contentkey=contentkey;
+	portlet.structkey=structkey;
+
+	var path = []
+	var struct = db(dbkey).getStructEntryByKey(structkey)
+	var Struct = AFW.structentry(struct);
+	var area = struct.getArea().name;
+	while(struct){
+		path.unshift(struct.getStructKey())
+		struct = struct.getParentEntry();
+	}
+	//console.log("path", path.join("/"));
+	
+	var event = createevent("content-changed")
+	event.setParameter("path", path.join("/"))
+	event.setParameter("dbkey", dbkey)
+	event.setParameter("area", area)
+	event.setParameter("structkey", structkey)
+	event.setParameter("language", language)
+	
+	event.setParameter("may_create_content", Struct.mayCreateContent());
+	event.setParameter("may_create_child_page", Struct.mayCreatePage());
+	event.setParameter("may_delete_page", Struct.mayDeletePage());
+	
+	var may_create_root_page = false;
+	for(let area in Iterator(db(portlet.dbkey).getAreas().values())){
+		if(area.name.indexOf("$")==0)
+			continue;
+		if(area.mayEditPages()){
+			may_create_root_page = true;
+			break;
+		}
+	}
+	event.setParameter("may_create_root_page", may_create_root_page);
+	
+	if(contentkey){
+		event.setParameter("contentkey", contentkey)
+		var c = context("db:"+dbkey + "/docid:" + contentkey, false);
+		if(c){
+			var Content = AFW.content(c.content());
+			event.setParameter("status", c.STATUS)
+			event.setParameter("language", c.LANGUAGE)
+			event.setParameter("ismine", c.AUTHOR==c.meta("db", "username"))
+			event.setParameter("may_update_content", App.mayUpdateContent(c));
+			event.setParameter("may_delete_version", Content.mayDeleteContent());
+			event.setParameter("may_archive_version", Content.mayArchiveContent());
+			event.setParameter("may_approve_version", c.STATUS==c.content().STATUS_REVIEW && !c.content().isPendingRelease() && Content.mayApprove());
+			event.setParameter("may_edit_content", 
+				(c.STATUS==c.content().STATUS_RELEASE 
+					|| c.STATUS==c.content().STATUS_ARCHIVE 
+					|| (c.STATUS==c.content().STATUS_DRAFT && !Content.isMine())
+					|| (c.STATUS==c.content().STATUS_REVIEW && c.content().isPendingRelease())
+				) 
+				&& Content.mayEditContent()
+			);
+		}
+	}
+	
+	portlet.fireevent(event)
+</tml:action>
+
+<script>
+	require(["jquery"], function($){
+		//console.log("add onload handler",$("#site-panel")); 
+		$("#site-panel").on("load.sitepanel", function(){
+			$("#loading").hide();
+			//console.log("sitepanel load", this.contentWindow.WGA.contentinfo);
+			if(this.contentWindow.WGA.contentinfo){
+				var info = this.contentWindow.WGA.contentinfo
+				location.hash = info.dbkey + (info.contentkey ? "/" + info.contentkey : info.structkey ? "/"+info.structkey : "");
+				WGA.ajax.action({
+					action: "<tml:action ref="content-changed" ajax="norefresh"/>",
+					mode: "norefresh",
+					graydiv: false,
+					params: info
+				})
+			}
+		})
+	})
+	
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "scale", function(ev){
+		WGA.ajax.action({
+			action: "<tml:action ajax="norefresh">
+				profile.scale = request.getParameter("scale")
+			</tml:action>",
+			mode: "norefresh",
+			graydiv: false,
+			params: {
+				scale: ev.params.scale
+			}
+		})		
+	}) 
+
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "clipboard-copy", function(ev){
+		WGA.ajax.action({
+			action: "<tml:action ajax="norefresh">
+				var path = "db:"+portlet.dbkey+"/docid:"+portlet.structkey;
+				setsessionvar("_CM_clipboard_context", path)
+				console.log("clipbord copy", path);
+				portlet.fireevent("clipboard-changed", {
+					path: path
+				})
+			</tml:action>",
+			mode: "norefresh",
+			graydiv: false
+		})		
+	}) 
+
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "set-primary-attachment", function(ev){
+		WGA.ajax.action({
+			action: "<tml:action ajax="norefresh">
+				var path = "db:"+portlet.dbkey+"/docid:"+portlet.structkey;
+				var c = context(path).content();
+				c.setPrimaryFileName(request.filename)
+				c.save();
+			</tml:action>",
+			mode: "norefresh",
+			graydiv: false,
+			params: {
+				filename: ev.params.filename
+			}
+		})		
+	}) 
+
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "move-page", function(ev){
+		WGA.ajax.action({
+			action: "<tml:action ajax="norefresh">
+			
+				var struct = db(portlet.dbkey).getStructEntryByKey(request.key)
+				var parent;
+				
+				if(request.parent){ 
+					parent = db(portlet.dbkey).getStructEntryByKey(request.parent)
+				}
+				else{
+					parent = struct.getArea();
+				}
+				
+				var children = parent.getChildEntries();
+				var index = request.index;
+
+				if((struct.isRoot() && !request.parent) || (!struct.isRoot() && struct.getParentEntry().getStructKey()==request.parent)){
+					// same parent
+					if(children.getIndexOfEntry(struct) < index)
+						index++;
+				}
+				//else console.log("move to new parent", index);
+				
+				var after = children.getByIndex(index-1);
+				var before = children.getByIndex(index);
+				
+				//console.log("update position", after && after.position, before && before.position);
+				
+				var pos;
+				if(after && before){
+					if(before.position - after.position < 2){
+						//console.log("renumbering nessessary");
+						WGA.Master.runFunction(function(struct){							
+							db(struct.getDatabase().getDbReference());	// = reopen session
+							var siblings=WGA.createList();
+							var next=struct.getNextSibling();
+							while(next){
+								siblings.add(next);
+								next=next.getNextSibling();
+							}
+							var pos = struct.position+100
+							for(let struct in Iterator(siblings)){
+								struct.setPosition(pos);
+								pos += 100;
+								struct.save();
+								//console.log("renumbered", struct.title, struct.position);
+							}
+						}, after)
+						pos = after.position+50;
+					}
+					else pos = (before.position+after.position)/2
+				}
+				else if(!after && !before){
+					pos = 0;
+				}
+				else if(after){
+					// no before
+					pos = after.position + 100;
+				}
+				else{
+					// no after
+					pos = before.position - 100;
+				}
+				//console.log("new position", pos);
+				
+				db(portlet.dbkey).moveStructEntry(struct, parent)
+				struct.setPosition(pos);
+				struct.save();
+				
+				portlet.fireEvent("content-metas-changed");
+				
+			</tml:action>",
+			mode: "norefresh",
+			graydiv: false,
+			params: ev.params
+		})		
+	}) 
+
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "logout", function(ev){
+		WGA.ajax.action({
+			action: "<tml:action>
+				WGA.app(portlet.dbkey).domain().auth().logout()
+				WGA.redirectTo("<tml:url/>")
+			</tml:action>"
+		})		
+	}) 
+
+</script>
+

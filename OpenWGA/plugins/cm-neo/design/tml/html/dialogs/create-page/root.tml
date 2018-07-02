@@ -1,0 +1,69 @@
+<tml:action id="create-page">
+	if(tmlform.validate()){
+		var ct = db().getContentType(tmlform.contenttype)
+		var area = db().getArea(tmlform.area)
+
+		var rootEntries = area.getRootEntries();
+		var position = (rootEntries.size() && rootEntries.getByIndex(rootEntries.size()-1).getPosition()+100) || 0;
+
+		var doc = area.createRootPage(ct, tmlform.title, tmlform.language)
+		var struct = doc.getStructEntry()
+		struct.setPosition(position)
+		struct.save();
+		
+		portlet.fireevent("close-dialog", {
+			redirectto: context(doc).contenturl()
+		})
+	}
+</tml:action>
+
+<tml:form id="form-create-page" source="portlet" context="[$struct:{document.getStructKey()}]">
+
+	<tml:script>
+		_areas = WGA.createList()
+		for(let area in Iterator(db().getAreas().values())){
+			if(area.systemArea)
+				continue;
+			if(area.name=="hdb-content" && !WGA.app().isManager())
+				continue;
+			var visiblefor = area.getExtensionData("CM_area_visible")
+			if(visiblefor && visiblefor.size() && !db().isMemberOfUserList(visiblefor))
+				continue;
+			if(!area.mayEditPages())
+				continue;
+			if(area.mayReadContent())
+				_areas.add(area.name)
+		}
+		WGA.TMLPage.setVar("_areas", _areas)
+		if(_areas.size()==1)
+			tmlform.area = _areas.get(0);
+		else if(!tmlform.submitted && _areas.contains(document.getArea().name))
+			tmlform.area = document.getArea().name
+	</tml:script>
+
+	<div class="header">
+		Neue Hauptseite
+		<a data-modal="hide">&times;</a>
+	</div>
+
+	<div class="content form-horizontal">
+		<tml:[::form] o_page="root"/>
+		<tml:[form-field] o_label="Websitebereich" o_type="select" o_field="area" o_optionsitem="_areas" o_mode="{_areas.size()==1 ? 'view':'edit'}"/>
+	</div>
+
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:{button} html_class="btn btn-primary" if="_isValid">Erstellen</tml:{button}>
+	</div>
+
+	<script>
+		require(["jquery", "siteexplorer"], function($, S){		
+			$("#form-create-page button").click(function(ev){
+				ev.preventDefault();
+				S.forceReload();
+				WGA.ajax.callAction("<tml:action ref="create-page"/>");
+			})
+		})
+	</script>	
+</tml:form>	
+

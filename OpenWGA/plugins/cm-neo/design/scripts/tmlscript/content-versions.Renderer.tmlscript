@@ -1,0 +1,120 @@
+function Renderer() {}
+
+Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey, $urlParam_structkey, $urlParam_language) {
+
+	var contentkey = $urlParam_contentkey
+	var structkey = $urlParam_structkey
+	var dbkey = $urlParam_dbkey
+
+	var c=null;
+	var contentlist;
+	var current_lang=$urlParam_language;
+	
+	if(contentkey){
+		c = context("db:"+dbkey + "/docid:" + contentkey, false);
+		if(c){
+			contentlist=c.content().getStructEntry().getAllContent(true);
+			current_lang = c.LANGUAGE;
+		}
+	}
+	if(c==null){
+		c = context("db:"+dbkey + "/$struct:" + structkey, false);
+		if(c)
+			contentlist=c.document.getAllContent(true);
+	}
+	if(c==null)
+		return "{}";
+	
+	var archive=[];
+	var current=[];
+	
+	var released_version=null;
+	var draft_version=null;
+	var review_version=null;
+	
+	var langs={};
+	
+
+	function versionData(version){
+		return {
+			version: version.getVersion(),
+			key: version.getContentKey().toString(),
+			status: label("content-properties.status." + (version.isPendingRelease() ? 'pending' : version.getStatus())),
+			modified: WGA.format(version.getLastModified(), "dd.MM.yyyy HH:mm"),
+			published: AFW.Util.dateRange(version.getPublished(), version.getLastModified()),
+			cssclass: version.getVersion()==c.VERSION ? "selected":"",
+			language: version.getLanguage().getTitle(),
+			url: context(version).contenturl("html", null, true)
+		}
+	}
+	
+	for(let version in Iterator(contentlist)){
+		//console.log("version", version.status)
+		var status=version.getStatus();
+
+		if(status!=version.STATUS_RELEASE && !version.mayEditContent())
+			continue;			
+			
+		if(!current_lang || version.getLanguage().getName()!=current_lang){
+			var lang=version.getLanguage().getName();
+			var rating=0;
+			switch(status){
+				case version.STATUS_DRAFT:
+					rating=3;
+					break;
+				case version.STATUS_REVIEW:
+					rating=2;
+					break;
+				case version.STATUS_RELEASE:
+					rating=1;
+					break;
+			}
+			if(!langs[lang]){
+				langs[lang]={};
+				langs[lang].content=version;
+				langs[lang].rating=rating;
+			}
+			else{
+				if(rating>langs[lang].rating){
+					langs[lang].content=version;
+					langs[lang].rating=rating;
+				}
+			}
+			continue;
+		}
+		if(version.getStatus()==version.STATUS_ARCHIVE){
+			archive.push(versionData(version))
+		}
+		else if(version.getStatus()==version.STATUS_RELEASE)
+			released_version=versionData(version);
+		else if(version.getStatus()==version.STATUS_DRAFT)
+			draft_version=versionData(version);
+		else if(version.getStatus()==version.STATUS_REVIEW)
+			review_version=versionData(version);
+	}
+
+	draft_version && current.push(draft_version);
+	review_version && current.push(review_version);
+	released_version && current.push(released_version);
+	
+	var languages=[]
+	for(var i in langs){
+		var version = langs[i].content;
+		languages.push(versionData(version))
+	}
+	
+	var json = {
+		versions: contentlist.size(), 
+		current: current,		
+		archive: archive.sort(function(a,b){
+			return a.version < b.version ? 1 : -1;
+		}),
+		languages: languages,
+		current_lang: current_lang
+	}
+	
+	//console.log(JSON.stringify(json));
+	
+	WGA.TMLPage.write(JSON.stringify(json))
+
+}

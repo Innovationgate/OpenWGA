@@ -1,0 +1,43 @@
+this.login = function(dbkey, username, password, contentkey){
+	var database=wgacore.getContentdbs().get(dbkey)
+	if(!database){
+		return label("login.database-not-found", createlist([encode("html", dbkey)]))
+	}
+	var domain = WGA.database(database).domain().name
+	
+	if(login(username, password, domain)){
+		log.info("OpenWGA Contentmanager: user '" + username + "' logged in to database '" + dbkey + "' in domain '" + domain + "' from IP " + request.getRemoteAddr());
+		try{
+			var wgdb = db(dbkey);	// opens a db session
+			if(!wgdb.isSessionOpen()){
+				return WGA.design(this).label("login.user-is-no-author", WGA.createList([tmlform.username, dbkey]))
+			}
+			log.info("user '" + username + "' is logged in as " + AFW.database(database).getAccessLevelText())
+			if(!AFW.database(database).isAuthor())
+				return WGA.design(this).label("login.user-is-no-author", WGA.createList([tmlform.username, dbkey]))
+						
+			redirectto(this.getAuthoringURL(dbkey, contentkey));
+		}
+		catch(e){
+			logException(e);
+			return e.message
+		}
+	}
+	else {
+		// is logon blocked?
+		if(WGACore.getBruteForceLoginBlocker().isLoginBlocked(domain, username))
+			return WGA.design(this).label("login.login-blocked", [username])
+		else return WGA.design(this).label("login.login-error")
+	}
+}
+
+this.getAuthoringURL=function(dbkey, contentkey){
+	var url = WGA.urlBuilder(WGA.design(this).resolve("main").layoutURL())
+	if(dbkey)
+		url.setParameter("dbkey", dbkey);
+	if(contentkey){
+		url.setParameter("contentkey", contentkey);
+		return url.build(true)+"#"+dbkey+"/"+contentkey
+	}
+	else return url.build(true)
+}

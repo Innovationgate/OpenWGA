@@ -1,0 +1,148 @@
+#content {
+	background: white;
+	overflow: auto;
+	.content {
+		.header {
+			position: absolute;
+			top:0;
+			left: 0;
+			right: 0;
+			height: 44;
+			background: #EBEBEB;
+			border-bottom: solid #dddddd 1px;
+			padding: 2;
+			&.dark {
+				background: black;
+				color: white;
+				border-bottom: solid #333333 1px;
+			}
+		}
+		.body {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			overflow: hidden;
+			transition: right .3s ease-in;
+
+			iframe#site-panel {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				border: none;
+			}
+
+			.loading {
+				font-size: 2em;
+				width: 75%;
+				margin: 100px 0;
+			}
+
+			.sitepanel-wrapper{
+				transform-origin: top left;
+				-webkit-transform-origin: top left;
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				overflow: hidden;
+
+				overflow-y: auto;
+				-webkit-overflow-scrolling: touch;
+
+				&.scale80{
+					right: -25%;
+					bottom: -25%;
+					height: 125%;
+					transform: scale(0.8, 0.8);
+					-webkit-transform: scale(0.8, 0.8);
+				}
+				&.scale50{
+					right: -100%;
+					bottom: -100%;
+					height: 200%;
+					transform: scale(0.5, 0.5);
+					-webkit-transform: scale(0.5, 0.5);
+				}
+			}
+
+		}
+		.footer {
+			position: absolute;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			height: 44px;
+			background-color: #ebebeb;
+			background-image: linear-gradient(90deg, white 75%, #ebebeb);
+			border-top: solid #dddddd 1px;
+			padding: 5px;
+			&.dark {
+				background: black;
+				color: white;
+				border-top: solid #333333 1px;
+			}
+		}
+
+		.sidebar {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			overflow: auto;
+			width: 0;
+			background: #EBEBEB;
+			transition: width .3s ease-in;
+			&.dark {
+				background: black;
+				color: white;
+			}
+		}
+
+
+		&.header {
+			.body, .sidebar {
+				top: 44px;
+			}
+		}
+		&.footer {
+			.body, .sidebar {
+				bottom: 44px;
+			}
+		}
+		&.sidebar {
+			.body {
+				right:250px;
+			}
+			.sidebar {
+				border-left: solid silver 1px;
+				width: 250px;
+			}
+
+			@media screen and (max-width: $width_breakpoint){
+				font-size: .8em;
+				.body {
+					right:220px;
+				}
+				.sidebar {
+					width: 220px;
+				}
+			}
+
+		}
+
+	}
+
+	.splash {
+		width: 600px;
+		margin: 50px auto;
+		.logo{
+			display: block;
+			max-height: 150px;
+			max-width: 100%;
+			margin: 0 auto;
+		}
+	}
+}

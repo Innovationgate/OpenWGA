@@ -1,0 +1,76 @@
+function Renderer() {}
+
+Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey) {
+
+	var query;
+	var drafts=[],
+		toapprove=[],
+		waiting=[];
+
+	var _context = context("db:"+$urlParam_dbkey+"/docid:"+$urlParam_contentkey);
+	var me = WGA.app($urlParam_dbkey).getUserName();
+
+	var docs = WGA.app($urlParam_dbkey).query("content.status='w' AND content.author = :me order by content.lastmodified DESC", {
+		onlypublished: false,
+		//alllanguages: true,
+		context: _context,
+		p_me: me
+	})
+	for(let doc in Iterator(docs)){
+		drafts.push({
+			title: WGA.encode("html", doc.TITLE),
+			version: doc.VERSION,
+			modified: AFW.Util.timeElapsed(doc.MODIFIED),
+			language: doc.LANGUAGETITLE,
+			cssclass: doc.KEY==$urlParam_contentkey ? "selected":"",
+			href: doc.contenturl('html', null, true)
+		})
+	}
+	
+	var wfe = WGA.db($urlParam_dbkey).getWorkflowEngine();
+	if(wfe instanceof Packages.de.innovationgate.webgate.api.workflow.WGDefaultWorkflowEngine){
+		// no workflows
+	}
+	else {
+	
+		var item = Packages.de.innovationgate.webgate.api.workflow.WGStraightWorkflow.ITEM_INITIATOR.toLowerCase()
+		query = "content.items[:item].text=:me AND content.status='g'"
+		var docs = WGA.app($urlParam_dbkey).query(query, {
+			onlypublished: false,
+			//alllanguages: true,
+			context: _context,
+			p_item: item,
+			p_me: me
+		}).filter(function(doc) !doc.content().isPendingRelease())
+		
+		for(let doc in Iterator(docs)){
+	
+			var approver=[];
+			var wf = db($urlParam_dbkey).getWorkflowEngine().getWorkflowDefinitions().get(doc.wfname);
+			for(var level in Iterator(wf.getLevels())){
+				if(level.name==doc.wflevelnr){
+					for(let name in Iterator(level.reviewers)){
+						approver.push(name);
+					}
+					break;
+				}
+			}
+		
+			waiting.push({
+				title: WGA.encode("html", doc.TITLE),
+				href: doc.contenturl('html', null, true),
+				modified: AFW.Util.timeElapsed(doc.MODIFIED),
+				workflow: doc.wfname + " / " + doc.wflevelnr,
+				cssclass: doc.KEY==$urlParam_contentkey ? "selected":"",
+				approver: approver
+			})
+		}
+	}
+	
+	WGA.TMLPage.write(JSON.stringify({
+		drafts: drafts,
+		waiting: waiting,
+		toapprove: toapprove
+	}))
+
+}
