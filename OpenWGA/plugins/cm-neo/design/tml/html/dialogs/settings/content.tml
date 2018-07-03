@@ -46,7 +46,7 @@
 			<li class="active"><a data-toggle="tab" href="#basic">Eigenschaften</a></li>
 			<li><a data-toggle="tab" href="#link">Link</a></li>
 			<li><a data-toggle="tab" href="#items">Items</a></li>
-			<li><a data-toggle="tab" href="#validity">Sichbarkeit</a></li>
+			<li><a data-toggle="tab" href="#validity">Sichtbarkeit</a></li>
 		</ul>
 
 		<div class="tab-content">
