@@ -122,7 +122,10 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 			a = editor.createLink(url, url, "exturl");
 			AFW.RTF.setURLInfo(a, {type:"exturl", key:url})
 			a.title = $("[name=title]", root_el).val();
-			a.target = $("[name=target]", root_el).val();
+			var target = $("[name=target]", root_el).val();
+			if(target)
+				a.target = target;
+			else a.removeAttribute("target") 
 		},
 		"update-link": function(el){
 			var a = editor.getNearestTagFromSelection("a")
@@ -144,7 +147,10 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 				AFW.RTF.setURLInfo(a, {type:"exturl", key:url})
 			}
 			a.title = $("[name=title]", root_el).val();
-			a.target = $("[name=target]", root_el).val();
+			var target = $("[name=target]", root_el).val();
+			if(target)
+				a.target = target;
+			else a.removeAttribute("target") 
 		},
 		"delete-link": function(el){
 			var a = editor.getNearestTagFromSelection("a")
