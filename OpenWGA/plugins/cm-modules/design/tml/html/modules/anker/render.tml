@@ -1,1 +1,1 @@
-<a name="<tml:script expression="CMM.setting('name')"/>"></a>
+<a id="<tml:script expression="CMM.setting('name')"/>"></a>
