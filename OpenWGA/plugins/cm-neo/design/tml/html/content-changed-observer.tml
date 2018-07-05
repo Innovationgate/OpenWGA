@@ -106,7 +106,6 @@
 			action: "<tml:action ajax="norefresh">
 				var path = "db:"+portlet.dbkey+"/docid:"+portlet.structkey;
 				setsessionvar("_CM_clipboard_context", path)
-				console.log("clipbord copy", path);
 				portlet.fireevent("clipboard-changed", {
 					path: path
 				})

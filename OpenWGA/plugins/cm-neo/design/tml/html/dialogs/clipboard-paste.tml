@@ -47,7 +47,7 @@
 		<tml:[form-field] o_label="Einfügen" o_field="root_or_child" o_type="select" o_default="child" o_optionsitem="_root_or_child" o_changeaction="$refresh"/>
 		
 		<tml:case condition="tmlform.root_or_child=='root'">
-			<tml:[form-field] o_label="Bereich" o_field="area" o_type="select" o_optionsitem="_areas"/>
+			<tml:[form-field] o_label="Bereich" o_field="area" o_type="select" o_optionsitem="_areas" o_changeaction="$refresh"/>
 		</tml:case>
 		
 		<tml:{div} html_class="alert alert-danger" unless="$mc.isAllowedPageType">

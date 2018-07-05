@@ -41,17 +41,23 @@ Controller.prototype.pageType = function($cx, $item__CM_clipboard_context) {
 	return source.getContentType().name;
 }
 
-Controller.prototype.isAllowedPageType = function(AFW, $cx, $item__CM_clipboard_context) {
+Controller.prototype.isAllowedPageType = function(AFW, $cx, $item__CM_clipboard_context, $field_root_or_child, $field_area) {
 	
 	var source = $cx.context($item__CM_clipboard_context).content().structEntry;
 	var dest = $cx.content().structEntry;
-	
+
 	var ct = source.getContentType();
 	var Contenttype = AFW.contenttype(ct);
-	
+
 	if(!Contenttype.isValid()){
 		return false;
 	}
+
+	if($field_root_or_child=="root"){
+		var area = $field_area || $cx.AREA
+		dest = $cx.db().getArea(area)
+	}
+	
 	if(!Contenttype.isAllowed(dest)){
 		return false;
 	}
