@@ -25,8 +25,8 @@
 		<tml:{div} html_class="alert alert-danger clearfix" if="_query_delete">
 			<tml:if istrue="_may_delete">
 				<tml:then>
-					<p style="margin:0 0 20px">Diesen Seitentype wirklich löschen?</p>
-					<tml:button cssclass="btn btn-default _pull-right" clickaction="delete" portletmode="view">Sprache löschen</tml:button>
+					<p style="margin:0 0 20px">Diesen Seitentyp wirklich löschen?</p>
+					<tml:button cssclass="btn btn-default _pull-right" clickaction="delete" portletmode="view">Seitentyp löschen</tml:button>
 				</tml:then>
 				<tml:else>
 					<p>Dieser Seitentyp kann nicht gelöscht werden.</p>
