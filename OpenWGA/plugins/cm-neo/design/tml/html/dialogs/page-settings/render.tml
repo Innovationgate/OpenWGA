@@ -3,7 +3,7 @@
 	if(!tmlform.validate())
 		return;
 
-	if(tmlform.UNIQUENAME.trim()==""){
+	if(tmlform.hasfield("UNIQUENAME") && tmlform.UNIQUENAME.trim()==""){
 		document.setUniqueName(null);
 		tmlform.removefield("UNIQUENAME")
 	}

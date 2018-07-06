@@ -3,13 +3,21 @@
 	var contentkey = request.getParameter("contentkey");
 	var dbkey = request.getParameter("dbkey")
 	var language = request.getParameter("language")
+
+	if(dbkey && (!structkey || structkey=="null")){
+		var event = createevent("content-changed")
+		event.setParameter("dbkey", dbkey)
+		event.setParameter("language", language || db(dbkey).getDefaultLanguage())
+		portlet.fireevent(event)
+		return;
+	}
 	
 	if(!structkey || !dbkey)
 		return;
 	
 	portlet.dbkey=dbkey;
 	portlet.contentkey=contentkey;
-	portlet.structkey=structkey;
+		portlet.structkey=structkey;
 
 	var path = []
 	var struct = db(dbkey).getStructEntryByKey(structkey)

@@ -18,12 +18,12 @@
 	<tml:script>
 		request.getSession().setAttribute("CM.appid", Packages.de.innovationgate.cm_neo.modules.CMHtmlHeadInclusion.CM_APP_ID);
 		request.getSession().setAttribute(WGACore.ATTRIB_BROWSERINTERFACE, true);
+
+		var url = WGA.urlBuilder(WGA.design().resolve("virtual-doc").layoutURL()).build();
+		request.getSession().setAttribute(wgacore.ATTRIB_VIRTUAL_CONTENT_URL, url + "?contentkey=#CONTENTKEY_UNIQUE_MODE#&structkey=#STRUCTKEY#&dbkey=#DBKEY#");
 	
-		request.getSession().setAttribute(wgacore.ATTRIB_VIRTUAL_CONTENT_URL, 
-			"/"+meta("db", "dbkey")+"/html/virtual-doc.int.html?contentkey=#CONTENTKEY_UNIQUE_MODE#&structkey=#STRUCTKEY#&dbkey=#DBKEY#");
-	
-		request.getSession().setAttribute(wgacore.ATTRIB_NO_CONTENT_NOTIFCATION_URL, 
-			"/"+meta("db", "dbkey")+"/html/no-content.int.html?dbkey=#DBKEY#&structkey=#KEY#");
+		var url = WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL()).build();
+		request.getSession().setAttribute(wgacore.ATTRIB_NO_CONTENT_NOTIFCATION_URL, url + "?dbkey=#DBKEY#&structkey=#KEY#");
 
 		var app = WGA.app(portlet.dbkey);
 		var auth = app.domain().auth()
@@ -81,8 +81,14 @@
 								<tml:then>
 									src="<tml:script expression="contenturl('html', null, true)"/>"								
 								</tml:then>
-								<tml:else>
-									src="<tml:url type="homepage" context="[db:{portlet.dbkey}]"/>"
+								<tml:elseif condition="WGA.app(portlet.dbkey).getHomepageURL()">
+									src="<tml:script expression="WGA.app(portlet.dbkey).getHomepageURL()"/>"
+								</tml:elseif>
+								<tml:else>								
+									src="<tml:script>
+										var baseurl = meta("request", "wgaurl")
+										return (baseurl ? "/" + baseurl : "") + "/" + portlet.dbkey
+									</tml:script>"
 								</tml:else>
 							</tml:if>
 						></iframe>

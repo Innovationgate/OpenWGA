@@ -7,6 +7,10 @@ Renderer.prototype.render = function(App, $urlParam_id, $urlParam_dbkey, $urlPar
 	var structs = WGA.createList()
 	if($urlParam_id=="root"){
 		var area = db($urlParam_dbkey).getArea($urlParam_area);
+		if(!area){
+			WGA.TMLPage.write(JSON.stringify(ret))
+			return;
+		}
 		var visiblefor = area.getExtensionData("CM_area_visible")
 		//console.log($urlParam_area, ""+visiblefor)
 		if(!visiblefor || visiblefor.size()==0 || db($urlParam_dbkey).isMemberOfUserList(visiblefor))
