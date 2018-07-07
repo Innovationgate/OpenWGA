@@ -45,7 +45,9 @@
 		ev.stopPropagation();
 		var node = $(this).parents('.node').first();
 		if(node.hasClass('collapsed'))
-			expandNode(node)
+			expandNode(node, function(){
+				//scrollIntoView(node);
+			})
 		else collapseNode(node)
 	}
 	
@@ -189,9 +191,11 @@
 		node.parents(".wga_tree").first().find(".node").removeClass("selected");
 		node.addClass("selected")
 		node.parents(".node").removeClass("collapsed");
+		
 		setTimeout(function(){
-			scrollIntoView(node.children("div").first())
-		}, 200);
+			scrollIntoView(node)
+		}, 250)
+		
 		if(trigger_selected){
 			node.trigger("select", {
 				node: node,
@@ -205,9 +209,9 @@
 		}
 	}
 
-	function scrollIntoView(element) {
-		if(!element.length)
-			return;	// element not found
+	/*
+	function isInView(element) {
+
 		var container = element.offsetParent();
 		
 		var containerScrollTop = container.scrollTop();
@@ -216,17 +220,40 @@
 		var elemTop = element.position().top;
 		var elemBottom = elemTop + element.height();
 
-		if(elemTop<0){
-			var top = containerScrollTop + elemTop
-			if(top<containerHeight)
-				top=0;
-			container.animate({scrollTop: top}, 100)
-		}
-		else if (elemBottom > containerHeight){
-			container.animate({scrollTop: containerScrollTop + elemBottom - containerHeight}, 100)
-		}
+		var inView = elemTop >= containerScrollTop && elemBottom <= containerScrollTop + containerHeight; 
+		//var inView = elemTop >= containerScrollTop
+		console.log(inView, "top", elemTop, containerScrollTop, "inview-top", elemTop >= containerScrollTop)
+		console.log(inView, "bottom", elemBottom, containerScrollTop + containerHeight, "in-view-bottom", elemBottom <= containerScrollTop + containerHeight)
+		console.log("el-height", element.height())
+		
+		return {
+			top: elemTop >= containerScrollTop,
+			bottom: elemBottom <= containerScrollTop + containerHeight
+		};
+		
 	}
+	*/
 	
+	function scrollIntoView(node) {
+		
+		if(!node.length)
+			return;	// element not found
+		
+		var container = node.offsetParent();
+		
+		var containerScrollTop = container.scrollTop();
+		var containerHeight = container.height();
+		
+		var entryTop = node.position().top;
+		var entryBottom = entryTop + $(".entry", node).height()
+
+		if(entryTop < containerScrollTop)
+			container.animate({scrollTop: entryTop}, 100)
+		else if (entryBottom > containerScrollTop + containerHeight)
+			container.animate({scrollTop: entryBottom-containerHeight}, 100)
+
+	}
+
 	function selectpath(path, parentNode){
 		var parts = path.split("/");
 		var node = parentNode || this;
