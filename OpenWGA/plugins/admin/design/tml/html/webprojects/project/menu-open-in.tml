@@ -60,13 +60,13 @@
 		
 		<tml:case condition="DBM.database(option('dbkey')).isFullFeature">
 			,"-"
-			<tml:case condition="AFW.Util.hasPlugin('de.innovationgate.contentmanager') && AFW.database(option('dbkey')).isAuthoringAllowed()">
+			<tml:case condition="AFW.database(option('dbkey')).isAuthoringAllowed()">
 				,{
 					cls:'x-btn-text-icon',						
 					icon: '<tml:url type="file" db="@afw" doc="icons" file="application_form_edit.png"/>',		                
 					text: "WGA Content Manager",
 					handler: function(){
-						window.open('<tml:meta type="request" name="absolutewgaurl"/>/plugin-contentmanager/html/contentstore?dbkey=<tml:option name="dbkey"/>')
+						window.open('<tml:meta type="request" name="absolutewgaurl"/>/contentmanager?dbkey=<tml:option name="dbkey"/>')
 					}	
 				}
 			</tml:case>
