@@ -63,7 +63,7 @@
 							icon: '<tml:url type="file" db="@afw" doc="icons" file="application_form_edit.png"/>',		                
 							text: "open in Content Manager",
 							handler: function(){
-								window.open('<tml:meta type="request" name="absolutewgaurl"/>/plugin-contentmanager/html/contentstore?dbkey=<tml:meta name="dbkey" type="db"/>&contentkey=<tml:meta name="key"/>#<tml:meta type="db" name="dbkey"/>/<tml:meta name="key"/>')
+								window.open('<tml:meta type="request" name="absolutewgaurl"/>/contentmanager?dbkey=<tml:meta name="dbkey" type="db"/>&contentkey=<tml:meta name="key"/>#<tml:meta type="db" name="dbkey"/>/<tml:meta name="key"/>')
 							}
 						}
 					</tml:case>
