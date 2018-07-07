@@ -17,7 +17,7 @@
 	
 	portlet.dbkey=dbkey;
 	portlet.contentkey=contentkey;
-		portlet.structkey=structkey;
+	portlet.structkey=structkey;
 
 	var path = []
 	var struct = db(dbkey).getStructEntryByKey(structkey)

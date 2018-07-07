@@ -154,7 +154,6 @@ define([
 		        	if(!editor.getParagraph() && !editor.isInTable())
 		        		editor.execCmd("FormatBlock", "p");
 					var el = editor.createImg(file.poster, file.type||"intfile")
-					console.log("createImg", file.poster)
 					AFW.RTF.setURLInfo(el, {type:file.type||"intfile", key:file.key||file.name})
 					el.alt = el.title=file.title || file.name;
 					editor.getRange().setStartAfter(el);
