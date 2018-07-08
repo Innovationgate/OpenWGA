@@ -195,9 +195,13 @@ public class App extends Database {
     }
     
     public String getBaseURL() throws WGException {
-        return _wga.server().getBaseURL() + "/" + getDbKey();
+        return getBaseURL(true);
     }
-    
+
+    public String getBaseURL(boolean absolute) throws WGException {
+        return _wga.server().getBaseURL(absolute) + "/" + getDbKey();
+    }
+
     public Context getHomepage() throws WGException{
     	String homepageName = (String)getPublisherOption(WGACore.DBATTRIB_HOME_PAGE_NAME);
     	if(homepageName!=null){

@@ -359,17 +359,29 @@ public class Server {
         return _wga.getCore().getLog();
     }
     
+
+    /**
+     * Returns the base URL to reach this OpenWGA runtime
+     * This is the base part of every OpenWGA URL that is necessary to address the OpenWGA server itself, without any extra path information that is used to address resources within OpenWGA. 
+     * @throws WGAPIException
+     */
+    public String getBaseURL() throws WGException {
+    	return getBaseURL(true);
+    }
+
     /**
      * Returns the base URL to reach this OpenWGA runtime
      * This is the base part of every OpenWGA URL that is necessary to address the OpenWGA server itself, without any extra path information that is used to address resources within OpenWGA. 
      * It is an absolute URL which uses an "best effort" approach to serve a matching host name (as an OpenWGA server may listen to many hostnames). When in a normal WebTML environment running on behalf of a request then this URL uses the base URL information from that request. If not then it uses the configured root URL from WGA configuration.
+     * @param absolute
      * @throws WGAPIException
      */
-    public String getBaseURL() throws WGException {
+
+    public String getBaseURL(boolean absolute) throws WGException {
 
         if (_wga.isRequestAvailable())  {
             try {
-                return WGPDispatcher.getPublisherURL(_wga.getRequest(), true);
+                return WGPDispatcher.getPublisherURL(_wga.getRequest(), absolute);
             }
             catch (UnavailableResourceException e) {
                 // Cannot happen
