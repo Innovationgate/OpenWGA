@@ -43,8 +43,6 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 			
 			.find("[data-action='create-draft']")[ev.params.may_edit_content ? "removeClass":"addClass"]("disabled")
 			.end()
-			//.find("[data-action='publish-page']")[ev.params.status=='w' ? "removeClass" : "addClass"]("disabled")
-			//.end()
 			.find("[data-action='content-modules']")[ev.params.status ? "removeClass" : "addClass"]("disabled")
 			.end()
 			.find("[data-action='seo']")[ev.params.status ? "removeClass" : "addClass"]("disabled")
@@ -64,6 +62,11 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 		
 		$("#toolbars [data-action='settings-content']").parent()[ev.params.contentkey ? "removeClass" : "addClass"]("disabled")
 		$("#toolbars [data-action='settings-user-defined']").parent()[ev.params.contentkey ? "removeClass" : "addClass"]("disabled")
+		
+		$("#toolbars [data-action-group='settings']")[ev.params.structkey ? "removeClass" : "addClass"]("disabled")
+		$("#toolbars [data-action-group='create']")[ev.params.structkey ? "removeClass" : "addClass"]("disabled")
+		$("#toolbars [data-action-group='delete']")[ev.params.structkey ? "removeClass" : "addClass"]("disabled")
+		$("#toolbars [data-action-group='clipboard']")[ev.params.structkey ? "removeClass" : "addClass"]("disabled")
 			
 	})
 

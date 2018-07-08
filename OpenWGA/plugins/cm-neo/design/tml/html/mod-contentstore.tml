@@ -50,9 +50,7 @@
 			</a>
 			
 			<a href="#" title="Dashboard" data-view="dashboard">
-				<i class="icon fas fa-tachometer-alt">
-					<tml:comment><span class="badge" style="color:red;background:white">10</span></tml:comment>
-				</i>
+				<i class="icon fas fa-tachometer-alt"></i>
 			</a>
 			
 		</tml:option>

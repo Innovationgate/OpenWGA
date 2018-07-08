@@ -43,7 +43,7 @@
 		</div>
 
 		<div class="btn-group">
-			<a class="btn button" href="#" data-toggle="dropdown" id="tb-button-copy-cb">
+			<a class="btn button" href="#" data-toggle="dropdown" id="tb-button-copy-cb" data-action-group="clipboard">
 				<span class="icon far fa-clipboard"></span>
 				<div class="text">
 					Ablage
@@ -63,11 +63,10 @@
 			</ul>
 		</div>
 
-
 	</div>
 	<div class="toolbar" data-toolbar="content">
 		<div class="btn-group">
-			<a class="btn button" href="#" data-toggle="dropdown">
+			<a class="btn button" href="#" data-toggle="dropdown" data-action-group="create">
 				<span class="icon glyphicon glyphicon-plus"></span>
 				<div class="text">
 					Erstellen
@@ -112,7 +111,7 @@
 		</div>
 
 		<div class="btn-group" _style="margin-right:50px">
-			<a class="btn button" href="#" data-toggle="dropdown">
+			<a class="btn button" href="#" data-toggle="dropdown" data-action-group="delete">
 				<span class="icon glyphicon glyphicon-trash"></span>
 				<div class="text">
 					Löschen
@@ -156,9 +155,8 @@
 				<div class="text">Inhaltsmodule</div>
 			</a>
 
-
 			<div class="btn-group">
-				<a class="btn button" href="#" data-toggle="dropdown">
+				<a class="btn button" href="#" data-toggle="dropdown" data-action-group="settings">
 					<span class="icon glyphicon glyphicon-cog"></span>
 					<div class="text">
 						Eigenschaften

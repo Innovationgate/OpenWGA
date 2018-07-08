@@ -6,6 +6,8 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 	var structkey = $urlParam_structkey
 	var dbkey = $urlParam_dbkey
 
+	//console.log("keys", dbkey, structkey, contentkey)
+
 	var c=null;
 	var contentlist;
 	var current_lang=$urlParam_language;
@@ -22,8 +24,10 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 		if(c)
 			contentlist=c.document.getAllContent(true);
 	}
-	if(c==null)
-		return "{}";
+	if(c==null){
+		WGA.TMLPage.write("{}")
+		return;
+	}
 	
 	var archive=[];
 	var current=[];
@@ -33,7 +37,6 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 	var review_version=null;
 	
 	var langs={};
-	
 
 	function versionData(version){
 		return {

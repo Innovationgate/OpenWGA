@@ -108,10 +108,12 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 			for(var i=0; i<areas.length; i++){
 				el.append("<li><a href='#'>" + areas[i] + "</a></li>"); 
 			}
-			if(!area)
-				area = areas[0];
-			$("#area-dropdown .area-menu .area-title").html(area);
-
+			
+			if(!area){
+				$("#area-dropdown .area-menu .area-title").html("Kein Bereich ausgewählt");
+			}
+			else $("#area-dropdown .area-menu .area-title").html(area);
+			
 			if(callback)
 				callback()
 		})

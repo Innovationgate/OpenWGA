@@ -50,7 +50,7 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 	}
 
 	var parent = null
-	struct = struct.getParentEntry();
+	struct = struct && struct.getParentEntry();
 	if(struct){
 		parent = {
 			title: struct.title
