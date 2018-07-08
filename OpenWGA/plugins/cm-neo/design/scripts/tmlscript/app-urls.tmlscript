@@ -1,0 +1,8 @@
+var baseurl = WGA.app().getBaseURL(false);
+
+return {
+	base: baseurl,
+	js: baseurl + "/js",
+	file: baseurl + "/file",
+	json: baseurl + "/json"
+} 

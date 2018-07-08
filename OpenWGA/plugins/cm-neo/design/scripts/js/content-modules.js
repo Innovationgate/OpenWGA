@@ -32,7 +32,7 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 				var mod = mods[i];
 				child_mods.push({					
 					title: mod.title,
-					iconurl: modules[mod.module_id] && modules[mod.module_id].icon || CM.getImageRoot() + "error.png",
+					iconurl: modules[mod.module_id] && modules[mod.module_id].icon || CM.url.file + "/images/error.png",
 					cssclass: modules[mod.module_id] ? "" : "error",
 					id: mod.id,
 					context: mod.module_id,

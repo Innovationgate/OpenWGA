@@ -1,6 +1,6 @@
 define(["cm", "appnav"], function(CM, Appnav){
 
-	var url = "/plugin-cm-neo/json/child-docs"
+	var url = CM.url.json + "/child-docs"
 	var template;
 
 	function onContextChange(context){

@@ -1,4 +1,4 @@
-define(["jquery", "select2"], function($){
+define(["jquery", "cm", "select2"], function($, CM){
 
 	return function(){
 
@@ -13,7 +13,7 @@ define(["jquery", "select2"], function($){
 			width: "100%",
 			ajax: {
 				delay: 250,
-		        url: "/plugin-cm-neo/json/keywords.de.json",
+		        url: CM.url.json +"/keywords",
 		        dataType: 'json',
 		        data: function (params) {
 		            return {

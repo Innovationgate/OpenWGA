@@ -54,12 +54,8 @@ define("cm", ["jquery", "mustache.min"], function($, Mustache){
 			WGA.event.fireEvent("open-dialog", "*", opts)
 		}
 		
-		,setImageRoot: function(url){
-			imageRootUrl = url;
-		}
-		,getImageRoot: function(){
-			return imageRootUrl;
-		}
+		,url: 
+			//@import type=tmlscript app-urls
 	
 	}
 

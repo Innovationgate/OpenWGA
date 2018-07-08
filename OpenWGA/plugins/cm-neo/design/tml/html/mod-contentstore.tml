@@ -101,8 +101,6 @@
 	<tml:include ref="content-changed-observer"/>
 	
 	<script>
-		require(["api", "cm"], function(API, CM){
-			CM.setImageRoot("<tml:url type="file" doc="images" file=""/>");
-		})
+		require(["api"])
 	</script>
 </tml:case>

@@ -1,6 +1,7 @@
 define(["cm", "appnav"], function(CM, Appnav){
 
-	var url = "/plugin-cm-neo/json/dashboard"
+	var url = CM.url.json + "/dashboard";
+		
 	var template;
 
 	function onContextChange(context){

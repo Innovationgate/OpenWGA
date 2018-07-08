@@ -170,7 +170,7 @@ define([
 		        	if(!editor.getParagraph() && !editor.isInTable())
 		        		editor.execCmd("FormatBlock", "p");
 		        	
-					var el = editor.createImg(CM.getImageRoot() + "ajax-loader-bar.gif", "intfile")
+					var el = editor.createImg(CM.url.file + "/images/ajax-loader-bar.gif", "intfile")
 					AFW.RTF.setURLInfo(el, {type:"intfile", key:filename})
 					el.alt = "uploading ..."
 					editor.getRange().setStartAfter(el);
