@@ -1,6 +1,6 @@
 define(["cm", "appnav"], function(CM, Appnav){
 
-	var url = CM.url.json + "/child-docs"
+	var url = CM.url.json + "/child-docs.int.json"
 	var template;
 
 	function onContextChange(context){

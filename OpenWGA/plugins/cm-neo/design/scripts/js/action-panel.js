@@ -72,7 +72,7 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 	WGA.event.addListener("*", "CMS_save_item", function(ev){
 		if(editor){
 			var close_editor = ev.params.close_editor;
-			var url = CM.url.json + "/save-item"
+			var url = CM.url.json + "/save-item.int.json"
 			var params = $.extend({}, contentInfo, {
 				item: edit_item,
 				format: edit_item_format,
@@ -144,7 +144,7 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 	})
 	
 	function updateContentProperties(context){
-		var url = CM.url.json + "/content-properties"
+		var url = CM.url.json + "/content-properties.int.json"
 		var template = CM.template("sidepannel-content-properties")
 		context = context || template.getContext();
 		$.getJSON(url, context, function(result){
@@ -153,7 +153,7 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 	}
 
 	function updateContentAttachments(context, callback){
-		var url = CM.url.json + "/content-attachments"
+		var url = CM.url.json + "/content-attachments.int.json"
 		var template = CM.template("sidepannel-content-attachments")
 		context = context || template.getContext();
 		//console.log("updateContentAttachments", context)
@@ -169,7 +169,7 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 	}
 
 	function updateContentVersions(context){
-		var url = CM.url.json + "/content-versions"
+		var url = CM.url.json + "/content-versions.int.json"
 		var template = CM.template("sidepannel-content-versions")
 		context = context || template.getContext();
 		$.getJSON(url, context, function(result){

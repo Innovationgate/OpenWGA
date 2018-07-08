@@ -1,6 +1,6 @@
 define(["cm", "appnav"], function(CM, Appnav){
 
-	var url = CM.url.json + "/dashboard";
+	var url = CM.url.json + "/dashboard.int.json";
 		
 	var template;
 

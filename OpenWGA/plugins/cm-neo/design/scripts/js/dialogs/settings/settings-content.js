@@ -13,7 +13,7 @@ define(["jquery", "cm", "select2"], function($, CM){
 			width: "100%",
 			ajax: {
 				delay: 250,
-		        url: CM.url.json +"/keywords",
+		        url: CM.url.json +"/keywords.int.json",
 		        dataType: 'json',
 		        data: function (params) {
 		            return {
