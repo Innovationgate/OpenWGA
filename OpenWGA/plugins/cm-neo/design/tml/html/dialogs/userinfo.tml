@@ -23,7 +23,8 @@
 		WGA.domain(tmlform.domain).auth().applyAccessFilter(cm_db.getAttribute("CM.FilterUids").get(cm_db.ACCESSLEVEL_CHIEF_EDITOR), WGA.database(meta("database","dbkey")));
 		_userChanged=true;
 	}
-	else tmlform.addmessage("Anmeldefehler. Bitte prüfen Sie Benutzername und Kennwort.")		
+	else tmlform.addmessage("Anmeldefehler. Bitte prüfen Sie Benutzername und Kennwort.")
+	
 </tml:action>
 
 <tml:form id="form-user-info" source="none" unless="_userChanged">
@@ -35,35 +36,22 @@
 	
 	<div class="content form-horizontal">
 		
-		<tml:case condition="tmlform.hasmessages()">
-			<div class="alert alert-danger alert-dismissible">
-				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<tml:formmessages divider="<br/>"/>
-			</div>
-		</tml:case>	
-		<div class="form-group">
-			<label class="col-sm-4 control-label">Benutzer:</label>
-			<div class="col-sm-8 form-control-static"><tml:script>return _Database.getUserName()</tml:script></div>
-		</div>
-		<tml:comment><div class="form-group">
-			<label class="col-sm-4 control-label">Aliases:</label>
-			<div class="col-sm-8 form-control-static"><tml:script divider="<br>">return AFW.Util.list(_Database.getUserAliases()).trim()</tml:script></div>
-		</div></tml:comment>
-		<tml:comment><div class="form-group">
-			<label class="col-sm-4 control-label">E-Mail:</label>
-			<div class="col-sm-8 form-control-static"><tml:script divider="<br>">return _Database.getUserEmail()</tml:script></div>
-		</div></tml:comment>
+		<tml:[form-messages] o-close="true"/>
+		
+		<tml:[form-field] o_label="Benutzer" o_mode="view">
+			<tml:script expression="_Database.getUserName()"/>
+		</tml:[form-field]>
+
 		<tml:case condition="_Database.getUserGroups().size()">
-			<div class="form-group">
-				<label class="col-sm-4 control-label">Gruppen:</label>
-				<div class="col-sm-8 form-control-static"><tml:script expression="_Database.getUserGroups()" divider="<br>"/></div>
-			</div>
+			<tml:[form-field] o_label="Gruppen" o_mode="view">
+				<tml:script expression="_Database.getUserGroups()" divider="<br>"/>
+			</tml:[form-field]>
 		</tml:case>
+
 		<tml:case condition="_Database.getUserRoles().size()">
-			<div class="form-group">
-				<label class="col-sm-4 control-label">Rollen:</label>
-				<div class="col-sm-8 form-control-static"><span class="badge"><tml:script divider="</span><span class='badge'>">return _Database.getUserRoles()</tml:script></span></div>
-			</div>
+			<tml:[form-field] o_label="Rollen" o_mode="view">
+				<span class="badge" style="margin-right:5px"><tml:script divider="</span><span class='badge' style='margin-right:5px'>" expression="_Database.getUserRoles()"/></span>
+			</tml:[form-field]>
 		</tml:case>
 		
 		<tml:script>
@@ -88,15 +76,14 @@
 			}
 			_currentLevel=currentLevel
 		</tml:script>
-		<div class="form-group">
-			<label class="col-sm-4 control-label">Berechtigung:</label>
-			<div class="col-sm-8">
-				<div class="btn-group">
-				  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-				    <tml:script>return _Database.getAccessLevelText()</tml:script> <span class="caret"></span>
-				  </button>
-				  <ul class="dropdown-menu">
-				  	<tml:foreach item="_levels" currentvalue="_level" sortexpression="_level" sortorder="descending">
+
+		<tml:[form-field] o_label="Berechtigung">
+			<div class="btn-group">
+				<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+			    	<tml:script>return _Database.getAccessLevelText()</tml:script> <span class="caret"></span>
+			  	</button>
+				<ul class="dropdown-menu">
+					<tml:foreach item="_levels" currentvalue="_level" sortexpression="_level" sortorder="descending">
 				    	<li <tml:case condition="_currentLevel==_level">class="disabled"</tml:case>>
 					    	<a href="#" data-action="changeUser" data-level="<tml:item name="_level"/>">
 				    			<i class="fas <tml:script>
@@ -110,31 +97,41 @@
 					    		<tml:script expression="db().accessLevelText(_level)"/>
 					    	</a>
 					    </li>
-				   </tml:foreach>
-				  </ul>
-				</div>
+					</tml:foreach>
+				</ul>
 			</div>
-		</div>
+		</tml:[form-field]>
 		
-		<div class="form-group">
-			<label class="col-sm-4 control-label">Privilegien:</label>
-			<div class="col-sm-8 form-control-static">
-				<tml:label key="{'privileges.may'+(_Database.getUserAccess().mayDeleteDocuments()?'':'Not')+'DeleteDocuments'}"/>
-				<br>
-				<tml:label key="{'privileges.may'+(_Database.getUserAccess().mayMoveStructEntries()?'':'Not')+'MoveDocuments'}"/>
-			</div>
-		</div>
+		<tml:script>
+			_privs = WGA.createList()
+			if(!_Database.getUserAccess().mayDeleteDocuments())
+				_privs.add("privileges.mayNotDeleteDocuments")
+			if(!_Database.getUserAccess().mayMoveStructEntries())
+				_privs.add("privileges.mayNotMoveDocuments")
+		</tml:script>
+		<tml:case condition="_privs.size()">
+			<tml:[form-field] o_label="Einschränkungen" o_mode="view">
+				<tml:foreach item="_privs" currentvalue="_priv">
+					<tml:label key="{_priv}"/>
+					<tml:between><br></tml:between>
+				</tml:foreach>
+			</tml:[form-field]>
+		</tml:case>
+		
 		<hr>
-		<tml:[form-field] o_label="Neuer Benutzer:" o_field="username"/>
-		<tml:[form-field] o_label="Kennwort:" o_field="password" o_type="password"/>
+		
+		<tml:[form-field] o_label="Neuer Benutzer" o_field="username"/>
+		<tml:[form-field] o_label="Kennwort" o_field="password" o_type="password"/>
 		<tml:input type="hidden" name="domain" default="{meta('db', 'domain')}"/>
+		
 	</div>
 	
 	<div class="footer">
 		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
-		<tml:button cssclass="btn btn-primary" html_type="submit" clickaction="login">Anmelden</tml:button>
+		<tml:button cssclass="btn btn-primary" html_type="submit" clickaction="login">Benutzer wechseln</tml:button>
 	</div>
 </tml:form>
+
 <script>
 	require(['jquery'], function($) {
 		$("#dialog-userinfo [data-action=changeUser]").click(function(ev) {
