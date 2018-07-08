@@ -42,6 +42,7 @@ import de.innovationgate.webgate.api.WGUserDetails;
 import de.innovationgate.webgate.api.WGUserProfile;
 import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wga.config.ContentStore;
+import de.innovationgate.wga.config.VirtualHost;
 import de.innovationgate.wga.config.WGAConfiguration;
 import de.innovationgate.wga.server.api.tml.Context;
 import de.innovationgate.wga.server.api.tml.UserProfile;
@@ -58,6 +59,7 @@ import de.innovationgate.wgpublisher.expressions.ExpressionEngineFactory;
 import de.innovationgate.wgpublisher.expressions.tmlscript.ManagedTMLScriptGlobalDefinition;
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptGlobal;
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptObjectMetadata;
+import de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
 import de.innovationgate.wgpublisher.hdb.HDBModel;
 import de.innovationgate.wgpublisher.url.RequestIndependentDefaultURLBuilder;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
@@ -199,6 +201,16 @@ public class App extends Database {
     }
 
     public String getBaseURL(boolean absolute) throws WGException {
+    	
+    	HttpServletRequest request = _wga.getRequest();
+    	if(request!=null){
+	    	VirtualHost vhost = WGAVirtualHostingFilter.findMatchingHost(_wga.getCore().getWgaConfiguration(), request);
+	    	if(vhost!=null && vhost.isHideDefaultDatabaseInURL()){
+	    		String defaultDBKey = WGAVirtualHostingFilter.getDefaultDBKey(_wga.getCore(), vhost);
+	    		if(defaultDBKey.equals(getDbKey()))
+	    			return _wga.server().getBaseURL(absolute);
+	    	}
+    	}
         return _wga.server().getBaseURL(absolute) + "/" + getDbKey();
     }
 
