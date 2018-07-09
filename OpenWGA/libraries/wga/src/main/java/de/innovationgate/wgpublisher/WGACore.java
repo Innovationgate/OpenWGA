@@ -8212,7 +8212,7 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
                     serverName = hostname;
                 }
 
-				msg.setSubject(serverName + ": " + notification.getSubject());
+				msg.setSubject(notification.getSubject());
 				
 				msg.setHeader(WGAMailNotification.HEADERFIELD_TYPE, notification.getType());
 				
@@ -8222,17 +8222,17 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
 		       		        
 		          
 		        StringBuffer strBody = new StringBuffer();
-		        strBody.append("<html><head></head><body>");
+		        strBody.append("<html><head></head><body style=\"color:#808080\">");
 		        strBody.append(notification.getMessage());
 		        String rootURL = getWgaConfiguration().getRootURL();
 		        if (rootURL != null) {
-		        	strBody.append("<br><br>");
-		        	strBody.append("<a href=\"" + rootURL + "/plugin-admin\">Open OpenWGA admin client</a><br>");
+		        	//strBody.append("<br><br>");
+		        	strBody.append("<p><a href=\"" + rootURL + "/plugin-admin\">" + WGABrand.getName() + " admin client ...</a></p>");
 		        }
 		        // append footer
-				strBody.append("<br><br><b>System information:</b><br>");
-				strBody.append("<b>WGA Publisher Version:</b> " + WGACore.getReleaseString() + "<br>");
-				strBody.append("<b>Server name:</b> " + hostname + "<br>");
+				strBody.append("<br><br><b>System information:</b><br><br>");
+				strBody.append("<b>Server:</b> " + serverName + " / " + WGACore.getReleaseString() + "<br>");
+				strBody.append("<b>Host:</b> " + hostname + "<br>");
 				strBody.append("<b>Operation System:</b> " + System.getProperty("os.name") + " Version " + System.getProperty("os.version") + " (" + System.getProperty("os.arch") + ")<br>");						
 		        strBody.append("<b>Java virtual machine:</b> " + System.getProperty("java.vm.name") + " Version " + System.getProperty("java.vm.version") + " (" + System.getProperty("java.vm.vendor") + ")");
 		        

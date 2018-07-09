@@ -178,8 +178,8 @@ public class BruteForceLoginBlocker {
             
             
         	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_LOGIN_BLOCKED);
-        	mail.setSubject("Login for user '" + domain.getName() + "/" + username + "' has been blocked bc. of '" + inf.getFailedAttempts() + "' failed login attemps.");
-        	mail.append("Login for user <b>'" + domain.getName() + "/" + username + "'</b> has been blocked bc. of <b>'" + inf.getFailedAttempts() + "'</b> failed login attemps.");
+        	mail.setSubject("Logins has been blocked");
+        	mail.append("Login for user <b>" + username + "</b> has been blocked in authentication domain <b>" + domain.getName() + "</b> bc. of <b>" + inf.getFailedAttempts() + "</b> failed login attemps.");
         	_core.send(mail);
         }
         
