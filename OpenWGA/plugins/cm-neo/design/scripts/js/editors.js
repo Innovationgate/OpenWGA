@@ -250,10 +250,11 @@ define([
 		}
 	
 		return {
-			data_type: "text",
+			data_type: "textblock",
 			open: open,
-			update: function(data){
-				editor.setRTFHTML(data, data)
+			update: function(data, data_encoded){
+				//editor.setRTFHTML(data, data)
+				editor.setRTFHTML(data, data_encoded)
 			},
 			close: function(){
 				Sitepanel.getWindow().onbeforeunload=null;

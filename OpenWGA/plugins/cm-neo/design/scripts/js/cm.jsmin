@@ -54,6 +54,10 @@ define("cm", ["jquery", "mustache.min"], function($, Mustache){
 			WGA.event.fireEvent("open-dialog", "*", opts)
 		}
 		
+		,jsonURL: function(path){
+			return this.url.json + "/" + path + ".int.json"
+		}
+	
 		,url: 
 			//@import type=tmlscript app-urls
 	

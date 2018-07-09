@@ -47,6 +47,7 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 			break;
 
 		case "rtf":
+		case "textblock":
 			result.value = WGA.encode("rtfsystem", value, WGA.context(doc))
 			result.value_encoded = WGA.encode("rtf", value, WGA.context(doc)) 
 			break;
