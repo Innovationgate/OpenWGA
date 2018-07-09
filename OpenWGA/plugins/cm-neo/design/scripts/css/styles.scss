@@ -4,19 +4,6 @@ $base_blue: #286090;
 
 $width_breakpoint: 1200px;
 
-/* Font-awesome */
-//$fa-font-path: wga_file_url("font-awesome", "fonts");
-/*
-@import "type=file /font-awesome/scss/font-awesome.scss";
-*/
-/*
-@import "type=file /font-awesome/scss/variables";
-@import "type=file /font-awesome/scss/mixins";
-@import "type=file /font-awesome/scss/core";
-@import "type=file /font-awesome/scss/path";
-@import "type=file /font-awesome/scss/icons";
-*/
-
 /* Font-awesome 5 */
 
 $fa-font-path: wga_file_url("fa5", "webfonts");
@@ -28,8 +15,8 @@ $fa-font-path: wga_file_url("fa5", "webfonts");
 @import "type=file /fa5/scss/icons";
 @import "type=file /fa5/scss/rotated-flipped";
 
-
 /* Bootstrap */
+
 $icon-font-path: wga_file_url("bootstrap", "fonts/bootstrap") + "/";
 @import "type=file /bootstrap/stylesheets/_bootstrap.scss";
 
