@@ -53,8 +53,5 @@
 	    	</tml:case>
     	</tml:case>
     	<tml:option name="body"/>
-    	<tml:comment><tml:case condition="option('body') && option('body').replace(/\s/g, '')">
-	    	<div _class="form-control-static"><tml:option name="body"/></div>
-    	</tml:case></tml:comment>
     </div>
 </div>			
