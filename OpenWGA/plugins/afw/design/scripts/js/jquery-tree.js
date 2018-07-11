@@ -617,11 +617,18 @@
 									
 									if(parent.find("li").length==0)
 										parent.attr("data-haschildren", "false");
+
+									var after = dragged_el.prev();
+									var before = dragged_el.next();
+									//console.log("drop after", after.data("title"), "before", before.data("title"));
+									
 									dragged_el.trigger("moved", {
 										id: dragged_el.data("id"),
 										href: dragged_el.data("href"),
 										parent_id: el.data("id"),
-										index: el.find("> ul > li:not(.placeholder)").index(dragged_el) 
+										index: el.find("> ul > li:not(.placeholder)").index(dragged_el),
+										after_id: after.data("id"),
+										before_id: before.data("id")
 									})
 									
 								});
@@ -638,11 +645,18 @@
 
 								if(parent.find("li").length==0)
 									parent.attr("data-haschildren", "false");
+								
+								var after = placeholder.prev();
+								var before = dragged_el.next();
+								//console.log("drop after", after.data("title"), "before", before.data("title"));
+								
 								dragged_el.trigger("moved", {
 										id: dragged_el.data("id"),
 										href: dragged_el.data("href"),
 										parent_id: dragged_el.parents("li").first().data("id"),
-										index: index
+										index: index,
+										after_id: after.data("id"),
+										before_id: before.data("id")
 								})
 							}
 
