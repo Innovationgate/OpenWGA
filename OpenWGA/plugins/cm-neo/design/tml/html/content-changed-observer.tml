@@ -153,19 +153,12 @@
 					parent = struct.getArea();
 				}
 				
-				var children = parent.getChildEntries();
-				var index = request.index;
-
-				if((struct.isRoot() && !request.parent) || (!struct.isRoot() && struct.getParentEntry().getStructKey()==request.parent)){
-					// same parent
-					if(children.getIndexOfEntry(struct) < index)
-						index++;
-				}
-				//else console.log("move to new parent", index);
+				//console.log("after", request.after, "before", request.before);
 				
-				var after = children.getByIndex(index-1);
-				var before = children.getByIndex(index);
-				
+				var after = request.after && db(portlet.dbkey).getStructEntryByKey(request.after)
+				var before = request.before && db(portlet.dbkey).getStructEntryByKey(request.before)
+					
+				//console.log("after", after && after.title, "before", before && before.title);
 				//console.log("update position", after && after.position, before && before.position);
 				
 				var pos;

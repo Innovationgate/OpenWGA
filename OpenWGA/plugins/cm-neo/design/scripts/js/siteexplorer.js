@@ -60,7 +60,9 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 				WGA.event.fireEvent("move-page", "cm-neo", {
 					key: node.id,
 					parent: node.parent_id,
-					index: node.index
+					index: node.index,
+					after: node.after_id,
+					before: node.before_id
 				})
 			}
 		})
