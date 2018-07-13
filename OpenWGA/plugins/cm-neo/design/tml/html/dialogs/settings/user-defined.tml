@@ -9,7 +9,7 @@
 		callAction("settings-saved")
 	}
 	catch(e){
-		console.log(e);
+		//console.log(e);
 	}
 
 	portlet.fireevent("close-dialog");
