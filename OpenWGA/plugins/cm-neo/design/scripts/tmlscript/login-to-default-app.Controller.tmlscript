@@ -1,0 +1,28 @@
+function Controller() {}
+
+Controller.prototype.prepare = function() {
+	if(this.defaultDbKey()){
+		var app = WGA.app(this.defaultDbKey())
+		if(app && app.isAuthor()){
+			WGA.redirectTo("/contentmanager?dbkey=" + this.defaultDbKey())
+		}
+	}
+}.nonIsolated()
+
+Controller.prototype.defaultDbKey = function() {
+	var wgaconfig = WGA.Core.getWgaConfiguration()
+	var vhost_filter = Packages.de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
+	var vhost = vhost_filter.findMatchingHost(wgaconfig, WGA.request);
+	return vhost && vhost_filter.getDefaultDBKey(WGA.Core, vhost)
+}
+
+Controller.prototype.cmlogin = function($field_username, $field_password, $field_dbkey) {
+	if($field_dbkey)
+		WGA.redirectTo("/contentmanager?dbkey=" + $field_dbkey)
+	else{
+		var dbkey = this.defaultDbKey();
+		if(dbkey && WGA.app(dbkey).domain().auth().login($field_username, $field_password)){
+			WGA.redirectTo("/contentmanager?dbkey=" + dbkey)
+		}
+	}
+}.nonIsolated()

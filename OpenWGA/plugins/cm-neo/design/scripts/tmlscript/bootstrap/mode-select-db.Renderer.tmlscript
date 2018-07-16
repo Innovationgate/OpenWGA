@@ -1,0 +1,8 @@
+function Renderer() {}
+
+Renderer.prototype.render = function($portlet_dbkey) {
+	var custom_login_url = WGA.Core.getWgaConfiguration().getServerOptions().get("CM.customLoginURL");
+	if(!$portlet_dbkey && custom_login_url)
+		WGA.redirectTo(custom_login_url);
+	else WGA.TMLPage.renderDefault();
+}

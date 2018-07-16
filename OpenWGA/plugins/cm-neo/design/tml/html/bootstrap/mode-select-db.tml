@@ -19,15 +19,7 @@
 			return;
 		}
 		else if(!_Database.isAuthor() && App.isOpen() && !App.isAnonymous()){
-			if(custom_login_url){
-				var b = WGA.urlBuilder(custom_login_url)
-				b.setParameter("dbkey", portlet.dbkey)
-				b.setParameter("contentkey", request.getParameter("contentkey"))
-				redirectto(b.build(true));
-			}
-			else{
-				_msg = "Der angemeldete User <b>" + context("db:"+portlet.dbkey).meta("db", "username") + "</b> ist kein Autor dieser Website. Bitte melden Sie sich als Autor an."
-			}
+			_msg = "Der angemeldete User <b>" + context("db:"+portlet.dbkey).meta("db", "username") + "</b> ist kein Autor dieser Website. Bitte melden Sie sich als Autor an."
 		}
 	}
 </tml:script>
