@@ -16,13 +16,21 @@ Controller.prototype.defaultDbKey = function() {
 	return vhost && vhost_filter.getDefaultDBKey(WGA.Core, vhost)
 }
 
-Controller.prototype.cmlogin = function($field_username, $field_password, $field_dbkey) {
-	if($field_dbkey)
-		WGA.redirectTo("/contentmanager?dbkey=" + $field_dbkey)
-	else{
-		var dbkey = this.defaultDbKey();
-		if(dbkey && WGA.app(dbkey).domain().auth().login($field_username, $field_password)){
-			WGA.redirectTo("/contentmanager?dbkey=" + dbkey)
-		}
-	}
+Controller.prototype.hasDefaultDbKey = function() {
+	return this.defaultDbKey()!=null
+}
+
+Controller.prototype.cmlogin = function($form) {
+	if(!$form.validate())
+		return;
+	var dbkey = this.defaultDbKey() || $form.dbkey;
+	var app = dbkey && WGA.app(dbkey)
+	if(!app)
+		return $form.addMessage("Website '" + dbkey + "' konnte nicht gefunden werden")
+	if(!WGA.app(dbkey).domain().auth().login($form.username, $form.password))
+		return $form.addMessage("Anmeldefehler. Bitte prüfen Sie Benutzername und Kennwort")
+	if(!WGA.app(dbkey).isAuthor())
+		return $form.addMessage("User '" + $form.username + "' ist kein Autor der Website")
+	// finaly:
+	WGA.redirectTo("/contentmanager?dbkey=" + dbkey)
 }.nonIsolated()
