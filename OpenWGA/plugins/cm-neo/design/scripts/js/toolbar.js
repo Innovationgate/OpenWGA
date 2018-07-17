@@ -257,20 +257,20 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 	// popovers
 	$("#toolbars [data-action='save-item']").popover({
 		placement: "bottom",
-		content: "<div style='color:red'><span class='glyphicon glyphicon-ok'></span> Feld wurde gespeichert</div>",
+		content: "<div style='color:red'><span class='fas fa-check'></span> Feld wurde gespeichert</div>",
 		trigger: "manual",
 		html: true
 	})
 	$("#toolbars [data-action='remove-item']").popover({
 		placement: "bottom",
-		content: "<div style='color:red'><span class='glyphicon glyphicon-trash'></span> Feld wurde gelöscht</div>",
+		content: "<div style='color:red'><span class='far fa-trash-alt'></span> Feld wurde gelöscht</div>",
 		trigger: "manual",
 		html: true
 	})
 	$("#tb-button-copy-cb").popover({
 		placement: "bottom",
 		container: 'body',
-		content: "<div style='color:red'><span class='glyphicon glyphicon-ok'></span> Seite wurde in die Ablage eingefügt</div>",
+		content: "<div style='color:red'><span class='fas fa-check'></span> Seite wurde in die Ablage eingefügt</div>",
 		trigger: "manual",
 		html: true
 	})

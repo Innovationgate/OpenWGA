@@ -111,12 +111,12 @@
 	<div class="footer">
 		<div class="pull-left">
 			<a class="btn btn-default" href="<tml:url type="file" file="{portlet.filename}" u_forcedownload="true"/>">
-				<i class="glyphicon glyphicon-download-alt"></i>
+				<i class="fas fa-download"></i>
 				Download
 			</a>
 			<tml:case condition="_Attachment.isVideo()">
 				<tml:button cssclass="btn btn-default" clickaction="edit-video">
-					<i class="glyphicon glyphicon-edit"></i>
+					<i class="fa fa-edit"></i>
 					Video bearbeiten
 				</tml:button>
 			</tml:case>

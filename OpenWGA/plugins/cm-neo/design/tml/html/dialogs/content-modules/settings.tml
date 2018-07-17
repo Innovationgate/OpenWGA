@@ -57,10 +57,6 @@
 		})
 	</script>
 
-<tml:comment>	<div style="font-size:2em;margin-bottom:10px;color:gray"><tml:item name="title" type="tmlform"/></div>
-	<hr size="1">
-</tml:comment>
-	
 	<tml:if condition="tmlform.settingstml=='none'">
 	
 		<tml:then>
@@ -73,7 +69,7 @@
 				<p>Bitte wenden Sie sich an Ihren Administrator oder löschen Sie dieses Modul.</p>
 			</div>
 			<button class="btn btn-default" data-button="delete" title="Modul löschen">
-				<i class="glyphicon glyphicon-trash"></i>
+				<i class="far fa-trash-alt"></i>
 				Modul löschen
 			</button>
 			
