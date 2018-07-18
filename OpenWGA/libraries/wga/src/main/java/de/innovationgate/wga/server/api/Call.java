@@ -105,7 +105,7 @@ public class Call {
         }
     }
     
-    public TMLForm getPostedPorm() throws WGException {
+    public TMLForm getPostedForm() throws WGException {
         return (TMLForm) getJavaRequest().getAttribute(WGACore.ATTRIB_POSTED_TMLFORM);
     }
     
