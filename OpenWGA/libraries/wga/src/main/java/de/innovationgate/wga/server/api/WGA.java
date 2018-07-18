@@ -2336,6 +2336,7 @@ public class WGA {
     /**
      * Returns a subobject "TMLPage" providing operations regarding the current output of WebTML page
      */
+    @CodeCompletion
     public TMLPage tmlPage() {
         return new TMLPageImpl(this);        
     }

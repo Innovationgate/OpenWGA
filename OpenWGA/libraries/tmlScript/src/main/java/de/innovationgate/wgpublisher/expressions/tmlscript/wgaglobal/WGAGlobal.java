@@ -74,6 +74,7 @@ import de.innovationgate.wga.server.api.ObjectScope;
 import de.innovationgate.wga.server.api.Plugin;
 import de.innovationgate.wga.server.api.Server;
 import de.innovationgate.wga.server.api.Session;
+import de.innovationgate.wga.server.api.TMLScript;
 import de.innovationgate.wga.server.api.Validate;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wga.server.api.WGAContext;
@@ -287,6 +288,7 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
         "Jobs",
         "Master",
         "TMLPage",
+        "TMLScript",
         "Scopes",
         "Server",
         "Session",
@@ -308,7 +310,11 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
     public static TMLPage jsGet_TMLPage(ScriptableObject thisObj) {
         return getStaticWga(thisObj).tmlPage();
     }
-    
+
+    public static TMLScript jsGet_TMLScript(ScriptableObject thisObj) throws WGException {
+        return getStaticWga(thisObj).tmlscript();
+    }
+
     public static Server jsGet_Server(ScriptableObject thisObj) {
         return getStaticWga(thisObj).server();
     }

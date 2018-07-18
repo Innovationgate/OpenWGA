@@ -46,6 +46,7 @@ import de.innovationgate.wga.server.api.Lucene;
 import de.innovationgate.wga.server.api.Plugin;
 import de.innovationgate.wga.server.api.Validate;
 import de.innovationgate.wga.server.api.WGA;
+import de.innovationgate.wga.server.api.TMLScript;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.expressions.tmlscript.wgaglobal.Master;
 import de.innovationgate.wgpublisher.expressions.tmlscript.wgaglobal.Xml;
@@ -78,6 +79,7 @@ public abstract class WGAGlobal extends WGA {
     public Validate Validate = null;
 
     public TMLPage TMLPage = null;
+    public TMLScript TMLScript = null;
     public Call Call = null;
     public ObjectScope Scopes = null;
     public Session Session = null;

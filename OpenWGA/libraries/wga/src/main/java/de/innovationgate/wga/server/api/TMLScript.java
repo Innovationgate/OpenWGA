@@ -55,7 +55,7 @@ import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 /**
  * 
  */
-@CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
+@CodeCompletion(methodMode=CodeCompletion.MODE_INCLUDE)
 public class TMLScript {
     
     public enum ObjectType {
@@ -81,6 +81,19 @@ public class TMLScript {
         _wga = wga;
     }
     
+
+    /**
+     * Runs a TMLScript expression
+     * Uses the WebTML context of the environment and is therefor only usable in WebTML/TMLScript environments.
+     * @param expression The expression
+     * @return The expression result
+     * @throws WGAServerException
+     */
+    @CodeCompletion
+    public Object runExpression(String expression) throws WGException {
+        return run(null, null, expression, null, ExpressionEngine.TYPE_EXPRESSION);
+    }
+
     /**
      * Runs a TMLScript expression
      * Uses the WebTML context of the environment and is therefor only usable in WebTML/TMLScript environments.
@@ -100,6 +113,7 @@ public class TMLScript {
      * @return The expression result
      * @throws WGAServerException
      */
+    @CodeCompletion
     public Object runExpression(Context context, String expression) throws WGException {
         return run(new Design(_wga, ((TMLContext) context).getDesignContext()), (TMLContext) context, expression, null, ExpressionEngine.TYPE_EXPRESSION);
     }
@@ -143,7 +157,19 @@ public class TMLScript {
     
     /**
      * Runs a TMLScript script
-     * Uses the WebTML context of the environment and is therefor only usable in WebTML/TMLScript environments.
+     * Uses the WebTML context of the environment and is therefore only usable in WebTML/TMLScript environments.
+     * @param expression The script
+     * @return The script return result
+     * @throws WGAServerException
+     */
+    @CodeCompletion
+    public Object runScript(String expression) throws WGException {
+        return run(null, null, expression, null, ExpressionEngine.TYPE_SCRIPT);
+    }
+    
+    /**
+     * Runs a TMLScript script
+     * Uses the WebTML context of the environment and is therefore only usable in WebTML/TMLScript environments.
      * @param design Base design context to run the script under
      * @param expression The script
      * @return The script return result
@@ -152,7 +178,7 @@ public class TMLScript {
     public Object runScript(Design design, String expression) throws WGException {
         return run(design, null, expression, null, ExpressionEngine.TYPE_SCRIPT);
     }
-    
+
     /**
      * Runs a TMLScript script
      * @param context WebTML context under which the expression runs and whose design context is used
@@ -160,6 +186,7 @@ public class TMLScript {
      * @return The script return result
      * @throws WGAServerException
      */
+    @CodeCompletion
     public Object runScript(Context context, String expression) throws WGException {
         return run(new Design(_wga, ((TMLContext) context).getDesignContext()), (TMLContext) context, expression, null, ExpressionEngine.TYPE_SCRIPT);
     }
@@ -341,6 +368,7 @@ public class TMLScript {
      * @return A new object
      * @throws WGException
      */
+    @CodeCompletion
     public Object createObject(Design resolve) throws WGException {
         return createObject(resolve, ObjectType.V1, Collections.<String,Object>emptyMap(), Collections.<Object>emptyList());
     }
@@ -413,12 +441,13 @@ public class TMLScript {
     }
     
     /**
-     * Calls a method without paramters or retrieves a property from  a TMLScript object 
+     * Calls a method without parameters or retrieves a property from  a TMLScript object 
      * @param object The object
      * @param method The method/property name. Use dots to chain multiple method calls/property retrievals together.
      * @return The property or return value
      * @throws WGException
      */
+    @CodeCompletion
     public Object callMethod(Object object, String method) throws WGException {
         return callMethod(object, method, null, null);
     }
@@ -428,6 +457,7 @@ public class TMLScript {
      * @param object The object
      * @param prop The property name
      */
+    @CodeCompletion
     public boolean hasProperty(Object object, String prop) {
         RhinoExpressionEngine engine = ExpressionEngineFactory.getTMLScriptEngine();
         return engine.hasProperty(object, prop);
