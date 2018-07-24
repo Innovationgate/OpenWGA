@@ -310,7 +310,7 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 			data[section]=getNodes($this)
 		})
 		WGA.event.fireEvent("save-modules", "*", {
-			selected: selected_tree_node.data("id"),
+			selected: selected_tree_node && selected_tree_node.data("id"),
 			mods: JSON.stringify(data),
 			deleted_mods: JSON.stringify(deleted_mods)
 		})

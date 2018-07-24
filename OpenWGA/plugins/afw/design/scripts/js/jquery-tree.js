@@ -484,6 +484,9 @@
 						e.preventDefault();
 						
 						var el = $(e.target).parents("li").first()
+						if(!el.length)
+							return;
+						
 						var parent = el.parents("li").first()
 						
 						/*
@@ -513,7 +516,7 @@
 						}
 
 						var pos = el.offset();
-						var height = el.find(".entry").first().height();
+						var height = el.find(".entry").first().outerHeight();
 
 						placeholder.find(".indent").css("margin-left", el.find(".indent").css("margin-left"))
 						mayDrop=true;
