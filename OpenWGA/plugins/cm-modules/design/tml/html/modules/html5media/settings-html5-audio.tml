@@ -28,12 +28,16 @@
 </tml:script>
 
 <label><tml:label key="html5media.mp3-audio-file"/>:</label>
-<tml:include ref="util:select-file" o_fieldname="mp3" o_file-extensions="mp3"/>
+<div style="margin:10px">
+	<tml:include ref="util:select-file" o_fieldname="mp3" o_file-extensions="mp3"/>
+</div>
 
 <label><tml:label key="html5media.ogg-audio-file"/>:</label>
-<tml:include ref="util:select-file" o_fieldname="ogg" o_file-extensions="ogg"/>
+<div style="margin:10px">
+	<tml:include ref="util:select-file" o_fieldname="ogg" o_file-extensions="ogg"/>
+</div>
 
 <label><tml:label key="html5media.audio.options"/>:</label>
-<div style="margin:10">
+<div style="margin:10px">
 	<tml:input name="{scoped:opts}" type="checkbox" default="controls" options="{label('html5media.audio.options.values')}" mode="{option:mode}"/>
 </div>

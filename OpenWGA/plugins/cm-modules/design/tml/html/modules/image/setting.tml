@@ -49,11 +49,13 @@
 		/>
 	</div>
 	
-	<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document">
-		<tml:option name="dbkey" expression="tmlform.field(WGA.scoped('dbkey'))"/>
-		<tml:option name="fieldname" expression="WGA.scoped('sourcedoc')"/>
-		<tml:option name="changeaction"><tml:action ref="clearImages"/></tml:option>
-	</tml:include>
+	<div style="margin:10px">
+		<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document">
+			<tml:option name="dbkey" expression="tmlform.field(WGA.scoped('dbkey'))"/>
+			<tml:option name="fieldname" expression="WGA.scoped('sourcedoc')"/>
+			<tml:option name="changeaction"><tml:action ref="clearImages"/></tml:option>
+		</tml:include>
+	</div>
 	
 </tml:case>
 
@@ -66,10 +68,14 @@
 </tml:script>
 <tml:case context="{_context}" iscontextvalid="true">
 	<label><tml:label key="image"/>:</label>
-	<tml:include ref="util:select-image" o_derivate="usage=poster"/>
+	<div style="margin:10px">
+		<tml:include ref="util:select-image" o_derivate="usage=poster"/>
+	</div>
 	
 	<label><tml:label key="image.img-mouse-over"/>:</label>
-	<tml:include ref="util:select-image" o_derivate="usage=poster" o_fieldname="image_mo" o_empty-text="Original"/>
+	<div style="margin:10px">
+		<tml:include ref="util:select-image" o_derivate="usage=poster" o_fieldname="image_mo" o_empty-text="Original"/>
+	</div>
 </tml:case>
 
 <label><tml:label key="image.settings.labeling"/>:</label>
@@ -114,9 +120,12 @@
 	<tml:case value="zoom">
 		<tml:case context="{_context}" iscontextvalid="true">
 			<label>Lightbox-Image:</label>
-			<tml:include ref="util:select-image" o_fieldname="lightbox_image" o_empty-text="Original"/>
-			<div style="margin:10px">
-				<tml:input name="{scoped:download}" type="boolean" default="false" options="{label('image.settings.lightbox.show-download.options')}" mode="{option:mode}"/>
+				<div style="margin:10px">
+					<tml:include ref="util:select-image" o_fieldname="lightbox_image" o_empty-text="Original"/>
+				</div>
+				<div style="margin:10px">
+					<tml:input name="{scoped:download}" type="boolean" default="false" options="{label('image.settings.lightbox.show-download.options')}" mode="{option:mode}"/>
+				</div>
 			</div>
 		</tml:case>
 		<label><tml:label key="image.settings.lightbox-group"/>:</label>

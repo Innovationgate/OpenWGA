@@ -29,7 +29,9 @@
 </div>
 
 <label><tml:label key="content-box.settings.background-image"/>:</label>
-<tml:include ref="util:select-image" o_mode="{option:mode}"/>
+<div style="margin:10px">
+	<tml:include ref="util:select-image" o_mode="{option:mode}"/>
+</div>
 
 <label><tml:label key="content-box.settings.margin"/>:</label>
 <div style="margin:10px">

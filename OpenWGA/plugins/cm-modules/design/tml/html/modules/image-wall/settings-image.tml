@@ -57,5 +57,7 @@
 </tml:script>
 <tml:case context="{_context}" iscontextvalid="true">
 	<label><tml:label key="image"/>:</label>
-	<tml:include ref="util:select-image"/>
+	<div style="margin:10px">
+		<tml:include ref="util:select-image"/>
+	</div>
 </tml:case>

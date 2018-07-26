@@ -51,7 +51,9 @@
 </tml:script>
 
 <label><tml:label key="html5media.video-file"/>:</label>
-<tml:include ref="util:select-file" o_fieldname="video_file" o_mimetype="video"/>
+<div style="margin:10px">
+	<tml:include ref="util:select-file" o_fieldname="video_file" o_mimetype="video"/>
+</div>
 
 <tml:case condition="tmlform.field(WGA.scoped('video_file'))">
 	
@@ -63,20 +65,25 @@
 		_hasPoster = WGA.selectDerivate(filename, "usage=poster")!=null
 	</tml:script>
 	
-	<tml:case isfalse="_hasMp4">
+	<tml:case isfalse="_hasMp4">	
 		<label><tml:label key="html5media.mp4-video-file"/>:</label>
-		<tml:include ref="util:select-file" o_fieldname="mp4" o_mimetype="video/mp4"/>
+		<div style="margin:10px">
+			<tml:include ref="util:select-file" o_fieldname="mp4" o_mimetype="video/mp4"/>
+		</div>
 	</tml:case>
 	<tml:case isfalse="_hasWebm">
 		<label><tml:label key="html5media.webm-video-file"/>:</label>
-		<tml:include ref="util:select-file" o_fieldname="webm" o_mimetype="video/webm"/>
+		<div style="margin:10px">
+			<tml:include ref="util:select-file" o_fieldname="webm" o_mimetype="video/webm"/>
+		</div>
 	</tml:case>
 
 	<label><tml:label key="html5media.posterimage"/>:</label>
-	<tml:include ref="util:select-image" o_empty-text="{_hasPoster ? 'Aus Video':VOID}"/>
-	
+	<div style="margin:10px">
+		<tml:include ref="util:select-image" o_empty-text="{_hasPoster ? 'Aus Video':VOID}"/>
+	</div>
 	<label><tml:label key="html5media.autoplay"/>:</label>
-	<div style="margin:10">
+	<div style="margin:10px">
 		<tml:input name="{scoped:autoplay}" type="boolean" mode="{option:mode}"/>
 	</div>
 	

@@ -43,13 +43,13 @@
 	_filenames.add(0, "");
 </tml:script>
 
-<div style="margin:10px">
-	<tml:input name="{_fieldname}" type="select" optionsitem="_filenames" mode="{option:mode}" cssstyle="width:100%"/>
-	<div style="margin:10px 0" class="fileinfo clearfix" style="display:none" id="select-file-<tml:item name="_fieldname"/>">
-		<div style="float:left;width:60px;margin-top:5px" class="image"></div>
-		<div style="margin-left:70px" class="metas"></div>
-	</div>
+<tml:input name="{_fieldname}" type="select" optionsitem="_filenames" mode="{$option_mode||tmlform.mode()}" cssstyle="width:100%"/>
+
+<div style="margin:10px 0" class="fileinfo clearfix" style="display:none" id="select-file-<tml:item name="_fieldname"/>">
+	<div style="float:left;width:60px;margin-top:5px" class="image"></div>
+	<div style="margin-left:70px" class="metas"></div>
 </div>
+
 <script>
 	require(["select2"], function(Select2){
 		var urls={

@@ -35,7 +35,7 @@
 
 <tml:input name="{_fieldname}" type="hidden" mode="{option:mode}"/>
 
-<div style="margin:10px" id="select_file_Combo-<tml:item name="_fieldname"/>"></div>
+<div id="select_file_Combo-<tml:item name="_fieldname"/>"></div>
 
 <tml:script>
 	var derivate = option("derivate");
@@ -121,7 +121,7 @@
 	_filename = tmlform.field(_fieldname);
 </tml:script>
 <tml:case condition="_filename">
-	<div style="margin:10px">
+	<div style="margin:10px 0">
 	
 		<tml:if condition="content().hasFile(_filename)">
 			<tml:then>

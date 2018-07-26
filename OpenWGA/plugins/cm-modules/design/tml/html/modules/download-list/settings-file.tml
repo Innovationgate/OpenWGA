@@ -48,7 +48,9 @@
 </tml:script>
 <tml:case context="{_context}" iscontextvalid="true">
 	<label><tml:label key="download-list-file.file"/>:</label>
-	<tml:include ref="util:select-file" o_fieldname="filename"/>
+	<div style="margin:10px">
+		<tml:include ref="util:select-file" o_fieldname="filename"/>
+	</div>
 </tml:case>
 
 <label><tml:label key="download-list-file.title-source"/>:</label>
