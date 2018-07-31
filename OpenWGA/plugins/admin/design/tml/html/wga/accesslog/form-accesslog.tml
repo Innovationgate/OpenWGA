@@ -66,12 +66,18 @@
 	
 	<tml:case condition="tmlform.field('/accessLog/implClassName')">
 		<tml:script>
-			var types_map = DBM.getModReg().getModulesForType(Packages.de.innovationgate.wga.modules.types.AccessLoggerModuleType);
-			var accessLogManager = types_map.get(tmlform.field("/accessLog/implClassName")).getProperties();
+			_servers = WGA.createList();
+			
+			var moddef = DBM.getModuleDefinition("AccessLogger", tmlform.field('/accessLog/implClassName'))
+			setOption("module-definition", moddef);
+			
+			if(!moddef)
+				return;
+				
+			var accessLogManager = moddef.getProperties();
 			_pathOptions = accessLogManager.getPathOptions();
 			var availableServers = accessLogManager.getAvailableDatabaseServers().iterator();
-			_servers = createList();
-			var default_value
+			var default_value;
 			while(availableServers.hasNext()){
 				var server = availableServers.next();
 				_servers.add(server.getTitle(DBM.locale) + "|" + server.uid);
@@ -81,13 +87,18 @@
 				tmlform.setField("/accessLog/dbServer", default_value);
 		</tml:script>
 		
-		<tml:if condition="_servers.isEmpty()">
+		<tml:if condition="option('module-definition')==null">
 			<tml:then>
+				<div class="data" style="color:red">The selected module is currently not installed on this server</div>
+			</tml:then>
+		
+			<tml:elseif condition="_servers.isEmpty()">
 				<label><tml:label file="wgaconfig" key="WGAConfiguration/accessLog/dbServer"/>:</label>
 				<div class="data" style="color:red">
 					No Servers available
 				</div>
-			</tml:then>
+			</tml:elseif>
+			
 			<tml:else>
 				
 				<tml:[system:fs-input] o_ns="/accessLog" o_field="dbServer" o_type="select" o_options="{_servers}" o_changeaction="clearAccessLogOptions"
@@ -99,46 +110,29 @@
 			
 				<tml:case condition="tmlform.field('/accessLog/dbServer')">
 					
-					<tml:script>
-						try{
-							var moddef = DBM.getModuleDefinition("AccessLogger", tmlform.field('/accessLog/implClassName'))
-							setOption("module-definition", moddef);							
-						}
-						catch(e){
-							log.info(e.message);
-						}		
-					</tml:script>
-					
-					<tml:if condition="option('module-definition')">
+					<tml:if condition="_config_bean.accessLog.options.isEmpty()">
 						<tml:then>
-							<tml:if condition="_config_bean.accessLog.options.isEmpty()">
-								<tml:then>
-									<tml:case condition="tmlform.mode()=='edit'">
-										<tml:include ref="::form-select-or-create-accesslog-db">
-											<tml:option name="implClassName"><tml:item name="/accessLog/implClassName" type="tmlform"/></tml:option>
-											<tml:option name="dbServer"><tml:item name="/accessLog/dbServer" type="tmlform"/></tml:option>
-										</tml:include>
-									</tml:case>
-								</tml:then>
-								<tml:else>
-									<tml:[system:module-options:form] o_title="Optional Parameters">
-										<tml:option name="ns">/accessLog/options</tml:option>
-										<tml:option name="changeDbAction">clearAccessLogOptions</tml:option>
-										<tml:option name="pathOptionsReadonly">true</tml:option>
-										<tml:option name="pathOptions" expression="_pathOptions"/>
-									</tml:[system:module-options:form]>
-								</tml:else>
-							</tml:if>
+							<tml:case condition="tmlform.mode()=='edit'">
+								<tml:include ref="::form-select-or-create-accesslog-db">
+									<tml:option name="implClassName"><tml:item name="/accessLog/implClassName" type="tmlform"/></tml:option>
+									<tml:option name="dbServer"><tml:item name="/accessLog/dbServer" type="tmlform"/></tml:option>
+								</tml:include>
+							</tml:case>
 						</tml:then>
-			
 						<tml:else>
-							<div class="data" style="color:red">The selected module is currently not installed on this server</div>					
+							<tml:[system:module-options:form] o_title="Optional Parameters">
+								<tml:option name="ns">/accessLog/options</tml:option>
+								<tml:option name="changeDbAction">clearAccessLogOptions</tml:option>
+								<tml:option name="pathOptionsReadonly">true</tml:option>
+								<tml:option name="pathOptions" expression="_pathOptions"/>
+							</tml:[system:module-options:form]>
 						</tml:else>
-					</tml:if>		
+					</tml:if>
 			
 				</tml:case>
 					
 			</tml:else>
+			
 		</tml:if>
 	
 	</tml:case>

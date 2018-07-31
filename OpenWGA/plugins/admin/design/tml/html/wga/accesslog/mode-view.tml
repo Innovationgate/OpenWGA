@@ -22,41 +22,26 @@
 ## along with OpenWGA in file COPYING.
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
-<tml:script>
-	var types_map = DBM.getModReg().getModulesForType(Packages.de.innovationgate.wga.modules.types.AccessLoggerModuleType);
-	_hasLogger = (types_map && !types_map.values().isEmpty())
-</tml:script>
 
 <tml:include designdb="@ui" ref="windowview">
 	<tml:option name="title">Access Log Configuration</tml:option>	
 	<tml:option name="config" scope="local">
-		<tml:case istrue="_hasLogger">
-			tbar: [
-				{
-					cls:'x-btn-text-icon',						
-					icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
-					text: "<tml:label key="btn.edit"/>",
-					handler: function(){
-						WGA.ajax.callAction("<tml:action ref="actions:setEditMode"/>","<tml:script expression="portlet.portletkey"/>");
-					}
+		tbar: [
+			{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="page_edit.png"/>',		                
+				text: "<tml:label key="btn.edit"/>",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action ref="actions:setEditMode"/>","<tml:script expression="portlet.portletkey"/>");
 				}
-			]
-		</tml:case>
+			}
+		]
 	</tml:option>
 
 	<tml:inline name="body">
-	
-		<tml:if istrue="_hasLogger">
-			<tml:then>	
-				<tml:form id="view-wga-config" mode="view" source="none">
-					<tml:include ref="::form"/>
-				</tml:form>
-			</tml:then>
-			<tml:else>
-				No Access Logger avaliable on this OpenWGA system
-			</tml:else>
-		</tml:if>
-							
+		<tml:form id="view-wga-config" mode="view" source="none">
+			<tml:include ref="::form"/>
+		</tml:form>
 	</tml:inline>
 	
 </tml:include>
