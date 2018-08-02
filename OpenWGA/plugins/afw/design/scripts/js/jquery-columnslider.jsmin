@@ -201,7 +201,15 @@
 						opacity: 1
 					});
 				})
-				$wrapper.css("opacity", 0);
+				if($wrapper.css("opacity")=="1")
+					$wrapper.css("opacity", 0);
+				else{
+					// should not happen but just in case
+					$wrapper.css({
+						left: new_left,
+						opacity: 1
+					});
+				}
 			}
 			else {
 				$wrapper.animate({opacity:0}, {
