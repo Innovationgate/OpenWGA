@@ -99,7 +99,7 @@
 		</div>
 	
 		<tml:script>
-			_mod_structure = CMM.getContentModulesData(CMM.getModulesSource())||"{}";		
+			_mod_structure = CMM.getContentModulesData(CMM.getModulesSource())||"{}";
 		</tml:script>
 		
 		<script>
@@ -117,7 +117,7 @@
 						modules[id]=mod;
 					}
 				</tml:foreach>
-				M.init(modules, '<tml:item name="_mod_structure" encode="none"/>', 
+				M.init(modules, '<tml:item name="_mod_structure" encode="javascript"/>', 
 					"<tml:option name="mode"/>", 
 					"<tml:script expression="request.section"/>",
 					"<tml:item name="last_selected_module" type="portlet"/>"
