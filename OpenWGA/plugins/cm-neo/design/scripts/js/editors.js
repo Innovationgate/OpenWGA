@@ -3,7 +3,7 @@ define([
 	"uploadmanager",
 	"cm",
 	"jquery-textarea-autogrow",
-	"/plugin-wga-app-framework/js/rtfeditor2"		// defines AFW.RTF.editor
+	"afw/rtfeditor2"		// defines AFW.RTF.editor
 ], function(Sitepanel, UploadManager, CM){
 
 	var rtf_editor = function(){
