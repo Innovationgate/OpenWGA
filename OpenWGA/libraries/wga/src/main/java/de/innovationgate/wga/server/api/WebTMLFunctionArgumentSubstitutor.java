@@ -178,6 +178,12 @@ public class WebTMLFunctionArgumentSubstitutor implements FunctionArgumentSubsti
             return null;
             
         }
+        else if (argumentName.equals("$tag")){
+            if (!_wga.isTMLContextAvailable() || !_wga.tmlcontext().iswebenvironment()) {
+                return null;
+            }
+            return _wga.tmlcontext().tag();
+        }
         else if (argumentName.startsWith("$tagInfo_") || argumentName.startsWith("$tag_")) {
             
             if (!_wga.isTMLContextAvailable() || !_wga.tmlcontext().iswebenvironment()) {
