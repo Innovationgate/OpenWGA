@@ -18,6 +18,8 @@
 
 <script>
 	require(["jquery", "jquery-textarea-autogrow"], function($){
-		$("#<tml:script expression="tmlform.formid"/> textarea").autogrow();
+		$("a[data-toggle='tab']").on("shown.bs.tab", function(){
+			$("#<tml:script expression="tmlform.formid"/> textarea").autogrow()
+		})
 	})
 </script>
