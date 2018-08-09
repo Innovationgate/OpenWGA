@@ -517,12 +517,16 @@ public class FileDerivateManager {
 
                             // No revision of last run: Complete re-init
                             if (lastRevision == null) {
+                            	LOG.info("performInitialDerivateCreation bc. no lastRevision");
                                 performInitialDerivateCreation(db, currentRun, creatorSelector);
                                 currentRun.setSomethingDone(true);
                             }
                             
                             // Creator set changed: Perform reinit with the set of changed creators
                             else if (creatorSelector.checkForCreatorSetChange(lastCreators)) {
+                            	LOG.info("performInitialDerivateCreation (reinit) bc. CreatorSet Changed");
+                            	LOG.info("lastCreators: " + lastCreators.toString());
+                            	LOG.info("EnabledCreatorNames: " + creatorSelector.getEnabledCreatorNames());
                                 performInitialDerivateCreation(db, currentRun, creatorSelector);
                                 currentRun.setSomethingDone(true);
                             }
@@ -1014,10 +1018,10 @@ public class FileDerivateManager {
 
     private synchronized DatabaseStatus getDatabaseStatus(WGDatabase db) {
         DatabaseStatus status = _databaseStatus.get(db.getDbReference());
-            if (status == null) {
-                status = new DatabaseStatus();
-                _databaseStatus.put(db.getDbReference(), status);
-            }
+        if (status == null) {
+            status = new DatabaseStatus();
+            _databaseStatus.put(db.getDbReference(), status);
+        }
     
         return status;
     }
