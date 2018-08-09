@@ -7,7 +7,7 @@
 
 !function(root, factory) {
   	if(typeof define === 'function' && define.amd)
-    	define("jquery-tree", ['jquery'], factory);
+    	define("jquery-tree", ["jquery"], factory);
   	else factory(root.jQuery);
 }(window, function($){
 
@@ -46,7 +46,9 @@
 		var node = $(this).parents('.node').first();
 		if(node.hasClass('collapsed'))
 			expandNode(node, function(){
-				//scrollIntoView(node);
+				setTimeout(function(){
+					scrollIntoView(node)
+				}, 250)
 			})
 		else collapseNode(node)
 	}
@@ -209,31 +211,6 @@
 		}
 	}
 
-	/*
-	function isInView(element) {
-
-		var container = element.offsetParent();
-		
-		var containerScrollTop = container.scrollTop();
-		var containerHeight = container.height();
-		
-		var elemTop = element.position().top;
-		var elemBottom = elemTop + element.height();
-
-		var inView = elemTop >= containerScrollTop && elemBottom <= containerScrollTop + containerHeight; 
-		//var inView = elemTop >= containerScrollTop
-		console.log(inView, "top", elemTop, containerScrollTop, "inview-top", elemTop >= containerScrollTop)
-		console.log(inView, "bottom", elemBottom, containerScrollTop + containerHeight, "in-view-bottom", elemBottom <= containerScrollTop + containerHeight)
-		console.log("el-height", element.height())
-		
-		return {
-			top: elemTop >= containerScrollTop,
-			bottom: elemBottom <= containerScrollTop + containerHeight
-		};
-		
-	}
-	*/
-	
 	function scrollIntoView(node) {
 		
 		if(!node.length)
@@ -245,9 +222,9 @@
 		var containerHeight = container.height();
 		
 		var entryTop = node.position().top;
-		var entryBottom = entryTop + $(".entry", node).height()
+		var entryBottom = entryTop + node.height()
 
-		if(entryTop < containerScrollTop)
+		if(entryTop < containerScrollTop || node.height()>containerHeight)
 			container.animate({scrollTop: entryTop}, 100)
 		else if (entryBottom > containerScrollTop + containerHeight)
 			container.animate({scrollTop: entryBottom-containerHeight}, 100)
