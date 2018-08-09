@@ -445,6 +445,12 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
         _includeKeys = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_INCLUDEKEYS, false);
         _allowUmlaute = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_ALLOW_UMLAUTE, false);
         _db = db;
+        
+        if(_shortcutArea!=null && db.getArea(_shortcutArea)==null){
+        	// this warning should only logged once.
+            _core.getLog().warn("Title path URL shortcut area '" + _shortcutArea + "' does not (yet) exist in database " + db.getDbReference());
+        }
+        
         db.addDatabaseEventListener(this);
         
         if (generateTitlePathURLs) {
@@ -511,7 +517,6 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
     private void parseShortcutArea(WGDatabase db, Map newNames) throws WGAPIException, UnsupportedEncodingException {
         WGArea area = db.getArea(_shortcutArea);
         if (area == null) {
-            _core.getLog().warn("Title path URL shortcut area '" + _shortcutArea + "' does not (yet) exist in database " + db.getDbReference());
             return;
         }
 
