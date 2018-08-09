@@ -4,7 +4,7 @@ Controller.prototype.prepare = function() {
 	if(this.defaultDbKey()){
 		var app = WGA.app(this.defaultDbKey())
 		if(app && app.isAuthor()){
-			WGA.redirectTo("/contentmanager?dbkey=" + this.defaultDbKey())
+			WGA.redirectTo(WGA.Server.getBaseURL() + "/contentmanager?dbkey=" + this.defaultDbKey())
 		}
 	}
 }.nonIsolated()
@@ -41,5 +41,5 @@ Controller.prototype.cmlogin = function($form) {
 	if(!app.isAuthor())
 		return $form.addMessage("Benutzer '" + $form.username + "' ist kein Autor der Website")
 	// finaly:
-	WGA.redirectTo("/contentmanager?dbkey=" + dbkey)
+	WGA.redirectTo(WGA.Server.getBaseURL() + "/contentmanager?dbkey=" + dbkey)
 }.nonIsolated()
