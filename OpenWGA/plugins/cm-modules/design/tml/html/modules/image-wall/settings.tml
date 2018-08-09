@@ -10,8 +10,8 @@
 	/>
 </div>
 
-<label><tml:label key="module.image-wall.settings.lightbox.show-download"/></label>
 <tml:case condition="tmlform.field(WGA.scoped('lightbox'))">
+	<label><tml:label key="module.image-wall.settings.lightbox.show-download"/></label>
 	<div style="margin:10px">
 		<tml:input name="{scoped:download}" type="boolean" default="false" mode="{option:mode}"/>
 	</div>
