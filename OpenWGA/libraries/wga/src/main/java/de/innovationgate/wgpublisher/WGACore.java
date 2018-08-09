@@ -4375,10 +4375,12 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             // init TestCore
             initTestCore();
             
+            /*
             // Perform initial daily DB maintenance if in devmode, because devmode servers normally do not run 24 hours
             if ("true".equals(System.getProperty(SYSPROPERTY_DEVELOPMENT_MODE))) {
                 performDbMaintenanceForDevmode();
             }
+            */
 
             // notify LuceneManger
             logCategoryInfo("Lucene Fulltext Index", 1);
