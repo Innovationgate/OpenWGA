@@ -4426,7 +4426,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         }
     }
 
-    private void performDbMaintenanceForDevmode() throws WGAPIException {
+    public void performDbMaintenanceForDevmode() throws WGAPIException {
         logCategoryInfo("Database maintenance", 1);
         Thread maintenance = new Thread() {
 
