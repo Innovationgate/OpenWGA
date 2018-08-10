@@ -316,6 +316,11 @@ public class BaseTagStatus {
             return false;
         }
         
+        // No wrap attribute
+        String wrap = tag.getWrap(); 
+        if(wrap != null && !wrap.isEmpty())
+        	return false;
+        
         return true;
     }
     
