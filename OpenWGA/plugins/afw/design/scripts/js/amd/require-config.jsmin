@@ -1,3 +1,10 @@
 require.config(	
 	//@import type=tmlscript db=plugin-wga-app-framework require-config
 )
+
+// don't load jquery if already included:
+if(window.jQuery){
+	define('jquery', [], function() {
+	    return window.jQuery;
+	});	
+}
