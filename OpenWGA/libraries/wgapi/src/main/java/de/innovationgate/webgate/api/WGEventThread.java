@@ -24,7 +24,9 @@
  ******************************************************************************/
 package de.innovationgate.webgate.api;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -35,6 +37,7 @@ import de.innovationgate.webgate.api.locking.LockException;
  */
 public class WGEventThread {
 
+	private static final String SYSPROPERTY_EVENT_FULL_MAINTENANCE_HOUR = "de.innovationgate.wgapi.eventthread.full_maintenance_hour";
 	public static String SYSPROPERTY_EVENT_SLEEP_TIME = "de.innovationgate.wgapi.eventthread.sleeptime";
 
 	private int _sleepTime = 1000 * 10;
@@ -43,6 +46,7 @@ public class WGEventThread {
 	private volatile AtomicLong _runIndex = new AtomicLong(Long.MIN_VALUE);	
 	
 	protected void start() {
+		
 		this._thread = new Thread(new Runnable() {
 
             @Override
@@ -91,14 +95,26 @@ public class WGEventThread {
 
 		while (this._thread == meThread) {
 		    
-		    
             // Do "full maintenance" on the first event thread run each day
             boolean fullMaintenance = false;
             Date nowDate = WGUtils.dateOnly(new Date());
             if (!nowDate.equals(_lastFullMaintenance)) {
-                fullMaintenance = true;
-                _lastFullMaintenance = nowDate;
-                WGFactory.getLogger().info("Performing full WGAPI event thread maintenance");
+            	
+            	String full_maintenance_hour = System.getProperty(WGEventThread.SYSPROPERTY_EVENT_FULL_MAINTENANCE_HOUR);
+            	if(full_maintenance_hour!=null){
+            		int hour = WGUtils.parseInt(full_maintenance_hour);
+            		Calendar cal = new GregorianCalendar();
+            		if(cal.get(Calendar.HOUR_OF_DAY)>=hour){
+    	                fullMaintenance = true;
+    	                _lastFullMaintenance = nowDate;
+    	                WGFactory.getLogger().info("Performing full WGAPI event thread maintenance");
+            		}
+            	}
+            	else{
+	                fullMaintenance = true;
+	                _lastFullMaintenance = nowDate;
+	                WGFactory.getLogger().info("Performing full WGAPI event thread maintenance");
+            	}
             }
 
 			List<WGDatabase> dbsList = WGFactory.getInstance().getOpenedDatabases();
