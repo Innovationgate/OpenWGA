@@ -83,6 +83,9 @@
 					<tml:script expression="_file_md.displayHeight"/>
 					Pixel
 				</tml:case>
+				<tml:case condition="_file_md && _file_md.getCustomFieldValue('pageCount')">
+					<p><tml:script expression="_file_md.getCustomFieldValue('pageCount')"/> Seiten</p>
+				</tml:case>
 				<tml:case condition="_file_md.usage=='poster' && _derivates.size()">
 					<p style="margin-top:20px">Derivate:</p>
 	    			<tml:foreach item="_derivates" currentvalue="_derivate" sortexpression="_derivate.size" sortorder="descending">
