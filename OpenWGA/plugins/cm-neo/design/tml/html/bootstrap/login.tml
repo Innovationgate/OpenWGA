@@ -34,7 +34,7 @@
 
 		<img class="logo" src="<tml:url type="static" file="images/brand/logo_600.png"/>">
 	
-		<tml:form source="none" id="login" defaultaction="login">
+		<tml:form source="none" id="login-form" defaultaction="login">
 			<tml:script>
 				if(option("msg"))
 					tmlform.addmessage(option('msg'))
@@ -49,7 +49,7 @@
 				</div>
 			</tml:case>
 			<div class="form-group">
-				<label _class="control-label col-sm-2">Benutzername:</label>
+				<label>Benutzername:</label>
 				<tml:input name="username" cssclass="form-control" html_placeholder="Ihr Benutzername ..." focus="true"/>
 			</div>
 			<div class="form-group">
@@ -57,8 +57,26 @@
 				<tml:input name="password" type="password" cssclass="form-control" html_placeholder="Ihr Kennwort ..."/>
 			</div>
 			<div class="form-group">
-				<tml:button cssclass="btn btn-primary" clickaction="login" ajax="true" html_type="submit">Anmelden ...</tml:button>
+				<button id="login-button" type="submit" class="btn btn-primary">Anmelden ...</button>
 			</div>
+			<div id="loading" style="display:none">
+				<tml:image doc="images" file="ajax-loader-bar.gif"/>
+			</div>
+
+			<script>
+				require(["jquery"], function($){
+					$("#login-form").submit(function(ev){
+						ev.preventDefault();
+						$(".form-group, .alert", this).hide();
+						$("#loading").show();
+						WGA.ajax.action({
+							action: "<tml:action ref="login"/>"
+						})
+					})
+				})
+			</script>
+
 		</tml:form>
 	</div>
 </tml:include>
+
