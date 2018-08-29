@@ -51,9 +51,9 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>6</minorVersion>
-        <maintenanceVersion>1</maintenanceVersion>
+        <maintenanceVersion>2</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>677</buildVersion>
+        <buildVersion>678</buildVersion>
       </version>
     </id>
     <title>OpenWGA Application UI Interface Library 3.1</title>
