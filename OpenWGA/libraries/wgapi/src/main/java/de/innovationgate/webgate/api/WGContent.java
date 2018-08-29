@@ -1127,7 +1127,9 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
                 throw new WGBackendException("Could not publish document " + getContentKey().toString() + " because it could not be saved");
             }
     		
+            // Initialize by workflow engine
             WGWorkflow workflow = getWorkflow();
+            workflow.initialize();
 		    
 		    if (getDatabase().isProjectMode()) {
 		        release(comment, workflow, "Released in project mode");

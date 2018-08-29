@@ -5065,9 +5065,6 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
                 }
             }
 
-            // Initialize by workflow engine
-            WGWorkflow workflow = this.getWorkflowEngine().getWorkflow(newContent);
-            workflow.initialize();
         }
 
 
@@ -7491,9 +7488,12 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
             newContent.setValidity(null, null);
         }
 
+        /*
         // Initialize by workflow engine
         WGWorkflow workflow = getWorkflowEngine().getWorkflow(newContent);
         workflow.initialize();
+        */
+        
         if (!projectMode) {
             newContent.addWorkflowHistoryEntry("Draft copy created");
         }
