@@ -16,7 +16,7 @@
 ================================================================================
 
 
-                     Apache Tomcat Version 7.0.64
+                     Apache Tomcat Version 7.0.90
                             Release Notes
 
 
@@ -98,7 +98,7 @@ Bundled APIs:
 =============
 A standard installation of Tomcat 7.0 makes all of the following APIs available
 for use by web applications (by placing them in "lib"):
-* annotations-api.jar (Annotations package)
+* annotations-api.jar (Common Annotations 1.1 package)
 * catalina.jar (Tomcat Catalina implementation)
 * catalina-ant.jar (Tomcat Catalina Ant tasks)
 * catalina-ha.jar (High availability package)
@@ -121,9 +121,16 @@ You can make additional APIs available to all of your web applications by
 putting unpacked classes into a "classes" directory (not created by default),
 or by placing them in JAR files in the "lib" directory.
 
-To override the XML parser implementation or interfaces, use the endorsed
-mechanism of the JVM. The default configuration defines JARs located in
-"endorsed" as endorsed.
+To override the XML parser implementation or interfaces, use the Endorsed
+Standards Override mechanism of the JVM. The default configuration defines
+JARs located in "$CATALINA_HOME/endorsed" as endorsed. This mechanism is
+no longer supported with Java 9.
+
+When running on Java 6, the Common Annotations 1.0 implementation provided
+by the JRE will be used. To use the Common Annotations 1.1 provided by
+Tomcat, use the Endorsed Standards Override mechanism of the JVM. The
+default configuration defines JARs located in "$CATALINA_HOME/endorsed" as
+endorsed.
 
 
 ================================================================
@@ -227,4 +234,4 @@ software:
 When all else fails:
 ====================
 See the FAQ
-http://tomcat.apache.org/faq/
+https://tomcat.apache.org/faq/
