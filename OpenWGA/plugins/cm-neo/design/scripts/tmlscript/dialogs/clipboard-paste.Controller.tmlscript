@@ -46,8 +46,7 @@ Controller.prototype.isAllowedPageType = function(AFW, $cx, $item__CM_clipboard_
 	var source = $cx.context($item__CM_clipboard_context).content().structEntry;
 	var dest = $cx.content().structEntry;
 
-	var ct = source.getContentType();
-	var Contenttype = AFW.contenttype(ct);
+	var Contenttype = AFW.contenttype(source.getContentType().name);
 
 	if(!Contenttype.isValid()){
 		return false;
