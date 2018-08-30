@@ -271,7 +271,15 @@ public class BaseContentStorePublisherOptionsModuleDefinition implements ModuleD
         tpuIncludeKeys.setDefaultValue(Boolean.TRUE.toString());
         tpuIncludeKeys.addDependentOption(WGACore.DBATTRIB_TITLEPATHURL, Boolean.TRUE.toString());
         options.addOption(tpuIncludeKeys);
-        
+
+        LocalizedOptionDefinition tpuUseStruckkeys = new LocalizedOptionDefinition(WGACore.DBATTRIB_TITLEPATHURL_USESTRUCTKEYS, BooleanOptionType.INSTANCE, _bundleLoader);
+        tpuUseStruckkeys.setOptional(true);
+        tpuUseStruckkeys.setDefaultValue(Boolean.FALSE.toString());
+        tpuUseStruckkeys.setExpert(true);
+        tpuUseStruckkeys.addDependentOption(WGACore.DBATTRIB_TITLEPATHURL, Boolean.TRUE.toString());
+        tpuUseStruckkeys.addDependentOption(WGACore.DBATTRIB_TITLEPATHURL_INCLUDEKEYS, Boolean.TRUE.toString());
+        options.addOption(tpuUseStruckkeys);
+
         LocalizedOptionDefinition tpuAllowUmlaute = new LocalizedOptionDefinition(WGACore.DBATTRIB_TITLEPATHURL_ALLOW_UMLAUTE, BooleanOptionType.INSTANCE, _bundleLoader);
         tpuAllowUmlaute.setDefaultValue(Boolean.FALSE.toString());
         tpuAllowUmlaute.addDependentOption(WGACore.DBATTRIB_TITLEPATHURL, Boolean.TRUE.toString());
