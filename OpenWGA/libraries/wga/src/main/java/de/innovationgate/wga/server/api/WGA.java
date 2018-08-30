@@ -2381,16 +2381,16 @@ public class WGA {
      * More intuitive alias for tmlcontext()
      */
     public Context context() throws WGException{
-    	return tmlcontext();
+    	return get().tmlcontext();
     }
     public Context context(String expression) throws WGException{
-    	return tmlcontext().context(expression);
+    	return get().tmlcontext().context(expression);
     }
     public Context context(String expression, boolean returnContextOnError) throws WGException{
-    	return tmlcontext().context(expression, returnContextOnError);
+    	return get().tmlcontext().context(expression, returnContextOnError);
     }
     public Context context(WGContent content) throws WGException{
-    	return tmlcontext().context(content);
+    	return get().tmlcontext().context(content);
     }
     
     protected TMLContext fetchTMLContext() {
