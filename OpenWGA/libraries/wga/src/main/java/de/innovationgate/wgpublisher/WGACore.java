@@ -3961,7 +3961,8 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
     
     public static final String DBATTRIB_TITLEPATHURL_MIXEDLANGUAGES = "TitlePathURL.MixedLanguages";
     
-    public static final String DBATTRIB_TITLEPATHURL_INCLUDEKEYS = "TitlePathURL.IncludeKeys";
+    public static final String DBATTRIB_TITLEPATHURL_INCLUDEKEYS = "TitlePathURL.IncludeKeys";    
+    public static final String DBATTRIB_TITLEPATHURL_USESTRUCTKEYS = "TitlePathURL.UseStructkeysAsKey";
     
     public static final String DBATTRIB_TITLEPATHURL_ALLOW_UMLAUTE = "TitlePathURL.AllowUmlaute";
 
@@ -5669,7 +5670,6 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
 
     public static final String ATTRIB_SESSION_LIFECYCLE_LISTENER = "SessionLifecycleListener";
 
-    
     
     // Server options
     public WGPDispatcher getDispatcher() {

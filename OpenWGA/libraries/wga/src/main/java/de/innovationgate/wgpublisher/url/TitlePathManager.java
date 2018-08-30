@@ -426,6 +426,7 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
     private boolean _allowUmlaute;
 
     private boolean _includeKeys;
+    private boolean _useStructKeysInPath;
     
     public PathTitle parseURLPathTitle(String title) throws UnsupportedEncodingException {
         return new URLPathTitle(title);
@@ -443,6 +444,7 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
         _generateTitlePathURLs = generateTitlePathURLs;
         _contentIndexing = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_CONTENTINDEXING, false);
         _includeKeys = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_INCLUDEKEYS, false);
+        _useStructKeysInPath = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_USESTRUCTKEYS, false);
         _allowUmlaute = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_ALLOW_UMLAUTE, false);
         _db = db;
         
@@ -966,10 +968,17 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
                 	if(hasCustomTitlepath){
                 		title = normalizeURLTitle(customTitlepath);
                 	}
-                	long seq = content.getStructEntry().getPageSequence();
-                	if(seq!=0)
-                		baseContentSuffix.append("~").append(Long.toHexString(seq));
-                	else baseContentSuffix.append("~").append(String.valueOf(content.getStructKey()));
+                	
+                	if(_useStructKeysInPath)
+                		baseContentSuffix.append("~").append(String.valueOf(content.getStructKey()));
+                	else{
+                		// use page sequence as key
+	                	long seq = content.getStructEntry().getPageSequence();
+	                	if(seq!=0)
+	                		baseContentSuffix.append("~").append(Long.toHexString(seq));
+	                	else baseContentSuffix.append("~").append(String.valueOf(content.getStructKey()));
+                	}
+                	
                 }
                 baseContentSuffix.append(".").append(language).append(".").append(mediaKey);
                 
