@@ -13,6 +13,7 @@
 </tml:action>
 
 <tml:script>
+	console.log(VIRTUALLINKTYPE, VIRTUALLINK)
 	if(!tmlform.submitted && !VIRTUALLINK)
 		tmlform.VIRTUALLINKTYPE="";
 </tml:script>
@@ -20,7 +21,7 @@
 <tml:item name="_msg" wrap="div" wrap_class="alert alert-danger"/>
 
 <tml:[form-field] o_label="Art" o_name="VIRTUALLINKTYPE" o_type="select" o_meta="true"
-	o_options="Kein Link|,Interner Link|int,Externer Link|exturl"
+	o_options="Kein Link|,Interner Link|int,Externer Link|exturl,Context-Ausdruck|exp,Dateianhang|intfile"
 	o_changeaction="reset-link"
 />
 
@@ -28,8 +29,17 @@
 	<tml:case value="exturl">
 		<tml:[form-field] o_label="URL" o_name="VIRTUALLINK" o_meta="true" o_placeholder="URL des Link-Ziels"/> 	
 	</tml:case>
+	<tml:case value="exp">
+		<tml:[form-field] o_label="Ausdruck" o_name="VIRTUALLINK" o_meta="true" o_placeholder="Context-Ausdruck"/> 	
+	</tml:case>
+	<tml:case value="intfile">
+		<tml:script>
+			WGA.TMLPage.setVar("_filenames", content().getFileNames())
+		</tml:script>
+		<tml:[form-field] o_label="Datei" o_name="VIRTUALLINK" o_meta="true" o_placeholder="Dateiname" o_type="select" o_optionsitem="_filenames"/> 	
+	</tml:case>
 	<tml:case value="int">
-		<tml:input name="VIRTUALLINK" type="hidden" meta="true" changeaction=""/>
+		<tml:input name="VIRTUALLINK" type="hidden" meta="true"/>
 		<tml:[form-field] o_mode="view">
 			<tml:if condition="tmlform.VIRTUALLINK">
 				<tml:then>
@@ -54,7 +64,7 @@
 	<tml:[form-field] o_mode="view">
 		<tml:button clickaction="insert-link" cssclass="btn btn-default">
 			<i class="fas fa-paste"></i>
-			internen Link aus Zwischenablage einfügen ...
+			Internen Link aus Zwischenablage einfügen ...
 		</tml:button>
 	</tml:[form-field]> 	
 </tml:case>
