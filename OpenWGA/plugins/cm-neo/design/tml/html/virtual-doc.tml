@@ -54,8 +54,8 @@
 			WGA.contentinfo={
 				dbkey: "<tml:meta name="dbkey" type="db"/>",
 				contentkey: "<tml:meta name="key"/>",
-				structkey: "<tml:meta name="structkey"/>",
-				title: "<tml:script>return TITLE.replace(/"/g, "\\\"");</tml:script>",
+				structkey: "<tml:meta name="structkey"/>",				
+				title: "<tml:script expression="AFW.Util.encodeForScript(TITLE)"/>",
 				language: "<tml:meta name="language"/>"
 			}
 		</script>		
