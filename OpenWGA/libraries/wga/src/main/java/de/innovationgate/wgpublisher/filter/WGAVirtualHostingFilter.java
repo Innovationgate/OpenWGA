@@ -163,19 +163,26 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                         	if(vHost.isHideHomepageURL()){
 								try {
 		                            WGDatabase db = (WGDatabase) _core.getContentdbs().get(defaultDBKey);
-		                            WGAURLBuilder urlBuilder = _core.retrieveURLBuilder(httpRequest, db);	 
-		                            String homepage = urlBuilder.buildHomepageURL(db, httpRequest);
-		                            homepage = homepage.substring(httpRequest.getContextPath().length());
-									homepage = "/" + defaultDBKey + homepage;
-									/*
-									 * #00005217
-									 * forwarding must be done after all filters had a change to get the request.
-									 * Otherwise we might have problems f. e. with request based authentications. 
-									 * Therefore we put an attribute to the request and let WGAFilterChain.doFilter() do the job. 
-									 */
-									httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, homepage);
+		                            if(db==null){
+		                            	_core.getLog().error("v-host '" + vHost.getServername() + "': default app '" + defaultDBKey + "' is not connected.");
+										// Generate 404 for the user:
+										httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
+		                            }
+		                            else{
+			                            WGAURLBuilder urlBuilder = _core.retrieveURLBuilder(httpRequest, db);	 
+			                            String homepage = urlBuilder.buildHomepageURL(db, httpRequest);
+			                            homepage = homepage.substring(httpRequest.getContextPath().length());
+										homepage = "/" + defaultDBKey + homepage;
+										/*
+										 * #00005217
+										 * forwarding must be done after all filters had a change to get the request.
+										 * Otherwise we might have problems f. e. with request based authentications. 
+										 * Therefore we put an attribute to the request and let WGAFilterChain.doFilter() do the job. 
+										 */
+										httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, homepage);
+		                            }
 								} catch (Exception e) {
-									_core.getLog().error("v-host: unable to proxy homepage", e);
+									_core.getLog().error("v-host '" + vHost.getServername() + "': unable to proxy homepage", e);
 									// fallback:
 									httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
 								}    
@@ -202,32 +209,34 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                     	boolean hasValidTitlePath = false;
                     	try{
                         	WGDatabase database = _core.getContentdbs().get(defaultDBKey);
-	                    	database = _core.openContentDB(database, httpRequest, false);
-	                		TitlePathManager tpm = (TitlePathManager) database.getAttribute(WGACore.DBATTRIB_TITLEPATHMANAGER);
-	                		if (tpm != null && tpm.isGenerateTitlePathURLs() && database.isSessionOpen()) {
-	                			ArrayList<String> elements = new ArrayList<String>(Arrays.asList(pathElements));
-	                			elements.remove(0); // remove empty first element produced by "/"
-	                			TitlePathManager.TitlePath title_path_url = tpm.parseTitlePathURL(elements);
-	                			if(title_path_url!=null && title_path_url.getStructKey()!=null){
-	                				String key = title_path_url.getStructKey();
-	                				WGStructEntry entry = database.getStructEntryByKey(key);
-	                				if(entry==null){
-	                					// may be a sequence?
-		                            	try{
-		                	            	long seq = Long.parseLong(key, 16);
-		                	            	entry = database.getStructEntryBySequence(seq);
-		                            	}
-		                            	catch(Exception e){
-		                            		// may be unable to parse structkey as long. Ignore any errors here.
-		                            	}
-	                				}
-	                				if(entry!=null){
-		                				// we have a structkey or sequence pointing to a content in this database
-		                				// requestedDBKey should be ignored in this case: it's part of the title path
-		                                hasValidTitlePath = true;
-	                				}
-	                			}
-	                		}
+                        	if(database!=null){
+		                    	database = _core.openContentDB(database, httpRequest, false);
+		                		TitlePathManager tpm = (TitlePathManager) database.getAttribute(WGACore.DBATTRIB_TITLEPATHMANAGER);
+		                		if (tpm != null && tpm.isGenerateTitlePathURLs() && database.isSessionOpen()) {
+		                			ArrayList<String> elements = new ArrayList<String>(Arrays.asList(pathElements));
+		                			elements.remove(0); // remove empty first element produced by "/"
+		                			TitlePathManager.TitlePath title_path_url = tpm.parseTitlePathURL(elements);
+		                			if(title_path_url!=null && title_path_url.getStructKey()!=null){
+		                				String key = title_path_url.getStructKey();
+		                				WGStructEntry entry = database.getStructEntryByKey(key);
+		                				if(entry==null){
+		                					// may be a sequence?
+			                            	try{
+			                	            	long seq = Long.parseLong(key, 16);
+			                	            	entry = database.getStructEntryBySequence(seq);
+			                            	}
+			                            	catch(Exception e){
+			                            		// may be unable to parse structkey as long. Ignore any errors here.
+			                            	}
+		                				}
+		                				if(entry!=null){
+			                				// we have a structkey or sequence pointing to a content in this database
+			                				// requestedDBKey should be ignored in this case: it's part of the title path
+			                                hasValidTitlePath = true;
+		                				}
+		                			}
+		                		}
+                        	}
 						} catch (WGException e) {
 							_core.getLog().info("Unable to determine title path", e);
 						}
