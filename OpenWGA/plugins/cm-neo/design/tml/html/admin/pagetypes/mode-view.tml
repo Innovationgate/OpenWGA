@@ -5,12 +5,6 @@
 <div class="header"><tml:label key="admin.pagetypes"/></div>
 
 <div class="content">
-	<tml:comment><tml:script>
-		_pagetypes = WGA.createList()
-		var pagetypes = db($option_dbkey).getContentTypes();
-		for(let pagetype in Iterator(pagetypes))
-			_pagetypes.add(pagetype.name);
-	</tml:script></tml:comment>
 	<ul>
 		<tml:foreach item="$pc.pagetypes" currentvalue="_pagetype">
 			<li>
