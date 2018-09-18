@@ -11,6 +11,7 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 		buttonWidth: '100%',
 		onChange: function(option){
 			if(editor){
+				editor.focus();
 				var para = $(option).val()
 				if(para){
 					editor.execCmd("FormatBlock", para||null);
@@ -21,7 +22,6 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 						editor.removeNode(el, true);
 					}
 				}
-				editor.focus();
 			}
 		}
 	})
@@ -34,6 +34,7 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 		disableIfEmpty: true,
 		buttonWidth: '100%',
 		onChange: function(option, checked){
+			editor.focus();
 			var el = editor.getParagraph()
 			var cls = $(option).val()
 			if(el){
