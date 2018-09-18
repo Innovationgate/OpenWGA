@@ -67,7 +67,9 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 		$("#toolbars [data-action-group='create']")[ev.params.structkey ? "removeClass" : "addClass"]("disabled")
 		$("#toolbars [data-action-group='delete']")[ev.params.structkey ? "removeClass" : "addClass"]("disabled")
 		$("#toolbars [data-action-group='clipboard']")[ev.params.structkey ? "removeClass" : "addClass"]("disabled")
-			
+		
+		$("#toolbars [data-action='settings-user-defined']").parent()[ev.params.has_userdefined_settings ? "removeClass" : "addClass"]("disabled")
+		
 	})
 
 	/* Click handler */

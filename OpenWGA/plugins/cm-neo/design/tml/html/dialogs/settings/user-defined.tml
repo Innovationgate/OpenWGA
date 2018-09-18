@@ -29,15 +29,18 @@
 	</div>
 	
 	<div class="content form-horizontal">
-		<tml:include ref="{AFW.content().getUserdefinedMetasTML()}" designdb="{meta('db', 'dbkey')}">
+		<tml:include ref="{$mc.settingsTML}" designdb="{meta('db', 'dbkey')}" if="$mc.settingsTML">
 			<tml:option name="cm_dbkey" expression="context('main').meta('db', 'dbkey')"/>
 			<tml:option name="label-width">250</tml:option>
 		</tml:include>
+		<tml:{p} unless="$mc.settingsTML">
+			Für diesen Seitentyp stehen keine Einstellungen zur Verfügung.
+		</tml:{p}>
 	</div>
 
 	<div class="footer">
 		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
-		<tml:case condition="tmlform.mode()=='edit'">
+		<tml:case condition="tmlform.mode()=='edit'" if="$mc.settingsTML">
 			<tml:button clickaction="save-page-settings" cssclass="btn btn-primary">Aktualisieren</tml:button>
 		</tml:case>
 	</div>

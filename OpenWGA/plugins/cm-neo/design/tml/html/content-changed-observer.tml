@@ -71,6 +71,7 @@
 				) 
 				&& Content.mayEditContent()
 			);
+			event.setParameter("has_userdefined_settings", Content.getUserdefinedMetasTML()!=null)
 		}
 	}
 	

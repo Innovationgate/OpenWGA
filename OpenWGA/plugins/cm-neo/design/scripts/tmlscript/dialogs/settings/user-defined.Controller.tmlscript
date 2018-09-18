@@ -1,0 +1,6 @@
+function Controller() {
+}
+
+Controller.prototype.prepare = function(AFW, $cx) {
+	this.settingsTML = AFW.content($cx).getUserdefinedMetasTML()
+}
