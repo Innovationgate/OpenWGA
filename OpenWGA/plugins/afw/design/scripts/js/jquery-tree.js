@@ -445,13 +445,17 @@
 						mayDrop=true;
 						
 						//e.originalEvent.dataTransfer.effectAllowed = "copyLink"
-						e.originalEvent.dataTransfer.setDragImage(drag_img, 0, 0);
-						e.originalEvent.dataTransfer.setData("wga/link", JSON.stringify({
-							title: drag_el.data("title"),
-							id: drag_el.data("id"),
-							context: drag_el.data("context"),
-							href: drag_el.data("href")
-						}))
+						try{
+							// added try-catch because IE does not support this.
+							e.originalEvent.dataTransfer.setDragImage(drag_img, 0, 0);
+							e.originalEvent.dataTransfer.setData("wga/link", JSON.stringify({
+								title: drag_el.data("title"),
+								id: drag_el.data("id"),
+								context: drag_el.data("context"),
+								href: drag_el.data("href")
+							}))
+						}
+						catch(e){}
 
 					},
 					dragover: function(e){
