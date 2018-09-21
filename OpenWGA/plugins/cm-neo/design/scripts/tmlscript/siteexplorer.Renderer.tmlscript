@@ -42,7 +42,6 @@ Renderer.prototype.render = function(App, $urlParam_id, $urlParam_dbkey, $urlPar
 		if(c){
 			ret.push({
 				title: WGA.encode("html", c.TITLE),
-				//title: c.TITLE + " (" + c.POSITION + ")",
 				id: c.STRUCTKEY,
 				cssclass: App.getCssClass(c),
 				symbolclass: App.getSymbolIcon(c),
