@@ -53,9 +53,11 @@
 				.text {
 	 				font-size: 80%;	 				
 					margin-top: 5px;
-					max-width: 120px;
-					overflow: hidden;
-					text-overflow: ellipsis;
+					&.username{
+						max-width: 120px;
+						overflow: hidden;
+						text-overflow: ellipsis;
+					}
 				}
 			}
 			
