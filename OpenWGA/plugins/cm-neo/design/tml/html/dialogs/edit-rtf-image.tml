@@ -88,6 +88,7 @@
 		$("#edit-rtf-image [data-action=create]").on("click", function(ev){
 			ev.preventDefault();
 
+			editor.focus();
 			var el = editor.getNearestTagFromSelection("img")
 			if(el)
 				return;		// just in case - should not happen
@@ -119,6 +120,9 @@
 		})
 		$("#edit-rtf-image [data-action=save]").on("click", function(ev){
 			ev.preventDefault();
+
+			editor.focus();
+			console.log("save: editor.focus();");
 
 			var el = editor.getNearestTagFromSelection("img")
 			if(!el)

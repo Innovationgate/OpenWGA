@@ -84,6 +84,7 @@
 		$("#edit-rtf-link [data-action=create]").on("click", function(ev){
 			ev.preventDefault();
 
+			editor.focus();
 			var a = editor.getNearestTagFromSelection("a")
 			if(a)
 				return; // should not happen 
@@ -136,6 +137,7 @@
 		$("#edit-rtf-link [data-action=save]").on("click", function(ev){
 			ev.preventDefault();
 
+			editor.focus();
 			var a = editor.getNearestTagFromSelection("a")
 			
 			var form = $("#edit-rtf-link");
