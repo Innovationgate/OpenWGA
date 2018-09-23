@@ -72,6 +72,4 @@ Renderer.prototype.render = function(App, $urlParam_id, $urlParam_dbkey, $urlPar
 	//console.log("ret", JSON.stringify(ret));
 
 	WGA.TMLPage.write(JSON.stringify(ret))
-
-	//WGA.TMLPage.renderDefault();
 }
