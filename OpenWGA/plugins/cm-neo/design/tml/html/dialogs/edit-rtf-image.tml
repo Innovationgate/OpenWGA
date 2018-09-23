@@ -1,0 +1,154 @@
+##MDSET preprocess=true
+
+<tml:form id="edit-rtf-image">
+
+	<div class="header">
+		Bild <tml:script expression="$option_dialog_options.type ? 'ändern':'einfügen'"/>
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content form-horizontal">
+		<tml:[form-field] o_label="Typ" o_name="type" o_type="select" o_options="Externes Bild|exturl,Internes Bild|intfile" o_default="{$option_dialog_options.type||'exturl'}"
+			o_changeaction="$refresh"
+		/>
+		<tml:select switch="tmlform.type">
+			<tml:case value="exturl">
+				<tml:[form-field] o_label="URL" o_name="url" 
+					o_default="{$option_dialog_options.url}"
+					o_placeholder="vollständige absolute URL ..."
+				/>
+			</tml:case>
+			<tml:case value="intfile">
+				<tml:script>
+					var filenames = WGA.createList(["Bitte auswählen|"])
+					for(let filename in Iterator(content().getFileNames())){
+						var file_md = content().getFileMetaData(filename);
+						if(file_md.mimeType.indexOf("image")==0)
+							filenames.add(filename);						
+					}
+					if(!tmlform.submitted && $option_dialog_options.key){
+						tmlform.key = $option_dialog_options.key;
+						tmlform.url = fileurl($option_dialog_options.key)
+					}
+					WGA.TMLPage.setVar("_filenames", filenames)
+				</tml:script>
+				<tml:[form-field] o_label="Bild-Datei" o_name="key" 
+					o_type="select" o_optionsitem="_filenames"
+					o_changeaction="$refresh"
+				>
+					<tml:script>
+						if(tmlform.key){
+							tmlform.url = fileurl(tmlform.key)
+							_url = AFW.content().attachment(tmlform.key).getThumbnailURL()
+							var file = content().getFileMetaData(tmlform.key);
+							_size = AFW.Util.renderFileSize(file.getSize());
+							_date = file.getLastmodified()
+							_mimetype = file.getMimeType()					
+						}					
+					</tml:script>
+					<tml:{div} if="_url" html_class="_fileinfo clearfix" html_style="margin-top:10px">
+						<div style="float:left;width:60px;margin-top:5px" class="image">
+							<img style="max-width:60px;max-height:40px" src="<tml:item name="_url"/>">
+						</div>
+						<div style="margin-left:70px" class="metas">
+							@{_mimetype} - @{_size}
+							<br>
+							@{_date}
+						</div>					
+					</tml:{div}>
+				</tml:[form-field]>
+				<tml:input name="url" type="hidden"/>
+			</tml:case>
+		</tml:select>
+		<hr>
+		<tml:[form-field] o_label="Titel" o_name="title" o_default="{$option_dialog_options.title}"
+			o_placeholder="Titel des Bildes ..."
+		/>
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:if condition="$option_dialog_options.type">
+			<tml:then>
+				<a class="btn btn-primary" data-action="save">Aktualisieren</a>
+			</tml:then>
+			<tml:else>
+				<a class="btn btn-primary" data-action="create">Einfügen</a>
+			</tml:else>
+		</tml:if>
+	</div>
+
+</tml:form>
+
+<script>
+	require(["jquery", "jquery-modal", "toolpanels/rtf"], function($, Modal, RTF){
+		
+		var editor = RTF.getEditor();
+		
+		$("#edit-rtf-image [data-action=create]").on("click", function(ev){
+			ev.preventDefault();
+
+			var el = editor.getNearestTagFromSelection("img")
+			if(el)
+				return;		// just in case - should not happen
+
+			var form = $("#edit-rtf-image");
+			var type = $("[name=type]", form).val();
+			var url = $("[name=url]", form).val();
+			if(type=="exturl"){
+				if(!url){
+					alert("Bitte geben Sie eine Bild-URL ein.");
+					$("[name=url]", form).focus();
+					return;
+				}
+				el = editor.createImg(url, "exturl");
+				AFW.RTF.setURLInfo(el, {type:type, key:url})
+			}
+			else if(type=="intfile"){
+				var key = $("[name=key]", form).val();	// filename
+				el = editor.createImg(url, "intfile");
+				AFW.RTF.setURLInfo(el, {type:type, key:key})
+			}
+			else{
+				alert("Unbekannter Bild-Typ: " + type);
+				return;
+			}
+			el.alt = el.title = $("[name=title]", form).val();
+			Modal.hide();
+
+		})
+		$("#edit-rtf-image [data-action=save]").on("click", function(ev){
+			ev.preventDefault();
+
+			var el = editor.getNearestTagFromSelection("img")
+			if(!el)
+				return;
+			var form = $("#edit-rtf-image");
+			var type = $("[name=type]", form).val();
+			var url = $("[name=url]", form).val();
+			if(type=="exturl"){
+				if(!url){
+					alert("Bitte geben Sie eine Bild-URL ein.");
+					$("[name=url]", form).focus();
+					return;
+				}
+				el.src=url;
+				AFW.RTF.setURLInfo(el, {type:type, key:url})
+			}
+			else if(type=="intfile"){
+				var key = $("[name=key]", form).val();	// filename
+				el.src=url;
+				AFW.RTF.setURLInfo(el, {type:type, key:key})
+			}
+			else{
+				alert("Unbekannter Bild-Typ: " + type);
+				return;
+			}
+			el.alt = el.title = $("[name=title]", form).val();
+			
+			Modal.hide();
+				
+		})
+	})
+</script>
+

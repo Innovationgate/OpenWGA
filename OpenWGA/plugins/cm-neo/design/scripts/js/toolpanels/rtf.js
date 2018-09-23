@@ -113,79 +113,52 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 			var a = editor.getNearestTagFromSelection("a")
 			if(a)
 				return; // should not happen 
-			var root_el = $("#rtf-tab-link");
-			var url = $("[name=url]", root_el).val();
-			if(!url){
-				alert("Bitte geben Sie eine Link-URL ein.");
-				$("[name=url]", root_el).focus();
-				return;
-			}
-			a = editor.createLink(url, url, "exturl");
-			AFW.RTF.setURLInfo(a, {type:"exturl", key:url})
-			a.title = $("[name=title]", root_el).val();
-			var target = $("[name=target]", root_el).val();
-			if(target)
-				a.target = target;
-			else a.removeAttribute("target") 
+			CM.openDialog("edit-rtf-link")
 		},
-		"update-link": function(el){
+		"edit-link": function(el){
 			var a = editor.getNearestTagFromSelection("a")
 			if(!a)
 				return;
-			var root_el = $("#rtf-tab-link");
 			var info = AFW.RTF.getURLInfo(a)
-			if(info.type=="int" || info.type=="intfile"){
-				var key = info.key;
+			var key = info.key;
+			var anker = ""
+			if(info.type=="int"){
 				var parts = key.split("#");
-				var anker = $("[name=anker]", root_el).val();
-				AFW.RTF.setURLInfo(a, {
-					type:info.type, 
-					key:parts[0] + (anker ? "#"+anker : "")
-				})
+				key = parts[0];
+				anker = parts[1];
 			}
-			else{
-				var url = $("[name=url]", root_el).val();				
-				AFW.RTF.setURLInfo(a, {type:"exturl", key:url})
-			}
-			a.title = $("[name=title]", root_el).val();
-			var target = $("[name=target]", root_el).val();
-			if(target)
-				a.target = target;
-			else a.removeAttribute("target") 
+			CM.openDialog("edit-rtf-link", {
+				title: a.title,
+				target: a.target,
+				type: info.type,
+				key: key,
+				anker: anker,
+				url: a.href
+			});			
 		},
 		"delete-link": function(el){
 			var a = editor.getNearestTagFromSelection("a")
-			//console.log("delete link", a)
 			a && editor.removeLink(a)
 			editor.focus();
 		},
 
+		"edit-image": function(el){
+			var el = editor.getNearestTagFromSelection("img")
+			if(!el)
+				return;
+			var info = AFW.RTF.getURLInfo(el)
+			CM.openDialog("edit-rtf-image", {
+				title: el.title,
+				type: info.type,
+				key: info.key,
+				url: el.src
+			});			
+		},
 		"create-image": function(el){
 			var el = editor.getNearestTagFromSelection("img")
 			if(el)
 				return; // should not happen 
-			var root_el = $("#rtf-tab-image");
-			var url = $("[name=url]", root_el).val();
-			if(!url){
-				alert("Bitte geben Sie eine Bild-URL ein.");
-				$("[name=url]", root_el).focus();
-				return;
-			}
-			el = editor.createImg(url, "exturl");
-			AFW.RTF.setURLInfo(el, {type:"exturl", key:url})
-			el.alt = el.title = $("[name=title]", root_el).val();
-		},
-		"update-image": function(el){
-			var el = editor.getNearestTagFromSelection("img")
-			if(!el)
-				return;
-			var root_el = $("#rtf-tab-image");
-			if(AFW.RTF.getURLInfo(el).type!="intfile"){
-				var url = $("[name=url]", root_el).val();
-				el.src=url;
-				AFW.RTF.setURLInfo(el, {type:"exturl", key:url})
-			}
-			el.alt = el.title = $("[name=title]", root_el).val();
+			CM.openDialog("edit-rtf-image")
 		},
 		
 		"edit-html": function(el){
@@ -298,46 +271,36 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 			var el = editor.getNearestTagFromSelection("a")
 			if(el){
 				$("#editor-panel-rtf [data-action=create-link]").hide()
-				$("#editor-panel-rtf [data-action=update-link]").show()
 				$("#editor-panel-rtf [data-action=delete-link]").show()
-				
-				$("#rtf-tab-link [name=url]").val($(el).prop("href"))
-				$("#editor-panel-rtf [name=title]").val(el.title)
-				$("#editor-panel-rtf [name=target]").val(el.target)
-
-				var info = AFW.RTF.getURLInfo(el)
-				if(info.type=="int" || info.type=="intfile"){
-					$("#editor-panel-rtf [data-id=anker-wrapper]").show()
-					var parts = info.key.split("#");
-					$("#editor-panel-rtf [name=url]").val(parts[0])
-						.prop("disabled", true);
-					$("#editor-panel-rtf [name=anker]").val(parts[1])
-				}
-				else {
-					$("#editor-panel-rtf [data-id=anker-wrapper]").hide()
-					$("#editor-panel-rtf [name=url]").val(info.key)
-						.prop("disabled", false);
-				}
+				$("#editor-panel-rtf [data-action=edit-link]").show()
+				$("#editor-panel-rtf [data-id=link-info-wrapper]").show()
 				
 				var classes = el.className.split(" ");
 				if(options && options.linkStyleList && options.linkStyleList.length){
 					$("#editor-panel-rtf .link-options").show()
 					$("#editor-panel-rtf [name=link-style]").multiselect('select', classes)
 				}
+				var info = AFW.RTF.getURLInfo(el)
+				var types={
+					"int": "Interner Link",
+					"exturl": "Externer Link",
+					"intfile": "Link auf Datei",
+					"undefined": "Undefiniert"
+				}				
+				$("#editor-panel-rtf [data-id=link-type]").html(types[info.type||"undefined"])
+				if(info.type=="exturl")
+					$("#editor-panel-rtf [data-id=link-info]").html($(el).prop("href"))
+				else if(info.type=="intfile")
+					$("#editor-panel-rtf [data-id=link-info]").html(info.key)
+				else $("#editor-panel-rtf [data-id=link-info]").html("")
 			}
 			else{
-				$("#editor-panel-rtf [name=url]").val("").prop("disabled", false);
-				$("#editor-panel-rtf [name=anker]").val("")
-				$("#editor-panel-rtf [name=title]").val("")
-				$("#editor-panel-rtf [name=target]").val("")
-				$("#editor-panel-rtf [data-id=link-type]").html("Kein Link")
-				$("#editor-panel-rtf [data-id=url-wrapper]").show()
-				$("#editor-panel-rtf [data-action=update-link]").hide()
+				$("#editor-panel-rtf [data-id=link-info-wrapper]").hide()			
 				$("#editor-panel-rtf [data-action=delete-link]").hide()
-				$("#editor-panel-rtf [data-action=create-link]").show()
-
+				$("#editor-panel-rtf [data-action=edit-link]").hide()
 				$("#editor-panel-rtf .link-options").hide()
-				$("#editor-panel-rtf [data-id=anker-wrapper]").hide()
+
+				$("#editor-panel-rtf [data-action=create-link]").show()
 			}
 
 			// Image
@@ -345,34 +308,41 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 			$("#editor-panel-rtf [name=image-style]").multiselect('deselectAll', false)
 			selectedImg=el;
 			if(el){
-				$("#rtf-tab-image [data-action=update-image]").show()
 				$("#rtf-tab-image [data-action=create-image]").hide()
-				var link_type=AFW.RTF.getURLInfo(el).type;
-				if(link_type=="intfile")
-					$("#rtf-tab-image [name=url]").val(AFW.RTF.getURLInfo(el).key).prop("disabled", true).autogrow("update");
-				else {
-					$("#rtf-tab-image [name=url]").val($(el).prop("src")).prop("disabled", false).autogrow("update");
-				}
-				$("#rtf-tab-image [name=title]").val(el.title)
+				$("#rtf-tab-image [data-action=edit-image]").show()
+				$("#editor-panel-rtf .img-options").show()
+				$("#editor-panel-rtf [data-id=image-info-wrapper]").show()
+				
 				$("#rtf-tab-image [name=width]").val(el.width).css("color", el.style.width?"brown":"gray")
 				$("#rtf-tab-image [name=height]").val(el.height).css("color", el.style.height?"brown":"gray")
 
 				var classes = el.className.split(" ");
 				if(options && options.imageStyleList && options.imageStyleList.length){
-					$("#editor-panel-rtf .img-options").show()
+					$("#editor-panel-rtf [data-id=image-style]").show()
 					$("#editor-panel-rtf [name=image-style]").multiselect('select', classes)					
 				}
+				var info = AFW.RTF.getURLInfo(el)
+				var types={
+					"exturl": "Externes Bild",
+					"intfile": "Internes Bild",
+					"undefined": "Undefiniert"
+				}				
+				$("#editor-panel-rtf [data-id=image-type]").html(types[info.type||"undefined"])
+				if(info.type=="exturl")
+					$("#editor-panel-rtf [data-id=image-info]").html($(el).prop("src"))
+				else if(info.type=="intfile")
+					$("#editor-panel-rtf [data-id=image-info]").html(info.key)
+				else $("#editor-panel-rtf [data-id=image-info]").html("")
 			}
 			else{
-				$("#rtf-tab-image [data-action=update-image]").hide()
+				$("#rtf-tab-image [data-action=edit-image]").hide()
+				$("#editor-panel-rtf [data-id=image-info-wrapper]").hide()
 				$("#rtf-tab-image [data-action=create-image]").show()
-				$("#rtf-tab-image [name=url]").val("").prop("disabled", false).autogrow("update");
-				$("#rtf-tab-image [name=title]").val("");
 				$("#rtf-tab-image [name=width]").val("").css("color", "black")
 				$("#rtf-tab-image [name=height]").val("").css("color", "black")
 				
-				//$("#editor-panel-rtf [name=image-style]").multiselect('select', [])
 				$("#editor-panel-rtf .img-options").hide()
+				$("#editor-panel-rtf [data-id=image-style]").show()
 			}
 		
 		},
@@ -384,19 +354,6 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 		}
 	}
 
-	function delay(f, timeout){
-		var timer = null;
-		return function(){
-			var self = this;
-			var args = arguments;
-			if(timer)
-				clearTimeout(timer);
-			timer = setTimeout(function(){
-				f.apply(self, args)
-			}, timeout||500)
-		}
-	}
-	
 	return{
 		setEditor: function(e){
 			editor=e;

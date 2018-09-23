@@ -193,13 +193,9 @@
 		.nav > li > a {
 			padding: 8px;
 		}
-		/*
-		.btn-sm {
-			.fa, .fas, .far, .glyphicon{
-				font-size: 1.2em;
-			}
+		[data-id=image-info], [data-id=link-info]{
+			overflow: hidden;
 		}
-		*/
 	}
 
 	.text-editor-input {

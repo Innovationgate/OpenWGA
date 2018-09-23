@@ -98,44 +98,28 @@
 		</ul>
 		<div class="tab-content" style="padding:10px;background:white;border:1px solid #ddd;porder-radius:0 4px 4px 4px;margin-top:-1px">
 			<div class="tab-pane active" id="rtf-tab-link">
-				<tml:comment><div style="margin-bottom:10px">
-					<label>Linkart:</label>
-					<div data-id="link-type">Extern</div>
-				</div></tml:comment>
-				<div style="margin-bottom:10px" data-id="url-wrapper">
-					<label>URL:</label>
-					<input type="text" name="url" class="form-control input-sm" placeholder="externe URL ...">
+			
+				<div style="margin-bottom:10px" data-id="link-info-wrapper">
+					<label data-id="link-type"></label>
+					<div data-id="link-info"></div>
 				</div>
-				<div style="margin-bottom:10px" data-id="anker-wrapper">
-					<label>Sprungmarke (Anker):</label>
-					<input type="text" name="anker" class="form-control input-sm" placeholder="- keine -">
-				</div>
-				<div style="margin-bottom:10px">
-					<label>Titel:</label>
-					<input type="text" name="title" class="form-control input-sm" placeholder="Titel des Links ...">
-				</div>
-				<div style="margin-bottom:10px">
-					<label>Zielfenster:</label>
-					<input type="text" name="target" class="form-control input-sm" placeholder="Name des Zielfensters ...">
-				</div>
-
+				
 				<div style="margin:10px 0" class="link-options">
 					<label>Stil:</label>
 					<select name="link-style" style="width:100%" multiple="multiple"></select> 
 				</div>
 
-				<div class="btn-group">
+				<div _class="btn-group">
 					<a class="btn btn-sm btn-default" data-action="create-link" href="#">
 						<i class="fa fa-plus"></i>
-						einfügen
+						Link einfügen
 					</a>
-					<a class="btn btn-sm btn-default" data-action="update-link" href="#">
-						<i class="fa fa-external-link"></i>
-						aktualisieren
+					<a class="btn btn-sm btn-default" data-action="edit-link" href="#">
+						<i class="fas fa-edit"></i>
+						Link bearbeiten
 					</a>
-					<a class="btn btn-sm btn-default" data-action="delete-link" href="#">
+					<a class="btn btn-sm btn-default pull-right" data-action="delete-link" href="#" title="Link löschen">
 						<i class="fa fa-trash"></i>
-						löschen
 					</a>
 				</div>
 			</div>
@@ -143,25 +127,22 @@
 				<a href="#" class="btn btn-primary btn-sm">Tabelle einfügen ...</a>
 			</div>
 			<div class="tab-pane" id="rtf-tab-image">
-				<div style="margin-bottom:10px">
-					<label>URL:</label>
-					<textarea name="url" class="form-control input-sm" placeholder="externe Bild-URL ..."></textarea>
-				</div>			
-				<div style="margin-bottom:10px">
-					<label>Titel:</label>
-					<input type="text" name="title" class="form-control input-sm" placeholder="Titel des Bildes ...">
+
+				<div style="margin-bottom:10px" data-id="image-info-wrapper">
+					<label data-id="image-type"></label>
+					<div data-id="image-info"></div>
 				</div>
 				
 				<div class="img-options">
 					<div style="margin-bottom:10px">
 						<label>Breite x Höhe:</label>
 						<br>
-						<input type="text" name="width" class="form-control input-sm" style="display:inline;width:50px">
+						<input type="text" name="width" class="form-control input-sm" style="display:inline;width:70px">
 						x
-						<input type="text" name="height" class="form-control input-sm" style="display:inline;width:50px">
+						<input type="text" name="height" class="form-control input-sm" style="display:inline;width:70px">
 					</div>
 	
-					<div style="margin:10px 0">
+					<div style="margin:10px 0" data-id="image-style">
 						<label>Stil:</label>
 						<select name="image-style" style="width:100%" multiple="multiple"></select> 
 					</div>
@@ -169,11 +150,11 @@
 				
 				<a class="btn btn-sm btn-default" data-action="create-image" href="#">
 					<i class="fa fa-plus"></i>
-					einfügen
+					Bild einfügen
 				</a>
-				<a class="btn btn-sm btn-default" data-action="update-image" href="#">
-					<i class="fa fa-external-link"></i>
-					aktualisieren
+				<a class="btn btn-sm btn-default" data-action="edit-image" href="#">
+					<i class="fas fa-edit"></i>
+					Bild ändern
 				</a>
 			</div>
 		</div>
@@ -186,11 +167,11 @@
 	<div class="btn-group" style="display:block">
 		<a data-action="clean-html" style="width:50%" href="#" class="btn btn-default btn-sm">
 			<i class="fas fa-code"></i>
-			bereinigen
+			Bereinigen
 		</a>
 		<a data-action="edit-html" style="width:50%" href="#" class="btn btn-default btn-sm">
 			<i class="fas fa-edit"></i>
-			bearbeiten
+			Bearbeiten
 		</a>
 	</div>
 </fieldset>
