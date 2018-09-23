@@ -1008,7 +1008,7 @@ AFW.RTF.editor=function(id, config){
 			return null;
 		}	
 	}
-	this.getSelection = _getSelection();
+	this.getSelection = _getSelection;
 	
 	// returns a range for the current selection
 	function _createRange(sel) {
