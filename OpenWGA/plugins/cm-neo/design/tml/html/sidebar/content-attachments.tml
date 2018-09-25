@@ -70,9 +70,9 @@
 					<span class="fas fa-plus"></span>
 				</a>
 				
-				<tml:comment><a href="#" class="disabled" data-action="set-primary" title="Primäre Datei setzen">
-					<i class="fas fa-file-powerpoint"></i>
-				</a></tml:comment>
+				<a href="#" class="disabled" data-action="edit-file-metas" title="Datei-Eigenschaften bearbeiten">
+					<i class="far fa-file-alt"></i>
+				</a>
 				
 				<a class="pull-right disabled" href="#" data-action="delete">
 					<span class="glyphicon glyphicon-trash"></span>

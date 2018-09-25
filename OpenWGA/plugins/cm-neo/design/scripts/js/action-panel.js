@@ -220,6 +220,9 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 			if(contentInfo.may_update_content){
 				var method = panel.find(".thumb.selected").length ? "removeClass":"addClass";
 				panel.find(".sidebar-toolbar [data-action=delete]")[method]("disabled")
+				
+				panel.find(".sidebar-toolbar [data-action=edit-file-metas]")[method]("disabled")
+				
 			}
 		},
 		dblclick: function(e){
@@ -270,7 +273,11 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 				})
 				break;
 			case "upload-file":
-				CM.openDialog("upload-file", {
+				CM.openDialog("upload-file")
+				break;
+			case "edit-file-metas":
+				CM.openDialog("attachment-metas", {
+					filename: $("#sidepannel-content-attachments .thumb.selected").data("filename")
 				})
 				break;
 		}
