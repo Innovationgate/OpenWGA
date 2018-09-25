@@ -84,7 +84,10 @@
 					Pixel
 				</tml:case>
 				<tml:case condition="_file_md && _file_md.getCustomFieldValue('pageCount')">
-					<p><tml:script expression="_file_md.getCustomFieldValue('pageCount')"/> Seiten</p>
+					<tml:script>
+						_pages = _file_md.getCustomFieldValue('pageCount')
+					</tml:script>
+					<p><tml:script expression="_pages > 1 ? _pages + ' Seiten' : 'Eine Seite'"/></p>
 				</tml:case>
 				<tml:case condition="_file_md.usage=='poster' && _derivates.size()">
 					<p style="margin-top:20px">Derivate:</p>
