@@ -74,7 +74,7 @@
 					<i class="far fa-file-alt"></i>
 				</a>
 				
-				<a class="pull-right disabled" href="#" data-action="delete">
+				<a class="pull-right disabled" href="#" data-action="delete" title="Ausgewählte Datei(en) löschen">
 					<span class="glyphicon glyphicon-trash"></span>
 				</a>					
 			</div>
