@@ -27,7 +27,7 @@
 	<tml:then>
 		<tml:portlet name="[{option('ns')}-image]" ref="::image" ajax="true" o_mode="edit" portletmode="view"/>
 	</tml:then>
-	<tml:else>
+	<tml:elseif condition="CMM.setting('image')">
 		<tml:include ref="::image"/>
-	</tml:else>
+	</tml:elseif>
 </tml:if>
