@@ -71,7 +71,7 @@
 					}
 				}
 			</tml:script>
-			<img src="<tml:item name="_url"/>" srcset="<tml:item name="_srcset"/>">
+			<img src="<tml:item name="_url"/>" srcset="<tml:item name="_srcset"/>" title="<tml:script expression="_file_md.mimeType"/>">
 			<div class="info">
 				<tml:script expression="_file_md.mimeType"/>
 				-

@@ -14,6 +14,8 @@
 		.info {
 			margin-top:10px;
 			color: gray;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 	}
 	.metas {
