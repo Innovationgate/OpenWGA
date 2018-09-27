@@ -533,6 +533,9 @@ this.attachment = function(filename){
 		,isVideo: function(){
 			return this.mimeType.indexOf("video")==0
 		}
+		,isAudio: function(){
+			return this.mimeType.indexOf("audio")==0
+		}
 		,isPDF: function(){
 			return this.mimeType=="application/pdf";
 		}
@@ -597,7 +600,7 @@ this.attachment = function(filename){
 						: this.mimeType=="application/zip" ? "tar.png"
 						: this.mimeType=="text/javascript" || this.mimeType=="text/css" ? "source.png"
 						: this.mimeType=="text/html" ? "html.png"
-						: "",
+						: "binary.png",
 				pos: 999
 			}
 		}
