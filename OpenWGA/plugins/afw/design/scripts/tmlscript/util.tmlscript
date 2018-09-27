@@ -473,7 +473,7 @@ this.dateRange = function(start_date, end_date){
 }
 
 this.renderFileSize = function(value) {
-	// start with GB and work way down to kB
+	// start with GB and work way down to Bytes
 	var kb = 1000;
 	var mb = kb*kb;
 	var gb = mb*kb;				
@@ -484,11 +484,11 @@ this.renderFileSize = function(value) {
 	else if (value >= kb)
 		return Math.round(value/kb) + ' KB';
 	else
-		return value + ' bytes';		
+		return value + ' Bytes';		
 }
 
 this.fileSizeText = function(value) {
-	// start with GB and work way down to kB
+	// start with GB and work way down to Bytes
 	var kb = 1000;
 	var mb = kb*kb;
 	var gb = mb*kb;				
@@ -499,7 +499,7 @@ this.fileSizeText = function(value) {
 	else if (value >= kb)
 		return Math.round(value/kb) + ' KB';
 	else
-		return value + ' bytes';		
+		return value + ' Bytes';		
 }
 
 /*
