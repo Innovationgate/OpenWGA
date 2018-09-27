@@ -107,6 +107,10 @@
 			}
 			else if(type=="intfile"){
 				var key = $("[name=key]", form).val();	// filename
+				if(!key){
+					alert("Bitte wählen Sie ein Bild aus.");
+					return;
+				}
 				el = editor.createImg(url, "intfile");
 				AFW.RTF.setURLInfo(el, {type:type, key:key})
 			}
@@ -141,6 +145,10 @@
 			}
 			else if(type=="intfile"){
 				var key = $("[name=key]", form).val();	// filename
+				if(!key){
+					alert("Bitte wählen Sie ein Bild aus.");
+					return;
+				}
 				el.src=url;
 				AFW.RTF.setURLInfo(el, {type:type, key:key})
 			}
