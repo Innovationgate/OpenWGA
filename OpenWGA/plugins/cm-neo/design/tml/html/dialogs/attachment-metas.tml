@@ -63,7 +63,6 @@
 		<div class="poster">
 			<tml:script>
 				_url = _Attachment.getThumbnailURL({width:200,checksum:true})
-				console.log("_url", _url);
 				var ssc = WGA.service(Packages.de.innovationgate.wgpublisher.webtml.utils.SrcSetCreator);
 				if(_file_md && ssc.getMaxAvailablePosterSize){
 					var fileOriginalSize = ssc.getMaxAvailablePosterSize(content(), _file_md);
