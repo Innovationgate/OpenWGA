@@ -581,6 +581,12 @@ this.attachment = function(filename){
 					pos: 2,
 					icon: "video.png"
 				}
+			else if(this.isAudio())
+				return {
+					name: "videos",
+					pos: 2,
+					icon: "sound.png"
+				}
 			else if(this.isPDF())
 				return {
 					name: "pdf-docs",
