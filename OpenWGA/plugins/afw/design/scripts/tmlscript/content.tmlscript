@@ -602,8 +602,7 @@ this.attachment = function(filename){
 
 			return {
 				name: "others",
-				icon: this.mimeType.indexOf("audio")==0 ? "sound.png"
-						: this.mimeType=="application/zip" ? "tar.png"
+				icon: this.mimeType=="application/zip" ? "tar.png"
 						: this.mimeType=="text/javascript" || this.mimeType=="text/css" ? "source.png"
 						: this.mimeType=="text/html" ? "html.png"
 						: "binary.png",
