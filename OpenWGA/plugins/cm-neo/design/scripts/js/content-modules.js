@@ -46,7 +46,7 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 				
 		$("#module-tree").wga_tree({
 			data: data,
-			dragdrop: true,
+			dragdrop: mode=="edit",
 			mayDrop: mayDrop
 		}).on({
 			select: contentModuleSelected,
@@ -132,12 +132,6 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 		//console.log("selected", node, node.id, selected_tree_node);
 		
 		if(mode=="edit" && selected_tree_node && selected_tree_node.data("id").indexOf("section.")<0 && selected_tree_node.data("id") == node.id){
-			var link = node.node.find(".link-text").first();
-//			var txt = prompt("Neuen Titel eingeben", node.node.data("title"))
-//			if(txt){
-//				link.html(txt)
-//				node.node.data("title", txt);
-//			}
 			return;
 		}
 		
