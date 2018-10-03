@@ -1,3 +1,69 @@
-<div style="margin:10px">
-	<tml:input type="text" cssstyle="width:100%" name="{option('fieldname')}" mode="{option('mode')}"/>
+<tml:input name="{$option_fieldname}" default="{$option_default}" type="hidden"/>
+
+<tml:script>
+	_dbkey = $option_dbkey || meta('db', 'dbkey')
+</tml:script>
+
+<div class="select-tree-wrapper">
+	<a href="#" id="select-key-<tml:option name="fieldname"/>">
+		<span class="title">
+			<tml:if context="[db:{_dbkey}/docid:{tmlform.field($option_fieldname)}]" iscontextvalid="true">
+				<tml:then>
+					<tml:script>
+						var struct = content().getStructEntry();
+						var path=[struct.getStructKey()];
+						for(var parent=struct.getParentEntry(); parent; parent=parent.getParentEntry())
+							path.push(parent.getStructKey().toString());
+					
+						path.push("area-"+struct.getArea().getName());
+						_path = path.reverse().join("/");
+					</tml:script>
+					<tml:path>
+						<tml:meta name="title"/>
+						<tml:between> / </tml:between>
+					</tml:path>
+				</tml:then>
+				<tml:else><tml:script expression="$option_placeholder || 'Dokument auswählen ...'"/></tml:else>
+			</tml:if>
+		</span>
+		<span class="caret"></span>
+	</a>
+	<div class="select-tree">
+		<div class="tree" id="tree-<tml:option name="fieldname"/>" data-url="<tml:url type="tml" medium="json" layout="siteexplorer" u-dbkey="_dbkey" u_language="{LANGUAGE}"/>"></div>
+	</div>
 </div>
+
+<script>
+	require(["jquery", "jquery-tree"], function($){
+
+		var el = $("#select-key-<tml:option name="fieldname"/>");
+		var field = $("[name='<tml:option name="fieldname"/>']");
+		el.on("focus click", function(ev){
+			ev.preventDefault();
+			tree.show();
+		})
+	
+		var tree = $("#tree-<tml:option name="fieldname"/>").wga_tree({
+			<tml:case isfilled="_path">
+				path: "<tml:item name="_path"/>"
+			</tml:case>
+		})
+		.on("select", function(ev, node){
+			if(node.id.indexOf("area-")==0)
+				return;		// area selected
+			field.val(node.id)
+			<tml:case hasoptions="changeaction">
+				WGA.ajax.callAction("<tml:option name="changeaction"/>");
+			</tml:case>
+			$(".title", el).html(node.title);
+			tree.hide();
+		})
+
+		$(document).on("focusin click", function(ev){
+			var wrapper = el.parent();
+			if(wrapper.has(ev.target).length==0)
+				tree.hide();
+		})
+	
+	})
+</script>

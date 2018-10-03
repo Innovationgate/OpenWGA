@@ -5,18 +5,54 @@ Renderer.prototype.render = function(App, $urlParam_id, $urlParam_dbkey, $urlPar
 	var ret = []
 
 	var structs = WGA.createList()
+
+	function getRootEntries(areaname){
+		var structs = WGA.createList();
+		var area = db($urlParam_dbkey).getArea(areaname);
+		if(area){
+			var visiblefor = area.getExtensionData("CM_area_visible")
+			if(!visiblefor || visiblefor.size()==0 || db($urlParam_dbkey).isMemberOfUserList(visiblefor))
+				structs = area.getRootEntries()
+		}
+		return structs;
+	}
+	
 	if($urlParam_id=="root"){
-		var area = db($urlParam_dbkey).getArea($urlParam_area);
-		if(!area){
+	
+		if($urlParam_area){
+			structs = getRootEntries($urlParam_area);
+		}
+		else {
+			// return area list
+			var database = db($urlParam_dbkey);
+			var areas = database.getAreas();
+			for(let area in Iterator(areas.values())){
+
+				if(area.systemArea)
+					continue;
+				if(area.name=="hdb-content" && !WGA.app($urlParam_dbkey).isManager())
+					continue;
+				var visiblefor = area.getExtensionData("CM_area_visible")
+				if(visiblefor && visiblefor.size() && !database.isMemberOfUserList(visiblefor))
+					continue;
+
+				if(area.getChildNodes().size()>0)
+					ret.push({
+						title: WGA.encode("html", area.name),
+						id: "area-"+area.name,
+						cssclass: "area",
+						href: "#",
+						hasChildren: true
+					})
+			}
 			WGA.TMLPage.write(JSON.stringify(ret))
 			return;
 		}
-		var visiblefor = area.getExtensionData("CM_area_visible")
-		//console.log($urlParam_area, ""+visiblefor)
-		if(!visiblefor || visiblefor.size()==0 || db($urlParam_dbkey).isMemberOfUserList(visiblefor))
-			structs = db($urlParam_dbkey).getArea($urlParam_area).getRootEntries()
 	}
-	else{
+	else if($urlParam_id.indexOf("area-")==0){
+		structs = getRootEntries($urlParam_id.substr(5))
+	}
+	else {
 		var parent = db($urlParam_dbkey).getStructEntryByKey($urlParam_id);
 		if(parent){
 			structs = parent.getChildEntries();
