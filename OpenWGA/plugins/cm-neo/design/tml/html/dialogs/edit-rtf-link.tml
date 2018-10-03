@@ -9,6 +9,12 @@
 	}
 </tml:action>
 
+<tml:action id="setLinkText">
+	var doc = context("docid:"+tmlform.key, false);
+	if(doc)
+		tmlform.link_text = doc.TITLE;
+</tml:action>
+
 <tml:form id="edit-rtf-link">
 
 	<div class="header">
@@ -17,15 +23,20 @@
 	</div>
 	
 	<div class="content form-horizontal">
-		<tml:[form-field] o_label="Typ" o_name="type" o_type="select" o_options="Externer Link|exturl,Interner Link|int,Link auf Datei|intfile" o_default="{$option_dialog_options.type||'exturl'}"
+	
+		<tml:[form-field] o_label="Typ" o_name="type" o_type="select" o_options="Externer Link|exturl,Interner Link|int,Link auf Datei aus diesem Dokument|intfile,Link auf Datei aus beliebigem Dokument|extfile" o_default="{$option_dialog_options.type||'exturl'}"
 			o_changeaction="$refresh"
 		/>
 		<tml:select switch="tmlform.type">
 			<tml:case value="int">
-				<tml:[form-field] o_label="Schlüssel" o_name="key" o_default="{$option_dialog_options.key}"
-					o_placeholder="Schlüssel des Dokuments ..."
-				/>
-				<tml:[form-field] o_label="Link-Text" o_name="link_text" unless="$option_dialog_options.type"/>
+				
+				<tml:[form-field] o_label="Dokument" o_mode="view">
+					<tml:include ref="util:select-document" o_fieldname="key" o_default="{$option_dialog_options.key}">
+						<tml:option name="changeaction"><tml:action ref="setLinkText"/></tml:option>
+					</tml:include>
+				</tml:[form-field]>
+				<tml:input name="link_text" type="hidden"/>
+				
 				<tml:[form-field] o_label="Sprungmarke (Anker)" o_name="anker" o_default="{$option_dialog_options.anker}"
 					o_placeholder="- keine -"
 				/>
@@ -45,8 +56,40 @@
 					o_type="select" o_optionsitem="_filenames"
 				/>
 			</tml:case>
+			<tml:case value="extfile">
+				
+				<tml:script>
+					WGA.TMLPage.setVar("_dbs", CMM.getDbKeys());
+					_dbkey = meta("db", "dbkey");
+					if($option_dialog_options.key){
+						var parts = $option_dialog_options.key.split("/");
+						_container = parts[0];
+						_filename = parts[1];
+						_dbkey = parts[2];
+					}
+				</tml:script>
+				
+				<tml:[form-field] o_label="App" o_name="dbkey" o_default="{_dbkey}" o_type="select" o_optionsitem="_dbs" o_changeaction="$refresh"/>
+
+				<tml:[form-field] o_label="Dokument" o_mode="view">
+					<tml:include ref="util:select-document" o_fieldname="container" o_default="{_container}" o_dbkey="{tmlform.dbkey}">
+						<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
+					</tml:include>
+				</tml:[form-field]>
+
+				<tml:case condition="tmlform.container" context="[db:{tmlform.dbkey}/docid:{tmlform.container}]" iscontextvalid="true">
+					<tml:script>
+						WGA.TMLPage.setVar("_filenames", WGA.createList(["Bitte auswählen|"]))
+						_filenames.addAll(content().getFileNames());
+					</tml:script>
+					<tml:[form-field] o_label="Datei" o_name="filename" o_type="select" o_options="{_filenames}" o_default="{_filename}"/>
+				</tml:case>
+				
+			</tml:case>
 		</tml:select>
+		
 		<hr>
+		
 		<tml:[form-field] o_label="Titel" o_name="title" o_default="{$option_dialog_options.title}"
 			o_placeholder="Titel des Links ..."
 		/>
@@ -111,6 +154,17 @@
 				a = editor.createLink(key, key, "intfile");
 				AFW.RTF.setURLInfo(a, {type:type, key:key})
 			}
+			else if(type=="extfile"){
+				var dbkey = $("[name=dbkey]", form).val();
+				var container = $("[name=container]", form).val();
+				var filename = $("[name=filename]", form).val();
+				if(!filename){
+					alert("Bitte wählen Sie eine Datei aus.");
+					return;
+				}
+				a = editor.createLink(filename, filename, "extfile");
+				AFW.RTF.setURLInfo(a, {type:type, key:container+"/"+filename+"/"+dbkey})
+			}
 			else if(type=="int"){
 				var key = $("[name=key]", form).val();
 				var link_text = $("[name=link_text]", form).val();
@@ -167,6 +221,18 @@
 					key: key
 				})
 			}
+
+			else if(type=="extfile"){
+				var dbkey = $("[name=dbkey]", form).val();
+				var container = $("[name=container]", form).val();
+				var filename = $("[name=filename]", form).val();
+				if(!filename){
+					alert("Bitte wählen Sie eine Datei aus.");
+					return;
+				}
+				AFW.RTF.setURLInfo(a, {type:type, key:container+"/"+filename+"/"+dbkey})
+			}
+
 			else{	// exturl
 				var url = $("[name=url]", form).val();
 				if(!url){
