@@ -41,6 +41,7 @@
 	else _filenames = filenames;	// take it all
 	_filenames = WGA.sortList(_filenames);
 	_filenames.add(0, "");
+	
 </tml:script>
 
 <tml:input name="{_fieldname}" type="select" optionsitem="_filenames" mode="{$option_mode||tmlform.mode()}" cssstyle="width:100%"/>
@@ -61,7 +62,7 @@
 					_date = file.getLastmodified()
 					_mimetype = file.getMimeType()					
 				</tml:script>
-				"<tml:item name="_image"/>": {
+				"<tml:item name="_image" encode="none"/>": {
 					"url": "<tml:item name="_url"/>",
 					"date": "<tml:item name="_date"/>",
 					"mimetype": "<tml:item name="_mimetype"/>",
