@@ -416,6 +416,9 @@
 				if(config.data)
 					addNodes($this, config.data)
 				
+				if(config.path)
+					selectpath(config.path, $this)
+				
 				if(!config.dragdrop)
 					return;
 				
