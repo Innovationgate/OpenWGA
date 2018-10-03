@@ -1,5 +1,9 @@
 ##MDSET preprocess=true
 
+<tml:action id="clearFilename">
+	tmlform.removefield("filename")
+</tml:action>
+
 <tml:form id="edit-rtf-image">
 
 	<div class="header">
@@ -8,7 +12,7 @@
 	</div>
 	
 	<div class="content form-horizontal">
-		<tml:[form-field] o_label="Typ" o_name="type" o_type="select" o_options="Externes Bild|exturl,Internes Bild|intfile" o_default="{$option_dialog_options.type||'exturl'}"
+		<tml:[form-field] o_label="Typ" o_name="type" o_type="select" o_options="Externes Bild|exturl,Bild aus diesem Dokument|intfile,Bild aus beliebigem Dokument|extfile" o_default="{$option_dialog_options.type||'exturl'}"
 			o_changeaction="$refresh"
 		/>
 		<tml:select switch="tmlform.type">
@@ -51,13 +55,72 @@
 							<img style="max-width:60px;max-height:40px" src="<tml:item name="_url"/>">
 						</div>
 						<div style="margin-left:70px" class="metas">
-							@{_mimetype} - @{_size}
+							@{_mimetype} - @{_size encode="none"}
 							<br>
 							@{_date}
 						</div>					
 					</tml:{div}>
 				</tml:[form-field]>
 				<tml:input name="url" type="hidden"/>
+			</tml:case>
+			<tml:case value="extfile">
+
+				<tml:script>
+					WGA.TMLPage.setVar("_dbs", CMM.getDbKeys());
+					_dbkey = meta("db", "dbkey");
+					if($option_dialog_options.key && !tmlform.submitted){
+						var parts = $option_dialog_options.key.split("/");
+						_container = parts[0];
+						_filename = parts[1];
+						_dbkey = parts[2];
+						tmlform.filename = _filename;
+					}
+				</tml:script>
+				
+				<tml:[form-field] o_label="App" o_name="dbkey" o_default="{_dbkey}" o_type="select" o_optionsitem="_dbs" o_changeaction="$refresh"/>
+
+				<tml:[form-field] o_label="Dokument" o_mode="view">
+					<tml:include ref="util:select-document" o_fieldname="container" o_default="{_container}" o_dbkey="{tmlform.dbkey}">
+						<tml:option name="changeaction"><tml:action ref="clearFilename"/></tml:option>
+					</tml:include>
+				</tml:[form-field]>
+
+				<tml:case condition="tmlform.container" context="[db:{tmlform.dbkey}/docid:{tmlform.container}]" iscontextvalid="true">
+					<tml:script>
+						WGA.TMLPage.setVar("_filenames", WGA.createList(["Bitte auswählen|"]))
+						for(let filename in Iterator(content().getFileNames())){
+							var file_md = content().getFileMetaData(filename);
+							if(file_md.mimeType.indexOf("image")==0)
+								_filenames.add(filename);						
+						}
+					</tml:script>
+					<tml:[form-field] o_label="Datei" o_name="filename" o_type="select" o_options="{_filenames}" o_default="{_filename}" o_changeaction="$refresh">
+
+						<tml:case condition="tmlform.filename">
+							<tml:script>
+								tmlform.url = fileurl(tmlform.filename)
+								_url = AFW.content().attachment(tmlform.filename).getThumbnailURL()
+								var file = content().getFileMetaData(tmlform.filename);
+								_size = AFW.Util.renderFileSize(file.getSize());
+								_date = file.getLastmodified()
+								_mimetype = file.getMimeType()					
+							</tml:script>
+							<tml:{div} if="_url" html_class="_fileinfo clearfix" html_style="margin-top:10px">
+								<div style="float:left;width:60px;margin-top:5px" class="image">
+									<img style="max-width:60px;max-height:40px" src="<tml:item name="_url"/>">
+								</div>
+								<div style="margin-left:70px" class="metas">
+									@{_mimetype} - @{_size encode="none"}
+									<br>
+									@{_date}
+								</div>					
+							</tml:{div}>
+						</tml:case>
+						<tml:input name="url" type="hidden"/>
+						
+					</tml:[form-field]>
+				</tml:case>
+				
 			</tml:case>
 		</tml:select>
 		<hr>
@@ -114,6 +177,17 @@
 				el = editor.createImg(url, "intfile");
 				AFW.RTF.setURLInfo(el, {type:type, key:key})
 			}
+			else if(type=="extfile"){
+				var dbkey = $("[name=dbkey]", form).val();
+				var container = $("[name=container]", form).val();
+				var filename = $("[name=filename]", form).val();
+				if(!filename){
+					alert("Bitte wählen Sie ein Bild aus.");
+					return;
+				}
+				el = editor.createImg(url, "extfile");
+				AFW.RTF.setURLInfo(el, {type:type, key:container+"/"+filename+"/"+dbkey})
+			}
 			else{
 				alert("Unbekannter Bild-Typ: " + type);
 				return;
@@ -151,6 +225,17 @@
 				}
 				el.src=url;
 				AFW.RTF.setURLInfo(el, {type:type, key:key})
+			}
+			else if(type=="extfile"){
+				var dbkey = $("[name=dbkey]", form).val();
+				var container = $("[name=container]", form).val();
+				var filename = $("[name=filename]", form).val();
+				if(!filename){
+					alert("Bitte wählen Sie ein Bild aus.");
+					return;
+				}
+				el.src=url;
+				AFW.RTF.setURLInfo(el, {type:type, key:container+"/"+filename+"/"+dbkey})
 			}
 			else{
 				alert("Unbekannter Bild-Typ: " + type);
