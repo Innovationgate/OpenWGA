@@ -45,6 +45,7 @@
 		</tml:script>
 		<tml:input name="{scoped:dbkey}" type="select" optionsitem="_dbs"
 			changeaction="clearImages" ajax="true"
+			default="{meta('db', 'dbkey')}"
 			mode="{option:mode}"
 		/>
 	</div>
