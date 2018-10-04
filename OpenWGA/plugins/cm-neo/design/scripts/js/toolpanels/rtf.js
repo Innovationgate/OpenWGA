@@ -285,6 +285,7 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 					"int": "Interner Link",
 					"exturl": "Externer Link",
 					"intfile": "Link auf Datei",
+					"extfile": "Link auf externe Datei",
 					"undefined": "Undefiniert"
 				}				
 				$("#editor-panel-rtf [data-id=link-type]").html(types[info.type||"undefined"])
@@ -292,6 +293,11 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 					$("#editor-panel-rtf [data-id=link-info]").html($(el).prop("href"))
 				else if(info.type=="intfile")
 					$("#editor-panel-rtf [data-id=link-info]").html(info.key)
+				else if(info.type=="extfile"){
+					var parts = info.key.split("/");
+					var filename = parts[1];
+					$("#editor-panel-rtf [data-id=link-info]").html(filename)
+				}
 				else $("#editor-panel-rtf [data-id=link-info]").html("")
 			}
 			else{
@@ -325,6 +331,7 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 				var types={
 					"exturl": "Externes Bild",
 					"intfile": "Internes Bild",
+					"extfile": "Bild aus anderem Dokument",
 					"undefined": "Undefiniert"
 				}				
 				$("#editor-panel-rtf [data-id=image-type]").html(types[info.type||"undefined"])
@@ -332,6 +339,11 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 					$("#editor-panel-rtf [data-id=image-info]").html($(el).prop("src"))
 				else if(info.type=="intfile")
 					$("#editor-panel-rtf [data-id=image-info]").html(info.key)
+				else if(info.type=="extfile"){
+					var parts = info.key.split("/");
+					var filename = parts[1];
+					$("#editor-panel-rtf [data-id=image-info]").html(filename)
+				}
 				else $("#editor-panel-rtf [data-id=image-info]").html("")
 			}
 			else{
