@@ -27,7 +27,7 @@
 	_id = AFW.Util.generateUID();
 </tml:script>
 
-<div style="margin:<tml:script expression="AFW.request().isIE?5:10"/>px">
+<div style="margin:<tml:script expression="AFW.request().isIE?5:10"/>px 0">
 	<tml:input type="hidden" name="{option('fieldname')}" mode="{option('mode')}"/>
 	<div id="<tml:item name="_id"/>"></div>
 	<script>
