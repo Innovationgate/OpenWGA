@@ -29,7 +29,7 @@
 	<tml:foreach sourcetag="{scoped:child-collection}" 
 			id="{scoped:child-collection-loop}"
 			sortexpression="date||PAGEPUBLISHED" sortorder="descending" 
-			pagesize="{CMM.setting('entries')||'0'}"
+			pagesize="{$option_entries||0}"
 			offset="{$option_offset}"			
 	>
 		<div class="clearfix news <tml:script expression="taginfo(WGA.scoped('child-collection-loop'),'iteration')%2?'even':'odd'"/><tml:case islastloop="true"> last</tml:case><tml:case isfirstloop="true"> first</tml:case>">

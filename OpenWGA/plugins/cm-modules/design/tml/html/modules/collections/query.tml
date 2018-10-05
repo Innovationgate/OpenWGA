@@ -23,6 +23,7 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 <tml:script>
+	_entries = CMM.setting('entries')||0;
 	_offset = CMM.setting('start_entry');
 	if(!_offset)
 		_offset = "1";
@@ -34,4 +35,4 @@
 	</tml:query>
 </tml:collection>
 
-<tml:include ref="{'::layout:'+CMM.setting('layout')}" o_offset="{_offset}"/>
+<tml:include ref="{'::layout:'+CMM.setting('layout')}" o_offset="{_offset}" o-entries="_entries"/>

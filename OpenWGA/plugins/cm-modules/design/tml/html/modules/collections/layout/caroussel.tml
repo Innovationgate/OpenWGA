@@ -22,13 +22,14 @@
 ## along with OpenWGA in file COPYING.
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
+
 <div class="column-slider" style="opacity:0;transition: opacity .2s">
 	<div class="columns">
 		<tml:foreach sourcetag="{scoped:child-collection}"
 				id="{scoped:child-collection-loop}"
 				sortexpression="date||PAGEPUBLISHED" sortorder="descending"
 				offset="{$option_offset}"
-				pagesize="{CMM.setting('entries')||0}"
+				pagesize="{$option_entries||0}"
 		>
 
 			<tml:script>

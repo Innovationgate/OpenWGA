@@ -28,30 +28,16 @@
 			changeaction="$refresh" ajax="true"
 			default="this"
 			options="{label('child-nav.settings.parent.options')}" mode="{option('mode')}"/>
-</div>
 
-<tml:case condition="tmlform.field(WGA.scoped('parent_type'))=='any'">
-	<div style="margin:<tml:script expression="AFW.request().isIE?5:10"/>px">
-		<tml:input type="hidden" name="{scoped:parent}" mode="{option('mode')}"/>
-		<div id="link-view"></div>
-		<script>
-			var combotree = new BI.ComboTree({
-			    width: 250,
-			    disabled: <tml:script expression="option('mode')=='view'"/>,
-				valueField: 'id',
-				displayField: 'text',
-				emptyText:'Please select a document'
-				<tml:case context="{'docid:'+tmlform.field(WGA.scoped('parent'))}" iscontextvalid="true">
-		        	,path: "/root/<tml:script expression="AFW.structentry().getPath('node-', '/')"/>"
-		 	   </tml:case>
-			});
-			combotree.on("select", function(ctree, node, e) {
-				document.forms['<tml:script expression="tmlform.formid"/>'].elements["<tml:script expression="WGA.scoped('parent')"/>"].value = ctree.getValue();
-			});
-			combotree.render("link-view");
-		</script>
-	</div>
-</tml:case>
+	<tml:case condition="tmlform.field(WGA.scoped('parent_type'))=='any'">
+		<div style="margin:10px 0">
+			<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document">
+				<tml:option name="fieldname" expression="WGA.scoped('parent')"/>
+				<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
+			</tml:include>
+		</div>
+	</tml:case>
+</div>
 
 <label><tml:label key="collections.startentry"/>:</label>
 <div style="margin:10px">

@@ -6,4 +6,4 @@
 	<tml:case isfilled="$mc.linkTarget">
 		target="<tml:item name="$mc.linkTarget"/>"
 	</tml:case>
-><tml:item name="$mc.linkBody" encode="html"/></a>
+><tml:item name="$mc.linkBody" encode="none"/></a>

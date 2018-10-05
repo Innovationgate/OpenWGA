@@ -28,7 +28,7 @@
 <tml:foreach sourcetag="{scoped:child-collection}" 
 		id="{scoped:child-collection-loop}"
 		sortexpression="date||PUBLISHED||CREATED" sortorder="descending" 
-		pagesize="{CMM.setting('entries')||'0'}"
+		pagesize="{$option_entries||0}"
 		offset="{$option_offset}"
 >
 	<tml:if condition="CMM.setting('group_by_date')">
