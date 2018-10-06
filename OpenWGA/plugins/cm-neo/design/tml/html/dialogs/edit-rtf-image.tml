@@ -175,7 +175,6 @@
 			ev.preventDefault();
 
 			editor.focus();
-			console.log("save: editor.focus();");
 
 			var el = editor.getNearestTagFromSelection("img")
 			if(!el)
