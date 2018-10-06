@@ -1,5 +1,3 @@
-##MDSET preprocess=true
-
 <tml:action id="clearFilename">
 	tmlform.removefield("filename")
 </tml:action>
@@ -39,28 +37,17 @@
 				<tml:[form-field] o_label="Bild-Datei" o_name="key" 
 					o_type="select" o_optionsitem="_filenames"
 					o_changeaction="$refresh"
-				>
+				/>
+				
+				<tml:case condition="tmlform.key">
 					<tml:script>
-						if(tmlform.key){
-							tmlform.url = fileurl(tmlform.key)
-							_url = AFW.content().attachment(tmlform.key).getThumbnailURL()
-							var file = content().getFileMetaData(tmlform.key);
-							_size = AFW.Util.renderFileSize(file.getSize());
-							_date = file.getLastmodified()
-							_mimetype = file.getMimeType()					
-						}					
+						tmlform.url = fileurl(tmlform.key)
 					</tml:script>
-					<tml:{div} if="_url" html_class="_fileinfo clearfix" html_style="margin-top:10px">
-						<div style="float:left;width:60px;margin-top:5px" class="image">
-							<img style="max-width:60px;max-height:40px" src="<tml:item name="_url"/>">
-						</div>
-						<div style="margin-left:70px" class="metas">
-							@{_mimetype} - @{_size encode="none"}
-							<br>
-							@{_date}
-						</div>					
-					</tml:{div}>
-				</tml:[form-field]>
+					<tml:[form-field]>
+						<tml:include ref="util:file-info" o_filename="{tmlform.key}"/>
+					</tml:[form-field]>
+				</tml:case>
+				
 				<tml:input name="url" type="hidden"/>
 			</tml:case>
 			<tml:case value="extfile">
@@ -87,38 +74,26 @@
 
 				<tml:case condition="tmlform.container" context="[db:{tmlform.dbkey}/docid:{tmlform.container}]" iscontextvalid="true">
 					<tml:script>
-						WGA.TMLPage.setVar("_filenames", WGA.createList(["Bitte auswählen|"]))
+						_filenames = WGA.createList(["Bitte auswählen|"]);
 						for(let filename in Iterator(content().getFileNames())){
 							var file_md = content().getFileMetaData(filename);
 							if(file_md.mimeType.indexOf("image")==0)
 								_filenames.add(filename);						
 						}
 					</tml:script>
-					<tml:[form-field] o_label="Datei" o_name="filename" o_type="select" o_options="{_filenames}" o_default="{_filename}" o_changeaction="$refresh">
+					<tml:[form-field] o_label="Datei" o_name="filename" o_type="select" o_options="{_filenames}" o_default="{_filename}" o_changeaction="$refresh"/>
 
-						<tml:case condition="tmlform.filename">
-							<tml:script>
-								tmlform.url = fileurl(tmlform.filename)
-								_url = AFW.content().attachment(tmlform.filename).getThumbnailURL()
-								var file = content().getFileMetaData(tmlform.filename);
-								_size = AFW.Util.renderFileSize(file.getSize());
-								_date = file.getLastmodified()
-								_mimetype = file.getMimeType()					
-							</tml:script>
-							<tml:{div} if="_url" html_class="_fileinfo clearfix" html_style="margin-top:10px">
-								<div style="float:left;width:60px;margin-top:5px" class="image">
-									<img style="max-width:60px;max-height:40px" src="<tml:item name="_url"/>">
-								</div>
-								<div style="margin-left:70px" class="metas">
-									@{_mimetype} - @{_size encode="none"}
-									<br>
-									@{_date}
-								</div>					
-							</tml:{div}>
-						</tml:case>
-						<tml:input name="url" type="hidden"/>
-						
-					</tml:[form-field]>
+					<tml:case condition="tmlform.filename">
+						<tml:script>
+							tmlform.url = fileurl(tmlform.filename)
+						</tml:script>
+						<tml:[form-field]>
+							<tml:include ref="util:file-info" o_filename="{tmlform.filename}"/>
+						</tml:[form-field]>
+					</tml:case>
+
+					<tml:input name="url" type="hidden"/>
+
 				</tml:case>
 				
 			</tml:case>
@@ -224,6 +199,7 @@
 					return;
 				}
 				el.src=url;
+				el.srcset=""
 				AFW.RTF.setURLInfo(el, {type:type, key:key})
 			}
 			else if(type=="extfile"){
@@ -235,6 +211,7 @@
 					return;
 				}
 				el.src=url;
+				el.srcset=""
 				AFW.RTF.setURLInfo(el, {type:type, key:container+"/"+filename+"/"+dbkey})
 			}
 			else{

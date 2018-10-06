@@ -1,0 +1,21 @@
+##MDSET preprocess=true
+
+<tml:script>
+	if($option_filename){
+		var file = content().getFileMetaData($option_filename);
+		_url = AFW.content().attachment($option_filename).getThumbnailURL()
+		_size = AFW.Util.renderFileSize(file.getSize());
+		_date = file.getLastmodified()
+		_mimetype = file.getMimeType()					
+	}					
+</tml:script>
+<tml:{div} if="_url" html_class="clearfix">
+	<div style="float:left;width:60px;margin-top:5px">
+		<img style="max-width:60px;max-height:40px" src="@{_url}">
+	</div>
+	<div style="margin-left:70px">
+		@{_mimetype} - @{_size encode="none"}
+		<br>
+		@{_date}
+	</div>					
+</tml:{div}>

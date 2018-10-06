@@ -54,7 +54,13 @@
 				</tml:script>
 				<tml:[form-field] o_label="Datei" o_name="key" o_default="{$option_dialog_options.key}"
 					o_type="select" o_optionsitem="_filenames"
+					o_changeaction="$refresh"
 				/>
+				<tml:case condition="tmlform.key">
+					<tml:[form-field]>
+						<tml:include ref="util:file-info" o_filename="{tmlform.key}"/>
+					</tml:[form-field]>
+				</tml:case>
 			</tml:case>
 			<tml:case value="extfile">
 				
@@ -82,7 +88,14 @@
 						WGA.TMLPage.setVar("_filenames", WGA.createList(["Bitte auswählen|"]))
 						_filenames.addAll(content().getFileNames());
 					</tml:script>
-					<tml:[form-field] o_label="Datei" o_name="filename" o_type="select" o_options="{_filenames}" o_default="{_filename}"/>
+					<tml:[form-field] o_label="Datei" o_name="filename" o_type="select" o_options="{_filenames}" o_default="{_filename}"
+						o_changeaction="$refresh"
+					/>
+					<tml:case condition="tmlform.filename">
+						<tml:[form-field]>
+							<tml:include ref="util:file-info" o_filename="{tmlform.filename}"/>
+						</tml:[form-field]>
+					</tml:case>
 				</tml:case>
 				
 			</tml:case>
