@@ -2586,23 +2586,31 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	}
 
 	/* (non-Javadoc)
-     * @see de.innovationgate.wgpublisher.webtml.utils.Context#contenturl(java.lang.String, java.lang.String)
-     */
-	@Override
-    public String contenturl(String mediaKey, String layoutKey) throws WGException {
-		return contenturl(mediaKey, layoutKey, false);
-	}
-     
-	/* (non-Javadoc)
-     * @see de.innovationgate.wgpublisher.webtml.utils.Context#contenturl()
+     * @see de.innovationgate.wga.server.api.tml.Context#contenturl()
      */
 	@Override
     public String contenturl() throws WGException {
 	    return contenturl(null, null, false);
 	}
-     
+
 	/* (non-Javadoc)
-     * @see de.innovationgate.wgpublisher.webtml.utils.Context#contenturl(java.lang.String, java.lang.String, boolean)
+     * @see de.innovationgate.wga.server.api.tml.Context#contenturl(java.lang.String, java.lang.String)
+     */
+	@Override
+    public String contenturl(String mediaKey) throws WGException {
+		return contenturl(mediaKey, null, false);
+	}
+
+	/* (non-Javadoc)
+     * @see de.innovationgate.wga.server.api.tml.Context#contenturl(java.lang.String, java.lang.String)
+     */
+	@Override
+    public String contenturl(String mediaKey, String layoutKey) throws WGException {
+		return contenturl(mediaKey, layoutKey, false);
+	}
+
+	/* (non-Javadoc)
+     * @see de.innovationgate.wga.server.api.tml.Context#contenturl(java.lang.String, java.lang.String, boolean)
      */
 	@Override
     public String contenturl(String mediaKey, String layoutKey, boolean ignoreVirtualLink) throws WGException {

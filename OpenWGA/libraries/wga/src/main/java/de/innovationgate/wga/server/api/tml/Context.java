@@ -102,6 +102,14 @@ public interface Context {
     /**
      * Returns a URL to the content document in context
      * @param mediaKey Mediakey of the WebTML module that should be used as outer layout for the document. Specify null to render it with its content types layouts.
+     * @throws WGException
+     */
+    @CodeCompletion(preferredCase="contentURL")
+    public abstract String contenturl(String mediaKey) throws WGException;
+
+    /**
+     * Returns a URL to the content document in context
+     * @param mediaKey Mediakey of the WebTML module that should be used as outer layout for the document. Specify null to render it with its content types layouts.
      * @param layoutKey Name of the WebTML module that should be used as outer layout for the document. Specify null to render it with its content types layouts.
      * @throws WGException
      */
