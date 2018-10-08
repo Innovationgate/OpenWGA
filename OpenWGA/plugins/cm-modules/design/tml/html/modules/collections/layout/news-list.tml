@@ -61,7 +61,7 @@
 						<<tml:option name="news_headings"/>><tml:script expression="headline||TITLE"/></<tml:option name="news_headings"/>>
 						<div class="img">
 							<tml:case condition="_filename">
-								<tml:[util:link] o_linktitle="{TITLE}">
+								<tml:[util:link] o_linktitle="{TITLE}" o_encode="none">
 									<img src="<tml:url type="file" file="{_filename}"/>" border="0">
 								</tml:[util:link]>
 							</tml:case>
