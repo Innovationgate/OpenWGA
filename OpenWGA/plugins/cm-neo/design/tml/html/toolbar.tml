@@ -201,7 +201,7 @@
 			<i class="icon fas fa-search"></i>
 			<div class="text">Suchen</div>
 		</a>
-		<a class="btn button" href="#" data-action="userinfo">
+		<a class="btn button" href="#" data-action="userinfo" title="<tml:meta type="database" name="username" context="[db:{portlet.dbkey}]"/>">
 			<tml:script>
 				_iconClass = context('db:'+portlet.dbkey).meta("db","useraccess") == 90 ? "fa-user-plus" : "fa-user";  
 			</tml:script>
