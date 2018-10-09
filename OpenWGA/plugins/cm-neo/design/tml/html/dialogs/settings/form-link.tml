@@ -13,7 +13,6 @@
 </tml:action>
 
 <tml:script>
-	console.log(VIRTUALLINKTYPE, VIRTUALLINK)
 	if(!tmlform.submitted && !VIRTUALLINK)
 		tmlform.VIRTUALLINKTYPE="";
 </tml:script>
@@ -39,25 +38,16 @@
 		<tml:[form-field] o_label="Datei" o_name="VIRTUALLINK" o_meta="true" o_placeholder="Dateiname" o_type="select" o_optionsitem="_filenames"/> 	
 	</tml:case>
 	<tml:case value="int">
-		<tml:input name="VIRTUALLINK" type="hidden" meta="true"/>
-		<tml:[form-field] o_mode="view">
-			<tml:if condition="tmlform.VIRTUALLINK">
-				<tml:then>
-					<i class="fas fa-arrow-right"></i>
-					<tml:path context="[docid:{tmlform.VIRTUALLINK}]" divider="/">
-						<tml:meta name="title"/>
-					</tml:path>
-				</tml:then>
-				<tml:else>
-					Verwenden Sie die Zwischenablage, um einen Link einzufügen.
-				</tml:else>
-			</tml:if>
-		</tml:[form-field]> 	
+		<tml:[form-field] o_label="Ziel-Dokument" o_mode="view">
+			<tml:include ref="util:select-document" o_fieldname="VIRTUALLINK" o_meta="true">
+				<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
+			</tml:include>
+		</tml:[form-field]>
 	</tml:case>
 </tml:select>
 
 <tml:case condition="tmlform.VIRTUALLINKTYPE">
-	<tml:[form-field] o_label="Zielfenster" o_name="LINKTARGET" o_meta="true" o_placeholder="optionaler Name eines neuen Fensters"/>
+	<tml:[form-field] o_label="Zielfenster" o_name="LINKTARGET" o_meta="true" o_placeholder="Optionaler Name eines neuen Fensters"/>
 </tml:case>
 
 <tml:case condition="!_link_inserted && tmlform.mode()=='edit'" context="{_CM_clipboard_context}" iscontextvalid="true">

@@ -1,4 +1,4 @@
-<tml:input name="{$option_fieldname}" default="{$option_default}" type="hidden"/>
+<tml:input name="{$option_fieldname}" default="{$option_default}" type="hidden" meta="{$option_meta||false}"/>
 
 <tml:script>
 	_dbkey = $option_dbkey || meta('db', 'dbkey')
