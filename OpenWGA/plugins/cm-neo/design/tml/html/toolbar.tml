@@ -203,9 +203,12 @@
 		</a>
 		<a class="btn button" href="#" data-action="userinfo" title="<tml:meta type="database" name="username" context="[db:{portlet.dbkey}]"/>">
 			<tml:script>
-				_iconClass = context('db:'+portlet.dbkey).meta("db","useraccess") == 90 ? "fa-user-plus" : "fa-user";  
+				var app = WGA.app(portlet.dbkey)
+				_iconClass = app.isManager() ? "fa-user-cog"
+					: app.isChiefEditor() ? "fa-user-graduate"
+					: "fa-user";  
 			</tml:script>
-			<span class="icon fa <tml:item name="_iconClass"/>"></span>
+			<span class="icon fas <tml:item name="_iconClass"/>"></span>
 			<div class="text username"><tml:meta type="database" name="username" context="[db:{portlet.dbkey}]"/></div>
 		</a>
 	</div>
