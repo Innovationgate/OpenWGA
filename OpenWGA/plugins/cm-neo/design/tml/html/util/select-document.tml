@@ -29,7 +29,7 @@
 		<span class="caret"></span>		
 	</a>
 	<tml:case condition="tmlform.field($option_fieldname)">
-		<a href="#" id="clear-key-<tml:option name="fieldname"/>">&times</a>
+		<a href="#" id="clear-key-<tml:option name="fieldname"/>" title="Auswahl löschen">&times</a>
 	</tml:case>
 	<div class="select-tree">
 		<div class="tree" id="tree-<tml:option name="fieldname"/>" data-url="<tml:url type="tml" medium="json" layout="siteexplorer" u-dbkey="_dbkey" u_language="{LANGUAGE}"/>"></div>
