@@ -182,7 +182,7 @@
 				var key = $("[name=key]", form).val();
 				var link_text = $("[name=link_text]", form).val();
 				if(!key){
-					alert("Bitte geben Sie einen Schlüssel ein.");
+					alert("Bitte wählen Sie ein Dokument aus.");
 					$("[name=key]", form).focus();
 					return;
 				}
@@ -213,7 +213,7 @@
 			if(type=="int"){
 				var key = $("[name=key]", form).val();
 				if(!key){
-					alert("Bitte geben Sie einen Schlüssel ein.");
+					alert("Bitte wählen Sie ein Dokument aus.");
 					$("[name=key]", form).focus();
 					return;
 				}
