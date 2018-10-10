@@ -31,7 +31,7 @@
 
 		<tml:[::form]/>
 		<tml:[form-field] o_label="Erstellen unter" o_mode="view">
-			<tml:script>
+			<tml:script encode="html">
 				var c = context("docid:"+document.getStructKey(), false)
 				if(c)
 					return c.TITLE;
