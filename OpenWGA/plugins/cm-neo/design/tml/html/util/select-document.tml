@@ -26,8 +26,11 @@
 				<tml:else><tml:script expression="$option_placeholder || 'Dokument auswählen ...'"/></tml:else>
 			</tml:if>
 		</span>
-		<span class="caret"></span>
+		<span class="caret"></span>		
 	</a>
+	<tml:case condition="tmlform.field($option_fieldname)">
+		<a href="#" id="clear-key-<tml:option name="fieldname"/>">&times</a>
+	</tml:case>
 	<div class="select-tree">
 		<div class="tree" id="tree-<tml:option name="fieldname"/>" data-url="<tml:url type="tml" medium="json" layout="siteexplorer" u-dbkey="_dbkey" u_language="{LANGUAGE}"/>"></div>
 	</div>
@@ -43,8 +46,17 @@
 			tree.show();
 		})
 	
+	
+		$("#clear-key-<tml:option name="fieldname"/>").on("click", function(ev){
+			ev.preventDefault();
+			field.val("");
+			<tml:case hasoptions="changeaction">
+				WGA.ajax.callAction("<tml:option name="changeaction"/>");
+			</tml:case>
+		})
+	
 		var tree = $("#tree-<tml:option name="fieldname"/>").wga_tree({
-			<tml:case isfilled="_path">
+			<tml:case condition="_path">
 				path: "<tml:item name="_path"/>"
 			</tml:case>
 		})
