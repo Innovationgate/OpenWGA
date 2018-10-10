@@ -34,8 +34,14 @@
 	<tml:case value="intfile">
 		<tml:script>
 			WGA.TMLPage.setVar("_filenames", content().getFileNames())
+			_filenames.add(0, "Bitte auswählen|");
 		</tml:script>
-		<tml:[form-field] o_label="Datei" o_name="VIRTUALLINK" o_meta="true" o_placeholder="Dateiname" o_type="select" o_optionsitem="_filenames"/> 	
+		<tml:[form-field] o_label="Datei" o_name="VIRTUALLINK" o_meta="true" o_placeholder="Dateiname" o_type="select" o_optionsitem="_filenames" o_changeaction="$refresh"/>
+		<tml:case condition="tmlform.VIRTUALLINK">
+			<tml:[form-field]>
+				<tml:include ref="util:file-info" o_filename="{tmlform.VIRTUALLINK}"/>
+			</tml:[form-field]>
+		</tml:case>
 	</tml:case>
 	<tml:case value="int">
 		<tml:[form-field] o_label="Ziel-Dokument" o_mode="view">
