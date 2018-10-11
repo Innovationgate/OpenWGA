@@ -18,7 +18,7 @@
 						path.push("area-"+struct.getArea().getName());
 						_path = path.reverse().join("/");
 					</tml:script>
-					<tml:path>
+					<tml:path role="none">
 						<tml:meta name="title"/>
 						<tml:between> / </tml:between>
 					</tml:path>
