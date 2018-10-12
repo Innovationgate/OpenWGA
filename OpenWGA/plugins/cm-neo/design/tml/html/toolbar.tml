@@ -87,8 +87,10 @@
 						var preferedParent=pagetype.getPreferredParent();
 						if(preferedParent && pagetype.mayCreateContent()){
 							var ParentStruct=AFW.structentry(preferedParent)
-							if(ParentStruct.mayCreatePage())
-								_fixparents.add(pagetype.getName() + "|" + ParentStruct.getStructKey());
+							if(ParentStruct.mayCreatePage()){
+								var name = pagetype.getNameForLanguage("de");
+								_fixparents.add(name + "|" + pagetype.getName() + "|" + ParentStruct.getStructKey());
+							}
 						}
 					}
 				</tml:script>
@@ -97,13 +99,14 @@
 					<tml:foreach item="_fixparents" currentvalue="_entry">
 						<tml:script>
 							var parts = _entry.split("|");
-							_pagetype = parts[0];
-							_parent = parts[1];
+							_pagetypealias = parts[0];
+							_pagetype = parts[1];
+							_parent = parts[2];
 						</tml:script>
 						<li><a data-action="create-child-page"
 							data-pagetype="<tml:item name="_pagetype"/>" 
 							data-parent="<tml:item name="_parent"/>" href="#">
-								<tml:item name="_pagetype"/>
+								<tml:item name="_pagetypealias"/>
 						</a></li>
 					</tml:foreach>
 				</tml:case>

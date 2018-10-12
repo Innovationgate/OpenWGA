@@ -4,10 +4,10 @@
 	o_mode="{portlet.mode=='new'?'edit':'view'}"
 />
 
-<tml:comment><tml:[form-field] o_label="Aliase" o_field="NAMEALIASES" o_meta="true" o_type="textarea" o_multiple="true"/>
+<tml:[form-field] o_label="Aliase" o_field="NAMEALIASES" o_meta="true" o_type="textarea" o_multiple="true" o_mode="{$pc.getMode('namealiases')}"/>
 
-<tml:[form-field] o_label="Beschreibung" o_type="textarea" o_name="description" o_mode="{$pc.getMode('description')}" o_meta="true"/>
-</tml:comment>
+<tml:comment><tml:[form-field] o_label="Beschreibung" o_type="textarea" o_name="description" o_mode="{$pc.getMode('description')}" o_meta="true"/></tml:comment>
+
 <hr>
 
 <tml:[form-field] o_label="Outer-Layout" o_name="outerlayout" o_mode="{$pc.getMode('outerlayout')}" o_meta="true"/>

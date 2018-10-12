@@ -1,19 +1,24 @@
 <tml:script>
 
-	_pagetypes = WGA.createList()
+	var pagetypes = WGA.createList()
 	for(let ct in Iterator(db().getContentTypes())){
 		if($option_page=="root"){
 			if(AFW.contenttype(ct).isAllowed(document.getArea()))
-				_pagetypes.add(ct.name)
+				pagetypes.add(ct.name)
 		}
 		else if(AFW.contenttype(ct).isAllowed(document))
-			_pagetypes.add(ct.name)
+			pagetypes.add(ct.name)
 	}
-	if($option_dialog_options.pagetype && _pagetypes.contains($option_dialog_options.pagetype))
+	if($option_dialog_options.pagetype && pagetypes.contains($option_dialog_options.pagetype))
 		tmlform.contenttype=$option_dialog_options.pagetype
-	else if(_pagetypes.size()==1)
-		tmlform.contenttype = _pagetypes.get(0);
-	WGA.TMLPage.setVar("_pagetypes", _pagetypes)
+	else if(pagetypes.size()==1)
+		tmlform.contenttype = pagetypes.get(0);
+	
+	WGA.TMLPage.setVar("_pagetypes", WGA.createList())
+	for(let name in Iterator(pagetypes)){
+		var ct = db().getContentType(name)
+		_pagetypes.add(ct.getNameForLanguage("de") + "|" + ct.name);
+	}
 
 	_languages = WGA.createList()
 	for(let lang in Iterator(db().getLanguages().values())){

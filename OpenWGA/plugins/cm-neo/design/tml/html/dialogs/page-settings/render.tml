@@ -37,7 +37,7 @@
 	<tml:script>
 		var pagetypes = WGA.createList()
 		for(let ct in Iterator(db().getContentTypes())){
-			pagetypes.add(ct.name)
+			pagetypes.add(ct.getNameForLanguage("de") + "|" + ct.name)
 		}
 		WGA.TMLPage.setVar("_pagetypes", pagetypes)
 	</tml:script>

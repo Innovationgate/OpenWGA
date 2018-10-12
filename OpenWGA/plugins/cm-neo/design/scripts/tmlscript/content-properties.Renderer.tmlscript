@@ -15,7 +15,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 			
 		result = {
 			title: WGA.encode("html", c.TITLE),
-			pagetype: c.CONTENTTYPE,
+			pagetype: db($urlParam_dbkey).getContentType(c.CONTENTTYPE).getNameForLanguage("de"),
 			pagename: c.PAGENAME,
 			version: c.VERSION,
 			language: c.LANGUAGE,
