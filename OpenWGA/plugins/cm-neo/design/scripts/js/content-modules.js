@@ -20,7 +20,6 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 			data.push({
 				title: sections[s].title || s,
 				id: "section."+s,
-				//type: "section",
 				context: "root",
 				cssclass: "section",
 				children: getChildMods(mods[s] || [])
@@ -37,7 +36,7 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 					cssclass: modules[mod.module_id] ? "" : "error",
 					id: mod.id,
 					context: mod.module_id,
-					data: mod,
+					//data: mod,
 					children: getChildMods(mod.children) 
 				})
 			}
@@ -82,12 +81,28 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 		var module_id = parent.context;
 		var parent_module = modules[module_id];
 		var allowedchildren = parent_module && parent_module.allowedchildren;
+		var allowedModulesArray = true;
 
+		if(parent.node){
+			// find root node (section) to get allowed modules for this section
+			var root_el = $(parent.node);
+			if(root_el.data("level")!="1")
+				root_el = root_el.parents("[data-level=1]")
+		
+			var parts = root_el.data("id").split("section.");
+			var section = parts[1];
+			var sections = Sitepanel.getWindow().WGA.CMM.sections
+			allowedModulesArray = sections[section].allowedModules
+		}
+		
 		if(parent_module && (!parent_module.type || parent_module.type.toLowerCase()!="container"))
 			return null
 		
 		for(var m in modules){
 			var module = modules[m];
+
+			if(allowedModulesArray!==true && allowedModulesArray.indexOf(module.id)<0)
+				continue;
 			
 			if(allowedchildren && allowedchildren.indexOf(module.id)<0)
 				continue;
