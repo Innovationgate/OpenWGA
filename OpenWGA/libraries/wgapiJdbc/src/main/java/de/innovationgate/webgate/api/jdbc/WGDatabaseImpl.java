@@ -3174,8 +3174,8 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
             String fullQuery;
             if (query != null) {
                 if (type.equals("hql")) {
-                fullQuery = "select profile.name from UserProfile profile where (" + query + ") order by profile.name asc";
-            }
+	                fullQuery = "select profile.name from UserProfile profile where (" + query + ") order by profile.name asc";
+	            }
                 else if (type.equals("fullhql")) {
                     fullQuery = query;
                 }
