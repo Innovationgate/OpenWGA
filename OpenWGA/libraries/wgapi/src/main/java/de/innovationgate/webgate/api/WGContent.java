@@ -401,7 +401,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     };
     
 	public static final String META_VIRTUAL_LINK_TYPE = "VIRTUALLINKTYPE";
-    public static final MetaInfo METAINFO_VIRTUAL_LINK_TYPE = new MetaInfo(META_VIRTUAL_LINK_TYPE, String.class, VIRTUALLINKTYPE_EXTERNAL);
+    public static final MetaInfo METAINFO_VIRTUAL_LINK_TYPE = new MetaInfo(META_VIRTUAL_LINK_TYPE, String.class, VIRTUALLINKTYPE_NOT_SPECIFIED);
     static {
         METAINFO_VIRTUAL_LINK_TYPE.setExtdataSinceCsVersion(WGDatabase.CSVERSION_WGA5);
         
