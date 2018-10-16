@@ -791,6 +791,34 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
 
 
     /**
+     * Returns all items as a map
+     * 
+     * @throws WGAPIException 
+     */
+    @SuppressWarnings("rawtypes")
+	public Map getItems() throws WGAPIException{
+    	HashMap<String,Object> map = new HashMap<String,Object>();
+    	for(String itemname: getItemNames()){
+    		map.put(itemname,  getItemValue(itemname));
+    	}
+    	return map;
+    }
+
+    /**
+     * Returns all metas as a map
+     * 
+     * @throws WGAPIException 
+     */
+    @SuppressWarnings("rawtypes")
+	public Map getMetas() throws WGAPIException{
+    	HashMap<String,Object> map = new HashMap<String,Object>();
+    	for(String name: getMetaNames()){
+    		map.put(name,  getMetaData(name));
+    	}
+    	return map;
+    }
+
+    /**
      * Returns a text item. 
      * If the item is not of type text it returns the text representation (obj.toString())
      * 
