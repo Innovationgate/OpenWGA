@@ -235,7 +235,9 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     public static final String INDEXFIELD_ALLCONTENT = "allcontent";
     public static final String INDEXFIELD_ALLATTACHMENTS = "allattachments";
     private static final String SORTITEM_PREFIX = "$sort_";
-    
+
+    public static final String INDEXFIELD_ATTACHMENT_CONTAINER_TITLE = "attachment_container_title";
+
     // how to index empty dates validFrom and validTo
     private static final String EMPTY_VALID_FROM = "00000000000000";
     private static final String EMPTY_VALID_TO = "99999999999999";
@@ -1688,6 +1690,8 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                     attachmentDoc.removeFields("TITLE");
                     attachmentDoc.removeFields("DESCRIPTION");
                     attachmentDoc.removeFields("KEYWORDS");
+                    
+                    addUnStored(attachmentDoc, INDEXFIELD_ATTACHMENT_CONTAINER_TITLE, content.getTitle());
                     
                     // add file metas
                     WGFileMetaData md = content.getFileMetaData(filename);
