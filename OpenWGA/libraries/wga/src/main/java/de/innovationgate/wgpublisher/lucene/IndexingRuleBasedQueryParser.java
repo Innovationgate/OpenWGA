@@ -56,8 +56,9 @@ public class IndexingRuleBasedQueryParser extends MultiFieldQueryParser {
 
     /**
      * 
-     * @param arg0 - the default field for query terms.
-     * @param arg1 - analyzer used to find terms in the query text.
+     * @param fields - the list of fields to search for query terms.
+     * @param analyser - analyzer used to find terms in the query text.
+     * @param boosts - a map of boost values for the fields
      * @param luceneConfigurations - map with luceneConfigurations for dbs (key=dbKey, value=LuceneConfiguration)
      * @param searchDBKeys - list of dbkeys (Strings) to search
      * @param metaKeywordFields - set of metaFields (String fieldname) indexed as keyword
