@@ -2,13 +2,12 @@ function Renderer() {}
 
 Renderer.prototype.render = function($urlParam_dbkey) {
 
-	var dbkey = $urlParam_dbkey
-	var database = db(dbkey);
+	var database = db($urlParam_dbkey);
 	var areas = []; 
 	for(let area in Iterator(database.getAreas().values())){
 		if(area.systemArea)
 			continue;
-		if(area.name=="hdb-content" && !WGA.app().isManager())
+		if(area.name=="hdb-content" && !WGA.app($urlParam_dbkey).isManager())
 			continue;
 		var visiblefor = area.getExtensionData("CM_area_visible")
 		if(visiblefor && visiblefor.size() && !database.isMemberOfUserList(visiblefor))
