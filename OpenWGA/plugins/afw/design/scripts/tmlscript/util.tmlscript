@@ -562,7 +562,7 @@ this.getAppKeysBasedOnPlugin=function(plugin_name){
  *		columns:		Array or List of item (column) definitions. Required.
  *		contentlist:	List of WGContent-s or TMLContext-s. Optional. If empty, option "query" is used.
  *		query:			A HQL query defining the contentlist. Optional. If empty, all child-Contents are used.
- *		dateFormat:		optional date format. If Empty yyyy-MM-dd HH:mm:SS ist used.
+ *		dateFormat:		optional date format. If Empty yyyy-MM-dd HH:mm:SS is used.
  *		divider:		Column divider. Default is Semicolon
  *
  *	Item Definition (config.items):
