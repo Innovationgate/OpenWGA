@@ -268,6 +268,7 @@ public class WGHierarchicalDatabase {
             if (contentType == null) {
                 contentType = db.createContentType(CONTENT_TYPE);
                 contentType.setOuterLayoutName(LAYOUT);
+                contentType.setAuthoring(false);
                 contentType.save();
             } 
             
