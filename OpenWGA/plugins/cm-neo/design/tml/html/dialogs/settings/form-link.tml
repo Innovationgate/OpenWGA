@@ -44,7 +44,7 @@
 		</tml:case>
 	</tml:case>
 	<tml:case value="int">
-		<tml:[form-field] o_label="Ziel-Dokument" o_mode="view">
+		<tml:[form-field] o_label="Ziel-Dokument">
 			<tml:include ref="util:select-document" o_fieldname="VIRTUALLINK" o_meta="true">
 				<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
 			</tml:include>

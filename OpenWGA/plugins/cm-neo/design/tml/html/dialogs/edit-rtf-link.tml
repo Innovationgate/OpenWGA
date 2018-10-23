@@ -30,7 +30,7 @@
 		<tml:select switch="tmlform.type">
 			<tml:case value="int">
 				
-				<tml:[form-field] o_label="Dokument" o_mode="view">
+				<tml:[form-field] o_label="Dokument">
 					<tml:include ref="util:select-document" o_fieldname="key" o_default="{$option_dialog_options.key}">
 						<tml:option name="changeaction"><tml:action ref="setLinkText"/></tml:option>
 					</tml:include>
