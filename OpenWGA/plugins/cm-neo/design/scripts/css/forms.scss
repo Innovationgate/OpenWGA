@@ -20,5 +20,27 @@ form{
 			padding: 0 10px 0 0
 		}
 	}
+
+	.select-tree-wrapper{
+		position: relative;
+		a.clear-key-field{
+			position: absolute;
+			top: 6px;
+			right: 20px;
+		}
+		.form-control{
+			height:auto;
+		}
+		.caret{
+			float:right;
+			margin-top:9px;
+		}
+		.title{
+			padding-right:20px
+		}
+		.placeholder{
+			color:#999;
+		}
+	}
 	
 }

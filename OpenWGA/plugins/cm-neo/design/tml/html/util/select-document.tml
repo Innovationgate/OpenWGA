@@ -5,9 +5,9 @@
 </tml:script>
 
 <div class="select-tree-wrapper">
-	<a href="#" id="select-key-<tml:option name="fieldname"/>" class="form-control" style="height:auto">
-		<span class="caret" style="float:right;margin-top:9px"></span>
-		<span class="title" style="padding-right:20px">
+	<a href="#" id="select-key-<tml:option name="fieldname"/>" class="form-control">
+		<span class="caret"></span>
+		<span class="title">
 			<tml:if context="[db:{_dbkey}/docid:{tmlform.field($option_fieldname)}]" iscontextvalid="true">
 				<tml:then>
 					<tml:script>
@@ -25,15 +25,15 @@
 					</tml:path>
 				</tml:then>
 				<tml:else>
-					<span style="color:#999"><tml:script expression="$option_placeholder || 'Dokument auswählen ...'"/></span>
+					<span class="placeholder"><tml:script expression="$option_placeholder || 'Dokument auswählen ...'"/></span>
 				</tml:else>
 			</tml:if>
 		</span>
 				
 	</a>
-	<tml:comment><tml:case condition="tmlform.field($option_fieldname)">
-		<a href="#" id="clear-key-<tml:option name="fieldname"/>" title="Auswahl löschen">&times</a>
-	</tml:case></tml:comment>
+	<tml:case condition="tmlform.field($option_fieldname)">
+		<a href="#" class="clear-key-field" id="clear-key-<tml:option name="fieldname"/>" title="Auswahl löschen">&times</a>
+	</tml:case>
 	<div class="select-tree">
 		<div class="tree" id="tree-<tml:option name="fieldname"/>" data-url="<tml:url type="tml" medium="json" layout="siteexplorer" u-dbkey="_dbkey" u_language="{LANGUAGE}"/>"></div>
 	</div>
