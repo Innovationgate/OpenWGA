@@ -1423,7 +1423,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
 
         // check client access to this db
         if (request != null && !this.isClientPermitted(db, request)) {
-            throw new ClientAccessException("Client '" + request.getRemoteAddr() + "' is not permitted to access db '" + db.getDbReference() + "'.");
+            throw new ClientAccessException("Client '" + request.getRemoteAddr() + "' is not permitted to access app '" + db.getDbReference() + "'.");
         }
         
         // Load config and login info from domain

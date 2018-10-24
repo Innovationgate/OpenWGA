@@ -914,6 +914,9 @@ public class WGPDispatcher extends HttpServlet {
             // moved from finally block to ensure errorpage can be displayed
             commitResponse(response);
         }
+        catch(ClientAccessException exc){
+        	response.sendError(403, exc.getMessage());
+        }
         catch (AjaxFailureException exc) {
             handleAjaxFailure(exc, request, response);   
         }

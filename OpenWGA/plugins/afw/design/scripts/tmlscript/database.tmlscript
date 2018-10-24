@@ -78,6 +78,8 @@ this.getContentStoreVersion = function(){
 }
 
 this.isAuthoringAllowed=function(){
+	if(!database)
+		return false;
 	var bs = wgacore.dispatcher.getBrowsingSecurity(database)
 	return bs>Packages.de.innovationgate.wga.model.BrowsingSecurity.NO_AUTHORING;
 }
