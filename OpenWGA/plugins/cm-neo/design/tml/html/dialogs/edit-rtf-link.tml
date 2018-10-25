@@ -15,6 +15,10 @@
 		tmlform.link_text = doc.TITLE;
 </tml:action>
 
+<tml:action id="clear-key">
+	tmlform.key=null;
+</tml:action>
+
 <tml:form id="edit-rtf-link">
 
 	<div class="header">
@@ -25,7 +29,7 @@
 	<div class="content form-horizontal">
 	
 		<tml:[form-field] o_label="Typ" o_name="type" o_type="select" o_options="Externer Link|exturl,Interner Link|int,Link auf Datei aus diesem Dokument|intfile,Link auf Datei aus beliebigem Dokument|extfile" o_default="{$option_dialog_options.type||'exturl'}"
-			o_changeaction="$refresh"
+			o_changeaction="clear-key"
 		/>
 		<tml:select switch="tmlform.type">
 			<tml:case value="int">
@@ -69,15 +73,17 @@
 					_dbkey = meta("db", "dbkey");
 					if($option_dialog_options.key){
 						var parts = $option_dialog_options.key.split("/");
-						_container = parts[0];
-						_filename = parts[1];
-						_dbkey = parts[2];
+						if(parts.length==3){
+							_container = parts[0];
+							_filename = parts[1];
+							_dbkey = parts[2];
+						}
 					}
 				</tml:script>
 				
 				<tml:[form-field] o_label="App" o_name="dbkey" o_default="{_dbkey}" o_type="select" o_optionsitem="_dbs" o_changeaction="$refresh"/>
 
-				<tml:[form-field] o_label="Dokument" o_mode="view">
+				<tml:[form-field] o_label="Dokument">
 					<tml:include ref="util:select-document" o_fieldname="container" o_default="{_container}" o_dbkey="{tmlform.dbkey}">
 						<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
 					</tml:include>
