@@ -48,8 +48,10 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 
 		case "rtf":
 		case "textblock":
-			result.value = WGA.encode("rtfsystem", value, WGA.context(doc))
-			result.value_encoded = WGA.encode("rtf", value, WGA.context(doc)) 
+			var ctx = WGA.context(doc);
+			ctx.setoption(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES, "usage=poster")
+			result.value = WGA.encode("rtfsystem", value, ctx)
+			result.value_encoded = WGA.encode("rtf", value, ctx) 
 			break;
 			
 		case "text":
