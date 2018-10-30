@@ -160,6 +160,11 @@ public class SrcSetCreator implements WGAAwareService {
                 maxWidth = Integer.parseInt(maxWidthStr);
             }
 
+            if (widthTermValue == -1 && heightTermValue == -1 && maxHeight == -1 && maxWidth == -1) {
+                // No scaling specification? No srcset: #00005288.
+                return "";
+            }
+
             
             List<String> sources = new ArrayList<String>();
             
@@ -167,11 +172,6 @@ public class SrcSetCreator implements WGAAwareService {
             for (Float ratio : RATIOS) {
                 
                 URLBuilder srcUrl = (URLBuilder) fileUrl.clone();
-                
-                // No scaling specification? No srcset beyond 1x! #00004116
-                if (ratio > 1 && derivateQuery == null && maxHeight == -1 && maxWidth == -1) {
-                    break;
-                }
                 
                 if (derivateQuery != null) { 
                     
