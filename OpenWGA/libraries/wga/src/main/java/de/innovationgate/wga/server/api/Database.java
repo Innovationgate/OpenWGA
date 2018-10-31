@@ -250,7 +250,7 @@ public class Database {
 
         Map<String,Object> allQueryParams = new HashMap<String,Object>();
         if (context != null) {
-            allQueryParams.putAll(buildDefaultQueryParams(context.content()));
+       		allQueryParams.putAll(buildDefaultQueryParams(context.content()));
         }
         allQueryParams.putAll(queryParams);
         queryParams = allQueryParams;
@@ -586,7 +586,7 @@ public class Database {
      */
     public static Map<String, Object> buildDefaultQueryParams(WGContent content) throws WGException {
         Map<String,Object> defaultParameters = new HashMap<String,Object>();
-        if (!content.isTemporary()) {
+        if (content!=null && !content.isTemporary()) {
             defaultParameters.put("content", content);
             defaultParameters.put("key", content.getContentKey(true).toString());
             defaultParameters.put("language", content.getLanguage().getName());
