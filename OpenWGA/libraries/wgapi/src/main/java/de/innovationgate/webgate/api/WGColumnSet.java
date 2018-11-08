@@ -44,8 +44,6 @@ import de.innovationgate.webgate.api.WGIllegalArgumentException;
  */
 public class WGColumnSet {
     
-    //public static final Pattern TERM_PATTERN = Pattern.compile("^([\\w\\-$�������]+)\\s*(?:\\(([\\w\\-=,]*)\\))?+$");
-    
     public static final Pattern TERM_PATTERN = Pattern.compile("^([\\w\\-$ÄÖÜäöüß]+)\\s*(?:\\(([\\w\\-=,]*)\\))?+$");    
     
     public static final Pattern FLAG_PATTERN = Pattern.compile("^([\\w]+)(?:=([\\w]+))?+$");
