@@ -511,10 +511,20 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
                     if (content.getContentClass().equals(childContent.getContentClass())) {
                 
                         Map<String, Object> itemDefaultValues = fetchItemDefaultValues(content, content.getItems(), childContent);
+                        
                         boolean somethingDone = false;
-                        somethingDone = initContentItems(childContent, itemDefaultValues);
-                        somethingDone = somethingDone || HDBModel.updateParentRelations(childContent);
-                        somethingDone = somethingDone || updateContentUniqueName(childContent);
+                        
+                        if(initContentItems(childContent, itemDefaultValues)){
+                        	somethingDone = true;
+                        }
+                        
+                        if(HDBModel.updateParentRelations(childContent)){
+                        	somethingDone = true;
+                        }
+                        
+                        if(updateContentUniqueName(childContent)){
+                        	somethingDone = true;
+                        }
                         
                         if (somethingDone) {
                             LOG.debug("Initializing data on document '" + childContent.getDocumentKey() + "'");
@@ -531,10 +541,10 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
                     }
                     performReinitSessionRefresh();
                 }
-                }
             }
-            
         }
+            
+    }
         
     public boolean updateContentUniqueName(WGContent childContent) throws WGAPIException {
         
