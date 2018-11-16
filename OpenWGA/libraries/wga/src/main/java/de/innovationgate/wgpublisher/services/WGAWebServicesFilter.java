@@ -116,18 +116,18 @@ public class WGAWebServicesFilter implements Filter {
                 registeredService.getService().service(httpReq, res);
             }
             else {
-                httpRes.sendError(404, "Unknown WGA service '" + serviceName + "'");
+                httpRes.sendError(404, "Unknown OpenWGA service '" + serviceName + "'");
             }
         }
-
-        
     }
 
     private void showServiceOverview(HttpServletResponse httpRes, HttpServletRequest httpReq) throws IOException {
 
         PrintWriter out = httpRes.getWriter();
-        out.write("<html><body>");
-        out.write("<h1>OpenWGA Web Services</h1>");
+        out.write("<!doctype html>\n<html lang=\"en\">\n");
+        out.write("<head><meta charset=\"UTF-8\"><title>OpenWGA Web Services</title></head>\n");
+        out.write("<body>\n");
+        out.write("<h1>OpenWGA Web Services</h1>\n");
         out.write("<ul>");
         
         for (Map.Entry<String, RegisteredService> serviceEntry : _services.entrySet()) {
@@ -135,7 +135,7 @@ public class WGAWebServicesFilter implements Filter {
         }
         
         out.write("</ul>");
-        out.write("</body></html>");
+        out.write("\n</body>\n</html>");
         
     }
 
