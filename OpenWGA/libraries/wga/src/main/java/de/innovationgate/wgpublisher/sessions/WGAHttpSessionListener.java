@@ -70,7 +70,7 @@ public class WGAHttpSessionListener implements HttpSessionListener {
         Integer sessionTimeout = (Integer) WGACore.INSTANCE.getVariousServerOptionReader().readOptionValueOrDefault(WGACore.SERVEROPTION_SERVER_SESSIONTIMEOUT);
         
         /*
-         * #00005295: this does not really make sense.
+         * #00005295: the following code does not really make sense.
          * 
         // We only want to set it if it really differs from the default, which is enforced by web.xml
         if (sessionTimeout.intValue() != WGACore.SERVEROPTIONDEFAULT_SESSIONTIMEOUT) {
