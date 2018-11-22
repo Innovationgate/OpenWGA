@@ -44,13 +44,17 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 		edit_item = ev.params.item;
 		edit_item_format = ev.params.format;
 		if(editor){
-			if(editor.toolpanel)
+			if(editor.toolpanel){
 				require([editor.toolpanel], function(Toolpanel){
 					if(Toolpanel.setOptions)
 						Toolpanel.setOptions(opts);
 					Toolpanel.setEditor(editor.open(ev.params.item, opts));
 				})
-			else editor.open(ev.params.item, opts)
+			}
+			else {				
+				var editor_object = editor.open(ev.params.item, opts)
+				editor_object.toolbar = null;
+			}
 		}
 		$("#section-edit [data-editor]").hide();
 		$("#editor-panel-"+ev.params.editor).show();
@@ -256,8 +260,12 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 					poster: el.data("poster")
 				})
 			}
-			e.originalEvent.dataTransfer.effectAllowed = "copyLink"
-			e.originalEvent.dataTransfer.setData("wga/files", JSON.stringify(data))
+			try{
+				// try-catch bc. IE Edge
+				e.originalEvent.dataTransfer.effectAllowed = "copyLink"
+				e.originalEvent.dataTransfer.setData("wga/files", JSON.stringify(data))
+			}
+			catch(e){}
 		},
 	})
 	.on("click.toolbar", ".sidebar-toolbar [data-action]", function(ev){

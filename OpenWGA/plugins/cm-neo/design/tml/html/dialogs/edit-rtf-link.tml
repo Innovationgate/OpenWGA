@@ -162,7 +162,7 @@
 					return;
 				}
 				a = editor.createLink(url, url, "exturl");
-				AFW.RTF.setURLInfo(a, {type:"exturl", key:url})
+				editor.setURLInfo(a, {type:"exturl", key:url})
 			}
 			else if(type=="intfile"){
 				var key = $("[name=key]", form).val();	// filename
@@ -171,7 +171,7 @@
 					return;
 				}
 				a = editor.createLink(key, key, "intfile");
-				AFW.RTF.setURLInfo(a, {type:type, key:key})
+				editor.setURLInfo(a, {type:type, key:key})
 			}
 			else if(type=="extfile"){
 				var dbkey = $("[name=dbkey]", form).val();
@@ -182,7 +182,7 @@
 					return;
 				}
 				a = editor.createLink(filename, filename, "extfile");
-				AFW.RTF.setURLInfo(a, {type:type, key:container+"/"+filename+"/"+dbkey})
+				editor.setURLInfo(a, {type:type, key:container+"/"+filename+"/"+dbkey})
 			}
 			else if(type=="int"){
 				var key = $("[name=key]", form).val();
@@ -193,7 +193,7 @@
 					return;
 				}
 				a = editor.createLink(key, link_text||key, "int");
-				AFW.RTF.setURLInfo(a, {type:type, key:key})
+				editor.setURLInfo(a, {type:type, key:key})
 			}
 			else{
 				alert("Unbekannter Link-Typ: " + type);
@@ -224,7 +224,7 @@
 					return;
 				}
 				var anker = $("[name=anker]", form).val();
-				AFW.RTF.setURLInfo(a, {
+				editor.setURLInfo(a, {
 					type: type, 
 					key: key + (anker ? "#"+anker : "")
 				})
@@ -235,7 +235,7 @@
 					alert("Bitte wählen Sie eine Datei aus.");
 					return;
 				}
-				AFW.RTF.setURLInfo(a, {
+				editor.setURLInfo(a, {
 					type: type, 
 					key: key
 				})
@@ -249,7 +249,7 @@
 					alert("Bitte wählen Sie eine Datei aus.");
 					return;
 				}
-				AFW.RTF.setURLInfo(a, {type:type, key:container+"/"+filename+"/"+dbkey})
+				editor.setURLInfo(a, {type:type, key:container+"/"+filename+"/"+dbkey})
 			}
 
 			else{	// exturl
@@ -260,7 +260,7 @@
 					return;
 				}
 				a.href=url;				
-				AFW.RTF.setURLInfo(a, {
+				editor.setURLInfo(a, {
 					type: type, 
 					key: url
 				})

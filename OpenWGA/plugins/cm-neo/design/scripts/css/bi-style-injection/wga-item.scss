@@ -11,6 +11,15 @@
 
 	display: inline;
 
+	[contenteditable]{
+		outline: none;
+		border: 1px solid #66afe9;
+		box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 233, 0.6);
+		border-radius: 3px;
+		padding: 3px;
+		margin: -4px;		// substracts 3px border and 1px padding.
+	}
+
 	&.WGA-Item-hover{
 		background: rgba(135, 161, 212, .2);	/*#f4f4f4;*/
 		-moz-border-radius: 4px;

@@ -1,4 +1,4 @@
-define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
+define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, CM){
 
 	var editor;
 	var options;
@@ -41,6 +41,8 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 				if(checked)
 					$(el).addClass(cls)
 				else $(el).removeClass(cls)
+				if(editor.toolbar)
+					editor.toolbar.update();
 			}
 		}
 	});
@@ -119,7 +121,7 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 			var a = editor.getNearestTagFromSelection("a")
 			if(!a)
 				return;
-			var info = AFW.RTF.getURLInfo(a)
+			var info = editor.getURLInfo(a)
 			var key = info.key;
 			var anker = ""
 			if(info.type=="int"){
@@ -146,7 +148,7 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 			var el = editor.getNearestTagFromSelection("img")
 			if(!el)
 				return;
-			var info = AFW.RTF.getURLInfo(el)
+			var info = editor.getURLInfo(el)
 			CM.openDialog("edit-rtf-image", {
 				title: el.title,
 				type: info.type,
@@ -163,7 +165,7 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 		
 		"edit-html": function(el){
 			CM.openDialog("edit-html", {
-				html: editor.getHTML()
+				html: editor.html()
 			});
 		}
 	
@@ -237,14 +239,16 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 	})
 	
 	var toolbar = {
-		update: function(event){
+		update: function(){
 			$("#editor-panel-rtf [data-cmd]").each(function(){
 				$this = $(this)
 				try{
-					var enabled = editor.doc.queryCommandState($this.data("cmd"));
+					var enabled = editor.queryCommandState($this.data("cmd"));
 					$this[enabled ? "addClass" : "removeClass"]("active");
 				}
-				catch(e){}
+				catch(e){
+					console.log(e);
+				}
 			})
 			
 			// paragraph
@@ -280,7 +284,7 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 					$("#editor-panel-rtf .link-options").show()
 					$("#editor-panel-rtf [name=link-style]").multiselect('select', classes)
 				}
-				var info = AFW.RTF.getURLInfo(el)
+				var info = editor.getURLInfo(el)
 				var types={
 					"int": "Interner Link",
 					"exturl": "Externer Link",
@@ -327,7 +331,7 @@ define(["jquery", "cm", "bootstrap-multiselect"], function($, CM){
 					$("#editor-panel-rtf [data-id=image-style]").show()
 					$("#editor-panel-rtf [name=image-style]").multiselect('select', classes)					
 				}
-				var info = AFW.RTF.getURLInfo(el)
+				var info = editor.getURLInfo(el)
 				var types={
 					"exturl": "Externes Bild",
 					"intfile": "Internes Bild",

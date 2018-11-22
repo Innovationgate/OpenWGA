@@ -31,7 +31,7 @@
 			ev.preventDefault();
 			var html = $("#edit-html [name=html]").val()
 			require(["toolpanels/rtf"], function(RTF){
-				RTF.getEditor().setHTML(html);
+				RTF.getEditor().html(html);
 			})
 		})
 	})

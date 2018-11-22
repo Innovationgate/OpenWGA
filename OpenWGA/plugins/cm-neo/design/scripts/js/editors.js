@@ -2,13 +2,144 @@ define([
 	"sitepanel",
 	"uploadmanager",
 	"cm",
-	"jquery-textarea-autogrow",
-	"afw/rtfeditor2"		// defines AFW.RTF.editor
-], function(Sitepanel, UploadManager, CM){
+	"afw/rtfeditor",
+	"jquery-textarea-autogrow"
+], function(Sitepanel, UploadManager, CM, RTFEditor){
 
+	
+	function makeScriptlets(html){
+		// use browsers dom as HTML parser:
+		
+		var el = $("<div></div>").html(html);
+		
+		$("a", el).each(function(){
+			
+			var link = this;
+			
+			var info = RTFEditor.getURLInfo(link);
+			var linktype=info.type;
+			var wgakey=info.key;
+
+			switch(linktype){
+				/*
+				 * Don't directly write URL to link.href because FF3 will encode this URL in this case
+				 * So we write the URL to an Attribute "wga:href" that will later be removed by a regexp
+				 */
+				case "int":
+					link.setAttribute("wga:href", "{%!contenturl:"+wgakey+"%}");
+					link.removeAttribute("href");
+					break;
+				case "intname":
+					link.setAttribute("wga:href", "{%!namedcontenturl:"+wgakey+"%}");
+					link.removeAttribute("href");
+					break;
+				case "intfile":
+					link.setAttribute("wga:href", "{%!fileurl:"+wgakey+"%}");
+					link.removeAttribute("href");
+					break;
+				case "file":
+				case "extfile":
+					var key = wgakey.split("/");
+					var container = key[0];
+					var filename = key[1];
+					var dbkey = key[2];
+					var scriptlet = "{%"
+					if(dbkey)
+						scriptlet += "(db:"+dbkey+")"
+					scriptlet += "!fileurl:"+container+","+filename+"%}"
+					link.setAttribute("wga:href", scriptlet);
+					link.removeAttribute("href");
+					break;
+			}
+		
+		})
+
+		$("img", el).each(function(){
+			
+			var img = this
+
+			var info = RTFEditor.getURLInfo(img);
+			var urltype=info.type;
+			var wgakey=info.key;
+			
+			switch(urltype){
+				case "file":
+				case "extfile":
+					var key = wgakey.split("/");
+					var container = key[0];
+					var filename = key[1];
+					var dbkey = key[2];
+
+					if(img.style){
+						if(img.style.width){
+							var w = img.style.width.indexOf("px");
+							if(w)
+								filename += "?width~"+img.style.width.substr(0, w);
+						}
+						else if(img.style.height){
+							var h = img.style.height.indexOf("px");
+							filename += "?height~"+img.style.height.substr(0, h);
+						}
+					}
+					
+					var scriptlet = "{%"
+					if(dbkey)
+						scriptlet += "(db:"+dbkey+")"
+					scriptlet += "!imgurl:"+container+","+filename+"%}"
+					img.setAttribute("wga:src", scriptlet);
+					
+					scriptlet = "{%"
+					if(dbkey)
+						scriptlet += "(db:"+dbkey+")"
+					scriptlet += "!srcset:"+container+","+filename+"%}"
+					img.setAttribute("wga:srcset", scriptlet);
+					
+					img.removeAttribute("src");
+					img.removeAttribute("srcset");
+					break;
+				case "intfile":
+					if(img.style){
+						if(img.style.width){
+							var index = img.style.width.indexOf("px");
+							if(index)
+								wgakey += "?width~"+img.style.width.substr(0, index);
+						}
+						else if(img.style.height){
+							var index = img.style.height.indexOf("px");
+							wgakey += "?height~"+img.style.height.substr(0, index);
+						}
+					}
+					
+					img.setAttribute("wga:src", "{%!imgurl:"+wgakey+"%}");
+					img.setAttribute("wga:srcset", '{%!srcset:' + wgakey + '%}');
+					img.removeAttribute("src");
+					img.removeAttribute("srcset");
+					break;
+				case "exturl":
+					img.setAttribute("wga:src", img.src);
+					img.removeAttribute("src");
+					break;
+			}
+		})
+
+		htmltext = el.html();
+		htmltext = htmltext.replace(/wga:href="([^"]*)"/g, 'href="$1"') 
+		htmltext = htmltext.replace(/wga:src="([^"]*)"/g, 'src="$1"')
+		htmltext = htmltext.replace(/wga:srcset="([^"]*)"/g, '$1') 
+
+		// CM 1.4: embed new attribute wga:urlinfo in scriptlet 
+		htmltext = htmltext.replace(/wga:urlinfo="([^"]*)"/g, '{%!rtfsystem:wga:urlinfo="$1"%}');
+		
+		//console.log(htmltext)
+		return htmltext;
+	}
+	
 	var rtf_editor = function(){
 	
 		var editor;
+		var edit_el;
+		var edit_el_unencoded;
+		var rtf_edit_el;
 	
 		function open(item, option){
 			
@@ -17,11 +148,22 @@ define([
 				return "Daten wurden noch nicht gespeichert";
 			}
 			
+			edit_el = $("#item_"+item, Sitepanel.getDocument())
+			edit_el_unencoded = $("#item_"+item+"_unencoded", Sitepanel.getDocument())
+			edit_el.hide();
+			
+			rtf_edit_el = $("<div>").html(edit_el_unencoded.html() || "<br>")
+			rtf_edit_el.insertBefore(edit_el);
+			
+			editor = RTFEditor.edit(rtf_edit_el)
+			
+			/*
 			editor = new AFW.RTF.editor("item_"+item, {
 				document: Sitepanel.getDocument(),
 				contentinfo: Sitepanel.getContentInfo(),
 				width: "100%"
 			})
+			*/
 
 			// drag&drop
 			function isDesktopDrop(dt){
@@ -50,6 +192,8 @@ define([
 			}
 			
 			function setDropEffect(e){
+			    if(!editor.toolbar)
+			    	return;
 				var dt = e.dataTransfer;
 				if(isLinkDrop(dt))
 					dt.dropEffect = "link";				
@@ -58,9 +202,6 @@ define([
 				else dt.dropEffect = (e.shiftKey||forceCreateLink() ? "link":"copy");
 			}
 			
-			function ignoreEvent(e) {
-			    e.preventDefault();
-			}
 			function dragover(e) {
 				setDropEffect(e);
 			    e.preventDefault();
@@ -85,11 +226,14 @@ define([
 			    e.preventDefault();
 			    e.stopPropagation();
 			    
+			    if(!editor.toolbar)
+			    	return;
+			    
 			    if(e.dataTransfer.getData("wga/link")){
 			    	var data = JSON.parse(e.dataTransfer.getData("wga/link"))
 			    	//console.log("link drop", e.dataTransfer.getData("wga/link"))
 					var el = editor.createLink(data.href, data.title, "int");
-					AFW.RTF.setURLInfo(el, {type:"int", key:data.id})
+					editor.setURLInfo(el, {type:"int", key:data.id})
 					el.alt = el.title = data.title;
 					editor.getRange().setStartAfter(el);
 			    	return;
@@ -110,9 +254,6 @@ define([
 					return;
 				}
 			    
-				if(!editor.toolbar)
-					return;
-					
 				// Files drop from local file system:
 				if(forceCreateLink()){
 					if(!editor.toolbar.isCmdDisabled("InsertLink"))
@@ -144,17 +285,18 @@ define([
 			function insertAttachment(file, as_link){
 				if(as_link && !editor.toolbar.isCmdDisabled("InsertLink")){
 					var el = editor.createLink(file.url, file.name, file.type||"intfile");
-					AFW.RTF.setURLInfo(el, {type:file.type||"intfile", key:file.key||file.name})
+					editor.setURLInfo(el, {type:file.type||"intfile", key:file.key||file.name})
 					el.alt = el.title=file.title || file.name;
 					editor.getRange().setStartAfter(el);
 				}
 				else if(!editor.toolbar.isCmdDisabled("InsertImg")){
-					if(!file.poster)
+					if(!file.poster){
 						return;
+					}
 		        	if(!editor.getParagraph() && !editor.isInTable())
 		        		editor.execCmd("FormatBlock", "p");
 					var el = editor.createImg(file.poster, file.type||"intfile")
-					AFW.RTF.setURLInfo(el, {type:file.type||"intfile", key:file.key||file.name})
+					editor.setURLInfo(el, {type:file.type||"intfile", key:file.key||file.name})
 					el.alt = el.title=file.title || file.name;
 					editor.getRange().setStartAfter(el);
 				}
@@ -171,52 +313,61 @@ define([
 		        		editor.execCmd("FormatBlock", "p");
 		        	
 					var el = editor.createImg(CM.url.file + "/images/ajax-loader-bar.gif", "intfile")
-					AFW.RTF.setURLInfo(el, {type:"intfile", key:filename})
+					editor.setURLInfo(el, {type:"intfile", key:filename})
 					el.alt = "uploading ..."
 					editor.getRange().setStartAfter(el);
 					
 					UploadManager.upload(file, {
 						callback: function(filename){
-					    	AFW.RTF.setURLInfo(el, {type:"intfile", key:filename})
+					    	editor.setURLInfo(el, {type:"intfile", key:filename})
 					    	el.src="../../file/" + Sitepanel.getContentInfo().contentkey + "/"+filename;
 					    	el.alt = filename;
-					    	el.style.opacity=null;
 						}
 					})
 				}
 				else{
 					// create link
 					var el = editor.createLink(filename, filename, "intfile");
-					AFW.RTF.setURLInfo(el, {type:"intfile", key:filename})
+					editor.setURLInfo(el, {type:"intfile", key:filename})
 					editor.getRange().setStartAfter(el);
+					UploadManager.upload(file)
 				}
 			}
 			
 			var dropbox = editor.editelement;
-			
 		    dropbox.addEventListener("dragenter", dragenter, true);
 		    dropbox.addEventListener("dragover", dragover, true);
 		    dropbox.addEventListener("drop", drop, true);
-
+			
 		    editor.focus();
-			//window.editor=editor	// dbg
+			window.editor=editor	// dbg
+		    
+		    if(this.onOpen)
+		    	this.onOpen(editor)
+		    
 			return editor;
 		}
 		
 		function close(){
 			Sitepanel.getWindow().onbeforeunload=null;
-			editor.closeEditor()
+			editor.close();
+			editor=null;
+			
+			rtf_edit_el.remove();
+			edit_el.show();
 		}
 
 		function focus(){
 			editor.focus();
 		}
 		function update(data, data_encoded){
-			editor.setRTFHTML(data, data_encoded)
+			edit_el_unencoded.html(data);
+			edit_el.html(data_encoded)
+			editor.html(data_encoded);
 		}
 	
 		function getContent(){
-			return editor.getRTFHTML()
+			return makeScriptlets(editor.html())
 		}
 		
 		return {
@@ -232,41 +383,20 @@ define([
 	}()
 
 	var textblock_editor = function(){
-	
+
 		var editor;
 		
-		function open(item, option){
-
-			Sitepanel.getWindow().onbeforeunload=function(){
-				return "Daten wurden noch nicht gespeichert";
-			}
-
-			editor = new AFW.RTF.editor("item_"+item, {
-				document: Sitepanel.getDocument(),
-				contentinfo: Sitepanel.getContentInfo(),
-				width: "100%"
-			})
-			return editor;
-		}
-	
-		return {
+		return $.extend({}, rtf_editor, {
 			data_type: "textblock",
-			open: open,
-			update: function(data, data_encoded){
-				//editor.setRTFHTML(data, data)
-				editor.setRTFHTML(data, data_encoded)
-			},
-			close: function(){
-				Sitepanel.getWindow().onbeforeunload=null;
-				editor.closeEditor()
-			},
-			focus: function(){
-				editor.focus();
+			onOpen: function(e){
+				editor = e;
+				editor.setDefaultParagraphSeparator("div");
 			},
 			getContent: function(){
-				return editor.getRTFHTML()
-			}
-		}
+				return editor.html();
+			},
+			toolpanel: null
+		})
 		
 	}();
 

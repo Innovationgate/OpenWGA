@@ -141,7 +141,7 @@
 					return;
 				}
 				el = editor.createImg(url, "exturl");
-				AFW.RTF.setURLInfo(el, {type:type, key:url})
+				editor.setURLInfo(el, {type:type, key:url})
 			}
 			else if(type=="intfile"){
 				var key = $("[name=key]", form).val();	// filename
@@ -150,7 +150,7 @@
 					return;
 				}
 				el = editor.createImg(url, "intfile");
-				AFW.RTF.setURLInfo(el, {type:type, key:key})
+				editor.setURLInfo(el, {type:type, key:key})
 			}
 			else if(type=="extfile"){
 				var dbkey = $("[name=dbkey]", form).val();
@@ -161,7 +161,7 @@
 					return;
 				}
 				el = editor.createImg(url, "extfile");
-				AFW.RTF.setURLInfo(el, {type:type, key:container+"/"+filename+"/"+dbkey})
+				editor.setURLInfo(el, {type:type, key:container+"/"+filename+"/"+dbkey})
 			}
 			else{
 				alert("Unbekannter Bild-Typ: " + type);
@@ -188,8 +188,8 @@
 					$("[name=url]", form).focus();
 					return;
 				}
-				el.src=url;
-				AFW.RTF.setURLInfo(el, {type:type, key:url})
+				el = editor.createImg(url, "exturl");
+				editor.setURLInfo(el, {type:type, key:url})
 			}
 			else if(type=="intfile"){
 				var key = $("[name=key]", form).val();	// filename
@@ -199,7 +199,7 @@
 				}
 				el.src=url;
 				el.srcset=""
-				AFW.RTF.setURLInfo(el, {type:type, key:key})
+				editor.setURLInfo(el, {type:type, key:key})
 			}
 			else if(type=="extfile"){
 				var dbkey = $("[name=dbkey]", form).val();
@@ -211,7 +211,7 @@
 				}
 				el.src=url;
 				el.srcset=""
-				AFW.RTF.setURLInfo(el, {type:type, key:container+"/"+filename+"/"+dbkey})
+				editor.setURLInfo(el, {type:type, key:container+"/"+filename+"/"+dbkey})
 			}
 			else{
 				alert("Unbekannter Bild-Typ: " + type);
