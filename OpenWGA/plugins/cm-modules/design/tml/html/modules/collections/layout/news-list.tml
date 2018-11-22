@@ -89,7 +89,7 @@
 						<<tml:option name="news_headings"/>><tml:script expression="headline||TITLE"/></<tml:option name="news_headings"/>>	
 						<tml:case condition="_filename">
 							<div class="img">
-								<tml:[util:link] o_linktitle="{TITLE}">								
+								<tml:[util:link] o_linktitle="{TITLE}" o_encode="none">								
 									<tml:if condition="db().hasFeature(db().FEATURE_CONTENT_FILE_DERIVATES)">
 										<tml:then>
 											<img src="<tml:url type="file" file="{_filename}" derivate="usage=poster,width~320"/>" alt="<tml:script expression="headline||TITLE"/>">
