@@ -6,12 +6,12 @@
 	var domain = WGA.database(database).domain().name
 	
 	if(login(tmlform.username, tmlform.password, domain)){
-		log.info(WGA.Brand.name + "Contentmanager: user '" + tmlform.username + "' logged in to database '" + dbkey + "' in domain '" + domain + "' from IP " + request.getRemoteAddr());
+		log.info(WGA.Brand.name + " Contentmanager: user '" + tmlform.username + "' logged in to database '" + dbkey + "' in domain '" + domain + "' from IP " + request.getRemoteAddr());
 
 		try{
 			var wgdb = db(dbkey);	// opens a db session
 			if(!wgdb.isSessionOpen()){
-				tmlform.addMessage(label("login.user-is-no-author", WGA.createList([tmlform.username, dbkey])));
+				tmlform.addMessage(label("login.user-no-access", WGA.createList([tmlform.username, dbkey])));
 				tmlform.addMessage(label("login.please-login-as-author"));
 				return;
 			}
