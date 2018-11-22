@@ -195,7 +195,7 @@ public class WGAHttpSession implements HttpSession, de.innovationgate.wgpublishe
 
     private void checkValidity() {
         if (_invalidated) {
-            throw new IllegalStateException("Session '" + _id + "' is already invalidated.");
+            throw new IllegalStateException("Session '" + _id + "' has been invalidated.");
         }        
     }
 
