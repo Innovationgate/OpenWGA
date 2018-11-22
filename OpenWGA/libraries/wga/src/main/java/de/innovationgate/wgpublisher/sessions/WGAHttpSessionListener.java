@@ -55,23 +55,30 @@ public class WGAHttpSessionListener implements HttpSessionListener {
     @Override
     public void sessionCreated(HttpSessionEvent ev) {
         
-        if (!isEnabledSession(ev.getSession())) {
+        HttpSession session = ev.getSession();
+
+        if (!isEnabledSession(session)) {
             return;
         }
         
-        LOG.debug("Session created: " + ev.getSession().getId());
-        HttpSession session = ev.getSession();
-        WGACore.INSTANCE.getActiveHttpSessions().put(ev.getSession().getId(), ev.getSession());
+        LOG.debug("Session created: " + session.getId());
+        WGACore.INSTANCE.getActiveHttpSessions().put(session.getId(), session);
         
         // LIfecycle monitoring
         session.setAttribute(WGACore.ATTRIB_SESSION_LIFECYCLE_LISTENER, new WGAHttpSessionActivationListener());
         
         Integer sessionTimeout = (Integer) WGACore.INSTANCE.getVariousServerOptionReader().readOptionValueOrDefault(WGACore.SERVEROPTION_SERVER_SESSIONTIMEOUT);
         
+        /*
+         * #00005295: this does not really make sense.
+         * 
         // We only want to set it if it really differs from the default, which is enforced by web.xml
         if (sessionTimeout.intValue() != WGACore.SERVEROPTIONDEFAULT_SESSIONTIMEOUT) {
             ev.getSession().setMaxInactiveInterval(sessionTimeout.intValue() * 60);
         }
+        */
+        
+        session.setMaxInactiveInterval(sessionTimeout.intValue() * 60);
         
         initializeSessionAttributes(session);
         
