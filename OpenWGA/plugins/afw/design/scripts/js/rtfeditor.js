@@ -126,17 +126,117 @@ define(["jquery"], function($){
 
 	editor.prototype.insertHTML = function(html){
 		var range = this.getRange();
-		range.deleteContents();
-        var el = document.createElement("div");
-        el.innerHTML = html;
-        var frag = document.createDocumentFragment(), 
-        	node;
-        while ( (node = el.firstChild) ) {
-            frag.appendChild(node);
-        }
-        range.insertNode(frag);
-        range.collapse(false);
-        this.setRange(range);
+		var el=this.doc.createElement("span");
+		el.innerHTML=html;
+		
+		//insertNodeAtSelection(el);
+		range.deleteContents();	// deletes the selected Text
+		range.insertNode(el);
+		
+		// Set Cursor after inserted HTML:
+		var nextSibling = el.nextSibling;		// set cursor to this position later
+		
+		/*
+		 * We have to clean up the DOM to avoid nested block-nodes:
+		 * This is mainly an "intelligent copy" of DOM nodes.
+		 * We create a new paragraph node and copy eveything to it
+		 * If we find a block node in inserted HTML, we move it AFTER the new paragraph. "closing" the new paragraph
+		 * We remove the original <p> afterwards
+		 */
+		var p = this.getParagraph();
+		if(p){
+			var parentsOfSpan=[];
+			var parentOfSpan=el.parentNode;
+			while(parentOfSpan && parentOfSpan!=p){
+				parentsOfSpan.push(parentOfSpan)
+				parentOfSpan = parentOfSpan.parentNode
+			}
+			function isParentOfSpan(node){
+				for(var i=0; i<parentsOfSpan.length; i++)
+					if(node==parentsOfSpan[i])
+						return true;
+				return false;
+			}
+			
+			var copyTo = document.createElement(p.tagName);
+			p.parentNode.insertBefore(copyTo, p);
+
+			copyAndSplitNode(p)
+
+			p.parentNode.removeChild(p);
+		}
+		else this.removeNode(el)
+
+		// set cursor after interted HTML
+		if(nextSibling){
+			range.selectNodeContents(nextSibling);
+			range.collapse(true);
+			this.setRange(range);
+		}
+		
+		function copyAndSplitNode(node){
+
+			var blocktags = "p,h1,h2,h3,h4,h5,h6";
+			var children = node.childNodes;
+			for(var i=0; i<children.length; i++){
+				var node = children[i];
+				if(node==el){
+					// this is the pasted <span> Tag. Move it childnodes to "newp"
+					//console.log("found pasted <span>", el.innerHTML);
+					var haveBlockTag = false;
+					var pastedNodes = el.childNodes;
+					for(var j=0; j<pastedNodes.length; j++){
+						var node = pastedNodes[j];
+						//console	.log("pasted node", node, haveBlockTag);
+						var tagName = node.tagName;
+						var isBlockTag = (tagName && blocktags.indexOf(tagName.toLowerCase())>=0) 
+						if(isBlockTag){
+							// we have a block tag -> move it and make it to the new "newp" (=destination to move nodes)
+							haveBlockTag = true;
+							p.parentNode.insertBefore(node, p);	// move node
+						}
+						else {
+							if(haveBlockTag){
+								if(!copyTo.innerHTML)
+									copyTo.parentNode.removeChild(copyTo);
+								copyTo = document.createElement(p.tagName);
+								p.parentNode.insertBefore(copyTo, p);
+								haveBlockTag = false;
+							}
+							copyTo.appendChild(node);
+						}
+
+						j--;
+					}
+					
+					if(haveBlockTag){
+						if(!copyTo.innerHTML)
+							copyTo.parentNode.removeChild(copyTo);
+						copyTo = document.createElement(p.tagName);
+						p.parentNode.insertBefore(copyTo, p);
+					}
+					
+				}
+				else if (isParentOfSpan(node)){
+					var newnode = document.createElement(node.tagName);
+					for(a=0; a<node.attributes.length; a++){
+						var name =  node.attributes[a].name;
+						var value =  node.attributes[a].value;
+						newnode.setAttribute(name, value);
+					} 
+					copyTo.appendChild(newnode);
+					copyTo = newnode;
+					//console.log("created new " + node.tagName);
+					copyAndSplitNode(node);
+				}
+				else{
+					copyTo.appendChild(node);
+					i--;
+				}
+			}
+			if(!copyTo.innerHTML)
+				copyTo.parentNode.removeChild(copyTo);
+		}
 	}
 	
 	editor.prototype.execCmd = function(cmd, param){
@@ -305,7 +405,13 @@ define(["jquery"], function($){
 		}
 		return info;
 	}
-	
+
+	function insertNodeAtSelection(editor, node){
+		var range = editor.getRange();
+		range.deleteContents();	// deletes the selected Text
+		range.insertNode(node);
+	}
+
 	function getCleanHTML(htmltext, toolbar){
 		
 		var good_els = "#h1#h2#h3#h4#h5#h6#a#img#p#pre#br#ul#ol#li#blockquote#";
