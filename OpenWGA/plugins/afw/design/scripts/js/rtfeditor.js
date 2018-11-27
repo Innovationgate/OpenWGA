@@ -129,7 +129,7 @@ define(["jquery"], function($){
 		var el=this.doc.createElement("span");
 		el.innerHTML=html;
 		
-		//insertNodeAtSelection(el);
+		//insert node at selection:
 		range.deleteContents();	// deletes the selected Text
 		range.insertNode(el);
 		
@@ -404,12 +404,6 @@ define(["jquery"], function($){
 			info.key=parts[1];
 		}
 		return info;
-	}
-
-	function insertNodeAtSelection(editor, node){
-		var range = editor.getRange();
-		range.deleteContents();	// deletes the selected Text
-		range.insertNode(node);
 	}
 
 	function getCleanHTML(htmltext, toolbar){
