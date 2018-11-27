@@ -39,7 +39,6 @@ define(["jquery"], function($){
 					setTimeout(editor.toolbar.update, 100);
 			},
 			"mousedown click": function(ev){
-				//console.log(ev.target, ev.target.tagName)
 				// Safari/chrome/edge don't select images
 				if(ev.target && ev.target.tagName=="IMG"){			
 					var imgel = ev.target;
@@ -92,12 +91,6 @@ define(["jquery"], function($){
 		},
 		getRange: function(){
 			var sel = this.doc.getSelection()
-			/*
-			if(!sel.rangeCount){
-				console.log("rangecount is 0")
-				sel = window.getSelection()
-			}
-			*/
 			return sel.getRangeAt(0)
 		},
 		focus: function(){
@@ -139,7 +132,7 @@ define(["jquery"], function($){
 		/*
 		 * We have to clean up the DOM to avoid nested block-nodes:
 		 * This is mainly an "intelligent copy" of DOM nodes.
-		 * We create a new paragraph node and copy eveything to it
+		 * We create a new paragraph node and copy everything to it
 		 * If we find a block node in inserted HTML, we move it AFTER the new paragraph. "closing" the new paragraph
 		 * We remove the original <p> afterwards
 		 */
@@ -167,7 +160,7 @@ define(["jquery"], function($){
 		}
 		else this.removeNode(el)
 
-		// set cursor after interted HTML
+		// set cursor after inserted HTML
 		if(nextSibling){
 			range.selectNodeContents(nextSibling);
 			range.collapse(true);
@@ -182,12 +175,10 @@ define(["jquery"], function($){
 				var node = children[i];
 				if(node==el){
 					// this is the pasted <span> Tag. Move it childnodes to "newp"
-					//console.log("found pasted <span>", el.innerHTML);
 					var haveBlockTag = false;
 					var pastedNodes = el.childNodes;
 					for(var j=0; j<pastedNodes.length; j++){
 						var node = pastedNodes[j];
-						//console	.log("pasted node", node, haveBlockTag);
 						var tagName = node.tagName;
 						var isBlockTag = (tagName && blocktags.indexOf(tagName.toLowerCase())>=0) 
 						if(isBlockTag){
@@ -205,7 +196,6 @@ define(["jquery"], function($){
 							}
 							copyTo.appendChild(node);
 						}
-
 						j--;
 					}
 					
@@ -226,7 +216,6 @@ define(["jquery"], function($){
 					} 
 					copyTo.appendChild(newnode);
 					copyTo = newnode;
-					//console.log("created new " + node.tagName);
 					copyAndSplitNode(node);
 				}
 				else{
@@ -264,8 +253,7 @@ define(["jquery"], function($){
 			var startNode=range.startContainer;
 			if (startNode.nodeType==startNode.ELEMENT_NODE)		// Element
 				return startNode.childNodes[range.startOffset] || startNode;
-				//return startNode;
-			return startNode.parentNode;		// Textnode or other node types ...
+			return startNode.parentNode;		// Text node or other node types ...
 		}
 
 	}
@@ -276,7 +264,6 @@ define(["jquery"], function($){
 		var startNode=range.startContainer;
 		if (startNode.nodeType==startNode.ELEMENT_NODE)		// Element
 			return getNearestTag(this, startNode.childNodes[range.startOffset]||startNode, tagNameToFind);
-			//return getNearestTag(this, startNode, tagNameToFind);
 		return getNearestTag(this, startNode.parentNode, tagNameToFind);	// Textnode or other node types ...
 
 		// helper
