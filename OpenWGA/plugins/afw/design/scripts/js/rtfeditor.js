@@ -230,6 +230,12 @@ define(["jquery"], function($){
 	
 	editor.prototype.execCmd = function(cmd, param){
 		this.doc.execCommand(cmd, false, param);
+		
+		// Safari/Chrome bug: remove <span> element created by the browser.
+		var span = this.getNearestTagFromSelection("span");
+		if(span)
+			this.removeNode(span);
+		
 		if(this.toolbar)
 			this.toolbar.update();
 	}
