@@ -44,7 +44,7 @@
 
 		<tml:case condition="_Database.getUserGroups().size()">
 			<tml:[form-field] o_label="Gruppen" o_mode="view">
-				<tml:script expression="_Database.getUserGroups()" divider="<br>"/>
+				<tml:script expression="WGA.sortList(_Database.getUserGroups())" divider="<br>"/>
 			</tml:[form-field]>
 		</tml:case>
 
