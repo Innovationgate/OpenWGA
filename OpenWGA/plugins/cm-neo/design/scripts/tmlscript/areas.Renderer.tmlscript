@@ -5,10 +5,10 @@ Renderer.prototype.render = function($urlParam_dbkey) {
 	var database = db($urlParam_dbkey);
 	var areas = []; 
 	for(let area in Iterator(database.getAreas().values())){
-		if(area.systemArea)
-			continue;
-		if(area.name=="hdb-content" && !WGA.app($urlParam_dbkey).isManager())
-			continue;
+		if(!WGA.app($urlParam_dbkey).isManager()){
+			if(area.systemArea || area.name.indexOf("$")==0 || area.name=="hdb-content")
+				continue;
+		}
 		var visiblefor = area.getExtensionData("CM_area_visible")
 		if(visiblefor && visiblefor.size() && !database.isMemberOfUserList(visiblefor))
 			continue;
