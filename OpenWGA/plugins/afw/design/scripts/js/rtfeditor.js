@@ -121,7 +121,7 @@ define(["jquery"], function($){
 		var range = this.getRange();
 		var el=this.doc.createElement("span");
 		el.innerHTML=html;
-		
+
 		//insert node at selection:
 		range.deleteContents();	// deletes the selected Text
 		range.insertNode(el);
@@ -405,7 +405,7 @@ define(["jquery"], function($){
 		
 		var good_els = "#h1#h2#h3#h4#h5#h6#a#img#p#pre#br#ul#ol#li#blockquote#";
 		var good_els_textblock = "#br#div#";
-		var bad_els = "#head#script#style#";
+		var bad_els = "#head#title#meta#link#script#style#";
 	
 		var source = document.createElement("div");
 		source.innerHTML = htmltext;
@@ -429,7 +429,7 @@ define(["jquery"], function($){
 		}
 	
 		function copyElement(source, dest, good_els){
-	
+			
 			if(source.nodeType==source.TEXT_NODE){					// text node 
 				var txt = source.nodeValue.replace(/\xA0/g, " ");	// removes &nbsp;
 				//console.log("created textnode", txt);
