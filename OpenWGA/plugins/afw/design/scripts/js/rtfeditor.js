@@ -403,7 +403,7 @@ define(["jquery"], function($){
 
 	function getCleanHTML(htmltext, toolbar){
 		
-		var good_els = "#h1#h2#h3#h4#h5#h6#a#img#p#pre#br#ul#ol#li#blockquote#";
+		var good_els = "#h1#h2#h3#h4#h5#h6#a#img#p#pre#br#ul#ol#li#";
 		var good_els_textblock = "#br#div#";
 		var bad_els = "#head#title#meta#link#script#style#";
 	
