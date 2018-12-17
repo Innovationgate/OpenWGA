@@ -156,14 +156,6 @@ define([
 			rtf_edit_el.insertBefore(edit_el);
 			
 			editor = RTFEditor.edit(rtf_edit_el)
-			
-			/*
-			editor = new AFW.RTF.editor("item_"+item, {
-				document: Sitepanel.getDocument(),
-				contentinfo: Sitepanel.getContentInfo(),
-				width: "100%"
-			})
-			*/
 
 			// drag&drop
 			function isDesktopDrop(dt){
@@ -340,7 +332,7 @@ define([
 		    dropbox.addEventListener("drop", drop, true);
 			
 		    editor.focus();
-			window.editor=editor	// dbg
+			//window.editor=editor	// dbg
 		    
 		    if(this.onOpen)
 		    	this.onOpen(editor)
