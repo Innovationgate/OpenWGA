@@ -23,6 +23,7 @@ define(["jquery"], function($){
 		this.el.on({
 			"keydown": function(ev){
 				//console.log("keypress", ev.key, ev.which);
+				$("img", el).removeClass("womodo-img-selected")
 				if(ev.key=="Tab"){
 					var para = editor.getParagraph();
 					if(para && para.tagName!="PRE"){
@@ -39,7 +40,8 @@ define(["jquery"], function($){
 					setTimeout(editor.toolbar.update, 100);
 			},
 			"mousedown click": function(ev){
-				// Safari/chrome/edge don't select images
+				// Safari/chrome/edge/FF64 don't select images
+				$("img", el).removeClass("womodo-img-selected")
 				if(ev.target && ev.target.tagName=="IMG"){			
 					var imgel = ev.target;
 					var sel = editor.getSelection();
@@ -48,6 +50,9 @@ define(["jquery"], function($){
 					range.setEndAfter(imgel);
 					sel.removeAllRanges()
 					sel.addRange(range);
+					
+					$(imgel).addClass("womodo-img-selected")
+					
 				}
 			},
 			"paste": function(ev){

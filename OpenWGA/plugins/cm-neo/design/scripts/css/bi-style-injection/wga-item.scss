@@ -18,6 +18,10 @@
 		border-radius: 3px;
 		padding: 3px;
 		margin: -4px;		// substracts 3px border and 1px padding.
+		img.womodo-img-selected{
+			margin: -1px;
+			border: solid gray 1px;
+		}
 	}
 
 	&.WGA-Item-hover{
