@@ -7,7 +7,7 @@
 	if(dbkey && (!structkey || structkey=="null")){
 		var event = createevent("content-changed")
 		event.setParameter("dbkey", dbkey)
-		event.setParameter("language", language || db(dbkey).getDefaultLanguage())
+		event.setParameter("language", language || db(dbkey).getDefaultLanhguage())
 		portlet.fireevent(event)
 		return;
 	}
@@ -21,6 +21,11 @@
 
 	var path = []
 	var struct = db(dbkey).getStructEntryByKey(structkey)
+	if(!struct){
+		console.log("unable to get struct", structkey, contentkey, dbkey);
+		return;
+	}
+	
 	var Struct = AFW.structentry(struct);
 	var area = struct.getArea().name;
 	while(struct){
@@ -40,6 +45,8 @@
 	event.setParameter("may_create_child_page", Struct.mayCreatePage());
 	event.setParameter("may_delete_page", Struct.mayDeletePage());
 	
+	event.setParameter("page_visible", Struct.isVisible());
+	
 	var may_create_root_page = false;
 	for(let area in Iterator(db(portlet.dbkey).getAreas().values())){
 		if(area.name.indexOf("$")==0)
@@ -51,7 +58,7 @@
 	}
 	event.setParameter("may_create_root_page", may_create_root_page);
 	
-	if(contentkey){
+	if(Struct.isVisible() && contentkey){
 		event.setParameter("contentkey", contentkey)
 		var c = context("db:"+dbkey + "/docid:" + contentkey, false);
 		if(c){

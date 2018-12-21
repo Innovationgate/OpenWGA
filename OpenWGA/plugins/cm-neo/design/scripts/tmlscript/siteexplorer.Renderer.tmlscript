@@ -17,6 +17,14 @@ Renderer.prototype.render = function(App, $urlParam_id, $urlParam_dbkey, $urlPar
 		return structs;
 	}
 	
+	function hasChildren(struct){
+		for(let child in Iterator(struct.getChildEntries())){
+			if(AFW.structentry(child).isVisible())
+				return true;		
+		}
+		return false;
+	}
+	
 	if($urlParam_id=="root"){
 	
 		if($urlParam_area){
@@ -84,11 +92,11 @@ Renderer.prototype.render = function(App, $urlParam_id, $urlParam_dbkey, $urlPar
 				iconurl: App.getIconURL(c),
 				href: c.contenturl("html", null, true),
 				context: JSON.stringify(struct_context),
-				hasChildren: struct.hasChildren()
+				hasChildren: hasChildren(struct)
 			})
 		}
 		else if(struct.title) {
-			ret.push({
+			AFW.structentry(struct).isVisible() && ret.push({
 				title: struct.title,
 				href: WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
 					.setParameter({
@@ -100,7 +108,7 @@ Renderer.prototype.render = function(App, $urlParam_id, $urlParam_dbkey, $urlPar
 				iconurl: "/plugin-wga-app-framework/file/icons/page_white_error.png",
 				cssclass: "not-visible",
 				context: JSON.stringify(struct_context),
-				hasChildren: struct.hasChildren()
+				hasChildren: hasChildren(struct)
 			})
 		}
 	}

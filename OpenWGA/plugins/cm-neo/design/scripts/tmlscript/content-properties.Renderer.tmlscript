@@ -75,7 +75,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 		}
 		
 	}
-	else{
+	else if(AFW.structentry($urlParam_structkey, $urlParam_dbkey).isVisible()){
 		var c = context("db:" + $urlParam_dbkey + "/$struct:" + $urlParam_structkey, false)
 		if(c){
 			result = {
