@@ -33,20 +33,20 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey)
 	}
 	else {
 	
-		var item = Packages.de.innovationgate.webgate.api.workflow.WGStraightWorkflow.ITEM_INITIATOR.toLowerCase()
+		var initiator_item = Packages.de.innovationgate.webgate.api.workflow.WGStraightWorkflow.ITEM_INITIATOR.toLowerCase()
 		query = "content.items[:item].text=:me AND content.status='g'"
 		var docs = WGA.app($urlParam_dbkey).query(query, {
 			onlypublished: false,
 			//alllanguages: true,
 			context: _context,
-			p_item: item,
+			p_item: initiator_item,
 			p_me: me
 		}).filter(function(doc) !doc.content().isPendingRelease())
 		
 		for(let doc in Iterator(docs)){
 	
 			var approver=[];
-			var wf = db($urlParam_dbkey).getWorkflowEngine().getWorkflowDefinitions().get(doc.wfname);
+			var wf = wfe.getWorkflowDefinitions().get(doc.wfname);
 			for(var level in Iterator(wf.getLevels())){
 				if(level.name==doc.wflevelnr){
 					for(let name in Iterator(level.reviewers)){
@@ -65,6 +65,27 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey)
 				approver: approver
 			})
 		}
+		
+		// toapprove
+		
+		var docs = WGA.app($urlParam_dbkey).query("content.status='g'", {
+			onlypublished: false,
+		}).filter(function(doc){
+			var wf = doc.content().getWorkflow();
+			return wf && wf.isApprovableByUser(); 		
+		})
+		
+		for(let doc in Iterator(docs)){
+			toapprove.push({
+				title: WGA.encode("html", doc.TITLE),
+				href: doc.contenturl('html', null, true),
+				modified: AFW.Util.timeElapsed(doc.MODIFIED),
+				workflow: doc.wfname + " / " + doc.wflevelnr,
+				initiator: doc.item(initiator_item),
+				cssclass: doc.KEY==$urlParam_contentkey ? "selected":""
+			})
+		}
+		
 	}
 	
 	WGA.TMLPage.write(JSON.stringify({

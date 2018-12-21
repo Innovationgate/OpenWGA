@@ -5,6 +5,25 @@
 	</fieldset></tml:comment>
 
 	<tml:[template] o_id="appnav-dashboard">
+	
+		{{#toapprove.length}}
+			<fieldset>
+				<legend>Von mir zu Genehmigen</legend>
+				{{#toapprove}}
+					<div class="entry {{cssclass}}">
+						<a href="{{href}}">
+							{{{title}}}
+						</a>
+						<div class="info">
+							zur Genehmigung vorgelegt <b>{{modified}}</b> von <b>{{initiator}}</b>
+							<br>
+							Workflow: {{workflow}}
+						</div>
+					</div>
+				{{/toapprove}}
+			</fieldset>
+		{{/toapprove.length}}
+	
 		{{#waiting.length}}
 			<fieldset>
 				<legend>Warte auf Genehmigung</legend>
