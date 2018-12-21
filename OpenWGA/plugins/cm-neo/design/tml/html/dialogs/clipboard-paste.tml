@@ -37,8 +37,11 @@
 					continue;
 				if(!area.mayEditPages())
 					continue;
-				if(area.mayReadContent())
+				if(area.mayReadContent()){
 					areas.add(area.name)
+					if(!tmlform.area)
+						tmlform.area = area.name
+				}
 			}
 			WGA.TMLPage.setVar("_areas", areas)
 			if(!tmlform.submitted && areas.contains(AREA))
@@ -51,7 +54,7 @@
 		</tml:case>
 		
 		<tml:{div} html_class="alert alert-danger" unless="$mc.isAllowedPageType">
-			Der Seitentyp '<tml:item name="$mc.pageType"/>' ist an dieser Stelle nicht erlaubt.
+			Das Einfügen der Seite ist an dieser Stelle nicht erlaubt.
 		</tml:{div}>
 		
 		<tml:case if="$mc.isAllowedPageType">
