@@ -27,11 +27,7 @@ dependencies {
     compile 'net.sf.json-lib:json-lib:2.4:jdk15'
     compile 'quartz:quartz:1.4.5'
     compile fileTree(dir: '../../customLibs/simpleXml', include: ['*.jar'])
-    compile 'stax:stax-api:1.0.1'
-    compile 'org.codehaus.woodstox:wstx-asl:3.2.3'
     compile 'com.thoughtworks.xstream:xstream:1.4.7'
-    
-    compile 'com.twelvemonkeys.imageio:imageio-jpeg:3.3.2'
     
     compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
 
