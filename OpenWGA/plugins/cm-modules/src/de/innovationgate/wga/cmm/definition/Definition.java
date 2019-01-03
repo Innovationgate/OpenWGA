@@ -1,9 +1,5 @@
 package de.innovationgate.wga.cmm.definition;
 
-import org.simpleframework.xml.Attribute;
-
-import de.innovationgate.wga.config.NotNull;
-
 public class Definition {
     
     private String configtml;
