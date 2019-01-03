@@ -2,7 +2,6 @@ package de.innovationgate.wga.modules.types;
 
 import de.innovationgate.wga.cmm.definition.Definition;
 import de.innovationgate.wga.modules.DeclaringModuleType;
-import de.innovationgate.wga.modules.ModuleType;
 
 public class CmmDefinitionModuleType implements DeclaringModuleType {
 

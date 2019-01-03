@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.net.URLClassLoader;
 import java.util.Collection;
-import java.util.List;
 
 import net.sf.json.JSONArray;
 
@@ -14,7 +13,6 @@ import de.innovationgate.webgate.api.WGFileContainer;
 import de.innovationgate.wga.cmm.definition.Definition;
 import de.innovationgate.wga.cmm.modules.CmmModuleDefinition;
 import de.innovationgate.wga.modules.CustomModuleRegistrationService;
-import de.innovationgate.wga.modules.ModuleRegistrar;
 import de.innovationgate.wga.modules.ModuleRegistry;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.plugins.WGAPlugin;
@@ -25,7 +23,8 @@ public class CmmRegistrationService implements CustomModuleRegistrationService {
 
     private void registerCMM(ModuleRegistry registry, String dbKey, Reader cmmDefReader) throws Exception {
         
-        Collection<Definition> cmdefs = JSONArray.toCollection(JSONArray.fromObject(WGUtils.readString(cmmDefReader)), Definition.class);
+        @SuppressWarnings("unchecked")
+		Collection<Definition> cmdefs = JSONArray.toCollection(JSONArray.fromObject(WGUtils.readString(cmmDefReader)), Definition.class);
         
         for (Definition def : cmdefs) {
             def.setDbkey(dbKey);
@@ -54,7 +53,7 @@ public class CmmRegistrationService implements CustomModuleRegistrationService {
                 }
                 
                 if (systemFC.hasFile(CMM_DEFINITIONS)) {
-                    registerCMM(registry, db.getDbReference(), systemFC.getFileText(CMM_DEFINITIONS));
+                    registerCMM(registry, db.getDbReference(), systemFC.getFileText(CMM_DEFINITIONS, "UTF-8"));
                 }
                 
                 
