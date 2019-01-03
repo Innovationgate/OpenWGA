@@ -40,7 +40,7 @@ import java.util.concurrent.Executors;
 import org.apache.commons.jxpath.JXPathContext;
 import org.apache.log4j.Logger;
 
-import de.bannkreis.groq.Groq;
+import de.innovationgate.groq.Groq;
 import de.innovationgate.utils.MD5HashingInputStream;
 import de.innovationgate.utils.UIDGenerator;
 import de.innovationgate.utils.WGUtils;

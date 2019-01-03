@@ -27,25 +27,19 @@ package de.innovationgate.webgate.api.jdbc;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.Hibernate;
-import org.hibernate.Query;
 
-import de.bannkreis.groq.Groq;
-import de.bannkreis.groq.GroqFilterSet;
+import de.innovationgate.groq.Groq;
 import de.innovationgate.utils.UIDGenerator;
-import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGClosedSessionException;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGIllegalArgumentException;
 import de.innovationgate.webgate.api.WGPortlet;
-import de.innovationgate.webgate.api.WGPortletDefaultBean;
 import de.innovationgate.webgate.api.WGPortletRegistry;
 import de.innovationgate.webgate.api.WGUserProfile;
 import de.innovationgate.wga.common.ImmutableObject;

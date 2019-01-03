@@ -49,7 +49,7 @@ import org.hibernate.Session;
 import org.hibernate.dialect.HSQLDialect;
 import org.hibernate.jdbc.Work;
 
-import de.bannkreis.groq.Groq;
+import de.innovationgate.groq.Groq;
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGACLEntry;
 import de.innovationgate.webgate.api.WGAPIException;
