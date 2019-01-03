@@ -25,8 +25,6 @@
 package de.innovationgate.wgpublisher.filter;
 
 import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -39,7 +37,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import javax.security.auth.x500.X500Principal;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -55,7 +52,6 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.mockito.Mockito;
 
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.utils.URLBuilder;
@@ -663,11 +659,6 @@ public class WGAFilter implements Filter {
 	        
 	        FinalCharacterEncodingResponseWrapper wrappedResponse =  createResponseWrapper(response, wrappedRequest);
 	        
-	        // Probably mock request certificate
-            if (WGACore.isDevelopmentModeEnabled()) {
-                mockX509Cert(wrappedRequest);
-            }
-	        
 	        _holdRequestsLock.readLock().lock();
 	        try {
 	            _wgaFilterChain.doFilter(wrappedRequest, wrappedResponse);
@@ -731,30 +722,6 @@ public class WGAFilter implements Filter {
 	       _currentRequests.remove(request);
        }
 	}
-
-    public void mockX509Cert(HttpServletRequest request) {
-        X509Certificate cert = (X509Certificate) request.getSession().getAttribute(WGAFilter.SESATTRIB_MOCK_CERT);
-        if (cert == null) {
-            String mockCert = request.getParameter("mockX509Cert");
-            if (mockCert != null) {
-                try {
-                    cert = Mockito.mock(X509Certificate.class);
-                    X500Principal principal = new X500Principal(mockCert);
-                    Mockito.when(cert.getSubjectDN()).thenReturn(principal);
-                    Mockito.when(cert.getSubjectX500Principal()).thenReturn(principal);
-                    Mockito.when(cert.getEncoded()).thenReturn(new byte[] {1,1,1});
-                    request.getSession().setAttribute(WGAFilter.SESATTRIB_MOCK_CERT, cert);
-                }
-                catch (CertificateEncodingException e) {
-                    _core.getLog().error("Exception mocking X509 certificate", e);
-                }
-            }
-        }
-        
-        if (cert != null) {
-            request.setAttribute("javax.servlet.request.X509Certificate", new X509Certificate[] {cert});
-        }
-    }
 
     protected FinalCharacterEncodingResponseWrapper createResponseWrapper(ServletResponse response, RequestWrapper wrappedRequest) {
         FinalCharacterEncodingResponseWrapper responseWrapper =  new FinalCharacterEncodingResponseWrapper(wrappedRequest, (HttpServletResponse)response);

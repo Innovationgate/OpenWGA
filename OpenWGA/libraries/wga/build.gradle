@@ -21,10 +21,13 @@ dependencies {
     compile 'org.apache.jackrabbit:jackrabbit-webdav:1.6.5'
     compile 'org.apache.jackrabbit:jackrabbit-jcr-server:1.6.5'
     compile 'org.glassfish:javax.json:1.0.4'
-    compile 'nekohtml:nekohtml:1.9.6.2'
-    compile 'org.mockito:mockito-core:1.10.19'
+
     compile 'javax.jcr:jcr:1.0'
     
+    // WGA.Html:
+    compile 'nekohtml:nekohtml:1.9.6.2'
+    
+	// exif meta data for images:
 	compile 'com.drewnoakes:metadata-extractor:2.10.1'
     
     compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
