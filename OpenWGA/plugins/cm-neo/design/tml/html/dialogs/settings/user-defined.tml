@@ -1,16 +1,18 @@
-<tml:action id="save-page-settings">
+<tml:action id="save-custom-settings">
 
 	if(!tmlform.validate())
 		return;
 
+	for(let [index, handler] in App.settingsSaveHandler){
+		try{
+			handler(tmlform);
+		}
+		catch(e){
+			console.log(e);
+		}		
+	}
+	App.settingsSaveHandler=[];
 	tmlform.store();
-
-	try{
-		callAction("settings-saved")
-	}
-	catch(e){
-		//console.log(e);
-	}
 
 	portlet.fireevent("close-dialog");
 	portlet.fireevent("content-metas-changed", {
@@ -20,6 +22,10 @@
 	});
 	_dialog_closed=true;
 </tml:action>
+
+<tml:script>	
+	App.settingsSaveHandler=[];
+</tml:script>
 
 <tml:form id="form-user-defined-settings" mode="{App.mayUpdateContent(this) ? 'edit':'view'}" html_data-context="{path}" unless="_dialog_closed">
 
@@ -41,7 +47,7 @@
 	<div class="footer">
 		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
 		<tml:case condition="tmlform.mode()=='edit'" if="$mc.settingsTML">
-			<tml:button clickaction="save-page-settings" cssclass="btn btn-primary">Aktualisieren</tml:button>
+			<tml:button clickaction="save-custom-settings" cssclass="btn btn-primary">Aktualisieren</tml:button>
 		</tml:case>
 	</div>
 	
