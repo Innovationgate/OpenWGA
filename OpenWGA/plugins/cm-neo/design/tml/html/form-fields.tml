@@ -1,0 +1,33 @@
+<tml:script>
+	_fields = WGA.createList(option("body").split("\n"));
+</tml:script>
+
+<tml:foreach item="_fields" currentvalue="_field" filter="_field.trim()!=''">
+	<tml:script>
+		var parts = _field.split(",")
+		
+		_label = parts.shift().trim();
+		_name = (parts.shift()||_label).trim();
+		_type = (parts.shift()||"text").trim();
+		_options = parts.join(",");
+
+		var p = _type.split(/\s/)
+		if(p.length>1){			
+			_type = p.shift();
+			_default = p.join(" ");
+		}
+		else _default="";
+
+		_meta = (_name==_name.toUpperCase())
+		
+	</tml:script>
+
+
+	<tml:if condition="_label=='-'">
+		<tml:then><hr></tml:then>
+		<tml:else>
+			<tml:[form-field] o-label="_label" o-name="_name" o-meta="_meta" o-type="_type" o-options="_options" o-default="_default"/>
+		</tml:else>
+	</tml:if>	
+	
+</tml:foreach>
