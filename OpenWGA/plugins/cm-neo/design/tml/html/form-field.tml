@@ -39,7 +39,7 @@
 				changeaction=		"{option('changeaction')==null ? VOID : option('changeaction')}"
 				mode=				"{_mode}"
 
-	    		cssclass="[{option('type')=='date' || _wrap ? '' : 'form-control'}]"
+	    		cssclass="[{/*option('type')=='date' ||*/ _wrap ? '' : 'form-control'}]"
 	    		
 	    		wrap="{_wrap}"
 	    		wrap_class="{_wrap_class}"
