@@ -1731,7 +1731,10 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
         
         PageRightsFilter.Right readRight = getDatabase().getPageRightsFilter().mayReadContent(this, getDatabase().getSessionContext().getUserAccess());
         if (readRight ==  Right.DENIED) {
-            throw new WGAuthorisationException("The page rights filter denies reading content on this page", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGERIGHTSFILTER);
+        	List<String> mandatory = getDatabase().getMandatoryReaders();
+        	if (!getDatabase().isMemberOfUserList(mandatory)) {        	
+        		throw new WGAuthorisationException("The page rights filter denies reading content on this page", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGERIGHTSFILTER);
+        	}
         }
         
         if (readRight != Right.ALLOWED_SKIP_DEFAULT_CHECKS) {
