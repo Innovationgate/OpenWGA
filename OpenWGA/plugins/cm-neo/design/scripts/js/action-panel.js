@@ -21,7 +21,11 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 	WGA.event.addListener("*", "content-metas-changed", function(ev){
 		updateContentProperties(ev.params);
 	})
-	
+
+	WGA.event.addListener("*", "page-moved", function(){
+		Sitepanel.reload();
+	})
+
 	WGA.event.addListener("*", "content-changed", function(ev){
 	
 		contentInfo = ev.params;

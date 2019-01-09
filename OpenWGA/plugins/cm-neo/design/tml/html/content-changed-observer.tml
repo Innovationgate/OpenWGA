@@ -210,7 +210,7 @@
 				struct.setPosition(pos);
 				struct.save();
 				
-				portlet.fireEvent("content-metas-changed");
+				portlet.fireEvent("page-moved")
 				
 			</tml:action>",
 			mode: "norefresh",
