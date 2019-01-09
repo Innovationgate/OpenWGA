@@ -284,7 +284,7 @@ AFW.RTF.editor=function(id, config){
 		
 		document.execCommand('styleWithCSS', false, true);
 
-		//document.execCommand("enableObjectResizing", false, "false");
+		document.execCommand("enableObjectResizing", false, true);
 		document.execCommand("enableInlineTableEditing", false, "false");
 
 		registerEvents();
