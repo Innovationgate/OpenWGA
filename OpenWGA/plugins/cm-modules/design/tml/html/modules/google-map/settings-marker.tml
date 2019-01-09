@@ -23,10 +23,21 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:action id="getGeoData">
+<tml:comment><tml:action id="getGeoData">
 	try{
-		var url = "http://maps.googleapis.com/maps/api/geocode/xml?"
-			+ "address=" + WGA.encode("url", tmlform.field(WGA.scoped('map_address')))
+
+		var apikey = option("google-maps-api-key");
+		if(!apikey){
+			var ctx = context("db:"+WGA.design().db().getDbReference()+"/name:cm_google_map", false)
+			if(ctx)
+				apikey = ctx.apikey
+		}
+
+		var url = "http://maps.googleapis.com/maps/api/geocode/xml?key=" + apikey
+			+ "&address=" + WGA.encode("url", tmlform.field(WGA.scoped('map_address')))
+		console.log(url, option("google-maps-api-key"), path);
+		return;
+		
 		var xml = WGA.Xml.load(url)
 		var status = xml.selectSingleNode('/GeocodeResponse/status');
 		if(status=="OK"){
@@ -39,14 +50,14 @@
 	catch(e){
 		log.info(e);
 	}
-</tml:action>
+</tml:action></tml:comment>
 
 <label><tml:label key="google-maps.settings.address"/>:</label>
 <div style="margin:10px">
 	<tml:input name="{WGA.scoped('map_address')}" cssstyle="width:100%" mode="{option('mode')}"/>
 </div>
 
-<label><tml:label key="google-maps.settings.alternative"/> <tml:label key="google-maps.settings.latlng"/>:</label>
+<tml:comment><label><tml:label key="google-maps.settings.alternative"/> <tml:label key="google-maps.settings.latlng"/>:</label>
 <div style="margin:10px">
 	<tml:label key="google-maps.settings.longitude"/>:<br>
 	<tml:input name="{WGA.scoped('map_lng')}" cssstyle="width:100%" mode="{option('mode')}"/>
@@ -60,7 +71,7 @@
 			<tml:button clickaction="getGeoData" ajax="true">Lookup</tml:button>
 		</div>
 	</tml:case>
-</div>
+</div></tml:comment>
 
 <label><tml:label key="google-maps.settings.address-info"/>:</label>
 <div style="margin:10px">
