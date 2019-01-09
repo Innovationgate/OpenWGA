@@ -5467,5 +5467,15 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     	}
     	return false;
     }
+
+	@Override
+	public List getfilenames() throws WGAPIException {
+		return getcontent().getFileNames();
+	}
+
+	@Override
+	public String getprimaryfilename() throws WGAPIException {
+		return getcontent().getPrimaryFileName();
+	}
 	
 } 
