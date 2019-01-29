@@ -158,6 +158,15 @@ public class PortletEvent implements Serializable {
     }
 
     /**
+     * Retrieves the event parameter as a map
+     * @param name Name of the parameter
+     */
+    @CodeCompletion
+    public Map<String,Object> getParameters() {
+        return _parameters;
+    }
+
+    /**
      * Returns the name of the event
      */
     @CodeCompletion
