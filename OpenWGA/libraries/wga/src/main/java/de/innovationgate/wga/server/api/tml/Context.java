@@ -752,10 +752,4 @@ public interface Context {
     @CodeCompletion(preferredCase="isHomePage")
     public abstract boolean ishomepage();
  
-    @CodeCompletion(preferredCase="getFileNames")
-    public List<String> getfilenames() throws WGAPIException;
-
-    @CodeCompletion(preferredCase="getPrimaryFileName")
-    public String getprimaryfilename() throws WGAPIException;
-
 }
