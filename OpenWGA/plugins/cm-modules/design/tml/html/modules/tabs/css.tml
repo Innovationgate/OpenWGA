@@ -29,29 +29,32 @@
 		margin: "0 0 10px",
 		padding: 0,
 		border_bottom: "solid silver 1px",
-		"li a": {
-			float: "left",
-			padding: "10px 20px",
-			text_decoration: "none",
-			"&:focus, &:hover": {
-				outline: "none",
-				text_decoration: "none"
-			},
-			"&.current" :{
-				margin_bottom: -1,
-				background: "linear-gradient(0deg, white 50%, #efefef)",
-				border_:{
-					"top, left, right": "solid silver 1px"
-				}
-			}
-		},
-		"&.boxed": {
-			border_bottom: "solid #004080 3px",
+		li: {
+			margin: 0,
 			a: {
-				"&.current": {
-					border: "none",
-					background: "#004080",
-					color: "white"
+				float: "left",
+				padding: "10px 20px",
+				text_decoration: "none",
+				"&:focus, &:hover": {
+					outline: "none",
+					text_decoration: "none"
+				},
+				"&.current" :{
+					margin_bottom: -1,
+					background: "linear-gradient(0deg, white 50%, #efefef)",
+					border_:{
+						"top, left, right": "solid silver 1px"
+					}
+				}
+			},
+			"&.boxed": {
+				border_bottom: "solid #004080 3px",
+				a: {
+					"&.current": {
+						border: "none",
+						background: "#004080",
+						color: "white"
+					}
 				}
 			}
 		}
