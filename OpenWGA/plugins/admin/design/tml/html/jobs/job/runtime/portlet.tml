@@ -25,8 +25,11 @@
 <tml:action id="runJob">
 	var jobname = tmlparam1;
 	log.info("starting job " + jobname); 
-	var event = WGA.app().createEvent("system-message/receivers=me", {
+	/*var event = WGA.app().createEvent("system-message/receivers=me", {
 		msg: String("Job '" + jobname + "' finished")
+	})*/
+	var event = WGA.app().createEvent("job-finished/receivers=me", {
+		job: jobname
 	})
 	wgacore.getScheduler().run(jobname, "wga admin client", null, null, event);
 	_show_log = true; 	
@@ -38,6 +41,11 @@
 	wgacore.getScheduler().getJob(jobname).cancel();
 	_show_log = true;
 </tml:action>
+
+<tml:eventscript onevent="job-finished">
+	console.log("event job-finished", portletEvent.getParameter("job"))
+	_show_log = true;
+</tml:eventscript>
 
 <tml:eventscript onevent="wga-config-changed"/>
 

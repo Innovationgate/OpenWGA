@@ -15,3 +15,21 @@ Websockets.prototype.message = function($websocket, $event){
 	
 }.listenToAppEvents("system-message");
 
+Websockets.prototype.jobFinished = function($websocket, $event){
+
+	if($event.path.length>1 && $event.path[1].key=="receivers" && $event.path[1].value=="me"){
+		// only for me
+		// console.log($event.path[1].value, $event);
+		if($websocket.windowId != $event.source)
+			return;		// not fired by myself
+	}
+
+	$websocket.firePortletEvent("job-finished", {
+		job: $event.params.job
+	});
+	$websocket.firePortletEvent("system-message", {
+		msg: String("Job '" +  $event.params.job + "' finished")
+	});
+	
+}.listenToAppEvents("job-finished");
+
