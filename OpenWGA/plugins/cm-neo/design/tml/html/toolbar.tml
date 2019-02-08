@@ -3,8 +3,7 @@
 		
 		<div class="btn-group">
 			<a class="btn button" href="#" data-toggle="dropdown">
-				<tml:comment><span class="icon fas fa-globe"></span></tml:comment>
-				<img class="icon" src="/static/images/brand/icon_32.png">
+				<img class="icon" src="<tml:url type="static" file="images/brand/icon_32.png"/>">
 				<div class="text">
 					Website
 					<span class="caret"></span>
