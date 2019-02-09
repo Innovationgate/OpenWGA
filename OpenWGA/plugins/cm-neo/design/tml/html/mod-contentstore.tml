@@ -66,11 +66,10 @@
 				</div>
 				<div class="body">
 					<div id="loading" class="loading">
-						Lade Website <span class="dots">...</span>
-						<div class="progress">
-						  <div class="progress-bar progress-bar-striped active" style="width:100%">
-						  </div>
-						</div>					
+						<i class="spinner fa fa-spinner fa-spin"></i>
+						<div style="margin-top:30px">
+							Lade Website <span class="dots">...</span>
+						</div>
 					</div>
 					<div class="sitepanel-wrapper <tml:script expression="profile.scale ? 'scale'+profile.scale : ''"/>">
 						<iframe
