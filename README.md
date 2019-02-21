@@ -1,4 +1,4 @@
-OpenWGA Community Edition Server
+OpenWGA CMS Server
 ================================
 
 Building
@@ -6,12 +6,13 @@ Building
 
 Run
 
-`./gradlew clean build`
-  
+    cd OpenWGA
+    ./gradlew clean build
+
 Distributions are:
 
-- /server/build/libs/openwga-ce.war - The JavaEE web application archive
-- /distros/wgaDeb/distributions/openwga....deb - The debian package
+- OpenWGA/server/build/libs/openwga-[version]-ce.war - The JavaEE web application archive
+- OpenWGA/distros/wgaDeb/distributions/openwga....deb - The debian package
 
 
 Developing in Eclipse
