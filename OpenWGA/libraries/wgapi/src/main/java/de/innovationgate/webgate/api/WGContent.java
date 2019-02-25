@@ -2231,8 +2231,8 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
         }
 
 	    // When the content is in review and the user is approver for it we automatically enable authoring mode
-	    if (content.getStatus().equals(WGContent.STATUS_REVIEW) && content.getWorkflowRole() >= WGWorkflow.ROLE_APPROVER) {
-	        isAuthoringMode = true;
+	    if (content.getStatus().equals(WGContent.STATUS_REVIEW)){
+	    	isAuthoringMode = content.getWorkflowRole() >= WGWorkflow.ROLE_APPROVER;
 	    }
 	    
 	    // A user below ACL level author cannot use authoring mode
