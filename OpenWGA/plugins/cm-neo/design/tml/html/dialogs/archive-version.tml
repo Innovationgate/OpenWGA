@@ -5,31 +5,38 @@
 	var dbkey = meta("db", "dbkey");
 	var struct = content().structEntry;
 
-	content().archive("");
-	//console.log("archived");
-	
-	var clist=AFW.structentry(structkey).getAllContent(lang, false);
-	if(clist.isEmpty()){
-		var url = WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL())
-		url.setParameter({
-			dbkey: dbkey,
-			structkey: structkey,
-			lang: lang
-		})
-		portlet.fireevent("close-dialog", {
-			redirectto: url.build()
-		})
-		portlet.fireevent("struct-updated", App.getStructData(struct))
+	try{
+
+		content().archive("");
+		//console.log("archived");
+		
+		var clist=AFW.structentry(structkey).getAllContent(lang, false);
+		if(clist.isEmpty()){
+			var url = WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL())
+			url.setParameter({
+				dbkey: dbkey,
+				structkey: structkey,
+				lang: lang
+			})
+			portlet.fireevent("close-dialog", {
+				redirectto: url.build()
+			})
+			portlet.fireevent("struct-updated", App.getStructData(struct))
+		}
+		else {
+			var doc = context(clist.get(0));
+			//console.log("redirct to version", doc.VERSION);
+			portlet.fireevent("close-dialog", {
+				redirectto: doc.contenturl("html", null, true)
+			})
+			portlet.fireevent("struct-updated", App.getStructData(doc))
+		}
+		_dialog_closed=true
 	}
-	else {
-		var doc = context(clist.get(0));
-		//console.log("redirct to version", doc.VERSION);
-		portlet.fireevent("close-dialog", {
-			redirectto: doc.contenturl("html", null, true)
-		})
-		portlet.fireevent("struct-updated", App.getStructData(doc))
+	catch(e){
+		logException(e);
+		_error_msg = e.message
 	}
-	_dialog_closed=true
 </tml:action>
 
 <tml:case isfalse="_dialog_closed">
@@ -39,6 +46,9 @@
 	</div>
 	
 	<div class="content form-horizontal">
+	
+		<tml:item name="_error_msg" wrap="div" wrap_class="alert alert-danger"/>
+	
 		<tml:[form-field] o_label="Titel">
 			<tml:metadata name="title"/>
 		</tml:[form-field]>
