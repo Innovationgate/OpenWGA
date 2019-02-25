@@ -38,7 +38,7 @@ public class WGRestrictionException extends WGAPIException {
     }
     
     public WGRestrictionException(String msg, String code, WGDocumentKey cause) {
-        super(msg, code);
+        super(msg, code, cause);
     }
 
     public WGRestrictionException(String msg, Throwable cause) {
