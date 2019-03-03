@@ -76,8 +76,6 @@ public class WriteVersionTask extends BuildInformationTask {
             if (target == null) {
                 throw new BuildException("You must specify an attribute target!");
             }
-            String buildType = getProject().getProperty("build.type");
-            
     
             // Create signature consisting of builder name and date/time of build
             String userName = getProject().getProperty("wga.builduser");
