@@ -769,7 +769,7 @@ public class WGPDispatcher extends HttpServlet {
             }
 
             if (iPathType == WGPRequestPath.TYPE_UNKNOWN_CONTENT) {
-                sendNoContentNotification(path, request, response, path.getDatabase(), true);
+                sendNoContentNotification(path, request, response, path.getDatabase());
                 return;
             }
 
@@ -1155,7 +1155,7 @@ public class WGPDispatcher extends HttpServlet {
         if (content != null) {
 
             if (!content.mayBePublished(isBrowserInterface(session) || isAuthoringMode(database.getDbReference(), session), WGContent.DISPLAYTYPE_NONE)) {
-                sendNoContentNotification(path, request, response, database, false);
+                sendNoContentNotification(path, request, response, database);
                 return;
             }
 
@@ -1501,9 +1501,9 @@ public class WGPDispatcher extends HttpServlet {
         return ajaxInfo;
     }
 
-    private void sendNoContentNotification(WGPRequestPath path, javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, WGDatabase database, boolean mayRedirectToLogin)
+    private void sendNoContentNotification(WGPRequestPath path, javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, WGDatabase database)
             throws IOException, HttpErrorException, WGException {
-        if (mayRedirectToLogin && request.getQueryString() != null && request.getQueryString().toLowerCase().indexOf("login") != -1 && (!database.isSessionOpen() || database.getSessionContext().isAnonymous())) {
+    	if(request.getParameter("login")!=null && (!database.isSessionOpen() || database.getSessionContext().isAnonymous())){
             sendRedirect(request, response, getLoginURL(request, database, path.getCompleteURL()));
         }
         else {
