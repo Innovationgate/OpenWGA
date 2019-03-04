@@ -70,8 +70,15 @@
 				<div class="content-words" style="width:50%;float:left">
 					<h4>TOP 10 Begriffe</h4>
 				</div>
-				<div class="stats" style="width:50%;float:left">
-					<h4>Statistik</h4>
+				<div style="width:50%;float:left">
+					<h4>Schlüsselwörter</h4>
+					<div>
+						<tml:script divider="<br>">
+							return metalist("keywords").size() ? metalist("keywords") : "- keine -"
+						</tml:script>
+					</div>
+					<h4 style="margin-top:20px">Statistik</h4>
+					<div class="stats"></div>
 				</div>
 			</div>
 			<div class="tab-pane" id="seo-w3c">
