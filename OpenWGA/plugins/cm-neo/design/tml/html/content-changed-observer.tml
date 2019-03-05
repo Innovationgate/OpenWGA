@@ -4,8 +4,6 @@
 	var dbkey = request.getParameter("dbkey")
 	var language = request.getParameter("language")
 
-	console.log(dbkey, contentkey, language, db(dbkey).getDefaultLanguage())
-
 	if(dbkey && (!structkey || structkey=="null")){
 		var event = createevent("content-changed")
 		event.setParameter("dbkey", dbkey)
