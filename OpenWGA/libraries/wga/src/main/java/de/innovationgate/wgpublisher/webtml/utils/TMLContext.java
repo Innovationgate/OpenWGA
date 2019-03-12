@@ -5468,4 +5468,9 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     	return false;
     }
 
+	@Override
+	public String loginurl() throws WGException {
+        return getURLBuilder().buildLoginURL(db(), getrequest(), contenturl());
+	}
+
 } 
