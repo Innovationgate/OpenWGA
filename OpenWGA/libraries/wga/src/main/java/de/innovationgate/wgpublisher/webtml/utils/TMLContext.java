@@ -998,22 +998,29 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     @CodeCompletion
     public String highlightitem(String name, String prefix, String suffix, String encode) throws WGAPIException {
         if (name == null) {
-            return itemTextValue(name, encode);
+            return null;
         }
+        
+        // lowercase name
+        name = name.toLowerCase();           
+
+        // retrieve itemtext
+        String originalText = itemTextValue(name, encode);        
+        if (originalText == null) {
+            return null;
+        }
+        
         if (!getwgacore().isLuceneEnabled()) {
             addwarning("Unable to highlight item '" + name + "' bc. lucene is not enabled.");
-            return itemTextValue(name, encode);
+            return originalText;
         }
         // try to retrieve last lucene query for highlighting
         org.apache.lucene.search.Query query = (org.apache.lucene.search.Query) getrequest().getSession().getAttribute(Query.SESSION_ATTRIBUTE_SIMPLIFIED_LUCENEQUERY);
         if (query == null) {
             // no query in session - highlighting not possible
             addwarning("Lucene highlighting not possible because there is no query with enabled highlighting support");
-            return itemTextValue(name, encode);
+            return originalText;
         }
-        
-        // lowercase name
-        name = name.toLowerCase();           
         
         // create htmlformatter to highlight fragments with "$HIGHLIGHT_PREFIX$", "$HIGHLIGHT_SUFFIX$"
         // these placeholders are later on replaced by the given prefix and suffix
@@ -1025,12 +1032,6 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 
         // create highlighter
         Highlighter highlighter = getwgacore().getLuceneManager().createHighlighter(name, query, formatter);
-        
-        // retrieve itemtext
-        String originalText = itemTextValue(name, encode);        
-        if (originalText == null) {
-            return null;
-        }
         
         // create text to analyze
         LuceneConfiguration config = getwgacore().getLuceneManager().retrieveLuceneConfig(content().getDatabase().getDbReference());
@@ -1045,7 +1046,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         highlighter.setTextFragmenter(fragmenter);
                 
         try {
-            String highlighted = highlighter.getBestFragment(tokenStream, originalText.toString());
+            String highlighted = highlighter.getBestFragment(tokenStream, originalText);
             if (highlighted != null) {
             	// replace highlight placeholders with correct prefix and suffix
             	highlighted = WGUtils.strReplace(highlighted, prefixPlaceholder, prefix, true);
@@ -1053,17 +1054,14 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 
             	return highlighted;
             } 
-            else {
-                return itemTextValue(name, encode);
-            }
-            }
+        }
         catch (IOException e) {
             addwarning("Unable to highlight item '" + name + "' bc. of exception '" + e.getMessage() + "'.");
-            return itemTextValue(name, encode);
         } catch (InvalidTokenOffsetsException e) {
         	addwarning("Unable to highlight item '" + name + "' bc. of exception '" + e.getMessage() + "'.");
-            return itemTextValue(name, encode);
-		}                
+		}   
+        
+        return originalText;
 
     }
 
@@ -1097,17 +1095,21 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	@CodeCompletion
     public List highlightMeta(String name, String prefix, String suffix, String encode) throws WGAPIException {
         if (name == null) {
-            return metalist(name);
+            return null;
         }
+        
+        String originalText = metaTextValue(name, encode);
+        List<String> originalTextAsList = Collections.singletonList(originalText);
+        
         if (!getwgacore().isLuceneEnabled()) {
             addwarning("Unable to highlight meta '" + name + "' bc. lucene is not enabled.");
-            return metalist(name);
+            return originalTextAsList;
         }
         // try to retrieve last lucene query for highlighting
         org.apache.lucene.search.Query query = (org.apache.lucene.search.Query) getrequest().getSession().getAttribute(Query.SESSION_ATTRIBUTE_SIMPLIFIED_LUCENEQUERY);
         if (query == null) {
             // no query in session - highlighting not possible
-            return metalist(name);
+            return originalTextAsList;
         }
                 
         // create htmlformatter to highlight fragments with "$HIGHLIGHT_PREFIX$", "$HIGHLIGHT_SUFFIX$"
@@ -1119,12 +1121,6 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 
         // create highlighter
         Highlighter highlighter = getwgacore().getLuceneManager().createHighlighter(name.toUpperCase(), query, formatter);
-        
-        // retrieve metatext
-        String originalText = metaTextValue(name, encode);        
-        if (originalText == null) {
-            return metalist(name);
-        }
         
         // create tokenstream
         TokenStream tokenStream = getwgacore().getLuceneManager().createTokenStream(originalText, content());
@@ -1143,15 +1139,15 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
             	            	
                 return Collections.singletonList(highlighted);
             } else {
-                return metalist(name);
+                return originalTextAsList;
             }
         } catch (IOException e) {
             addwarning("Unable to highlight meta '" + name + "' bc. of exception '" + e.getMessage() + "'.");
-            return metalist(name);
+            return originalTextAsList;
         } catch (InvalidTokenOffsetsException e) {
         	addwarning("Unable to highlight meta '" + name + "' bc. of exception '" + e.getMessage() + "'.");
-            return metalist(name);
-		}                
+        	return originalTextAsList;
+		}
 
     }
     
@@ -1342,24 +1338,18 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         
         
         // Optionally encode
-        String finalText;
-        if (encode != null && !encode.equals("none") && true) {
+        String finalText = text.toString();
+        if (encode != null && !encode.equals("none")) {
             try {
-                finalText = multiencode(encode, text.toString());
+                finalText = multiencode(encode, finalText);
             }
             catch (FormattingException e) {
                 addwarning("Unable to highlight item '" + name + "' bc. of formating exception '" + e.getMessage() + "'.");
-                return itemTextValue(name, null);
             }
         }
-        else {
-            finalText = text.toString();
-        }
-        
-        
+
         return finalText;
         
-
     }
     
     
@@ -1401,21 +1391,17 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         }
         
         // Optionally encode
-        String finalText;
-        if (encode != null && !encode.equals("none") && true) {
+        String finalText = text.toString();
+        if (encode != null && !encode.equals("none")) {
             try {
-                finalText = multiencode(encode, text.toString());
+                finalText = multiencode(encode, finalText);
             }
             catch (FormattingException e) {
                 addwarning("Unable to highlight meta '" + name + "' bc. of formating exception '" + e.getMessage() + "'.");
-                return metaTextValue(name, null);
             }
         }
-        else {
-            finalText = text.toString();
-        }
         
-        return text.toString();
+        return finalText;
         
     }
     
