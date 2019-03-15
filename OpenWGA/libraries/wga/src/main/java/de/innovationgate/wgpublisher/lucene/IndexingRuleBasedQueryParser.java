@@ -127,15 +127,15 @@ public class IndexingRuleBasedQueryParser extends MultiFieldQueryParser {
 
     @Override
     protected Query getPrefixQuery(String field, String termStr) throws ParseException {
-        if (field!=null && (isMetaKeywordField(field) || isIndexedAsKeyword(field)) ){
-            if (!getAllowLeadingWildcard() && termStr.startsWith("*")) {
-                throw new ParseException("'*' not allowed as first character in PrefixQuery");
-            }
-            Term t = new Term(field, termStr);
-            return newPrefixQuery(t);
-        } else {
-            return super.getPrefixQuery(field, termStr);
-        }
+    	
+    	if(field!=null && !isMetaKeywordField(field) && !isIndexedAsKeyword(field)){
+    		// Use Analyser to stem term
+	    	Query q = getFieldQuery(field, termStr, false);
+	    	if(q!=null)	// may be a stopword
+	    		termStr = q.toString(field);
+    	}
+    	return super.getPrefixQuery(field, termStr);
+    	
     }
 
     /**
