@@ -2,8 +2,6 @@ function Renderer() {}
 
 Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey, $urlParam_structkey ) {
 	
-	console.log($urlParam_dbkey, $urlParam_contentkey, $urlParam_structkey)
-	
 	var result = {}
 
 	var c = context("db:" + $urlParam_dbkey + "/docid:" + $urlParam_contentkey, false)
