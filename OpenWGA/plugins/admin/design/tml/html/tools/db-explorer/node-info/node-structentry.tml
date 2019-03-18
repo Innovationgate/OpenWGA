@@ -155,7 +155,7 @@
 				</tml:then>
 				<tml:else>
 					<label>Title:</label>		
-					<div class="data"><tml:script expression="_Struct.getTitle()"/></div>		
+					<div class="data"><tml:script expression="_Struct.getTitle()" encode="html"/></div>		
 					<div class="clear"></div>		
 				</tml:else>
 			</tml:if>
@@ -223,15 +223,15 @@
 							<tml:then>
 								<tml:include designdb="@ui" ref="tr">
 									<tml:option name="ajaxaction">
-								    	WGA.ajax.callAction('<tml:action param1="{'db:'+option('key')+'/docid:'+KEY}" param2="{(TITLE||KEY) + ' ('+VERSION+')'}">
+								    	WGA.ajax.callAction('<tml:action param1="{'db:'+option('key')+'/docid:'+KEY}" param2="{WGA.encode('html', TITLE||KEY) + ' ('+VERSION+')'}">
 									    		var tabview=createObject("@ui/tabview", portlet);
 												tabview.addPage("tools:db-explorer:node-info:content:portlet", tmlparam1, tmlparam2);
 								    		</tml:action>', '<tml:script expression="portlet.portletkey"/>')
 									</tml:option>
 								</tml:include>
-									<td><tml:meta name="title"/></td>
+									<td><tml:meta name="title"  encode="html"/></td>
 									<tml:foreach type="itemvalue" item="_metas" currentvalue="_meta">		
-										<td><tml:metadata name="{_meta}" divider=","/></td>		
+										<td><tml:metadata name="{_meta}" divider=","  encode="html"/></td>		
 									</tml:foreach>		
 								</tr>
 							</tml:then>
@@ -239,7 +239,7 @@
 								<tr>
 									<td><i>Not visible for user <tml:meta type="db" name="username"/></i></td>
 									<tml:foreach type="itemvalue" item="_metas" currentvalue="_meta">		
-										<td><tml:metadata name="{_meta}" divider=","/></td>		
+										<td><tml:metadata name="{_meta}" divider="," encode="html"/></td>		
 									</tml:foreach>
 								</tr>
 							</tml:else>

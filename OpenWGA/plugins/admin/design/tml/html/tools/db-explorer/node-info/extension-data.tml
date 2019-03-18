@@ -12,7 +12,7 @@
 				
 			<label><tml:item name="_extension_data_name"/>:</label>			
 			<div class="data">			
-				<tml:script>		
+				<tml:script encode="html">		
 					return _document.getExtensionData(_extension_data_name)		
 				</tml:script>			
 			</div>			

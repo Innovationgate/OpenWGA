@@ -133,7 +133,7 @@
 							    </tml:option>
 						    </tml:include>
 						      <TD><tml:meta name="KEY"/></TD>		
-						      <TD><tml:meta name="title"/></TD>
+						      <TD><tml:meta name="title" encode="html"/></TD>
 						      <td><tml:meta name="CREATED"/></td>		           
 						      <td><tml:meta name="LASTMODIFIED"/></td>		               
 						      <td><tml:meta name="STATUS"/></td>

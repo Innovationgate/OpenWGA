@@ -9,7 +9,7 @@
 	<fieldset>
 		<tml:foreach type="itemvalue" item="_metas" currentvalue="_meta">
 			<label><tml:item name="_meta"/>:</label>
-			<div class="data"><tml:script expression="document.getMetaDataList(_meta)" divider="<br>"/></div>
+			<div class="data"><tml:script expression="document.getMetaDataList(_meta)" divider="<br>" encode="html"/></div>
 			<div class="clear"></div>
 		</tml:foreach>
 	</fieldset>	

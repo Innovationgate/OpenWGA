@@ -35,7 +35,7 @@
 				<tml:case condition="meta(_key)">		
 					<label><tml:item name="_key"/>:</label>			
 					<div class="data">			
-						<tml:meta name="{_key}" divider=", "/>							
+						<tml:meta name="{_key}" divider=", " encode="html"/>							
 					</div>			
 					<div class="clear"></div>		
 				</tml:case>		
