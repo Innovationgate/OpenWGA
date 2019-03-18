@@ -11,6 +11,9 @@ dependencies {
     
     compile fileTree(dir: '../../customLibs/datedFileAppender', include: ['*.jar'])
     compile 'xerces:xercesImpl:2.11.0'
+
+	// this avoids fop XML parsing warnings like accessExternalDTD and entityExpansionLimit:    
+	compile 'xalan:xalan:2.7.2'
     
     compile 'org.apache.lucene:lucene-core:3.5.0'
     compile 'org.apache.lucene:lucene-analyzers:3.5.0'
