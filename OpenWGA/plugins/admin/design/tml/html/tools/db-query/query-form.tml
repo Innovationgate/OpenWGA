@@ -33,7 +33,7 @@
 	tmlform.removeField("items");
 </tml:action>
 
-<tml:form id="_queryParameter" source="portlet" htmlinput="ignore">
+<tml:form id="_queryParameter" source="portletsessionvars" htmlinput="ignore">
 
 	<tml:script>
 		if(_uid && tmlform.db!=_uid){
