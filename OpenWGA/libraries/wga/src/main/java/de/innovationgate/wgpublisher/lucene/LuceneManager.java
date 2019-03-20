@@ -71,6 +71,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.TermEnum;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.QueryParser.Operator;
@@ -3107,6 +3108,49 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     public WGDatabaseRevision getDatabaseUpdateStatus(String dbKey) {
         return _indexConfig.getLastUpdated(dbKey);
     }
+
+    public Directory getLuceneDirectory(){
+    	return _indexDirectory;
+    }
+
+    public class LuceneTerm{
+    	String _text;
+    	int _freq;
+    	
+    	public LuceneTerm(String t, int f){
+    		_text=t;
+    		_freq=f;
+    	}
+    	public String text(){
+    		return _text;
+    	}
+    	public int freq(){
+    		return _freq;
+    	}
+    	public String toString(){
+    		return _text + ": " + _freq;
+    	}
+    	
+    }
     
-    
+    public List<LuceneTerm> getTerms(String fieldname) throws CorruptIndexException, IOException{
+    	IndexReader reader = IndexReader.open(_indexDirectory);
+    	TermEnum terms = reader.terms();
+    	List<LuceneTerm> uniqueTerms = new ArrayList<LuceneTerm>();
+    	
+    	while (terms.next()) {
+            Term term = terms.term();
+            if (term.field().equals(fieldname)) {
+            	uniqueTerms.add(new LuceneTerm(term.text(), terms.docFreq()));
+            }
+    	}
+
+    	reader.close();
+    	return uniqueTerms;
+    }
+
+    public List<LuceneTerm> getTerms() throws CorruptIndexException, IOException{
+    	return getTerms(INDEXFIELD_ALLCONTENT);
+    }
+
 }
