@@ -289,20 +289,25 @@ public class Root extends Base {
         
         // Determine, which (if any) document can be edited in this request
         if (getTMLContext().isbrowserinterface()) {
-        	WGContent content = this.getTMLContext().content();				
-        					
-        	List<String> userNamesList = new ArrayList<String>();
-        	userNamesList.add(content.getAuthor());
-        	
-        	if ( content.getStatus().equals(WGContent.STATUS_DRAFT)
-        		&& content.mayEditContent()
-        		&& content.getDatabase().isMemberOfUserList(userNamesList)
-        		&& !content.hasItem("remote_info")
-        		&& request.getParameter(WGACore.URL_PARAM_CLEAN)==null
-        		&& !(content.hasCompleteRelationships() && content.getStructEntry().getArea().getName().equals("$trash"))
-        		) {			        		
-        			request.setAttribute(WGACore.ATTRIB_EDITDOCUMENT, content.getContentKey().toString());
-        		}
+        	try{
+	        	WGContent content = this.getTMLContext().content();				
+	        					
+	        	List<String> userNamesList = new ArrayList<String>();
+	        	userNamesList.add(content.getAuthor());
+	        	
+	        	if ( content.getStatus().equals(WGContent.STATUS_DRAFT)
+	        		&& content.mayEditContent()
+	        		&& content.getDatabase().isMemberOfUserList(userNamesList)
+	        		&& !content.hasItem("remote_info")
+	        		&& request.getParameter(WGACore.URL_PARAM_CLEAN)==null
+	        		&& !(content.hasCompleteRelationships() && content.getStructEntry().getArea().getName().equals("$trash"))
+	        		) {			        		
+	        			request.setAttribute(WGACore.ATTRIB_EDITDOCUMENT, content.getContentKey().toString());
+	        	}
+        	}
+        	catch(Exception e){
+        		// content deleted? die quite
+        	}
         }
         
         // Eventually load WGA error object as variable

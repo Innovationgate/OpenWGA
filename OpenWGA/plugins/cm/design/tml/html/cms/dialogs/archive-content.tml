@@ -23,6 +23,7 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 <tml:action id="archiveContent">
+
 	var dbkey=option("dbkey");
 	var contentkey=option("contentkey");
 	
@@ -31,6 +32,7 @@
 	var cdoc = database.getContentByKey(contentkeyObject);				
 	var sdoc=cdoc.getStructEntry();
 	try{
+
 		cdoc.archive(tmlform.comment);
 		
 		_actionDone=true;
@@ -67,6 +69,11 @@
 
 <tml:form id="archive-content-form" source="none">
 	
+	<tml:case condition="tmlform.hasmessages()">
+		<div class="warning"><b><tml:formmessages divider="<br/>"/></b></div>
+		<hr size="1">
+	</tml:case>		
+
 	<script>
 		// submit function called from dialog handler and on RETURN
 		BI.dialog.submit=function(){

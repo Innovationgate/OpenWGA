@@ -7,7 +7,7 @@
 	if(dbkey && (!structkey || structkey=="null")){
 		var event = createevent("content-changed")
 		event.setParameter("dbkey", dbkey)
-		event.setParameter("language", language || db(dbkey).getDefaultLanhguage())
+		event.setParameter("language", language || db(dbkey).getDefaultLanguage())
 		portlet.fireevent(event)
 		return;
 	}

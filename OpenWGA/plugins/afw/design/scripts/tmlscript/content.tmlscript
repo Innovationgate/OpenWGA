@@ -257,9 +257,7 @@ this.mayDeleteContent=function(){
 }
 
 this.mayArchiveContent=function(){
-	//return this.mayEditContent() && content.getStatus()==content.STATUS_RELEASE;
-	return this.mayDeleteContent() && 
-		(content.getStatus()==content.STATUS_RELEASE || content.getStatus()==content.STATUS_DRAFT)
+	return this.mayEditContent() && (content.getStatus()==content.STATUS_RELEASE || content.getStatus()==content.STATUS_DRAFT);
 }
 
 this.mayDeletePage=function(){

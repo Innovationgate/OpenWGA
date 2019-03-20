@@ -87,6 +87,13 @@ public interface Context {
     public abstract void appendvar(String name, Object value) throws WGAPIException;
 
     /**
+     * Returns a URL to the content document in context using login parameter
+     */
+    @CodeCompletion(preferredCase="loginURL")
+    public abstract String loginurl() throws WGException;
+    
+    
+    /**
      * Provides the WGAPI object "WGContent" which represents the current content document in context
      */
     @CodeCompletion

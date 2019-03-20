@@ -235,7 +235,7 @@
 						<tml:else>
 							<label>Result:</label>
 							<div class="data">						
-								<tml:item name="_result" divider="<br>"/>
+								<tml:item name="_result" divider="<br>" encode="html"/>
 							</div>
 							<div class="clear"></div>
 							

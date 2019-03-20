@@ -178,18 +178,14 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 			WGA.event.fireEvent('CMS_cancel_item_edit')
 		}
 
-		,"change-user": function(){
-			CM.openDialog('change-user');
-		},
-
-		"scale": function(button){
+		,"scale": function(button){
 			var scale = button.data("scale")
 			Sitepanel.scale(scale)
 			button.parents(".btn-group").find(".icon").html(scale+"%");
 			WGA.event.fireEvent("scale", "*", {scale:scale})
-		},
+		}
 
-		"toggle-appnav": function(button){
+		,"toggle-appnav": function(button){
 			$('#page').toggleClass('appnav')
 			button.html("Panel " + ($('#page').hasClass("appnav") ? "ausblenden" : "einblenden"))
 		},

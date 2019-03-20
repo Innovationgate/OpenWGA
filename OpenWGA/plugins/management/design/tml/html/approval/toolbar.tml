@@ -12,10 +12,17 @@
 			</a>
 		</tml:case>
 
-		<a class="btn button" href="<tml:script expression="CM.getAuthoringURL(option('dbkey'), option('key'))"/>">
+		<a class="btn button" href="<tml:script>
+			return WGA.urlBuilder(meta("request", "wgaurl") + "contentmanager")
+				.setParameter({
+					dbkey: option('dbkey'),
+					contentkey: option('key')
+				}).build()
+		</tml:script>#<tml:option name="dbkey"/>/<tml:option name="key"/>">
 			<span class="icon glyphicon glyphicon-open"></span>
 			<div class="text">Im Content Manager öffnen</div>
 		</a>
+		
 	</tml:case>
 	
 </div>

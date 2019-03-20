@@ -88,7 +88,12 @@ define(["jquery"], function($){
 
 	editor.prototype={
 		html: function(html){
-			return arguments.length ? this.el.html(html) : this.el.html()
+			if(arguments.length)
+				this.el.html(html)
+			else {
+				$("img", this.el).removeClass("womodo-img-selected")
+				return this.el.html()
+			}
 		},
 		close: function(){
 			this.el.off()

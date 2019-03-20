@@ -413,6 +413,12 @@ public class Lucene {
     }
 
     @CodeCompletion
+    public List<String> highlightLuceneField(String field, String originalText, String prefix, String suffix, String encoder) throws WGException, FormattingException{
+    	String encodedText = WGA.get(_cx).encode(encoder, originalText);
+    	return highlightLuceneField(field, encodedText, prefix, suffix);
+    }
+    
+    @CodeCompletion
     public List<String> highlightLuceneField(String field, String originalText, String prefix, String suffix) throws WGException{
     	WGACore core = _wga.getCore();
         if (!core.isLuceneEnabled()) {

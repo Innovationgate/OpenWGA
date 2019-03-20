@@ -44,6 +44,12 @@
 	}
 
 	var currentContextPath = request.getSession().getAttribute("CM.currentContextPath");
+	
+	if(!currentContextPath){
+		log.error("siteexplorer entry: http session attribute 'CM.currentContextPath' not set");
+		return;
+	}
+	
 	var currentContext=context(currentContextPath);
 	
 	if(currentContext.STRUCTKEY==document.getStructKey())
