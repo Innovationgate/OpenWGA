@@ -4267,7 +4267,13 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         if (contentType == null && getEnvironment().isPageContextAvailable()) {
             // try to determine mime type
             contentType = getwgacore().getServletContext().getMimeType(fileName);            
-        }        
+        }
+        
+        String url = createDataURL(fileData, contentType);
+        if(url.length()>65000){
+        	addwarning("File " + fileName + ": data url size exeeds 65 KB: " + url.length()/1000 + " KB.");
+        }
+        
         return createDataURL(fileData, contentType);        
     }
     
@@ -4285,6 +4291,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         }
         url.append(";base64");
         url.append("," + Base64.encode(data));
+        
         return url.toString();        
     }
     
