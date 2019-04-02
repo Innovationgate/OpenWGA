@@ -2381,6 +2381,12 @@
           <valueHelpEnabled>false</valueHelpEnabled>
         </attribute>
         <attribute>
+          <name>language</name>
+          <required>false</required>
+          <values/>
+          <valueHelpEnabled>false</valueHelpEnabled>
+        </attribute>
+        <attribute>
           <name>param2</name>
           <required>false</required>
           <values/>

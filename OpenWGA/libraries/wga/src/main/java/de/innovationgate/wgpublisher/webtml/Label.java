@@ -26,6 +26,7 @@ package de.innovationgate.wgpublisher.webtml;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import de.innovationgate.webgate.api.WGException;
@@ -76,27 +77,18 @@ public class Label extends Base {
     public String getWebTMLLabel() throws WGException {
 
         Design design = WGA.get(getTMLContext()).design();
-        
+
+    	HashMap<String,Object> config = new HashMap<String,Object>();
+    	config.put("container", getContainer());
+    	config.put("file", getFile());
+    	config.put("params", collectParams());
+
         String language = getLanguage();
         if (language != null) {
-            try {
-                String rawLabel = design.getLabelBundle(getContainer(), getFile(), language).getString(getKey());
-                if (rawLabel != null) {
-                    return design.applyLabelParams(rawLabel, collectParams());
-                }
-                else {
-                    return "#" + getFile() + "." + getKey();
-                }
-            }
-            catch (IOException e) {
-                throw new TMLException("Exception reading label bundle", e, true);
-            }
-            
-        }
-        else {
-            return design.label(getContainer(), getFile(), getKey(), collectParams());
+        	config.put("language", language);
         }
         
+        return design.label(getKey(), config);
         
     }
 
