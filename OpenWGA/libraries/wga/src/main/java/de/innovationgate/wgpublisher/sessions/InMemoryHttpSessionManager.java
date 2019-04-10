@@ -23,8 +23,6 @@ public class InMemoryHttpSessionManager extends AbstractWGAHttpSessionManager {
     private SessionCleanupTask _sessionCleanupTask;
     private Timer _sessionCleanupTimer;
 
-//    private String _jvmRoute;
-
     private class SessionCleanupTask extends TimerTask {
 
         @Override
