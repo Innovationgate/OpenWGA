@@ -39,8 +39,8 @@
 		</tml:script>
 		<script>
 			require(["jquery", 
-				"<tml:url type="tml" name="::js" u_noext=""/>",
-				"async!///maps.googleapis.com/maps/api/js?libraries=weather,places<tml:case condition="_apikey">&key=<tml:item name="_apikey"/></tml:case>"
+				"<tml:url type="tml" name="google-maps" medium="javascripts" u_noext=""/>",
+				"async!//maps.googleapis.com/maps/api/js?libraries=weather,places<tml:case condition="_apikey">&key=<tml:item name="_apikey"/></tml:case>"
 			], function(){
 
 				$(function(){
