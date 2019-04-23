@@ -187,11 +187,15 @@ define([
 			    if(!editor.toolbar)
 			    	return;
 				var dt = e.dataTransfer;
+				var linkEffect = "link";
+				if(dt.effectAllowed.toLowerCase().indexOf("link")<0)
+					linkEffect = "move";	// Safari does not know "link" as effect
 				if(isLinkDrop(dt))
-					dt.dropEffect = "link";				
+					dt.dropEffect = linkEffect;				
 				else if(!isFilesDrop(dt) && !isDesktopDrop(dt))
 					dt.dropEffect = "none"
-				else dt.dropEffect = (e.shiftKey||forceCreateLink() ? "link":"copy");
+				else dt.dropEffect = (e.shiftKey||forceCreateLink() ? linkEffect:"copy");
+				//console.log("dt.dropEffect", dt.dropEffect, dt.effectAllowed)
 			}
 			
 			function dragover(e) {
@@ -238,7 +242,7 @@ define([
 					}
 					else{
 						for(var i=0; i<data.length; i++)
-							insertAttachment(data[i], e.dataTransfer.dropEffect=="link");
+							insertAttachment(data[i], e.dataTransfer.dropEffect=="move" || e.dataTransfer.dropEffect=="link");
 					} 
 					return;
 				}
@@ -275,6 +279,7 @@ define([
 			}
 			
 			function insertAttachment(file, as_link){
+				
 				if(as_link && !editor.toolbar.isCmdDisabled("InsertLink")){
 					var el = editor.createLink(file.url, file.name, file.type||"intfile");
 					editor.setURLInfo(el, {type:file.type||"intfile", key:file.key||file.name})
