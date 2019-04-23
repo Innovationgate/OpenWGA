@@ -1265,7 +1265,7 @@ WGA.ajax.post = function(actionDef, customObj) {
 
 	var divTag = document.getElementById("$ajaxContentDiv_" + actionDef.id);
 	if (divTag != null) {
-		if (actionDef.graydiv == undefined || actionDef.graydiv) {
+		if (actionDef.mode!="norefresh" && (actionDef.graydiv==undefined || actionDef.graydiv)) {
 			window.setTimeout(function(){
 				WGA.util.maskElement(divTag);
 			}, 250);
