@@ -4021,6 +4021,12 @@
           <valueHelpEnabled>false</valueHelpEnabled>
         </attribute>
         <attribute>
+          <name>labellanguage</name>
+          <required>false</required>
+          <values/>
+          <valueHelpEnabled>false</valueHelpEnabled>
+        </attribute>
+        <attribute>
           <name>defaultxpl</name>
           <required>false</required>
           <values>
