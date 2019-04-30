@@ -86,6 +86,7 @@ public class Range extends Base {
     
     private String labelcontainer;
     private String labelfile;
+    private String labellanguage;
     
     private String tmlscope;
     
@@ -248,7 +249,12 @@ public class Range extends Base {
         if (labelFile != null) {
             status.setOption(Base.OPTION_DEFAULT_LABELFILE + getTMLContext().getDesignDBKey(), labelFile, null);
         }
-        
+
+        String labelLanguage = getLabellanguage();
+        if (labelLanguage != null) {
+            status.setOption(Base.OPTION_DEFAULT_LABELLANGUAGE, labelLanguage, null);
+        }
+
         // Set scope information
         String scope = getTmlscope();
         if (scope != null) {
@@ -599,6 +605,20 @@ public class Range extends Base {
      */
     public void setLabelfile(String labelfile) {
         this.labelfile = labelfile;
+    }
+
+    /**
+     * @return Returns the labellanguage.
+     */
+    public String getLabellanguage() {
+        return getTagAttributeValue("labellanguage", labellanguage, null);
+    }
+
+    /**
+     * @param labellanguage The labellanguage to set.
+     */
+    public void setLabellanguage(String labellanguage) {
+        this.labellanguage = labellanguage;
     }
 
     public static Map<String,Long> getCurrentlyEvaluatedCaches() {
