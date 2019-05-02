@@ -34,6 +34,16 @@ define(["jquery"], function($){
 					else editor.insertHTML("\t")
 					ev.preventDefault();
 				}
+				else if(ev.key=="Enter"){
+					var para = editor.getParagraph();
+					if(ev.shiftKey || (para && para.tagName=="PRE")){
+						editor.insertHTML("<br>")
+						ev.preventDefault();
+					}
+					else if(!para){
+						editor.execCmd("formatBlock", "p")
+					}
+				}
 			},
 			"keyup focus click": function(ev){
 				if(editor.toolbar)

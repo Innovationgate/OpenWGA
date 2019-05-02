@@ -200,6 +200,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     public static final String OPTION_RESULT_INTERCEPTORS = SYSTEMOPTION_PREFIX + "resultInterceptors";
     public static final String OPTION_DEFAULT_LABELFILE = SYSTEMOPTION_PREFIX + "defaultlabelbundle:";
     public static final String OPTION_DEFAULT_LABELCONTAINER = SYSTEMOPTION_PREFIX + "defaultlabelcontainer:";
+    public static final String OPTION_DEFAULT_LABELLANGUAGE = SYSTEMOPTION_PREFIX + "defaultlabellanguage";
     public static final String OPTION_INNER_LAYOUT = SYSTEMOPTION_PREFIX + "innerlayout";
     public static final String OPTION_PORTLET_EVENT_STARTINDEX = SYSTEMOPTION_PREFIX + "portletEventStartIndex";
     public static final String OPTION_WEBTML_SCOPE = SYSTEMOPTION_PREFIX + "webtmlScope";

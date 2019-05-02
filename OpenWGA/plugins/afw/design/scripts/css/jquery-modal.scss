@@ -25,8 +25,13 @@ body{
 		position: fixed;
 		overflow: auto;
 		z-index: 102;
+		
 		width: 600px;
 		margin-left: -300px;
+		&.large{
+			width: 800px;
+			margin-left: -400px;
+		}
 				
 		top: 10%;
 		left: 50%;

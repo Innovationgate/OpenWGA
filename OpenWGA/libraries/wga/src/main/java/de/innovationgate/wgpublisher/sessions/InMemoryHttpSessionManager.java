@@ -23,8 +23,6 @@ public class InMemoryHttpSessionManager extends AbstractWGAHttpSessionManager {
     private SessionCleanupTask _sessionCleanupTask;
     private Timer _sessionCleanupTimer;
 
-//    private String _jvmRoute;
-
     private class SessionCleanupTask extends TimerTask {
 
         @Override
@@ -42,7 +40,11 @@ public class InMemoryHttpSessionManager extends AbstractWGAHttpSessionManager {
                         }
                         invalidateSession(session);
                         sessions.remove();
-                    } else if (session.isNew() && (System.currentTimeMillis() - session.getCreationTime()) >= 1000*60) {
+                    } 
+                    /*
+                     * The following code doen't make sense to me.
+                     * The consequence is that the first request in a new session must be finished in one minute. Otherwise we get errors.
+                    else if (session.isNew() && (System.currentTimeMillis() - session.getCreationTime()) >= 1000*10) {
                         // invalidate not joined sessions early
                         if (isDebug()) {
                             getCore().getLog().info("InMemoryHttpSessionManager.SessionCleanupTask invalidating session '" + session.getId()  + "' - early cleanup");
@@ -50,6 +52,7 @@ public class InMemoryHttpSessionManager extends AbstractWGAHttpSessionManager {
                         invalidateSession(session);
                         sessions.remove();
                     }
+                    */
                 }
             } catch (Throwable e) {
                 getCore().getLog().error("InMemoryHttpSessionManager.SessionCleanupTask failed.", e);

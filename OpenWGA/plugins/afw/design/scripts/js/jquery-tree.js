@@ -447,7 +447,7 @@
 						drag_el.addClass("dragging");
 						mayDrop=true;
 						
-						//e.originalEvent.dataTransfer.effectAllowed = "copyLink"
+						e.originalEvent.dataTransfer.effectAllowed = "link"
 						try{
 							// added try-catch because IE does not support this.
 							e.originalEvent.dataTransfer.setDragImage(drag_img, 0, 0);

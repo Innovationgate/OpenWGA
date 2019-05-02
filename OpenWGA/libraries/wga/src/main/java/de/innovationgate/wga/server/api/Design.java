@@ -439,6 +439,9 @@ public class Design {
         
         String label = null;
         String forceLanguage = (String)config.get("language");
+        if(forceLanguage==null && _wga.isTMLContextAvailable()) {
+           	forceLanguage = (String) _wga.tmlcontext().option(Base.OPTION_DEFAULT_LABELLANGUAGE);
+        }
         if(forceLanguage==null)
         	forceLanguage = (String) designDB.getAttribute(WGACore.DBATTRIB_FORCE_LABEL_LANGUAGE);
         if (forceLanguage != null) {
