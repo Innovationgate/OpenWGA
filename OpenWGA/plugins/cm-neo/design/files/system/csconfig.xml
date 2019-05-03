@@ -48,9 +48,9 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>6</minorVersion>
-        <maintenanceVersion>7</maintenanceVersion>
+        <maintenanceVersion>8</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>683</buildVersion>
+        <buildVersion>684</buildVersion>
       </version>
     </id>
     <title>OpenWGA Content Manager</title>
