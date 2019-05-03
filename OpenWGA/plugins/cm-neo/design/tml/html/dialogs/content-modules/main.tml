@@ -108,15 +108,17 @@
 				<tml:script>
 					_mods = CMM.getConfigTMLs();
 				</tml:script>
-				<tml:foreach type="itemvalue" item="_mods" currentvalue="_mod">
-					var mods = [<tml:include designdb="{_mod.dbkey}" ref="{_mod.configtml}"/>]
-					for(var i=0; i<mods.length; i++){
-						var mod = mods[i];
-						var id = mod.id;
-						mod.designdb="<tml:script expression="_mod.dbkey"/>";
-						modules[id]=mod;
-					}
-				</tml:foreach>
+				<tml:range labellanguage="de">
+					<tml:foreach type="itemvalue" item="_mods" currentvalue="_mod">
+						var mods = [<tml:include designdb="{_mod.dbkey}" ref="{_mod.configtml}"/>]
+						for(var i=0; i<mods.length; i++){
+							var mod = mods[i];
+							var id = mod.id;
+							mod.designdb="<tml:script expression="_mod.dbkey"/>";
+							modules[id]=mod;
+						}
+					</tml:foreach>
+				</tml:range>
 				M.init(modules, '<tml:item name="_mod_structure" encode="javascript"/>', 
 					"<tml:option name="mode"/>", 
 					"<tml:script expression="request.section"/>",

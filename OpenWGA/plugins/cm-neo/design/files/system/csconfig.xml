@@ -2,7 +2,7 @@
   <connectionScript>connect</connectionScript>
   <anonymousAccessLevel>10</anonymousAccessLevel>
   <defaultAccessLevel>10</defaultAccessLevel>
-  <versionCompliance>wga7.5</versionCompliance>
+  <versionCompliance>wga7.6</versionCompliance>
   <publisherOptions>
     <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
       <name>DesignEncoding</name>
@@ -97,7 +97,7 @@
   <staticClasspath>false</staticClasspath>
   <minimumWGAVersion>
     <majorVersion>7</majorVersion>
-    <minorVersion>5</minorVersion>
+    <minorVersion>6</minorVersion>
     <maintenanceVersion>0</maintenanceVersion>
     <patchVersion>0</patchVersion>
     <buildVersion>0</buildVersion>

@@ -99,11 +99,12 @@
 			</tml:script>
 	
 			<div>
-				<tml:include designdb="{_designdb}" ref="{_tml}" o_ns="{tmlform.mod_id}" tmlscope="{tmlform.mod_id}">
-					<tml:option name="$$wga_defaultlabellanguage">de</tml:option>
-					<tml:option name="parent-scope" expression="tmlform.parent_mod_id"/>
-					<tml:option name="cm_dbkey" expression="context('main').meta('db', 'dbkey')"/>
-				</tml:include>
+				<tml:range labellanguage="de">
+					<tml:include designdb="{_designdb}" ref="{_tml}" o_ns="{tmlform.mod_id}" tmlscope="{tmlform.mod_id}">
+						<tml:option name="parent-scope" expression="tmlform.parent_mod_id"/>
+						<tml:option name="cm_dbkey" expression="context('main').meta('db', 'dbkey')"/>
+					</tml:include>
+				</tml:range>
 			</div>
 		
 		</tml:else>
