@@ -14,8 +14,8 @@
       <uniqueName>de.innovationgate.xfire-server</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>6</minorVersion>
-        <maintenanceVersion>8</maintenanceVersion>
+        <minorVersion>7</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
         <buildVersion>684</buildVersion>
       </version>
