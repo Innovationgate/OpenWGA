@@ -783,7 +783,7 @@ public class Input extends ActionBase implements DynamicAttributes {
     private String getMultiValueDivider() {
         String htmlDivider = getDivider();
         if (htmlDivider == null || htmlDivider.equals("")) {
-        	htmlDivider = "<br/>";
+        	htmlDivider = "<br>";
         }
         return htmlDivider;
     }
