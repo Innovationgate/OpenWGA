@@ -721,7 +721,14 @@ public class Input extends ActionBase implements DynamicAttributes {
 		String optionText;
         Iterator<InputOption> options = this.retrieveInputOptions().iterator();
         
-        boolean doLabelling = stringToBoolean(getLabeled());
+        String labeled = getLabeled();
+        boolean doLabelling = false;
+        boolean wrapWithLabels = false;
+        if(labeled!=null){
+            doLabelling = labeled.equalsIgnoreCase("true");
+            wrapWithLabels = labeled.equalsIgnoreCase("wrap");        	
+        }
+        //boolean doLabelling = stringToBoolean(getLabeled());
         
         // We need an id for option inputs so we can reference them from their labels
         String theId = getId();
@@ -730,8 +737,6 @@ public class Input extends ActionBase implements DynamicAttributes {
         }
         
         int idx=0;
-        
-        
         
 		while (options.hasNext()) {
             InputOption option = options.next();
@@ -752,6 +757,9 @@ public class Input extends ActionBase implements DynamicAttributes {
 			String dynHtml = buildDynamicHtmlAttributes();
 			getTMLContext().removevar("$O_VALUE");
 			
+			if(wrapWithLabels)
+				this.appendResult("<label>");
+				
 			this.appendResult("<input").appendResult(dynHtml).appendResult(optionIdHtml).appendResult(" type=\"").appendResult(type).appendResult("\" name=\"").appendResult(name).appendResult("\" ");
 			this.appendResult(" value=\"").appendResult(WGUtils.encodeHTML(optionValue)).appendResult("\" ");
             
@@ -772,6 +780,9 @@ public class Input extends ActionBase implements DynamicAttributes {
 			else {
 			    this.appendResult(optionText);
 			}
+
+			if(wrapWithLabels)
+				this.appendResult("</label>");
 			
 			if (options.hasNext()) {
 				appendResult(htmlDivider);

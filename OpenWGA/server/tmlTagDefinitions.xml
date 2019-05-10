@@ -2994,19 +2994,13 @@
           <values>
             <string>true</string>
             <string>false</string>
+            <string>wrap</string>
           </values>
           <valueHelpEnabled>false</valueHelpEnabled>
           <validValues>
-            <string>no</string>
-            <string>f</string>
-            <string>t</string>
             <string>true</string>
-            <string>y</string>
-            <string>0</string>
-            <string>yes</string>
-            <string>n</string>
-            <string>1</string>
             <string>false</string>
+            <string>wrap</string>
           </validValues>
         </attribute>        
         <attribute>
