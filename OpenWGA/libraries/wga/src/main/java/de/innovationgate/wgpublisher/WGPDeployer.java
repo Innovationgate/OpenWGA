@@ -334,9 +334,9 @@ public class WGPDeployer implements WGACoreEventListener {
                         String code = WGUtils.strReplace(mod.getCode(), "@{", preProcessor, true);
                 		out.write(code);
                 	}
-                	else LOG.error("unable to <@import " + refStr);
+                	else LOG.error("unable to @{import " + refStr);
 				} catch (WGException e) {
-					LOG.error("unable to <@import " + refStr);
+					LOG.error("unable to @{import " + refStr);
 				}
                 
             }
@@ -628,10 +628,9 @@ public class WGPDeployer implements WGACoreEventListener {
             LOG.error("Error preprocessing WebTML module " + mod.getDocumentKey(), e);
         }
 
-        // Process <@ preprocessor if enabled
+        // Process @{...} preprocessor if enabled
         if(mod.isPreprocess()){
 	        try {
-	        	//code = code.replaceAll("@@([\\w|\\$]+)", "<tml:item name=\"$1\"/>");
 	            PPPreProcessor pppreProcessor = new PPPreProcessor(_core, mod);
 	            code = WGUtils.strReplace(code, "@{", pppreProcessor, true);
 	        }

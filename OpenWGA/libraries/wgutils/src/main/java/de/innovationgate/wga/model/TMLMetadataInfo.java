@@ -16,40 +16,36 @@
 package de.innovationgate.wga.model;
 
 import com.thoughtworks.xstream.annotations.XStreamOmitField;
-
 import de.innovationgate.utils.WGUtils;
 
 /**
  * beans representing information for TMLMetadata
- *
  */
 public class TMLMetadataInfo extends DesignMetadataInfo {
 	
-	private static final String METANAME_CATEGORY = "category";
-
     public static final String XSTREAM_ALIAS = "TMLMetaData";
 
+    private static final String METANAME_CATEGORY = "category";
+    private static final String METANAME_CATEGORIES = "categories";
     private static final String METANAME_DIRECTACCESS = "directaccess";
     private static final String METANAME_PREPROCESS = "preprocess";
-
     private static final String METANAME_CACHEABLE = "cacheable";
-
-    private static final String METANAME_CATEGORIES = "categories";
 
 	private boolean directAccess = true;
 	private boolean cacheable = false;
 	private String category = "";
 	
 	@XStreamOmitField
-	private boolean preprocess=false;
+	private Boolean preprocess=true;
 	
-	public boolean isPreprocess() {
+	
+	public Boolean getPreprocess() {
 		return preprocess;
 	}
-	public void setPreprocess(boolean p){
+	public void setPreprocess(Boolean p){
 		this.preprocess=p;
 	}
-	
+		
 	public boolean isDirectAccess() {
 		return directAccess;
 	}
