@@ -908,7 +908,7 @@
       <bodyNeeded>false</bodyNeeded>
       <bodyRecommended>false</bodyRecommended>
       <multiLineBodyRecommended>false</multiLineBodyRecommended>
-      <attributeNecessary>true</attributeNecessary>
+      <attributeNecessary>false</attributeNecessary>
     </tag>
     <tag>
       <name>if</name>
