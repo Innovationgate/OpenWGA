@@ -1827,18 +1827,9 @@ public class WGADesignConfigurationModel extends AbstractModel {
 			    }
 			} else if (propertyName.equals("minimumWGAVersion")) {
 			    return _csConfig instanceof de.innovationgate.wga.common.beans.csconfig.v4.CSConfig;
-			} else if (propertyName.equals("versionCompliance")) {
-			    return !isOverlay();
 			} else if (propertyName.equals("pluginWGAVersion")) {
 			    return !(_csConfig instanceof de.innovationgate.wga.common.beans.csconfig.v4.CSConfig);
 			}
-//			} else if (propertyName.equals("browsingSecurity")) {
-//			    if (getVersionCompliance().toWGAVersion().isAtLeast(5, 3)) {
-//			        return true;
-//			    } else {
-//			        return false;
-//			    }
-//            }
 		} 
 		return true;
 	}

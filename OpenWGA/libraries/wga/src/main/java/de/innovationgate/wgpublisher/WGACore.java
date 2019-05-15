@@ -7515,7 +7515,7 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
             info.setEnforcedLibraryUpdate(true);
         }
         
-        // If no cxconfig.xml we are finished here
+        // If no csconfig.xml we are finished here
         CSConfig csConfig = info.getCsConfig();
         if (csConfig == null) {
             return;
@@ -7628,14 +7628,11 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
             
         }
         
-        // Set WGA version compliance, either being overridden by the overlay or take it from the base
-        VersionCompliance versionCompliance = null;
-        if (versionCompliance == null) {
-            versionCompliance = VersionCompliance.get(csConfig.getVersionCompliance());
-        }
-        
+        // Set WGA version compliance
         Set firstLevelOptions = (Set) db.getAttribute(DBATTRIB_FIRSTLEVELDBOPTIONS);
-        db.enforceVersionCompliance(versionCompliance.getComplianceString(), !firstLevelOptions.contains(WGDatabase.COPTION_NOITEMBEHAVIOUR));
+        db.enforceVersionCompliance(csConfig.getVersionCompliance(), !firstLevelOptions.contains(WGDatabase.COPTION_NOITEMBEHAVIOUR));
+        if (overlayConfig != null)
+        	db.setOverlayComplianceVersion(overlayConfig.getVersionCompliance());
         
         // Add jobs
         if (!isPluginInitDisabled(db, csConfig)) {
