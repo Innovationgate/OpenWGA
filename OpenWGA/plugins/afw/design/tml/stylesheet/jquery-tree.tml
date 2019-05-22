@@ -38,24 +38,14 @@
 						image: "url('<tml:url type="file" doc="icons" file="add.png"/>') !important",
 						position: "center center !important"
 					}
-				}<tml:comment>,
-				".icon": {
-					background_image: "url('<tml:url type="file" doc="icons" file="page_white_stack.png"/>')"
-				}</tml:comment>
+				}
 			},
 			
 			"&.dragging": {
 				".entry": {
 					background_color: "rgba(255,80,0, .1) !important"
-					<tml:comment>opacity: ".2",
-					color: "white"</tml:comment>
 				}
 			},
-			<tml:comment>"&.drag-over": {
-				".entry": {
-					color: "red"
-				}
-			},</tml:comment>
 			"&.loading": {
 				font_style: "italic",
 				opacity: ".5",
@@ -75,7 +65,9 @@
 					overflow: "hidden",
 					text_overflow: "ellipsis",
 					".link-text": {
-						margin_left: 20
+						margin_left: 20,
+						text_overflow: "ellipsis",
+						overflow_x: "hidden"
 					},
 					".symbol": {
 						width: 20,
