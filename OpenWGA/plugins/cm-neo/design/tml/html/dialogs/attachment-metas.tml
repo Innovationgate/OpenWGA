@@ -49,7 +49,7 @@
 			portlet.filename = filename
 		_file_md = content().getFileMetaData(portlet.filename)
 		_Attachment = AFW.content().attachment(portlet.filename)
-		_derivates = content().getFileDerivates(filename)
+		_derivates = content().getFileDerivates(filename, "poster")
 		_isPrimary = (content().getPrimaryFileName()==filename)
 	</tml:script>
 
@@ -72,7 +72,9 @@
 				}
 			</tml:script>
 			<tml:case condition="_url">
-				<img src="<tml:item name="_url"/>" srcset="<tml:item name="_srcset"/>" title="<tml:script expression="_file_md.mimeType"/>">
+				<a href="<tml:url type="file" file="{portlet.filename}"/>" target="_blank">
+					<img src="<tml:item name="_url"/>" srcset="<tml:item name="_srcset"/>" title="<tml:script expression="_file_md.mimeType"/>">
+				</a>
 			</tml:case>
 			<div class="info">
 				<tml:label key="[filetype.single.{_Attachment.getType().name}]"/>
@@ -80,10 +82,12 @@
 				<tml:script expression="AFW.Util.renderFileSize(_file_md.size)"/>
 				<tml:case condition="_file_md && _file_md.displayWidth>0">
 					<br>
-					<tml:script expression="_file_md.displayWidth"/>
-					x
-					<tml:script expression="_file_md.displayHeight"/>
-					Pixel
+					<a href="<tml:url type="file" file="{portlet.filename}"/>" target="_blank" title="in neuem Fenster öffnen">
+						<tml:script expression="_file_md.displayWidth"/>
+						x
+						<tml:script expression="_file_md.displayHeight"/>
+						Pixel
+					</a>
 				</tml:case>
 				<tml:case condition="_file_md && _file_md.getCustomFieldValue('pageCount')">
 					<tml:script>
@@ -91,15 +95,22 @@
 					</tml:script>
 					<p><tml:script expression="_pages > 1 ? _pages + ' Seiten' : 'Eine Seite'"/></p>
 				</tml:case>
-				<tml:case condition="_file_md.usage=='poster' && _derivates.size()">
-					<p style="margin-top:20px">Derivate:</p>
+				<tml:case condition="_derivates.size()">
+					<p style="margin-top:20px">Poster Derivate:</p>
 	    			<tml:foreach item="_derivates" currentvalue="_derivate" sortexpression="_derivate.size" sortorder="descending">
+	    				<tml:script>
+							_url = WGA.urlBuilder(fileurl(portlet.filename))
+										.setParameter("derivate", "id="+_derivate.id)
+										.build(true);
+	    				</tml:script>
 	    				<div>
-			    			<tml:script expression="_derivate.displayWidth"/>
-			    			x
-			    			<tml:script expression="_derivate.displayHeight"/>
-			    			Pixel,
-			    			<tml:script expression="AFW.Util.renderFileSize(_derivate.size)"/>
+	    					<a href="<tml:item name="_url"/>" target="_blank" title="in neuem Fenster öffnen">
+				    			<tml:script expression="_derivate.displayWidth"/>
+				    			x
+				    			<tml:script expression="_derivate.displayHeight"/>
+				    			Pixel,
+				    			<tml:script expression="AFW.Util.renderFileSize(_derivate.size)"/>
+			    			</a>
 						</div>
 	    			</tml:foreach>
 				</tml:case>
@@ -118,16 +129,16 @@
 	
 	<div class="footer">
 		<div class="pull-left">
-			<a class="btn btn-default" href="<tml:url type="file" file="{portlet.filename}" u_forcedownload="true"/>">
-				<i class="fas fa-download"></i>
-				Download
-			</a>
 			<tml:case condition="_Attachment.isVideo()">
 				<tml:button cssclass="btn btn-default" clickaction="edit-video">
 					<i class="fa fa-edit"></i>
 					Video bearbeiten
 				</tml:button>
 			</tml:case>
+			<a class="btn btn-default" href="<tml:url type="file" file="{portlet.filename}" u_forcedownload="true"/>">
+				<i class="fas fa-download"></i>
+				Download
+			</a>
 		</div>
 		
 		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
