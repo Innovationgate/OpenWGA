@@ -49,7 +49,7 @@
 			portlet.filename = filename
 		_file_md = content().getFileMetaData(portlet.filename)
 		_Attachment = AFW.content().attachment(portlet.filename)
-		_derivates = content().getFileDerivates(filename, "poster")
+		_derivates = content().getFileDerivates(filename, ["poster"])
 		_isPrimary = (content().getPrimaryFileName()==filename)
 	</tml:script>
 

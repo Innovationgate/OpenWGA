@@ -2960,7 +2960,7 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
      * @return List of derivate metadata objects
      * @throws WGAPIException
      */
-    public List<WGFileDerivateMetaData> getFileDerivates(String fileName, String usage) throws WGAPIException {
+    public List<WGFileDerivateMetaData> getFileDerivates(String fileName, List<String> usage) throws WGAPIException {
         
         List<WGFileDerivateMetaData> all_derivates = getCore().getFileDerivates(fileName);
         if (all_derivates == null) {
@@ -2969,7 +2969,7 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
         else if(usage!=null){
         	List<WGFileDerivateMetaData> derivates = new ArrayList<WGFileDerivateMetaData>();
         	for (WGFileDerivateMetaData md : all_derivates) {
-				if(md.getUsage().equalsIgnoreCase(usage))
+        		if(usage.contains(md.getUsage()))
 					derivates.add(md);
 			}
         	return derivates;
