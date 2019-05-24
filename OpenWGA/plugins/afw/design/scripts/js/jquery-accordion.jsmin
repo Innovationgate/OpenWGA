@@ -18,6 +18,8 @@
 				panel.trigger("activated", [this, index]);
 			}
 		});
+		// give child elements a chance to resize if necessary:
+		$(window).trigger("resize");
 	}
 
 	function activate(el, index){
