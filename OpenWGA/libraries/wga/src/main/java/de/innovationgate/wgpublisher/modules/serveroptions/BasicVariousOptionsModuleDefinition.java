@@ -72,7 +72,7 @@ public class BasicVariousOptionsModuleDefinition implements ModuleDefinition, Re
         OptionDefinitionsMap options = new OptionDefinitionsMap();
         
         LocalizedOptionDefinition defaultAutoringApp = new LocalizedOptionDefinition(WGACore.SERVEROPTION_DEFAULT_AUTHORING_APP, AuthoringAppOptionType.INSTANCE, _bundleLoader);
-        defaultAutoringApp.setDefaultValue("plugin-contentmanager");
+        defaultAutoringApp.setDefaultValue("plugin-cm-neo");
         options.addOption(defaultAutoringApp);
 
         LocalizedOptionDefinition outputEncoding = new LocalizedOptionDefinition(WGAConfiguration.SERVEROPTION_ENCODING_OUTPUT, TextEncodingOptionType.INSTANCE, _bundleLoader);
