@@ -78,9 +78,16 @@ public class BasicModuleDefinition implements ModuleDefinition {
         options.addOption(serverName);
         
         LocalizedOptionDefinition rootURL = new LocalizedOptionDefinition(WGAConfiguration.SERVEROPTION_ROOT_URL, new URLOptionType(), _bundleLoader);
-        rootURL.setEmptyAllowedOverride(true);
-        options.addOption(rootURL);
+        String defaultURL;
+        try {
+        	defaultURL = "http://" + InetAddress.getLocalHost().getCanonicalHostName();
+        }
+        catch (UnknownHostException e) {
+        	defaultURL = "http://localhost";
+        }
+        rootURL.setDefaultValue(defaultURL);
         
+        options.addOption(rootURL);
         
         return options;
         
