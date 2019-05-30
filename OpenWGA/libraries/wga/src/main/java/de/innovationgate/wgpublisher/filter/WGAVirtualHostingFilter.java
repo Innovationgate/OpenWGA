@@ -153,6 +153,15 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
             if (uri.equalsIgnoreCase("/login") && httpRequest.getMethod().equalsIgnoreCase("post")) {
                 // skip post to login url - for this filter
             }
+
+            // first handle virtual root resource request
+            String resource_path = uri;
+            if(resource_path.startsWith("/"))
+            	resource_path = resource_path.substring(1);
+            if (isRootResource(vHost, resource_path)) {
+                VirtualResource resource = findVirtualResource(vHost, resource_path);
+                httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, resource.getPath());
+            }
             else {
                 String[] pathElements = uri.split("/");
                 if (pathElements == null || pathElements.length < 1) {
@@ -195,11 +204,6 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                             return;
                         }
                     }
-                }
-                else if (pathElements.length == 2 && isRootResource(vHost, pathElements[1])) {
-                    // handle root resource request
-                    VirtualResource resource = findVirtualResource(vHost, pathElements[1]);
-                    httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, resource.getPath());
                 }
                 else {
                     // normal db request
