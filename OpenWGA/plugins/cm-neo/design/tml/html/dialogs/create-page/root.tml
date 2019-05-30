@@ -17,7 +17,7 @@
 	}
 </tml:action>
 
-<tml:form id="form-create-page" source="portlet" context="[$struct:{document.getStructKey()}]">
+<tml:form id="form-create-page" source="portlet">
 
 	<tml:script>
 		_areas = WGA.createList()
@@ -35,10 +35,15 @@
 				_areas.add(area.name)
 		}
 		WGA.TMLPage.setVar("_areas", _areas)
+
 		if(_areas.size()==1)
 			tmlform.area = _areas.get(0);
-		else if(!tmlform.submitted && _areas.contains(document.getArea().name))
-			tmlform.area = document.getArea().name
+		else if(!tmlform.submitted){
+			var struct = !document.isDummy() && document.getStructEntry();
+			if(struct && _areas.contains(struct.getArea().name))
+				tmlform.area = struct.getArea().name
+			else tmlform.area = _areas.get(0);
+		}
 	</tml:script>
 
 	<div class="header">
@@ -48,7 +53,7 @@
 
 	<div class="content form-horizontal">
 		<tml:[::form] o_page="root"/>
-		<tml:[form-field] o_label="Websitebereich" o_type="select" o_field="area" o_optionsitem="_areas" o_mode="{_areas.size()==1 ? 'view':'edit'}"/>
+		<tml:[form-field] o_label="Websitebereich" o_type="select" o_field="area" o_optionsitem="_areas" o_changeaction="$refresh" o_mode="{_areas.size()==1 ? 'view':'edit'}"/>
 	</div>
 
 	<div class="footer">

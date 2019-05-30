@@ -3,7 +3,8 @@
 	var pagetypes = WGA.createList()
 	for(let ct in Iterator(db().getContentTypes())){
 		if($option_page=="root"){
-			if(AFW.contenttype(ct).isAllowed(document.getArea()))
+			var area = db().getArea(tmlform.area)
+			if(AFW.contenttype(ct).isAllowed(area))
 				pagetypes.add(ct.name)
 		}
 		else if(AFW.contenttype(ct).isAllowed(document))
