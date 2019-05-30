@@ -5,6 +5,8 @@
 		_ctx = context("db:" + portlet.parent().dbkey + "/docid:" + portlet.parent().contentkey, false)
 		if(!_ctx)
 			_ctx = context("db:" + portlet.parent().dbkey + "/$struct:" + portlet.parent().structkey, false)
+		if(!_ctx)
+			_ctx = context("db:" + portlet.parent().dbkey, false)
 	</tml:script>
 	<div class="modal-popup" style="<tml:script expression="portlet.style"/>" id="dialog-<tml:item name="_id"/>">		
 		<tml:portlet name="curent-dialog" ref="[::{portlet.dialog}]" portletmode="view" context="{_ctx}">
