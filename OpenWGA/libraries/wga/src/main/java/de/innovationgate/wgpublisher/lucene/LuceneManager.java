@@ -1835,14 +1835,14 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             }
             
             if (!content.getStructEntry().isRoot()) {
-                WGStructEntry ancestor = content.getStructEntry().getParentEntry();
-                addKeyword(document, VIRTUALMETA_PARENT, ancestor.getStructKey().toString());
-                do {
-                    addKeyword(document, VIRTUALMETA_PATH, ancestor.getStructKey().toString());
-                    ancestor = ancestor.getParentEntry();
-                } while (ancestor != null);                
-                
+            	addKeyword(document, VIRTUALMETA_PARENT, content.getStructEntry().getParentEntry().getStructKey().toString());
             }
+            
+            WGStructEntry ancestor = content.getStructEntry();
+            do {
+                addKeyword(document, VIRTUALMETA_PATH, ancestor.getStructKey().toString());
+                ancestor = ancestor.getParentEntry();
+            } while (ancestor != null);                
             
             Iterator contentMetaNames = content.getMetaNames().iterator();
             while (contentMetaNames.hasNext()) {
