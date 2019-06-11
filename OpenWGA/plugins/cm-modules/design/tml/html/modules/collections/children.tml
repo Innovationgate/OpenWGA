@@ -35,10 +35,22 @@
 	_headings = CMM.setting("news_heading") || "h1"
 	_top_news = CMM.setting('top_news');
 	_entries = CMM.setting('entries');
+	_sortorder = CMM.setting('sortorder');
+	_group_by_date = CMM.setting("group_by_date");
+	_show_description = CMM.setting('show_description')
+	
 </tml:script>
 <tml:case context="{_context}" iscontextvalid="true">
 	<tml:children id="{scoped:child-collection}" exclude="main"/>
 	<div class="<tml:item name="{scoped:class}"/> <tml:[setting] o_name="layout"/>">
-		<tml:include ref="[::layout:{_layout}]" o-offset="_offset" o-news_headings="_headings" o-top_news="_top_news" o-entries="_entries"/>
+		<tml:include ref="[::layout:{_layout}]" 
+			o-sortorder="_sortorder" 
+			o-group_by_date="_group_by_date"
+			o-show_description="_show_description"
+			o-offset="_offset" 
+			o-news_headings="_headings" 
+			o-top_news="_top_news" 
+			o-entries="_entries"
+		/>
 	</div>
 </tml:case>

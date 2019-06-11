@@ -23,15 +23,19 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:item name="{scoped:target}" var="_target"/>
-
+<tml:script>
+	_sortexpression = $option_sortorder=="date" ? "date||PUBLISHED||CREATED"
+		: $option_sortorder=="title" ? "TITLE"
+		: "POSITION"
+	_sortorder = $option_sortorder=="date" ? "descending" : "ascending"
+</tml:script>
 <tml:foreach sourcetag="{scoped:child-collection}" 
 		id="{scoped:child-collection-loop}"
-		sortexpression="date||PUBLISHED||CREATED" sortorder="descending" 
 		pagesize="{$option_entries||0}"
+		sortexpression="{_sortexpression}" sortorder="{_sortorder}"
 		offset="{$option_offset}"
 >
-	<tml:if condition="CMM.setting('group_by_date')">
+	<tml:if condition="$option_sortorder=='date' && $option_group_by_date">
 		<tml:then>
 			<tml:script>
 				_dateGroup = AFW.Util.dateGroup(date||PUBLISHED||CREATED);
@@ -48,8 +52,8 @@
 	</tml:if>
 	
 	<li>
-		<tml:[util:link] o_linktarget="{_target}"/>
-		<tml:case condition="CMM.setting('show_description') && DESCRIPTION">
+		<tml:[util:link]/>
+		<tml:case condition="$option_show_description && DESCRIPTION">
 			<div class="description"><tml:metadata name="description"/></div>
 		</tml:case>
 	</li>

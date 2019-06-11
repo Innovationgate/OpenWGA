@@ -50,10 +50,11 @@
 	<tml:input type="text" name="{scoped:entries}" default="10" cssstyle="width:100%" mode="{option('mode')}"/>
 </div>
 
-<label><tml:label key="collections.targetframe"/>:</label>
+<tml:comment><label><tml:label key="collections.targetframe"/>:</label>
 <div style="margin:10px">
 	<tml:input type="text" name="{scoped:target}" cssstyle="width:100%" mode="{option('mode')}"/>
 </div>
+</tml:comment>
 
 <label><tml:label key="collections.layout"/>:</label>
 <div style="margin:10px">

@@ -49,11 +49,6 @@
 	<tml:input type="text" name="{scoped:entries}" default="0" cssstyle="width:100%" mode="{option('mode')}"/>
 </div>
 
-<tml:comment><label><tml:label key="columns.settings.class"/>:</label>
-<div style="margin:10px">
-	<tml:input name="{scoped:class}" type="text" cssstyle="width:100%" mode="{option('mode')}"/>
-</div></tml:comment>
-
 <label><tml:label key="collections.layout"/>:</label>
 <div style="margin:10px">
 	<tml:input type="select" name="{scoped:layout}" 	
@@ -62,6 +57,19 @@
 			changeaction="$refresh" ajax="true"
 			mode="{option('mode')}"/>
 </div>
+
+<tml:case condition="tmlform.field(WGA.scoped('layout'))=='link-list'">
+	<label>Sortierung:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:sortorder}" type="select" options="Nach Position|,Nach Titel|title,Nach Datum|date" changeaction="$refresh"/>
+	</div>
+	<tml:case condition="tmlform.field(WGA.scoped('sortorder'))=='date' && tmlform.field(WGA.scoped('layout'))=='link-list'">
+		<label><tml:label key="collections.group-by-date"/>:</label>
+		<div style="margin:10px">
+			<tml:input type="boolean" name="{scoped:group_by_date}" mode="{option('mode')}"/>
+		</div>
+	</tml:case>
+</tml:case>
 
 <tml:case condition="tmlform.field(WGA.scoped('layout'))=='news-list'">
 	<label><tml:label key="collections.news-heading"/>:</label>
@@ -78,10 +86,6 @@
 	<label><tml:label key="collections.show-description"/>:</label>
 	<div style="margin:10px">
 		<tml:input type="boolean" name="{scoped:show_description}" mode="{option('mode')}"/>
-	</div>
-	<label><tml:label key="collections.group-by-date"/>:</label>
-	<div style="margin:10px">
-		<tml:input type="boolean" name="{scoped:group_by_date}" mode="{option('mode')}"/>
 	</div>
 </tml:case>
 
