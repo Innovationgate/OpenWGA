@@ -23,9 +23,9 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<label><tml:label key="content-box.settings.style"/>:</label>
+<label><tml:label key="content-box.settings.layout"/>:</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:style}" type="select" options="{label('content-box.settings.style.options')}" mode="{option('mode')}"/>
+	<tml:input name="{scoped:style}" type="select" options="{label('content-box.settings.layout.options')}" mode="{option('mode')}"/>
 </div>
 
 <label><tml:label key="content-box.settings.background-image"/>:</label>
