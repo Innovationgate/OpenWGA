@@ -11,6 +11,7 @@
 <tml:input name="title" type="hidden" store="false"/>
 
 <tml:input name="mod_title" type="hidden" store="false"/>
+<tml:input name="module_id" type="hidden" store="false"/>
 <tml:input name="mod_id" type="hidden" store="false"/>
 <tml:input name="parent_mod_id" type="hidden" store="false"/>
 <tml:input name="ids_to_duplicate" type="hidden" store="false"/>
@@ -20,12 +21,12 @@
 		var form = document.forms["<tml:script expression="tmlform.formid"/>"];
 		var module = ev.params.module;
 		var config = ev.params.config;
-		//console.log(module, config);
 
 		if(config){
 			form.designdb.value = config.designdb;
 			form.settingstml.value = config.settingstml||"none";
 			form.title.value=config.title;
+			form.module_id.value = config.id;
 		}
 		else if(module.level==1){
 			form.title.value="Bereich '" + module.title + "'";
@@ -96,6 +97,12 @@
 				if(tmlform.field("setting_source_"+tmlform.mod_id)=="template")
 					_mode = "view";
 				else _mode = option("mode");
+				
+				_classes = WGA.createList()
+				if(tmlform.module_id){
+					_classes.addAll(CMM.getModuleCssClasses(tmlform.module_id))
+				}
+				
 			</tml:script>
 	
 			<div>
@@ -104,6 +111,12 @@
 						<tml:option name="parent-scope" expression="tmlform.parent_mod_id"/>
 						<tml:option name="cm_dbkey" expression="context('main').meta('db', 'dbkey')"/>
 					</tml:include>
+					<tml:case condition="_classes.size()">
+						<label>Stil</label>
+						<div style="margin:10px">
+							<tml:input name="{WGA.scoped('module_css_classes', tmlform.mod_id)}" type="checkbox" optionsitem="_classes"/>
+						</div>
+					</tml:case>					
 				</tml:range>
 			</div>
 		

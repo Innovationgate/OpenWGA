@@ -327,3 +327,24 @@ this.getModuleConfig = function(id){
 	}
 	return null;
 }
+
+this.getModuleCssClasses = function(id){
+	var classes = WGA.createList();
+	var config = this.getModuleConfig(id);
+	if(config && config.module_classes){
+		classes.addAll(config.module_classes)
+	}
+	var script = WGA.design(db()).resolveSystemScriptModule("content-manager:module-css-classes", "tmlscript")
+	if(script){
+		var mod = script.getTMLScriptModule()
+		try{
+			var result = mod && WGA.tmlscript().runScript(mod.getCode())
+			if(result && result[id])
+				classes.addAll(result[id]);
+		}
+		catch(e){
+			logException(e);
+		}
+	}
+	return classes;
+}
