@@ -1,0 +1,41 @@
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_tiles">
+
+	margin_bottom: "0 !important",
+
+	".tiles": {
+		display: "flex",
+		
+		">.tile":{
+			box_sizing: "border-box",
+			margin: 0,
+			">.content":{
+				height: "100%",
+				box_sizing: "border-box",
+				display: "flex",
+				justify_content: "space-between",	// Default
+				flex_direction: "column",
+				
+				background_position: "center",
+				background_size: "cover",
+				
+				"> a.title-link":{
+					color: "inherit"
+				},
+				
+				"&.border": {
+					border: "solid silver 1px",
+					".rtf": {
+						padding: 10				
+					}
+				},
+				
+				"&.padding": {
+					padding: 20
+				}
+				
+			}
+
+		}
+	}
+	
+</tml:include>

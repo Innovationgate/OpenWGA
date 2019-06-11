@@ -8,6 +8,7 @@
 	{ configtml:"modules:drag-drop-box:config" },
 	{ configtml:"modules:overlay:config" },
 	{ configtml:"modules:columns:config" },
+	{ configtml:"modules:tiles:config" },
 	{ configtml:"modules:comments:config" },
 	{ configtml:"modules:content-box:config" },
 	{ configtml:"modules:form:config" },

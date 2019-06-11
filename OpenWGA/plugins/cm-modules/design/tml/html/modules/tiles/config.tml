@@ -1,0 +1,27 @@
+{
+	id:				'cm_tiles',
+	category:		'Container',
+	title:			'Kacheln',
+	icon:			"<tml:url db="@afw" type="file" doc="icons" file="text_columns.png"/>",
+	tml:			'modules:tiles:render',
+	settingstml:	'modules:tiles:settings',
+	type:			'container',
+	allowedchildren: ["cm_tile"],
+	includes: {
+		css: 'modules:tiles:css'
+	}	
+}
+,{
+	id:				'cm_tile',
+	title:			'Kachel',
+	icon:			"<tml:url db="@afw" type="file" doc="icons" file="table.png"/>",
+	tml:			'modules:tiles:render-tile',
+	settingstml:	'modules:tiles:settings-tile',
+	type:			'container',
+	module_classes:	[
+		"Abstand zum Rand|padding",
+		"Rahmen|border"
+	],
+	allowedparents: ["cm_tiles"]
+}
+

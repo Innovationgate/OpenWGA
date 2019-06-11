@@ -1,0 +1,6 @@
+<tml:script>
+	_space = CMM.setting('space')/2;
+</tml:script>
+<div class="tiles" style="margin: <tml:script expression="_space*2" format="0"/>px -<tml:item name="_space" format="0"/>px">
+	<tml:include ref="system:include-child-modules" o-margins="false" o-raw="true" o-space="_space"/>
+</div>
