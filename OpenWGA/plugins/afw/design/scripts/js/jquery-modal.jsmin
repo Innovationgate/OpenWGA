@@ -71,7 +71,8 @@
 					onload.call(el);
 					onload=null;
 				}
-				$(this).trigger("modal-shown", el);
+				console.log("dbg", triggerEl && $(triggerEl).data())
+				$(this).trigger("modal-shown", [el, triggerEl && $(triggerEl).data()]);
 				if(triggerEl){
 					$(triggerEl).trigger("load", el);	// deprecated
 					$(triggerEl).trigger("modal-shown", el);
