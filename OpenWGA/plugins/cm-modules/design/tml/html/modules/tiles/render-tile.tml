@@ -27,7 +27,7 @@
 		</tml:script>"
 	>
 		<tml:{a} html-href="_url" html-title="_link_title" html-target="_link_target" html_class="title-link" wrapif="_url">
-			<tml:include ref="system:include-child-modules"/>
+			<tml:include ref="system:include-child-modules" o_margins="true"/>
 		</tml:{a}>
 	</div>
 </div>
