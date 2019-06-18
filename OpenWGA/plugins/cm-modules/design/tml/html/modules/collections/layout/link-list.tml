@@ -51,7 +51,7 @@
 		</tml:elseif>
 	</tml:if>
 	
-	<li>
+	<li <tml:case isselected="true">class="selected"</tml:case>>
 		<tml:[util:link]/>
 		<tml:case condition="$option_show_description && DESCRIPTION">
 			<div class="description"><tml:metadata name="description"/></div>
