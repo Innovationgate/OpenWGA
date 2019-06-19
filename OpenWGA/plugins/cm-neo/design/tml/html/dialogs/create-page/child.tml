@@ -18,6 +18,8 @@
 
 <tml:script>
 	_opts = option("dialog_options")
+	setOption("current_lang", LANGUAGE);
+	setOption("current_pagetype", CONTENTTYPE);
 </tml:script>
 
 <tml:form id="form-create-page" source="portlet" context="[$struct:{_opts.parent || document.getStructKey()}]">

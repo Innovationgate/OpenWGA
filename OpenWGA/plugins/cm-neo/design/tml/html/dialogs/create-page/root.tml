@@ -20,6 +20,7 @@
 <tml:form id="form-create-page" source="portlet">
 
 	<tml:script>
+		setOption("current_lang", LANGUAGE);
 		_areas = WGA.createList()
 		for(let area in Iterator(db().getAreas().values())){
 			if(area.systemArea)
