@@ -221,12 +221,14 @@
 			<tml:[script]>
 				require([
 					"jquery-ui-js/datepicker",
-					"jquery-ui-js/i18n/datepicker-<tml:metadata name="language"/>", 
+					<tml:case condition="LANGUAGE!='en'">
+						"jquery-ui-js/i18n/datepicker-<tml:metadata name="language"/>",
+					</tml:case> 
 					"css!jquery-ui-css",
 					"jquery-textarea-autogrow"
 				], function(picker, config){
 					if(picker){
-						picker.setDefaults(config);
+						config && picker.setDefaults(config);
 						picker.setDefaults({							
 							showWeek: true,
 							changeMonth: true,
