@@ -1,7 +1,18 @@
 <tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_tiles">
 
 	".tiles": {
-		display: "block"
+		display: "block",
+		margin: "0 !important",
+		".tile": {
+			padding: "0 !important",
+			margin: "30px 0",
+			"&:first-child": {
+				margin_top: 0
+			},
+			"&:last-child": {
+				margin_bottom: 0
+			}			
+		}
 	}
 	
 </tml:include>
