@@ -24,7 +24,8 @@
 				background_size: "cover",
 				
 				"> a.title-link":{
-					color: "inherit"
+					color: "inherit",
+					text_decoration: "none"
 				},
 				
 				"&.border": {
