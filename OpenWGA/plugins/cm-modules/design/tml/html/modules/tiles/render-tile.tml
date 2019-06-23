@@ -13,7 +13,7 @@
 	}
 </tml:script>
 <div class="tile <tml:option name="module_classes"/>" 
-	style="flex:<tml:script expression="CMM.setting('width') || 1"/>;padding:0 <tml:item name="$option_space" format="0"/>px"
+	style="flex:<tml:script expression="CMM.setting('width') || 1"/>"
 >
 	<div class="content <tml:option name="module_classes"/>"
 		style="<tml:script>

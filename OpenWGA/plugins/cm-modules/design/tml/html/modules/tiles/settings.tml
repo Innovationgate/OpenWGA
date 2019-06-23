@@ -1,4 +1,0 @@
-<label>Kachelabstand in Pixel</label>
-<div style="margin:10px">
-	<tml:input name="{scoped:space}" type="number" default="20"/>
-</div>

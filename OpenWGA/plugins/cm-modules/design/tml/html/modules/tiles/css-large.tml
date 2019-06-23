@@ -1,10 +1,9 @@
 <tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_tiles">
 
-	".tiles": {
-		display: "block",
-		margin: "0",
+	">.tiles": {
+		margin: "0 -15px",
 		">.tile":{
-			padding: "10px 0"
+			padding: "15px"
 		}
 	}
 	

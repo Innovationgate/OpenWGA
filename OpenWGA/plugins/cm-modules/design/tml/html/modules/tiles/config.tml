@@ -7,6 +7,7 @@
 	settingstml:	'modules:tiles:settings',
 	type:			'container',
 	allowedchildren: ["cm_tile"],
+	module_classes:	<tml:label key="tiles.tiles.module-classes"/>,
 	includes: {
 		css: 'modules:tiles:css'
 	}	
@@ -18,10 +19,7 @@
 	tml:			'modules:tiles:render-tile',
 	settingstml:	'modules:tiles:settings-tile',
 	type:			'container',
-	module_classes:	[
-		"Abstand zum Rand|padding",
-		"Rahmen|border"
-	],
+	module_classes:	<tml:label key="tiles.tile.module-classes"/>,
 	allowedparents: ["cm_tiles"]
 }
 
