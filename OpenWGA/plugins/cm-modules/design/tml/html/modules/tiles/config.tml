@@ -7,7 +7,7 @@
 	settingstml:	'modules:tiles:settings',
 	type:			'container',
 	allowedchildren: ["cm_tile"],
-	module_classes:	<tml:label key="tiles.tiles.module-classes"/>,
+	module_classes:	["Nahtlos / no margins|no-margins"],
 	includes: {
 		css: 'modules:tiles:css'
 	}	
@@ -19,7 +19,7 @@
 	tml:			'modules:tiles:render-tile',
 	settingstml:	'modules:tiles:settings-tile',
 	type:			'container',
-	module_classes:	<tml:label key="tiles.tile.module-classes"/>,
+	module_classes:	["Abstand zum Rand / Padding|padding","Rahmen / Border|border"],
 	allowedparents: ["cm_tiles"]
 }
 
