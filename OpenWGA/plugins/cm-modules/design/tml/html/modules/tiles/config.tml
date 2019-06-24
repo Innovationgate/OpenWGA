@@ -1,7 +1,7 @@
 {
 	id:				'cm_tiles',
 	category:		'Container',
-	title:			'Kacheln',
+	title:			'<tml:label key="tiles.tiles.title"/>',
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="text_columns.png"/>",
 	tml:			'modules:tiles:render',
 	settingstml:	'modules:tiles:settings',
@@ -14,7 +14,7 @@
 }
 ,{
 	id:				'cm_tile',
-	title:			'Kachel',
+	title:			'<tml:label key="tiles.tile.title"/>',
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="table.png"/>",
 	tml:			'modules:tiles:render-tile',
 	settingstml:	'modules:tiles:settings-tile',

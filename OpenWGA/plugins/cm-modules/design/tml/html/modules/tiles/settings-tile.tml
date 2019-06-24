@@ -1,23 +1,23 @@
-<label>Relative Breite</label>
+<label><tml:label key="tiles.tile.setting.width"/></label>
 <div style="margin:10px">
 	<tml:input name="{scoped:width}" type="number" default="1"/>
 </div>
 
-<label>Hintergrundbild</label>
+<label><tml:label key="tiles.tile.setting.background-image"/></label>
 <div style="margin:10px">
 	<tml:include ref="util:select-image" o_derivate="usage=poster"/>
 </div>
 
-<label>Vertikale Ausrichting</label>
+<label><tml:label key="tiles.tile.setting.vertical-align"/></label>
 <div style="margin:10px">
 	<tml:input name="{scoped:justify_content}" type="select" 
-		options="Oben|start,Unter|end,zentriert|center,Raum zwischen Elementen|space-between,gleichmäßig verteilt|space-evenly"
+		options="{label('tiles.tile.setting.vertical-align.options')}"
 	/>
 </div>
 
 <label>Link</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:link}" type="select" options="Kein Link|,interner Link|int,externer Link|ext" changeaction="$refresh"/>
+	<tml:input name="{scoped:link}" type="select" options="{label('tiles.tile.setting.link.options')}" changeaction="$refresh"/>
 	<tml:select switch="tmlform.field(WGA.scoped('link'))">
 		<tml:case value="int">
 			<div style="margin: 5px 0">
