@@ -1,15 +1,17 @@
 <tml:script>
 	_url = null;
-	_link_title = _link_target = "";
-	if(CMM.setting("link")=="int"){
-		var ctx = context("docid:"+CMM.setting("wgakey")) 
-		_url = ctx.contenturl()
-		_link_title = ctx.TITLE
-	}
-	else if(CMM.setting("link")=="ext"){
-		_url = CMM.setting("url");
-		_link_title = _url
-		_link_target = "_blank"
+	if(STATUS!=content().STATUS_DRAFT){
+		_link_title = _link_target = "";
+		if(CMM.setting("link")=="int"){
+			var ctx = context("docid:"+CMM.setting("wgakey")) 
+			_url = ctx.contenturl()
+			_link_title = ctx.TITLE
+		}
+		else if(CMM.setting("link")=="ext"){
+			_url = CMM.setting("url");
+			_link_title = _url
+			_link_target = "_blank"
+		}
 	}
 </tml:script>
 <div class="tile <tml:option name="module_classes"/>" 
