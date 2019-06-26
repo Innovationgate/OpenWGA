@@ -1,7 +1,7 @@
 <tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_tiles">
 
 	"+ .module-cm_tiles": {
-		// if we have a followin tile module remove default module margin 
+		// if we have a following tile module remove default module margin 
 		margin_top: "-10px"
 	},
 
@@ -33,6 +33,9 @@
 					".module-cm_rtf": {
 						margin: 10
 					}
+				},
+				"&.padding": {
+					padding: 20
 				}
 								
 			}
