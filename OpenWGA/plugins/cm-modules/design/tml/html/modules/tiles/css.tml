@@ -30,8 +30,8 @@
 				
 				"&.border": {
 					border: "solid silver 1px",
-					".rtf": {
-						padding: 10				
+					".module-cm_rtf": {
+						margin: 10
 					}
 				},
 				
