@@ -65,7 +65,7 @@
 				/>
 				
 				<tml:case condition="content().getUniqueName()">
-					<tml:[form-field] o_label="Eindeutiger Name" o_field="uniquename" o_meta="true"/>
+					<tml:[form-field] o_label="Eindeutiger Name" o_field="name" o_meta="true"/>
 				</tml:case>
 				
 				<tml:if condition="tmlform.mode()=='edit'">
