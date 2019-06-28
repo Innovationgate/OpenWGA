@@ -222,7 +222,12 @@
 				require([
 					"jquery-ui-js/datepicker",
 					<tml:case condition="LANGUAGE!='en'">
-						"jquery-ui-js/i18n/datepicker-<tml:metadata name="language"/>",
+						<tml:script>
+							_lang = LANGUAGE;
+							if(_lang=="jp")
+								_lang = "ja"	// japanese label file ends with "ja".
+						</tml:script>
+						"jquery-ui-js/i18n/datepicker-<tml:item name="_lang"/>",
 					</tml:case> 
 					"css!jquery-ui-css",
 					"jquery-textarea-autogrow"
