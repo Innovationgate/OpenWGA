@@ -66,30 +66,42 @@ public class Link extends Base implements DynamicAttributes {
             catch (WGUnresolveableVirtualLinkException e) {
                 throw new TMLException("Unresolveable virtual link on content " + content.getContentKey(true) + ": " + e.getMessage(), true);
             } 
-            String linkBody = null;
-            String moEventAttributes = "";
-        
-        
-            linkBody = getTMLContext().encode("html", content.getTitle());
-        
+
             String linkTarget = content.getLinkTarget();
             if (linkTarget != null && !linkTarget.equals("")) {
-            	linkTarget = "target=\"" + linkTarget + "\" ";
+            	linkTarget = " target=\"" + linkTarget + "\" ";
             }
             else {
             	linkTarget = "";
             }
-    
-    
-            String result = "<a" + buildDynamicHtmlAttributes() + " href=\"" + getResponse().encodeURL(contentURL) + "\" " + linkTarget + moEventAttributes + this.getResultString() + ">" + linkBody + "</a>";
+
+            String result;
             
+            if(getTMLContext().getDesignContext().getVersionCompliance().isAtLeast(7, 7)){
+            	// use Tag-Body as link-body
+                String linkBody = this.getResultString(false);
+                if(linkBody==null){
+                	linkBody = getTMLContext().encode("html", content.getTitle());
+                }
+                result = "<a" + buildDynamicHtmlAttributes() 
+                	+ " href=\"" + getResponse().encodeURL(contentURL) + "\"" 
+            		+ linkTarget 
+            		+ ">" + linkBody + "</a>";
+            }
+            else{
+            	//Use Tag-Body as link attributes
+	            String linkBody = getTMLContext().encode("html", content.getTitle());
+	            result = "<a" + buildDynamicHtmlAttributes() 
+	            	+ " href=\"" + getResponse().encodeURL(contentURL) + "\"" 
+	            		+ linkTarget 
+	            		+ this.getResultString(false) + ">" + linkBody + "</a>";
+            }
             
             this.setResult(result);
         }
         catch (Exception e) {
             throw new TMLException("Exception building link", e, true);
         }
-        
 
 	}
 

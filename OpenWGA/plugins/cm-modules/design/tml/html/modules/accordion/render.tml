@@ -38,9 +38,13 @@
 				,active: 0
 			</tml:case>
 		})
-		.on("activated", function(ev, el){
-			WGA.event.fireEvent("CMM-element-activated", "CMM", {el:el})
-		})
+		<tml:comment>
+			the following is no longer nesessary bc. we now fire window.resize event on page activation.
+			See #00005374
+			.on("activated", function(ev, el){
+				WGA.event.fireEvent("CMM-element-activated", "CMM", {el:el})
+			})
+		</tml:comment>
 		.css("opacity", 1);
 	})
 </tml:[script]>

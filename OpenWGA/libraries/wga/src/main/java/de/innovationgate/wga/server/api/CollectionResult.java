@@ -424,7 +424,7 @@ public abstract class CollectionResult implements Iterable<Context> {
     }
  
     public interface Function {
-        public void call(Context context) throws WGException;
+        public Object call(Context context) throws WGException;
     }
 
     /**
@@ -437,6 +437,22 @@ public abstract class CollectionResult implements Iterable<Context> {
     	while(it.hasNext()){
     		function.call(it.next());
     	}
+    }
+
+    /**
+     * Calls a JS-function for each element in the collection. The function should return an Object.
+     * The return value is a list of all return values.
+     * @param function
+     * @return List of mapped values
+     * @throws WGException
+     */
+    public ArrayList<Object> map(Function function) throws WGException{
+    	ArrayList<Object> result = new ArrayList<Object>();
+    	SkippingIterator<Context> it = iterator();
+    	while(it.hasNext()){
+    		result.add(function.call(it.next()));
+    	}
+    	return result;
     }
 
 }

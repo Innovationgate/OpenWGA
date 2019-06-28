@@ -16,8 +16,6 @@ Controller.prototype.prepare = function($cx, CMM){
 	var tml=null;
 	if(this.mod_config){
 		tml = this.mod_config.tml;
-		//$cx.setOption("isContainer", this.mod_config.type=="container", "local");
-		// no longer used ???
 	}
 	else WGA.log.error("no module definition found for id '" + this.module_id + "'");
 	
@@ -67,6 +65,9 @@ Controller.prototype.prepare = function($cx, CMM){
 	}
 	this.request_module_css_reg = $cx.request.getAttribute("CMM_module_css_reg");
 	
+	// module css classes
+	this.moduleCssClasses = WGA.Utils.serializeCollection(CMM.settingList("module_css_classes", this.id), " ");
+	
 }.nonIsolated();
 
 
@@ -104,3 +105,4 @@ Controller.prototype.isCssRendered = function(){
 Controller.prototype.setCssRendered = function(){
 	this.request_module_css_reg.add(this.module_id);	
 }
+

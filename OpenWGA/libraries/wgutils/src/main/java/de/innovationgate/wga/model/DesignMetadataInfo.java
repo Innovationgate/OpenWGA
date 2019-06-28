@@ -15,11 +15,8 @@
  ******************************************************************************/
 package de.innovationgate.wga.model;
 
-
-
 /**
  * bean representing information for DesignMetadata
- *
  */
 public class DesignMetadataInfo {
     
@@ -68,8 +65,6 @@ public class DesignMetadataInfo {
             throw new IllegalArgumentException("Unknown design file header: " + line);
         }
         
-        
     }
-	
 	
 }

@@ -10,6 +10,10 @@
 .WGA-Item{
 
 	display: inline;
+	
+	&.rtf{
+		display: block;
+	}
 
 	[contenteditable]{
 		outline: none;
@@ -24,7 +28,7 @@
 		}
 	}
 
-	&.WGA-Item-hover{
+	&.___WGA-Item-hover{
 		background: rgba(135, 161, 212, .2);	/*#f4f4f4;*/
 		-moz-border-radius: 4px;
 		-webkit-border-radius: 4px;	

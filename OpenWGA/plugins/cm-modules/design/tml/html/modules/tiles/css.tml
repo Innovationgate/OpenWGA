@@ -1,0 +1,55 @@
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_tiles">
+
+	"+ .module-cm_tiles": {
+		// if we have a following tile module remove default module margin 
+		margin_top: "-10px"
+	},
+
+	">.tiles": {
+		display: "flex",
+		
+		margin: "0 -10px",
+		
+		">.tile":{
+			box_sizing: "border-box",
+			margin: 0,
+			padding: "10px",
+			">.content":{
+				height: "100%",
+				box_sizing: "border-box",
+				display: "flex",
+				flex_direction: "column",
+				
+				background_position: "center",
+				background_size: "cover",
+				
+				"> a.title-link":{
+					color: "inherit",
+					text_decoration: "none"
+				},
+				
+				"&.border": {
+					border: "solid silver 1px",
+					".module-cm_rtf": {
+						margin: 10
+					}
+				},
+				"&.padding": {
+					padding: 20
+				}
+								
+			}
+
+		}
+	},
+	
+	"&.no-margins": {
+		">.tiles": {
+			margin: 0,
+			">.tile":{
+				padding: 0
+			}	
+		}
+	}
+	
+</tml:include>

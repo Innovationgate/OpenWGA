@@ -71,7 +71,7 @@
 					onload.call(el);
 					onload=null;
 				}
-				$(this).trigger("modal-shown", el);
+				$(this).trigger("modal-shown", [el, triggerEl && $(triggerEl).data()]);
 				if(triggerEl){
 					$(triggerEl).trigger("load", el);	// deprecated
 					$(triggerEl).trigger("modal-shown", el);

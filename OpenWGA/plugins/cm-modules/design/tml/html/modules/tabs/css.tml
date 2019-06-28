@@ -33,7 +33,7 @@
 			margin: 0,
 			a: {
 				float: "left",
-				padding: "10px 20px",
+				padding: "10px 20px 5px",
 				text_decoration: "none",
 				"&:focus, &:hover": {
 					outline: "none",
@@ -46,20 +46,24 @@
 						"top, left, right": "solid silver 1px"
 					}
 				}
-			},
-			"&.boxed": {
-				border_bottom: "solid #004080 3px",
-				a: {
-					"&.current": {
-						border: "none",
-						background: "#004080",
-						color: "white"
-					}
+			}
+		},
+		"&.boxed": {
+			border_bottom: "solid #004080 3px",
+			a: {
+				"&.current": {
+					border: "none",
+					background: "#004080",
+					color: "white"
 				}
 			}
 		}
+	
 	}, 
 	".pane": {
-		display: "none"
+		display: "none",
+		"&.active": {
+			display: "block"
+		}
 	}
 </tml:include>

@@ -190,8 +190,6 @@ public class DesignResourceReference implements Serializable {
      * Returns the part of the overlay name that adresses the overlay level of the resource. So for a resource "overlay:my_module" returns "overlay".
      */
     public String getResourceOverlayReference() {
-        
-        
         List<String> outParts = new ArrayList<String>();
         for (String part :WGUtils.deserializeCollection(normalize().getResourceName(), ":")) {
             if (part.equals("overlay")) {
@@ -203,10 +201,10 @@ public class DesignResourceReference implements Serializable {
         }
         
         return WGUtils.serializeCollection(outParts, ":");
-        
-        
+    }
+
+    public boolean isOverlayReference(){
+    	return getResourceOverlayReference().equals("overlay");
     }
     
-    
-
 }

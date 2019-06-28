@@ -4,10 +4,23 @@
 	var dbkey = request.getParameter("dbkey")
 	var language = request.getParameter("language")
 
+	var may_create_root_page = false;
+	if(dbkey){
+		for(let area in Iterator(db(dbkey).getAreas().values())){
+			if(area.name.indexOf("$")==0)
+				continue;
+			if(area.mayEditPages()){
+				may_create_root_page = true;
+				break;
+			}
+		}
+	}
+
 	if(dbkey && (!structkey || structkey=="null")){
 		var event = createevent("content-changed")
 		event.setParameter("dbkey", dbkey)
 		event.setParameter("language", language || db(dbkey).getDefaultLanguage())
+		event.setParameter("may_create_root_page", may_create_root_page);
 		portlet.fireevent(event)
 		return;
 	}
@@ -46,16 +59,6 @@
 	event.setParameter("may_delete_page", Struct.mayDeletePage());
 	
 	event.setParameter("page_visible", Struct.isVisible());
-	
-	var may_create_root_page = false;
-	for(let area in Iterator(db(portlet.dbkey).getAreas().values())){
-		if(area.name.indexOf("$")==0)
-			continue;
-		if(area.mayEditPages()){
-			may_create_root_page = true;
-			break;
-		}
-	}
 	event.setParameter("may_create_root_page", may_create_root_page);
 	
 	if(Struct.isVisible() && contentkey){

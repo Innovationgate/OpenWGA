@@ -24,7 +24,7 @@ define(["jquery"], function($){
 		$("#form-publish-page [name=validto]").datepicker("option", {
 			minDate: 0,
 			onClose: function(txt){
-				$("#form-publish-page [name=validfrom]").datepicker("option", "maxDate", txt||0)
+				$("#form-publish-page [name=validfrom]").datepicker("option", "maxDate", txt)
 				if(txt){
 					$(this).parent().addClass("col-sm-8")
 						.css("padding", "0 10px 0 0")
@@ -46,7 +46,16 @@ define(["jquery"], function($){
 			else $(this).hide()
 			$(this).click(function(){
 				$(this).hide()
-				$(this).parent().find("input").val("");
+
+				var input = $(this).parent().find("input")
+				input.val("");
+				if(input.prop("name")=="validfrom"){
+					$("#form-publish-page [name=validto]").datepicker("option", "minDate", 0)
+				}
+				else if(input.prop("name")=="validto"){
+					$("#form-publish-page [name=validfrom]").datepicker("option", "maxDate", "")
+				}
+
 				$(this).parent().removeClass("col-sm-8")
 					.css("padding", "0")
 					.next().hide();

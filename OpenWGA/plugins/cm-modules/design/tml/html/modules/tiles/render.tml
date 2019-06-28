@@ -1,0 +1,3 @@
+<div class="tiles">
+	<tml:include ref="system:include-child-modules" o-margins="false" o-raw="true"/>
+</div>

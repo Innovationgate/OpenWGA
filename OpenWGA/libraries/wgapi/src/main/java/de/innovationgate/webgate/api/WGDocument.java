@@ -2954,19 +2954,38 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
 
     
     /**
+     * Returns a list of all available derivates for the specified file and a specified usage
+     * @param fileName The name of the file
+     * @param usage the usage to filter for
+     * @return List of derivate metadata objects
+     * @throws WGAPIException
+     */
+    public List<WGFileDerivateMetaData> getFileDerivates(String fileName, List<String> usage) throws WGAPIException {
+        
+        List<WGFileDerivateMetaData> all_derivates = getCore().getFileDerivates(fileName);
+        if (all_derivates == null) {
+            return Collections.emptyList();
+        }
+        else if(usage!=null){
+        	List<WGFileDerivateMetaData> derivates = new ArrayList<WGFileDerivateMetaData>();
+        	for (WGFileDerivateMetaData md : all_derivates) {
+        		if(usage.contains(md.getUsage()))
+					derivates.add(md);
+			}
+        	return derivates;
+        }
+        else return all_derivates;
+        
+    }
+
+    /**
      * Returns a list of all available derivates for the specified file
      * @param fileName The name of the file
      * @return List of derivate metadata objects
      * @throws WGAPIException
      */
     public List<WGFileDerivateMetaData> getFileDerivates(String fileName) throws WGAPIException {
-        
-        List<WGFileDerivateMetaData> md = getCore().getFileDerivates(fileName);
-        if (md == null) {
-            md = Collections.emptyList();
-        }
-        return md;
-        
+    	return getFileDerivates(fileName, null);
     }
     
     @Override

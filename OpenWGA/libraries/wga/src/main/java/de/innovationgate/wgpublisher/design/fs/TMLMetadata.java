@@ -25,10 +25,6 @@
 
 package de.innovationgate.wgpublisher.design.fs;
 
-import java.util.ArrayList;
-import java.util.Collections;
-
-import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGTMLModule;
@@ -51,7 +47,7 @@ public class TMLMetadata extends DesignMetadata {
    public void writeToDocument(WGTMLModule mod) throws WGAPIException {
        super.writeToDocument(mod); 
        mod.setDirectAccessAllowed(isDirectAccess());
-       mod.setPreprocess(isPreprocess());
+       mod.setPreprocess(getPreprocess());
        mod.setCacheable(isCacheable());
        if (mod.getDatabase().getContentStoreVersion() >= WGDatabase.CSVERSION_WGA5) {
            mod.setMetaData(WGTMLModule.META_CODEOFFSET, getHeaderLines());
@@ -83,14 +79,12 @@ public class TMLMetadata extends DesignMetadata {
     	((TMLMetadataInfo)_info).setDirectAccess(directAccess);
     }
 
-    
-    public boolean isPreprocess() {
-    	return ((TMLMetadataInfo)_info).isPreprocess();
+    public Boolean getPreprocess() {
+    	return ((TMLMetadataInfo)_info).getPreprocess();
     }
-    public void setPreprocess(boolean value) {
+    public void setPreprocess(Boolean value) {
     	((TMLMetadataInfo)_info).setPreprocess(value);
     }
-
     
     /**
      * @return Returns the category.

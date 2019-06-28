@@ -33,7 +33,7 @@
 </tml:[script]>
 
 <tml:{div} if="$mc.tml" wrapif="!$option_raw"
-	html_class="[module module-{$mc.module_id} {option('module-class')}]"
+	html_class="[module module-{$mc.module_id} {$mc.moduleCssClasses} {option('module-class')}]"
 	html_style="{option('module-style')}"
 	html_id="[module-{$mc.id}]"
 	trim="true"
@@ -41,5 +41,6 @@
 	<tml:include medium="{$mc.medium}" designdb="{$mc.designdb}" ref="{$mc.tml}" o_ns="{$mc.id}" o_title="{$mc.title}" tmlscope="{$mc.id}" trim="true">
 		<tml:option name="module-config" expression="$mc.mod"/>
 		<tml:option name="child-modules" expression="$mc.mod.selectNodes('mod')"/>
+		<tml:option name="module_classes" expression="$mc.moduleCssClasses"/>
 	</tml:include>
 </tml:{div}>

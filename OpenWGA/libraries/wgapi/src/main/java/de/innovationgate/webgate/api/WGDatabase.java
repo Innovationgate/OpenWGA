@@ -2081,7 +2081,8 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
     private boolean _maintainOperationKeys;
 
     private Version _complianceVersion = CSConfig.getComplianceVersion(VersionCompliance.VERSIONCOMPLIANCE_DEFAULT);
-
+    private Version _overlayComplianceVersion = CSConfig.getComplianceVersion(VersionCompliance.VERSIONCOMPLIANCE_DEFAULT);
+    
     private String _uuid = null;
     private double _csVersion;
     private int _csPatchLevel;
@@ -9593,13 +9594,10 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
      * @param enforceNoItemBehaviour If the behaviour regarding nonexistent items for the compliance should be enforced. May be false if this was already set by a higher priority configuration.
      */
     public void enforceVersionCompliance(String compliance, boolean enforceNoItemBehaviour) {
-        
         if (enforceNoItemBehaviour) {
             getNoItemBehaviour().compliantTo(compliance);
         }
-        
         _complianceVersion = CSConfig.getComplianceVersion(compliance);        
-        
     }
 
     /**
@@ -9608,7 +9606,18 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
     public Version getComplianceVersion() {
         return _complianceVersion;
     }
-    
+
+    public void setOverlayComplianceVersion(String compliance) {
+        _overlayComplianceVersion = CSConfig.getComplianceVersion(compliance);        
+    }
+
+    /**
+     * Returns the WGA version whose behaviour is enforced on this database via {@link #enforceVersionCompliance(String, boolean)}
+     */
+    public Version getOverlayComplianceVersion() {
+        return _overlayComplianceVersion;
+    }
+
     /**
      * Returns a universal ID for the current database.
      * This ID is stored on the data backend as database extension data field and therefor really identifies the backend databases data set rather than the WGAPI database instance.

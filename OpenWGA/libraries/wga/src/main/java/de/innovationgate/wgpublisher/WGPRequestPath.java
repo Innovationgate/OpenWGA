@@ -520,7 +520,7 @@ public class WGPRequestPath {
             this.pathType = TYPE_REDIRECT;
             String defaultAuthoringApp = core.getWgaConfiguration().getServerOptions().get(WGACore.SERVEROPTION_DEFAULT_AUTHORING_APP);
             if(defaultAuthoringApp==null)
-            	defaultAuthoringApp = "plugin-contentmanager";
+            	defaultAuthoringApp = "plugin-cm-neo";
             this.resourcePath = this.publisherURL + "/" + defaultAuthoringApp;
         }
         else {

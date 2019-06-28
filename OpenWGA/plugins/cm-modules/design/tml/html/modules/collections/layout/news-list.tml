@@ -28,7 +28,7 @@
 <div class="news-collection">
 	<tml:foreach sourcetag="{scoped:child-collection}" 
 			id="{scoped:child-collection-loop}"
-			sortexpression="date||PAGEPUBLISHED" sortorder="descending" 
+			sortexpression="date||PUBLISHED||CREATED" sortorder="descending" 
 			pagesize="{$option_entries||0}"
 			offset="{$option_offset}"			
 	>
@@ -66,7 +66,7 @@
 								</tml:[util:link]>
 							</tml:case>
 						</div>
-						<div class="date"><tml:script expression="date||PAGEPUBLISHED||MODIFIED" format="longdate"/></div>
+						<div class="date"><tml:script expression="date||PUBLISHED||CREATED" format="longdate"/></div>
 						<div class="rtf">
 							<div class="intro"><tml:script expression="intro||DESCRIPTION" encode="rtf"/></div>
 							<div class="more">
@@ -77,10 +77,10 @@
 				</tml:then>
 				<tml:else>
 					<div class="standard-news clearfix">
-						<div class="date"><tml:script expression="date||PAGEPUBLISHED||MODIFIED" format="longdate"/></div>
+						<div class="date"><tml:script expression="date||PUBLISHED||CREATED" format="longdate"/></div>
 						<div class="date-elements">
 							<tml:script>
-								_values = format(date||PAGEPUBLISHED||MODIFIED, "d#MMMMM#yyyy").split("#");
+								_values = format(date||PUBLISHED||CREATED, "d#MMMMM#yyyy").split("#");
 							</tml:script>
 							<span class="day"><tml:script expression="_values[0]"/></span>
 							<span class="month"><tml:script expression="_values[1]"/></span>

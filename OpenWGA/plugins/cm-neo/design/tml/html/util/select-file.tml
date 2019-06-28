@@ -72,6 +72,8 @@
 		}
 		function showFileinfo(id){
 			var data = urls[id];
+			if(!data)
+				return;
 			var el = $("#select-file-<tml:item name="_fieldname"/>");
 			el.find(".image").html('<img style="max-width:60px;max-height:40px" src="' + data.url + '">');
 			el.find(".metas").html(data.mimetype + " - " + data.size

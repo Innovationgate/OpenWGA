@@ -340,7 +340,7 @@ public class DesignFileDocument extends AbstractDesignFile implements WGDocument
                     }
                     else if (type.equals(WGTMLModule.META_PREPROCESS)) {
                         TMLMetadata metadata = (TMLMetadata) getData().getMetadata();
-                        return Boolean.valueOf(metadata.isPreprocess());
+                        return metadata.getPreprocess();
                     }
                     else if (type.equals(WGTMLModule.META_MEDIAKEY)) {
                         return _docKey.getMediakey();

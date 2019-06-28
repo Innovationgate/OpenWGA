@@ -2,6 +2,7 @@
 
 	img: {
 		max_width: "100%",
+		display: "block",
 		"&.dragover": {
 			opacity: ".5"
 		}

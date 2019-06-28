@@ -107,6 +107,10 @@ public class WebTMLDesignContext implements TMLDesignContext {
         
         WGDatabase db = getDesignDB();
         if (db != null) {
+        	
+        	if(getBaseReference().isOverlayReference())
+        		return db.getOverlayComplianceVersion();
+        	
             return db.getComplianceVersion();
         }
         

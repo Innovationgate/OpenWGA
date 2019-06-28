@@ -1,0 +1,35 @@
+<tml:script>
+	_url = null;
+	if(STATUS!=content().STATUS_DRAFT){
+		_link_title = _link_target = "";
+		if(CMM.setting("link")=="int"){
+			var ctx = context("docid:"+CMM.setting("wgakey")) 
+			_url = ctx.contenturl()
+			_link_title = ctx.TITLE
+		}
+		else if(CMM.setting("link")=="ext"){
+			_url = CMM.setting("url");
+			_link_title = _url
+			_link_target = "_blank"
+		}
+	}
+</tml:script>
+<div class="tile <tml:option name="module_classes"/>" 
+	style="flex:<tml:script expression="CMM.setting('width') || 1"/>"
+>
+	<div class="content <tml:option name="module_classes"/>"
+		style="<tml:script>
+			var styles = [
+				"justify-content:"+CMM.setting('justify_content')
+			];
+			var image = CMM.setting("image")
+			if(image)
+				styles.push("background-image:url('" + fileurl(image) + "')");
+			return styles.join(";");
+		</tml:script>"
+	>
+		<tml:{a} html-href="_url" html-title="_link_title" html-target="_link_target" html_class="title-link" wrapif="_url">
+			<tml:include ref="system:include-child-modules" o_margins="true"/>
+		</tml:{a}>
+	</div>
+</div>

@@ -63,7 +63,11 @@
 				<tml:[form-field] o_label="Beschreibung (max 160 Zeichen)" o_field="description" o_meta="true" o_type="textarea" o_encode="html"
 					o_placeholder="Kurze Beschreibung des Inhalts für Suchmaschinen"
 				/>
-		
+				
+				<tml:case condition="content().getUniqueName()">
+					<tml:[form-field] o_label="Eindeutiger Name" o_field="uniquename" o_meta="true"/>
+				</tml:case>
+				
 				<tml:if condition="tmlform.mode()=='edit'">
 					<tml:then>
 						<tml:script>

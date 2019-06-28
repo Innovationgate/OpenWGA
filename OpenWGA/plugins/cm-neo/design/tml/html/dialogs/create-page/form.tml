@@ -3,7 +3,8 @@
 	var pagetypes = WGA.createList()
 	for(let ct in Iterator(db().getContentTypes())){
 		if($option_page=="root"){
-			if(AFW.contenttype(ct).isAllowed(document.getArea()))
+			var area = db().getArea(tmlform.area)
+			if(AFW.contenttype(ct).isAllowed(area))
 				pagetypes.add(ct.name)
 		}
 		else if(AFW.contenttype(ct).isAllowed(document))
@@ -11,6 +12,8 @@
 	}
 	if($option_dialog_options.pagetype && pagetypes.contains($option_dialog_options.pagetype))
 		tmlform.contenttype=$option_dialog_options.pagetype
+	else if(!tmlform.submitted && $option_current_pagetype && pagetypes.contains($option_current_pagetype))
+		tmlform.contenttype=$option_current_pagetype
 	else if(pagetypes.size()==1)
 		tmlform.contenttype = pagetypes.get(0);
 	
@@ -22,8 +25,11 @@
 
 	_languages = WGA.createList()
 	for(let lang in Iterator(db().getLanguages().values())){
-		if(lang.mayCreateContent())
+		if(lang.mayCreateContent()){
 			_languages.add(lang.title + "|" + lang.name)
+			if($option_current_lang==lang.name && !tmlform.submitted)
+				tmlform.language=lang.name
+		}
 	}
 	WGA.TMLPage.setVar("_languages", _languages)
 	if(_languages.size()==1)

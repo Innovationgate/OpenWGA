@@ -31,6 +31,7 @@ import java.util.List;
 import de.innovationgate.utils.SkippingIterator;
 import de.innovationgate.utils.SkippingIteratorWrapper;
 import de.innovationgate.webgate.api.locking.ResourceIsLockedException;
+import de.innovationgate.wga.common.beans.csconfig.v1.Version;
 
 /**
  * A TML module containing WebTML Source code.
@@ -54,7 +55,7 @@ public class WGTMLModule extends WGDesignResourceDocument implements PageHierarc
     public static final MetaInfo METAINFO_CODEOFFSET = new MetaInfo(META_CODEOFFSET, Integer.class, new Integer(0));
 
     public static final String META_PREPROCESS = "PREPROCESS";
-    public static final MetaInfo METAINFO_PREPROCESS = new MetaInfo(META_PREPROCESS, Boolean.class, Boolean.FALSE);
+    public static final MetaInfo METAINFO_PREPROCESS = new MetaInfo(META_PREPROCESS, Boolean.class, null);
     
     static {
         METAINFO_CODEOFFSET.setExtdata(true);
@@ -148,14 +149,26 @@ public class WGTMLModule extends WGDesignResourceDocument implements PageHierarc
 
 
 	public boolean isPreprocess() throws WGAPIException {
-		return ((Boolean)this.getMetaData(META_PREPROCESS)).booleanValue();
+
+		Boolean preprocess = (Boolean)this.getMetaData(META_PREPROCESS);
+		if(preprocess==null){
+			Version complianceVersion = getDatabase().getComplianceVersion();
+			if(isOverlayRecource())
+				complianceVersion = getDatabase().getOverlayComplianceVersion();
+			return complianceVersion.isAtLeast(7, 7) ? true : false;
+		}
+		return preprocess.booleanValue();
+
 	}
+	
 	public boolean setPreprocess(boolean value) throws WGAPIException {
 		return setMetaData(META_PREPROCESS, new Boolean(value));
 	}
 
 
-
+	public boolean isOverlayRecource() throws WGAPIException{
+		return getName().startsWith("overlay:");
+	}
 
 	/**
 	 * @throws WGAPIException 

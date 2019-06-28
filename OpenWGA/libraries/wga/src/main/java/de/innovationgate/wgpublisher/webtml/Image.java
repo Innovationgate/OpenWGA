@@ -60,8 +60,8 @@ public class Image extends Base implements DynamicAttributes {
 
     public static final String OPTION_EDITOR_FIELD = SYSTEMOPTION_PREFIX + "editorField";
 	
-	private String _name;
-	private String _src;
+	private String _doc;
+	private String _file;
 	private String _item;
 	private String _label;
 	private String _db;
@@ -84,47 +84,54 @@ public class Image extends Base implements DynamicAttributes {
     /**
 	 * Gets the name
 	 * @return Returns a String
+	 * @deprecated use getDoc() instead
 	 */
+    @Deprecated
 	public String getName() {
-		return this.getTagAttributeValue("name", _name, null);
+		return getDoc();
 	}
 	
 	public String getDoc() {
-		return this.getName();
+		return this.getTagAttributeValue("doc", _doc, null);
 	}
 	/**
 	 * Sets the name
 	 * @param name The name to set
+	 * @deprecated use setDoc() instead
 	 */
+	@Deprecated
 	public void setName(String name) {
-		this._name = name;
+		setDoc(name);
 	}
 	
 	public void setDoc(String name) {
-		this.setName(name);
+		_doc = name;
 	}
 
 	/**
 	 * Gets the src
 	 * @return Returns a String
+	 * @deprecated use setFile() instead
 	 */
 	public String getSrc() {
-		return this.getTagAttributeValue("src", _src, null);
+		return getFile();
 	}
 	
 	public String getFile() {
-		return this.getSrc();
+		return this.getTagAttributeValue("file", _file, null);
 	}
 	/**
-	 * Sets the src
+	 * Sets the file to be rendered
 	 * @param src The src to set
+	 * @deprecated use setFile() instead
 	 */
+	@Deprecated
 	public void setSrc(String src) {
-		this._src = src;
+		setFile(src);
 	}
 	
-	public void setFile(String src) {
-		this.setSrc(src);
+	public void setFile(String file) {
+		_file = file;
 	}
 
 	public void tmlEndTag() throws WGAPIException, TMLException {
@@ -187,8 +194,8 @@ public class Image extends Base implements DynamicAttributes {
                 
             }
             else {
-            	doc = this.getName();
-            	file = this.getSrc();
+            	doc = this.getDoc();
+            	file = this.getFile();
             	db = this.getDb();
             	cssClass = this.getCssclass();
             	cssStyle = this.getCssstyle();
@@ -207,8 +214,22 @@ public class Image extends Base implements DynamicAttributes {
             	doc = null;
             }
             
-            if(doc == null && file == null && item == null) {
-            	this.addWarning("No image information given", false);
+            if(file==null && item==null) {
+            	if(doc!=null){
+            		this.addWarning("No file attribute given on <tml:image doc=\"" + doc + "\">", false);
+            		return;
+            	}
+            	// use primary file or first file in content
+            	file = getTMLContext().getcontent().getPrimaryFileName();
+            	if(file==null){
+            		List<String> filenames = getTMLContext().getcontent().getFileNames();
+            		if(filenames!=null && filenames.size()>0)
+            			file = filenames.get(0);
+            		else {
+            			this.addWarning("<tml:image/>: No files found on content", false);
+            			return;
+            		}
+            	}
             }
             
             // Determine CSS
@@ -275,7 +296,7 @@ public class Image extends Base implements DynamicAttributes {
                 }
                 
                 String fileurlStr = (stringToBoolean(getAbsolute()) ? fileurl.build(true) : fileurl.buildLikeGiven());
-                imageHTML = "<img" + buildDynamicHtmlAttributes() + imgAlign + borderAttributesHTML.toString() + titleAttributeString + " src=\"" + fileurlStr + "\" " + srcSetAttribute + css.toString() + this.getResultString() + ">";
+                imageHTML = "<img" + buildDynamicHtmlAttributes() + imgAlign + borderAttributesHTML.toString() + titleAttributeString + " src=\"" + fileurlStr + "\" " + srcSetAttribute + css.toString() + this.getResultString(false) + ">";
             }
             
             // If in edit mode, show editing link
