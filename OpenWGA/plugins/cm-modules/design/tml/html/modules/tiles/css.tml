@@ -25,7 +25,9 @@
 				
 				"> a.title-link":{
 					color: "inherit",
-					text_decoration: "none"
+					text_decoration: "none",
+					display: "block",
+					overflow: "hidden"
 				},
 				
 				"&.border": {
