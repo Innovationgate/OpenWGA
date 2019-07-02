@@ -70,7 +70,7 @@ public class WGRelationData {
         return _targetLanguage;
     }
     /**
-     * Returns the language name of the targeted content
+     * Sets the language name of the targeted content
      */
     public void setTargetLanguage(String lang) {
         _targetLanguage=lang;
