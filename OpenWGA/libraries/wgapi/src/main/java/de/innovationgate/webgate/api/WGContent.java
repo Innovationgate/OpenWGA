@@ -2834,18 +2834,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
      * @throws WGAPIException 
      */
     public List<WGRelationData> getIncomingRelations(boolean includeUnreleased) throws WGAPIException {
-        
-        if (getDatabase().getContentStoreVersion() < WGDatabase.CSVERSION_WGA5) {
-            return Collections.emptyList();
-        }
-        
-        // Non-released contents cannot be target of relations
-        if (!getStatus().equals(WGContent.STATUS_RELEASE)) {
-            return Collections.emptyList();
-        }
-        
-        return getDatabase().getCore().getIncomingRelations(getStructKey(), getLanguage().getName(), null, null, null, includeUnreleased, null);
-        
+    	return getIncomingRelations(null, null, includeUnreleased);
     }
 
     /**
@@ -2869,11 +2858,6 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     public List<WGRelationData> getIncomingRelations(String contentClass, String relName, boolean includeUnreleased, String orderExpression) throws WGAPIException {
         
         if (getDatabase().getContentStoreVersion() < WGDatabase.CSVERSION_WGA5) {
-            return Collections.emptyList();
-        }
-        
-        // Non-released contents cannot be target of relations
-        if (!getStatus().equals(WGContent.STATUS_RELEASE)) {
             return Collections.emptyList();
         }
         
@@ -2914,11 +2898,6 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     public List<WGRelationData> getIncomingRelationsOfGroup(String contentClass, String relGroupName, boolean includeUnreleased, String orderExpression) throws WGAPIException {
         
         if (getDatabase().getContentStoreVersion() < WGDatabase.CSVERSION_WGA5) {
-            return Collections.emptyList();
-        }
-        
-        // Non-released contents cannot be target of relations
-        if (!getStatus().equals(WGContent.STATUS_RELEASE)) {
             return Collections.emptyList();
         }
         
