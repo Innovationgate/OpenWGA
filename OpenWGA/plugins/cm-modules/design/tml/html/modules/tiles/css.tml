@@ -26,6 +26,9 @@
 				color: "inherit",
 				text_decoration: "none",
 				overflow: "hidden",
+				".module-cm_image": {
+					overflow: "hidden"		// IE11 needs this.
+				},
 				
 				"&.border": {
 					border: "solid silver 1px",
