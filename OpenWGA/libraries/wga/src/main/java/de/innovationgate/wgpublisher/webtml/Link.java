@@ -80,7 +80,7 @@ public class Link extends Base implements DynamicAttributes {
             if(getTMLContext().getDesignContext().getVersionCompliance().isAtLeast(7, 7)){
             	// use Tag-Body as link-body
                 String linkBody = this.getResultString(false);
-                if(linkBody==null){
+                if(linkBody==null || linkBody.isEmpty()){
                 	linkBody = getTMLContext().encode("html", content.getTitle());
                 }
                 result = "<a" + buildDynamicHtmlAttributes() 
