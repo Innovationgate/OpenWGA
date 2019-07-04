@@ -107,6 +107,7 @@ import de.innovationgate.wga.server.api.ObjectScope;
 import de.innovationgate.wga.server.api.TMLScript;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wga.server.api.tml.Context;
+import de.innovationgate.wgpublisher.auth.LoginAttemptInformation;
 import de.innovationgate.wgpublisher.cache.FileCache;
 import de.innovationgate.wgpublisher.cache.PostprocessedResourcesCache;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessData;
@@ -697,7 +698,14 @@ public class WGPDispatcher extends HttpServlet {
         }
         else {
 
-            if (WGACore.DOMAIN_ADMINLOGINS.equals(domain)) {
+        	LoginAttemptInformation inf = _core.getBruteForceLoginBlocker().getLoginAttemptInformation(domain, username); 
+        	if(inf.isBlocked()){
+        		long now = System.currentTimeMillis();
+        		Float minutes = (float)LoginAttemptInformation.BLOCKED_MINUTES - ((now - inf.getBlockedDate().getTime())/(1000*60)); 
+        		request.setAttribute(WGACore.ATTRIB_LOGINERROR, "Login for username '" + username + "' is blocked for the next " + minutes.intValue() + " minutes because of too many wrong login attempts.");
+        	}
+        	
+        	else if (WGACore.DOMAIN_ADMINLOGINS.equals(domain)) {
                 request.setAttribute(WGACore.ATTRIB_LOGINERROR, "Invalid administrative login. Please verify username and password.");
             }
             else {
