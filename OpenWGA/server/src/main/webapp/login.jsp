@@ -95,19 +95,19 @@
 		body{
 			padding: 0;
 			margin: 0;
-			font-size: 20px;
+			font-size: 16px;
 			font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
 		}
 		.header{
 			padding: 20px;
-			font-size: 30px;
+			font-size: 24px;
 			background: #286090;
 			color: white;
 			text-align: right;
 		}
 		form{
-			margin: 100px auto;
-			width: 500px;
+			margin: 50px auto;
+			width: 300px;
 		}
 		label{
 			display: inline-block;
@@ -143,6 +143,26 @@
 		button:hover{
 			background: brown;
 		}
+
+		p.big{
+			font-size:1.5em
+		}				
+		
+		@media (min-width: 768px){
+			body{
+				font-size: 20px;
+			}
+			.header{
+				font-size: 30px;
+			}			
+			form{
+				margin: 100px auto;
+				width: 500px;
+			}
+			p.big{
+				font-size:2em
+			}				
+		}
 	</style>
 
 </head>
@@ -159,7 +179,7 @@
 		<input type="hidden" name="flag" value="true">
 
 		<div class="section">
-			<p style="font-size:2em">
+			<p class="big">
 
 				<% if (domain.equals(jspHelper.getCore().DOMAIN_ADMINLOGINS)) { %>
 					Administrative login to server <%= jspHelper.getCore().getWgaConfiguration().getServerName() %> ...
