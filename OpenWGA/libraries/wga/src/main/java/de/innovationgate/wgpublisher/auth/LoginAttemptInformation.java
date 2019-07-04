@@ -86,6 +86,12 @@ public class LoginAttemptInformation implements Serializable {
      * @return Returns the blocked.
      */
     public boolean isBlocked() {
+    	if(_blocked && _blockedDate!=null){
+    		// check if blocked date is older then 30 minutes and reset state.
+    		long now = System.currentTimeMillis();
+    		if(now - _blockedDate.getTime() > 1000*60*30)
+    			reset();
+    	}
         return _blocked;
     }
     /**
