@@ -657,11 +657,6 @@ public class WGPDispatcher extends HttpServlet {
         if (password == null) {
             throw new HttpErrorException(500, "Missing parameter \"password\". (Hint: Field name must be lower case)", null);
         }
-        if (username == null || password == null) {
-            request.setAttribute(WGACore.ATTRIB_LOGINERROR, "Invalid login for domain " + domain + ". Username or password is null.");
-            username = "Anonymous";
-            password = "";
-        }
 
         boolean isLoginSuccessful = false;
         try {
@@ -669,12 +664,11 @@ public class WGPDispatcher extends HttpServlet {
                 if (!_core.isAdministrativePort(request.getLocalPort())) {
                     throw new HttpErrorException(HttpServletResponse.SC_FORBIDDEN, "Access to administrative applications is disabled", null);
                 }
-
-                isLoginSuccessful = _core.doAdminLogin(username, password, request);
+                if (!username.isEmpty() && !password.isEmpty())
+                	isLoginSuccessful = _core.doAdminLogin(username, password, request);
             }
-            else {
-                isLoginSuccessful = _core.login(username, password, domain, request, response);
-            }
+            else if (!username.isEmpty() && !password.isEmpty()) 
+           		isLoginSuccessful = _core.login(username, password, domain, request, response);
         }
         catch (LoginException e) {
             throw new ServletException("Login Error", e);
@@ -699,17 +693,21 @@ public class WGPDispatcher extends HttpServlet {
         else {
 
         	LoginAttemptInformation inf = _core.getBruteForceLoginBlocker().getLoginAttemptInformation(domain, username); 
-        	if(inf.isBlocked()){
+        	if(inf!=null && inf.isBlocked()){
         		long now = System.currentTimeMillis();
         		Float minutes = (float)LoginAttemptInformation.BLOCKED_MINUTES - ((now - inf.getBlockedDate().getTime())/(1000*60)); 
         		request.setAttribute(WGACore.ATTRIB_LOGINERROR, "Login for username '" + username + "' is blocked for the next " + minutes.intValue() + " minutes because of too many wrong login attempts.");
         	}
         	
         	else if (WGACore.DOMAIN_ADMINLOGINS.equals(domain)) {
-                request.setAttribute(WGACore.ATTRIB_LOGINERROR, "Invalid administrative login. Please verify username and password.");
+                if (username.isEmpty() || password.isEmpty())
+                    request.setAttribute(WGACore.ATTRIB_LOGINERROR, "Invalid administrative login: Empty username or password.");
+                else request.setAttribute(WGACore.ATTRIB_LOGINERROR, "Invalid administrative login. Please verify username and password.");
             }
             else {
-                request.setAttribute(WGACore.ATTRIB_LOGINERROR, "Invalid login for domain " + domain + ". Please verify username and password.");
+            	if (username.isEmpty() || password.isEmpty()) 
+            		request.setAttribute(WGACore.ATTRIB_LOGINERROR, "Invalid login to domain " + domain + ": Empty username or password.");
+            	else request.setAttribute(WGACore.ATTRIB_LOGINERROR, "Invalid login to domain " + domain + ". Please verify username and password.");
             }
 
             if (request.getParameter("flag") != null) {
