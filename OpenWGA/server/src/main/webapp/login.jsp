@@ -122,6 +122,7 @@
 			border-bottom: dashed #286090 1px;
 			width: 100%;
 			padding: 5px 0px;
+			outline: none;
 		}
 		.section{
 			margin: 40px 0;
