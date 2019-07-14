@@ -186,14 +186,20 @@
 			}
 			else if(type=="int"){
 				var key = $("[name=key]", form).val();
+				var anker = $("[name=anker]", form).val();
 				var link_text = $("[name=link_text]", form).val();
-				if(!key){
+				if(!key && !anker){
 					alert("Bitte wählen Sie ein Dokument aus.");
 					$("[name=key]", form).focus();
 					return;
 				}
+				if(anker)
+					key = key + "#" + anker
 				a = editor.createLink(key, link_text||key, "int");
-				editor.setURLInfo(a, {type:type, key:key})
+				editor.setURLInfo(a, {
+					type: type, 
+					key: key
+				})				
 			}
 			else{
 				alert("Unbekannter Link-Typ: " + type);
@@ -218,12 +224,12 @@
 			
 			if(type=="int"){
 				var key = $("[name=key]", form).val();
-				if(!key){
+				var anker = $("[name=anker]", form).val();
+				if(!key && !anker){
 					alert("Bitte wählen Sie ein Dokument aus.");
 					$("[name=key]", form).focus();
 					return;
 				}
-				var anker = $("[name=anker]", form).val();
 				editor.setURLInfo(a, {
 					type: type, 
 					key: key + (anker ? "#"+anker : "")
