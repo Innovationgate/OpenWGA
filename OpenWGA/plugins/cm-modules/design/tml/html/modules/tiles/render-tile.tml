@@ -18,7 +18,27 @@
 	}
 	_wrap_tag = url ? "a" : "div";
 	_wrap_attribs = url ? 'href="' + url + '" title="' + link_title + '" target="' + link_target + '"' : ''
-</tml:script>
+	
+	// calc image derivates width
+	_imagederivates=null;
+	var option_imagederivates = option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES)
+	if(option_imagederivates){
+		var max_width;
+		var match = /width~([0-9]+)/.exec(option_imagederivates)
+		if(match && match.length>0)
+			max_width = match[1]
+
+		if(max_width){
+			var col_width_factor = Number(CMM.setting("width") || "1")/$option_total,
+				responsive = WGA.design(db()).getGlobal("RESPONSIVE");
+
+			_imagederivates = max_width * col_width_factor;
+			if(responsive)
+				_imagederivates = Math.max((responsive.small && responsive.small.maxPageWidth)||responsive.medium.width, _imagederivates);
+		}
+	} 
+	
+</tml:script>	
 
 <div class="tile <tml:option name="module_classes"/>" 
 	style="flex:<tml:script expression="CMM.setting('width') || 1"/>"
@@ -34,6 +54,8 @@
 			return styles.join(";");
 		</tml:script>"
 	>
-		<tml:include ref="system:include-child-modules" o_margins="true"/>
+		<tml:range imagederivates="{_imagederivates ? 'width~'+WGA.format(_imagederivates, '0') : VOID}">
+			<tml:include ref="system:include-child-modules" o_margins="true"/>
+		</tml:range>
 	</@{_wrap_tag}>
 </div>
