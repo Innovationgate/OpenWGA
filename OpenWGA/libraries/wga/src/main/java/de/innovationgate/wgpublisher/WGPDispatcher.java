@@ -3211,9 +3211,11 @@ public class WGPDispatcher extends HttpServlet {
                 
                 }
                 
-                return targetContext.contenturl(mediaKey, layoutKey);
-                
-                
+                String url = targetContext.contenturl(mediaKey, layoutKey);
+                String anchor = content.getLinkAnchor();
+                if(anchor!=null && !anchor.isEmpty())
+                	url += "#" + anchor;
+                return url;
             }
             else {
                 return null;

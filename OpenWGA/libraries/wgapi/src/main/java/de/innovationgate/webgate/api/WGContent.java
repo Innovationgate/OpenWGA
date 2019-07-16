@@ -418,7 +418,13 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     
 	public static final String META_LINK_TARGET = "LINKTARGET";
     public static final MetaInfo METAINFO_LINK_TARGET = new MetaInfo(META_LINK_TARGET, String.class, null);
-       
+
+	public static final String META_LINK_ANCHOR = "LINKANCHOR";
+    public static final MetaInfo METAINFO_LINK_ANCHOR = new MetaInfo(META_LINK_ANCHOR, String.class, null);
+    static {
+        METAINFO_LINK_ANCHOR.setExtdata(true);
+    }
+    
 	public static final String META_KEYWORDS = "KEYWORDS";
     public static final MetaInfo METAINFO_KEYWORDS = new MetaInfo(META_KEYWORDS, String.class, Collections.EMPTY_LIST);
     static { 
@@ -783,6 +789,15 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	}
 
 	/**
+	 * Returns the link anchor of this document
+	 * @return String
+	 * @throws WGAPIException
+	 */
+	public String getLinkAnchor() throws WGAPIException {
+		return (String) this.getMetaData(META_LINK_ANCHOR);
+	}
+
+	/**
 	 * Returns the struct key for this content document, which is the key of the struct entry this content document is attached to.
 	 * @return Object
 	 * @throws WGAPIException 
@@ -953,6 +968,15 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	 */
 	public void setLinkTarget(String target) throws WGAPIException {
 		this.setMetaData(WGContent.META_LINK_TARGET, target);
+	}
+
+	/**
+	 * Sets the link anchor of this content 
+	 * @param anchor
+	 * @throws WGAPIException 
+	 */
+	public void setLinkAnchor(String anchor) throws WGAPIException {
+		this.setMetaData(WGContent.META_LINK_ANCHOR, anchor);
 	}
 
 	/**
