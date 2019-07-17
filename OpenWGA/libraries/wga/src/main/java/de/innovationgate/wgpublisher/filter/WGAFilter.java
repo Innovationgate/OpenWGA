@@ -292,6 +292,8 @@ public class WGAFilter implements Filter {
 
         private WGAHttpSession _wgaHttpSession;
 
+        private boolean _anonymise_remote_addr = Boolean.getBoolean("de.innovationgate.wga.anonymise_remote_addr");
+        
 		public RequestWrapper(HttpServletRequest request, HttpServletResponse reponse) {			
 			super(request);
 			_wrappedRequest = request;
@@ -330,6 +332,18 @@ public class WGAFilter implements Filter {
 				}
 			}
 
+		}
+		
+		public String getRemoteAddr(){
+			if(_anonymise_remote_addr)
+				return "_._._._";
+			else return _wrappedRequest.getRemoteAddr();
+		}
+
+		public String getRemoteHost(){
+			if(_anonymise_remote_addr)
+				return "anonymousRemoteHost";
+			else return _wrappedRequest.getRemoteHost();
 		}
 		
 		@Override
