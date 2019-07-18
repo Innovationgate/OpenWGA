@@ -449,9 +449,10 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
                 homepageName = "home";
             }
             LanguageBehaviour langBehaviour = LanguageBehaviourTools.retrieve(db);
-            WGContent content = langBehaviour.requestSelectContentForName(db, request, homepageName, false);
-                
-            if (content != null && content.mayBePublished(false, WGContent.DISPLAYTYPE_NONE)) {
+            boolean isBI = WGPDispatcher.isBrowserInterface(request.getSession());
+            WGContent content = langBehaviour.requestSelectContentForName(db, request, homepageName, isBI);
+            
+            if (content != null && content.mayBePublished(isBI, WGContent.DISPLAYTYPE_NONE)) {
                 TMLContext cx = new TMLContext(content, _core, null, null, request, null, request.getSession());
                 String mediaKey = (String) _core.readPublisherOptionOrDefault(db, WGACore.DBATTRIB_DEFAULT_MEDIAKEY);
                 return innerBuildContentURL(cx, mediaKey, null, false).getUrl();

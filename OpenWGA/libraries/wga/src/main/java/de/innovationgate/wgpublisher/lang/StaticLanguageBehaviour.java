@@ -242,7 +242,18 @@ public class StaticLanguageBehaviour implements LanguageBehaviour, PriorizingLan
         }
         
         String sourceLangName = context.content().getLanguage().getName();
-        WGContent content = db.getContentByName(name, sourceLangName);
+        WGContent content=null;
+        
+    	// first try: find by PAGENAME
+    	WGStructEntry struct = db.getStructEntryByName(name);
+    	if(struct!=null){
+    		content = LanguageBehaviourTools.getRelevantContent(struct, sourceLangName, isBI);
+            if (content != null) {
+                return content;
+            }
+    	}
+    	// second try: find by (deprecated) CONTENTNAME 
+        content = db.getContentByName(name, sourceLangName);
         if (content != null) {
             return content;
         }
