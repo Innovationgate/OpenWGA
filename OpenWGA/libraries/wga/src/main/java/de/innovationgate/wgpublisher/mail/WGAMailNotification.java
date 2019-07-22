@@ -37,6 +37,7 @@ public class WGAMailNotification {
 	public static final String TYPE_LICENSE_VALIDITY = "LicenseValidity";
 	public static final String TYPE_MEMORY_THRESHOLD = "MemoryThreshold";
 	public static final String TYPE_MEMORY_FATAL = "MemoryThresholdFatal";
+	public static final String TYPE_PROBLEM = "HighSeverityProblem";
 	public static final String TYPE_CUSTOM = "Custom";
 	
 	

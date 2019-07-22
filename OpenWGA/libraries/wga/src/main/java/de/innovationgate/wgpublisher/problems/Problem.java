@@ -273,10 +273,10 @@ public class Problem extends WGAServerException implements ProblemQueueEvent {
         }
         
         if(severity.equals(ProblemSeverity.HIGH)){
-        	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_CUSTOM);
+        	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_PROBLEM);
         	mail.setSubject(p.getTitle(Locale.getDefault()));
         	mail.append(p.getMessage(Locale.getDefault()));
-        	mail.append("\n");
+        	mail.append("<br>");
         	mail.append(p.getDescription(Locale.getDefault()));        	
 			try {
 				WGA.get().getCore().send(mail);
