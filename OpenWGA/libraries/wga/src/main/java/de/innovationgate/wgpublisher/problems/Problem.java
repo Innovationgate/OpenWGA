@@ -36,9 +36,12 @@ import java.util.Map;
 
 import de.innovationgate.utils.ReplaceProcessor;
 import de.innovationgate.utils.WGUtils;
+import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.modules.BundleLoader;
 import de.innovationgate.wga.modules.LocalisationBundleLoader;
+import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGAServerException;
+import de.innovationgate.wgpublisher.mail.WGAMailNotification;
 
 public class Problem extends WGAServerException implements ProblemQueueEvent {
     
@@ -258,15 +261,32 @@ public class Problem extends WGAServerException implements ProblemQueueEvent {
         }
         ProblemPath problemPath = new ProblemPath(occasion.getDefaultType(), scope, problemKey);
         
+        Problem p;
         if (occasion instanceof UseSpecialProblemImplementation) {
-            return ((UseSpecialProblemImplementation) occasion).createProblem(problemPath, text, severity, occasion, throwable, providers);
+            p = ((UseSpecialProblemImplementation) occasion).createProblem(problemPath, text, severity, occasion, throwable, providers);
         }
         else if (type instanceof UseSpecialProblemImplementation) {
-            return ((UseSpecialProblemImplementation) type).createProblem(problemPath, text, severity, occasion, throwable, providers);
+            p = ((UseSpecialProblemImplementation) type).createProblem(problemPath, text, severity, occasion, throwable, providers);
         }
         else {
-            return new Problem(problemPath, text, severity, occasion, throwable, providers);
+            p = new Problem(problemPath, text, severity, occasion, throwable, providers);
         }
+        
+        if(severity.equals(ProblemSeverity.HIGH)){
+        	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_CUSTOM);
+        	mail.setSubject(p.getTitle(Locale.getDefault()));
+        	mail.append(p.getMessage(Locale.getDefault()));
+        	mail.append("\n");
+        	mail.append(p.getDescription(Locale.getDefault()));        	
+			try {
+				WGA.get().getCore().send(mail);
+			} catch (WGException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
+        
+        return p;
         
     }
     
