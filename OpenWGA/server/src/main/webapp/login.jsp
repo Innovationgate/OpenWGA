@@ -84,6 +84,7 @@
 <head>
 	<title><%= wga.encode("html", WGABrand.getName()) %> Login</title>
 	<meta name="robots" content="noindex,nofollow">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 	<script>
 		function init(){
