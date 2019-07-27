@@ -59,6 +59,7 @@
 		<tml:param name="contentkey" expression="KEY"/>
 		<tml:param name="jquery_plugin_css" expression="_plugins"/>
 		<tml:param name="modified" expression="MODIFIED"/>
+		<tml:param name="css_version" expression="option('css-version')||'none'"/>
 	</tml:url>">
 
 <script type="text/javascript" src="<tml:url type="tml" medium="javascripts" name="include">
