@@ -67,6 +67,7 @@
 		<tml:param name="contentkey" expression="KEY"/>
 		<tml:param name="jquery_plugins" expression="_plugins"/>
 		<tml:param name="modified" expression="MODIFIED"/>
+		<tml:param name="js_version" expression="option('js-version')||'none'"/>
 	</tml:url>"></script>	
 
 <tml:foreach type="itemvalue" item="_tmls" currentvalue="_tml">
