@@ -23,9 +23,11 @@
 				background_position: "center",
 				background_size: "cover",
 				
-				"> a.title-link":{
-					color: "inherit",
-					text_decoration: "none"
+				color: "inherit",
+				text_decoration: "none",
+				overflow: "hidden",
+				".module-cm_image": {
+					overflow: "hidden"		// IE11 needs this.
 				},
 				
 				"&.border": {

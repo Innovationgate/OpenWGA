@@ -79,158 +79,140 @@
 	}
 
 %>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
+<!DOCTYPE html>
 <%@page import="de.innovationgate.wgpublisher.WGACore"%><html>
 <head>
 	<title><%= wga.encode("html", WGABrand.getName()) %> Login</title>
-	<meta name="robots" content="noindex">
+	<meta name="robots" content="noindex,nofollow">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<script type="text/javascript">
+	<script>
 		function init(){
-		  document.forms[0].username.focus(); 
+			document.forms[0].username.focus(); 
 		}
 	</script>
 	
 	<style>
 		body{
-			text-align: center;
+			padding: 0;
+			margin: 0;
+			font-size: 16px;
+			font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
 		}
-		body *{
-			font: 16px helvetica;
-		}
-		img{
-			max-width: 100%;
-			max-height: 100px;
-		}
-		#content{
-			text-align: left;
-			margin:100px auto 0 auto; 
-			width:500px;
-			border: solid silver 1px;
-			padding: 10px;
-			background: #efefef;
-			-moz-border-radius: 10px;
-			-moz-box-shadow: 1px 1px 10px silver;
-			-webkit-border-radius: 10px;
-			-webkit-box-shadow: 1px 1px 10px silver;
-			border-radius: 10px;
-			box-shadow: 1px 1px 10px silver;
-		}
-		
-		.adminlogin #content{
-			background-color: white;
-			color: black;
-			-moz-box-shadow: 1px 1px 10px rgba(0,0,0, 0.3);
-			-webkit-box-shadow: 1px 1px 10px rgba(0,0,0, 0.3);
-			box-shadow: 1px 1px 10px rgba(0,0,0, 0.3);
-		}
-		.adminlogin #content div{
+		.header{
+			padding: 20px;
+			font-size: 24px;
+			background: #286090;
 			color: white;
-		}
-		h1{
-			font-size: 125%;
-		}
-		h1.servername{
-			text-align: center;
-			color: gray;
+			text-align: right;
 		}
 		form{
-			border-top: solid #dfdfdf 1px;
-			display: block;
-			margin-top: 10px;
+			margin: 50px auto;
+			width: 300px;
 		}
-		form label{
-			float: left;
-			width: 100px;
-			margin-top: 5px;
+		label{
+			display: inline-block;
+			width: 110px;
+			margin-right: 10px;
+			color: gray;
+			font-size: 16px;
 		}
-		form .data{
-			margin-left: 110px;
-			margin-bottom: 5px;
-			line-height: 32px;
-		}
-		form input{
+		input{
+			font-size: inherit;
+			border: none;
+			border-bottom: dashed #286090 1px;
 			width: 100%;
-			border: solid gray 1px;
-			padding: 4px;
+			padding: 5px 0px;
+			outline: none;
 		}
-		form button{
-			border: 1px solid gray;
-    		margin-top: 20px;
-    		padding: 5px 20px;
-   		}
+		.section{
+			margin: 40px 0;
+		}
+		.section.error{
+			color: brown;
+			<% if (errorMsg == null) {%>
+				display: none;
+			<% } %>
+		}
+		button{
+			font-size: inherit;
+			border: none;
+			padding: 5px 50px;
+			background: #286090;
+			color: white;
+			border-radius: 3px;
+		}
+		button:hover{
+			background: brown;
+		}
+
+		p.big{
+			font-size:1.5em
+		}				
 		
-		#error{
-			display: <%= errorMsg != null ? "block" : "none" %>;
-			margin-bottom: 15px;
-			padding:10px;
-			border:1px red solid;
-			background-color:white;
-			color:red !important;
-			font-weight:bold;
-			-moz-border-radius: 5px;
-			-moz-box-shadow: 1px 1px 10px silver;
-			-webkit-border-radius: 5px;
-			-webkit-box-shadow: 1px 1px 10px silver;
-			border-radius: 5px;
-			box-shadow: 1px 1px 10px silver;
-		}
-		#submit-button{
-			color: silver;
-			font-style: italic;
+		@media (min-width: 768px){
+			body{
+				font-size: 20px;
+			}
+			.header{
+				font-size: 30px;
+			}			
+			form{
+				margin: 100px auto;
+				width: 500px;
+			}
+			p.big{
+				font-size:2em
+			}				
 		}
 	</style>
 
 </head>
-<body onLoad="init();" <%= jspHelper.getCore().DOMAIN_ADMINLOGINS.equals(domain) ? "class='adminlogin'":"" %>>
+<body onLoad="init()">
 
-	<div id="content">
-		<div align="center">
-			<img src="<%= request.getContextPath() %>/static/images/brand/logo_600.png">
-		</div>
-		
-		<form method="post" action="login" onsubmit="document.getElementById('error').style.display='none';document.getElementById('submit-button').innerHTML='processing login request ...'" accept-charset="<%= jspHelper.getCore().getCharacterEncoding() %>">
-	
-			<input type="hidden" name="domain" value="<%= domain %>">
-			<input type="hidden" name="redirect" value="<%= redirect %>">
-			<input type="hidden" name="flag" value="true">
-
-			<% if (domain.equals(jspHelper.getCore().DOMAIN_ADMINLOGINS)) { %>
-				<h1 class="servername"><%= jspHelper.getCore().getWgaConfiguration().getServerName() %></h1>
-				<h1>Administrative login ...</h1>
-			<% } else if (domain.startsWith("plugin-")) { %>
-				<% if (authDomain != null && !authDomain.equals(domain)) { %>
-					<h1>Login to plugin <%= domain.substring("plugin-".length()) %> ...</h1>
-					<label>Domain:</label>
-					<div class="data"><%= authDomain %></div>	
-					<div style="clear:both"></div>
-				<%} else { %>							
-					<h1>Login to plugin <%= domain.substring("plugin-".length()) %>...</h1>
-				<% } %>
-			<% } else { %>
-					<h1>Login to domain <%= domain %> ...</h1>	
-			<% } %>
-
-			<div id="error"><%= errorMsg != null ? errorMsg : ""  %></div>
-			
-			<label>Username:</label>
-			<div class="data">
-				<input name="username" value="">
-			</div>
-			<div style="clear:both"></div>
-			
-			<label>Password:</label>
-			<div class="data">
-				<input name="password" type="password" value="">
-			</div>
-			<div style="clear:both"></div>
-			
-			<div id="submit-button">
-				<button id="loginButton" type="submit">Login</button>
-			</div>
-			
-		</form>
+	<div class="header">
+		<%= WGABrand.getName() %> Login
 	</div>
+
+	<form method="post" action="login" onsubmit="document.getElementById('error').style.display='none';document.getElementById('submit-button-section').innerHTML='processing login request ...'" accept-charset="<%= jspHelper.getCore().getCharacterEncoding() %>">
+
+		<input type="hidden" name="domain" value="<%= domain %>">
+		<input type="hidden" name="redirect" value="<%= redirect %>">
+		<input type="hidden" name="flag" value="true">
+
+		<div class="section">
+			<p class="big">
+
+				<% if (domain.equals(jspHelper.getCore().DOMAIN_ADMINLOGINS)) { %>
+					Administrative login to server <%= jspHelper.getCore().getWgaConfiguration().getServerName() %> ...
+				<% } else if (domain.startsWith("plugin-")) { %>
+					<% if (authDomain != null && !authDomain.equals(domain)) { %>
+						Login to plugin <%= domain.substring("plugin-".length()) %>  in Domain <%= authDomain %> ...	
+					<%} else { %>							
+						Login to plugin <%= domain.substring("plugin-".length()) %> ...
+					<% } %>
+				<% } else { %>
+					Login to domain <%= domain %> ...	
+				<% } %>
+
+			</p>
+		</div>
+		<div class="section error" id="error">
+			<p><%= errorMsg != null ? errorMsg : ""  %></p>
+		</div>
+		<div class="section">
+			<label>Username:</label>
+			<input name="username" type="text">
+		</div>
+		<div class="section">
+			<label>Password:</label>
+			<input name="password" type="password">
+		</div>
+		<div class="section" id="submit-button-section">
+			<button type="submit">Login</button>
+		</div>
+
+	</form>
+	
 </body>
 </html>

@@ -39,6 +39,7 @@ public class LoginAttemptInformation implements Serializable {
     }
     
     public static final int DEFAULT_MAX_FAILED_ATTEMPTS = 5;
+    public static final int BLOCKED_MINUTES = 30;
     private String _domain;
     private String _name;
     private int _failedAttempts = 0;
@@ -86,6 +87,12 @@ public class LoginAttemptInformation implements Serializable {
      * @return Returns the blocked.
      */
     public boolean isBlocked() {
+    	if(_blocked && _blockedDate!=null){
+    		// check if blocked date is older then 30 minutes and reset state.
+    		long now = System.currentTimeMillis();
+    		if(now - _blockedDate.getTime() > 1000*60*BLOCKED_MINUTES)
+    			reset();
+    	}
         return _blocked;
     }
     /**

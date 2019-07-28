@@ -313,6 +313,8 @@ public class WebTMLScriptletResolver {
         if(parts.length>1){
         	contentKey = parts[0];        	
         	anker = "#"+parts[1];
+        	if(contentKey.isEmpty())
+        		contentKey = context.getcontent().getContentKey().toString();
         }
         
         

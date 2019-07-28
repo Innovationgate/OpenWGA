@@ -1,3 +1,13 @@
+<tml:script>
+	_total = 0;
+	var columns = option("child-modules").iterator();
+	while(columns.hasNext()){
+		var id = columns.next().selectSingleNode("@id");
+		var w = CMM.setting("width", id.getText()) || "1";
+		_total += Number(w);
+	}
+</tml:script>
+
 <div class="tiles">
-	<tml:include ref="system:include-child-modules" o-margins="false" o-raw="true"/>
+	<tml:include ref="system:include-child-modules" o-margins="false" o-raw="true" o-total="_total"/>
 </div>

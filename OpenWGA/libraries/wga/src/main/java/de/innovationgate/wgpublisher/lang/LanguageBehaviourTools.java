@@ -232,7 +232,17 @@ public class LanguageBehaviourTools {
             Locale locale = locales.nextElement();
             WGLanguage lang = db.getLanguageForLocale(locale);
             if (lang != null && !lang.isDummy()) {
-                WGContent content = db.getContentByName(name, lang.getName());
+            	WGContent content=null;
+            	// first try: find by PAGENAME
+            	WGStructEntry struct = db.getStructEntryByName(name);
+            	if(struct!=null){
+            		content = getRelevantContent(struct, lang.getName(), isBI);
+	                if (content != null) {
+	                    return content;
+	                }
+            	}
+            	// second try: find by (deprecated) CONTENTNAME 
+                content = db.getContentByName(name, lang.getName());
                 if (content != null) {
                     return content;
                 }

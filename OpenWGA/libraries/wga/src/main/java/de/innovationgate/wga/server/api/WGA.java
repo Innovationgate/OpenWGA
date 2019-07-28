@@ -3039,7 +3039,7 @@ public class WGA {
         for (String alias : aliases) {
             String optionText = alias;
             String optionValue = alias;
-            int divider = alias.indexOf("|");
+            int divider = alias.lastIndexOf("|");
             if (divider != -1) {
                 optionText = alias.substring(0, divider);
                 optionValue = alias.substring(divider + 1);

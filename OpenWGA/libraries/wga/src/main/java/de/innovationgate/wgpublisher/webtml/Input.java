@@ -517,7 +517,7 @@ public class Input extends ActionBase implements DynamicAttributes {
                 continue;
             }
             
-            int divider = rawOption.indexOf("|");
+            int divider = rawOption.lastIndexOf("|");
             if (divider != -1) {
                 optionText = rawOption.substring(0, divider).trim();
                 optionValue = rawOption.substring(divider + 1).trim();

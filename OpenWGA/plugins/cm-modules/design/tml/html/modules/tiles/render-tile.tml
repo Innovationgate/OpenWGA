@@ -1,23 +1,49 @@
+##MDSET preprocess=true
+
 <tml:script>
-	_url = null;
+	var url = null,
+		link_title = "", 
+		link_target = "";
 	if(STATUS!=content().STATUS_DRAFT){
-		_link_title = _link_target = "";
 		if(CMM.setting("link")=="int"){
 			var ctx = context("docid:"+CMM.setting("wgakey")) 
-			_url = ctx.contenturl()
-			_link_title = ctx.TITLE
+			url = ctx.contenturl()
+			link_title = ctx.TITLE
 		}
 		else if(CMM.setting("link")=="ext"){
-			_url = CMM.setting("url");
-			_link_title = _url
-			_link_target = "_blank"
+			url = CMM.setting("url");
+			link_title = url
+			link_target = "_blank"
 		}
 	}
-</tml:script>
+	_wrap_tag = url ? "a" : "div";
+	_wrap_attribs = url ? 'href="' + url + '" title="' + link_title + '" target="' + link_target + '"' : ''
+	
+	// calc image derivates width
+	_imagederivates=null;
+	var option_imagederivates = option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES)
+	if(option_imagederivates){
+		var max_width;
+		var match = /width~([0-9]+)/.exec(option_imagederivates)
+		if(match && match.length>0)
+			max_width = match[1]
+
+		if(max_width){
+			var col_width_factor = Number(CMM.setting("width") || "1")/$option_total,
+				responsive = WGA.design(db()).getGlobal("RESPONSIVE");
+
+			_imagederivates = max_width * col_width_factor;
+			if(responsive)
+				_imagederivates = Math.max((responsive.small && responsive.small.maxPageWidth)||responsive.medium.width, _imagederivates);
+		}
+	} 
+	
+</tml:script>	
+
 <div class="tile <tml:option name="module_classes"/>" 
 	style="flex:<tml:script expression="CMM.setting('width') || 1"/>"
 >
-	<div class="content <tml:option name="module_classes"/>"
+	<@{_wrap_tag} @{_wrap_attribs encode="none"} class="content <tml:option name="module_classes"/>"
 		style="<tml:script>
 			var styles = [
 				"justify-content:"+CMM.setting('justify_content')
@@ -28,8 +54,8 @@
 			return styles.join(";");
 		</tml:script>"
 	>
-		<tml:{a} html-href="_url" html-title="_link_title" html-target="_link_target" html_class="title-link" wrapif="_url">
+		<tml:range imagederivates="{_imagederivates ? 'width~'+WGA.format(_imagederivates, '0') : VOID}">
 			<tml:include ref="system:include-child-modules" o_margins="true"/>
-		</tml:{a}>
-	</div>
+		</tml:range>
+	</@{_wrap_tag}>
 </div>

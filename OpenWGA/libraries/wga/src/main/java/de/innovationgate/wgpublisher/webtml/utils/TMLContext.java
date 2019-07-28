@@ -4032,9 +4032,14 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
             else if (part.equals("..")) { // Go up one level
                 if (idx == 0) { // At start: Use the parent folder of the base reference, otherwise just go up from wherever we are 
                     currentParts = "".equals(currentModuleRef) ? new ArrayList<String>() : WGUtils.deserializeCollection(currentModuleRef, ":");
+                    if (currentParts.size() > 0) {
+                    	// remove tml module part (last element)
+                        currentParts.remove(currentParts.size() - 1);
+                    }
                 }
                 
                 if (currentParts.size() > 0) {
+                	// we are in some folder: remove the folder
                     currentParts.remove(currentParts.size() - 1);
                 }
             }

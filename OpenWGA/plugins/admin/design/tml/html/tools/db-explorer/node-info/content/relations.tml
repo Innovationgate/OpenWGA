@@ -80,7 +80,7 @@
 							</a>
 						</tml:then>
 						<tml:else>
-							<tml:script expression="_relation.getParentContentKey()"/>
+							<tml:script expression="_relation.getParentContentKey()"/> (invalid)
 						</tml:else>
 					</tml:if>
 					<tml:case condition="_relation.getType()==content().RELATIONTYPE_PROTECTED">

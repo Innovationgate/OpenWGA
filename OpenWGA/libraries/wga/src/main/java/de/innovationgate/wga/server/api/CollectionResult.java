@@ -35,12 +35,12 @@ import de.innovationgate.utils.IteratorWrapper;
 import de.innovationgate.utils.PrefetchingIterator;
 import de.innovationgate.utils.SkippingIterator;
 import de.innovationgate.utils.WGUtils;
+import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGContentNavigator;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.server.api.Nav.IndexCountingIterator;
 import de.innovationgate.wga.server.api.tml.Context;
-
 import de.innovationgate.wga.common.CodeCompletion;
 
 /**
@@ -453,6 +453,15 @@ public abstract class CollectionResult implements Iterable<Context> {
     		result.add(function.call(it.next()));
     	}
     	return result;
+    }
+
+    public boolean contains(Context ctx) throws WGAPIException{
+    	SkippingIterator<Context> it = iterator();
+    	while(it.hasNext()){
+    		if(it.next().equals(ctx))
+    			return true;
+    	}
+    	return false;
     }
 
 }
