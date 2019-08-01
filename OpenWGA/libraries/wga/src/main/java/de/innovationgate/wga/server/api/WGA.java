@@ -430,7 +430,14 @@ public class WGA {
      * @param context A WGA context object
      */
     public static WGA get(WGAContext context) {
-        return new WGA(context);
+    	if(context!=null)
+    		return new WGA(context);
+    	try {
+			return get();	// best chance
+		} catch (WGException e) {
+			e.printStackTrace();
+			return null;
+		} 
     }
     
     public static WGA get(final TMLContextEnvironment env) {
