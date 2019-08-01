@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -43,7 +44,10 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import de.innovationgate.webgate.api.WGException;
+import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
+import de.innovationgate.wgpublisher.mail.WGAMailNotification;
 
 public class ProblemRegistry {
     
@@ -277,15 +281,17 @@ public class ProblemRegistry {
                 }
                 problems.add(problem);
             }
-            
-            /*
-            ProblemOccasion occ = problem.getOccasion();
-            if (occ != null && !_occasionsWithProblems.contains(occ)) {
-                _occasionsWithProblems.add(occ);
+
+            if(problem.getSeverity().equals(ProblemSeverity.HIGH)){
+            	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_PROBLEM);
+            	mail.setSubject(problem.getTitle(Locale.getDefault()));
+            	mail.append(problem.getMessage(Locale.getDefault()));
+            	mail.append("<br>");
+            	mail.append(problem.getDescription(Locale.getDefault()));        	
+    			_core.send(mail);
             }
-            */
+
         }
-        
         
     }
     
