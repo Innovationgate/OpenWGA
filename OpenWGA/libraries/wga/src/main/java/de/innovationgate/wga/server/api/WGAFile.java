@@ -36,6 +36,13 @@ public class WGAFile {
 		_file = file;
 	}
 
+	public File getFile(){
+		return _file;
+	}
+	public void setFile(File file){
+		_file = file;
+	}
+	
 	public String toString(){
 		if(_file!=null)
 			return _file.toString();
@@ -80,16 +87,19 @@ public class WGAFile {
 		copy(ctx.content().getFileData(filename));
 	}
 
-	public List<File> listFiles(FileFilter filter){
-		ArrayList<File> list = new ArrayList<File>();
+	public List<WGAFile> listFiles(FileFilter filter){
+		ArrayList<WGAFile> list = new ArrayList<WGAFile>();
 		if(_file!=null){
-			File [] files = _file.listFiles();
-			if(files!=null)
-				list.addAll(Arrays.asList(_file.listFiles(filter)));
+			File [] files = _file.listFiles(filter);
+			if(files!=null){
+				for (File file: files){
+					list.add(new WGAFile(_wga, file));				
+				}
+			}
 		}
 		return list;
 	}
-	public List<File> listFiles(){
+	public List<WGAFile> listFiles(){
 		return listFiles(null);
 	}
 
