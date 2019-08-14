@@ -8,13 +8,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
+import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
 
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGDocument;
@@ -49,6 +50,12 @@ public class WGAFile {
 		else return "file not defined";
 	}
 	
+	/**
+	 * Returns file content as String
+	 * @param encode
+	 * @return file content as string
+	 * @throws IOException
+	 */
 	public String asString(String encode) throws IOException{
 		FileInputStream inputStream = new java.io.FileInputStream(_file);
 		String text = IOUtils.toString(inputStream, encode);
@@ -59,22 +66,61 @@ public class WGAFile {
 		return asString(DEFAULT_ENCODING);
 	}
 	
+	/**
+	 * returns file content as DOM4J Document
+	 * @return Dom4j document
+	 * @throws DocumentException
+	 */
 	public Document asXMLDocument() throws DocumentException{
 		SAXReader reader = new SAXReader();
 		return reader.read(_file);
 	}
 
+	/**
+	 * Writes a String to file
+	 * @param text
+	 * @throws IOException
+	 */
 	public void write(String text) throws IOException{
 		FileWriter out = new java.io.FileWriter(_file);
 		IOUtils.write(text, out);
 		out.close();
 	}
+	
+	/**
+	 * Appends a String to file
+	 * @param text
+	 * @throws IOException
+	 */
 	public void append(String text) throws IOException{
 		FileWriter out = new java.io.FileWriter(_file, true);
 		IOUtils.write(text, out);
 		out.close();
 	}
 	
+	/**
+	 * Writes an XML document to file
+	 * @param xml
+	 * @throws IOException
+	 */
+	public void write(Document xml) throws IOException {
+		FileOutputStream out = new java.io.FileOutputStream(_file);
+		try{
+			OutputFormat format = OutputFormat.createPrettyPrint();
+			XMLWriter writer = new XMLWriter(out, format);
+			writer.write(xml);
+			writer.flush();
+		}
+		finally{
+			out.close();
+		}
+	}
+	
+	/**
+	 * Copy some binary content to file 
+	 * @param in
+	 * @throws IOException
+	 */
 	public void copy(InputStream in) throws IOException{
 		FileOutputStream out = new java.io.FileOutputStream(_file);
 		IOUtils.copy(in, out);
@@ -87,6 +133,11 @@ public class WGAFile {
 		copy(ctx.content().getFileData(filename));
 	}
 
+	/**
+	 * Returns directory list as WGAFile objects
+	 * @param filter
+	 * @return
+	 */
 	public List<WGAFile> listFiles(FileFilter filter){
 		ArrayList<WGAFile> list = new ArrayList<WGAFile>();
 		if(_file!=null){
