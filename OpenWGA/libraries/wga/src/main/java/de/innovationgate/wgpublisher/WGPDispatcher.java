@@ -1679,7 +1679,10 @@ public class WGPDispatcher extends HttpServlet {
 
         // replace variables in relative URL
         relativeURL = relativeURL.replaceAll("#DBKEY#", database.getAttribute(WGACore.DBATTRIB_DBKEY).toString());
-        relativeURL = relativeURL.replaceAll("#KEY#", path.getContentKey().toString());
+        String contentKey = path.getContentKey();
+        if(contentKey!=null)
+        	relativeURL = relativeURL.replaceAll("#KEY#", contentKey.toString());
+        else relativeURL = relativeURL.replaceAll("#KEY#", "");
 
         StringBuffer url = new StringBuffer();
         url.append(getContextPath());
