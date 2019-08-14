@@ -3351,6 +3351,12 @@ public class WGA {
     }
 
 
+    public WGAFile File(String filename){
+    	return new WGAFile(this, filename);
+    }
+    public WGAFile File(File file){
+    	return new WGAFile(this, file);
+    }
     
 }
  
