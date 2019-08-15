@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -19,14 +18,16 @@ import org.dom4j.io.XMLWriter;
 
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGDocument;
+import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 
+@CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
 public class WGAFile {
 
-	File _file;
-	WGA _wga;
+	private File _file;
+	private WGA _wga;
 	
-	public static String DEFAULT_ENCODING = "utf8";
+	public static String DEFAULT_ENCODING = "UTF-8";
 	
 	public WGAFile(WGA wga, String filename){
 		_wga = wga;
@@ -57,9 +58,10 @@ public class WGAFile {
 	 * @throws IOException
 	 */
 	public String asString(String encode) throws IOException{
-		FileInputStream inputStream = new java.io.FileInputStream(_file);
-		String text = IOUtils.toString(inputStream, encode);
-		inputStream.close();
+		String text = "";
+		try(FileInputStream inputStream = new java.io.FileInputStream(_file)){
+			text = IOUtils.toString(inputStream, encode);
+		}
 		return text;
 	}
 	public String asString() throws IOException{
@@ -71,9 +73,13 @@ public class WGAFile {
 	 * @return Dom4j document
 	 * @throws DocumentException
 	 */
-	public Document asXMLDocument() throws DocumentException{
+	public Document asXMLDocument(String encode) throws DocumentException{
 		SAXReader reader = new SAXReader();
+		reader.setEncoding(encode);
 		return reader.read(_file);
+	}
+	public Document asXMLDocument() throws DocumentException{
+		return asXMLDocument(DEFAULT_ENCODING);
 	}
 
 	/**
@@ -81,10 +87,13 @@ public class WGAFile {
 	 * @param text
 	 * @throws IOException
 	 */
+	public void write(String text, String encode) throws IOException{
+		try(FileOutputStream out = new java.io.FileOutputStream(_file)){
+			IOUtils.write(text, out, encode);
+		}
+	}
 	public void write(String text) throws IOException{
-		FileWriter out = new java.io.FileWriter(_file);
-		IOUtils.write(text, out);
-		out.close();
+		write(text, DEFAULT_ENCODING);
 	}
 	
 	/**
@@ -92,10 +101,13 @@ public class WGAFile {
 	 * @param text
 	 * @throws IOException
 	 */
+	public void append(String text, String encode) throws IOException{
+		try(FileOutputStream out = new java.io.FileOutputStream(_file, true)){
+			IOUtils.write(text, out, encode);
+		}
+	}
 	public void append(String text) throws IOException{
-		FileWriter out = new java.io.FileWriter(_file, true);
-		IOUtils.write(text, out);
-		out.close();
+		append(text, DEFAULT_ENCODING);
 	}
 	
 	/**
@@ -103,17 +115,18 @@ public class WGAFile {
 	 * @param xml
 	 * @throws IOException
 	 */
-	public void write(Document xml) throws IOException {
-		FileOutputStream out = new java.io.FileOutputStream(_file);
-		try{
+	public void write(Document xml, String encode) throws IOException {
+		try(FileOutputStream out = new java.io.FileOutputStream(_file)){
 			OutputFormat format = OutputFormat.createPrettyPrint();
+			format.setEncoding(encode);
 			XMLWriter writer = new XMLWriter(out, format);
 			writer.write(xml);
 			writer.flush();
+			writer.close();
 		}
-		finally{
-			out.close();
-		}
+	}
+	public void write(Document xml) throws IOException {
+		write(xml, DEFAULT_ENCODING);
 	}
 	
 	/**
@@ -122,9 +135,9 @@ public class WGAFile {
 	 * @throws IOException
 	 */
 	public void copy(InputStream in) throws IOException{
-		FileOutputStream out = new java.io.FileOutputStream(_file);
-		IOUtils.copy(in, out);
-		out.close();
+		try(FileOutputStream out = new java.io.FileOutputStream(_file)){
+			IOUtils.copy(in, out);
+		}
 	}
 	public void copy(WGDocument doc, String filename) throws WGAPIException, IOException{
 		copy(doc.getFileData(filename));
