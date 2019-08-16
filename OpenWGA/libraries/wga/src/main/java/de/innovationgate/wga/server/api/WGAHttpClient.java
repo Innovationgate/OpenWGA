@@ -16,8 +16,10 @@ import org.apache.commons.httpclient.methods.DeleteMethod;
 
 import de.innovationgate.utils.Base64;
 import de.innovationgate.webgate.api.WGFactory;
+import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wga.modules.options.PasswordEncodingException;
 
+@CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
 public class WGAHttpClient {
 
 	private static String DEFAULT_CHARSET = "UTF-8";
