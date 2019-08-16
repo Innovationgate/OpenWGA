@@ -3357,6 +3357,10 @@ public class WGA {
     public WGAFile File(File file){
     	return new WGAFile(this, file);
     }
+ 
+    public WGAHttpClient HttpClient(String url){
+    	return new WGAHttpClient(url);
+    }
     
 }
  
