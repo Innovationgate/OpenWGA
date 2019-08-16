@@ -74,16 +74,15 @@ public class WGAHttpClient {
 			method.setRequestHeader(entry.getKey(), entry.getValue());
 		}
 		// execute
-		int status = _client.executeMethod(method);
-		String statusText = method.getStatusText();
-		String body = method.getResponseBodyAsString();
-		method.releaseConnection();
-		
-		return new Result(status, statusText, body);
-	}
-	
-	public HttpClient getClient(){
-		return _client;
+		try{
+			int status = _client.executeMethod(method);
+			String statusText = method.getStatusText();
+			String body = method.getResponseBodyAsString();
+			return new Result(status, statusText, body);
+		}
+		finally{
+			method.releaseConnection();
+		}
 	}
 	
 	public Result get() throws HttpException, IOException{
