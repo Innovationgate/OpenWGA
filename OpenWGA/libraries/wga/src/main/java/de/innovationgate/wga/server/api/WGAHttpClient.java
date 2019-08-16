@@ -20,6 +20,8 @@ import de.innovationgate.wga.modules.options.PasswordEncodingException;
 
 public class WGAHttpClient {
 
+	private static String DEFAULT_CHARSET = "UTF-8";
+	
 	public class Result{
 		
 		private int _status;
@@ -98,6 +100,9 @@ public class WGAHttpClient {
 		method.setRequestEntity(entity);
 		return executeMethod(method);
 	}
+	public Result post(String body, String contentType) throws HttpException, IOException{
+		return post(body, contentType, DEFAULT_CHARSET);
+	}
 	public Result post(String body) throws HttpException, IOException{
 		return post(body, null, null);
 	}
@@ -108,6 +113,9 @@ public class WGAHttpClient {
 		StringRequestEntity entity = new StringRequestEntity(body, contentType, charset);
 		method.setRequestEntity(entity);
 		return executeMethod(method);
+	}
+	public Result put(String body, String contentType) throws HttpException, IOException{
+		return put(body, contentType, DEFAULT_CHARSET);
 	}
 	public Result put(String body) throws HttpException, IOException{
 		return put(body, null, null);
