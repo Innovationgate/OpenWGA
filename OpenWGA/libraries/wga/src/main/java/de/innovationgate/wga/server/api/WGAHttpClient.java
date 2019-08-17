@@ -23,6 +23,7 @@ import de.innovationgate.wga.modules.options.PasswordEncodingException;
 public class WGAHttpClient {
 
 	private static String DEFAULT_CHARSET = "UTF-8";
+	private static String DEFAULT_CONTENTTYPE = "text/plain";
 	
 	public class Result{
 		
@@ -105,7 +106,7 @@ public class WGAHttpClient {
 		return post(body, contentType, DEFAULT_CHARSET);
 	}
 	public Result post(String body) throws HttpException, IOException{
-		return post(body, null, null);
+		return post(body, DEFAULT_CONTENTTYPE, DEFAULT_CHARSET);
 	}
 	
 
@@ -119,7 +120,7 @@ public class WGAHttpClient {
 		return put(body, contentType, DEFAULT_CHARSET);
 	}
 	public Result put(String body) throws HttpException, IOException{
-		return put(body, null, null);
+		return put(body, DEFAULT_CONTENTTYPE, DEFAULT_CHARSET);
 	}
 	
 }
