@@ -47,6 +47,25 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 		}
 	});
 
+	$("#editor-panel-rtf [name=table-style]").multiselect({
+		nonSelectedText: "Kein Stil ausgewählt",
+		numberDisplayed: 2,
+		nSelectedText: "Stile ausgwewählt",
+		allSelectedText: "Alle Stile ausgewählt",
+		buttonClass: "btn btn-default btn-sm",
+		disableIfEmpty: true,
+		buttonWidth: '100%',
+		onChange: function(option, checked){
+			var el = editor.getNearestTagFromSelection("table")
+			var cls = $(option).val()
+			if(el){
+				if(checked)
+					$(el).addClass(cls)
+				else $(el).removeClass(cls)
+			}
+		}
+	});
+
 	$("#editor-panel-rtf [name=link-style]").multiselect({
 		nonSelectedText: "Kein Stil ausgewählt",
 		numberDisplayed: 2,
@@ -109,6 +128,41 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 		"clean-html": function(){
 			if(confirm("Möchten Sie wirlich das HTML bereinigen und damit Formattierungen entfernen?"))
 				editor.cleanHTML()						
+		},
+		
+		"create-table": function(){
+			editor.insertHTML("<table><tr><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td></tr></table>");			
+		},
+		"delete-table": function(){
+			var el = editor.getNearestTagFromSelection("table")
+			el && editor.deleteElement(el);
+			editor.focus();
+		},
+		"create-td": function(){
+			editor.insertTableCol();
+			editor.focus();
+		},
+		"create-tr": function(){
+			editor.insertTableRow();
+			editor.focus();
+		},
+		"delete-td": function(){
+			editor.deleteTableCol();
+			editor.focus();
+		},
+		"delete-tr": function(){
+			editor.deleteTableRow()
+			editor.focus();
+		},
+		"table-para-before": function(){
+			var el = editor.getNearestTagFromSelection("table")
+			el && $("<p><br></p>").insertBefore(el);
+			editor.focus();
+		},
+		"table-para-after": function(){
+			var el = editor.getNearestTagFromSelection("table")
+			el && $("<p><br></p>").insertAfter(el);
+			editor.focus();
 		},
 		
 		"create-link": function(el){
@@ -270,6 +324,22 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 				$("#editor-panel-rtf [name=text-style]").multiselect('updateButtonText')
 			}
 			
+			// table
+			$("#editor-panel-rtf [name=table-style]").multiselect('deselectAll', false)
+			var el = editor.getNearestTagFromSelection("table")
+			if(el){
+				$("#editor-panel-rtf [data-action=create-table]").hide()
+				$("#editor-panel-rtf .table-edit-actions").show()
+				var classes = el.className.split(" ");
+				if(options && options.tableStyleList && options.tableStyleList.length){
+					$("#editor-panel-rtf [name=table-style]").multiselect('select', classes)
+				}
+			}
+			else{
+				$("#editor-panel-rtf [data-action=create-table]").show()
+				$("#editor-panel-rtf .table-edit-actions").hide()				
+			}
+			
 			// links
 			$("#editor-panel-rtf [name=link-style]").multiselect('deselectAll', false)
 			var el = editor.getNearestTagFromSelection("a")
@@ -420,6 +490,19 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 					})
 				}
 				$("#editor-panel-rtf [name=image-style]").multiselect("dataprovider", opts)
+			}
+			if(options && options.tableStyleList && options.tableStyleList.length){
+				opts=[]
+				toolbar.tableStyleList = options.tableStyleList;
+				for(var i=0; i<options.tableStyleList.length; i++){
+					var parts = options.tableStyleList[i].split("|");
+					opts.push({
+						label: parts[0],
+						title: parts[0],
+						value: parts[1]
+					})
+				}
+				$("#editor-panel-rtf [name=table-style]").multiselect("dataprovider", opts)
 			}
 		}
 		
