@@ -126,12 +126,12 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 	var actions = {
 		
 		"clean-html": function(){
-			if(confirm("Möchten Sie wirlich das HTML bereinigen und damit Formattierungen entfernen?"))
+			if(confirm("Möchten Sie wirlich das HTML bereinigen und damit ggfl. Formattierungen entfernen?"))
 				editor.cleanHTML()						
 		},
 		
 		"create-table": function(){
-			editor.insertHTML("<table><tr><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td></tr></table>");			
+			editor.insertHTML('<table style="width:100%"><tr><td><br></td><td><br></td></tr><tr><td><br></td><td><br></td></tr></table>');			
 		},
 		"delete-table": function(){
 			var el = editor.getNearestTagFromSelection("table")
