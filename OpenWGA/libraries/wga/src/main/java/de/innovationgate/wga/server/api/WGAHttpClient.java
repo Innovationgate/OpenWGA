@@ -15,6 +15,7 @@ import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 
 import de.innovationgate.utils.Base64;
+import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGFactory;
 import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wga.modules.options.PasswordEncodingException;
@@ -22,7 +23,6 @@ import de.innovationgate.wga.modules.options.PasswordEncodingException;
 @CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
 public class WGAHttpClient {
 
-	private static String DEFAULT_CHARSET = "UTF-8";
 	private static String DEFAULT_CONTENTTYPE = "text/plain";
 	
 	public class Result{
@@ -51,10 +51,12 @@ public class WGAHttpClient {
 	HttpClient _client;
 	String _url;
 	HashMap<String,String> _headers = new HashMap<String,String>();
+	String _default_charset;
 	
-	public WGAHttpClient(String url) {
+	public WGAHttpClient(WGA wga, String url) throws WGException {
 		_client = WGFactory.getHttpClientFactory().createHttpClient();
 		_url = url;
+		_default_charset = wga.getCore().getCharacterEncoding();
 	}
 	
 	public WGAHttpClient setRequestHeader(String header, String value){
@@ -103,10 +105,10 @@ public class WGAHttpClient {
 		return executeMethod(method);
 	}
 	public Result post(String body, String contentType) throws HttpException, IOException{
-		return post(body, contentType, DEFAULT_CHARSET);
+		return post(body, contentType, _default_charset);
 	}
 	public Result post(String body) throws HttpException, IOException{
-		return post(body, DEFAULT_CONTENTTYPE, DEFAULT_CHARSET);
+		return post(body, DEFAULT_CONTENTTYPE, _default_charset);
 	}
 	
 
@@ -117,10 +119,10 @@ public class WGAHttpClient {
 		return executeMethod(method);
 	}
 	public Result put(String body, String contentType) throws HttpException, IOException{
-		return put(body, contentType, DEFAULT_CHARSET);
+		return put(body, contentType, _default_charset);
 	}
 	public Result put(String body) throws HttpException, IOException{
-		return put(body, DEFAULT_CONTENTTYPE, DEFAULT_CHARSET);
+		return put(body, DEFAULT_CONTENTTYPE, _default_charset);
 	}
 	
 }

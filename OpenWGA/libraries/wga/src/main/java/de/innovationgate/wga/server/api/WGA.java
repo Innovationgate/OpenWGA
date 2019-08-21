@@ -3358,8 +3358,8 @@ public class WGA {
     	return new WGAFile(this, file);
     }
  
-    public WGAHttpClient HttpClient(String url){
-    	return new WGAHttpClient(url);
+    public WGAHttpClient HttpClient(String url) throws WGException{
+    	return new WGAHttpClient(this, url);
     }
     
 }

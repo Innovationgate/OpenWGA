@@ -26,16 +26,17 @@ public class WGAFile {
 
 	private File _file;
 	private WGA _wga;
-	
-	public static String DEFAULT_ENCODING = "UTF-8";
+	private String _default_encoding;
 	
 	public WGAFile(WGA wga, String filename){
 		_wga = wga;
-		_file = new File(_wga.getCore().getConfigFile().getParentFile(), filename);
+		_file = new File(wga.getCore().getConfigFile().getParentFile(), filename);
+		_default_encoding = wga.getCore().getCharacterEncoding();
 	}
 	public WGAFile(WGA wga, File file){
 		_wga = wga;
 		_file = file;
+		_default_encoding = wga.getCore().getCharacterEncoding();
 	}
 
 	public File getFile(){
@@ -65,7 +66,7 @@ public class WGAFile {
 		return text;
 	}
 	public String asString() throws IOException{
-		return asString(DEFAULT_ENCODING);
+		return asString(_default_encoding);
 	}
 	
 	/**
@@ -79,7 +80,7 @@ public class WGAFile {
 		return reader.read(_file);
 	}
 	public Document asXMLDocument() throws DocumentException{
-		return asXMLDocument(DEFAULT_ENCODING);
+		return asXMLDocument(_default_encoding);
 	}
 
 	/**
@@ -93,7 +94,7 @@ public class WGAFile {
 		}
 	}
 	public void write(String text) throws IOException{
-		write(text, DEFAULT_ENCODING);
+		write(text, _default_encoding);
 	}
 	
 	/**
@@ -107,7 +108,7 @@ public class WGAFile {
 		}
 	}
 	public void append(String text) throws IOException{
-		append(text, DEFAULT_ENCODING);
+		append(text, _default_encoding);
 	}
 	
 	/**
@@ -126,7 +127,7 @@ public class WGAFile {
 		}
 	}
 	public void write(Document xml) throws IOException {
-		write(xml, DEFAULT_ENCODING);
+		write(xml, _default_encoding);
 	}
 	
 	/**
