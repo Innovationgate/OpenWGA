@@ -36,6 +36,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -3449,7 +3450,11 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                 }
             }
             
-            createLogEntry(getSession(), WGUpdateLog.TYPE_UPDATE, WGDocument.TYPENAME_DBMETADATA + "/" + name, md.getId());
+            /*
+             * Ist das wirklich notwendig?
+             * Bei einer CS-Replikation wird ohnehin immer ein full-comapre für DB-Metas gemacht.
+             */
+            //createLogEntry(getSession(), WGUpdateLog.TYPE_UPDATE, WGDocument.TYPENAME_DBMETADATA + "/" + name, md.getId());
             commitHibernateTransaction();
         }
         catch (HibernateException e) {
@@ -3763,10 +3768,6 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
         
     }
 
-
-
-
-
     private Long upgradeFileStorage(Logger log) throws WGAPIException {
         
         _ugradeFileStorageRunning  = true;
@@ -3856,7 +3857,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                     log.info("Clearing session cache");
                     refresh();
                     log.info("Running file storage maintenance to remove duplicate file data");
-                    freedMemory+=dailyMaintenance(log);
+                    freedMemory += getFileHandling().dailyFileMaintenance(log);
                 }
                 finally {
                     Hibernate.close(oldMetas);
@@ -3874,7 +3875,17 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
     }
 
     protected long dailyMaintenance(Logger log) throws WGAPIException {
-        return getFileHandling().dailyFileMaintenance(log);
+        long bytes = getFileHandling().dailyFileMaintenance(log);
+        // clean historylog:
+        Calendar date = Calendar.getInstance();
+        date.add(Calendar.MONDAY, -3);
+        log.info(getDb().getDbReference() + ": remove entries from historylog before " + date.getTime());
+        Query query = getSession().createQuery("delete from LogEntry as entry where entry.logtime < :date");
+        query.setParameter("date", date.getTime());
+        query.executeUpdate();
+        
+        commitHibernateTransaction();
+        return bytes;
     }
 
     @Override
@@ -3884,10 +3895,6 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
         query.setParameter("entry", hentry);
         return ((Number) query.uniqueResult()).intValue();
     }
-
-
-
-
 
     @Override
     public int getRootEntryCount(WGArea area) throws WGAPIException {
