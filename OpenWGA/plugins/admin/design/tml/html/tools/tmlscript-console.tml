@@ -203,8 +203,7 @@
 						<tml:else>
 							<label>Result:</label>
 							<div class="data">						
-								<tml:comment><tml:item name="_result" divider="<br>" encode="html"/></tml:comment>
-								<tml:script>
+								<tml:script encode="html">
 									return _result && _result.toString ? _result.toString() : _result
 								</tml:script>
 							</div>
