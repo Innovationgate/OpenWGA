@@ -3,7 +3,6 @@ package de.innovationgate.wga.server.api;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +35,7 @@ public class WGAFile {
 		
 		ZipOutputStream _out;
 		
-		public ZipStream(OutputStream out) throws FileNotFoundException{
+		public ZipStream(OutputStream out){
 			_out = new ZipOutputStream(out);
 		}
 		
