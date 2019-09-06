@@ -1,13 +1,18 @@
 package de.innovationgate.wga.server.api;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
@@ -25,9 +30,52 @@ import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 public class WGAFile {
 
 	private File _file;
-	private WGA _wga;
+	protected WGA _wga;
 	private String _default_encoding;
 	
+	public class ZipStream{
+		
+		ZipOutputStream _out;
+		
+		public ZipStream(OutputStream out) throws FileNotFoundException{
+			_out = new ZipOutputStream(out);
+		}
+		
+		public ZipStream addEntry(String filename, InputStream in) throws IOException{
+			_out.putNextEntry(new ZipEntry(filename));
+			IOUtils.copy(in, _out);
+			_out.closeEntry();
+			return this;
+		}
+		
+		public ZipStream addFile(WGAFile wgafile) throws IOException{
+			return addFile(wgafile.getFile());
+		}
+		
+		public ZipStream addFile(File file) throws IOException{
+			try(FileInputStream in = new FileInputStream(file)){
+				addEntry(file.getName(), in);
+			}
+			return this;
+		}
+		
+		public ZipStream addFile(WGDocument doc, String filename) throws IOException, WGAPIException{
+			return addEntry(filename, doc.getFileData(filename));
+		}
+		public ZipStream addFile(TMLContext ctx, String filename) throws IOException, WGAPIException{
+			return addFile(ctx.content(), filename);
+		}
+		
+		public void close() throws IOException{
+			_out.flush();
+			_out.close();
+		}
+	}
+
+	public WGAFile(WGA wga){
+		_wga = wga;
+	}
+
 	public WGAFile(WGA wga, String filename){
 		_wga = wga;
 		_file = new File(wga.getCore().getConfigFile().getParentFile(), filename);
@@ -52,6 +100,10 @@ public class WGAFile {
 		else return "file not defined";
 	}
 	
+	public ZipStream createZipStream() throws FileNotFoundException{
+		return new ZipStream(createOutputStream());
+	}
+	
 	/**
 	 * Returns file content as String
 	 * @param encode
@@ -60,7 +112,7 @@ public class WGAFile {
 	 */
 	public String asString(String encode) throws IOException{
 		String text = "";
-		try(FileInputStream inputStream = new java.io.FileInputStream(_file)){
+		try(FileInputStream inputStream = new FileInputStream(_file)){
 			text = IOUtils.toString(inputStream, encode);
 		}
 		return text;
@@ -129,12 +181,21 @@ public class WGAFile {
 	public void write(Document xml) throws IOException {
 		write(xml, _default_encoding);
 	}
-	
+
+	/**
+     * Creates an output stream to write binary data to the file. 
+     * @throws FileNotFoundException 
+     */
+    public OutputStream createOutputStream() throws FileNotFoundException {
+    	return new BufferedOutputStream(new FileOutputStream(_file), 2048);
+    }
+
 	/**
 	 * Copy some binary content to file 
 	 * @param in
 	 * @throws IOException
 	 */
+	
 	public void copy(InputStream in) throws IOException{
 		try(FileOutputStream out = new java.io.FileOutputStream(_file)){
 			IOUtils.copy(in, out);
