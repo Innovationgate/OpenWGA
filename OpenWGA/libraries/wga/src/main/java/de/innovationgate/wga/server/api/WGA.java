@@ -3361,6 +3361,10 @@ public class WGA {
     public WGAHttpClient HttpClient(String url) throws WGException{
     	return new WGAHttpClient(this, url);
     }
-    
+ 
+    public WGATempFile TempFile(String filename) throws IOException{
+    	return new WGATempFile(this, filename);
+    }
+ 
 }
  
