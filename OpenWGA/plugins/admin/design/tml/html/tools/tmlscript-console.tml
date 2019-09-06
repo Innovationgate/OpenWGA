@@ -221,6 +221,8 @@
 										var firstElementType = (firstElement == null ? "null" : javaObject(firstElement).getClass().getName());		
 										return "List or Array with first element of type " + firstElementType;
 									}
+									else if(typeof(_result)=="string" && !_result)
+										return "Empty String"
 								
 									return _result === null ? "null" : javaObject(_result).getClass().getName();		
 								</tml:script>		
