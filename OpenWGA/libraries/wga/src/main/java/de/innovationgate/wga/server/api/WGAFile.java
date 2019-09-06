@@ -1,6 +1,5 @@
 package de.innovationgate.wga.server.api;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -100,8 +99,8 @@ public class WGAFile {
 		else return "file not defined";
 	}
 	
-	public ZipStream createZipStream() throws FileNotFoundException{
-		return new ZipStream(createOutputStream());
+	public ZipStream createZipStream() throws IOException{
+		return new ZipStream(new java.io.FileOutputStream(_file));
 	}
 	
 	/**
@@ -181,14 +180,6 @@ public class WGAFile {
 	public void write(Document xml) throws IOException {
 		write(xml, _default_encoding);
 	}
-
-	/**
-     * Creates an output stream to write binary data to the file. 
-     * @throws FileNotFoundException 
-     */
-    public OutputStream createOutputStream() throws FileNotFoundException {
-    	return new BufferedOutputStream(new FileOutputStream(_file), 2048);
-    }
 
 	/**
 	 * Copy some binary content to file 
