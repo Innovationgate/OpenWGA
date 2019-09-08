@@ -1,10 +1,12 @@
 package de.innovationgate.wga.server.api;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
@@ -27,25 +29,40 @@ public class WGAHttpClient {
 	
 	public class Result{
 		
-		private int _status;
-		private String _statusText;
-		private String _body;
+		HttpMethod _method;
+		int _status;
 		
-		Result(int status, String statusText, String body){
+		public Result(int status, HttpMethod m){
 			_status = status;
-			_statusText = statusText;
-			_body = body;			
+			_method = m;
 		}
 		
 		public int getStatus(){
 			return _status;
 		}
 		public String getStatusText(){
-			return _statusText;
+			return _method.getStatusText();
 		}
-		public String getBody() throws IOException{
-			return _body;
+		public String getText() throws IOException{
+			return _method.getResponseBodyAsString();
 		}
+		public InputStream getInputStream() throws IOException{
+			return _method.getResponseBodyAsStream();
+		}
+		public String getHeader(String headerName){
+			Header header = _method.getResponseHeader(headerName);
+			return header == null ? null : header.getValue();
+		}
+		public String getContentType(){
+			return getHeader("content-type");
+		}
+		public HttpMethod getMethod(){
+			return _method;
+		}
+	}
+	
+	public interface Callback{
+		public void call(Result result);
 	}
 	
 	HttpClient _client;
@@ -73,7 +90,7 @@ public class WGAHttpClient {
 		return setRequestHeader("Authorization", "Basic " + authString);
 	}
 	
-	private Result executeMethod(HttpMethod method) throws HttpException, IOException{
+	private int executeMethod(HttpMethod method, Callback callback) throws HttpException, IOException{
 		// set request headers
 		for(Entry<String,String> entry: _headers.entrySet()){
 			method.setRequestHeader(entry.getKey(), entry.getValue());
@@ -81,48 +98,83 @@ public class WGAHttpClient {
 		// execute
 		try{
 			int status = _client.executeMethod(method);
-			String statusText = method.getStatusText();
-			String body = method.getResponseBodyAsString();
-			return new Result(status, statusText, body);
+			if(callback!=null)
+				callback.call(new Result(status, method));
+			return status;
 		}
 		finally{
 			method.releaseConnection();
 		}
 	}
 	
-	public Result get() throws HttpException, IOException{
-		return executeMethod(new GetMethod(_url));
+	/*
+	 * http-method get
+	 */
+	public int get(Callback callback) throws HttpException, IOException{
+		return executeMethod(new GetMethod(_url), callback);
+	}
+	public int get() throws HttpException, IOException{
+		return get(null);
 	}
 
-	public Result delete() throws HttpException, IOException{
-		return executeMethod(new DeleteMethod(_url));
+	/*
+	 * http-method delete
+	 */
+	public int delete(Callback callback) throws HttpException, IOException{
+		return executeMethod(new DeleteMethod(_url), callback);
 	}
-
-	public Result post(String body, String contentType, String charset) throws HttpException, IOException{
+	public int delete() throws HttpException, IOException{
+		return delete(null);
+	}
+	
+	/*
+	 * http-method post
+	 */
+	public int post(String body, String contentType, String charset, Callback callback) throws HttpException, IOException{
 		PostMethod method = new PostMethod(_url);
 		StringRequestEntity entity = new StringRequestEntity(body, contentType, charset);
 		method.setRequestEntity(entity);
-		return executeMethod(method);
+		return executeMethod(method, callback);
 	}
-	public Result post(String body, String contentType) throws HttpException, IOException{
-		return post(body, contentType, _default_charset);
+	public int post(String body, String contentType, String charset) throws HttpException, IOException{
+		return post(body, contentType, charset, null);
 	}
-	public Result post(String body) throws HttpException, IOException{
-		return post(body, DEFAULT_CONTENTTYPE, _default_charset);
+	public int post(String body, String contentType, Callback callback) throws HttpException, IOException{
+		return post(body, contentType, _default_charset, callback);
+	}
+	public int post(String body, String contentType) throws HttpException, IOException{
+		return post(body, contentType, _default_charset, null);
+	}
+	public int post(String body, Callback callback) throws HttpException, IOException{
+		return post(body, DEFAULT_CONTENTTYPE, _default_charset, callback);
+	}
+	public int post(String body) throws HttpException, IOException{
+		return post(body, DEFAULT_CONTENTTYPE, _default_charset, null);
 	}
 	
-
-	public Result put(String body, String contentType, String charset) throws HttpException, IOException{
+	/*
+	 * http-method put
+	 */
+	public int put(String body, String contentType, String charset, Callback callback) throws HttpException, IOException{
 		PutMethod method = new PutMethod(_url);
 		StringRequestEntity entity = new StringRequestEntity(body, contentType, charset);
 		method.setRequestEntity(entity);
-		return executeMethod(method);
+		return executeMethod(method, callback);
 	}
-	public Result put(String body, String contentType) throws HttpException, IOException{
-		return put(body, contentType, _default_charset);
+	public int put(String body, String contentType, String charset) throws HttpException, IOException{
+		return put(body, contentType, charset, null);
 	}
-	public Result put(String body) throws HttpException, IOException{
-		return put(body, DEFAULT_CONTENTTYPE, _default_charset);
+	public int put(String body, String contentType, Callback callback) throws HttpException, IOException{
+		return put(body, contentType, _default_charset, callback);
+	}
+	public int put(String body, String contentType) throws HttpException, IOException{
+		return put(body, contentType, _default_charset, null);
+	}
+	public int put(String body, Callback callback) throws HttpException, IOException{
+		return put(body, DEFAULT_CONTENTTYPE, _default_charset, callback);
+	}
+	public int put(String body) throws HttpException, IOException{
+		return put(body, DEFAULT_CONTENTTYPE, _default_charset, null);
 	}
 	
 }
