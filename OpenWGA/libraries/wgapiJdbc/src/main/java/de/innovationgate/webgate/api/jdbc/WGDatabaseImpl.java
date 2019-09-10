@@ -81,7 +81,6 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.jdbc.ColumnNameCache;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.exception.SQLGrammarException;
@@ -100,9 +99,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.Dom4JDriver;
 
 import de.innovationgate.monitoring.JmxManager;
-import de.innovationgate.utils.TemporaryFile;
 import de.innovationgate.utils.WGUtils;
-import de.innovationgate.webgate.api.MetaInfo;
 import de.innovationgate.webgate.api.WGACLCore;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGArea;
@@ -124,7 +121,6 @@ import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGDocumentCore;
 import de.innovationgate.webgate.api.WGDocumentKey;
 import de.innovationgate.webgate.api.WGFactory;
-import de.innovationgate.webgate.api.WGFileMetaData;
 import de.innovationgate.webgate.api.WGIllegalArgumentException;
 import de.innovationgate.webgate.api.WGIllegalDataException;
 import de.innovationgate.webgate.api.WGInvalidDatabaseException;
@@ -159,13 +155,11 @@ import de.innovationgate.webgate.api.jdbc.filehandling.FileHandling;
 import de.innovationgate.webgate.api.jdbc.pool.DBCPConnectionProvider;
 import de.innovationgate.webgate.api.jdbc.pool.DBCPReplicationConnectionProvider;
 import de.innovationgate.webgate.api.mysql.GaleraClusterTableGenerator;
-import de.innovationgate.webgate.api.mysql.MySqlDatabaseServer;
 import de.innovationgate.webgate.api.servers.WGDatabaseServer;
 import de.innovationgate.webgate.api.utils.MasterSessionTask;
 import de.innovationgate.wga.common.Constants;
 import de.innovationgate.wga.config.Database;
 import de.innovationgate.wga.config.DatabaseServer;
-
 
 public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabaseCore, 
 		WGDatabaseCoreFeatureReturnHierarchyCount, WGDatabaseCoreFeatureSequenceProvider, WGDatabaseCoreFeaturePageSequences, 
@@ -3877,14 +3871,31 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
     protected long dailyMaintenance(Logger log) throws WGAPIException {
         long bytes = getFileHandling().dailyFileMaintenance(log);
         // clean historylog:
-        Calendar date = Calendar.getInstance();
-        date.add(Calendar.MONDAY, -3);
-        log.info(getDb().getDbReference() + ": remove entries from historylog before " + date.getTime());
-        Query query = getSession().createQuery("delete from LogEntry as entry where entry.logtime < :date");
-        query.setParameter("date", date.getTime());
-        query.executeUpdate();
         
-        commitHibernateTransaction();
+	    if (_ddlVersion >= WGDatabase.CSVERSION_WGA5) {
+	        
+	    	// remove entries older then 3 month but keep the newest entry in order to have a valid db revision
+	    	
+	    	Long max_id=0L;
+	    	
+	        List result = getSession().createQuery("select max(entry.id) from LogEntry as entry").list();
+	        if (result.size() > 0) {
+	            Long id = (Long) result.get(0);
+	            if (id != null) {
+	                max_id = id;
+	            }
+	        }
+	        
+	        Calendar date = Calendar.getInstance();
+	        date.add(Calendar.MONDAY, -3);
+	        log.info(getDb().getDbReference() + ": remove entries from historylog before " + date.getTime());
+	        Query query = getSession().createQuery("delete from LogEntry as entry where entry.logtime < :date and entry.id!=:id");
+	        query.setParameter("date", date.getTime());
+	        query.setParameter("id", max_id);
+	        query.executeUpdate();
+	        
+	        commitHibernateTransaction();
+	    }
         return bytes;
     }
 
