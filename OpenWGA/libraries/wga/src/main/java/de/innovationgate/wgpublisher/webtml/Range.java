@@ -469,7 +469,12 @@ public class Range extends Base {
                 
                 boolean useCache = false;
                 if (CACHEUPDATE_DB.equals(cacheUpdate) || CACHEUPDATE_CONTENT.equals(cacheUpdate)) {
-                    useCache = cacheEntry.getDate().getTime() >= testedDate.getTime();
+                	if(testedDate==null){
+                		log.error("testedDate==null. cacheUpdate is " + cacheUpdate + " - Error retrieving WebTML cache data for key "  + getTMLContext().db().getDbReference() + "/" + status._currentCacheId + "/" + status._currentCacheKey);
+                	}
+                	else{
+                		useCache = cacheEntry.getDate().getTime() >= testedDate.getTime();
+                	}
                 }
                 else {
                     useCache = true;
