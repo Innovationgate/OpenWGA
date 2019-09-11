@@ -1429,10 +1429,6 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
         try {
             List result;
             if (_ddlVersion >= WGDatabase.CSVERSION_WGA5) {                
-                //Sequence seq = (Sequence) getSession().get(Sequence.class, "historylog_id");
-                //if (seq != null) {
-                    //return (seq.getValue() - 1);
-                //}
                 result = getSession().createQuery("select max(entry.id) from LogEntry as entry").list();
                 if (result.size() > 0) {
                     Long id = (Long) result.get(0);
@@ -1440,7 +1436,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                         return id;
                     }
                 } 
-                return Long.MIN_VALUE;                
+                return 0;                
             }
             else {
                 result = getSession().createQuery("select max(entry.logtime) from LogEntry as entry").list();
@@ -1453,7 +1449,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                     return lcDate;
                 }
                 else {
-                    return new Date(Long.MIN_VALUE);
+                    return new Date(0);
                 }
             }
         }
@@ -3389,8 +3385,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                 return entry.getLogtime();
             }
             else {
-            	return null;
-                //return new Date(Long.MIN_VALUE);
+                return new Date(0);
             }
         }
         else {
