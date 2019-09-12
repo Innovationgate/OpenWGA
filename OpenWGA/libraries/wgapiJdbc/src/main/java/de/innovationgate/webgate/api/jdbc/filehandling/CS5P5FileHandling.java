@@ -165,8 +165,11 @@ public class CS5P5FileHandling extends CS5P4FileHandling {
             if (getParent().isSaveIsolationActive()) {
                 getParent().getSession().save(cfd);
             }
-
+            /*
+             * Das müllt die historylog Tabelle voll.
+             * Ist das wirklich irgendwo für notwendig ???
             getParent().createLogEntry(getParent().getSession(), WGUpdateLog.TYPE_UPDATE, WGDocument.TYPENAME_FILEDERIVATE + "/" + cfd.getId(), cfd.getId());
+            */
             getParent().commitHibernateTransaction();
 
             return cfd.getId();

@@ -3298,6 +3298,9 @@ public abstract class WGUtils {
         }
         
     }
-            
+    
+    public static String generateUID(){
+    	return UIDGenerator.generateUID();
+    }
             
 }

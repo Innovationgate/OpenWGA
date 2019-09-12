@@ -118,12 +118,14 @@ public class Design {
         private boolean _clearedAutomatically;
         private String _occasionKey;
         private WGACore _core;
+        private Design _design;
 
         public DesignOccasion(Design design, String occKey, boolean cleared) throws WGException {
             _core = design._wga.getCore();
             _dbKey = design.db().getDbReference();
             _occasionKey = occKey;
             _clearedAutomatically = cleared;
+            _design = design;
         }
 
         @Override
@@ -188,23 +190,20 @@ public class Design {
                 public ResourceBundle getBundle(Locale locale) {
                     try {
                         
-                        WGA wga = WGA.get(_core);
-                        Design design = wga.design(_dbKey);
-                        
                         // Requested language
-                        ResourceBundle bundle = design.getLabelBundle(null, "problems", locale.toString());
+                        ResourceBundle bundle = _design.getLabelBundle(null, "problems", locale.toString());
                         if (bundle != null) {
                             return bundle;
                         }
                         
                         // DB default language
-                        bundle = design.getLabelBundle(null, "problems", design.db().getDefaultLanguage());
+                        bundle = _design.getLabelBundle(null, "problems", _design.db().getDefaultLanguage());
                         if (bundle != null) {
                             return bundle;
                         }
                         
                         // Generic problem label fallback language "en"
-                        return design.getLabelBundle(null, "problems", "en");
+                        return _design.getLabelBundle(null, "problems", "en");
                         
                     }
                     catch (Exception e) {
@@ -622,7 +621,6 @@ public class Design {
         WGAResourceBundleManager manager = _wga.getCore().getResourceBundleManager(_designContext.getDesignDB());
         
         if (container == null) {
-            //container = WGAResourceBundleManager.CONTAINER_DEFAULT;
             DesignResourceReference containerRef = resolveReference(WGAResourceBundleManager.CONTAINER_DEFAULT);
             container = containerRef.getResourceName();
         }
@@ -1616,7 +1614,7 @@ public class Design {
     public void addProblem(String occasionKey, String key, Map<Object,Object> params) throws WGException {
         
         ProblemOccasion occ = startProblemOccasion(occasionKey, false);
-        addProblem(occ,  key, params);
+        addProblem(occ, key, params);
         
     }
     

@@ -36,6 +36,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -80,7 +81,6 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.jdbc.ColumnNameCache;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.exception.SQLGrammarException;
@@ -99,9 +99,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.Dom4JDriver;
 
 import de.innovationgate.monitoring.JmxManager;
-import de.innovationgate.utils.TemporaryFile;
 import de.innovationgate.utils.WGUtils;
-import de.innovationgate.webgate.api.MetaInfo;
 import de.innovationgate.webgate.api.WGACLCore;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGArea;
@@ -123,7 +121,6 @@ import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGDocumentCore;
 import de.innovationgate.webgate.api.WGDocumentKey;
 import de.innovationgate.webgate.api.WGFactory;
-import de.innovationgate.webgate.api.WGFileMetaData;
 import de.innovationgate.webgate.api.WGIllegalArgumentException;
 import de.innovationgate.webgate.api.WGIllegalDataException;
 import de.innovationgate.webgate.api.WGInvalidDatabaseException;
@@ -158,13 +155,11 @@ import de.innovationgate.webgate.api.jdbc.filehandling.FileHandling;
 import de.innovationgate.webgate.api.jdbc.pool.DBCPConnectionProvider;
 import de.innovationgate.webgate.api.jdbc.pool.DBCPReplicationConnectionProvider;
 import de.innovationgate.webgate.api.mysql.GaleraClusterTableGenerator;
-import de.innovationgate.webgate.api.mysql.MySqlDatabaseServer;
 import de.innovationgate.webgate.api.servers.WGDatabaseServer;
 import de.innovationgate.webgate.api.utils.MasterSessionTask;
 import de.innovationgate.wga.common.Constants;
 import de.innovationgate.wga.config.Database;
 import de.innovationgate.wga.config.DatabaseServer;
-
 
 public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabaseCore, 
 		WGDatabaseCoreFeatureReturnHierarchyCount, WGDatabaseCoreFeatureSequenceProvider, WGDatabaseCoreFeaturePageSequences, 
@@ -1434,10 +1429,6 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
         try {
             List result;
             if (_ddlVersion >= WGDatabase.CSVERSION_WGA5) {                
-                //Sequence seq = (Sequence) getSession().get(Sequence.class, "historylog_id");
-                //if (seq != null) {
-                    //return (seq.getValue() - 1);
-                //}
                 result = getSession().createQuery("select max(entry.id) from LogEntry as entry").list();
                 if (result.size() > 0) {
                     Long id = (Long) result.get(0);
@@ -1445,7 +1436,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                         return id;
                     }
                 } 
-                return Long.MIN_VALUE;                
+                return 0;                
             }
             else {
                 result = getSession().createQuery("select max(entry.logtime) from LogEntry as entry").list();
@@ -1458,7 +1449,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                     return lcDate;
                 }
                 else {
-                    return new Date(Long.MIN_VALUE);
+                    return new Date(0);
                 }
             }
         }
@@ -3394,8 +3385,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                 return entry.getLogtime();
             }
             else {
-            	return null;
-                //return new Date(Long.MIN_VALUE);
+                return new Date(0);
             }
         }
         else {
@@ -3449,7 +3439,11 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                 }
             }
             
-            createLogEntry(getSession(), WGUpdateLog.TYPE_UPDATE, WGDocument.TYPENAME_DBMETADATA + "/" + name, md.getId());
+            /*
+             * Ist das wirklich notwendig?
+             * Bei einer CS-Replikation wird ohnehin immer ein full-comapre für DB-Metas gemacht.
+             */
+            //createLogEntry(getSession(), WGUpdateLog.TYPE_UPDATE, WGDocument.TYPENAME_DBMETADATA + "/" + name, md.getId());
             commitHibernateTransaction();
         }
         catch (HibernateException e) {
@@ -3763,10 +3757,6 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
         
     }
 
-
-
-
-
     private Long upgradeFileStorage(Logger log) throws WGAPIException {
         
         _ugradeFileStorageRunning  = true;
@@ -3856,7 +3846,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                     log.info("Clearing session cache");
                     refresh();
                     log.info("Running file storage maintenance to remove duplicate file data");
-                    freedMemory+=dailyMaintenance(log);
+                    freedMemory += getFileHandling().dailyFileMaintenance(log);
                 }
                 finally {
                     Hibernate.close(oldMetas);
@@ -3874,7 +3864,34 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
     }
 
     protected long dailyMaintenance(Logger log) throws WGAPIException {
-        return getFileHandling().dailyFileMaintenance(log);
+        long bytes = getFileHandling().dailyFileMaintenance(log);
+        // clean historylog:
+        
+	    if (_ddlVersion >= WGDatabase.CSVERSION_WGA5) {
+	        
+	    	// remove entries older then 3 month but keep the newest entry in order to have a valid db revision
+	    	
+	    	Long max_id=0L;
+	    	
+	        List result = getSession().createQuery("select max(entry.id) from LogEntry as entry").list();
+	        if (result.size() > 0) {
+	            Long id = (Long) result.get(0);
+	            if (id != null) {
+	                max_id = id;
+	            }
+	        }
+	        
+	        Calendar date = Calendar.getInstance();
+	        date.add(Calendar.MONDAY, -3);
+	        log.info(getDb().getDbReference() + ": remove entries from historylog before " + date.getTime());
+	        Query query = getSession().createQuery("delete from LogEntry as entry where entry.logtime < :date and entry.id!=:id");
+	        query.setParameter("date", date.getTime());
+	        query.setParameter("id", max_id);
+	        query.executeUpdate();
+	        
+	        commitHibernateTransaction();
+	    }
+        return bytes;
     }
 
     @Override
@@ -3884,10 +3901,6 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
         query.setParameter("entry", hentry);
         return ((Number) query.uniqueResult()).intValue();
     }
-
-
-
-
 
     @Override
     public int getRootEntryCount(WGArea area) throws WGAPIException {

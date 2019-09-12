@@ -230,7 +230,6 @@ public class Design extends ScriptableObject implements Wrapper {
     
     public static PropertyResourceBundle getLabelBundle(Context cx, Scriptable thisObj, java.lang.Object[] args, Function funObj) throws JavaScriptException, WGException, IOException {
         
-        TMLContext tmlContext = WGAGlobal.fetchInitialContext(cx);
         Design design = (Design) thisObj;
         
         Arguments varArgs = _getLabelBundleVarargs.parse(args);
@@ -239,7 +238,7 @@ public class Design extends ScriptableObject implements Wrapper {
         String file = (String) varArgs.get("file");
         String language = (String) varArgs.get("language");
         
-        return design._apiDesign.getLabelBundle(tmlContext, container, file, language);
+        return design._apiDesign.getLabelBundle(container, file, language);
         
     }
     

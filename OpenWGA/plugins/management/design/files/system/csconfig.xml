@@ -32,9 +32,9 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>7</minorVersion>
-        <maintenanceVersion>1</maintenanceVersion>
+        <maintenanceVersion>2</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>685</buildVersion>
+        <buildVersion>686</buildVersion>
       </version>
     </id>
     <title>OpenWGA general management</title>

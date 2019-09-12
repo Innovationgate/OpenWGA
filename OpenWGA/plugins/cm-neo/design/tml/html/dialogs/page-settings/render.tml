@@ -3,33 +3,37 @@
 	if(!tmlform.validate())
 		return;
 
-	if(tmlform.hasfield("UNIQUENAME") && tmlform.UNIQUENAME.trim()==""){
-		document.setUniqueName(null);
-		tmlform.removefield("UNIQUENAME")
+	try{
+		if(tmlform.hasfield("UNIQUENAME") && tmlform.UNIQUENAME.trim()==""){
+			document.setUniqueName(null);
+			tmlform.removefield("UNIQUENAME")
+		}
+		
+		if(tmlform.child_editors=="custom")
+			document.setChildEditors(tmlform.fieldlist("custom_child_editors"));
+		else document.setChildEditors(tmlform.fieldlist("child_editors"));
+	
+		if(tmlform.page_editors=="custom")
+			document.setPageEditors(tmlform.fieldlist("custom_page_editors"));
+		else document.setPageEditors(tmlform.fieldlist("page_editors"));
+	
+		if(tmlform.page_readers=="custom")		
+			document.setReaders(tmlform.fieldList("custom_page_readers"));
+		else document.setReaders(WGA.createList());
+	
+		tmlform.store();
+	
+		portlet.fireevent("close-dialog");
+		portlet.fireevent("content-metas-changed", {
+			contentkey: KEY,
+			dbkey: meta("db", "dbkey")
+		});
+		
+		_dialog_closed=true
 	}
-	
-	if(tmlform.child_editors=="custom")
-		document.setChildEditors(tmlform.fieldlist("custom_child_editors"));
-	else document.setChildEditors(tmlform.fieldlist("child_editors"));
-
-	if(tmlform.page_editors=="custom")
-		document.setPageEditors(tmlform.fieldlist("custom_page_editors"));
-	else document.setPageEditors(tmlform.fieldlist("page_editors"));
-
-	if(tmlform.page_readers=="custom")		
-		document.setReaders(tmlform.fieldList("custom_page_readers"));
-	else document.setReaders(WGA.createList());
-
-	tmlform.store();
-
-	portlet.fireevent("close-dialog");
-	portlet.fireevent("content-metas-changed", {
-		contentkey: KEY,
-		dbkey: meta("db", "dbkey")
-	});
-	
-	_dialog_closed=true
-	
+	catch(e){
+		tmlform.addmessage(e.message)
+	}
 </tml:action>
 
 <tml:form id="form-page-settings" context="[$struct:{document.structKey}]" unless="_dialog_closed" mode="{WGA.app().isChiefEditor()?'edit':'view'}">
@@ -48,6 +52,10 @@
 	</div>
 	
 	<div class="content form-horizontal">
+
+		<tml:case condition="tmlform.hasmessages()">
+			<tml:[form-messages] o_title="Die Einstellungen können nicht gespeichert werden"/>
+		</tml:case>
 
 		<ul class="nav nav-tabs">
 			<li class="active"><a data-toggle="tab" href="#basic">Eigenschaften</a></li>

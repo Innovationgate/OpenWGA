@@ -272,20 +272,6 @@ public class Problem extends WGAServerException implements ProblemQueueEvent {
             p = new Problem(problemPath, text, severity, occasion, throwable, providers);
         }
         
-        if(severity.equals(ProblemSeverity.HIGH)){
-        	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_PROBLEM);
-        	mail.setSubject(p.getTitle(Locale.getDefault()));
-        	mail.append(p.getMessage(Locale.getDefault()));
-        	mail.append("<br>");
-        	mail.append(p.getDescription(Locale.getDefault()));        	
-			try {
-				WGA.get().getCore().send(mail);
-			} catch (WGException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        }
-        
         return p;
         
     }

@@ -89,10 +89,10 @@
 			<li>
 				<a href="#rtf-tab-image" data-toggle="tab">Bild</a>
 			</li>
-			<tml:comment><li>
+			<li>
 				<a href="#rtf-tab-table" data-toggle="tab">Tabelle</a>
 			</li>
-			<li>
+			<tml:comment><li>
 				<a href="#rtf-tab-section" data-toggle="tab">Abschnitt</a>
 			</li></tml:comment>
 		</ul>
@@ -123,9 +123,68 @@
 					</a>
 				</div>
 			</div>
+			
 			<div class="tab-pane" id="rtf-tab-table">
-				<a href="#" class="btn btn-primary btn-sm">Tabelle einfügen ...</a>
+				<a href="#" class="btn btn-default btn-sm" data-action="create-table">
+					<i class="fa fa-plus"></i>
+					Tabelle einfügen
+				</a>
+
+				<div style="margin:0 0 10px" class="table-options table-edit-actions">
+					<label>Stil:</label>
+					<select name="table-style" style="width:100%" multiple="multiple"></select> 
+				</div>
+
+				<div class="btn-group table-edit-actions">
+					<a class="btn btn-default btn-sm" href="#" data-toggle="dropdown">
+						<i class="fa fa-plus"></i>
+						<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li>
+							<a href="#" data-action="create-td">
+								Spalte rechts hinzufügen
+							</a>
+						</li>
+						<li>
+							<a href="#" data-action="create-tr">
+								Zeile unterhalb hinzufügen
+							</a>
+						</li>
+					</ul>
+					<a class="btn btn-default btn-sm" href="#" data-action="table-para-before" title="Absatz vor Tabelle einfügen">
+						<i class="fa fa-arrow-up"></i>
+					</a>
+					<a class="btn btn-default btn-sm" href="#" data-action="table-para-after" title="Absatz nach Tabelle einfügen">
+						<i class="fa fa-arrow-down"></i>
+					</a>
+				</div>
+
+				<div class="btn-group table-edit-actions pull-right">
+					<a class="btn btn-default btn-sm" href="#" data-toggle="dropdown">
+						<i class="fa fa-trash"></i>
+						<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li>
+							<a href="#" data-action="delete-table">
+								Tabelle löschen
+							</a>
+						</li>
+						<li class="divider"></li>
+						<li>
+							<a href="#" data-action="delete-tr">
+								Zeile löschen
+							</a>
+							<a href="#" data-action="delete-td">
+								Spalte löschen
+							</a>
+						</li>
+					</ul>
+				</div>
+				
 			</div>
+
 			<div class="tab-pane" id="rtf-tab-image">
 
 				<div style="margin-bottom:10px" data-id="image-info-wrapper">

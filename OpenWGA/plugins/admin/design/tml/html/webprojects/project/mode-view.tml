@@ -85,6 +85,7 @@
 
 	var dbkey = DBM.getConfigBean().key;
 	var wgadb = db(dbkey);
+	wgadb.reopenSession();
 	
 	if(!tmlform || tmlform.fieldlist("caches").contains("data")){
 		log.info(dbkey + ": Data Cache cleared");

@@ -350,6 +350,72 @@ define(["jquery"], function($){
 		parent.removeChild(node);
 	}
 	
+	editor.prototype.deleteElement = function(el){
+		var parent = el.parentNode;
+		parent.removeChild(el);
+	}
+	
+	editor.prototype.insertTableCol = function(){
+		var td = this.getNearestTagFromSelection("TD");
+		if(!td)
+			return;
+		var index = td.cellIndex+1;
+		var rows=td.parentNode.parentNode.rows;
+		for (i=0; i<rows.length; i++){
+			tr=rows[i]
+			if (tr.cells.length>=index)
+				var new_td=tr.insertCell(index);	
+			else
+				var new_td=tr.insertCell();
+			new_td.innerHTML="<br>";
+		}
+	}
+	editor.prototype.deleteTableCol = function(){
+		var td = this.getNearestTagFromSelection("TD");
+		if (!td){
+			return;
+		}
+		var table = this.getNearestTagFromSelection("TABLE")
+		var index= td.cellIndex;
+		var rows=td.parentNode.parentNode.rows;
+		for (i=0; i<rows.length; i++){
+			tr=rows[i];
+			tr.deleteCell(index);
+			if (table && tr.cells.length==0){
+				this.deleteElement(table)	// last col: delete the table.
+				break;
+			}
+		}
+	}
+	
+	editor.prototype.insertTableRow = function(){
+		var tr = this.getNearestTagFromSelection("TR")		
+		if (!tr) {
+			return;
+		}
+		var otr = tr.cloneNode(true);
+		//clear row
+		var tds = otr.getElementsByTagName("td");
+		for (var i in tds) {
+			var td = tds[i];
+			try{
+				td.innerHTML = "<br>";
+			}
+			catch(e){
+				// may happen, if td contains a sub-table. Ignore this.
+			}
+		}
+		tr.parentNode.insertBefore(otr, tr.nextSibling);
+	}
+
+	editor.prototype.deleteTableRow = function(){
+		var tr = this.getNearestTagFromSelection("TR")
+		var table = this.getNearestTagFromSelection("TABLE")
+		tr && this.deleteElement(tr);
+		if(table && table.rows.length==0)
+			this.deleteElement(table)	// last row: delete the table.
+	}
+	
 	editor.prototype.removeLink = function(aTag){
 		if(!aTag)
 			aTag=this.getNearestTagFromSelection("A");	// try to find one
@@ -423,7 +489,7 @@ define(["jquery"], function($){
 
 	function getCleanHTML(htmltext, toolbar){
 		
-		var good_els = "#h1#h2#h3#h4#h5#h6#a#img#p#pre#br#ul#ol#li#";
+		var good_els = "#h1#h2#h3#h4#h5#h6#a#img#p#pre#br#ul#ol#li#table#tr#td#";
 		var good_els_textblock = "#br#div#";
 		var bad_els = "#head#title#meta#link#script#style#";
 	
@@ -523,6 +589,7 @@ define(["jquery"], function($){
 								continue;
 							if((tagname=="a" && hasToolbarClass(toolbar.linkStyleList, cls))
 								|| (tagname=="img" && hasToolbarClass(toolbar.imageStyleList, cls))
+								|| (tagname=="table" && hasToolbarClass(toolbar.tableStyleList, cls))
 								|| ("p,h1,h2,h3,h4,h5,h6,pre".indexOf(tagname)>=0  && hasToolbarClass(toolbar.paragraphStyleList, cls))
 							)
 								dest_classes.push(cls); 

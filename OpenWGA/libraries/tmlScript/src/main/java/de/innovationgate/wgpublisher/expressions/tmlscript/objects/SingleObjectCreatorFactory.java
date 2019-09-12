@@ -63,16 +63,18 @@ public class SingleObjectCreatorFactory implements ObjectCreatorFactory {
         
         if (_allowConstructorExtraction && objectDefinition.getObjectName() != null) {
             try {
-                return "function _tmlfunction() {" + objectDefinition.getCode() +  "\nif (typeof(" + objectDefinition.getObjectName() + ")=='function') this.__constructor__=" + objectDefinition.getObjectName() + ";\n} _tmlfunction;";
+                //return "function _tmlfunction() {" + objectDefinition.getCode() +  "\nif (typeof(" + objectDefinition.getObjectName() + ")=='function') this.__constructor__=" + objectDefinition.getObjectName() + ";\n} _tmlfunction;";
+            	return "(function(){" + objectDefinition.getCode() +  "\nif(typeof(" + objectDefinition.getObjectName() + ")=='function') this.__constructor__=" + objectDefinition.getObjectName() + "})";
             }
             catch (IllegalArgumentException e) { // In case the name is not suitable for an expected Object Name
             }
         }
 
-        return "function _tmlfunction() {" + objectDefinition.getCode() + "\n} _tmlfunction;";
+        //return "function _tmlfunction() {" + objectDefinition.getCode() + "\n} _tmlfunction;";
+        return "(function(){" + objectDefinition.getCode() + "})";
 
     }
-    
+   
         
     
     @Override

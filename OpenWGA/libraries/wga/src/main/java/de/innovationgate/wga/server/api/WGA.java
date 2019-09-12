@@ -430,7 +430,14 @@ public class WGA {
      * @param context A WGA context object
      */
     public static WGA get(WGAContext context) {
-        return new WGA(context);
+    	if(context!=null)
+    		return new WGA(context);
+    	try {
+			return get();	// best chance
+		} catch (WGException e) {
+			e.printStackTrace();
+			return null;
+		} 
     }
     
     public static WGA get(final TMLContextEnvironment env) {
@@ -3344,6 +3351,20 @@ public class WGA {
     }
 
 
-    
+    public WGAFile File(String filename){
+    	return new WGAFile(this, filename);
+    }
+    public WGAFile File(File file){
+    	return new WGAFile(this, file);
+    }
+ 
+    public WGAHttpClient HttpClient(String url) throws WGException{
+    	return new WGAHttpClient(this, url);
+    }
+ 
+    public WGATempFile TempFile(String filename) throws IOException{
+    	return new WGATempFile(this, filename);
+    }
+ 
 }
  

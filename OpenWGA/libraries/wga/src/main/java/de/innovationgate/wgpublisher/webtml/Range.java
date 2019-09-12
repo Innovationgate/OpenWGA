@@ -436,7 +436,6 @@ public class Range extends Base {
         // Determine tested date by cacheupdate mode
         Date testedDate;
         try {
-            testedDate = null;
             if (CACHEUPDATE_DB.equals(cacheUpdate) || CACHEUPDATE_NEVER.equals(cacheUpdate) || CACHEUPDATE_BRANCH.equals(cacheUpdate) || CACHEUPDATE_PRELOAD.equals(cacheUpdate)) {
                 testedDate = getCore().getDeployer().getLastChangedOrDeployed(db);
             }
@@ -469,7 +468,7 @@ public class Range extends Base {
                 
                 boolean useCache = false;
                 if (CACHEUPDATE_DB.equals(cacheUpdate) || CACHEUPDATE_CONTENT.equals(cacheUpdate)) {
-                    useCache = cacheEntry.getDate().getTime() >= testedDate.getTime();
+            		useCache = cacheEntry.getDate().getTime() >= testedDate.getTime();
                 }
                 else {
                     useCache = true;
