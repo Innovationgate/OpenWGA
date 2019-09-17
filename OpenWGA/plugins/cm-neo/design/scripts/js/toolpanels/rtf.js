@@ -364,7 +364,7 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 				}				
 				$("#editor-panel-rtf [data-id=link-type]").html(types[info.type||"undefined"])
 				if(info.type=="exturl")
-					$("#editor-panel-rtf [data-id=link-info]").html($(el).prop("href"))
+					$("#editor-panel-rtf [data-id=link-info]").html(info.key || $(el).prop("href"))
 				else if(info.type=="intfile")
 					$("#editor-panel-rtf [data-id=link-info]").html(info.key)
 				else if(info.type=="extfile"){

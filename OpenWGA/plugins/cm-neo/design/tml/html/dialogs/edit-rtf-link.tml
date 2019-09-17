@@ -47,7 +47,7 @@
 			</tml:case>
 			<tml:case value="exturl">
 				<tml:[form-field] o_label="URL" o_name="url" 
-					o_default="{$option_dialog_options.url}"
+					o_default="{$option_dialog_options.key || $option_dialog_options.url}"
 					o_placeholder="vollständige absolute URL ..."
 				/>
 			</tml:case>
