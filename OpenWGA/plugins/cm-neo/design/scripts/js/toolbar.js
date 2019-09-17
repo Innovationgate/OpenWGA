@@ -146,7 +146,6 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 
 		,"show-create-areas": function(){
 			Sitepanel.showCreateAreas();
-			//WGA.event.fireEvent('CMS_showCreateAreas')
 		}
 
 		,"save-item-cancel-edit": function(){
@@ -158,10 +157,6 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 		}
 
 		,"save-item": function(button){
-			/*button.popover("show");
-			setTimeout(function(){
-				button.popover("hide");
-			}, 2000)*/
 			WGA.event.fireEvent('CMS_save_item')
 		}
 
@@ -171,7 +166,6 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 				button.popover("hide");
 			}, 2000)
 			WGA.event.fireEvent('CMS_save_item', "*", {remove_item: true, close_editor: true})
-			//WGA.event.fireEvent('CMS_remove_item')
 		}
 
 		,"cancel-edit": function(){
@@ -209,13 +203,10 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 		},
 
 		"content-modules": function(button){
-			CM.openDialog("content-modules", {
-				//style: "width:80%;margin-left:-40%;height:80%"
-			});
+			CM.openDialog("content-modules");
 		},
 
 		"delete-page": function(){
-			//WGA.event.fireEvent("page-deleted")
 			CM.openDialog("delete-page")
 		},
 
