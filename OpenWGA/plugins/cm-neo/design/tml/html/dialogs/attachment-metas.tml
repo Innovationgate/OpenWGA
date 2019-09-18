@@ -96,7 +96,7 @@
 					<p><tml:script expression="_pages > 1 ? _pages + ' Seiten' : 'Eine Seite'"/></p>
 				</tml:case>
 				<tml:case condition="_derivates.size()">
-					<p style="margin-top:20px">Poster Derivates:</p>
+					<p style="margin-top:20px">Poster Derivate:</p>
 	    			<tml:foreach item="_derivates" currentvalue="_derivate" sortexpression="_derivate.size" sortorder="descending">
 	    				<tml:script>
 							_url = WGA.urlBuilder(fileurl(portlet.filename))
