@@ -4,20 +4,19 @@
 	var url = null,
 		link_title = "", 
 		link_target = "";
-	if(STATUS!=content().STATUS_DRAFT){
-		if(CMM.setting("link")=="int"){
-			var ctx = context("docid:"+CMM.setting("wgakey")) 
-			url = ctx.contenturl()
-			link_title = ctx.TITLE
-		}
-		else if(CMM.setting("link")=="ext"){
-			url = CMM.setting("url");
-			link_title = url
-			link_target = "_blank"
-		}
+	if(CMM.setting("link")=="int"){
+		var ctx = context("docid:"+CMM.setting("wgakey")) 
+		url = ctx.contenturl()
+		link_title = ctx.TITLE
 	}
+	else if(CMM.setting("link")=="ext"){
+		url = CMM.setting("url");
+		link_title = url
+		link_target = "_blank"
+	}
+
 	_wrap_tag = url ? "a" : "div";
-	_wrap_attribs = url ? 'href="' + url + '" title="' + link_title + '" target="' + link_target + '"' : ''
+	_wrap_attribs = (url && STATUS!=content().STATUS_DRAFT) ? 'href="' + url + '" title="' + link_title + '" target="' + link_target + '"' : ''
 	
 	// calc image derivates width
 	_imagederivates=null;
