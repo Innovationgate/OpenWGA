@@ -49,7 +49,7 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 			.end()
 
 		$("#toolbars [data-action='create-draft']")[ev.params.may_edit_content ? "show" : "hide"]()
-		$("#toolbars [data-action='publish-page']")[ev.params.status=='w' ? "show" : "hide"]()
+		$("#toolbars [data-action='publish-page']")[ev.params.status=='w' && ev.params.ismine ? "show" : "hide"]()
 		$("#toolbars [data-action='approve-content']")[ev.params.may_approve_version ? "show" : "hide"]()
 		$("#toolbars [data-action='reject-content']")[ev.params.may_approve_version ? "show" : "hide"]()
 			
