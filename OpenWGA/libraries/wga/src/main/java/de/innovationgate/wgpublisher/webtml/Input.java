@@ -728,7 +728,6 @@ public class Input extends ActionBase implements DynamicAttributes {
             doLabelling = labeled.equalsIgnoreCase("true");
             wrapWithLabels = labeled.equalsIgnoreCase("wrap");        	
         }
-        //boolean doLabelling = stringToBoolean(getLabeled());
         
         // We need an id for option inputs so we can reference them from their labels
         String theId = getId();
@@ -819,26 +818,26 @@ public class Input extends ActionBase implements DynamicAttributes {
 	}
 	
 	private void renderDateInput(
-			String name,
-			String format,
-			String cssClass,
-			String cssStyle,
-			Object singleValue,
-			String tagContent,
-            String disabled) throws FormattingException, WGException {
-		
-			if (format==null){
-				getStatus().format = "yyyy/MM/dd HH:mm:ss";
-				format="yyyy/MM/dd HH:mm:ss";	
-			}			
-			renderSimpleInput("text", name, format, cssClass, cssStyle, singleValue, tagContent, disabled);
-			FormInputRegistrator formBase = (FormInputRegistrator) getStatus().getAncestorTag(FormBase.class);	
-            if (formBase != null) {
-                if (formBase.getFormMode().equals(TMLFormInfo.READONLY_MODE) || formBase.getFormMode().equals(TMLFormInfo.VIEW_MODE)) {
-                    return;		// no calendar control if form is in readonly- or view-mode.
-                }
+		String name,
+		String format,
+		String cssClass,
+		String cssStyle,
+		Object singleValue,
+		String tagContent,
+        String disabled) throws FormattingException, WGException {
+	
+		if (format==null){
+			getStatus().format = "yyyy/MM/dd HH:mm:ss";
+			format="yyyy/MM/dd HH:mm:ss";	
+		}			
+		renderSimpleInput("text", name, format, cssClass, cssStyle, singleValue, tagContent, disabled);
+		FormInputRegistrator formBase = (FormInputRegistrator) getStatus().getAncestorTag(FormBase.class);	
+        if (formBase != null) {
+            if (formBase.getFormMode().equals(TMLFormInfo.READONLY_MODE) || formBase.getFormMode().equals(TMLFormInfo.VIEW_MODE)) {
+                return;		// no calendar control if form is in readonly- or view-mode.
             }
-		}
+        }
+	}
 		
 	private void renderTextArea( String name, String format, String cssClass, String cssStyle, Object value, String tagContent, boolean multiple, String disabled) throws FormattingException, WGException {
 		
@@ -892,8 +891,14 @@ public class Input extends ActionBase implements DynamicAttributes {
 			}
 		}
 
-        boolean doLabelling = stringToBoolean(getLabeled());
-        
+		String labeled = getLabeled();
+		boolean doLabelling = false;
+		boolean wrapWithLabels = false;
+		if(labeled!=null){
+			doLabelling = labeled.equalsIgnoreCase("true");
+			wrapWithLabels = labeled.equalsIgnoreCase("wrap");        	
+		}
+
         // We need an id for option inputs so we can reference them from their labels
         String theId = getId();
         if (doLabelling && theId == null) {
@@ -928,6 +933,9 @@ public class Input extends ActionBase implements DynamicAttributes {
 
     			String htmlDivider = getMultiValueDivider();
     	
+    			if(wrapWithLabels)
+    				this.appendResult("<label>");
+
     			this.appendResult("<input").appendResult(buildDynamicHtmlAttributes());
     			if(optionId!=null){
     				this.appendResult(" id=\"" + optionId + "\"");
@@ -950,6 +958,10 @@ public class Input extends ActionBase implements DynamicAttributes {
     			else {
     			    this.appendResult(optionText);
     			}
+    			
+    			if(wrapWithLabels)
+    				this.appendResult("</label>");
+
     			if (optionsIt.hasNext()) {
     				appendResult(htmlDivider);
     			}
@@ -959,6 +971,10 @@ public class Input extends ActionBase implements DynamicAttributes {
         
         // If no options given Build a single checkbox representing "true"
         else {
+
+        	if(wrapWithLabels)
+    			this.appendResult("<label>");
+        	
             this.appendResult("<input").appendResult(buildDynamicHtmlAttributes());
             if (theId!=null) {
             	this.appendResult(" id=\"" + theId + "\"");
@@ -983,7 +999,10 @@ public class Input extends ActionBase implements DynamicAttributes {
     			    this.appendResult(optionText);
     			}
             }
-            
+
+    		if(wrapWithLabels)
+    			this.appendResult("</label>");
+
         }
 	}
 
