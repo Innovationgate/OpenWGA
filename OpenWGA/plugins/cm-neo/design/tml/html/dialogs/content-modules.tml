@@ -7,6 +7,11 @@
 				tmlform.setField(setting, settings_map.get(setting))
 		}
 		_mayEdit = STATUS==content().STATUS_DRAFT && AUTHOR==meta("db", "username")
+		/*
+		  #00005453
+		  Don't allow ChiefEditors to edit in this case
+		  Therefore using App.mayUpdateContent(this) is not want we need
+		 */
 	</tml:script>
 
 	<tml:include ref="::content-modules:main">
