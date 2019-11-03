@@ -1,0 +1,34 @@
+function Controller() {}
+
+Controller.prototype.prepare = function() {}
+
+Controller.prototype.pageType = function($cx, $item__CM_clipboard_context) {
+	var source = $cx.context($item__CM_clipboard_context).content().structEntry;
+	return source.getContentType().name;
+}
+
+Controller.prototype.isSamePageType = function($cx, $item__CM_clipboard_context) {
+	return this.pageType($cx, $item__CM_clipboard_context) == $cx.CONTENTTYPE
+}
+
+Controller.prototype.copyElements = function(AFW, $cx, $item__CM_clipboard_context, $form) {
+
+	var source = WGA.context($item__CM_clipboard_context, false)
+	if(!source)
+		return $form.addMessage("Unable to locate source content");
+	
+	var els = $form.fieldList("elements");	
+	AFW.content($cx).copyElements(els, source.content())
+
+	return {
+		"$portletEvents": {
+			"close-dialog": {
+				redirectto: $cx.contenturl()	// reload page
+			}
+		},
+		"$vars": {
+			_dialog_closed: true
+		}
+	}
+
+}

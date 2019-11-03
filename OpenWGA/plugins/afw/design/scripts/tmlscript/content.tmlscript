@@ -409,11 +409,16 @@ this.copyElements = function(els, source){
 }
 
 this.copyItems = function(sourcedoc){
-	var items=createObject(this, "content", sourcedoc).getItemNames().iterator();		// sourcedoc.getItemNames();
-	while(items.hasNext()){
-		var item=items.next();
-		if(item!="remote_references")	// don't copy this reference-item!
-			content.setItemValue(item, sourcedoc.getItemValue(item));
+	// remove all existing items
+	var items=this.getItemNames();
+	for(let itemname in Iterator(items)){
+		content.removeItem(itemname);
+	}
+	// copy new items
+	var items=createObject(this, "content", sourcedoc).getItemNames();
+	for(let itemname in Iterator(items)){
+		if(itemname!="remote_references")	// don't copy this reference-item!
+			content.setItemValue(itemname, sourcedoc.getItemValue(itemname));
 	}
 }
 
@@ -433,6 +438,7 @@ this.copyMetas = function(sourcedoc){
 this.copyAttachments = function(sourcedoc){
 	content.removeAllFiles();
 	content.attachAllFiles(sourcedoc, true);
+	content.setPrimaryFileName(sourcedoc.getPrimaryFileName())
 }
 
 this.copyModules = function(sourcedoc){

@@ -32,7 +32,8 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 	})	
 	
 	WGA.event.addListener("*", "clipboard-changed", function(ev){
-		$("#toolbars [data-action='clipboard-paste']").parent().removeClass("disabled")
+		$("#toolbars .clipboard-paste-actions").show();
+		$("#toolbars .clipboard-content").html("Seite '" + ev.params.title + "'");
 	})
 	
 	WGA.event.addListener("*", "content-changed", function(ev){
@@ -85,8 +86,11 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 			WGA.event.fireEvent('clipboard-copy', "*")
 		},
 
-		"clipboard-paste": function(){
-			CM.openDialog("clipboard-paste");
+		"paste-page": function(){
+			CM.openDialog("paste-page");
+		},
+		"paste-content": function(){
+			CM.openDialog("paste-content");
 		},
 
 		"search": function(){

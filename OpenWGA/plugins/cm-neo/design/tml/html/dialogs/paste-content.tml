@@ -1,0 +1,48 @@
+<tml:form unless="_dialog_closed" id="form-copy-pages" cssclass="form-horizontal">
+
+	<div class="header">
+		<a data-modal="hide">&times;</a>
+		Inhaltselemente einfügen
+	</div>
+	
+	<div class="content">
+		
+		<tml:[form-field] o_label="Von Seite" o_mode="view">
+			<tml:range context="{_CM_clipboard_context}">
+				<b><tml:meta name="title" encode="html"/></b>
+				<br>
+				Seitentyp: <tml:item name="$mc.pageType"/>			
+			</tml:range>
+		</tml:[form-field]>	
+
+		<tml:case unless="$mc.isSamePageType">
+			<div class="alert alert-danger">
+				Die Quelle ist nicht vom Seitentyp '<tml:meta name="contenttype"/>'.<br>
+				Inhaltselemente können nicht eingefügt werden.
+			</div>
+		</tml:case>
+
+		<tml:case if="$mc.isSamePageType">
+			<tml:script>
+				if(!tmlform.issubmitted())
+					tmlform.setfield("elements", WGA.createList(["items","metas","attachments","modules"]))
+			</tml:script>
+			<tml:[form-field] o_label="Inhaltselemente"
+				o_name="elements" o_type="checkbox" 
+				o_options="Inhaltsfelder|items,Eigenschaften|metas,Dateianhänge|attachments,Inhaltsmodule|modules"
+				o_divider="<br>"
+			/>
+	
+			<div class="alert alert-info">
+				Durch diese Aktion werden alle existierenden Elemente des ausgewählten Typs in dieser Seite gelöscht und durch neue Elemente ersetzt.
+			</div>
+		</tml:case>
+		
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:button cssclass="btn btn-primary" clickaction="$mc.copyElements" if="$mc.isSamePageType">Elemente einfügen</tml:button>
+	</div>
+	
+</tml:form>
