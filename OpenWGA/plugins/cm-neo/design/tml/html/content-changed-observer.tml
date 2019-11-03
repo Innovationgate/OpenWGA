@@ -127,7 +127,8 @@
 				if(context(path, false)){
 					setsessionvar("_CM_clipboard_context", path)
 					portlet.fireevent("clipboard-changed", {
-						title: WGA.encode("html", context(path).TITLE)
+						title: WGA.encode("html", context(path).TITLE),
+						lang: context(path).LANGUAGE
 					})
 				}
 			</tml:action>",

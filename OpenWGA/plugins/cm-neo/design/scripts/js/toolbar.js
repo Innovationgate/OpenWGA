@@ -33,7 +33,7 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 	
 	WGA.event.addListener("*", "clipboard-changed", function(ev){
 		$("#toolbars .clipboard-paste-actions").show();
-		$("#toolbars .clipboard-content").html("Seite '" + ev.params.title + "'");
+		$("#toolbars .clipboard-content").html("Seite '" + ev.params.title + "' - " + ev.params.lang);
 	})
 	
 	WGA.event.addListener("*", "content-changed", function(ev){
