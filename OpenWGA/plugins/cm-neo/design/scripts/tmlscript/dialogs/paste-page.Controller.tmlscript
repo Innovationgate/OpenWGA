@@ -5,7 +5,6 @@ Controller.prototype.prepare = function($cx) {
 	/*
 	 * The following code needs wga 7.6 to work.
 	 * this bc. $cx is not correctly initialised in ajax portlet requests
-	 * We leaf it anywhere here - but don't use the $options on 7.5.5
 	 */ 
 
 	// Areas
@@ -68,8 +67,10 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 	var source = $cx.context($item__CM_clipboard_context).content().structEntry;
 	var dest = $cx.content().structEntry;
 	
-	if($form.root_or_child=="root")
-		dest = $cx.content().structEntry.getArea();
+	if($form.root_or_child=="root"){
+		// #00005454
+		dest = $cx.db().getArea($form.area)
+	}
 
 	try{
 		var struct = copyStruct(source, dest, $form.recursive, $form.publish)
@@ -90,10 +91,10 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 	}
 
 	function copyStruct(source, dest, recursive, publish){
-		//console.log("copy", source.title, "to", dest.title, recursive, publish)
+		//console.log("copy", source.title, "to", dest.title || dest.name, recursive, publish)
 
-		var ct = source.getContentType();
-		var Contenttype = AFW.contenttype(ct);
+		var Contenttype = AFW.contenttype(source.getContentType().name);
+		var ct = Contenttype.WGObject;
 
 		if(!Contenttype.isValid()) throw{
 			message: "Seitentyp nicht gefunden"
@@ -133,7 +134,13 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 		var docs=source.getAllReleasedContent().values();
 		for(let doc in Iterator(docs)){
 		
-			var lang = doc.getLanguage();
+			var lang = doc.getLanguage().name;
+			// check if language exists
+			if(!dest.getDatabase().getLanguages().containsKey(lang)){
+				console.log("Langauge not found. Content will be ignored", lang);
+				continue;
+			}
+			
 			var newdoc = struct.createContent(lang, doc.title);
 
 			// copy all items

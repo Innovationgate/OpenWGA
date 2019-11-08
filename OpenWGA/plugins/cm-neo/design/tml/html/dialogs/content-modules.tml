@@ -1,16 +1,21 @@
 <tml:form id="module-settings">
 
 	<tml:script>
-		//var settings_map = CMM.getModulesSettingsMap("content", tmlform.mod_id);
 		var settings_map = CMM.getModulesSettingsMap("content");
 		for(let setting in Iterator(settings_map.keySet())){
 			if(!tmlform.hasfield(setting))
 				tmlform.setField(setting, settings_map.get(setting))
 		}
+		_mayEdit = STATUS==content().STATUS_DRAFT && AUTHOR==meta("db", "username")
+		/*
+		  #00005453
+		  Don't allow ChiefEditors to edit in this case
+		  Therefore using App.mayUpdateContent(this) is not want we need
+		 */
 	</tml:script>
 
 	<tml:include ref="::content-modules:main">
-		<tml:option name="mode" expression="STATUS==content().STATUS_DRAFT ? 'edit':'view'"/>
+		<tml:option name="mode" expression="_mayEdit ? 'edit':'view'"/>
 	</tml:include>
 	
 </tml:form>

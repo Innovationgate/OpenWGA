@@ -132,8 +132,6 @@ public class FileDerivateManager {
         
         private float _score;
         private WGFileAnnotations _file;
-        
-        
 
         public DerivateQueryResult(float score, WGFileAnnotations file) {
             super();
@@ -148,10 +146,10 @@ public class FileDerivateManager {
                 if (comparision != 0) {
                     return comparision;
                 }
-                return new Long(_file.getSize()).compareTo(o.getFile().getSize());
+                return new Long(o.getFile().getSize()).compareTo(_file.getSize());
             }
             catch (WGAPIException e) {
-                throw new IllegalStateException("Exception comparingd derivate query results", e);
+                throw new IllegalStateException("Exception comparing derivate query results", e);
             }
         }
 
@@ -878,7 +876,7 @@ public class FileDerivateManager {
             return null;
         }
         
-        // From all results that have the highest score use the largest file
+        // From all results that have the highest score use the smallest file
         Collections.sort(results);
         return results.get(results.size() - 1).getFile();
     

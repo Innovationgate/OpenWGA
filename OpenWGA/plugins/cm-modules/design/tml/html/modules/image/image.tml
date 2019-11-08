@@ -126,16 +126,32 @@
 	>
 </tml:range>
 
-<tml:if condition="(!CMM.setting('onclick') || CMM.setting('onclick')=='link') && CMM.setting('url')">
+<tml:if condition="(!CMM.setting('onclick') || CMM.setting('onclick')=='link')">
 	<tml:then>
-		<tml:if context="[docid:{CMM.setting('url')}]" iscontextvalid="true">
+
+		<tml:if condition="CMM.setting('link_type')=='int' && CMM.setting('wgakey')">
 			<tml:then>
-				<a href="<tml:url/>"><tml:item name="_img" encode="none"/></a>
+				<a href="<tml:url context="[docid:{CMM.setting('wgakey')}]"/>"><tml:item name="_img" encode="none"/></a>
 			</tml:then>
-			<tml:else>
+			<tml:elseif condition="CMM.setting('link_type')=='ext' && CMM.setting('url')">
 				<a href="<tml:[setting] o_name="url"/>"><tml:item name="_img" encode="none"/></a>
+			</tml:elseif>
+			<tml:elseif condition="CMM.setting('url')">
+				<tml:comment>old style url</tml:comment>
+				<tml:if context="[docid:{CMM.setting('url')}]" iscontextvalid="true">
+					<tml:then>
+						<a href="<tml:url/>"><tml:item name="_img" encode="none"/></a>
+					</tml:then>
+					<tml:else>
+						<a href="<tml:[setting] o_name="url"/>"><tml:item name="_img" encode="none"/></a>
+					</tml:else>
+				</tml:if>
+			</tml:elseif>
+			<tml:else>
+				<tml:item name="_img" encode="none"/>
 			</tml:else>
 		</tml:if>
+		
 	</tml:then>
 	<tml:elseif condition="CMM.setting('onclick')=='open'">
 		<a target="_blank" href="<tml:item name="_download_url"/>"><tml:item name="_img" encode="none"/></a>

@@ -18,39 +18,14 @@
 		</tml:[form-field]>	
 		
 		<tml:script>
-		
-			var root_or_child = WGA.createList([
-				"unter Seite '" + TITLE + "'|child",
-				"Als Hauptseite|root"
-			])
-			WGA.TMLPage.setVar("_root_or_child", root_or_child)
-
-			// Areas
-			var areas = WGA.createList()
-			for(let area in Iterator(db().getAreas().values())){
-				if(area.systemArea)
-					continue;
-				if(area.name=="hdb-content" && !WGA.app().isManager())
-					continue;
-				var visiblefor = area.getExtensionData("CM_area_visible")
-				if(visiblefor && visiblefor.size() && !db().isMemberOfUserList(visiblefor))
-					continue;
-				if(!area.mayEditPages())
-					continue;
-				if(area.mayReadContent()){
-					areas.add(area.name)
-					if(!tmlform.area)
-						tmlform.area = area.name
-				}
+			if(!tmlform.area){
+				tmlform.area = $option_areas.contains(AREA) ? AREA : $option_areas.get(0)
 			}
-			WGA.TMLPage.setVar("_areas", areas)
-			if(!tmlform.submitted && areas.contains(AREA))
-				tmlform.area = AREA
 		</tml:script>
-		<tml:[form-field] o_label="Einfügen" o_field="root_or_child" o_type="select" o_default="child" o_optionsitem="_root_or_child" o_changeaction="$refresh"/>
+		<tml:[form-field] o_label="Einfügen" o_field="root_or_child" o_type="select" o_default="child" o_optionsitem="$option_root_or_child" o_changeaction="$refresh"/>
 		
 		<tml:case condition="tmlform.root_or_child=='root'">
-			<tml:[form-field] o_label="Bereich" o_field="area" o_type="select" o_optionsitem="_areas" o_changeaction="$refresh"/>
+			<tml:[form-field] o_label="Bereich" o_field="area" o_type="select" o_optionsitem="$option_areas" o_changeaction="$refresh"/>
 		</tml:case>
 		
 		<tml:{div} html_class="alert alert-danger" unless="$mc.isAllowedPageType">

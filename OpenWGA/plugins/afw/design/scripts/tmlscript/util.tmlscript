@@ -599,6 +599,19 @@ this.csvWriter = function(config){
 		line = null;		
 	};
 
+	function colLabel(col) {
+		return typeof(col)=="string" ? col.split("|")[0] : (col.label||"");
+	};
+
+	function colValue($cx, col) {
+		if(typeof(col)=="string"){
+			var parts = col.split("|");
+			var value = parts[1]||parts[0];
+			return value==value.toUpperCase() ? $cx.meta(value) : $cx.item(value); 
+		}
+		else return col.value.call($cx, $cx);
+	}
+
 	return {
 		write: function(stream_or_file, encoding){
 			
@@ -629,35 +642,19 @@ this.csvWriter = function(config){
 			
 			// headline:
 			if(config.header!==false){
-				var items = itemlist.iterator();
-				var line = null;
-				while(items.hasNext()){
-					var item = items.next();
-					var label = (typeof(item)=="string" ? item : item.label)
-					addValue(label);
-				}
+				for(let col in Iterator(itemlist))
+					addValue(colLabel(col));
 				flush(out);
 			}
 
 			// data
-			var docs = contentlist.iterator();
-			while(docs.hasNext()){
-				var doc = docs.next();
+			for(let doc in Iterator(contentlist)){
 				if(doc instanceof Packages.de.innovationgate.webgate.api.WGContent)
 					doc=context(doc);
-				var items = itemlist.iterator();
-				while(items.hasNext()){
-					var item = items.next();
+				for(let col in Iterator(itemlist)){
 					var value="";
 					try{
-						if(typeof(item)=="string"){
-							if(item==item.toUpperCase())
-								value = doc.meta(item);
-							else value = doc.item(item);
-						}
-						else {
-							value = item.value.call(doc, doc)
-						}
+						var value = colValue(doc, col);
 					}
 					catch(e){
 						value = e.message;

@@ -100,10 +100,36 @@
 	<tml:case value="link">
 		<label>Link:</label>
 		<div style="margin:10px">
-			<tml:input name="{scoped:url}" cssstyle="width:100%" mode="{option:mode}"/>
+			<tml:script>
+				// backward compatibilty
+				var existing_url = tmlform.field(WGA.scoped("url"))
+				if(existing_url && !tmlform.field(WGA.scoped("link_type"))){
+					if(context("docid:"+existing_url, false)){
+						tmlform.setfield(WGA.scoped("link_type"), "int")
+						tmlform.setfield(WGA.scoped("wgakey"), context("docid:"+existing_url).STRUCTKEY)
+					}
+					else{
+						tmlform.setfield(WGA.scoped("link_type"), "ext")
+					}
+				}
+			</tml:script>
+			<tml:input name="{scoped:link_type}" default="int" type="select" options="{label('image.setting.link.options')}" changeaction="$refresh" mode="{option:mode}"/>
+			<tml:if condition="tmlform.field(WGA.scoped('link_type'))=='int'">
+				<tml:then>
+					<div style="margin: 5px 0">
+						<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document">
+							<tml:option name="fieldname" expression="WGA.scoped('wgakey')"/>
+							<tml:comment><tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option></tml:comment>
+						</tml:include>
+					</div>
+				</tml:then>
+				<tml:else>
+					<tml:input name="{scoped:url}" cssstyle="width:100%" mode="{option:mode}" html_placeholder="absolute URL ..."/>
+				</tml:else>
+			</tml:if>
 		</div>
 		
-		<tml:case condition="option('mode')=='edit'">
+		<tml:comment><tml:case condition="option('mode')=='edit'">
 			<div id="link-view-<tml:option name="ns"/>" class="ychooser-view" style="height:170px;overflow:auto"></div>
 			<script>
 				var sitemap = new BI.util.structTree("link-view-<tml:option name="ns"/>");			
@@ -116,7 +142,7 @@
 			        sitemap.tree.selectPath("/root/<tml:script expression="AFW.structentry().getPath('node-', '/')"/>")				
 				</tml:case>
 			</script>
-		</tml:case>
+		</tml:case></tml:comment>
 	</tml:case>
 	<tml:case value="zoom">
 		<tml:case context="{_context}" iscontextvalid="true">

@@ -3381,6 +3381,10 @@ public class WGPDispatcher extends HttpServlet {
             if (!errorDatabase.isSessionOpen() && !wga.openDatabase(errorDatabase)) {
                 return false;
             }
+            // #00005451: don't show custom error page if app is not direct accessable
+            if(!errorDatabase.getSessionContext().getUserAccess().mayAccessDirectly()){
+            	return false;
+            }
             
             WGTMLModule tmlLib = determineErrorModule(errorDatabase, wga, error);
             if (tmlLib == null) {

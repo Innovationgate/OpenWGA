@@ -106,6 +106,9 @@ public class ThumbnailDerivateCreator implements FileDerivateCreator {
             }
         }
         
+        // add original size
+        infos.add(new ThumbnailSize(md.getDisplayWidth(), md.getDisplayHeight()));
+        
         return infos;
     }
 

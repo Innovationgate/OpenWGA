@@ -54,11 +54,22 @@
 					<span class="far fa-copy"></span>
 					In die Zwischenablage kopieren
 				</a></li>
-				<li class="divider"></li>
-				<li <tml:case isempty="_CM_clipboard_context">class="disabled"</tml:case>><a data-action="clipboard-paste" href="#">
-					<span class="fas fa-paste"></span>
-					Aus der Zwischenablage einfügen ...
+				
+				<li class="divider clipboard-paste-actions" <tml:case isempty="_CM_clipboard_context">style="display:none"</tml:case>></li>
+				<li class="dropdown-header clipboard-content clipboard-paste-actions" <tml:case isempty="_CM_clipboard_context">style="display:none"</tml:case>>
+					<tml:case condition="_CM_clipboard_context" context="{_CM_clipboard_context}" iscontextvalid="true">
+						Seite '<tml:meta name="title" encode="html"/>' - <tml:meta name="language"/>
+					</tml:case>
+				</li>
+				<li class="clipboard-paste-actions" <tml:case isempty="_CM_clipboard_context">style="display:none"</tml:case>><a data-action="paste-page" href="#">
+					<span class="fas fa-file-import"></span>
+					Kopie dieser Seite einfügen ...
 				</a></li>
+				<li class="clipboard-paste-actions" <tml:case isempty="_CM_clipboard_context">style="display:none"</tml:case>><a data-action="paste-content" href="#">
+					<span class="fas fa-file-import"></span>					
+					Inhaltselemente dieser Seite einfügen ...
+				</a></li>
+				
 			</ul>
 		</div>
 
