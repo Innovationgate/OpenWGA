@@ -2388,16 +2388,19 @@ public class WGA {
      * More intuitive alias for tmlcontext()
      */
     public Context context() throws WGException{
-    	return get().tmlcontext();
+    	TMLContext ctx = fetchTMLContext();
+    	if(isIsolated())
+    		return ctx.toIsolatedVersion();
+    	return ctx;
     }
     public Context context(String expression) throws WGException{
-    	return get().tmlcontext().context(expression);
+    	return context().context(expression);
     }
     public Context context(String expression, boolean returnContextOnError) throws WGException{
-    	return get().tmlcontext().context(expression, returnContextOnError);
+    	return context().context(expression, returnContextOnError);
     }
     public Context context(WGContent content) throws WGException{
-    	return get().tmlcontext().context(content);
+    	return context().context(content);
     }
     
     protected TMLContext fetchTMLContext() {
@@ -3204,7 +3207,7 @@ public class WGA {
     }
 
     public Nav nav(String expression) throws WGException {    	
-        return new Nav(this, tmlcontext().context(expression));
+        return new Nav(this, context(expression));
     }
 
     protected TMLContextWrapperIterator wrapIntoTMLContextIterator(SkippingIterator<WGContent> it) {
