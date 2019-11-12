@@ -1,107 +1,103 @@
-<tml:action id="refresh">
-	var ev = createevent("file-selected")
-	ev.addParameter("field", tmlparam1)
-	portlet.fireevent(ev)
-</tml:action>
+<tml:input name="{$mc.fieldname}" default="{$option_default}" type="hidden"/>
 
-<tml:script>
-	_fieldname = WGA.scoped(option("fieldname")||"image");
-</tml:script>
+<tml:if condition="tmlform.mode()=='edit'">
+	<tml:then>
+		<div class="select-image-wrapper">
+			<a href="#" id="select-image-<tml:item name="$mc.fieldname"/>" class="form-control">
+				<span class="caret"></span>
+				<span class="title">					
+					<tml:if condition="tmlform.field($mc.fieldname)">
+						<tml:then>
+							<tml:item name="{$mc.fieldname}" type="tmlform"/>
+						</tml:then>
+						<tml:else>
+							<span class="placeholder">
+								<tml:script expression="option('placeholder') || option('empty-text') || 'Keine Datei ausgewählt'"/>
+							</span>
+						</tml:else>
+					</tml:if>
+				</span>						
+			</a>
+			<tml:case condition="tmlform.field($mc.fieldname)">
+				<a href="#" class="clear-key-field" id="clear-key-<tml:item name="$mc.fieldname"/>" title="Auswahl löschen">&times</a>
+			</tml:case>
+			<div class="select-image">
+				<div class="image-selection" id="images-<tml:item name="$mc.fieldname"/>">
+					<tml:foreach item="$mc.filenames" currentvalue="_filename">
+						<a class="file" data-filename="<tml:item name="_filename"/>" href="#">
+							<div class="image">
+								<img src="<tml:script expression="AFW.content().attachment(_filename).getThumbnailURL()"/>">
+							</div>
+							<div class="filename">
+								<tml:script>
+									var file = content().getFileMetaData(_filename);
+									_size = file.getSize();
+									_mimetype = file.getMimeType()					
+								</tml:script>
+								<tml:item name="_filename"/><br>
+								<tml:item name="_mimetype"/><br>
+								<tml:script expression="AFW.Util.renderFileSize(_size)"/>
+							</div>
+						</a>
+					</tml:foreach>
+					<tml:case unless="$mc.filenames.size">
+						<span class="placeholder">
+							Es stehen keine (passenden) Dateien zur Verfügung.
+						</span>
+					</tml:case>
+				</div>
+			</div>
+			
+		</div>
+		
+		<script>
+			require(["jquery"], function($){
+		
+				var el = $("#select-image-<tml:item name="$mc.fieldname"/>");
+				var field = $("[name='<tml:item name="$mc.fieldname"/>']");
+				var images = $("#images-<tml:item name="$mc.fieldname"/>")
+				var fileinfo = $("#fileinfo-<tml:item name="$mc.fieldname"/>")
+				
+				el.on("focus click", function(ev){
+					ev.preventDefault();
+					images.slideDown("fast");
+					fileinfo.hide();
+				})
+			
+				$("a.file", images).click(function(ev){					
+					ev.preventDefault();
+					var filename = $(this).data("filename");
+					field.val(filename)
+					$(".title", el).html(filename);
+					images.slideUp("fast");
+					fileinfo.show();
+					WGA.ajax.callAction("<tml:action ref="{$option_changeaction || '$refresh'}"/>");
+				})
+			
+				$("#clear-key-<tml:item name="$mc.fieldname"/>").on("click", function(ev){
+					ev.preventDefault();
+					field.val("");
+					WGA.ajax.callAction("<tml:action ref="{$option_changeaction || '$refresh'}"/>");
+				})
+		
+				$(document).on("focusin click", function(ev){
+					var wrapper = el.parent();
+					if(wrapper.has(ev.target).length==0){
+						images.slideUp("fast");
+						fileinfo.show();
+					}
+				})
+			
+			})
+		</script>
+	</tml:then>
+	<tml:else>
+		<tml:script expression="tmlform.field($mc.fieldname) || 'Keine Datei ausgewählt'"/>
+	</tml:else>
+</tml:if>
 
-<tml:script>
-	var derivate = option("derivate");
-	var extensions=option("file-extensions");
-	var mimetype=option("mimetype");
-	var filenames = content().getFileNames();
-
-	if(derivate || extensions || mimetype){
-		_filenames = WGA.createList();
-		if(derivate && db().hasFeature(db().FEATURE_CONTENT_FILE_DERIVATES)){
-			for(var filename in Iterator(filenames)){
-				if(WGA.selectDerivate(filename, derivate))
-					_filenames.add(filename);
-			}
-		}
-		if(mimetype){
-			for(var filename in Iterator(filenames)){
-				var file_md = content().getFileMetaData(filename);
-				if(file_md.mimeType.indexOf(mimetype)==0 && !_filenames.contains(filename))
-					_filenames.add(filename);
-			}
-		}
-		if(extensions){
-			extensions += ",";
-			for(var filename in Iterator(filenames)){
-				var ext = filename.split(".").pop().toLowerCase() + ",";
-				if(extensions.indexOf(ext)>=0 && !_filenames.contains(filename))
-					_filenames.add(filename);
-			}
-		}
-	}
-	else _filenames = filenames;	// take it all
-	_filenames = WGA.sortList(_filenames);
-	_filenames.add(0, "");
-	
-</tml:script>
-
-<tml:input name="{_fieldname}" type="select" optionsitem="_filenames" mode="{$option_mode||tmlform.mode()}" cssstyle="width:100%"/>
-
-<div style="margin:10px 0" class="fileinfo clearfix" style="display:none" id="select-file-<tml:item name="_fieldname"/>">
-	<div style="float:left;width:60px;margin-top:5px" class="image"></div>
-	<div style="margin-left:70px" class="metas"></div>
-</div>
-
-<script>
-	require(["select2"], function(Select2){
-		var urls={
-			<tml:foreach item="_filenames" currentvalue="_image" filter="_image!=''">
-				<tml:script>
-					_url = AFW.content().attachment(_image).getThumbnailURL()
-					var file = content().getFileMetaData(_image);
-					_size = file.getSize();
-					_date = file.getLastmodified()
-					_mimetype = file.getMimeType()					
-				</tml:script>
-				"<tml:item name="_image" encode="none"/>": {
-					"url": "<tml:item name="_url"/>",
-					"date": "<tml:item name="_date"/>",
-					"mimetype": "<tml:item name="_mimetype"/>",
-					"size": '<tml:script expression="AFW.Util.renderFileSize(_size)"/>'
-				}<tml:between>,</tml:between>
-			</tml:foreach>
-		}
-		function showFileinfo(id){
-			var data = urls[id];
-			if(!data)
-				return;
-			var el = $("#select-file-<tml:item name="_fieldname"/>");
-			el.find(".image").html('<img style="max-width:60px;max-height:40px" src="' + data.url + '">');
-			el.find(".metas").html(data.mimetype + " - " + data.size
-				+ "<br>"
-				+ data.date
-			)
-			el.show();
-		}
-		<tml:case condition="tmlform.field(_fieldname)">
-			showFileinfo("<tml:item name="{_fieldname}" type="tmlform"/>")
-		</tml:case>
-		function format(state) {
-			//console.log("state", state);
-			if (!state.id || state.id=="-")
-				return state.text;
-			return $('<div class="select2-img clearfix"><img src="' + urls[state.id].url + '"><div class="title">' + state.text + '</div>');
-		}
-		$("#<tml:script expression="tmlform.formid"/> select[name=<tml:item name="_fieldname"/>]").select2({
-			placeholder: "<tml:script expression="option('placeholder') || option('empty-text') || label('none')"/>",
-			allowClear: true,
-			templateResult: format,
-			//templateSelection: format
-		}).on("select2:select", function(ev){
-			//console.log("change", this, ev.params.data);
-			showFileinfo(ev.params.data.id);
-		}).on("select2:unselect", function(ev){
-			//console.log("unselect", this, ev.params.data);
-			$(this).nextAll(".fileinfo").hide();	
-		})
-	})
-</script>
+<tml:case condition="tmlform.field($mc.fieldname)">
+	<div style="margin-top:10px" id="fileinfo-<tml:item name="$mc.fieldname"/>">
+		<tml:include ref="::file-info" o_filename="{tmlform.field($mc.fieldname)}"/>
+	</div>
+</tml:case>			

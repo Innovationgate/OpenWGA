@@ -1,0 +1,44 @@
+function Controller() {
+}
+
+Controller.prototype.prepare = function($option_fieldname) {
+	this.fieldname = WGA.scoped($option_fieldname || "image");
+}.nonIsolated()
+
+Controller.prototype.filenames = function($cx) {
+
+	var derivate = $cx.option("derivate");
+	var extensions = $cx.option("file-extensions");
+	var mimetype = $cx.option("mimetype");
+
+	var filenames = $cx.content().getFileNames();
+	var _filenames = WGA.createList();
+	
+	if(derivate || extensions || mimetype){
+		if(derivate && $cx.db().hasFeature($cx.db().FEATURE_CONTENT_FILE_DERIVATES)){
+			for(var filename in Iterator(filenames)){
+				if(WGA.selectDerivate(filename, derivate))
+					_filenames.add(filename);
+			}
+		}
+		if(mimetype){
+			for(var filename in Iterator(filenames)){
+				var file_md = $cx.content().getFileMetaData(filename);
+				if(file_md.mimeType.indexOf(mimetype)==0 && !_filenames.contains(filename))
+					_filenames.add(filename);
+			}
+		}
+		if(extensions){
+			extensions += ",";
+			for(var filename in Iterator(filenames)){
+				var ext = filename.split(".").pop().toLowerCase() + ",";
+				if(extensions.indexOf(ext)>=0 && !_filenames.contains(filename))
+					_filenames.add(filename);
+			}
+		}
+	}
+	else _filenames = filenames;	// take it all
+	return WGA.sortList(_filenames);
+	
+}.nonIsolated()
+
