@@ -142,10 +142,11 @@ public class FileDerivateManager {
         @Override
         public int compareTo(DerivateQueryResult o) {
             try {
-                int comparision = new Float(_score).compareTo(o.getScore());
+            	int comparision = new Float(o.getScore()).compareTo(_score);
                 if (comparision != 0) {
                     return comparision;
                 }
+                // if scores are equal compare file size
                 return new Long(o.getFile().getSize()).compareTo(_file.getSize());
             }
             catch (WGAPIException e) {
@@ -849,9 +850,6 @@ public class FileDerivateManager {
         // Collect all files that may be used as results
         List<DerivateQueryResult> results = new ArrayList<DerivateQueryResult>();
         List<WGFileAnnotations> fileAnnotations = new ArrayList<WGFileAnnotations>();
-        if (includeOriginal) {
-            fileAnnotations.add(container.getFileMetaData(fileName));
-        }
         fileAnnotations.addAll(container.getFileDerivates(fileName));
         
         // Determine possible results and their score
@@ -872,13 +870,23 @@ public class FileDerivateManager {
             }
         }
         
-        if (results.size() == 0) {
-            return null;
+        if (results.size() > 0) {
+        	// use best match (highest score / smallest file)   
+            Collections.sort(results);
+            return results.get(0).getFile();
+        }
+        else if (includeOriginal) {
+        	WGFileAnnotations original = container.getFileMetaData(fileName);
+            for (DerivateQueryTerm queryTerm : queryTerms.values()) {
+                float rating = testDerivateQueryTerm(original, queryTerm, clientHints);
+                if (rating == 0) {
+                	return null;	// original doesn't match query
+                }
+            }
+            return original;
         }
         
-        // From all results that have the highest score use the smallest file
-        Collections.sort(results);
-        return results.get(results.size() - 1).getFile();
+        return null;
     
     }
 
