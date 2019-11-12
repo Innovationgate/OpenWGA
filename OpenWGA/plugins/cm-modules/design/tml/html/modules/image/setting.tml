@@ -70,7 +70,7 @@
 <tml:case context="{_context}" iscontextvalid="true">
 	<label><tml:label key="image"/>:</label>
 	<div style="margin:10px">
-		<tml:include ref="util:select-image" o_derivate="usage=poster"/>
+		<tml:include ref="util:select-image" o_derivate="usage=poster" o_empty-text="Kein Bild"/>
 	</div>
 	
 	<label><tml:label key="image.img-mouse-over"/>:</label>
