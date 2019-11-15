@@ -4,7 +4,7 @@
 	_dbkey = $option_dbkey || meta('db', 'dbkey')
 </tml:script>
 
-<tml:if condition="tmlform.mode()=='edit'">
+<tml:if condition="tmlform.mode()=='edit' && $option_mode!='view'">
 	<tml:then>
 		<div class="select-tree-wrapper">
 			<a href="#" id="select-key-<tml:option name="fieldname"/>" class="form-control">

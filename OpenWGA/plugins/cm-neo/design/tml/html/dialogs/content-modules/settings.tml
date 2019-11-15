@@ -109,7 +109,7 @@
 					<tml:case condition="_classes.size()">
 						<label>Stil</label>
 						<div style="margin:10px">
-							<tml:input name="{WGA.scoped('module_css_classes', tmlform.mod_id)}" type="checkbox" optionsitem="_classes"/>
+							<tml:input name="{WGA.scoped('module_css_classes', tmlform.mod_id)}" type="checkbox" optionsitem="_classes" mode="{option:mode}"/>
 						</div>
 					</tml:case>
 					<tml:case condition="!_classes.size() && !_tml">

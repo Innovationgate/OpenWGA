@@ -1,27 +1,28 @@
 <label><tml:label key="tiles.tile.setting.width"/></label>
 <div style="margin:10px">
-	<tml:input name="{scoped:width}" type="number" default="1"/>
+	<tml:input name="{scoped:width}" type="number" default="1" mode="{option:mode}"/>
 </div>
 
 <label><tml:label key="tiles.tile.setting.background-image"/></label>
 <div style="margin:10px">
-	<tml:include ref="util:select-image" o_derivate="usage=poster"/>
+	<tml:include ref="util:select-image" o_derivate="usage=poster" o_mode="{option:mode}"/>
 </div>
 
 <label><tml:label key="tiles.tile.setting.vertical-align"/></label>
 <div style="margin:10px">
 	<tml:input name="{scoped:justify_content}" type="select" 
 		options="{label('tiles.tile.setting.vertical-align.options')}"
+		mode="{option:mode}"
 	/>
 </div>
 
 <label>Link</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:link}" type="select" options="{label('tiles.tile.setting.link.options')}" changeaction="$refresh"/>
+	<tml:input name="{scoped:link}" type="select" options="{label('tiles.tile.setting.link.options')}" changeaction="$refresh" mode="{option:mode}"/>
 	<tml:select switch="tmlform.field(WGA.scoped('link'))">
 		<tml:case value="int">
 			<div style="margin: 5px 0">
-				<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document">
+				<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document" o_mode="{option:mode}">
 					<tml:option name="fieldname" expression="WGA.scoped('wgakey')"/>
 					<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
 				</tml:include>
@@ -29,7 +30,7 @@
 		</tml:case>
 		<tml:case value="ext">
 			<div style="margin:5px 0">
-				<tml:input name="{scoped:url}" html_placeholder="URL"/>
+				<tml:input name="{scoped:url}" html_placeholder="URL" mode="{option:mode}"/>
 			</div>
 		</tml:case>	
 	</tml:select>
