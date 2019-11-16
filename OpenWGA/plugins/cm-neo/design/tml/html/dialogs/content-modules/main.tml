@@ -1,40 +1,12 @@
 <tml:eventscript onevent="save-modules">
+	var module_ids;
 	var mods = portletEvent.getParameter("mods")
-	var deleted_mods = portletEvent.getParameter("deleted_mods")
 	
-	if(deleted_mods)
-		deleted_mods = JSON.parse(deleted_mods);
-	//console.log("deleted_mods", deleted_mods, typeof(deleted_mods))
+	// save module tree structure
+	CMM.writeContentModulesData(mods);
 
-	portlet.last_selected_module = portletEvent.getParameter("selected");
-	
-	var forminfo = tmlform.formInfo;
-	var settings = CMM.getContentModulesSettingsData()||WGA.createLookupTable()
-	for(let field in Iterator(tmlform.fieldnames)){
-		var reg = forminfo.getFieldRegistration(field);
-		if(reg){
-			if(reg.isStore() && reg.mode==reg.EDIT_MODE){
-				settings.put(field, tmlform.fieldlist(field))
-				//console.log("add setting", field, tmlform.fieldlist(field))
-			}
-			else {
-				settings.remove(field)
-				//console.log("remove setting", field, reg.isStore(), reg.mode==reg.EDIT_MODE)
-			}
-		}
-		else {
-			//settings.remove(field)
-			//console.log("no reg", field);
-		}
-	}
-
-	if(!CMM.hasTemplate()){
-		CMM.writeContentModulesData(mods);
-	}
-
-	var module_ids = CMM.getContentModuleScopes(content());
-	//console.log("module_ids", module_ids);
-
+	// helper
+	module_ids = CMM.getContentModuleScopes(content());		// read id-s from just saved modules
 	function hasModule(setting){
 		for(let id in Iterator(module_ids)){
 			if(endsWith(setting, id))
@@ -47,17 +19,20 @@
 		return i>=0 && (i + s2.length == s1.length)
 	}
 
-	// remove not used settings
-	var fields = WGA.createList();
-	fields.addAll(settings.keySet())
-	for(let setting in Iterator(fields)){
-		if(!hasModule(setting)){
-			//console.log("setting not used", setting);
-			settings.remove(setting);
-		}
+	// create and store module settings
+	var settings = WGA.createLookupTable()
+	for(let field in Iterator(tmlform.fieldnames)){
+		if(hasModule(field))
+			settings.put(field, tmlform.fieldlist(field))
 	}
-	
+	CMM.writeContentModulesSettingsData(settings)
+
 	// delete items from content:
+	var deleted_mods = portletEvent.getParameter("deleted_mods")
+	if(deleted_mods)
+		deleted_mods = JSON.parse(deleted_mods);
+	//console.log("deleted_mods", deleted_mods, typeof(deleted_mods))
+	
 	if(deleted_mods && deleted_mods.length){
 		for(let itemname in Iterator(content().getItemNames())){
 			for(let [index, id] in deleted_mods){
@@ -68,19 +43,21 @@
 			} 
 		}
 	}
-	
-	CMM.writeContentModulesSettingsData(settings)	
+
+	// finally save content		
 	content().save();
 
+	portlet.last_selected_module = portletEvent.getParameter("selected");
+	
 	var ev = createevent("close-dialog")
-	ev.addParameter("redirectto", contenturl("html", null, true))		
+	ev.addParameter("redirectto", contenturl("html", null, true))		// this reloads the content
 	portlet.fireevent(ev)
 	
 	_dialog_closed=true;
 	
 </tml:eventscript>
 
-<tml:case isfalse="_dialog_closed">
+<tml:case unless="_dialog_closed">
 
 	<div class="header">
 		<div class="title">Inhaltsmodule</div>

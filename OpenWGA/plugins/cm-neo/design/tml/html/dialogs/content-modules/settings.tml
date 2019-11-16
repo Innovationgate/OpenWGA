@@ -1,3 +1,24 @@
+<tml:eventscript onevent="modules-duplicated">
+	var mod = portletEvent.getParameter("mod");
+	copyFields(mod)
+	
+	function copyFields(mod){
+		var duplicated_from = mod.get("duplicated_from");
+		var id = mod.get("id");
+		if(!duplicated_from)
+			return;
+		for(let fieldname in Iterator(tmlform.fieldnames)){
+			if(fieldname.indexOf(duplicated_from)>=0){
+				var base = fieldname.split(duplicated_from)[0];
+				tmlform.setField(base+id, tmlform.fieldList(fieldname));
+			}
+		}
+		var children = mod.get("children");
+		for(let child in Iterator(children))
+			copyFields(child);
+	}
+</tml:eventscript>
+
 <tml:action id="refresh">
 	var fields = tmlform.getfieldnames().iterator()
 	while(fields.hasNext()){
