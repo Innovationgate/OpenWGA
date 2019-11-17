@@ -48,8 +48,12 @@
 				"justify-content:"+CMM.setting('justify_content')
 			];
 			var image = CMM.setting("image")
-			if(image)
-				styles.push("background-image:url('" + fileurl(image) + "')");
+			if(image){
+				var url = WGA.urlBuilder(fileurl(image))
+					.setParameter("derivate", "usage=poster" + (_imagederivates ? ",width~"+WGA.format(_imagederivates, '0') :""))
+					.build()
+				styles.push("background-image:url('" + url + "')");
+			}
 			return styles.join(";");
 		</tml:script>"
 	>
