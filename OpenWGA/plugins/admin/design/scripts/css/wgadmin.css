@@ -707,3 +707,7 @@ textarea.source-code{
 	-moz-tab-size:4;
 	tab-size:4;
 }
+pre{
+	font-family: courier;
+	padding: 0 10px;
+}
