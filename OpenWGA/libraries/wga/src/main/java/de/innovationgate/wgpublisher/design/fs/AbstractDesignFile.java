@@ -51,6 +51,7 @@ import org.apache.commons.vfs2.Capability;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
+import org.apache.commons.vfs2.NameScope;
 import org.apache.log4j.Logger;
 
 import de.innovationgate.utils.DESEncrypter;
@@ -351,23 +352,35 @@ public abstract class AbstractDesignFile {
     
     protected FileObject getFileContainerFile(String name) throws FileSystemException, WGDesignSyncException {
         
+    	String filePath;
+    	String basePath = getCodeFile().getName().getPath();
+    	
         // First step: Fast lookup for the given file in the given and lower case
         FileObject file = getCodeFile().resolveFile(name);
         if (file.exists()) {
-            return (!isExcludedFileContainerFile(file) ? file : null); 
+        	/*
+        	 *  check if is this really is a child
+        	 *  See #00005472
+        	 */
+        	filePath = file.getName().getPath();
+        	if(filePath.contains(basePath))
+        		return (!isExcludedFileContainerFile(file) ? file : null); 
         }
         
         file = getCodeFile().resolveFile(name.toLowerCase());
         if (file.exists()) {
-            return (!isExcludedFileContainerFile(file) ? file : null);
+        	// check if is this really is a child
+        	filePath = file.getName().getPath();
+        	if(filePath.contains(basePath.toLowerCase()))
+        		return (!isExcludedFileContainerFile(file) ? file : null);
         }
         
-        // Second step: Slow but case insensitive search for file 
+        // Second step: Slow but case insensitive search for file
         Iterator<FileObject> files = getFileContainerFiles().iterator();
         while (files.hasNext()) {
-            file = files.next();
+        	file = files.next();
             if (file.getName().getBaseName().equalsIgnoreCase(name)) {
-                return (!isExcludedFileContainerFile(file) ? file : null);
+            	return file;
             }
         }
         
