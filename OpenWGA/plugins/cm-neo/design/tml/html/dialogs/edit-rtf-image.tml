@@ -22,33 +22,23 @@
 			</tml:case>
 			<tml:case value="intfile">
 				<tml:script>
-					var filenames = WGA.createList(["Bitte auswählen|"])
-					for(let filename in Iterator(content().getFileNames())){
-						var file_md = content().getFileMetaData(filename);
-						if(file_md.mimeType.indexOf("image")==0)
-							filenames.add(filename);						
-					}
 					if(!tmlform.submitted && $option_dialog_options.key){
 						tmlform.key = $option_dialog_options.key;
 						tmlform.url = fileurl($option_dialog_options.key)
 					}
-					WGA.TMLPage.setVar("_filenames", filenames)
 				</tml:script>
-				<tml:[form-field] o_label="Bild-Datei" o_name="key" 
-					o_type="select" o_optionsitem="_filenames"
-					o_changeaction="$refresh"
-				/>
+				<tml:[form-field] o_label="Bild-Datei">
+					<tml:include ref="util:select-file" o_derivate="usage=poster" o_fieldname="key" o_placeholder="Bitte auswählen ..."/>
+				</tml:[form-field]>
 				
 				<tml:case condition="tmlform.key">
 					<tml:script>
-						tmlform.url = fileurl(tmlform.key)
+						tmlform.url = AFW.content().attachment(tmlform.key).getPosterURL()
 					</tml:script>
-					<tml:[form-field]>
-						<tml:include ref="util:file-info" o_filename="{tmlform.key}"/>
-					</tml:[form-field]>
 				</tml:case>
 				
 				<tml:input name="url" type="hidden"/>
+				
 			</tml:case>
 			<tml:case value="extfile">
 
@@ -73,23 +63,15 @@
 				</tml:[form-field]>
 
 				<tml:case condition="tmlform.container" context="[db:{tmlform.dbkey}/docid:{tmlform.container}]" iscontextvalid="true">
-					<tml:script>
-						_filenames = WGA.createList(["Bitte auswählen|"]);
-						for(let filename in Iterator(content().getFileNames())){
-							var file_md = content().getFileMetaData(filename);
-							if(file_md.mimeType.indexOf("image")==0)
-								_filenames.add(filename);						
-						}
-					</tml:script>
-					<tml:[form-field] o_label="Datei" o_name="filename" o_type="select" o_options="{_filenames}" o_default="{_filename}" o_changeaction="$refresh"/>
+
+					<tml:[form-field] o_label="Bild-Datei">
+						<tml:include ref="util:select-file" o_derivate="usage=poster" o_fieldname="filename" o_placeholder="Bitte auswählen ..."/>
+					</tml:[form-field]>
 
 					<tml:case condition="tmlform.filename">
 						<tml:script>
-							tmlform.url = fileurl(tmlform.filename)
+							tmlform.url = AFW.content().attachment(tmlform.filename).getPosterURL() 
 						</tml:script>
-						<tml:[form-field]>
-							<tml:include ref="util:file-info" o_filename="{tmlform.filename}"/>
-						</tml:[form-field]>
 					</tml:case>
 
 					<tml:input name="url" type="hidden"/>

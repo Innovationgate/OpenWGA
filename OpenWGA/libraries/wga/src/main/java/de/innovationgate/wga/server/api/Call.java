@@ -482,6 +482,9 @@ public class Call {
      * @throws WGException
      */
     public Cookie createCookie(String name, String value) throws WGException {
+    	return createCookie(name, value, -1);
+    }
+    public Cookie createCookie(String name, String value, int maxAge) throws WGException {
 
         URLBuilder baseURL = _wga.urlBuilder(_wga.server().getBaseURL());
         URLBuilder requestURL = _wga.urlBuilder(getURL());
@@ -489,7 +492,7 @@ public class Call {
         Cookie c = new Cookie();
         c.setName(name);
         c.setValue(value);
-        c.setMaxAge(-1);
+        c.setMaxAge(maxAge);
         c.setPath(baseURL.build(false));
         if (_wga.isRequestAvailable()) {
             c.setDomain(requestURL.getHost());

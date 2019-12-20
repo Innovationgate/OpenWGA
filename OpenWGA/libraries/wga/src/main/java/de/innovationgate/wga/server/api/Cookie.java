@@ -91,7 +91,7 @@ public class Cookie {
     }
 
     public void setPath(String path) {
-        _path = path;
+        _path = path.isEmpty() ? "/" : path;
     }
 
     public void setValue(String value) {

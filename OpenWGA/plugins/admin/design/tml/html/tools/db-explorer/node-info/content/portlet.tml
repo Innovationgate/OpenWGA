@@ -77,7 +77,7 @@
 			<tml:then>
 
 				<tml:include designdb="@ui" ref="tabview_js">
-					<tml:option name="tabnames">Meta Data|meta,Items|items,Attachments|attachments,Relations|relations</tml:option>
+					<tml:option name="tabnames">Meta Data|meta,Items|items<tml:case condition="content().getExtensionDataNames().contains('content-modules')">,Content Modules|modules</tml:case>,Attachments|attachments,Relations|relations</tml:option>
 					
 					<tml:option name="body">
 				
@@ -88,6 +88,11 @@
 							<div class="x-hidden" id="items">
 								<tml:include ref="::items"/>
 							</div>
+							<tml:case condition="content().getExtensionDataNames().contains('content-modules')">
+								<div class="x-hidden" id="modules">
+									<tml:include ref="::modules"/>
+								</div>
+							</tml:case>
 							<div class="x-hidden" id="attachments">
 								<tml:include ref="::attachments"/>
 							</div>

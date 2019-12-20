@@ -21,7 +21,7 @@ form{
 		}
 	}
 
-	.select-tree-wrapper{
+	.select-tree-wrapper, .select-image-wrapper{
 		position: relative;
 		a.clear-key-field{
 			position: absolute;
@@ -42,5 +42,41 @@ form{
 			color:#999;
 		}
 	}
-	
+
+	.select-image-wrapper{
+		.image-selection{
+			display: none;
+			max-height: 250px;
+			width: 100%;
+			background: white;
+			padding: 5px;
+			margin-top: 5px;
+			border: solid silver 1px;
+			overflow: auto;
+			a.file{
+				display: flex;
+				width: 100%;
+				border-bottom: solid #efefef 1px;
+				padding: 5px;
+				&:last-child{
+					border: none;
+				}
+				&:hover{
+					background: #efefef;
+					text-decoration: none;
+				}
+				.image{
+					width: 80px;
+					img{
+						max-width: 100%;
+						max-height: 55px;
+					}
+				}
+				.filename{
+					margin: 0 10px;
+					font-size: .9em;
+				}
+			}
+		}
+	}	
 }

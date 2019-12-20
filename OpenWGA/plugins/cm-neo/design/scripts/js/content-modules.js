@@ -276,10 +276,18 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 		e.preventDefault();
 		if($(this).hasClass("disabled"))
 			return;
-		var id = selected_tree_node.data("id");
-		if(deleted_mods.indexOf(id)<0)
-			deleted_mods.push(id);
-		var parent = $("#module-tree").wga_tree("removenode", selected_tree_node, true);		
+		addToDeleted(selected_tree_node);
+		var parent = $("#module-tree").wga_tree("removenode", selected_tree_node, true);
+		
+		function addToDeleted(node){
+			var id = node.data("id");
+			if(deleted_mods.indexOf(id)<0)
+				deleted_mods.push(id);
+			node.find(">ul >.node").each(function(){
+				addToDeleted($(this))
+			})			
+		}
+		
 	}
 	
 	function duplicateModulesClick(e){
@@ -291,9 +299,11 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 		var data = getNodeData(selected_tree_node)
 
 		$("#module-tree").wga_tree("addnode", parent, data, true);
+		WGA.event.fireEvent("modules-duplicated", "module-editor", {mod:data})
 
 		function getNodeData(el){
 			var mod = modules[el.data("context")];
+			var new_id = mod.id + "_" + guid();
 			var children = [];
 			el.find(">ul >.node").each(function(){
 				children.push(getNodeData($(this)))
@@ -301,7 +311,8 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 			return {					
 				title: mod.title,
 				iconurl: mod.icon,
-				id: mod.id + "_" + guid(),
+				id: new_id,
+				duplicated_from: el.data("id"),
 				context: mod.id,
 				children: children
 			}

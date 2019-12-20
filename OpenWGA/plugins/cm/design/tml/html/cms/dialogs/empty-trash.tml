@@ -101,7 +101,9 @@
 							_users = users.keySet()
 						</tml:script>
 						<p><tml:label key="dialog.empty-trash.clear-trash-for-users"/>:</p>
-						<tml:input name="users" type="checkbox" multiple="true" default="{_Database.getUserName()}" optionsitem="_users"/>
+						<div style="max-height:300px;overflow:auto">
+							<tml:input name="users" type="checkbox" multiple="true" default="{_Database.getUserName()}" optionsitem="_users"/>
+						</div>
 					</div>
 					</tml:then>
 					<tml:else>

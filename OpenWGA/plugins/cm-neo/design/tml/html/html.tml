@@ -7,9 +7,9 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 		<meta name = "viewport" content = "initial-scale = 1.0, user-scalable = no">
 		
-		<script src="<tml:url type="js" name="::app"/>"></script>
+		<script src="<tml:url type="js" name="::app" u_v="{WGA.server().getVersion().toProjectVersion()}"/>"></script>
 		
-		<tml:htmlhead scripts="false"/>
+		<tml:htmlhead scripts="false" metaoutput="false"/>
 		
 		<script>
 			require.config({
@@ -27,7 +27,7 @@
 			})
 		</script>
 		
-		<link rel="stylesheet" href="<tml:url type="css" name="styles"/>">
+		<link rel="stylesheet" href="<tml:url type="css" name="styles" u_v="{WGA.server().getVersion().toProjectVersion()}"/>">
 		<link rel="icon" href="/static/images/brand/icon_32.png"/>	
 		
 	</head>

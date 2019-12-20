@@ -51,21 +51,13 @@
 					o_placeholder="vollständige absolute URL ..."
 				/>
 			</tml:case>
+
 			<tml:case value="intfile">
-				<tml:script>
-					WGA.TMLPage.setVar("_filenames", content().getFileNames())
-					_filenames.add(0, "Bitte auswählen|");
-				</tml:script>
-				<tml:[form-field] o_label="Datei" o_name="key" o_default="{$option_dialog_options.key}"
-					o_type="select" o_optionsitem="_filenames"
-					o_changeaction="$refresh"
-				/>
-				<tml:case condition="tmlform.key">
-					<tml:[form-field]>
-						<tml:include ref="util:file-info" o_filename="{tmlform.key}"/>
-					</tml:[form-field]>
-				</tml:case>
+				<tml:[form-field] o_label="Datei">
+					<tml:include ref="util:select-file" o_fieldname="key" o_default="{$option_dialog_options.key}" o_placeholder="Bitte auswählen ..."/>
+				</tml:[form-field]>
 			</tml:case>
+
 			<tml:case value="extfile">
 				
 				<tml:script>
@@ -90,18 +82,11 @@
 				</tml:[form-field]>
 
 				<tml:case condition="tmlform.container" context="[db:{tmlform.dbkey}/docid:{tmlform.container}]" iscontextvalid="true">
-					<tml:script>
-						WGA.TMLPage.setVar("_filenames", WGA.createList(["Bitte auswählen|"]))
-						_filenames.addAll(content().getFileNames());
-					</tml:script>
-					<tml:[form-field] o_label="Datei" o_name="filename" o_type="select" o_options="{_filenames}" o_default="{_filename}"
-						o_changeaction="$refresh"
-					/>
-					<tml:case condition="tmlform.filename">
-						<tml:[form-field]>
-							<tml:include ref="util:file-info" o_filename="{tmlform.filename}"/>
-						</tml:[form-field]>
-					</tml:case>
+				
+					<tml:[form-field] o_label="Datei">
+						<tml:include ref="util:select-file" o_fieldname="filename" o_default="{_filename}" o_placeholder="Bitte auswählen ..."/>
+					</tml:[form-field]>
+					
 				</tml:case>
 				
 			</tml:case>

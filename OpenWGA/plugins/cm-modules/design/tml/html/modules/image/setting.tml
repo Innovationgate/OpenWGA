@@ -70,7 +70,7 @@
 <tml:case context="{_context}" iscontextvalid="true">
 	<label><tml:label key="image"/>:</label>
 	<div style="margin:10px">
-		<tml:include ref="util:select-image" o_derivate="usage=poster"/>
+		<tml:include ref="util:select-image" o_derivate="usage=poster" o_empty-text="Kein Bild"/>
 	</div>
 	
 	<label><tml:label key="image.img-mouse-over"/>:</label>
@@ -119,7 +119,6 @@
 					<div style="margin: 5px 0">
 						<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document">
 							<tml:option name="fieldname" expression="WGA.scoped('wgakey')"/>
-							<tml:comment><tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option></tml:comment>
 						</tml:include>
 					</div>
 				</tml:then>
@@ -128,21 +127,6 @@
 				</tml:else>
 			</tml:if>
 		</div>
-		
-		<tml:comment><tml:case condition="option('mode')=='edit'">
-			<div id="link-view-<tml:option name="ns"/>" class="ychooser-view" style="height:170px;overflow:auto"></div>
-			<script>
-				var sitemap = new BI.util.structTree("link-view-<tml:option name="ns"/>");			
-				sitemap.tree.on("click", function(node, e) {
-		        	var a = node.id.split(":");
-		        	if(a[0]=="node-struct" && !node.disabled)
-			        	document.forms["<tml:script expression="tmlform.formid"/>"].elements["<tml:script expression="WGA.scoped('url')"/>"].value = a[1];		        
-		        }, this);
-				<tml:case context="{'docid:'+tmlform.field('url_'+option('ns'))}" iscontextvalid="true">
-			        sitemap.tree.selectPath("/root/<tml:script expression="AFW.structentry().getPath('node-', '/')"/>")				
-				</tml:case>
-			</script>
-		</tml:case></tml:comment>
 	</tml:case>
 	<tml:case value="zoom">
 		<tml:case context="{_context}" iscontextvalid="true">

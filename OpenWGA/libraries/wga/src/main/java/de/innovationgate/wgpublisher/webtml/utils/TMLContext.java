@@ -704,7 +704,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	    this.document = doc;
 	    
 		
-        // No environment given. This is a new independent TMLScript environmeent
+        // No environment given. This is a new independent TMLScript environment
         if (parentContext == null) {
             _environment = new IndependentTMLScriptEnvironment(this, core, userProfile, form, req, rsp, session);
             _designContext = new IndependentDesignContext((IndependentTMLScriptEnvironment) _environment, null, "");
@@ -5415,7 +5415,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     
     public TMLContext toIsolatedVersion() {
         if (!(_environment instanceof IsolatedTMLContextEnvironment)) {
-        	TMLContext isolatedContext =  new TMLContext(this.document, getwgacore(), getprofile(), gettmlform(), getrequest(), getresponse(), gethttpsession());
+        	TMLContext isolatedContext =  new TMLContext(this.document, this);
             isolatedContext.isolate();
             return isolatedContext;
         }
@@ -5445,7 +5445,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     
     private void isolate() {
         if (!(_environment instanceof IsolatedTMLContextEnvironment)) {
-            _environment = new IsolatedTMLContextEnvironment(this, getEnvironment().getCore(), getprofile(), getEnvironment().getForm(), getEnvironment().getRequest(), getEnvironment().getResponse(), getEnvironment().getSession());
+            _environment = new IsolatedTMLContextEnvironment(getmaincontext(), getEnvironment().getCore(), getprofile(), getEnvironment().getForm(), getEnvironment().getRequest(), getEnvironment().getResponse(), getEnvironment().getSession());
         }
     }
 

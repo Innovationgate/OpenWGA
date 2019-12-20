@@ -1025,6 +1025,39 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
             return null;
         }
     }
+    
+    /**
+     * Retrieves a boolean item.
+     * If the item is not a boolean returns null.
+     * 
+     * @param strName
+     *            Name of the item. 
+     * @throws WGAPIException 
+     */
+    public Boolean getItemBoolean(String strName) throws WGAPIException {
+
+        if (!hasItem(strName)) {
+            return null;
+        }
+        
+        Object booleanObj = this.getItemValue(strName);
+        if (booleanObj instanceof List) {
+            List<?> list = (List<?>) booleanObj;
+            if (list.size() >= 1) {
+            	booleanObj = list.get(0);
+            }
+            else {
+            	booleanObj = null;
+            }
+        }
+
+        if (booleanObj != null && booleanObj instanceof Boolean) {
+            return (Boolean) booleanObj;
+        }
+        else {
+            return null;
+        }
+    }
 
     /**
      * Retrieves the value of a date item. 
