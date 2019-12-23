@@ -680,7 +680,7 @@ public class ForEach extends Base implements IterationTag {
 		    
 		    String itemName = getItem();
 		    if (itemName != null) {
-    			values = this.getTMLContext().itemiterable(itemName);
+    			values = this.getTMLContext().itemiterable(itemName, buildNamedActionParameters(false));
     			if (values == null) {
     				throw new TMLException("Could not retrieve item " + itemName, true);
     			}
@@ -1246,4 +1246,12 @@ public class ForEach extends Base implements IterationTag {
 
     public void setExpression(String expression) {
         this.expression = expression;
-    }}
+    }
+
+    @Override
+    protected List<String> getDynamicAttributePrefixes() {
+        return WGUtils.list(super.getDynamicAttributePrefixes(), "a"); 
+    }
+
+
+}
