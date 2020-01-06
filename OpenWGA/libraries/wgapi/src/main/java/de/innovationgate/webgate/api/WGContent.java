@@ -3113,9 +3113,9 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     }
     
     /**
-     * Returns the target documents of all relations that belong to the given relation group
+     * Returns the (internal) relation name for a given group and target content 
      * @param group The group to query
-     * @return List of target documents
+     * @return target document or null
      */
     public String getRelationGroupnameForTarget(String group, WGContent target) throws WGAPIException  {
         
