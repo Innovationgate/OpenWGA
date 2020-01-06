@@ -758,5 +758,8 @@ public interface Context {
 
     @CodeCompletion(preferredCase="isHomePage")
     public abstract boolean ishomepage();
- 
+
+    @CodeCompletion(preferredCase="hasRelation")
+    public abstract boolean hasrelation(String relname) throws WGAPIException;
+
 }

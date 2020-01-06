@@ -5471,4 +5471,9 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         return getURLBuilder().buildLoginURL(db(), getrequest(), contenturl());
 	}
 
+	@Override
+	public boolean hasrelation(String relname) throws WGAPIException{
+		WGContent c = getcontent().getRelation(relname);
+		return c!=null && c.isVisibleNow();
+	}
 } 
