@@ -2385,11 +2385,11 @@ public class WGA {
     }
 
     /*
-     * More intuitive alias for tmlcontext()
+     * Better and more useful version then tmlcontext()
      */
     public Context context() throws WGException{
     	TMLContext ctx = fetchTMLContext();
-    	if(isIsolated())
+    	if(ctx!=null && isIsolated())
     		return ctx.toIsolatedVersion();
     	return ctx;
     }
