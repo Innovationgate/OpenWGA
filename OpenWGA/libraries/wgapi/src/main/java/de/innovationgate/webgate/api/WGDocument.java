@@ -44,6 +44,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
@@ -727,13 +728,22 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
         
         this.db = db;
         this.objectCreated = new Date();
-        
 
+        this.tempDuplicate = flags.isTempDuplicate();
+        if(this.tempDuplicate){
+        	/*
+        	 * See #00005481 and #00004139
+        	 * Generate uniqueId with qualifier to let doc have its own independent session context data
+        	 * We use a random value here
+        	 */
+        	long r = new Random().nextLong();
+        	this.uniqueId = this.uniqueId.withQualifier(String.valueOf(r));
+        }
         
         this.cachingEnabled = (!tempDuplicate && core.isDataCacheable() && db.isDoctypeCacheable(getType()));
         this.temporary = (tempDuplicate ? true : core.isTemporary());
-        this.tempDuplicate = flags.isTempDuplicate();
         this.dummy = flags.isDummy();
+        
         
         this.setCore(core);
         
