@@ -310,7 +310,7 @@ define(["jquery"], function($){
 		var imgTag=this.getNearestTagFromSelection("IMG");
 		if (!imgTag){
 			imgTag=this.doc.createElement("img");
-			imgTag.title = imgTag.alt = decodeURI(url.split("/").pop().split("?")[0]);
+			imgTag.alt = decodeURI(url.split("/").pop().split("?")[0]);
 			var range = this.getRange();
 			range.deleteContents();	// deletes the selected Text
 			range.insertNode(imgTag);

@@ -53,6 +53,9 @@
 					log.info("file " + filename + " replaced");
 				}
 				doc.attachFile(reader, filename);
+				var parts = file_title.split(".");
+				parts.pop();
+				file_title = parts.join(".").replace(/_/g, " ");
 				doc.getFileMetaData(filename).setTitle(file_title);
 				doc.save();
 			}, doc)(doc, reader, filename, file_title);

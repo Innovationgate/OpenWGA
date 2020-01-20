@@ -529,6 +529,7 @@ this.attachment = function(filename){
 	return{
 	
 		fileSize: content.getFileSize(filename)
+		,fileMetaData: file_md
 		,mimeType: file_md.mimeType || Packages.de.innovationgate.webgate.api.WGFactory.getMimetypeDeterminationService().determineByFilename(filename)
 	
 		,isImage: function(){

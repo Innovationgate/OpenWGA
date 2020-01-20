@@ -1,5 +1,6 @@
 <tml:action id="clearFilename">
 	tmlform.removefield("filename")
+	tmlform.removefield("alt")
 </tml:action>
 
 <tml:form id="edit-rtf-image">
@@ -33,7 +34,9 @@
 				
 				<tml:case condition="tmlform.key">
 					<tml:script>
-						tmlform.url = AFW.content().attachment(tmlform.key).getPosterURL()
+						var Attachment = AFW.content().attachment(tmlform.key);
+						tmlform.url = Attachment.getPosterURL()
+						tmlform.alt = Attachment.fileMetaData.title;
 					</tml:script>
 				</tml:case>
 				
@@ -70,7 +73,9 @@
 
 					<tml:case condition="tmlform.filename">
 						<tml:script>
-							tmlform.url = AFW.content().attachment(tmlform.filename).getPosterURL() 
+							var Attachment = AFW.content().attachment(tmlform.filename);
+							tmlform.url = Attachment.getPosterURL()
+							tmlform.alt = Attachment.fileMetaData.title;
 						</tml:script>
 					</tml:case>
 
@@ -81,8 +86,11 @@
 			</tml:case>
 		</tml:select>
 		<hr>
+		<tml:[form-field] o_label="ALT-Text" o_name="alt" o_default="{$option_dialog_options.alt}"
+			o_placeholder="Alternate Text für das Bild ..."
+		/>
 		<tml:[form-field] o_label="Titel" o_name="title" o_default="{$option_dialog_options.title}"
-			o_placeholder="Titel des Bildes ..."
+			o_placeholder="Optionaler Mouse-Over-Titel des Bildes ..."
 		/>
 	</div>
 	
@@ -113,6 +121,13 @@
 			if(el)
 				return;		// just in case - should not happen
 
+			var alt = $("[name=alt]", form).val();
+			if(!alt){
+				alert("Bitte geben Sie einen ALT-Text für das Bild ein.");
+				$("[name=alt]", form).focus();
+				return;
+			}
+
 			var form = $("#edit-rtf-image");
 			var type = $("[name=type]", form).val();
 			var url = $("[name=url]", form).val();
@@ -131,7 +146,7 @@
 					alert("Bitte wählen Sie ein Bild aus.");
 					return;
 				}
-				el = editor.createImg(url, "intfile");
+				el = editor.createImg(url, "intfile");				
 				editor.setURLInfo(el, {type:type, key:key})
 			}
 			else if(type=="extfile"){
@@ -149,7 +164,8 @@
 				alert("Unbekannter Bild-Typ: " + type);
 				return;
 			}
-			el.alt = el.title = $("[name=title]", form).val();
+			el.alt = alt;
+			el.title = $("[name=title]", form).val();
 			Modal.hide();
 
 		})
@@ -161,6 +177,13 @@
 			var el = editor.getNearestTagFromSelection("img")
 			if(!el)
 				return;
+
+			var alt = $("[name=alt]", form).val();
+			if(!alt){
+				alert("Bitte geben Sie einen ALT-Text für das Bild ein.");
+				$("[name=alt]", form).focus();
+				return;
+			}
 			var form = $("#edit-rtf-image");
 			var type = $("[name=type]", form).val();
 			var url = $("[name=url]", form).val();
@@ -180,7 +203,6 @@
 					return;
 				}
 				el.src=url;
-				el.srcset=""
 				editor.setURLInfo(el, {type:type, key:key})
 			}
 			else if(type=="extfile"){
@@ -191,15 +213,16 @@
 					alert("Bitte wählen Sie ein Bild aus.");
 					return;
 				}
-				el.src=url;
-				el.srcset=""
+				el.src=url;				
 				editor.setURLInfo(el, {type:type, key:container+"/"+filename+"/"+dbkey})
 			}
 			else{
 				alert("Unbekannter Bild-Typ: " + type);
 				return;
 			}
-			el.alt = el.title = $("[name=title]", form).val();
+			el.srcset=""
+			el.title = $("[name=title]", form).val();
+			el.alt = alt;
 			
 			Modal.hide();
 				
