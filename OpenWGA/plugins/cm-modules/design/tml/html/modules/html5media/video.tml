@@ -80,7 +80,7 @@
 	<tml:case condition="CMM.setting('autoplay')">
 		autoplay 
 	</tml:case>
-	style="opacity:0;transition: opacity .2s">
+	style="opacity:0;transition: opacity .2s"
 >
 		
 	<tml:script expression="_urls.keySet()" var="_types"/>
