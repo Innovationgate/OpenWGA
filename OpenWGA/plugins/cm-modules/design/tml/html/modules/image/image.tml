@@ -39,7 +39,10 @@
 	if(filename && c && c.content().hasFile(filename)){
 		_url = c.fileurl(filename);
 		_file_md = c.content().getFileMetaData(filename);
-		_img_title = _file_md.title;
+		_img_alt = _file_md.title;
+		_img_title = CMM.setting("title");
+		if(_img_title==null)
+			_img_title = _img_alt;	// backwards compatibilty
 		_download_url = _url;
 		var mt = _file_md.getMimeType();
 		if(mt && mt.indexOf("image")!=0){	// no image
@@ -109,8 +112,10 @@
 
 <tml:range var="_img">
 	<img src="<tml:item name="_url"/>"
-		title="<tml:script expression="_img_title || option('title')"/>"
-		alt="<tml:script expression="_img_title || option('title')"/>"
+		<tml:case condition="_img_title">
+			title="<tml:item name="_img_title"/>"
+		</tml:case>
+		alt="<tml:script expression="_img_alt || option('title')"/>"
 		<tml:case condition="_srcset">
 			srcset="<tml:item name="_srcset"/>"
 		</tml:case>
@@ -163,7 +168,7 @@
 
 <tml:range var="_info" trim="true">
 	<tml:case condition="CMM.settingList('descriptions').contains('title')">
-		<div class="title"><tml:script expression="_img_title || option('title')"/></div>
+		<div class="title"><tml:script expression="_img_alt || option('title')"/></div>
 	</tml:case>
 	<tml:case condition="CMM.settingList('descriptions').contains('copyright') && _file_md && _file_md.getCopyright()">
 		<div class="copyright">&copy; <tml:script expression="_file_md && _file_md.getCopyright()"/></div>
