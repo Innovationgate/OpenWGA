@@ -122,8 +122,25 @@
 							<TD>Last Modified</TD>
 							<TD>Status</TD>
 							<TD>Lang</TD>
-							<tml:case condition="tmlform.type=='lucene'">
+							<tml:case condition="tmlform.type.indexOf('lucene')>=0">
 								<TD>Score</TD>
+							</tml:case>
+							<tml:script>
+								_attachment_search=false;
+								if(tmlform.type.indexOf('lucene')>=0){
+									var opts = WGA.createList(tmlform.options, ",")
+									var dt_index=opts.indexOf("doctype:attachment")
+									if(dt_index>=0)
+										_attachment_search=true;
+									else{
+										dt_index=opts.indexOf("doctype:all")
+										if(dt_index>=0)
+											_attachment_search=true;
+									}
+								}
+							</tml:script>
+							<tml:case condition="_attachment_search">
+								<td>File</td>
 							</tml:case>
 						</tr>      
 						<tml:foreach id="searchFE" sourcetag="searchResult" page="{pagecontrol_searchFEPage}" pagesize="{tmlform.pagesize}" filllastpage="false">
@@ -138,9 +155,12 @@
 						      <td><tml:meta name="LASTMODIFIED"/></td>		               
 						      <td><tml:meta name="STATUS"/></td>
 						      <td><tml:meta name="LANGUAGE"/></td>
-						      <tml:case condition="tmlform.type=='lucene'">
+						      <tml:case condition="tmlform.type.indexOf('lucene')==0">
 						      	<td><tml:script expression="SEARCHSCORE * 100" format="##0"/>%</td>
-						      </tml:case>				      	          
+						      </tml:case>
+						      <tml:case condition="_attachment_search">
+						      	<td><tml:script expression="content().getSearchDetails().getFilename()"/></td>
+						      </tml:case>			      	          
 						    </tr>
 						</tml:foreach>
 					</tml:else>
