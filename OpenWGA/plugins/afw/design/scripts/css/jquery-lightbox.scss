@@ -65,6 +65,8 @@
 		text-decoration: none;
 		opacity: 0;
 		filter: alpha(opacity = 0);
+		box-sizing: content-box;
+		
 	}
 	
 	a.image-prev {
