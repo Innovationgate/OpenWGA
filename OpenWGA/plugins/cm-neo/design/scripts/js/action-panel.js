@@ -117,38 +117,7 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 	})
 
 	WGA.event.addListener("*", "attachments-updated", function(ev){
-		
-		updateContentAttachments(null, function(){
-			var i=0;
-			var waiting_files = []
-			$("#sidepannel-content-attachments .thumb[data-waiting=true]").each(function(){
-				waiting_files.push($(this).data("filename"))
-			})
-	
-			!function waitForDerivates(){
-				setTimeout(function(){
-					updateContentAttachments();
-	
-					var current_waiting_files = []
-					$("#sidepannel-content-attachments .thumb[data-waiting=true]").each(function(){
-						current_waiting_files.push($(this).data("filename"))
-					})
-	
-					for(var i=0; i<waiting_files.length; i++){
-						var filename = waiting_files[i];
-						if(current_waiting_files.indexOf(filename)<0){
-							var _wga = Sitepanel.getWindow().WGA
-							_wga && _wga.event.fireEvent("derivates-updated", "cm-neo", {
-								filename: filename								
-							})
-						}
-					}
-					
-					if (i < 10 && current_waiting_files.length)
-						waitForDerivates()
-				}, 1000*(++i))
-			}()
-		})
+		updateContentAttachments()
 	})
 	
 	function updateContentProperties(context){
@@ -160,19 +129,49 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 		})
 	}
 
-	function updateContentAttachments(context, callback){
+	function updateContentAttachments(context){
 		var url = CM.jsonURL("content-attachments");
 		var template = CM.template("sidepannel-content-attachments")
+		var initial_waitForDerivates=null;		
+		var count = 0;
 		context = context || template.getContext();
-		$.getJSON(url, context, function(result){
-			template.render(result, context)
-			if(!context.may_update_content){
-				$("#sidepannel-content-attachments .sidebar-toolbar [data-action]").addClass("disabled")
-				$("#sidepannel-content-attachments .drop-here").hide();
-			}
-			if(callback)
-				callback();
-		})
+		if(!context.may_update_content){
+			$("#sidepannel-content-attachments .sidebar-toolbar [data-action]").addClass("disabled")
+			$("#sidepannel-content-attachments .drop-here").hide();
+		}
+		readAttachments()
+		
+		function readAttachments(){
+			$.getJSON(url, context, function(result){
+				template.render(result, context)
+				if(initial_waitForDerivates==null){
+					initial_waitForDerivates=[]
+					$("#sidepannel-content-attachments .thumb[data-waiting=true]").each(function(){
+						initial_waitForDerivates.push($(this).data("filename"))
+					})
+				}
+				var current_waitForDerivates=[];
+				$("#sidepannel-content-attachments .thumb[data-waiting=true]").each(function(){
+					current_waitForDerivates.push($(this).data("filename"))
+				})
+
+				for(var i=0; i<initial_waitForDerivates.length; i++){
+					var filename = initial_waitForDerivates[i];
+					if(current_waitForDerivates.indexOf(filename)<0){
+						var _wga = Sitepanel.getWindow().WGA
+						_wga && _wga.event.fireEvent("derivates-updated", "cm-neo", {
+							filename: filename								
+						})
+						//console.log("fire event derivates-updated", filename)
+					}
+				}
+				
+				if(count++<10 && current_waitForDerivates.length){
+					//console.log("read again", count, current_waitForDerivates)
+					setTimeout(readAttachments, 1000)
+				}
+			})
+		}
 	}
 
 	function updateContentVersions(context){
