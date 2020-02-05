@@ -43,13 +43,16 @@
 		_img_title = CMM.setting("title");
 		if(_img_title==null)
 			_img_title = _img_alt;	// backwards compatibilty
-		_download_url = _url;
-		var mt = _file_md.getMimeType();
-		if(mt && mt.indexOf("image")!=0){	// no image
+		_download_url = c.fileurl(filename);
+		
+		var Attachment = AFW.content().attachment(filename)
+		if(!Attachment.isImage() && AFW.content().attachment(filename).waitingForDerivates()) {
+			_url = WGA.design().fileURL("images", "ajax-loader.gif");
+		}
+		else{			
+			// check for derivates:
 			var d = WGA.selectDerivate(c, filename, "usage=poster")
-			var file_rev = _file_md.getUpdateRevision()
-			var derivate_org_rev = d && d.getOriginalRevision()
-			if(d && file_rev && derivate_org_rev && (file_rev.compareTo(derivate_org_rev)==0)){
+			if(d){
 				var url = WGA.urlBuilder(_url).setParameter("derivate", "usage=poster")
 				if(isbrowserinterface()){
 					var cs = d.getSha512Checksum()
@@ -57,9 +60,8 @@
 				}
 				_url = url.build();
 			}
-			else if(AFW.content().attachment(filename).waitingForDerivates()) {
-				_url = WGA.design().fileURL("images", "ajax-loader.gif");
-			}
+			else if(Attachment.isImage())
+				_url = c.fileurl(filename);
 			else _url = no_image_url;
 		}
 	}
@@ -88,7 +90,7 @@
 		if(_url != no_image_url)
 			_url = WGA.urlBuilder(_url).setParameter("derivate", option_imagederivates).build();
 		_url_mo = _url_mo && (WGA.urlBuilder(_url_mo).setParameter("derivate", option_imagederivates).build());
-
+		
 		if(WGA.app().getPublisherOption(WGA.Core.DBATTRIB_USE_NONFINAL_HT_FEATURES)){
 			var ssc = WGA.service(Packages.de.innovationgate.wgpublisher.webtml.utils.SrcSetCreator);
 			if(_file_md && ssc.getMaxAvailablePosterSize){
