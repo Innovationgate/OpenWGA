@@ -130,7 +130,12 @@
 				<tml:else>
 					<tml:input name="{scoped:url}" cssstyle="width:100%" mode="{option:mode}" html_placeholder="absolute URL ..."/>
 				</tml:else>
-			</tml:if>
+			</tml:if>			
+		</div>
+
+		<label>Target:</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:link_target}" mode="{option:mode}"/>
 		</div>
 	</tml:case>
 	<tml:case value="zoom">

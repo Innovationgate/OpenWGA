@@ -109,6 +109,7 @@
 	}
 
 	_downloads = (CMM.setting('download') && _download_url) || false;
+	_link_target = CMM.setting('link_target');
 	
 </tml:script>
 
@@ -138,10 +139,10 @@
 
 		<tml:if condition="CMM.setting('link_type')=='int' && CMM.setting('wgakey')">
 			<tml:then>
-				<a href="<tml:url context="[docid:{CMM.setting('wgakey')}]"/>"><tml:item name="_img" encode="none"/></a>
+				<a <tml:case if="_link_target">target="<tml:item name="_link_target"/>"</tml:case> href="<tml:url context="[docid:{CMM.setting('wgakey')}]"/>"><tml:item name="_img" encode="none"/></a>
 			</tml:then>
 			<tml:elseif condition="CMM.setting('link_type')=='ext' && CMM.setting('url')">
-				<a href="<tml:[setting] o_name="url"/>"><tml:item name="_img" encode="none"/></a>
+				<a <tml:case if="_link_target">target="<tml:item name="_link_target"/>"</tml:case> href="<tml:[setting] o_name="url"/>"><tml:item name="_img" encode="none"/></a>
 			</tml:elseif>
 			<tml:elseif condition="CMM.setting('url')">
 				<tml:comment>old style url</tml:comment>
