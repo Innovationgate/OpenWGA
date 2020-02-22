@@ -2563,7 +2563,9 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             }
             
             if (languagesPriorityList == null) {
-                languagesPriorityList = getLanguagesForSearchDBKeys(searchDBKeys);;
+                languagesPriorityList = getLanguagesForSearchDBKeys(searchDBKeys);
+                if(languagesPriorityList.size()>1)
+                	filterLanguages = true;
             }
             
             // Handle visibility selection
@@ -2803,6 +2805,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     private List<WGLanguage> getLanguagesForSearchDBKeys(List searchDBKeys) throws WGAPIException {
         
         LinkedList<WGLanguage> languages = new LinkedList<WGLanguage>();
+        ArrayList<String> lang_codes = new ArrayList<String>();
         
         Iterator it = searchDBKeys.iterator();
         while (it.hasNext()) {
@@ -2810,7 +2813,15 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             WGDatabase db = (WGDatabase) _core.getContentdbs().get(dbKey);
             if (db != null) {
                 if (_indexedDbs.containsKey(dbKey)) {
-                    languages.addAll(db.getLanguages().values());
+                	
+                	for(WGLanguage lang: db.getLanguages().values()){
+                		String code = lang.getName().substring(0, 2);
+                		if(!lang_codes.contains(code)){
+                			lang_codes.add(code);
+                			languages.add(lang);
+                		}
+                	}
+                	
                 }
             }
         }
