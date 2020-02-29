@@ -677,10 +677,12 @@ public class WGSessionContext implements LockOwner {
         
         WGDocumentKey docKey = doc.getDocumentKeyObj();
         
+        /*
         // For temp duplicates we use a qualifier on the key, so it has a context key distinct from the original (#00004139)
         if (doc.isTempDuplicate()) {
             docKey = docKey.withQualifier(String.valueOf(doc.hashCode()));
         }
+        */
         
         DocumentContext con = getDocumentContext(docKey);
         if (con == null) {

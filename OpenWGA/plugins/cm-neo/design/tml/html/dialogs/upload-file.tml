@@ -4,6 +4,16 @@
 	else{
 		try{
 			tmlform.attach(content());
+			
+			var file_title = tmlform.filename;
+			var parts = file_title.split(".");
+			if(parts.length>1){
+				parts.pop();
+				file_title = parts.join(".")
+			}
+			file_title = file_title.replace(/_/g, " ");
+			content().getFileMetaData(tmlform.filename).setTitle(file_title);
+			
 			content().save();
 			portlet.fireevent("close-dialog")
 			portlet.fireevent("attachments-updated");

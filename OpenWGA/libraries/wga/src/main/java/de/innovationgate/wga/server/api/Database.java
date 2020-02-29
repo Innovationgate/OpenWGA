@@ -235,10 +235,9 @@ public class Database {
      * @throws WGException
      */
     public QueryResult query(String queryType, String queryString, Map<String,Object> atts, Map<String,Object> queryParams, Context context) throws WGException {
-        
-        if (context == null && _wga.isTMLContextAvailable()) {
-            context = _wga.tmlcontext();
-        }
+
+        if(context==null)
+        	context = _wga.context();
         
         if (atts == null) {
             atts = Collections.emptyMap();

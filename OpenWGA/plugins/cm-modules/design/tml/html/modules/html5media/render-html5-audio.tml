@@ -55,10 +55,10 @@
 		</tml:case>
 	>
 		<tml:case condition="_mp3">
-			<source src="<tml:url type="file" file="{_mp3}"/>" type="audio/mpeg"></source>
+			<source src="<tml:url type="file" file="{_mp3}"/>" type="audio/mpeg">
 		</tml:case>
 		<tml:case condition="_ogg">
-			<source src="<tml:url type="file" file="{_ogg}"/>" type="audio/ogg"></source>
+			<source src="<tml:url type="file" file="{_ogg}"/>" type="audio/ogg">
 		</tml:case>
 	</audio>
 </div>

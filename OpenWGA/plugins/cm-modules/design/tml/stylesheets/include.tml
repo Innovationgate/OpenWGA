@@ -25,13 +25,14 @@
 
 <tml:script>
 	WGA.accessLogging().setLoggingEnabled(false);
+	_context = context("db:" + dbkey + "/docid:" + contentkey, false) || context("db:"+dbkey, false)
 </tml:script>
 
 <tml:include designdb="@afw" medium="stylesheet" ref="jquery-plugins">
 	<tml:option name="jquery-plugins" expression="jquery_plugin_css"/>
 </tml:include>
 
-<tml:case context="[db:{dbkey}/docid:{contentkey}]" iscontextvalid="true">
+<tml:case condition="_context" context="{_context}" iscontextvalid="true">
 	
 	<tml:script>
 		responsive = WGA.design(db()).getGlobal("RESPONSIVE")

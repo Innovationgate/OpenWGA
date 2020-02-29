@@ -59,12 +59,13 @@
 </tml:script>
 
 <div class="clearfix formfield field-type-<tml:script expression="CMM.setting('fieldtype')"/><tml:case condition="tmlform.hasmessage(_fieldname)"> error</tml:case>">
-	<label>
+	<label for="<tml:option name="ns"/>">
 		<tml:case condition="_validation">* </tml:case> 
 		<tml:[setting] o_name="label"/>
 	</label>
 	<div class="data">
 		<tml:input name="{_fieldname}"
+			id="{option('ns')}"
 			focus="{CMM.setting('focus')||false}"
 			validation="{_validation||true}"
 			message="{_message}"

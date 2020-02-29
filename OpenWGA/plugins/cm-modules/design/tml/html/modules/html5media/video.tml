@@ -80,13 +80,13 @@
 	<tml:case condition="CMM.setting('autoplay')">
 		autoplay 
 	</tml:case>
-	style="opacity:0;transition: opacity .2s">
+	style="opacity:0;transition: opacity .2s"
 >
 		
 	<tml:script expression="_urls.keySet()" var="_types"/>
 	<tml:foreach item="_types" currentvalue="_type">
 		<tml:case condition="_urls.get(_type)">
-			<source src="<tml:script expression="_urls.get(_type)"/>" type="<tml:item name="_type"/>"></source>
+			<source src="<tml:script expression="_urls.get(_type)"/>" type="<tml:item name="_type"/>">
 		</tml:case>
 	</tml:foreach>
 	

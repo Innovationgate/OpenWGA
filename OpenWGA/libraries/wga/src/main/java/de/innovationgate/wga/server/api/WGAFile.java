@@ -72,6 +72,7 @@ public class WGAFile {
 
 	public WGAFile(WGA wga){
 		_wga = wga;
+		_default_encoding = wga.getCore().getCharacterEncoding();
 	}
 
 	public WGAFile(WGA wga, String filename){

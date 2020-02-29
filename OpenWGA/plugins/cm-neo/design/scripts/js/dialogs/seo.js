@@ -131,7 +131,7 @@ define(["jquery", "appnav", "sitepanel"], function($, Appnav, SitePanel){
 					dataType: "json"
 				})
 				.done(function(data){
-					$("#seo-w3c").html("<h3>" + data.messages.length + " Fehler gefunden</h3>");
+					$("#seo-w3c").html("<h3>" + data.messages.length + " Hinweise gefunden</h3>");
 					for(var i=0; i<data.messages.length; i++){
 						var entry = data.messages[i]
 						if(entry.extract)

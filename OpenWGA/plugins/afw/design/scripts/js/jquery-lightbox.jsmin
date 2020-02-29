@@ -197,7 +197,7 @@
 			var $this = $(this);
 			var url = config.imageURL || $this.data("image-url") || this.href||this.src;
 			url=url.split(";")[0];	// ignore ;jsessiond-s
-			var title = config.title || $this.data("image-title")||this.title||this.alt||decodeURI(url.split("/").pop())
+			var title = config.title || $this.data("image-title")||this.alt||this.title||decodeURI(url.split("/").pop())
 			var group = config.group||$this.data("image-group")||"default";
 			var download = config.download || $this.data("image-download")
 			var download_url = config.imageDownloadURL || $this.data("image-download-url")||url;

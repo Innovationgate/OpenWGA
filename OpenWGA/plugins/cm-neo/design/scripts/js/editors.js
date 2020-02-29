@@ -283,7 +283,6 @@ define([
 				if(as_link && !editor.toolbar.isCmdDisabled("InsertLink")){
 					var el = editor.createLink(file.url, file.name, file.type||"intfile");
 					editor.setURLInfo(el, {type:file.type||"intfile", key:file.key||file.name})
-					el.alt = el.title=file.title || file.name;
 					editor.getRange().setStartAfter(el);
 				}
 				else if(!editor.toolbar.isCmdDisabled("InsertImg")){
@@ -294,7 +293,7 @@ define([
 		        		editor.execCmd("FormatBlock", "p");
 					var el = editor.createImg(file.poster, file.type||"intfile")
 					editor.setURLInfo(el, {type:file.type||"intfile", key:file.key||file.name})
-					el.alt = el.title=file.title || file.name;
+					el.alt = file.title || file.name;
 					editor.getRange().setStartAfter(el);
 				}
 			}

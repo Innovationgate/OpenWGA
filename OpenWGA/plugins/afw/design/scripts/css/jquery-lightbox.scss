@@ -29,7 +29,8 @@
 	background: white;
 	padding: 10px;
 	box-shadow: 0 0 20px black;
-
+	box-sizing: content-box;
+	
 	img {
 		max-width: none;
 		max-height: none;
@@ -64,6 +65,8 @@
 		text-decoration: none;
 		opacity: 0;
 		filter: alpha(opacity = 0);
+		box-sizing: content-box;
+		
 	}
 	
 	a.image-prev {
@@ -102,11 +105,12 @@
 		right: 0;
 		height: 40px;
 		white-space: nowrap;
+		box-sizing: content-box;
 		padding: 10px;
 		background: #efefef;
 		border-top: solid #dddddd 1px;
-		font-size: 12px;
-		.image-title, image-group {
+		font-size: 14px;
+		.image-title, .image-group {
 			overflow: hidden;
 			text-overflow: ellipsis;
 		}

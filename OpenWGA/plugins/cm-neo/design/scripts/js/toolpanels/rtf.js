@@ -207,7 +207,8 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 				title: el.title,
 				type: info.type,
 				key: info.key,
-				url: el.src
+				url: el.src,
+				alt: el.alt
 			});			
 		},
 		"create-image": function(el){

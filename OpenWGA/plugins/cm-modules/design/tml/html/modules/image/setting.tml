@@ -79,9 +79,14 @@
 	</div>
 </tml:case>
 
+<label><tml:label key="image.settings.title"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:title}" type="text" mode="{option:mode}"/>
+</div>
+
 <label><tml:label key="image.settings.labeling"/>:</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:descriptions}" type="checkbox" options="{label('image.settings.descriptions.options')}" changeaction="$refresh" ajax="true" mode="{option:mode}"/>
+	<tml:input name="{scoped:descriptions}" type="checkbox" labeled="true" options="{label('image.settings.descriptions.options')}" changeaction="$refresh" ajax="true" mode="{option:mode}"/>
 	<tml:case condition="tmlform.fieldList(WGA.scoped('descriptions')).contains('subtitle')">
 		<br>
 		<tml:input name="{scoped:subtitle}" type="textarea" cssstyle="width:100%" mode="{option:mode}"/>
@@ -125,7 +130,12 @@
 				<tml:else>
 					<tml:input name="{scoped:url}" cssstyle="width:100%" mode="{option:mode}" html_placeholder="absolute URL ..."/>
 				</tml:else>
-			</tml:if>
+			</tml:if>			
+		</div>
+
+		<label>Target:</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:link_target}" mode="{option:mode}"/>
 		</div>
 	</tml:case>
 	<tml:case value="zoom">
@@ -135,7 +145,7 @@
 					<tml:include ref="util:select-image" o_fieldname="lightbox_image" o_empty-text="Original"/>
 				</div>
 				<div style="margin:10px">
-					<tml:input name="{scoped:download}" type="boolean" default="false" options="{label('image.settings.lightbox.show-download.options')}" mode="{option:mode}"/>
+					<tml:input name="{scoped:download}" labeled="true" type="boolean" default="false" options="{label('image.settings.lightbox.show-download.options')}" mode="{option:mode}"/>
 				</div>
 			</div>
 		</tml:case>

@@ -5280,7 +5280,10 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         if (!WGUtils.isEmpty(eventName)) {
             PortletEvent event = new PortletEvent(eventName, getDesignContext().getVersionCompliance());
             try {
-                String eventParams = getwgacore().getURLEncoder().decode(getrequest().getParameter("$portletEventParams"));
+            	// params should no be decoded.
+            	// See #00005494
+                //String eventParams = getwgacore().getURLEncoder().decode(getrequest().getParameter("$portletEventParams"));
+                String eventParams = getrequest().getParameter("$portletEventParams");
                 if (eventParams != null) {
                     event.setParameters(new Gson().fromJson(eventParams, Map.class));
                 }
@@ -5471,4 +5474,9 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         return getURLBuilder().buildLoginURL(db(), getrequest(), contenturl());
 	}
 
+	@Override
+	public boolean hasrelation(String relname) throws WGAPIException{
+		WGContent c = getcontent().getRelation(relname);
+		return c!=null && c.isVisibleNow();
+	}
 } 
