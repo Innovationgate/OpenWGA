@@ -45,8 +45,8 @@
 			_img_title = _img_alt;	// backwards compatibilty
 		_download_url = c.fileurl(filename);
 		
-		var Attachment = AFW.content().attachment(filename)
-		if(!Attachment.isImage() && AFW.content().attachment(filename).waitingForDerivates()) {
+		var Attachment = AFW.content(c).attachment(filename)
+		if(!Attachment.isImage() && Attachment.waitingForDerivates()) {
 			_url = WGA.design().fileURL("images", "ajax-loader.gif");
 		}
 		else{			
