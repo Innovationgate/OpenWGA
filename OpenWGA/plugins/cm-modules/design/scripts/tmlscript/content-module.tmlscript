@@ -73,6 +73,8 @@ this.setModuleDefs = function(mod_defs){
 }
 
 this.settings = function(doc){
+	if(doc instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)
+		doc = doc.content();
 	var settings_map = this.getExtensionData(doc || content(), "content-modules-settings") || WGA.createLookupTable() 
 	return {
 		get: function(name) settings_map.get(WGA.scoped(name))
