@@ -242,6 +242,9 @@
 			},
 			"en": {
 				"image_count": "Image {1} of {2}"
+			},
+			"fr": {
+				"image_count": "Image {1} de {2}"
 			}
 		},
 		deleteImage: function(url, group){
