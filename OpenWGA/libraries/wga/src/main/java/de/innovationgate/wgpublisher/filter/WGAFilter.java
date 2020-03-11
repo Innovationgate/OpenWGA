@@ -630,6 +630,7 @@ public class WGAFilter implements Filter {
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		WGARequestInformation info = new WGARequestInformation();
+		RequestWrapper wrappedRequest = null;
 		try {
 			info.setStartTime(System.currentTimeMillis());
 			info.setThread(Thread.currentThread());
@@ -662,7 +663,7 @@ public class WGAFilter implements Filter {
 	           }
 	        }
 	        
-	        RequestWrapper wrappedRequest = createRequestWrapper(response, (HttpServletRequest) request);
+	        wrappedRequest = createRequestWrapper(response, (HttpServletRequest) request);
 	        /*
 	         *  #00005078: don't store original URL. Store converted URL instead.
 	         *  Will be used in WGA.urlBuilder() and other sources 
@@ -699,8 +700,8 @@ public class WGAFilter implements Filter {
 			info.setEndTime(System.currentTimeMillis());	
 	       try {
 				WGALoggerWrapper logger = _core.getAccessLogger();
-				   if (logger != null) {
-					   logger.logRequest(request);
+				   if (logger!=null && wrappedRequest!=null) {
+					   logger.logRequest(wrappedRequest);
 				   }
 			} catch (Exception e) {
 				_core.getLog().error("Unable to log request.", e);
