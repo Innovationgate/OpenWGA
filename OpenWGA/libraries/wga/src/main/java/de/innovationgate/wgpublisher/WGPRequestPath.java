@@ -321,6 +321,7 @@ public class WGPRequestPath {
     		    if (url.getLanguage() == null) {
     		        completePath = false;
     		    }
+    		    else this.requestLanguage = url.getLanguage(); 
 		    }
 		}
 		
@@ -371,6 +372,7 @@ public class WGPRequestPath {
                 }
                 else {
                     pathType = TYPE_UNKNOWN_CONTENT;
+                    this.requestLanguage = contentid.getLanguage();
                 }
             }
             
