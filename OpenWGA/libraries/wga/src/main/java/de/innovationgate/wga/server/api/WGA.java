@@ -2089,7 +2089,7 @@ public class WGA {
      * @throws UnavailableResourceException
      */
     public Design design() throws WGException {
-        return new Design(this, ((TMLContext) tmlcontext()).getDesignContext());
+        return new Design(this, ((TMLContext) context()).getDesignContext());
     }
     
     /**
@@ -2370,12 +2370,7 @@ public class WGA {
      */
     @CodeCompletion
     public Context tmlcontext() throws WGException {
-        
-        if (isIsolated()) {
-            throw new UnavailableResourceException("TMLContext is not available in isolated mode but needed for this operation");
-        }
-        
-        TMLContext tmlContext = fetchTMLContext();
+    	TMLContext tmlContext = (TMLContext)context();
         if (tmlContext != null) {
             return tmlContext;
         }
