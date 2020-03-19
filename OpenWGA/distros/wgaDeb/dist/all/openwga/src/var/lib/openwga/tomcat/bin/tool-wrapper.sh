@@ -37,7 +37,7 @@
 #                   containing some jars in order to allow replacement of APIs
 #                   created outside of the JCP (i.e. DOM and SAX from W3C).
 #                   It can also be used to update the XML parser implementation.
-#                   Note that Java 9 no longer supports this feature.
+#                   This is only supported for Java <= 8.
 #                   Defaults to $CATALINA_HOME/endorsed.
 # -----------------------------------------------------------------------------
 
@@ -119,7 +119,7 @@ fi
 if [ ! -z "$CLASSPATH" ] ; then
   CLASSPATH="$CLASSPATH":
 fi
-CLASSPATH="$CLASSPATH""$CATALINA_HOME"/bin/bootstrap.jar:"$CATALINA_HOME"/bin/tomcat-juli.jar:"$CATALINA_HOME"/lib/servlet-api.jar
+CLASSPATH="$CLASSPATH""$CATALINA_HOME"/bin/bootstrap.jar:"$CATALINA_HOME"/bin/tomcat-juli.jar:"$CATALINA_HOME"/lib/servlet-api.jar:"$CATALINA_HOME"/lib/tomcat-coyote.jar
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
@@ -127,7 +127,7 @@ if $cygwin; then
   JRE_HOME=`cygpath --absolute --windows "$JRE_HOME"`
   CATALINA_HOME=`cygpath --absolute --windows "$CATALINA_HOME"`
   CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
-  JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
+  [ -n "$JAVA_ENDORSED_DIRS" ] && JAVA_ENDORSED_DIRS=`cygpath --path --windows "$JAVA_ENDORSED_DIRS"`
 fi
 
 # Java 9 no longer supports the java.endorsed.dirs
@@ -146,8 +146,8 @@ JAVA_OPTS="$JAVA_OPTS -Djava.util.logging.manager=org.apache.juli.ClassLoaderLog
 
 # ----- Execute The Requested Command -----------------------------------------
 
-exec "$_RUNJAVA" $JAVA_OPTS $TOOL_OPTS \
-  -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
-  -classpath "$CLASSPATH" \
-  -Dcatalina.home="$CATALINA_HOME" \
+eval exec "\"$_RUNJAVA\"" "$JAVA_OPTS" "$TOOL_OPTS" \
+  -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
+  -classpath "\"$CLASSPATH\"" \
+  -Dcatalina.home="\"$CATALINA_HOME\"" \
   org.apache.catalina.startup.Tool "$@"

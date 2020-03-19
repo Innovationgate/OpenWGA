@@ -18,6 +18,9 @@
 # -----------------------------------------------------------------------------
 # Control Script for the CATALINA Server
 #
+# For supported commands call "catalina.sh help" or see the usage section at
+# the end of this file.
+#
 # Environment Variable Prerequisites
 #
 #   Do not set the variables in this script. Instead put them into a script
@@ -62,14 +65,14 @@
 #                   containing some jars in order to allow replacement of APIs
 #                   created outside of the JCP (i.e. DOM and SAX from W3C).
 #                   It can also be used to update the XML parser implementation.
-#                   Note that Java 9 no longer supports this feature.
+#                   This is only supported for Java <= 8.
 #                   Defaults to $CATALINA_HOME/endorsed.
 #
 #   JPDA_TRANSPORT  (Optional) JPDA transport used when the "jpda start"
 #                   command is executed. The default is "dt_socket".
 #
 #   JPDA_ADDRESS    (Optional) Java runtime options used when the "jpda start"
-#                   command is executed. The default is 8000.
+#                   command is executed. The default is localhost:8000.
 #
 #   JPDA_SUSPEND    (Optional) Java runtime options used when the "jpda start"
 #                   command is executed. Specifies whether JVM should suspend
@@ -98,6 +101,8 @@
 #   LOGGING_MANAGER (Optional) Override Tomcat's logging manager
 #                   Example (all one line)
 #                   LOGGING_MANAGER="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
+#
+#   UMASK           (Optional) Override Tomcat's default UMASK of 0027
 #
 #   USE_NOHUP       (Optional) If set to the string true the start command will
 #                   use nohup so that the Tomcat process will ignore any hangup
@@ -158,6 +163,20 @@ if $cygwin; then
   [ -n "$CLASSPATH" ] && CLASSPATH=`cygpath --path --unix "$CLASSPATH"`
 fi
 
+# Ensure that neither CATALINA_HOME nor CATALINA_BASE contains a colon
+# as this is used as the separator in the classpath and Java provides no
+# mechanism for escaping if the same character appears in the path.
+case $CATALINA_HOME in
+  *:*) echo "Using CATALINA_HOME:   $CATALINA_HOME";
+       echo "Unable to start as CATALINA_HOME contains a colon (:) character";
+       exit 1;
+esac
+case $CATALINA_BASE in
+  *:*) echo "Using CATALINA_BASE:   $CATALINA_BASE";
+       echo "Unable to start as CATALINA_BASE contains a colon (:) character";
+       exit 1;
+esac
+
 # For OS400
 if $os400; then
   # Set job priority to standard for interactive (interactive - 6) by using
@@ -212,7 +231,7 @@ fi
 
 # Bugzilla 37848: When no TTY is available, don't output to console
 have_tty=0
-if [ "`tty`" != "not a tty" ]; then
+if [ -t 0 ]; then
     have_tty=1
 fi
 
@@ -246,6 +265,12 @@ if [ -z "$LOGGING_MANAGER" ]; then
   LOGGING_MANAGER="-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager"
 fi
 
+# Set UMASK unless it has been overridden
+if [ -z "$UMASK" ]; then
+    UMASK="0027"
+fi
+umask $UMASK
+
 # Java 9 no longer supports the java.endorsed.dirs
 # system property. Only try to use it if
 # JAVA_ENDORSED_DIRS was explicitly set
@@ -258,9 +283,8 @@ if [ -d "$CATALINA_HOME/endorsed" ]; then
     ENDORSED_PROP=java.endorsed.dirs
 fi
 
-# Uncomment the following line to make the umask available when using the
-# org.apache.catalina.security.SecurityListener
-#JAVA_OPTS="$JAVA_OPTS -Dorg.apache.catalina.security.SecurityListener.UMASK=`umask`"
+# Make the umask available when using the org.apache.catalina.security.SecurityListener
+JAVA_OPTS="$JAVA_OPTS -Dorg.apache.catalina.security.SecurityListener.UMASK=`umask`"
 
 if [ -z "$USE_NOHUP" ]; then
     if $hpux; then
@@ -271,7 +295,7 @@ if [ -z "$USE_NOHUP" ]; then
 fi
 unset _NOHUP
 if [ "$USE_NOHUP" = "true" ]; then
-    _NOHUP=nohup
+    _NOHUP="nohup"
 fi
 
 # Add the JAVA 9 specific start-up parameters required by Tomcat
@@ -303,7 +327,7 @@ if [ "$1" = "jpda" ] ; then
     JPDA_TRANSPORT="dt_socket"
   fi
   if [ -z "$JPDA_ADDRESS" ]; then
-    JPDA_ADDRESS="8000"
+    JPDA_ADDRESS="localhost:8000"
   fi
   if [ -z "$JPDA_SUSPEND" ]; then
     JPDA_SUSPEND="n"
@@ -315,6 +339,10 @@ if [ "$1" = "jpda" ] ; then
   shift
 fi
 
+# TODO: Bugzilla 63815
+# This doesn't currently work (and can't be made to work) if values used in
+# CATALINA_OPTS and/or JAVA_OPTS require quoting. See:
+# https://bugs.openjdk.java.net/browse/JDK-8234808
 if [ "$1" = "debug" ] ; then
   if $os400; then
     echo "Debug command not available on OS400"
@@ -356,7 +384,7 @@ elif [ "$1" = "run" ]; then
       echo "Using Security Manager"
     fi
     shift
-    eval exec "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
+    eval exec "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER "$JAVA_OPTS" "$CATALINA_OPTS" \
       -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
       -classpath "\"$CLASSPATH\"" \
       -Djava.security.manager \
@@ -366,7 +394,7 @@ elif [ "$1" = "run" ]; then
       -Djava.io.tmpdir="\"$CATALINA_TMPDIR\"" \
       org.apache.catalina.startup.Bootstrap "$@" start
   else
-    eval exec "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
+    eval exec "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER "$JAVA_OPTS" "$CATALINA_OPTS" \
       -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
       -classpath "\"$CLASSPATH\"" \
       -Dcatalina.base="\"$CATALINA_BASE\"" \
@@ -424,7 +452,7 @@ elif [ "$1" = "start" ] ; then
       echo "Using Security Manager"
     fi
     shift
-    eval $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
+    eval $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER "$JAVA_OPTS" "$CATALINA_OPTS" \
       -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
       -classpath "\"$CLASSPATH\"" \
       -Djava.security.manager \
@@ -436,7 +464,7 @@ elif [ "$1" = "start" ] ; then
       >> "$CATALINA_OUT" 2>&1 "&"
 
   else
-    eval $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER $JAVA_OPTS $CATALINA_OPTS \
+    eval $_NOHUP "\"$_RUNJAVA\"" "\"$LOGGING_CONFIG\"" $LOGGING_MANAGER "$JAVA_OPTS" "$CATALINA_OPTS" \
       -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
       -classpath "\"$CLASSPATH\"" \
       -Dcatalina.base="\"$CATALINA_BASE\"" \
@@ -489,7 +517,7 @@ elif [ "$1" = "stop" ] ; then
     fi
   fi
 
-  eval "\"$_RUNJAVA\"" $LOGGING_MANAGER $JAVA_OPTS \
+  eval "\"$_RUNJAVA\"" $LOGGING_MANAGER "$JAVA_OPTS" \
     -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
     -classpath "\"$CLASSPATH\"" \
     -Dcatalina.base="\"$CATALINA_BASE\"" \
@@ -576,7 +604,7 @@ elif [ "$1" = "stop" ] ; then
 
 elif [ "$1" = "configtest" ] ; then
 
-    eval "\"$_RUNJAVA\"" $LOGGING_MANAGER $JAVA_OPTS \
+    eval "\"$_RUNJAVA\"" $LOGGING_MANAGER "$JAVA_OPTS" \
       -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
       -classpath "\"$CLASSPATH\"" \
       -Dcatalina.base="\"$CATALINA_BASE\"" \

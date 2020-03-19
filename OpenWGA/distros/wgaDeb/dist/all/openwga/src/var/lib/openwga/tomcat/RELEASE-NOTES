@@ -16,7 +16,7 @@
 ================================================================================
 
 
-                     Apache Tomcat Version 7.0.90
+                     Apache Tomcat Version 7.0.100
                             Release Notes
 
 
@@ -41,7 +41,7 @@ CONTENTS:
 ===================
 Dependency Changes:
 ===================
-Tomcat 7.0 is designed to run on Java SE 6 and later.
+Tomcat 7.0 is designed to run on Java 6 and later.
 
 In addition, Tomcat 7.0 uses the Eclipse JDT Java compiler for
 compiling JSP pages.  This means you no longer need to have the complete
@@ -112,7 +112,7 @@ for use by web applications (by placing them in "lib"):
 * tomcat7-websocket.jar (WebSocket 1.1 implementation)
 * tomcat-api.jar (Interfaces shared by Catalina and Jasper)
 * tomcat-coyote.jar (Tomcat connectors and utility classes)
-* tomcat-dbcp.jar (package renamed database connection pool based on Commons DBCP)
+* tomcat-dbcp.jar (package renamed database connection pool based on Commons DBCP 1.x)
 * tomcat-jdbc.jar (Tomcat's database connection pooling solution)
 * tomcat-util.jar (Various utilities)
 * websocket-api.jar (WebSocket 1.1 API)
@@ -169,7 +169,7 @@ have a JDK that is up to date, or disable sendfile behavior in the Connector.<br
 Enabling SSI and CGI Support:
 =============================
 Because of the security risks associated with CGI and SSI available
-to web applications, these features are disabled by default.  
+to web applications, these features are disabled by default.
 
 To enable and configure CGI support, please see the cgi-howto.html page.
 
@@ -180,7 +180,7 @@ To enable and configue SSI support, please see the ssi-howto.html page.
 Security manager URLs:
 ======================
 In order to grant security permissions to JARs located inside the
-web application repository, use URLs of of the following format
+web application repository, use URLs of the following format
 in your policy file:
 
 file:${catalina.base}/webapps/examples/WEB-INF/lib/driver.jar

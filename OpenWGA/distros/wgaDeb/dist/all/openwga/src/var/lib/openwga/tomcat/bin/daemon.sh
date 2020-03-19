@@ -18,20 +18,22 @@
 # -----------------------------------------------------------------------------
 # Commons Daemon wrapper script.
 # -----------------------------------------------------------------------------
-#
+
 # resolve links - $0 may be a softlink
-ARG0="$0"
-while [ -h "$ARG0" ]; do
-  ls=`ls -ld "$ARG0"`
+PRG="$0"
+
+while [ -h "$PRG" ]; do
+  ls=`ls -ld "$PRG"`
   link=`expr "$ls" : '.*-> \(.*\)$'`
   if expr "$link" : '/.*' > /dev/null; then
-    ARG0="$link"
+    PRG="$link"
   else
-    ARG0="`dirname $ARG0`/$link"
+    PRG=`dirname "$PRG"`/"$link"
   fi
 done
-DIRNAME="`dirname $ARG0`"
-PROGRAM="`basename $ARG0`"
+
+DIRNAME="`dirname "$PRG"`"
+PROGRAM="`basename "$PRG"`"
 while [ ".$1" != . ]
 do
   case "$1" in
@@ -100,10 +102,10 @@ if [ -z "$JAVA_HOME" ]; then
         if expr "$link" : '/.*' > /dev/null; then
             JAVA_BIN="$link"
         else
-            JAVA_BIN="`dirname $JAVA_BIN`/$link"
+            JAVA_BIN="`dirname "$JAVA_BIN"`/$link"
         fi
     done
-    test -x "$JAVA_BIN" && JAVA_HOME="`dirname $JAVA_BIN`"
+    test -x "$JAVA_BIN" && JAVA_HOME="`dirname "$JAVA_BIN"`"
     test ".$JAVA_HOME" != . && JAVA_HOME=`cd "$JAVA_HOME/.." >/dev/null; pwd`
 else
     JAVA_BIN="$JAVA_HOME/bin/java"
@@ -134,7 +136,7 @@ elif [ -r "$CATALINA_HOME/bin/setenv.sh" ]; then
 fi
 
 # Add on extra jar files to CLASSPATH
-test ".$CLASSPATH" != . && CLASSPATH="${CLASSPATH}:"
+test ".$CLASSPATH" != . && CLASSPATH="$CLASSPATH:"
 CLASSPATH="$CLASSPATH$CATALINA_HOME/bin/bootstrap.jar:$CATALINA_HOME/bin/commons-daemon.jar"
 
 test ".$CATALINA_OUT" = . && CATALINA_OUT="$CATALINA_BASE/logs/catalina-daemon.out"
@@ -168,7 +170,7 @@ if [ "$cygwin" = "false" ]; then
     MAX_FD_LIMIT=`ulimit -H -n`
     if [ "$?" -eq 0 ]; then
         # Darwin does not allow RLIMIT_INFINITY on file soft limit
-        if [ "$darwin" = "true" -a "$MAX_FD_LIMIT" = "unlimited" ]; then
+        if [ "$darwin" = "true" ] && [ "$MAX_FD_LIMIT" = "unlimited" ]; then
             MAX_FD_LIMIT=`/usr/sbin/sysctl -n kern.maxfilesperproc`
         fi
         test ".$MAX_FD" = ".maximum" && MAX_FD="$MAX_FD_LIMIT"
@@ -197,49 +199,51 @@ fi
 case "$1" in
     run     )
       shift
-      "$JSVC" $* \
-      $JSVC_OPTS \
-      -java-home "$JAVA_HOME" \
-      -pidfile "$CATALINA_PID" \
-      -wait "$SERVICE_START_WAIT_TIME" \
+      eval exec "\"$JSVC\"" $* \
+      "$JSVC_OPTS" \
+      -java-home "\"$JAVA_HOME\"" \
+      -pidfile "\"$CATALINA_PID\"" \
+      -wait $SERVICE_START_WAIT_TIME \
       -nodetach \
-      -outfile "&1" \
-      -errfile "&2" \
-      -classpath "$CLASSPATH" \
-      "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
-      -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
-      -Dcatalina.base="$CATALINA_BASE" \
-      -Dcatalina.home="$CATALINA_HOME" \
-      -Djava.io.tmpdir="$CATALINA_TMP" \
+      -outfile "\"&1\"" \
+      -errfile "\"&2\"" \
+      -classpath "\"$CLASSPATH\"" \
+      "\"$LOGGING_CONFIG\"" "$JAVA_OPTS" "$CATALINA_OPTS" \
+      -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
+      -Dcatalina.base="\"$CATALINA_BASE\"" \
+      -Dcatalina.home="\"$CATALINA_HOME\"" \
+      -Djava.io.tmpdir="\"$CATALINA_TMP\"" \
       $CATALINA_MAIN
       exit $?
     ;;
     start   )
-      "$JSVC" $JSVC_OPTS \
-      -java-home "$JAVA_HOME" \
+      eval "\"$JSVC\"" \
+      "$JSVC_OPTS" \
+      -java-home "\"$JAVA_HOME\"" \
       -user $TOMCAT_USER \
-      -pidfile "$CATALINA_PID" \
-      -wait "$SERVICE_START_WAIT_TIME" \
-      -outfile "$CATALINA_OUT" \
-      -errfile "&1" \
-      -classpath "$CLASSPATH" \
-      "$LOGGING_CONFIG" $JAVA_OPTS $CATALINA_OPTS \
-      -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
-      -Dcatalina.base="$CATALINA_BASE" \
-      -Dcatalina.home="$CATALINA_HOME" \
-      -Djava.io.tmpdir="$CATALINA_TMP" \
+      -pidfile "\"$CATALINA_PID\"" \
+      -wait $SERVICE_START_WAIT_TIME \
+      -outfile "\"$CATALINA_OUT\"" \
+      -errfile "\"&1\"" \
+      -classpath "\"$CLASSPATH\"" \
+      "\"$LOGGING_CONFIG\"" "$JAVA_OPTS" "$CATALINA_OPTS" \
+      -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
+      -Dcatalina.base="\"$CATALINA_BASE\"" \
+      -Dcatalina.home="\"$CATALINA_HOME\"" \
+      -Djava.io.tmpdir="\"$CATALINA_TMP\"" \
       $CATALINA_MAIN
       exit $?
     ;;
     stop    )
-      "$JSVC" $JSVC_OPTS \
+      eval "\"$JSVC\"" \
+      "$JSVC_OPTS" \
       -stop \
-      -pidfile "$CATALINA_PID" \
-      -classpath "$CLASSPATH" \
-      -D$ENDORSED_PROP="$JAVA_ENDORSED_DIRS" \
-      -Dcatalina.base="$CATALINA_BASE" \
-      -Dcatalina.home="$CATALINA_HOME" \
-      -Djava.io.tmpdir="$CATALINA_TMP" \
+      -pidfile "\"$CATALINA_PID\"" \
+      -classpath "\"$CLASSPATH\"" \
+      -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
+      -Dcatalina.base="\"$CATALINA_BASE\"" \
+      -Dcatalina.home="\"$CATALINA_HOME\"" \
+      -Djava.io.tmpdir="\"$CATALINA_TMP\"" \
       $CATALINA_MAIN
       exit $?
     ;;
@@ -260,7 +264,7 @@ case "$1" in
       exit $?
     ;;
     *       )
-      echo "Unknown command: \`$1'"
+      echo "Unknown command: '$1'"
       echo "Usage: $PROGRAM ( commands ... )"
       echo "commands:"
       echo "  run               Start Tomcat without detaching from console"
