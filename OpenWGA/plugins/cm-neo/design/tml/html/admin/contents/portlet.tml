@@ -1,0 +1,90 @@
+<tml:form id="contents" source="portlet">
+
+	<div class="header">
+		<tml:input name="filter" type="select" options="Alle Inhalte|all,Seitentyp|pagetype,Sprache|language,Status|status"
+			changeaction="$store"
+		/>
+		<tml:select switch="tmlform.filter">
+			<tml:case value="pagetype">
+				<tml:input name="pagetype" type="select" optionsitem="$pc.pagetypes"
+					changeaction="$store"
+				/>
+			</tml:case>
+			<tml:case value="language">
+				<tml:input name="lang" type="select" optionsitem="$pc.languages"
+					changeaction="$store"
+				/>
+			</tml:case>
+			<tml:case value="status">
+				<tml:input name="status" type="select" optionsitem="$pc.statuse"
+					changeaction="$store"
+				/>
+			</tml:case>
+		</tml:select>
+		<tml:input name="order" type="select" options="Nach Erstellungsdatum|created,Nach Änderungsdatum|lastmodified"
+			default="created"
+			changeaction="$store"
+		/>
+		<tml:input name="dir" type="select" options="Absteigend|desc,Aufsteigend|asc"
+			default="desc"
+			changeaction="$store"
+		/>
+		
+	</div>
+	
+	<div class="content">
+		<div class="table">
+			<div class="row">
+				<div class="col" style="width:40%">Titel</div>
+				<div class="col">Seitentyp</div>
+				<div class="col">Status</div>
+				<div class="col">Sprache</div>
+				<div class="col">Erstellt</div>
+				<div class="col">Zuletzt geändert</div>
+			</div>
+			<tml:foreach item="$pc.contents" pagesize="{portlet.pagesize||50}">
+				<div class="row">
+					<div class="col">
+						<a href="#" data-wgakey="<tml:meta name="key"/>"
+							title="Version <tml:meta name="version"/>, Autor: <tml:meta name="author"/>"
+						>
+							<tml:meta name="title"/>
+						</a>
+					</div>
+					<div class="col"><tml:meta name="contenttype"/></div>
+					<div class="col">
+						<tml:label key="[content-properties.status.{STATUS}]"/>
+						<tml:case condition="VALIDTO && VALIDTO.before(now())">
+							<br><span class="abgelaufen" title="seit <tml:meta name="validto" format="dd.MM.yyyy HH:mm"/>">abgelaufen</span>
+						</tml:case>
+					</div>
+					<div class="col"><tml:meta name="language"/></div>
+					<div class="col"><tml:meta name="created" format="dd.MM.yyy HH:mm:ss"/></div>
+					<div class="col"><tml:meta name="modified" format="dd.MM.yyy HH:mm:ss"/></div>
+				</div>
+			</tml:foreach>
+		</div>
+	</div>
+	
+	<div class="footer">
+		<tml:item name="$pc.count"/> Dokument(e) gefunden.
+		<div class="right">
+			Anzeige: <tml:input name="pagesize" type="select" options="50,100,500" default="50"
+				changeaction="$store"
+			/> Dokumente
+		</div>
+	</div>
+	
+</tml:form>
+
+<script>
+	require(["jquery"], function($){
+		$("#contents a[data-wgakey]").click(function(ev){
+			ev.preventDefault();
+			WGA.event.fireEvent("setMainPortletMode", "*", {
+				mode: "select-db",
+				contentkey: $(this).data("wgakey")
+			})
+		})
+	})
+</script>

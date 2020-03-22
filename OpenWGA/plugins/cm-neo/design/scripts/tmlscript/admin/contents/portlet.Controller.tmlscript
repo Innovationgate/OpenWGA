@@ -1,0 +1,67 @@
+function Controller() {
+}
+
+Controller.prototype.prepare = function() {}
+
+Controller.prototype.pagetypes = function($option_dbkey) {
+	var values = WGA.createList(["Bitte auswählen|"])
+	var pagetypes = WGA.db($option_dbkey).getContentTypes();
+	for(let pagetype in Iterator(pagetypes))
+		values.add(pagetype.name);
+	return values
+	
+}
+
+Controller.prototype.languages = function($option_dbkey) {
+	var ret = WGA.createList(["Bitte auswählen|"])
+	var langs = WGA.db($option_dbkey).getLanguages().values();
+	for(let lang in Iterator(langs))
+		ret.add(lang.title + "|" + lang.name);
+	return ret
+}
+
+Controller.prototype.statuse = function($option_dbkey) {
+	return WGA.createList([
+		"Bitte auswählen|",
+		"In Arbeit|w",
+		"Veröffentlicht|p",
+		"Zur Genehmigung|g",
+		"Bevorstehend|pending"
+	])
+}
+
+Controller.prototype.contents = function($option_dbkey, $form) {
+	var query = "1=1";
+	var params = {
+		max: 0,
+		alllanguages: true,
+		onlypublished: false
+	};
+	switch($form.filter){
+		case "pagetype":
+			if(!$form.pagetype)
+				return [];
+			query = "content.structentry.contenttype.name=:value";
+			params.p_value = $form.pagetype;
+			break;
+		case "language":
+			if(!$form.lang)
+				return [];
+			query = "content.language.name=:value";
+			params.p_value = $form.lang;
+			break;
+		case "status":
+			if(!$form.status)
+				return [];
+			query = "content.status=:value";
+			params.p_value = $form.status;
+			break;
+	}
+	var result = WGA.app($option_dbkey).query(query 
+			+ " AND content.status!='a'"
+			+ " order by content." + $form.order 
+			+ " " + $form.dir
+		, params)
+	this.count = result.size;
+	return result;
+}

@@ -11,7 +11,7 @@
 			</a>
 			<ul class="dropdown-menu">
 				<tml:case condition="WGA.app(portlet.dbkey).isChiefEditor()">
-					<li><a href="<tml:url action="$refresh" portletmode="admin"/>">Einstellungen</a></li>
+					<li><a href="<tml:url action="$refresh" portletmode="admin"/>">Verwaltung</a></li>
 					<li class="divider"></li>
 				</tml:case>
 				<li class="dropdown-header">Webssite wechseln</li>

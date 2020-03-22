@@ -1,4 +1,7 @@
 <tml:eventscript onevent="setMainPortletMode">
+	var contentkey = portletEvent.getParameter("contentkey")
+	if(contentkey)
+		portlet.contentkey = contentkey;
 	portlet.setmode(portletEvent.getParameter("mode"))
 </tml:eventscript>
 
