@@ -56,6 +56,9 @@ Controller.prototype.contents = function($option_dbkey, $form) {
 			query = "content.status=:value";
 			params.p_value = $form.status;
 			break;
+		case "uname":
+			query = "content.uniquename!='' OR content.structentry.uniquename!=''";
+			break;
 	}
 	var result = WGA.app($option_dbkey).query(query 
 			+ " AND content.status!='a'"

@@ -1,7 +1,7 @@
 <tml:form id="contents" source="portlet">
 
 	<div class="header">
-		<tml:input name="filter" type="select" options="Alle Inhalte|all,Seitentyp|pagetype,Sprache|language,Status|status"
+		<tml:input name="filter" type="select" options="Alle Inhalte|all,Seitentyp|pagetype,Sprache|language,Status|status,Mit eindeutigem Namen|uname"
 			changeaction="$store"
 		/>
 		<tml:select switch="tmlform.filter">
@@ -35,10 +35,19 @@
 	<div class="content">
 		<div class="table">
 			<div class="row">
-				<div class="col" style="width:40%">Titel</div>
-				<div class="col">Seitentyp</div>
-				<div class="col">Status</div>
-				<div class="col">Sprache</div>
+				<div class="col" _style="width:40%">Titel</div>
+				<tml:case condition="tmlform.filter=='uname'">
+					<div class="col">Name</div>
+				</tml:case>
+				<tml:case condition="tmlform.filter!='pagetype'">
+					<div class="col">Seitentyp</div>
+				</tml:case>
+				<tml:case condition="tmlform.filter!='status'">
+					<div class="col">Status</div>
+				</tml:case>
+				<tml:case condition="tmlform.filter!='language'">
+					<div class="col">Sprache</div>
+				</tml:case>
 				<div class="col">Erstellt</div>
 				<div class="col">Zuletzt geändert</div>
 			</div>
@@ -49,16 +58,25 @@
 							title="Version <tml:meta name="version"/>, Autor: <tml:meta name="author"/>"
 						>
 							<tml:meta name="title"/>
+							<tml:case condition="VALIDTO && VALIDTO.before(now())">
+								<br><span class="abgelaufen" title="seit <tml:meta name="validto" format="dd.MM.yyyy HH:mm"/>">(abgelaufen)</span>
+							</tml:case>
 						</a>
 					</div>
-					<div class="col"><tml:meta name="contenttype"/></div>
-					<div class="col">
-						<tml:label key="[content-properties.status.{STATUS}]"/>
-						<tml:case condition="VALIDTO && VALIDTO.before(now())">
-							<br><span class="abgelaufen" title="seit <tml:meta name="validto" format="dd.MM.yyyy HH:mm"/>">abgelaufen</span>
-						</tml:case>
-					</div>
-					<div class="col"><tml:meta name="language"/></div>
+					<tml:case condition="tmlform.filter=='uname'">
+						<div class="col"><tml:script expression="PAGENAME || UNIQUENAME"/></div>
+					</tml:case>
+					<tml:case condition="tmlform.filter!='pagetype'">
+						<div class="col"><tml:meta name="contenttype"/></div>
+					</tml:case>
+					<tml:case condition="tmlform.filter!='status'">
+						<div class="col">
+							<tml:label key="[content-properties.status.{STATUS}]"/>
+						</div>
+					</tml:case>
+					<tml:case condition="tmlform.filter!='language'">
+						<div class="col"><tml:meta name="language"/></div>
+					</tml:case>
 					<div class="col"><tml:meta name="created" format="dd.MM.yyy HH:mm:ss"/></div>
 					<div class="col"><tml:meta name="modified" format="dd.MM.yyy HH:mm:ss"/></div>
 				</div>
