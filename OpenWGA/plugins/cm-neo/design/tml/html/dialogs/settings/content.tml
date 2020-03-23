@@ -60,6 +60,19 @@
 				<tml:[form-field] o_label="Fenstertitel (max 60 Zeichen)" o_field="browsertitle" o_meta="true"
 					o_placeholder="Alternativer Titel der Seite im Browser"
 				/>
+				
+				<tml:script>
+					_isTilepath = false
+					var tpm = db().getAttribute(WGA.Core.DBATTRIB_TITLEPATHMANAGER)
+					if(tpm && tpm.isIncludeKeys())
+						_isTilepath = true;
+				</tml:script>
+				<tml:case istrue="_isTilepath" condition="WGA.app().isChiefEditor()">
+					<tml:[form-field] o_label="Benutzerdefinierter URL-Bestandteil" o_field="titlepath" o_meta="true"
+						o_placeholder="Optionaler eigener Titel-Pfad"
+					/>
+				</tml:case>				
+				
 				<tml:[form-field] o_label="Beschreibung (max 160 Zeichen)" o_field="description" o_meta="true" o_type="textarea" o_encode="html"
 					o_placeholder="Kurze Beschreibung des Inhalts für Suchmaschinen"
 				/>
