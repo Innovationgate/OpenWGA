@@ -49,8 +49,8 @@ this.getConfigTMLs = function(){
 	return mods;
 }
 
-this.getModuleDefs = function(){
-	var dbkey = db().getDbReference();
+this.getModuleDefs = function(dbkey){
+	var dbkey = dbkey || db().getDbReference();
 	if(dbs_with_local_modules[dbkey] && !db().getAttribute("cmm_local_mods")){
 		// this is a db with registered local module, has been reconnected and now has NO modules:
 		// remove from reg
