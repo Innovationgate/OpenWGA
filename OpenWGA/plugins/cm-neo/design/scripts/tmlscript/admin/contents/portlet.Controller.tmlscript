@@ -30,6 +30,17 @@ Controller.prototype.statuse = function($option_dbkey) {
 	])
 }
 
+Controller.prototype.modules = function($option_dbkey, CMM) {
+	var mods = CMM.getModuleDefs($option_dbkey);
+	var ret = [];
+	for(let [index, mod] in mods){
+		if(mod.allowedparents)
+			continue;
+		ret.push(mod.title + "|" + mod.id)
+	}
+	return ret.sort();
+}
+
 Controller.prototype.contents = function($option_dbkey, $form) {
 	var query = "1=1";
 	var params = {
@@ -58,6 +69,12 @@ Controller.prototype.contents = function($option_dbkey, $form) {
 			break;
 		case "uname":
 			query = "content.uniquename!='' OR content.structentry.uniquename!=''";
+			break;
+		case "module":
+			if(!$form.module)
+				return [];
+			query = "content.extensionData['content-modules'].text like :value"
+			params.p_value = String("%" + $form.module + "%");
 			break;
 	}
 	var result = WGA.app($option_dbkey).query(query 

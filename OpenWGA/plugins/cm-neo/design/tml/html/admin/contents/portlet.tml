@@ -1,7 +1,7 @@
 <tml:form id="contents" source="portlet">
 
 	<div class="header">
-		<tml:input name="filter" type="select" options="Alle Inhalte|all,Seitentyp|pagetype,Sprache|language,Status|status,Mit eindeutigem Namen|uname"
+		<tml:input name="filter" type="select" options="Alle Inhalte|all,Seitentyp|pagetype,Sprache|language,Status|status,Enthält Inhaltsmodul|module,Mit eindeutigem Namen|uname"
 			changeaction="$store"
 		/>
 		<tml:select switch="tmlform.filter">
@@ -17,6 +17,11 @@
 			</tml:case>
 			<tml:case value="status">
 				<tml:input name="status" type="select" optionsitem="$pc.statuse"
+					changeaction="$store"
+				/>
+			</tml:case>
+			<tml:case value="module">
+				<tml:input name="module" type="select" optionsitem="$pc.modules"
 					changeaction="$store"
 				/>
 			</tml:case>
@@ -59,7 +64,7 @@
 						>
 							<tml:meta name="title"/>
 							<tml:case condition="VALIDTO && VALIDTO.before(now())">
-								<br><span class="abgelaufen" title="seit <tml:meta name="validto" format="dd.MM.yyyy HH:mm"/>">(abgelaufen)</span>
+								<br><span class="abgelaufen" title="abgelaufen seit <tml:meta name="validto" format="dd.MM.yyyy HH:mm"/>">(abgelaufen)</span>
 							</tml:case>
 						</a>
 					</div>
