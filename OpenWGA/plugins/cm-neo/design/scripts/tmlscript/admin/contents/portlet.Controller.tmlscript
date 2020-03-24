@@ -30,24 +30,58 @@ Controller.prototype.statuse = function($option_dbkey) {
 	])
 }
 
+/*
 Controller.prototype.modules = function($option_dbkey, CMM) {
 	var mods = CMM.getModuleDefs($option_dbkey);
 	var ret = [];
 	for(let [index, mod] in mods){
 		if(mod.allowedparents)
 			continue;
-		ret.push(mod.title + "|" + mod.id)
+		ret.push((mod.category ? (mod.category + "/") : "") + mod.title + "|" + mod.id)
 	}
 	return ret.sort();
 }
+*/
 
-Controller.prototype.contents = function($option_dbkey, $form) {
+Controller.prototype.rootModules = function(modules) {
+	var ret = [{
+		title: "Bitte auswählen",
+		value: ""
+	}]
+	for(let [index, mod] in modules){
+		if(mod.allowedparents || mod.category)
+			continue;
+		ret.push({
+			title: mod.title,
+			value: mod.id
+		})
+	}
+	return ret;
+}
+
+Controller.prototype.catModules = function(modules) {
+	var ret = WGA.createMap()
+	for(let [index, mod] in modules){
+		if(mod.allowedparents || !mod.category)
+			continue;
+		if(!ret[mod.category])
+			ret[mod.category]=[]
+		ret[mod.category].push({
+			title: mod.title,
+			value: mod.id
+		})
+	}
+	return ret;
+}
+
+Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 	var query = "1=1";
 	var params = {
 		max: 0,
 		alllanguages: true,
 		onlypublished: false
 	};
+	this.count = 0;
 	switch($form.filter){
 		case "pagetype":
 			if(!$form.pagetype)
@@ -71,10 +105,10 @@ Controller.prototype.contents = function($option_dbkey, $form) {
 			query = "content.uniquename!='' OR content.structentry.uniquename!=''";
 			break;
 		case "module":
-			if(!$form.module)
+			if(!$portlet.module)
 				return [];
 			query = "content.extensionData['content-modules'].text like :value"
-			params.p_value = String("%" + $form.module + "%");
+			params.p_value = String("%" + $portlet.module + "%");
 			break;
 	}
 	var result = WGA.app($option_dbkey).query(query 

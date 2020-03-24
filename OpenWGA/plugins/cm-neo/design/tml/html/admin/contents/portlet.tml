@@ -1,4 +1,4 @@
-<tml:form id="contents" source="portlet">
+<tml:form id="contents" source="portlet" htmlinput="true">
 
 	<div class="header">
 		<tml:input name="filter" type="select" options="Alle Inhalte|all,Seitentyp|pagetype,Sprache|language,Status|status,Enthält Inhaltsmodul|module,Mit eindeutigem Namen|uname"
@@ -21,11 +21,40 @@
 				/>
 			</tml:case>
 			<tml:case value="module">
-				<tml:input name="module" type="select" optionsitem="$pc.modules"
+				<tml:comment><tml:input name="module" type="select" optionsitem="$pc.modules"
 					changeaction="$store"
-				/>
+				/></tml:comment>
+
+				<tml:script>
+					_configs = CMM.getConfigTMLs();
+					_mods = [];
+				</tml:script>
+				<tml:foreach item="_configs" currentvalue="_config">
+					<tml:include designdb="{_config.dbkey}" ref="{_config.configtml}" var="_a"/>
+					<tml:script>
+						_mods = _mods.concat([<tml:item name="_a" encode="none"/>]);
+					</tml:script>
+				</tml:foreach>
+
+				<select name="module">
+					<tml:foreach item="$pc.rootModules" a-modules="_mods" currentvalue="_mod" sortorder="ascending">
+						<option title="<tml:item name="_mod.value"/>" value="<tml:item name="_mod.value"/>" <tml:case condition="portlet.module==_mod.value">selected</tml:case>>
+							<tml:item name="_mod.title"/>
+						</option>
+					</tml:foreach>
+					<tml:foreach item="$pc.catModules" a-modules="_mods" currentvalue="_entryset" sortorder="ascending">
+						<optgroup label="<tml:item name="_entryset.key"/>">
+							<tml:foreach item="_entryset.value" currentvalue="_mod" sortorder="ascending">
+								<option title="<tml:item name="_mod.value"/>" value="<tml:item name="_mod.value"/>" <tml:case condition="portlet.module==_mod.value">selected</tml:case>>
+									<tml:item name="_mod.title"/>
+								</option>
+							</tml:foreach>
+						</optgroup>
+					</tml:foreach>
+				</select>
 			</tml:case>
 		</tml:select>
+		
 		<tml:input name="order" type="select" options="Nach Erstellungsdatum|created,Nach Änderungsdatum|lastmodified"
 			default="created"
 			changeaction="$store"
@@ -97,17 +126,21 @@
 			/> Dokumente
 		</div>
 	</div>
+
+	<script>
+		require(["jquery"], function($){
+			$("#contents a[data-wgakey]").click(function(ev){
+				ev.preventDefault();
+				WGA.event.fireEvent("setMainPortletMode", "*", {
+					mode: "select-db",
+					contentkey: $(this).data("wgakey")
+				})
+			})
+			$("#contents select[name='module']").change(function(ev){
+				WGA.ajax.callAction("<tml:action ref="$store"/>");
+			})
+		})
+	</script>
 	
 </tml:form>
 
-<script>
-	require(["jquery"], function($){
-		$("#contents a[data-wgakey]").click(function(ev){
-			ev.preventDefault();
-			WGA.event.fireEvent("setMainPortletMode", "*", {
-				mode: "select-db",
-				contentkey: $(this).data("wgakey")
-			})
-		})
-	})
-</script>
