@@ -58,6 +58,9 @@ input, textarea{
 input[type=checkbox]{
 	margin-right: 6px;
 }
+input[type=checkbox] + label{
+	display: inline-block;
+}
 
 textarea{
 	height: 70px;
