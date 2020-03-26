@@ -33,6 +33,7 @@
 	<tml:input name="{scoped:source}" type="select" options="{label(CMM.settingSource()=='template'?'image.settings.source.template':'image.settings.source')}"
 		changeaction="clearImages" ajax="true"
 		mode="{option:mode}"
+		cssclass="form-control"
 	/>
 </div>
 
@@ -47,6 +48,7 @@
 			changeaction="clearImages" ajax="true"
 			default="{meta('db', 'dbkey')}"
 			mode="{option:mode}"
+			cssclass="form-control"
 		/>
 	</div>
 	
@@ -81,7 +83,7 @@
 
 <label><tml:label key="image.settings.title"/>:</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:title}" type="text" mode="{option:mode}"/>
+	<tml:input name="{scoped:title}" type="text" cssstyle="width:100%" mode="{option:mode}"/>
 </div>
 
 <label><tml:label key="image.settings.labeling"/>:</label>
@@ -98,6 +100,7 @@
 	<tml:input name="{scoped:onclick}" type="select" options="{label('image.settings.click-options')}" default="nothing"
 		changeaction="$refresh" ajax="true"
 		mode="{option:mode}"
+		cssclass="form-control"
 	/>
 </div>
 
@@ -118,7 +121,7 @@
 					}
 				}
 			</tml:script>
-			<tml:input name="{scoped:link_type}" default="int" type="select" options="{label('image.setting.link.options')}" changeaction="$refresh" mode="{option:mode}"/>
+			<tml:input name="{scoped:link_type}" default="int" type="select" cssclass="form-control" options="{label('image.setting.link.options')}" changeaction="$refresh" mode="{option:mode}"/>
 			<tml:if condition="tmlform.field(WGA.scoped('link_type'))=='int'">
 				<tml:then>
 					<div style="margin: 5px 0">
@@ -133,9 +136,9 @@
 			</tml:if>			
 		</div>
 
-		<label>Target:</label>
+		<label>Zielfenster:</label>
 		<div style="margin:10px">
-			<tml:input name="{scoped:link_target}" mode="{option:mode}"/>
+			<tml:input name="{scoped:link_target}" mode="{option:mode}" html_placeholder="Optionaler Names eines Zielfensters"/>
 		</div>
 	</tml:case>
 	<tml:case value="zoom">
