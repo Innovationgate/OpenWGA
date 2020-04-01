@@ -47,6 +47,9 @@
 			<li><a data-toggle="tab" href="#link">Link</a></li>
 			<li><a data-toggle="tab" href="#items">Items</a></li>
 			<li><a data-toggle="tab" href="#validity">Sichtbarkeit</a></li>
+			<tml:case condition="metaList('wfhistory').size()">
+				<li><a data-toggle="tab" href="#wfhistory">Historie</a></li>
+			</tml:case>
 		</ul>
 
 		<div class="tab-content">
@@ -128,6 +131,11 @@
 			<div class="tab-pane" id="validity">
 				<tml:include ref="::form-validity"/>
 			</div>
+
+			<div class="tab-pane" id="wfhistory" style="font-size:.8em">
+				<tml:meta name="wfhistory" divider="<br>"/>
+			</div>
+
 		</div>
 	</div>
 	
