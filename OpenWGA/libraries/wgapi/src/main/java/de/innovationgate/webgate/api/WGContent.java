@@ -1132,9 +1132,12 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 		
 		WGTransaction trans = getDatabase().startTransaction();
 		try {
-		
-    		// Set ITEM_REPLACEREASON (We must save after setting that to workaround B0000445E)
-    		
+
+            // Initialize workflow engine
+            WGWorkflow workflow = getWorkflow();
+            workflow.initialize();		// clear all wf-items
+		    
+    		// Set ITEM_REPLACEREASON (We must save after setting that to workaround B0000445E)    		
     		if( reasonForReplacement != null && !reasonForReplacement.trim().equals("") ){
     			this.setItemValue(ITEM_REPLACEREASON, reasonForReplacement);
     			save(new Date(), false);		
@@ -1151,10 +1154,6 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
                 throw new WGBackendException("Could not publish document " + getContentKey().toString() + " because it could not be saved");
             }
     		
-            // Initialize by workflow engine
-            WGWorkflow workflow = getWorkflow();
-            workflow.initialize();
-		    
 		    if (getDatabase().isProjectMode()) {
 		        release(comment, workflow, "Released in project mode");
 		    }
