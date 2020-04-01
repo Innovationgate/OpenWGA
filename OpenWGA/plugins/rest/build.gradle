@@ -1,5 +1,9 @@
 
 dependencies {
+
+	// JAX-B dependencies for JDK 9+
+	// vielleicht später mal. Momentan können wir Java +9 ohnehin nicht unterstützen.
+    //compile 'javax.xml.bind:jaxb-api:2.3.1'
     
     compileClasspath project(":wga");
     compileClasspath project(":wgaBuildTools");
