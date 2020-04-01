@@ -6,7 +6,7 @@
 	<tml:[layout:page] o_title="[{WGA.Brand.name} Freigabeworkflow]">
 
 		<tml:option name="header">
-				<tml:[::toolbar] o_dbkey="{_dbkey}" o_key="{_key}"/>
+			<tml:[::toolbar] o_dbkey="{_dbkey}" o_key="{_key}"/>
 		</tml:option>
 
 		<tml:option name="body">

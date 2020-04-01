@@ -9,7 +9,7 @@
 
 		<div>
 			<label>Status</label>
-			<p><tml:label key="[status.{STATUS}]"/></p>
+			<p><tml:label key="[status.{(content().isPendingRelease() ? 'pending' : STATUS)}]"/></p>
 		</div>
 
 		<tml:{div} if="VALIDFROM | VALIDTO">
