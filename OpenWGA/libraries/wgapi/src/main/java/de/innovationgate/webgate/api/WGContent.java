@@ -1297,7 +1297,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	    if (getDatabase().isBackendServiceSupported(WGDatabase.BACKENDSERVICE_SELECT_PENDINGRELEASE_DOCS)) {
     	    if (getValidFrom() != null && getValidFrom().after(new Date())) {
     	        setPendingRelease(true);
-    	        this.addWorkflowHistoryEntry("Waiting for pending release");
+    	        this.addWorkflowHistoryEntry(workflowHistoryEntry + " - waiting for pending release");
     	        if (!getStatus().equals(STATUS_REVIEW)) {
     	            setStatus(STATUS_REVIEW);
     	            fireStatusChangeEvent();
