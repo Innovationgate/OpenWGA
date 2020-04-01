@@ -22,6 +22,13 @@
 						</p>
 					</div>
 				
+					{{#replacementReason}}
+						<div class="form-group" style="color:gray">
+							<label>Ersetzungsgrund</label>
+							<p class="data">{{{replacementReason}}}</p>
+						</div>
+					{{/replacementReason}}
+				
 					{{#workflow}}
 						<div class="form-group">
 							<label>Workflow / Level</label>
