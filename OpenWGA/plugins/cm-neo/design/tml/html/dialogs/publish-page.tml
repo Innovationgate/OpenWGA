@@ -19,7 +19,10 @@
 		
 		content().setValidity(validfrom && validfrom.time, validto && validto.time);
 		content().publish(tmlform.comment, tmlform.reasonForReplacement)
-				
+		
+		if(tmlform.mail_to_authors)
+			$mc.sendTranslationRequestMails(this, tmlform.fieldList("mail_to_authors"), tmlform.reasonForReplacement);
+		
 		portlet.fireevent("close-dialog", {
 			redirectto: contenturl("html", null, true)
 		})
@@ -96,8 +99,17 @@
 				</tml:[form-field]>
 				
 				<tml:case condition="VERSION!=1">
-					<tml:[form-field] o_label="Grund der Ersetzung" o_type="textarea" o_field="reasonForReplacement" o_placeholder="Warum wurde der Inhalt ersetzt?"/>
-				</tml:case>				
+					<tml:[form-field] o_label="Grund der Ersetzung" o_type="textarea" o_field="reasonForReplacement" o_placeholder="Warum wurde der Inhalt ersetzt?"/>					
+					<tml:comment>
+						check if other autors (of other lanuages) should be notified
+					</tml:comment>
+					<tml:script>
+						WGA.TMLPage.setVar("_authors", $mc.translationAutors(this))
+					</tml:script>
+					<tml:case condition="_authors.size()" if="$mc.translationRequestSubject & $mc.isDefaultLang">
+						<tml:[form-field] o_label="Benachrichtigen" o_name="mail_to_authors" o_type="checkbox" o_labeled="true" o_divider="<br>" o_optionsitem="_authors"/>
+					</tml:case>
+				</tml:case>
 			</tml:else>
 		</tml:if>
 

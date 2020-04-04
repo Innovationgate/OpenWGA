@@ -1,0 +1,69 @@
+function Controller($cx) {}
+
+Controller.prototype.prepare = function() {}
+
+Controller.prototype.workflowMailConfig = function($cx) {
+	var script = WGA.design($cx.db()).resolveSystemScriptModule("workflow:mailconfig", "tmlscript")
+	if(script){
+		var mod = script.getTMLScriptModule()
+		try{
+			return mod && WGA.tmlscript().runScript($cx, mod.getCode())
+		}
+		catch(e){
+			logException(e);
+		}
+	}
+	return null;
+}
+
+Controller.prototype.translationRequestSubject = function($cx) {
+	var config = this.workflowMailConfig($cx);
+	return config && config.createMailSubject("translation_request");
+}
+
+Controller.prototype.sendTranslationRequestMails = function($cx, authors, reasonForReplacement) {
+	var config = this.workflowMailConfig($cx);
+	var subject = config && config.createMailSubject("translation_request");
+	if(subject){
+		$cx.setVar("replacereason", reasonForReplacement);		// global var for mail processor
+		$cx.setVar("cm_url", WGA.urlBuilder(WGA.design().resolve("main").layoutURL())
+				.setParameter({
+					dbkey: $cx.db().getDbReference(),
+					contentkey: $cx.KEY
+				}).build(true)
+		);											// global var for mail processor
+		for(let entry in Iterator(authors)){
+			var parts = entry.split("~");
+			$cx.setVar("lang", parts[0]);			// global var for mail processor
+			var email = parts[1];
+			var body = config.createMailBody("translation_request")
+			WGA.createMail({
+				to: email,
+				subject: String(subject),
+				body: String(body)
+			}).send();
+		}
+	}
+}
+
+Controller.prototype.isDefaultLang = function($cx) {
+	return $cx.LANGUAGE == $cx.db().getDefaultLanguage();
+}
+
+Controller.prototype.translationAutors = function($cx) {
+	var authors = WGA.createList();
+	var langs = $cx.db().getLanguages().keySet();
+	var struct = $cx.content().getStructEntry();				
+	for(let lang in Iterator(langs)){
+		if(lang==$cx.LANGUAGE)
+			continue;
+		var doc = struct.getReleasedContent(lang)
+		if(doc){
+			var author = doc.getAuthor()
+			var email = WGA.app().domain().auth().fetchEMail(author);
+			if(author != $cx.AUTHOR && email) 
+				authors.add(author + " (" + lang + ")|" + lang + "~" + email)
+		}
+	}
+	return authors;
+}
