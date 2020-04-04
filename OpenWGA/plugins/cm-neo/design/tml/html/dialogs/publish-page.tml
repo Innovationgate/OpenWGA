@@ -103,11 +103,8 @@
 					<tml:comment>
 						check if other autors (of other lanuages) should be notified
 					</tml:comment>
-					<tml:script>
-						WGA.TMLPage.setVar("_authors", $mc.translationAutors(this))
-					</tml:script>
-					<tml:case condition="_authors.size()" if="$mc.translationRequestSubject & $mc.isDefaultLang">
-						<tml:[form-field] o_label="Benachrichtigen" o_name="mail_to_authors" o_type="checkbox" o_labeled="true" o_divider="<br>" o_optionsitem="_authors"/>
+					<tml:case if="$mc.isDefaultLang & $mc.translationAutors.size & $mc.translationRequestSubject">
+						<tml:[form-field] o-optionvalues="$mc.translationAutors" o_label="Benachrichtigen" o_name="mail_to_authors" o_type="checkbox" o_labeled="true" o_divider="<br>"/>
 					</tml:case>
 				</tml:case>
 			</tml:else>
