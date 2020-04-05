@@ -1,5 +1,14 @@
 define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitepanel, $, Outline){
 
+	$('#toolbars .btn-group').on({
+		'shown.bs.dropdown': function () {
+			$("#content .sitepanel-mask").show();
+		},
+		'hidden.bs.dropdown': function () {
+			$("#content .sitepanel-mask").hide();
+		}
+	})
+	
 	WGA.event.addListener("*", "CMS_item_edit", function(ev){
 		$("#toolbars")
 			.find("[data-toolbar=content]").hide()

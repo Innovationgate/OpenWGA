@@ -71,6 +71,7 @@
 							Lade Website <span class="dots">...</span>
 						</div>
 					</div>
+					<div class="sitepanel-mask"></div>
 					<div class="sitepanel-wrapper <tml:script expression="profile.scale ? 'scale'+profile.scale : ''"/>">
 						<iframe
 							id="site-panel"
