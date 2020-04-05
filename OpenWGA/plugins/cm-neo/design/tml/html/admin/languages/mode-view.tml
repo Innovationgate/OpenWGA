@@ -6,6 +6,8 @@
 
 <div class="content">
 	<tml:script>
+		_defaultLang = db().getDefaultLanguage()
+		console.log("_defaultLang", _defaultLang);
 		_langs = WGA.createList()
 		var langs = db($option_dbkey).getLanguages().values();
 		for(let lang in Iterator(langs))
@@ -18,6 +20,9 @@
 		<tml:foreach item="_langs" currentvalue="_lang">
 			<li>
 				<a href="<tml:url action="edit" param1="{_lang.name}" portletmode="edit"/>"><tml:item name="_lang.title"/></a>
+				<tml:case condition="_lang.name==_defaultLang">
+					(Default)
+				</tml:case>
 			</li>			
 		</tml:foreach>
 	</ul>
