@@ -10,32 +10,18 @@
 <label><tml:label key="downloads.source"/>:</label>
 <div style="margin:10px">
 	<tml:input type="select" name="{scoped:source}"
+			cssclass="form-control"
 			changeaction="clearFileAndParent" ajax="true"
 			options="{label(CMM.settingSource()=='template'?'download-list-file.settings.source.template.options':'download-list-file.settings.source.options')}" 
 			mode="{option('mode')}"/>
 </div>
 
 <tml:case condition="tmlform.field(WGA.scoped('source'))=='any'">
-	<div style="margin:<tml:script expression="AFW.request().isIE?5:10"/>px">
-		<tml:input type="hidden" name="{scoped:parent}" mode="{option('mode')}"/>
-		<div id="link-view"></div>
-		<script>
-			var combotree = new BI.ComboTree({
-			    width: 265,
-			    disabled: <tml:script expression="option('mode')=='view'"/>,
-				valueField: 'id',
-				displayField: 'text',
-				emptyText:'Please select a document'
-				<tml:case context="{'docid:'+tmlform.field(WGA.scoped('parent'))}" iscontextvalid="true">
-		        	,path: "/root/<tml:script expression="AFW.structentry().getPath('node-', '/')"/>"
-		 	   </tml:case>
-			});
-			combotree.on("select", function(ctree, node, e) {
-				document.forms['<tml:script expression="tmlform.formid"/>'].elements["<tml:script expression="WGA.scoped('parent')"/>"].value = ctree.getValue();
-				WGA.ajax.callAction("<tml:action ref="clearFile"/>");
-			});
-			combotree.render("link-view");
-		</script>
+	<div style="margin:10px">
+		<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document">
+			<tml:option name="fieldname" expression="WGA.scoped('parent')"/>
+			<tml:option name="changeaction"><tml:action ref="clearFile"/></tml:option>
+		</tml:include>
 	</div>
 </tml:case>
 
@@ -55,7 +41,7 @@
 
 <label><tml:label key="download-list-file.title-source"/>:</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:title_source}" type="select" options="{label('download-list-file.settings.title-source')}" mode="{option:mode}" changeaction="$refresh"/>
+	<tml:input name="{scoped:title_source}" type="select" cssclass="form-control" options="{label('download-list-file.settings.title-source')}" mode="{option:mode}" changeaction="$refresh"/>
 	<tml:case condition="tmlform.field(WGA.scoped('title_source'))=='file_md'">
 		<p><tml:script context="{_context}" expression="content().getFileMetaData(tmlform.field(WGA.scoped('filename'))).title"/></p>
 	</tml:case>
