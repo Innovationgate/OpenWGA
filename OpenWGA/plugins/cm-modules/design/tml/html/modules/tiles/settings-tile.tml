@@ -13,12 +13,13 @@
 	<tml:input name="{scoped:justify_content}" type="select" 
 		options="{label('tiles.tile.setting.vertical-align.options')}"
 		mode="{option:mode}"
+		cssclass="form-control"
 	/>
 </div>
 
 <label>Link</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:link}" type="select" options="{label('tiles.tile.setting.link.options')}" changeaction="$refresh" mode="{option:mode}"/>
+	<tml:input name="{scoped:link}" type="select" cssclass="form-control" options="{label('tiles.tile.setting.link.options')}" changeaction="$refresh" mode="{option:mode}"/>
 	<tml:select switch="tmlform.field(WGA.scoped('link'))">
 		<tml:case value="int">
 			<div style="margin: 5px 0">

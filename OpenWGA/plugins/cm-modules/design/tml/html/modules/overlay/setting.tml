@@ -31,7 +31,7 @@
 
 <label><tml:label key="modal.layout"/>:</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:layout}" type="select" options="{label('general','modal.layout.options')}" mode="{option('mode')}"/>
+	<tml:input name="{scoped:layout}" type="select" cssclass="form-control" options="{label('general','modal.layout.options')}" mode="{option('mode')}"/>
 </div>
 
 <label><tml:label key="width"/>:</label>

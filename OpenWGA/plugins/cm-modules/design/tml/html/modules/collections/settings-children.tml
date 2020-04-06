@@ -25,6 +25,7 @@
 <label><tml:label key="collections.parent"/>:</label>
 <div style="margin:10px">
 	<tml:input type="select" name="{scoped:parent_type}"
+			cssclass="form-control"
 			changeaction="$refresh" ajax="true"
 			default="this"
 			options="{label('child-nav.settings.parent.options')}" mode="{option('mode')}"/>
@@ -52,6 +53,7 @@
 <label><tml:label key="collections.layout"/>:</label>
 <div style="margin:10px">
 	<tml:input type="select" name="{scoped:layout}" 	
+			cssclass="form-control"
 			options="Link-List|link-list,News collection|news-list,Caroussel|caroussel"
 			default="link-list"
 			changeaction="$refresh" ajax="true"
@@ -74,7 +76,7 @@
 <tml:case condition="tmlform.field(WGA.scoped('layout'))=='news-list'">
 	<label><tml:label key="collections.news-heading"/>:</label>
 	<div style="margin:10px">
-		<tml:input type="select" name="{scoped:news_heading}" options="h1,h2,h3,h4,h5,h6" mode="{option('mode')}"/>
+		<tml:input type="select" cssclass="form-control" name="{scoped:news_heading}" options="h1,h2,h3,h4,h5,h6" mode="{option('mode')}"/>
 	</div>
 	<label><tml:label key="collections.show-top-news"/>:</label>
 	<div style="margin:10px">
@@ -92,7 +94,7 @@
 <tml:case condition="tmlform.field(WGA.scoped('layout'))=='caroussel'">
 	<label><tml:label key="collections.news-heading"/>:</label>
 	<div style="margin:10px">
-		<tml:input type="select" name="{scoped:news_heading}" options="h1,h2,h3,h4,h5,h6" mode="{option('mode')}"/>
+		<tml:input type="select" cssclass="form-control" name="{scoped:news_heading}" options="h1,h2,h3,h4,h5,h6" mode="{option('mode')}"/>
 	</div>
 	<label><tml:label key="collections.caroussel-autorun"/>:</label>
 	<div style="margin:10px">
