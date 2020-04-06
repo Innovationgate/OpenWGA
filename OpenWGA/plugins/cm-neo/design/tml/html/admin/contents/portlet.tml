@@ -26,7 +26,7 @@
 				/></tml:comment>
 
 				<tml:script>
-					_configs = CMM.getConfigTMLs();
+					_configs = CMM.getConfigTMLs($option_dbkey);
 					_mods = [];
 				</tml:script>
 				<tml:foreach item="_configs" currentvalue="_config">

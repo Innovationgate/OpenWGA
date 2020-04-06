@@ -62,7 +62,7 @@ Controller.prototype.rootModules = function(modules) {
 Controller.prototype.catModules = function(modules) {
 	var ret = WGA.createMap()
 	for(let [index, mod] in modules){
-		if(mod.allowedparents || !mod.category)
+		if(!mod.category)
 			continue;
 		if(!ret[mod.category])
 			ret[mod.category]=[]
