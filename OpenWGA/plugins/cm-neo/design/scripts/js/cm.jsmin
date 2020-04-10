@@ -3,6 +3,21 @@ define("cm", ["jquery", "mustache.min"], function($, Mustache){
 	var imageRootUrl;
 	var reg={}
 
+	/*
+	 * Sitepanel mask handling for bootstrap dropdown menus
+	 */
+	$(document).on("click.dropdown", function(ev){
+		$("#content .sitepanel-mask").hide();
+	})
+	$(document).on("click.dropdown", "[data-toggle='dropdown']", function(ev){
+		var parent = $(this).parent();
+		setTimeout(function(){
+			if(parent.hasClass("open"))
+				$("#content .sitepanel-mask").show();
+			else $("#content .sitepanel-mask").hide();
+		}, 10)		
+	})
+	
 	function template(id){
 		
 		function register(code){
