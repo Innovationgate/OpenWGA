@@ -4,14 +4,24 @@
 	var dbkey = request.getParameter("dbkey")
 	var language = request.getParameter("language")
 
+	function hasAllowedContentTypes(area){
+		for(let ct in Iterator(db(dbkey).getContentTypes())){
+			if(AFW.contenttype(ct).isAllowed(area)){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	var may_create_root_page = false;
 	if(dbkey){
 		for(let area in Iterator(db(dbkey).getAreas().values())){
 			if(area.name.indexOf("$")==0)
 				continue;
 			if(area.mayEditPages()){
-				may_create_root_page = true;
-				break;
+				may_create_root_page = hasAllowedContentTypes(area);
+				if(may_create_root_page)
+					break;
 			}
 		}
 	}
