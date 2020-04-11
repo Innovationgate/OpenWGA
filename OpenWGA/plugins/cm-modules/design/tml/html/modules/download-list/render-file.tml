@@ -54,9 +54,7 @@
 							return "<p>" + option("title") + "</p>"
 					}
 				</tml:script>
-				<p class="description">
-					<tml:[setting] o_name="description" encode="html"/>
-				</p>
+				<tml:[setting] o_name="description" encode="html" wrap="p" wrap_class="description"/>
 			</div>
 		</a>
 	</tml:then>
