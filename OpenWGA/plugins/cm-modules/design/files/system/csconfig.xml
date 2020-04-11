@@ -1,8 +1,8 @@
 <de.innovationgate.wga.common.beans.csconfig.v5.CSConfig>
   <connectionScript>init:connect</connectionScript>
-  <anonymousAccessLevel>30</anonymousAccessLevel>
-  <defaultAccessLevel>30</defaultAccessLevel>
-  <versionCompliance>wga7.2</versionCompliance>
+  <anonymousAccessLevel>10</anonymousAccessLevel>
+  <defaultAccessLevel>10</defaultAccessLevel>
+  <versionCompliance>wga7.7</versionCompliance>
   <publisherOptions>
     <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
       <name>DesignEncoding</name>
@@ -22,7 +22,7 @@
     </de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
     <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
       <name>BrowsingSecurity</name>
-      <value>90</value>
+      <value>50</value>
     </de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
     <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
       <name>DefaultItemEncoding</name>
@@ -132,7 +132,7 @@ add to a page in a structure suitable for exactly the page content he is working
   <staticClasspath>false</staticClasspath>
   <minimumWGAVersion>
     <majorVersion>7</majorVersion>
-    <minorVersion>2</minorVersion>
+    <minorVersion>7</minorVersion>
     <maintenanceVersion>0</maintenanceVersion>
     <patchVersion>0</patchVersion>
     <buildVersion>0</buildVersion>
