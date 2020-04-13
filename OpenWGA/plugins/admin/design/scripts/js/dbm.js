@@ -176,20 +176,24 @@ DBM.joblog = function(divel, jobname){
 	}
 
 	function refresh(){
-		if(!iframe.contentWindow.running){
+		if(iframe.contentWindow.running===false){
 			if(autoUpdate_el)
 				autoUpdate_el.checked=false;
 			stopTimer();
 		}
 		if(!autoUpdate_el || autoUpdate_el.checked){
-			if(iframe.contentWindow)
-				iframe.contentWindow.location.reload();
-			else stopTimer();
+			if(iframe.contentWindow){
+				iframe.contentWindow.location = url;
+			}
+			else {
+				stopTimer();
+			}
 		}
 	}
 	
 	function setURL(){
 		iframe.src=url;
+		iframe.contentWindow.location = url;
 	}
 	
 	function stopTimer(){
