@@ -103,12 +103,15 @@
 				});
 			</tml:case>
 			
-			menu.on("show", function(){
-				Ext.get("<tml:option name="group-id"/>").addClass("menu-selected");
-			})
-			menu.on("hide", function(){
-				Ext.get("<tml:option name="group-id"/>").removeClass("menu-selected");
-			})
+			<tml:case hasoptions="group-id">
+				menu.on("show", function(){
+					Ext.get("<tml:option name="group-id"/>").addClass("menu-selected");
+				})
+				menu.on("hide", function(){
+					Ext.get("<tml:option name="group-id"/>").removeClass("menu-selected");
+				})
+			</tml:case>
+			
 			var button = new Ext.Button({
 				cls:'x-btn-text-icon',						
 				icon: '<tml:url type="file" db="@afw" doc="icons" file="{_design_may_be_upgraded ? 'layout_add.png' : 'layout.png'}"/>',          
