@@ -151,7 +151,7 @@ DBM = function(){
 
 DBM.joblog = function(divel, jobname){
 	var el = Ext.get(divel);
-	var url = DBM.baseurl + "/joblog?name=" + jobname;	// + "#bottom"
+	var url = DBM.baseurl + "/joblog?name=" + jobname;
 	var iframe = el.child("iframe").dom;
 	var timer=null;
 
@@ -160,7 +160,8 @@ DBM.joblog = function(divel, jobname){
 		 autoUpdate_el = el.child("#autoUpdate").dom;	
 	
 	iframe.onload=function(){
-		iframe.contentWindow.scrollBy(0, 10000);
+		var win = iframe.contentWindow;
+		win.scrollTo(0, win.document.body.scrollHeight);
 	}
 	
 	function showHide(){
