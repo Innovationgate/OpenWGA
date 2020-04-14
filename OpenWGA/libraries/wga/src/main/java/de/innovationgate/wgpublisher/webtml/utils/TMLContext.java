@@ -1428,6 +1428,9 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
             return ((ListVarContainer) value).getList();
         }
         
+        if (value instanceof Map) {
+            return ((Map)value).entrySet();
+        }
         
         if (value instanceof java.util.Collection) {
             return new ArrayList<Object>((java.util.Collection<?>) value);

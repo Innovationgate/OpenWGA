@@ -61,7 +61,7 @@ import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptGlobal;
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptObjectMetadata;
 import de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
 import de.innovationgate.wgpublisher.hdb.HDBModel;
-import de.innovationgate.wgpublisher.url.RequestIndependentDefaultURLBuilder;
+import de.innovationgate.wgpublisher.url.WGAURLBuilder;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 import de.innovationgate.wgpublisher.webtml.utils.TMLUserProfile;
 
@@ -223,13 +223,9 @@ public class App extends Database {
     }
     
     public String getHomepageURL() throws WGException{
-    	HttpServletRequest request = _wga.getRequest();
-    	if(request!=null){
-	    	RequestIndependentDefaultURLBuilder builder = new RequestIndependentDefaultURLBuilder();
-	    	builder.newIndependentInstance(_wga.getCore());
-	    	return builder.buildHomepageURL(db(), request);
-    	}
-    	return null;
+    	TMLContext ctx = (TMLContext)createTMLContext();
+    	WGAURLBuilder builder = ctx.getURLBuilder();
+    	return builder.buildHomepageURL(ctx);
     }
     
     public ApplicationEventBuilder createEvent(List<? extends Object> qualifiers) throws WGException {

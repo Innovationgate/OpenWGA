@@ -10,6 +10,12 @@
 						<iframe src="<tml:url/>"></iframe>
 						<tml:include ref="::actions"/>
 					</tml:then>
+					<tml:elseif condition="content().isPendingRelease()">
+						<div class="loading">
+							<tml:item name="_msg" wrap="h1"/>
+							Die Seite ist freigegeben und wartet auf Veröffentlichung.
+						</div>
+					</tml:elseif>
 					<tml:else>
 						<div class="loading">
 							<h1>Genehmigung für Sie nicht möglich</h1>
@@ -23,7 +29,7 @@
 			</tml:then>
 			<tml:else>
 				<div class="loading">
-					<h1><tml:item name="_msg"/></h1>
+					<tml:item name="_msg" wrap="h1"/>
 					Die Seite befindet sich im Status <tml:label key="[status.{STATUS}]"/>.
 				</div>
 			</tml:else>

@@ -1091,34 +1091,23 @@ public class WGPDispatcher extends HttpServlet {
 
         response.setContentType("text/html");
         Writer out = response.getWriter();
-        out.write("<HTML><HEAD>");
-
-        out.write("\n<script>\nvar running=" + Boolean.valueOf(job.isRunning()).toString() + ";\n</script>\n");
-
-        /*
-         * if (job.isRunning()) {
-         * out.write("<META HTTP-EQUIV=\"refresh\" CONTENT=\"3\"/>"); } else {
-         * out.write("<META HTTP-EQUIV=\"refresh\" CONTENT=\"6\"/>"); }
-         */
-        out.write("</HEAD>");
-        out.write("<BODY style=\"background-color:white; font-family:sans-serif; font-size:10pt\">");
+        out.write("<!DOCTYPE HTML>\n");
+        out.write("<html>\n");
+        out.write("<head><script>var running=" + Boolean.valueOf(job.isRunning()).toString() + ";</script></head>\n");
+        
+        out.write("<body style=\"background-color:white; font-family:courier; font-size:10pt\">\n");
         String log = job.getLog();
         LineNumberReader reader = new LineNumberReader(new StringReader(log));
         String line;
         while ((line = reader.readLine()) != null) {
             out.write(line);
-            out.write("<BR/>");
+            out.write("<br>\n");
         }
-
         if (!job.isRunning() && job.getEndMessage() != null) {
-            out.write("<p>");
-            out.write("<table border=\"1\" cellpadding=\"5\"><tr><td>");
+            out.write("<hr>\n");
             out.write(job.getEndMessage());
-            out.write("</td></tr></table>");
-            out.write("</p>");
         }
-        out.write("<a id=\"bottomLink\" name=\"bottom\">&nbsp;</a></BODY></HTML>");
-
+        out.write("\n</body>\n</html>");
     }
 
     private void dispatchTmlRequest(WGPRequestPath path, javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response, Date startDate) throws java.lang.Exception {
@@ -1266,6 +1255,10 @@ public class WGPDispatcher extends HttpServlet {
                 throw new HttpErrorException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Content " + content.getContentKey().toString() + " has no struct entry", path.getDatabaseKey());
             }
             outerLayout = wga.design(database).resolve(entry.getContentType().getOuterLayoutName());
+            WGTMLModule tmlLib = outerLayout.getTMLModule(mediaKey);
+            if(tmlLib==null){
+                throw new HttpErrorException(java.net.HttpURLConnection.HTTP_NOT_FOUND, "Design not found for mediakey '" + mediaKey +"': " + outerLayout.toString(), path.getDatabaseKey());
+            }
         }
 
         request.setAttribute(WGACore.ATTRIB_OUTER_DESIGN, outerLayout.getBaseReference().getResourceName());

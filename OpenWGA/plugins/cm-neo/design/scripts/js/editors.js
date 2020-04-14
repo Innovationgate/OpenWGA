@@ -408,7 +408,8 @@ define([
 			item_el = value_el.closest(".WGA-Item");
 			if(this.data_type=="textarea"){
 				item_el.append($("<textarea>", {
-					style: "width:100%;font:inherit"
+					"class": "text-editor-input",
+					"style": "width:100%;"
 				}).autogrow())
 			}
 			else item_el.append($("<input>", {

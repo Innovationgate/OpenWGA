@@ -41,6 +41,7 @@
 <label><tml:label key="google-maps.settings.map-type"/>:</label>
 <div style="margin:10px">
 	<tml:input name="[map_type_{option('ns')}]" type="select" 
+		cssclass="form-control"
 		options="{label('google-maps.settings.map-type-options')}"
 		default="google.maps.MapTypeId.ROADMAP"
 		mode="{option('mode')}"

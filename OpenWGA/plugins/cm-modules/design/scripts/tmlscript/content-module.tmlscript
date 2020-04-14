@@ -36,21 +36,21 @@ this.registerConfigTML = function(tml){
 	delete modReg[dbkey]
 }
 
-this.getConfigTMLs = function(){
+this.getConfigTMLs = function(dbkey){
 	var mods = WGA.createList();
 	
 	var regmods = WGA.Core.moduleRegistry.getModulesForType("de.innovationgate.wga.modules.types.CmmDefinitionModuleType").values().iterator();
 	while(regmods.hasNext())
 		mods.add(regmods.next().properties)
 	
-	var locals = db().getAttribute("cmm_local_mods");
+	var locals = (dbkey ? db(dbkey) : db()).getAttribute("cmm_local_mods");
 	if(locals)
 		mods.addAll(locals.values());
 	return mods;
 }
 
-this.getModuleDefs = function(){
-	var dbkey = db().getDbReference();
+this.getModuleDefs = function(dbkey){
+	var dbkey = dbkey || db().getDbReference();
 	if(dbs_with_local_modules[dbkey] && !db().getAttribute("cmm_local_mods")){
 		// this is a db with registered local module, has been reconnected and now has NO modules:
 		// remove from reg
@@ -73,6 +73,8 @@ this.setModuleDefs = function(mod_defs){
 }
 
 this.settings = function(doc){
+	if(doc instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)
+		doc = doc.content();
 	var settings_map = this.getExtensionData(doc || content(), "content-modules-settings") || WGA.createLookupTable() 
 	return {
 		get: function(name) settings_map.get(WGA.scoped(name))

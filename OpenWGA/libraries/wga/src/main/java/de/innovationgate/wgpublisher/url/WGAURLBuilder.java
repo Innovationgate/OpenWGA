@@ -51,7 +51,9 @@ public interface WGAURLBuilder {
     public String buildScriptURL(TMLContext context, String dbKey, String scriptType, String scriptName) throws WGException;
     
     public String buildHomepageURL(WGDatabase db, HttpServletRequest request) throws WGException;
-    
+
+    public String buildHomepageURL(TMLContext context) throws WGException;
+
     public String buildLoginURL(WGDatabase db, HttpServletRequest request, String redirectURL) throws WGException;
     
     public String buildLogoutURL(WGDatabase db, HttpServletRequest request, String redirectURL) throws WGException;

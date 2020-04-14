@@ -23,9 +23,11 @@
 			</tml:case>
 			<tml:case value="intfile">
 				<tml:script>
-					if(!tmlform.submitted && $option_dialog_options.key){
-						tmlform.key = $option_dialog_options.key;
-						tmlform.url = fileurl($option_dialog_options.key)
+					if(!tmlform.submitted){
+						if($option_dialog_options.key)
+							tmlform.key = $option_dialog_options.key;
+						if($option_dialog_options.alt)
+							tmlform.alt = $option_dialog_options.alt;						
 					}
 				</tml:script>
 				<tml:[form-field] o_label="Bild-Datei">
@@ -36,7 +38,8 @@
 					<tml:script>
 						var Attachment = AFW.content().attachment(tmlform.key);
 						tmlform.url = Attachment.getPosterURL()
-						tmlform.alt = Attachment.fileMetaData.title;
+						if(!tmlform.alt)
+							tmlform.alt = Attachment.fileMetaData.title;
 					</tml:script>
 				</tml:case>
 				

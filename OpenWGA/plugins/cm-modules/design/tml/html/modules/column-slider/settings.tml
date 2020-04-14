@@ -32,7 +32,7 @@
 
 <label><tml:label key="column-slider.settings.effect"/>:</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:effect}" type="select" options="slide,fade" default="slide" mode="{option('mode')}"/>
+	<tml:input name="{scoped:effect}" type="select" cssclass="form-control" options="slide,fade" default="slide" mode="{option('mode')}"/>
 </div>		
 
 <label><tml:label key="column-slider.settings.show-title"/>:</label>

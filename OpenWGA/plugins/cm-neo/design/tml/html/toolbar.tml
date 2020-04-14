@@ -11,16 +11,20 @@
 			</a>
 			<ul class="dropdown-menu">
 				<tml:case condition="WGA.app(portlet.dbkey).isChiefEditor()">
-					<li><a href="<tml:url action="$refresh" portletmode="admin"/>">Einstellungen</a></li>
+					<li><a href="<tml:url action="$refresh" portletmode="admin"/>">Verwaltung</a></li>
 					<li class="divider"></li>
 				</tml:case>
 				<li class="dropdown-header">Webssite wechseln</li>
-				<tml:foreach item="$mc.dbkeys" currentvalue="_dbkey">
-					<li><a href="<tml:url u-dbkey="_dbkey"/>">
-						<span class="far <tml:script expression="_dbkey==portlet.dbkey ? 'fa-check-square':'fa-square'"/>"></span> 
-						<tml:item name="_dbkey"/>
-					</a></li>
-				</tml:foreach>
+				<li>
+					<ul class="other-sites">
+						<tml:foreach item="$mc.dbkeys" currentvalue="_dbkey">
+							<li><a href="<tml:url u-dbkey="_dbkey"/>">
+								<span class="far <tml:script expression="_dbkey==portlet.dbkey ? 'fa-check-square':'fa-square'"/>"></span> 
+								<tml:item name="_dbkey"/>
+							</a></li>
+						</tml:foreach>
+					</ul>
+				</li>
 				<li class="divider"></li>
 				<li><a href="#" data-action="exit">Abmelden und Content Manager beenden</a></li>
 			</ul>

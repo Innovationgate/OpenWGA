@@ -61,6 +61,17 @@
 				}
 			}
 			
+			ul.other-sites{
+				max-height: 300px;
+				overflow-y: auto;
+				li{
+					line-height: 1.5em;
+					a{
+						display: block;
+					}
+				}
+			}
+			
 			.spacer{
 				display: inline-block;
 				width: 50px;

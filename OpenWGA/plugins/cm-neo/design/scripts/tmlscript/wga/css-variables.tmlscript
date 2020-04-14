@@ -1,0 +1,5 @@
+return{
+	isIE:		AFW.request().isIE,
+	isGecko:	AFW.request().isGecko,
+	isWebkit:	AFW.request().isWebkit
+}

@@ -116,10 +116,12 @@
 				</a>
 			</div>
 
-			<div id="job-log" style="display:none;margin:0 13px 0 3px">
-				<iframe style="margin:3px;height: 200px; width:100%"></iframe>
-				<button onclick="DBM.currentjoblog.refresh()">refresh</button>	
-				<input type="checkbox" id="autoUpdate" CHECKED> Automatic update
+			<div id="job-log" style="display:none;margin:0 13px 5px 3px">
+				<iframe style="margin:3px 3px 8px auto;height:200px;width:100%;border:solid silver 1px;border-radius:5px"></iframe>
+				<button onclick="DBM.currentjoblog.refresh()">refresh</button>
+				<label style="float:none;display:inline;cursor:pointer">
+					<input type="checkbox" id="autoUpdate" checked> Automatic update
+				</label>
 			</div>
 			<script>
 				DBM.currentjoblog = DBM.joblog('job-log', '<tml:script expression="_job.name"/>');

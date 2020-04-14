@@ -15,6 +15,16 @@
 		display: block;
 	}
 
+	.text-editor-input {
+		box-sizing: border-box;
+		border: 1px solid #66afe9;
+	    border-radius: 3px;
+	    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset, 0 0 8px rgba(102, 175, 233, 0.6);
+	    outline: medium none;
+	    padding: 3px;
+	    font:inherit;
+	}
+
 	[contenteditable]{
 		outline: none;
 		border: 1px solid #66afe9;

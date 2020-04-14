@@ -16,6 +16,49 @@
 		padding: 5px 10px;
 		border-bottom: solid silver 1px;
 	}
+	
+	#contents {
+		.header{
+			padding: 0px 10px;
+			select{
+				font-size: 16px;
+				padding: 5px 20px 5px 10px;
+			}
+			option[value=""]{  
+			    display: none;  
+			}
+		}
+		.footer{
+			.right{
+				float: right;
+			}
+		}
+		.content{
+			padding: 30px;
+			//bottom: 0;
+			.table{
+				display: table;
+				border-collapse: collapse;
+				width: 100%;
+				.row{
+					display: table-row;					
+					border-bottom: solid #efefef 1px;
+					&:first-child{
+						border-bottom: solid silver 2px;
+						color: gray;
+					}
+					.col{
+						padding: 10px;
+						display: table-cell;
+						.abgelaufen{
+							color: silver;
+							cursor: pointer;
+						}
+					}
+				}
+			}
+		}
+	}
 
 	.content{
 		position: absolute;

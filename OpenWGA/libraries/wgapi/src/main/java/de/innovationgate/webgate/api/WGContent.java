@@ -1132,9 +1132,12 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 		
 		WGTransaction trans = getDatabase().startTransaction();
 		try {
-		
-    		// Set ITEM_REPLACEREASON (We must save after setting that to workaround B0000445E)
-    		
+
+            // Initialize workflow engine
+            WGWorkflow workflow = getWorkflow();
+            workflow.initialize();		// clear all wf-items
+		    
+    		// Set ITEM_REPLACEREASON (We must save after setting that to workaround B0000445E)    		
     		if( reasonForReplacement != null && !reasonForReplacement.trim().equals("") ){
     			this.setItemValue(ITEM_REPLACEREASON, reasonForReplacement);
     			save(new Date(), false);		
@@ -1151,10 +1154,6 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
                 throw new WGBackendException("Could not publish document " + getContentKey().toString() + " because it could not be saved");
             }
     		
-            // Initialize by workflow engine
-            WGWorkflow workflow = getWorkflow();
-            workflow.initialize();
-		    
 		    if (getDatabase().isProjectMode()) {
 		        release(comment, workflow, "Released in project mode");
 		    }
@@ -1297,7 +1296,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	    if (getDatabase().isBackendServiceSupported(WGDatabase.BACKENDSERVICE_SELECT_PENDINGRELEASE_DOCS)) {
     	    if (getValidFrom() != null && getValidFrom().after(new Date())) {
     	        setPendingRelease(true);
-    	        this.addWorkflowHistoryEntry("Waiting for pending release");
+    	        this.addWorkflowHistoryEntry(workflowHistoryEntry + " - waiting for pending release");
     	        if (!getStatus().equals(STATUS_REVIEW)) {
     	            setStatus(STATUS_REVIEW);
     	            fireStatusChangeEvent();
@@ -2256,7 +2255,8 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 
 	    // When the content is in review and the user is approver for it we automatically enable authoring mode
 	    if (content.getStatus().equals(WGContent.STATUS_REVIEW)){
-	    	isAuthoringMode = content.getWorkflowRole() >= WGWorkflow.ROLE_APPROVER;
+	    	if(!isAuthoringMode && !content.isPendingRelease())
+	    		isAuthoringMode = content.getWorkflowRole() >= WGWorkflow.ROLE_APPROVER;
 	    }
 	    
 	    // A user below ACL level author cannot use authoring mode

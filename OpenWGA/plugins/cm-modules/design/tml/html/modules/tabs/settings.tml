@@ -25,5 +25,5 @@
 
 <label><tml:label key="tabs.settings.layout"/>:</label>
 <div style="margin:10px">
-	<tml:input name="{WGA.scoped('layout')}" type="select" options="{label('tabs.settings.layout-options')}" mode="{option('mode')}"/>
+	<tml:input name="{WGA.scoped('layout')}" type="select" cssclass="form-control" options="{label('tabs.settings.layout-options')}" mode="{option('mode')}"/>
 </div>

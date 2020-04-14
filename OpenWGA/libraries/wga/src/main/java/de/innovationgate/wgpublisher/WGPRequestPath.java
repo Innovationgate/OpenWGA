@@ -321,6 +321,7 @@ public class WGPRequestPath {
     		    if (url.getLanguage() == null) {
     		        completePath = false;
     		    }
+    		    else this.requestLanguage = url.getLanguage(); 
 		    }
 		}
 		
@@ -371,6 +372,7 @@ public class WGPRequestPath {
                 }
                 else {
                     pathType = TYPE_UNKNOWN_CONTENT;
+                    this.requestLanguage = contentid.getLanguage();
                 }
             }
             
@@ -620,25 +622,21 @@ public class WGPRequestPath {
         
         // We use this as layout key, if there is a layout of this name known to the deployer
         // Or if the design db is not yet connected (what would make it impossible for the deployer to know the layout)
-        boolean moduleFound = false;
         if (this.core.isDeploymentKeyDefined(deploymentKey) || (db != null  && !db.isConnected())) {
-        	moduleFound = true;
+        	return true;
         }
         
         // Try to retrieve the module directly from the open database
-        else {
-            WGTMLModule module = database.getTMLModule(layoutKeyCandidate, mediaKeyStr);
-            if (module != null) {
-                moduleFound = true;
-            }
-            
-            WGScriptModule scriptModule = database.getScriptModule(layoutKeyCandidate + ".renderer", WGScriptModule.CODETYPE_TMLSCRIPT);
-            if (scriptModule != null) {
-                moduleFound = true;
-            }
-                
+        WGTMLModule module = database.getTMLModule(layoutKeyCandidate, mediaKeyStr);
+        if (module != null) {
+            return true;
         }
-        return moduleFound;
+        // We may have a module renderer script
+        WGScriptModule scriptModule = database.getScriptModule(layoutKeyCandidate + ".renderer", WGScriptModule.CODETYPE_TMLSCRIPT);
+        if (scriptModule != null) {
+            return true;
+        }
+        return false;
     }
 
 	/**

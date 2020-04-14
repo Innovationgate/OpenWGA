@@ -134,7 +134,7 @@ public class DBDesignProvider extends WGConfigurableTypeDesignProvider implement
             }
         }
         catch (WGException e) {
-            WGFactory.getLogger().error("Error retrieving design from design database '" + _designDBKey + "'", e);
+            WGFactory.getLogger().error("Error retrieving design objects from design database '" + _designDBKey + "'", e);
             return null;
         }
     }

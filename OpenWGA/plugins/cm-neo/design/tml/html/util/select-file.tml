@@ -4,7 +4,7 @@
 	<tml:then>
 		<div class="select-image-wrapper">
 			<a href="#" id="select-image-<tml:item name="$mc.fieldname"/>" class="form-control">
-				<span class="caret"></span>
+				<tml:comment><span class="caret"></span></tml:comment>
 				<span class="title">					
 					<tml:if condition="tmlform.field($mc.fieldname)">
 						<tml:then>

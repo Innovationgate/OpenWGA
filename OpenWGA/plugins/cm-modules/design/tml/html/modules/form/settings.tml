@@ -26,6 +26,7 @@
 <label><tml:label key="form.settings.action"/>:</label>
 <div style="margin:10px">
 	<tml:input name="{scoped:action}" type="select" options="{label('form.settings.action.options')}"
+		cssclass="form-control"
 		default="mail" 
 		changeaction="$refresh" ajax="true"
 		mode="{option('mode')}"
@@ -50,7 +51,7 @@
 			<tml:then>
 				<label><tml:label key="form.settings.database"/>:</label>
 				<div style="margin:10px">
-					<tml:input name="{scoped:dbkey}" type="select" optionsitem="_dbkeys_options" mode="{option:mode}"/>
+					<tml:input name="{scoped:dbkey}" type="select" cssclass="form-control" optionsitem="_dbkeys_options" mode="{option:mode}"/>
 				</div>
 			</tml:then>
 			<tml:else>
@@ -73,6 +74,7 @@
 <label><tml:label key="form.settings.after-submit"/>:</label>
 <div style="margin:10px">
 	<tml:input name="{scoped:aftersubmit}" type="select"
+		cssclass="form-control"
 		changeaction="$refresh" ajax="true" 
 		options="{label('form.settings.after-submit.options')}" mode="{option('mode')}"
 		default="message"

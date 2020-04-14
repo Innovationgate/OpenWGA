@@ -23,7 +23,7 @@
 				type=				"{option('type')||'text'}"
 				labeled=			"{option('labeled') || VOID}"
 				options=			"{option('options')==null ? VOID : option('options')}"
-				optionsitem=		"{option('optionsitem')==null ? VOID : option('optionsitem')}"
+				optionsitem=		"{option('optionsitem') || ($option_optionvalues ? '$option_optionvalues' : VOID)}"
 				optionstitle=		"{option('optionstitle')==null ? VOID : option('optionstitle')}"
 				meta=				"{option('meta')||'false'}"
 				store=				"{option('store')||(_mode=='edit'?'true':'false')}"

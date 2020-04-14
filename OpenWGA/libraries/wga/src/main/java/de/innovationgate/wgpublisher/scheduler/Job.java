@@ -407,6 +407,7 @@ public class Job {
 		_failed = false;
 		_exception = null;
         _running = true;
+        _endMessage = null;
         
         // Create a options reader for predefined global options. Can only use those custom options that are of string value.
         Map<String,String> options = new HashMap<String,String>();
@@ -527,7 +528,7 @@ public class Job {
                     throw new JobCancelledException("Job was cancelled");
                 }
         		if (!_quiet) {
-        		    logger.info("Task successfully executed");
+        		    logger.info("Task finished");
         		}
         		
         		

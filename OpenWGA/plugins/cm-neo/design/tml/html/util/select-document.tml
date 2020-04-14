@@ -8,7 +8,6 @@
 	<tml:then>
 		<div class="select-tree-wrapper">
 			<a href="#" id="select-key-<tml:option name="fieldname"/>" class="form-control">
-				<span class="caret"></span>
 				<span class="title">
 					<tml:if context="[db:{_dbkey}/docid:{tmlform.field($option_fieldname)}]" iscontextvalid="true">
 						<tml:then>
@@ -50,7 +49,6 @@
 					ev.preventDefault();
 					tree.show();
 				})
-			
 			
 				$("#clear-key-<tml:option name="fieldname"/>").on("click", function(ev){
 					ev.preventDefault();

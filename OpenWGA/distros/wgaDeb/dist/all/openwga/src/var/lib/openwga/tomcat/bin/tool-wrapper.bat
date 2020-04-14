@@ -36,7 +36,7 @@ rem   JAVA_ENDORSED_DIRS (Optional) Lists of of semi-colon separated directories
 rem                   containing some jars in order to allow replacement of APIs
 rem                   created outside of the JCP (i.e. DOM and SAX from W3C).
 rem                   It can also be used to update the XML parser implementation.
-rem                   Note that Java 9 no longer supports this feature.
+rem                   This is only supported for Java <= 8.
 rem                   Defaults to $CATALINA_HOME/endorsed.
 rem ---------------------------------------------------------------------------
 
@@ -79,7 +79,7 @@ rem quotes into the CLASSPATH
 if "%CLASSPATH%" == "" goto emptyClasspath
 set "CLASSPATH=%CLASSPATH%;"
 :emptyClasspath
-set "CLASSPATH=%CLASSPATH%%CATALINA_HOME%\bin\bootstrap.jar;%CATALINA_HOME%\bin\tomcat-juli.jar;%CATALINA_HOME%\lib\servlet-api.jar"
+set "CLASSPATH=%CLASSPATH%%CATALINA_HOME%\bin\bootstrap.jar;%CATALINA_HOME%\bin\tomcat-juli.jar;%CATALINA_HOME%\lib\servlet-api.jar;%CATALINA_HOME%\lib\tomcat-coyote.jar"
 
 set JAVA_OPTS=%JAVA_OPTS% -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
 

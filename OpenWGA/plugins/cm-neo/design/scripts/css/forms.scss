@@ -1,10 +1,27 @@
 form{
+
 	input[type=text].form-control, input[type=password].form-control, textarea.form-control, a.form-control{
 		padding: 6px;
 	}
 
 	select.form-control{
-		padding: 5px 2px;
+		
+		@if($isGecko){
+			padding: 2px;
+		}
+		@else{
+			padding: 6px;
+		}
+		
+		-moz-appearance:none;
+		-webkit-appearance:none;
+		appearance:none;
+		background:{
+			image: url(wga_file_url("images", "select-pfeil.png"));
+			position: center right 8px;;
+			size: 14px;
+			repeat: no-repeat;
+		}
 	}
 	
 	.clear-field-wrapper {
@@ -26,17 +43,23 @@ form{
 		a.clear-key-field{
 			position: absolute;
 			top: 6px;
-			right: 20px;
+			right: 30px;
 		}
 		.form-control{
 			height:auto;
+			background:{
+				image: url(wga_file_url("images", "select-pfeil.png"));
+				position: top 12px right 8px;;
+				size: 14px;
+				repeat: no-repeat;
+			}
 		}
 		.caret{
 			float:right;
 			margin-top:9px;
 		}
 		.title{
-			padding-right:20px
+			padding-right:30px
 		}
 		.placeholder{
 			color:#999;

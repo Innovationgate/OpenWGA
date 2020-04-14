@@ -422,7 +422,7 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
     }
 
     public String buildHomepageURL(WGDatabase db, HttpServletRequest request) throws WGException {
-        String url = innerBuildHomepageURL(db, request);
+        String url = innerBuildHomepageURL(db, request, null);
         if (url != null) {
 	        return rewriteURL(url, request, _core, false);
 	    }
@@ -430,8 +430,33 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
            return null;
         }
     }
-    
-	protected String innerBuildHomepageURL(WGDatabase db, HttpServletRequest request) throws WGException {
+
+    public String buildHomepageURL(TMLContext ctx) throws WGException {
+    	
+    	HttpServletRequest request = ctx.getrequest();
+    	
+        // check for vhost isHideHomepageURL
+        VirtualHost vHost = WGAVirtualHostingFilter.findMatchingHost(_core.getWgaConfiguration(), request);
+        if(vHost!=null){
+        	String defaultDbKey = WGAVirtualHostingFilter.getDefaultDBKey(_core, vHost);
+        	if(ctx.db().getDbReference().equalsIgnoreCase(defaultDbKey) && vHost.isHideHomepageURL()){
+	        	String path = request.getContextPath();
+	        	if(path.isEmpty())
+	        		path = "/";
+	        	return path;
+        	}
+        }
+        
+        String url = innerBuildHomepageURL(ctx.db(), request, ctx);
+        if (url != null) {
+	        return rewriteURL(url, ctx.getrequest(), _core, false);
+	    }
+        else {
+           return null;
+        }
+    }
+
+	protected String innerBuildHomepageURL(WGDatabase db, HttpServletRequest request, TMLContext ctx) throws WGException {
         
         String homepage = (String) db.getAttribute(WGACore.DBATTRIB_HOME_PAGE);
         String homepageName = (String) db.getAttribute(WGACore.DBATTRIB_HOME_PAGE_NAME);
@@ -440,7 +465,7 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
         if (!WGUtils.isEmpty(homepage) && WGUtils.isEmpty(homepageName)) {
             return WGPDispatcher.qualifyWGAURL(homepage, request, db, false).toString();
         }
-
+        
         // Second try: Try find home page by name
         db = _core.openContentDB(db, request, false);
         if (db.isSessionOpen()) {
@@ -450,7 +475,10 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
             }
             LanguageBehaviour langBehaviour = LanguageBehaviourTools.retrieve(db);
             boolean isBI = WGPDispatcher.isBrowserInterface(request.getSession());
-            WGContent content = langBehaviour.requestSelectContentForName(db, request, homepageName, isBI);
+            WGContent content;
+            if(ctx!=null)
+            	content = langBehaviour.webtmlSelectContentForName(db, ctx, homepageName, isBI);
+            else content = langBehaviour.requestSelectContentForName(db, request, homepageName, isBI);
             
             if (content != null && content.mayBePublished(isBI, WGContent.DISPLAYTYPE_NONE)) {
                 TMLContext cx = new TMLContext(content, _core, null, null, request, null, request.getSession());

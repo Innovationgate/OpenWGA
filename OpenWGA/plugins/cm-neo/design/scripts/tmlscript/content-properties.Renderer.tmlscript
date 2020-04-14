@@ -23,11 +23,14 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 			status: label("content-properties.status." + (c.content().isPendingRelease() ? 'pending' : c.STATUS)),
 			author: WGA.encode("JSON", c.AUTHOR),
 
+			replacementReason: c.STATUS==c.content().STATUS_ARCHIVE && c.ersetzungsgrund && WGA.encode("html", c.ersetzungsgrund),
+
 			pagereaders: WGA.app($urlParam_dbkey).isManager() ? pagereaders : null,
 
 			workflow: c.STATUS==c.content().STATUS_REVIEW && c.WORKFLOW 
+					&& c.content().getWorkflow().getWorkflowLevel()
 					&& (c.WORKFLOW + " / " + c.content().getWorkflow().getWorkflowLevel().getName()),
-					
+	
 			pageworkflow: c.content().getStructEntry().getWorkflowName(), 
 
 			created: c.STATUS==c.content().STATUS_DRAFT ? WGA.format(c.CREATED, "d. MMMMM yyyy, HH:mm") + " Uhr" : "",

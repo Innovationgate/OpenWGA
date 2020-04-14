@@ -8,6 +8,11 @@
 			document.setUniqueName(null);
 			tmlform.removefield("UNIQUENAME")
 		}
+
+		document.setChildPageRestrictions(tmlform.field('struct_childpagerestrictions'));
+		if (tmlform.hasfield("struct_allowedchildtypes")) {
+			document.setAllowedChildTypes(tmlform.fieldlist("struct_allowedchildtypes"));
+		}
 		
 		if(tmlform.child_editors=="custom")
 			document.setChildEditors(tmlform.fieldlist("custom_child_editors"));
@@ -80,6 +85,8 @@
 					o_changeaction="$refresh"/>
 				
 				<tml:script>
+					if(OVERRIDE_WORKFLOW==null)
+						tmlform.OVERRIDE_WORKFLOW="";
 					var workflows=WGA.createList();
 					var ct_workflow = db().getContentType(tmlform.contenttype).getWorkflow() || "kein Workflow"
 					workflows.add("aus Seitentyp: " + ct_workflow + "|");
@@ -90,6 +97,30 @@
 					o_mode="{WGA.app().isChiefEditor() ? 'edit':'view'}" 
 					o_optionsitem="_workflows"
 				/>
+				
+				<tml:script>
+					if(!tmlform.submitted)
+						tmlform.struct_childpagerestrictions = document.getChildPageRestrictions()
+				</tml:script>
+				<tml:[form-field] o_label="Erlaubte Unterseiten" o_name="struct_childpagerestrictions" o_type="select"
+					o_options="Beliebig|any,Keine|none,Nur Seiten folgender Seitentypen|fixDocTypes,Im Seitentyp festgelegt|unspecified"
+					o_changeaction="$refresh"
+					o_store="false"
+				/>
+				<tml:case condition="tmlform.struct_childpagerestrictions=='fixDocTypes'">
+					<tml:script>
+						if(!tmlform.submitted)
+							tmlform.struct_allowedchildtypes = document.getAllowedChildTypes()
+					</tml:script>
+					<tml:[form-field] o_label="Seitentypen" o_name="struct_allowedchildtypes" o_type="checkbox"
+						o_multiple="true"
+						o_labeled="true"
+						o_divider="<br>"
+						o_optionsitem="_pagetypes"
+						o_store="false"
+					/>
+				</tml:case>
+				
 			</div>
 			<div class="tab-pane" id="access">
 				<tml:portlet name="access" ref="::form-access"/>

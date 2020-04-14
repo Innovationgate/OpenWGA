@@ -4,7 +4,7 @@
 
 <label><tml:label key="image.settings.datasource"/>:</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:source}" type="select" options="{label(CMM.settingSource()=='template'?'image.settings.source.template':'image.settings.source')}"
+	<tml:input name="{scoped:source}" type="select" cssclass="form-control" options="{label(CMM.settingSource()=='template'?'image.settings.source.template':'image.settings.source')}"
 		changeaction="clearImage" ajax="true"
 		mode="{option:mode}"
 	/>
@@ -18,12 +18,21 @@
 			_dbs = CMM.getDbKeys()
 		</tml:script>
 		<tml:input name="{scoped:dbkey}" type="select" optionsitem="_dbs"
-			changeaction="clearImage" ajax="true"
+			cssclass="form-control"
+			default="{meta('db', 'dbkey')}"
+			changeaction="clearImage"
 			mode="{option:mode}"
 		/>
 	</div>
+	<div style="margin:10px">
+		<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document">
+			<tml:option name="dbkey" expression="tmlform.field(WGA.scoped('dbkey'))"/>
+			<tml:option name="fieldname" expression="WGA.scoped('sourcedoc')"/>
+			<tml:option name="changeaction"><tml:action ref="clearImage"/></tml:option>
+		</tml:include>
+	</div>
 	
-	<div style="margin:<tml:script expression="AFW.request().isIE?5:10"/>px">
+	<tml:comment><div style="margin:<tml:script expression="AFW.request().isIE?5:10"/>px">
 		<tml:input type="hidden" name="{scoped:sourcedoc}" mode="{option('mode')}"/>
 		<div id="link-view"></div>
 		<script>
@@ -44,7 +53,7 @@
 			});
 			combotree.render("link-view");
 		</script>
-	</div>
+	</div></tml:comment>
 	
 </tml:case>
 

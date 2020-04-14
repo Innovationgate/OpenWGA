@@ -150,7 +150,7 @@ if(config){
 		}
 	}
 	
-	log.info("Finched checking links.")
+	log.info("Finished checking links.")
 	
 	report.finished="Linkchecker finished at " + createdate();
 	

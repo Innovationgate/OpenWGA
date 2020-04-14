@@ -818,7 +818,12 @@ public class Include extends Base implements DynamicAttributes, PreferredOptionR
             status.setOption(OPTION_LINK_MEDIUM, linkMedium, TMLOption.SCOPE_GLOBAL);
         }
         
-        status.dynamicOptions.clear();
+        /*
+         *  Why do we clear dynamicOptions here ?
+         *  This leads to wrap_<attr> not being rendered.
+         *  See #00005533
+         */
+        //status.dynamicOptions.clear();
         
     }
 

@@ -173,6 +173,10 @@ public class JobContext {
     public Job getCurrentJob() {
         return _currentJob;
     }
+    
+    public void setEndMessage(String msg){
+    	_currentJob.setEndMessage(msg);
+    }
 
     /**
      * Returns the object representing the current task
@@ -229,7 +233,14 @@ public class JobContext {
     protected void setCancelled(boolean cancelled) {
         _cancelled = cancelled;
     }
-    
+
+    /**
+     * Cancel the Job
+     */
+    public void cancelJob() {
+    	setCancelled(true);
+    }
+
     /**
      * Throws a {@link JobFailedException} if the Job has been cancelled.
      * Use this call inside a Jobs code at a place where the Job can be safely cancelled without leaving any data inconsistent.

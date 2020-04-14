@@ -7799,11 +7799,15 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
             document = getDocumentByKey(docKey);
         }
         
-        
         // Operations only neccessary if the document is currently in cache =
         // document is present
         if (document != null) {
 
+        	/*
+        	 * In case the document has been deleted and then is saved (recreated):
+        	 * We have to reset the deleted flag.
+        	 */
+        	document.setDeleted(false);
             document.dropCache();
 
             // Must be done to ensure that the most up-to-date object is mapped

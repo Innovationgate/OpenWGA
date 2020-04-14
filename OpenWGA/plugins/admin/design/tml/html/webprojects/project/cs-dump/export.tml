@@ -88,7 +88,7 @@
 </div>
 
 <div id="job-log" style="display:none; padding: 3px;margin-top:5px">
-	<iframe style="height: 250px; width:100%"></iframe>
+	<iframe style="height: 250px; width:100%;border:solid silver 1px;border-radius:5px"></iframe>
 </div>
 
 <script>

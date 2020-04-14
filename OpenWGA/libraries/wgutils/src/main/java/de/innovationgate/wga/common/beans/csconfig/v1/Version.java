@@ -87,22 +87,43 @@ public class Version implements Comparable<Version>, Serializable {
         
             // Remove additional information from version string, like update number and special qualifier
             // For possible version string formats see http://java.sun.com/j2se/versioning_naming.html
-        int sublinePos = version.indexOf("_");
-        if (sublinePos != -1) {
-            version = version.substring(0, sublinePos);
-            }
-            
-            int dashPos = version.indexOf("-");
-            if (dashPos != -1) {
-                version = version.substring(0, dashPos);
-        }
-        
-        List elems = WGUtils.deserializeCollection(version, ".");
-        int major = Integer.parseInt((String) elems.get(0));
-        int minor = Integer.parseInt((String) elems.get(1));
-        int maintenance = Integer.parseInt((String) elems.get(2));
-        
-        return new Version(major, minor, maintenance);
+        	/*
+        	 * Since java 9 the format of the version string has been changed.
+        	 * Before java 9 we got "1.8.0". In java 9 and later the first "1." has been removed.
+        	 * Java 9 version is "9.0.0" instead on "1.9.0"
+        	 * Moreover current java 14 has a version string of just "14"
+        	 */
+	        int sublinePos = version.indexOf("_");
+	        if (sublinePos != -1) {
+	            version = version.substring(0, sublinePos);
+	        }
+	            
+	        int dashPos = version.indexOf("-");
+	        if (dashPos != -1) {
+	            version = version.substring(0, dashPos);
+	        }
+	        
+	        List elems = WGUtils.deserializeCollection(version, ".");
+	        int major=0;
+	        int minor=0;
+	        int maintenance=0;
+	        major = Integer.parseInt((String) elems.get(0));
+	        if(elems.size()>1)
+	        	minor = Integer.parseInt((String) elems.get(1));
+	        if(elems.size()>2)
+	        	maintenance = Integer.parseInt((String) elems.get(2));
+	        
+	        /*
+	         *  handling for java version >= 9:
+	         *  convert 9.y.x into 1.9.y
+	         */
+	        if(major>1){
+	        	maintenance = minor;
+	        	minor = major;
+	        	major = 1;
+	        }
+	        
+	        return new Version(major, minor, maintenance);
         }
         catch (NumberFormatException e) {
            Logger.getLogger("wga.utils").error("Error retrieving java version", e);
