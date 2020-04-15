@@ -27,7 +27,6 @@ package de.innovationgate.cm_neo.filter;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,7 +40,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import de.innovationgate.wgpublisher.WGACore;
-import de.innovationgate.wgpublisher.filter.WGAFilterURLPatternProvider;
 
 public class ResourceAccessFilter implements Filter {
 
@@ -56,11 +54,11 @@ public class ResourceAccessFilter implements Filter {
     @SuppressWarnings("unchecked")
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {        
         if (req instanceof HttpServletRequest && res instanceof HttpServletResponse) {
-            HttpServletRequest httpReq = (HttpServletRequest) req;
+
+        	HttpServletRequest httpReq = (HttpServletRequest) req;
             HttpServletResponse httpRes = (HttpServletResponse) res;
             
             String urlDBKey = httpReq.getParameter(URL_PARAMETER_DBKEY);
-                        
             if (urlDBKey != null && !urlDBKey.trim().equals("")) {
             	
             	List<String> sessionDBKeys = Collections.emptyList();
