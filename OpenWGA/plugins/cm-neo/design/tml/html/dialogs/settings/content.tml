@@ -33,7 +33,10 @@
 	_dialog_closed=true;
 </tml:action>
 
-<tml:form unless="_dialog_closed" id="form-settings" mode="{App.mayUpdateContent(this) ? 'edit':'view'}" html_data-context="{path}" html_autocomplete="off">
+<tml:form unless="_dialog_closed" id="form-settings" mode="{App.mayUpdateContent(this) ? 'edit':'view'}" 
+		html_data-context="{path}" 
+		html_data-dbkey="{meta('db', 'dbkey')}"
+		html_autocomplete="off">
 
 	<div class="header">
 		Inhaltseigenschaften

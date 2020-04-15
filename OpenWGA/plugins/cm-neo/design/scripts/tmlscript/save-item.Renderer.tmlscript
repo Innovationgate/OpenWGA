@@ -2,6 +2,9 @@ function Renderer() {}
 
 Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $urlParam_item, $urlParam_format, $urlParam_value, $urlParam_data_type) {
 
+	if(!$urlParam_dbkey)
+		return;		// access denied 
+
 	var value = $urlParam_value;
 	var result = {
 		success: true,
