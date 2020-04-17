@@ -23,6 +23,11 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
+<tml:action id="reload-servlet-filter">
+	WGA.Core.getFilter().initFilterChain()
+	_server_message =  "Filter chain reinitialized";
+</tml:action>
+
 <tml:action id="reloadConfig">
 	WGA.server().reloadConfig();
 	portlet.fireEvent(createEvent("wga-config-changed"));
@@ -222,9 +227,17 @@
 			,{
 				cls:'x-btn-text-icon',						
 				icon: '<tml:url type="file" db="@afw" doc="icons" file="database_refresh.png"/>',		                
-				text: "Clear all caches",
+				text: "Clear all Caches",
 				handler: function(){
 					WGA.ajax.callAction("<tml:action>_query_clear_cache=true</tml:action>","<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="@afw" doc="icons" file="arrow_switch.png"/>',		                
+				text: "Re-Init Servlet Filter Chain",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action ref="reload-servlet-filter"/>","<tml:script expression="portlet.portletkey"/>");
 				}
 			}
 			<tml:case istrue="_dbsArePatcheable">
