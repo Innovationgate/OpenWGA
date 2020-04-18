@@ -28,8 +28,6 @@ package de.innovationgate.wga.config;
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
 
-import de.innovationgate.utils.UIDGenerator;
-
 /**
  * A resource definition for a virtual host
  */
