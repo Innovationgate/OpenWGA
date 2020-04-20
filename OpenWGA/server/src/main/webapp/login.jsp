@@ -178,7 +178,6 @@
 
 		<input type="hidden" name="domain" value="<%= domain %>">
 		<input type="hidden" name="redirect" value="<%= redirect %>">
-		<input type="hidden" name="flag" value="true">
 
 		<div class="section">
 			<p class="big">

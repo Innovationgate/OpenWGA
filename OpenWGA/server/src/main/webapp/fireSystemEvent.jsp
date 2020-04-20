@@ -32,7 +32,7 @@
 <% 
 	String event = new String(Base64.decodeWeb(request.getParameter("event")));
 %>
-<script type="text/javascript">
+<script>
 	
 	WGA.event.dispatch(<%=event%>);
 	WGA.event.fireEvents();

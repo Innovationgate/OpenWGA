@@ -35,7 +35,7 @@
 	
 %>
 <% if (!"norefresh".equals(request.getParameter("$ajaxMode"))) { %>
-<script type="text/javascript">
+<script>
 <% } %>
 
 <% if ("true".equals(System.getProperty("de.innovationgate.license.DevelopmentModeEnabled"))) { 
