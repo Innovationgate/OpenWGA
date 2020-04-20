@@ -40,7 +40,7 @@
 
 <% if ("true".equals(System.getProperty("de.innovationgate.license.DevelopmentModeEnabled"))) { 
     String msg1 = wga.encode("javascript", jspHelper.getLabels("errors").getString("ajaxerror.message.dev.1"));
-    String msg2 = wga.encode("javascript", error.getSubMessage());
+    String msg2 = wga.encode("javascript", error!=null ? error.getSubMessage() : "");
     String msg3 = wga.encode("javascript", jspHelper.getLabels("errors").getString("ajaxerror.message.dev.2"));
 %>
 	if (confirm("<%= msg1 + "\\n\\n" + msg2+ "\\n\\n" + msg3 %>")) {

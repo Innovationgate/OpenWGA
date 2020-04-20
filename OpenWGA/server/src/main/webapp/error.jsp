@@ -71,34 +71,39 @@ if (manager.isDisplayDefaultErrorPage()) {
 			<%= interpreter.getErrorCode() %>
 		</div>		
 		
-		<h1>Es ist leider ein Fehler aufgetreten
-		<br>
-		<%= interpreter.getMainMessage() %></h1>
-		
-		<% if (interpreter.getErrorCode() == 404) { %>
-			<p style="padding:5px 0 25px 0;border-bottom:dotted silver 1px">
-				Die angeforderte Seite konnte nicht gefunden werden.
-				<br>The requested page could not be found.
-			</p>
-		<% }else{ %>			
-			<p style="padding:5px 0 25px;border-bottom:dotted silver 1px">
-				<%= interpreter.getException().getMessage() %>
-			</p>
-		<% } %>
-		
-		<% if (interpreter.getDetailMessage() != null) { %>
-			<H1>Message:</H1>
-			<code><%= interpreter.getDetailMessageHTML() %></code>
-		<% } %>
-		
-		<% if (interpreter.getErrorCode() == 403 && interpreter.getDbHint() != null) {
+		<% if (interpreter.getErrorCode() == 200) { %>
+			<p>Alles klar soweit.</p>
+			<p>Everything works fine.</p>
+		<% }else{ %>
+			<h1>Es ist leider ein Fehler aufgetreten
+			<br>
+			<%= interpreter.getMainMessage() %></h1>
 			
-			 de.innovationgate.wga.server.api.Domain domain = wga.database(interpreter.getDbHint()).domain();
-			 if (domain != null) {
-				 de.innovationgate.wga.server.api.Auth auth = domain.auth();
-				 if (auth.getLoginName() != null && auth.getAuthenticationType().equals("password")) {		
-		 %>
-
+			<% if (interpreter.getErrorCode() == 404) { %>
+				<p style="padding:5px 0 25px 0;border-bottom:dotted silver 1px">
+					Die angeforderte Seite konnte nicht gefunden werden.
+					<br>The requested page could not be found.
+				</p>
+			<% }else{ %>
+				<p style="padding:5px 0 25px;border-bottom:dotted silver 1px">
+					<%= interpreter.getException().getMessage() %>
+				</p>
+			<% } %>
+			
+			<% if (interpreter.getDetailMessage() != null) { %>
+				<H1>Message:</H1>
+				<code><%= interpreter.getDetailMessageHTML() %></code>
+			<% } %>
+			
+			<% if (interpreter.getErrorCode() == 403 && interpreter.getDbHint() != null) {
+				
+				 de.innovationgate.wga.server.api.Domain domain = wga.database(interpreter.getDbHint()).domain();
+				 if (domain != null) {
+					 de.innovationgate.wga.server.api.Auth auth = domain.auth();
+					 if (auth.getLoginName() != null && auth.getAuthenticationType().equals("password")) {		
+			 %>
+	    <% } %>
+	    
 		<p style="padding:5px 0 25px 0">
 			Your are currently logged in as user '<%= wga.encode("html", auth.getLoginName()) %>'.
 			<br>
