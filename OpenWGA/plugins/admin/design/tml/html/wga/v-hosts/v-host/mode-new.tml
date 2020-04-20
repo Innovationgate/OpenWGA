@@ -5,14 +5,11 @@
 		
 	try{
 		var host = _config_bean;
-		//var vr = host.virtualResources;
 
 		DBM.tmlform.setConfigProperties(host);		
 
-		//host.serverAliases.clear();
 		host.serverAliases.addAll(tmlform.fieldlist("serverAliases"));
 
-		//host.allowedDatabases.clear();
 		if(tmlform.allowedDbsOption=="all")
 			host.allowedDatabases = createlist(["$all"]);
 		else if(tmlform.allowedDbsOption=="select")
@@ -20,11 +17,6 @@
 		else if(tmlform.allowedDbsOption=="none")
 			host.defaultDatabase="";
 
-		/*
-		host.virtualResources.clear();
-		host.virtualResources.addAll(vr);
-		*/
-		
 		var config = DBM.wgaconfig.clone();
 		config.getVirtualHosts().add(host);
 		_errors = config.validate()
@@ -64,7 +56,7 @@
 	
 		<tml:inline name="body">
 			<tml:include designdb="@ui" ref="formmessages"/>
-			<tml:include ref="::form"/>
+			<tml:include ref="::content"/>
 		</tml:inline>
 		
 	</tml:include>

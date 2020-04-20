@@ -6,6 +6,7 @@
 	try{
 
 		var vr = _config_bean.virtualResources;
+		var redirects = _config_bean.redirects;
 
 		var config = DBM.wgaconfig.clone();
 		var host = DBM.wgaconfig.getByUid(portlet.getSessionVar('key'));
@@ -24,6 +25,9 @@
 
 		host.virtualResources.clear();
 		host.virtualResources.addAll(vr);
+
+		host.redirects.clear();
+		host.redirects.addAll(redirects);
 
 		_errors = config.validate()
 		if(_errors.isEmpty()){
@@ -61,7 +65,7 @@
 	
 		<tml:inline name="body">
 			<tml:include designdb="@ui" ref="formmessages"/>
-			<tml:include ref="::form"/>
+			<tml:include ref="::content"/>
 		</tml:inline>
 		
 	</tml:include>

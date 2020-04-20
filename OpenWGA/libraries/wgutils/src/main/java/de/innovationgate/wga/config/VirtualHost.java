@@ -72,7 +72,10 @@ public class VirtualHost extends IdentifiableConfigBean {
     @ElementList
     @NotNull
     private List<VirtualResource> virtualResources = new ArrayList<VirtualResource>();
-    
+
+    @ElementList (required=false)
+    private List<VirtualHostRedirect> redirects = new ArrayList<VirtualHostRedirect>();
+
     @Attribute (required=false)
     private boolean hideDefaultDatabaseInURL = false;
 
@@ -134,7 +137,15 @@ public class VirtualHost extends IdentifiableConfigBean {
     public List<VirtualResource> getVirtualResources() {
         return virtualResources;
     }
-    
+
+    public void setRedirects(List<VirtualHostRedirect> redirects) {
+        this.redirects = redirects;
+    }
+
+    public List<VirtualHostRedirect> getRedirects() {
+        return redirects;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }

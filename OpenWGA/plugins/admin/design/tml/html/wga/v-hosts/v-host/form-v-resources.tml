@@ -72,7 +72,7 @@
 	<tml:else>
 		<table class="collection" width="100%" style="margin-bottom:20px">
 			<tr class="collection-title">
-				<td>Name</td>
+				<td width="30%">Name</td>
 				<td>Path</td>
 				<tml:case condition="tmlform.mode()=='edit'">
 					<td></td>

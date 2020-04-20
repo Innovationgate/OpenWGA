@@ -1,0 +1,188 @@
+<tml:action id="addEntry_redirect">
+	if(!tmlform.path){
+		_redirect_form_msg = "Please enter path"
+		return;
+	}
+	if(!tmlform.redirect){
+		_redirect_form_msg = "Please enter redirect URL"
+		return;
+	}
+
+	var value = new Packages.de.innovationgate.wga.config.VirtualHostRedirect()	
+	callAction("setValuesFromForm_redirect", value)
+	if(!_config_bean.redirects)
+		_config_bean.redirects = WGA.createList();
+	_config_bean.redirects.add(value);
+</tml:action>
+
+<tml:action id="updateEntry_redirect">
+	if(!tmlform.path){
+		_redirect_form_msg = "Please enter path"
+		return;
+	}
+	if(!tmlform.redirect){
+		_redirect_form_msg = "Please enter redirect URL"
+		return;
+	}
+
+	var value = _config_bean.redirects.get(tmlform._idx)
+	callAction("setValuesFromForm_redirect", value)
+</tml:action>
+
+<tml:action id="setValuesFromForm_redirect">
+	var obj = tmlparam1;
+	obj.redirect=tmlform.redirect;
+	obj.path=tmlform.path;
+	obj.forward=tmlform.forward;
+
+	tmlform.removeField("redirect");
+	tmlform.removeField("path");
+	tmlform.removeField("forward");
+	tmlform.removeField("_action");
+	tmlform.removeField("_idx");
+</tml:action>
+
+<tml:action id="removeEntry_redirect">
+	var idx = tmlparam1-1;
+	_config_bean.redirects.remove(idx)
+	tmlform.removeField("_idx");
+</tml:action>
+
+<tml:action id="editEntry_redirect">
+	var idx = tmlparam1-1;
+	var redirect = _config_bean.redirects.get(idx)
+	
+	tmlform.redirect = redirect.redirect;
+	tmlform.path = redirect.path;
+	tmlform.forward = redirect.forward;
+	
+	tmlform._idx = idx;
+	tmlform._action = "edit_redirect"
+</tml:action>
+
+<tml:action id="newEntry_redirect">
+	tmlform._action = "new_redirect"
+</tml:action>
+
+<tml:action id="cancelEdit_redirect">
+	tmlform._action = ""
+	tmlform.removeField("_idx");
+</tml:action>
+
+<tml:script>
+	_entry_list = _config_bean.redirects || WGA.createList()
+</tml:script>
+
+<tml:if condition="_entry_list.isEmpty()">
+	<tml:then>
+		<tml:case condition="tmlform.mode()=='view'">
+			<div style="padding: 5px">- none -</div>
+		</tml:case> 
+	</tml:then>
+	<tml:else>
+		<table class="collection" width="100%" style="margin-bottom:20px">
+			<tr class="collection-title">
+				<td width="30%">Path Expression</td>
+				<td>URL</td>
+				<td>Forward/Proxy</td>
+				<tml:case condition="tmlform.mode()=='edit'">
+					<td></td>
+				</tml:case>
+			</tr>
+		
+			<tml:foreach id="array-list-loop_redirect" type="itemvalue" item="_entry_list" currentvalue="_entry">
+				<tr class="List<tml:case condition="tmlform._idx==taginfo('array-list-loop_redirect', 'iteration')-1"> selected</tml:case>">
+					<td><tml:item name="_entry" xpath="path"/></td>
+					<td><tml:item name="_entry" xpath="redirect"/></td>
+					<td><tml:item name="_entry" xpath="forward"/></td>
+					<tml:case condition="tmlform.mode()=='edit'">
+						<td nowrap align="right" width="1%">
+							<tml:button clickaction="editEntry_redirect" param1="{taginfo('array-list-loop_redirect', 'iteration')}">edit</tml:button>
+							<tml:button clickaction="removeEntry_redirect" param1="{taginfo('array-list-loop_redirect', 'iteration')}">delete</tml:button>
+						</td>
+					</tml:case>
+				</tr>
+			</tml:foreach>
+		</table>
+	</tml:else>
+</tml:if>
+
+<div class="entry-form">
+			
+	<tml:if condition="tmlform._action=='new_redirect' || tmlform._action=='edit_redirect'">
+		<tml:then>
+	
+			<tml:include designdb="@ui" ref="message" if="_redirect_form_msg">
+				<tml:item name="_redirect_form_msg"/>
+			</tml:include>		
+					
+			<div style="font-style:italic">		
+				<tml:if condition="tmlform._action=='new_redirect'">		
+					<tml:then>New</tml:then>		
+					<tml:else>Edit</tml:else>		
+				</tml:if>		
+				Redirect
+			</div>		
+
+			<label>Path Expression:</label>		
+			<div class="data">
+				<tml:input name="path" type="text" cssstyle="width:500px"
+					validation="$E_VALUE!=''"
+					message = "Please enter a path."
+					trim="true"
+				/>		
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="path" o_msgtarget="title"/>			
+			</div>		
+			<div class="clear"></div>		
+
+			<label>URL:</label>		
+			<div class="data">
+				<tml:input name="redirect" type="text" cssstyle="width:500px"
+					validation="$E_VALUE!=''"
+					message = "Please enter a redirect URL."
+					trim="true"
+				/>		
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="redirect" o_msgtarget="title"/>			
+			</div>		
+			<div class="clear"></div>		
+
+			<label>Forward (proxy instead of redirect) this URL:</label>		
+			<div class="data">
+				<tml:input name="forward" type="boolean" cssstyle="margin-top:4px"/>
+			</div>		
+			<div class="clear"></div>		
+
+			<div class="data" style="margin-top:5px">		
+				<tml:if condition="tmlform._action=='new_redirect'">		
+					<tml:then>		
+						<tml:button clickaction="addEntry_redirect">Add Entry</tml:button>		
+					</tml:then>		
+					<tml:else>		
+						<tml:button clickaction="updateEntry_redirect">Update Entry</tml:button>		
+					</tml:else>		
+				</tml:if>		
+				<tml:button clickaction="cancelEdit_redirect">Cancel</tml:button>		
+			</div>		
+			<div class="clear"></div>		
+					
+			<tml:case hasoptions="id">
+				<script>
+					
+					Ext.get("$ajaxContentDiv_<tml:script expression="portlet.portletkey"/>").mask();
+					Ext.get("<tml:option name="id"/>").setStyle({
+						zIndex: 102,
+						position: "relative"
+					})
+						
+				</script>		
+			</tml:case>
+			
+		</tml:then>
+	
+		<tml:elseif condition="tmlform.mode()=='edit'">
+			<tml:button clickaction="newEntry_redirect" ajax="true">Add New Redirect ...</tml:button>
+		</tml:elseif>
+		
+	</tml:if>
+	
+</div>

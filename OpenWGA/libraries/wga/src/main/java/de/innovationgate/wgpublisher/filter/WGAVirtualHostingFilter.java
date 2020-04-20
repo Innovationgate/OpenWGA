@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
@@ -51,6 +52,7 @@ import de.innovationgate.webgate.api.WGStructEntry;
 import de.innovationgate.wga.config.ConfigBean;
 import de.innovationgate.wga.config.ContentDatabase;
 import de.innovationgate.wga.config.VirtualHost;
+import de.innovationgate.wga.config.VirtualHostRedirect;
 import de.innovationgate.wga.config.VirtualResource;
 import de.innovationgate.wga.config.WGAConfiguration;
 import de.innovationgate.wgpublisher.WGACore;
@@ -150,18 +152,26 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
             	response.getWriter().print(vHost.getRobotsTxt());
             	return;
             }
-            if (uri.equalsIgnoreCase("/login") && httpRequest.getMethod().equalsIgnoreCase("post")) {
-                // skip post to login url - for this filter
-            }
 
-            // first handle virtual root resource request
+            // check for redirects            
+            Redirect redirect = findRedirect(vHost, uri);
+
+            // check for virtual root resource request
             String resource_path = uri;
             if(resource_path.startsWith("/"))
             	resource_path = resource_path.substring(1);
-            if (isRootResource(vHost, resource_path)) {
-                VirtualResource resource = findVirtualResource(vHost, resource_path);
-                httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, resource.getPath());
+            VirtualResource resource = findVirtualResource(vHost, resource_path);
+
+            if(redirect!=null){
+            	if(redirect.isForward())
+            		httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, redirect.getUrl());
+            	else{
+	            	httpResponse.sendRedirect(httpResponse.encodeRedirectURL(redirect.getUrl()));
+	            	return;
+            	}
             }
+            else if(resource!=null)
+            	httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, resource.getPath());
             else {
                 String[] pathElements = uri.split("/");
                 if (pathElements == null || pathElements.length < 1) {
@@ -312,10 +322,6 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
         return null;
     }
     
-    private boolean isRootResource(VirtualHost vHost, String path) {
-        return findVirtualResource(vHost, path) != null;
-    }
-
     public static VirtualHost findMatchingHost(WGAConfiguration config, ServletRequest request) {
         List<VirtualHost> vHosts = config.getVirtualHosts();        
         if (vHosts != null && !vHosts.isEmpty()) {
@@ -461,4 +467,43 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
         }
         return defaultDBKey;
     }
+
+    private class Redirect{
+    	boolean _forward;
+    	String _url;
+    	public Redirect(String url, boolean forward) {
+			_forward = forward;
+			_url = url;
+		}
+    	String getUrl(){
+    		return _url;
+    	}
+    	boolean isForward(){
+    		return _forward;
+    	}
+    }
+    
+    private Redirect findRedirect(VirtualHost vHost, String uri){
+
+    	List<VirtualHostRedirect> redirects = vHost.getRedirects();
+    	if(redirects==null || redirects.size()==0)
+    		return null;
+
+    	for(VirtualHostRedirect redirect: redirects){
+    		Pattern pattern = Pattern.compile(redirect.getPath(), Pattern.CASE_INSENSITIVE);
+        	Matcher matcher= pattern.matcher(uri);
+            if(matcher.find()) {
+                String redirectURL = redirect.getRedirect();
+                Integer count = matcher.groupCount();
+                if(count > 0) {
+                    for(Integer i = 1; i <= count; i++) {
+                    	redirectURL = redirectURL.replace("$"+i, matcher.group(i));
+                    }
+                }
+                return new Redirect(redirectURL, redirect.isForward());
+            }
+    	}
+    	return null;
+    }
+    
 }

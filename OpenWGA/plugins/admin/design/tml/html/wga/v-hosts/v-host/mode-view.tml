@@ -89,7 +89,7 @@
 		</tml:case>
 
 		<tml:form id="view-vhost-form" source="none" mode="view">
-			<tml:include ref="::form"/>
+			<tml:include ref="::content"/>
 		</tml:form>
 
 	</tml:inline>
