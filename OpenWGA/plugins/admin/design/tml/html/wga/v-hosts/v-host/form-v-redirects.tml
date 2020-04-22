@@ -69,6 +69,20 @@
 	tmlform.removeField("_idx");
 </tml:action>
 
+<tml:action id="moveUp">
+	var idx = tmlparam1-1;
+	var entry = _config_bean.redirects.get(idx)
+	_config_bean.redirects.remove(idx)
+	_config_bean.redirects.add(idx-1, entry)
+</tml:action>
+
+<tml:action id="moveDown">
+	var idx = tmlparam1-1;
+	var entry = _config_bean.redirects.get(idx)
+	_config_bean.redirects.remove(idx)
+	_config_bean.redirects.add(idx+1, entry)
+</tml:action>
+
 <tml:script>
 	_entry_list = _config_bean.redirects || WGA.createList()
 </tml:script>
@@ -99,6 +113,8 @@
 						<td nowrap align="right" width="1%">
 							<tml:button clickaction="editEntry_redirect" param1="{taginfo('array-list-loop_redirect', 'iteration')}">edit</tml:button>
 							<tml:button clickaction="removeEntry_redirect" param1="{taginfo('array-list-loop_redirect', 'iteration')}">delete</tml:button>
+							<tml:button html_disabled="{isFirstLoop()?true:VOID}" clickaction="moveUp" param1="{taginfo('array-list-loop_redirect', 'iteration')}">&and;</tml:button>
+							<tml:button html_disabled="{isLastLoop()?true:VOID}" clickaction="moveDown" param1="{taginfo('array-list-loop_redirect', 'iteration')}">&or;</tml:button>
 						</td>
 					</tml:case>
 				</tr>
