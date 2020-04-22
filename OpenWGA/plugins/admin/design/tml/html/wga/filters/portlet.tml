@@ -40,7 +40,6 @@
 </tml:action>
 
 <tml:action id="moveFilterUp">
-	log.info("move up: " + tmlparam1);
 	var config = DBM.wgaconfig.clone();
 	var filters = config.filterMappings
 	var idx = tmlparam1-1;
@@ -51,7 +50,6 @@
 </tml:action>
 
 <tml:action id="moveFilterDown">
-	log.info("move down: " + tmlparam1);
 	var config = DBM.wgaconfig.clone();
 	var filters = config.filterMappings
 	var idx = tmlparam1-1;
