@@ -490,6 +490,8 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
     		return null;
 
     	for(VirtualHostRedirect redirect: redirects){
+    		if(!redirect.isEnabled())
+    			continue;
     		Pattern pattern = Pattern.compile(redirect.getPath(), Pattern.CASE_INSENSITIVE);
         	Matcher matcher= pattern.matcher(uri);
             if(matcher.find()) {

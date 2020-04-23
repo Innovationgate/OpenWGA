@@ -41,6 +41,9 @@ public class VirtualHostRedirect {
     
 
     @Attribute (required=false)
+    private boolean enabled=true;
+
+    @Attribute (required=false)
     private boolean forward=false;
 
     public VirtualHostRedirect() {
@@ -70,4 +73,10 @@ public class VirtualHostRedirect {
     	return forward;
     }
           
+    public void setEnabled(boolean enabled){
+    	this.enabled = enabled;
+    }
+    public boolean isEnabled(){
+    	return enabled;
+    }
 }

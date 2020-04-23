@@ -34,10 +34,12 @@
 	obj.redirect=tmlform.redirect;
 	obj.path=tmlform.path;
 	obj.forward=tmlform.forward;
+	obj.enabled=tmlform.enabled;
 
 	tmlform.removeField("redirect");
 	tmlform.removeField("path");
 	tmlform.removeField("forward");
+	tmlform.removeField("enabled");
 	tmlform.removeField("_action");
 	tmlform.removeField("_idx");
 </tml:action>
@@ -55,6 +57,7 @@
 	tmlform.redirect = redirect.redirect;
 	tmlform.path = redirect.path;
 	tmlform.forward = redirect.forward;
+	tmlform.enabled = redirect.enabled;
 	
 	tmlform._idx = idx;
 	tmlform._action = "edit_redirect"
@@ -99,6 +102,7 @@
 				<td width="30%">Path Expression</td>
 				<td>URL</td>
 				<td>Forward/Proxy</td>
+				<td align="right">Status</td>
 				<tml:case condition="tmlform.mode()=='edit'">
 					<td></td>
 				</tml:case>
@@ -106,9 +110,10 @@
 		
 			<tml:foreach id="array-list-loop_redirect" type="itemvalue" item="_entry_list" currentvalue="_entry">
 				<tr class="List<tml:case condition="tmlform._idx==taginfo('array-list-loop_redirect', 'iteration')-1"> selected</tml:case>">
-					<td><tml:item name="_entry" xpath="path"/></td>
-					<td><tml:item name="_entry" xpath="redirect"/></td>
-					<td><tml:item name="_entry" xpath="forward"/></td>
+					<td><tml:item name="_entry.path"/></td>
+					<td><tml:item name="_entry.redirect"/></td>
+					<td><tml:script expression="_entry.forward ? 'proxy' : ''"/></td>
+					<td align="right"><tml:script expression="!_entry.enabled ? 'disabled' : ''"/></td>
 					<tml:case condition="tmlform.mode()=='edit'">
 						<td nowrap align="right" width="1%">
 							<tml:button clickaction="editEntry_redirect" param1="{taginfo('array-list-loop_redirect', 'iteration')}">edit</tml:button>
@@ -139,6 +144,12 @@
 				</tml:if>		
 				Redirect
 			</div>		
+
+			<label>Enabled:</label>		
+			<div class="data">
+				<tml:input name="enabled" type="boolean" cssstyle="margin-top:4px"/>
+			</div>		
+			<div class="clear"></div>		
 
 			<label>Path Expression:</label>		
 			<div class="data">
