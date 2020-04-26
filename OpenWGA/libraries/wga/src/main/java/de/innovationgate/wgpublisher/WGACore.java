@@ -6866,12 +6866,15 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             }
 
             // Initialize title path url manager
-            try {
-                TitlePathManager titlePathManager = new TitlePathManager(db, this, db.getBooleanAttribute(DBATTRIB_TITLEPATHURL, false));
-                db.setAttribute(DBATTRIB_TITLEPATHMANAGER, titlePathManager);
-            }
-            catch (Exception e) {
-                getLog().error("Error initializing title path manager for database " + db.getDbReference(), e);
+            boolean allowPublishing = db.getBooleanAttribute(WGACore.DBATTRIB_ALLOW_PUBLISHING, true);
+            if(allowPublishing){
+	            try {
+	                TitlePathManager titlePathManager = new TitlePathManager(db, this, db.getBooleanAttribute(DBATTRIB_TITLEPATHURL, false));
+	                db.setAttribute(DBATTRIB_TITLEPATHMANAGER, titlePathManager);
+	            }
+	            catch (Exception e) {
+	                getLog().error("Error initializing title path manager for database " + db.getDbReference(), e);
+	            }
             }
             
             // Determine language behaviour
