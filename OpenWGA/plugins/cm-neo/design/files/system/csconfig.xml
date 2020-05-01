@@ -47,8 +47,8 @@
       <uniqueName>de.innovationgate.cm-neo</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>7</minorVersion>
-        <maintenanceVersion>7</maintenanceVersion>
+        <minorVersion>8</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
         <buildVersion>692</buildVersion>
       </version>
