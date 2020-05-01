@@ -29,7 +29,6 @@ import org.apache.lucene.document.Document;
 
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGException;
-import de.innovationgate.wgpublisher.lucene.analysis.FileHandler;
 
 public interface AttachmentAwareLuceneIndexEnhancer extends LuceneIndexEnhancer {
 
