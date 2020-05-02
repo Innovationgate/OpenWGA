@@ -33,8 +33,6 @@
 			dbkeys.add(portlet.dbkey)
 		request.getSession().setAttribute(Packages.de.innovationgate.cm_neo.filter.ResourceAccessFilter.SESSION_ATTRIB_EDITABLE_DATABASES, dbkeys);	
 
-		console.log(Packages.de.innovationgate.cm_neo.filter.ResourceAccessFilter.SESSION_ATTRIB_EDITABLE_DATABASES, dbkeys);
-
 		var app = WGA.app(portlet.dbkey);
 		var auth = app.domain().auth()
 		if(!auth.getAccessFilter(app))
