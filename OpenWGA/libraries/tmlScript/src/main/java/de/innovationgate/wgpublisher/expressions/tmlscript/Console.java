@@ -9,8 +9,16 @@ public class Console {
 	
 	private HashMap<String, Long> _timer= new HashMap<String, Long>();
     private Logger _logger;
+    
 	public Console(Logger logger) {
 		_logger = logger;
+	}
+	
+	public void setLogger(Logger logger){
+		_logger = logger;
+	}
+	public Logger getLogger(){
+		return _logger;
 	}
 	
 	private String replaceVariables(String str0, Object[] obj) {
