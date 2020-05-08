@@ -209,6 +209,17 @@ public abstract class DocumentResource<DocType extends WGDocument, ParentType ex
     }
 
     @XmlElement
+    public FieldList getExtensionData() throws WGException {
+    	List<Field> items = new ArrayList<Field>();
+    	WGDocument doc = getDoc();    	
+    	for(String name: doc.getExtensionDataNames()){
+    		Field f = Field.create(name, doc.getExtensionData(name));
+    		items.add(f);
+    	}    	
+    	return createFieldList(items);
+    }
+
+    @XmlElement
     public FieldList getItems() throws WGException {
         
         if (isNew()) {
