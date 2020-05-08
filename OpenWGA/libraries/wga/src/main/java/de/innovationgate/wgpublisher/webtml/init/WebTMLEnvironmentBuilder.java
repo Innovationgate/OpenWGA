@@ -611,15 +611,20 @@ public class WebTMLEnvironmentBuilder {
         if (tmlscript.hasProperty(actionResult, "$redirect")) {
             Object redirectionScriptData = tmlscript.callMethod(actionResult, "$redirect");
             try {
-                @SuppressWarnings("unchecked")
-                Map<Object,Object> redirectionData = tmlscript.descriptify(redirectionScriptData, Map.class);
-                String url = interpretRedirectionData((TMLContext) wga.tmlcontext(), redirectionData);
-                if (url != null) {
-                    wga.redirectTo(url);
-                }
+            	if(redirectionScriptData instanceof String){
+            		wga.redirectTo((String)redirectionScriptData);
+            	}
+            	else{
+	                @SuppressWarnings("unchecked")
+	                Map<Object,Object> redirectionData = tmlscript.descriptify(redirectionScriptData, Map.class);
+	                String url = interpretRedirectionData((TMLContext) wga.tmlcontext(), redirectionData);
+	                if (url != null) {
+	                    wga.redirectTo(url);
+	                }
+            	}
             }
             catch (Exception e) {
-                wga.getLog().error("Exception interpreting $redirect result of WebTML action '" + action.getDescription() + "' as Lookup table", e);
+                wga.getLog().error("Exception interpreting $redirect result of WebTML action '" + action.getDescription() + "' as String or Map", e);
             }
         }
     }
