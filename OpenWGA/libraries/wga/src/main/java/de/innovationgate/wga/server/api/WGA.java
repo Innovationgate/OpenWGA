@@ -1977,7 +1977,10 @@ public class WGA {
      * @throws IOException
      */
     public void redirectTo(String url) throws WGException, IOException {
-        ((TMLContext) tmlcontext()).redirectto(url);
+    	if(isIsolated()){
+    		getLog().error("WGA.redirectTo() called in isolated environment. No request/response availabe.");
+    	}
+    	else ((TMLContext) tmlcontext()).redirectto(url);
     }
     
     /**
