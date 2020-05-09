@@ -45,15 +45,17 @@
 					continue;
 		
 				opts.add(lang.getTitle() + "|" + lang.getName());
-				WGA.TMLPage.setVar("_languages", opts)
 			}
+			WGA.TMLPage.setVar("_languages", opts)
+			if(_languages.size()==1)
+				tmlform.language = _languages.get(0).split("|")[1];
 			
 		</tml:script>
 		<tml:[form-field] o_label="Titel" o_field="title"
 			o_validation="$E_VALUE!=''"
 			o_message="Bitte geben Sie einen Titel ein"
 		/>
-		<tml:[form-field] o_label="Sprache" o_type="select" o_field="language" o_optionsitem="_languages"/>
+		<tml:[form-field] o_label="Sprache" o_type="select" o_field="language" o_optionsitem="_languages" o_mode="{_languages.size()>1?'edit':'view'}"/>
 
 		<tml:case condition="content()">
 			<hr>
