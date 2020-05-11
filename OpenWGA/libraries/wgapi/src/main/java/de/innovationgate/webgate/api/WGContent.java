@@ -1166,14 +1166,14 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 		            this.addWorkflowHistoryEntry("Submitted for approval");
 		            
 		            fireStatusChangeEvent();
-   		            result = maybeAutoApprove(workflow);
+   		            maybeAutoApprove(workflow);
 		        }
 		        
 		        // Release doc if publish returned true
 		        else {
-                  this.release(comment, workflow, "Released");
+		        	this.release(comment, workflow, "Released");
 		        }
-    	
+		        
     			if (save(new Date(), false) == false) {
     				throw new WGBackendException("Could not publish document " + getContentKey().toString() + " because it could not be saved");
     			}
