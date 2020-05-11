@@ -58,7 +58,11 @@ public class WGContentEvent {
      */
     public static final int TYPE_STATUSCHANGED = 6;
 
-	
+	/**
+	 * A content is to be removed
+	 */
+	public static final int TYPE_WILLBEDELETED = 7;
+
 	private String _documentKey;
 
 	private int _type;

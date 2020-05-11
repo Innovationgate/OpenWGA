@@ -3186,6 +3186,13 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         // + look if we need to clear the query cache
         if (document instanceof WGContent) {
             WGContent content = (WGContent) document;
+
+            WGContentEvent event = new WGContentEvent(WGContentEvent.TYPE_WILLBEDELETED, content.getDocumentKey(), null, this);
+            event.setContent(content);
+            if (fireContentEvent(event) == false) {
+                throw new WGCancelledException("Remove operation was canceled by a ContentEventListener");
+            }
+            
             content.removeAllIncomingRelations();
             if (content.getRetrievalStatus().equals(WGContent.STATUS_RELEASE)) {
                 dropQueryCache = true;
@@ -3901,6 +3908,11 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
             }
             else if (event.getType() == WGContentEvent.TYPE_SAVED) {
                 if (listener.contentSaved(event) == false) {
+                    return false;
+                }
+            }
+            else if (event.getType() == WGContentEvent.TYPE_WILLBEDELETED && listener instanceof WGContentChangeListener) {
+                if (((WGContentChangeListener)listener).contentWillBeDeleted(event) == false) {
                     return false;
                 }
             }
