@@ -1145,6 +1145,27 @@ public class WGA {
     }
 
     /**
+     * encrypts a String
+     * @param text
+     * @return encrytped String
+     * @throws GeneralSecurityException
+     * @throws UnsupportedEncodingException
+     */
+    public String encryptString(String text) throws GeneralSecurityException, UnsupportedEncodingException{
+    	return getCore().getSymmetricEncryptionEngine().encryptBase64Web(text.getBytes("UTF-8"));
+    }
+    /**
+     * decrypts a string
+     * @param secret
+     * @return the decrypted string
+     * @throws GeneralSecurityException
+     * @throws IOException
+     */
+    public String decryptString(String secret) throws GeneralSecurityException, IOException{
+    	return new String(getCore().getSymmetricEncryptionEngine().decryptBase64Web(secret), "UTF-8");
+    }
+    
+    /**
      * Serializes an object to an encrypted string
      * The resulting string is a representation of the given object as string which is compressed as well as encrypted. It works with trivial data objects like {@link String}, {@link Number}, {@link Boolean} or {@link Date}, also with {@link List}, {@link Map} or JavaBeans containing those type of objects.
      * Uses this function to either use complex objects on places that only allow strings (for example on WebTML action parameters) or to prevent any data from being manipulated by the browser user when it needs to be transported to and returned from the browser.
@@ -1175,9 +1196,9 @@ public class WGA {
     public Object deserializeObject(String encrypted) throws WGException {        
         try {
             byte[] zipped = getCore().getSymmetricEncryptionEngine().decryptBase64Web(encrypted);
-        if (zipped == null) {
-            throw new IllegalArgumentException("Undecryptable serialized object");
-        }
+	        if (zipped == null) {
+	            throw new IllegalArgumentException("Undecryptable serialized object");
+	        }
         
             String xml = WGUtils.unzipString(zipped);
             Object obj = getCore().getLibraryXStream().fromXML(xml);
