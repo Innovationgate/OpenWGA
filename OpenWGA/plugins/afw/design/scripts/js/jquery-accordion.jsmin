@@ -22,6 +22,15 @@
 		$(window).trigger("resize");
 	}
 
+	function collapse(panel, speed, index){
+		panel.removeClass("active").next().slideUp({
+			duration: speed,
+			complete: function(){
+				panel.trigger("deactivated", [this, index]);
+			}
+		});
+	}
+
 	function activate(el, index){
 		var header = $("> .accordion-header", el).eq(index)
 		var isActive = header.hasClass("active");
@@ -66,9 +75,17 @@
 					ev.preventDefault();
 					var $this = $(this);
 					var isActive = $this.hasClass("active");
-					$("> .accordion-header", el).removeClass("active").next().slideUp(speed);
-					if(!isActive)
-						expand($this, speed, $("> .accordion-header", el).index($this));
+					if(config.multiple){
+						if(isActive)
+							collapse($this, speed, $("> .accordion-header", el).index($this));
+						else expand($this, speed, $("> .accordion-header", el).index($this));
+					}
+					else{
+						var current = $("> .accordion-header.active", el).first()
+						current && collapse(current, speed, $("> .accordion-header", el).index(current));
+						if(!isActive)
+							expand($this, speed, $("> .accordion-header", el).index($this));
+					}
 				})
 			}
 		})
