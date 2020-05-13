@@ -452,7 +452,7 @@ public class Design {
                 throw new WGAServerException("Exception retrieving label " + containerRef.getResourceName() + "/" + fileName + "/" + key + " for language " + prefLangLocale.toString() + " from DB " + manager.getDb().getDbReference(), e);
             }
         }
-        else if(_wga.isRequestAvailable()){
+        else if(_wga.isTMLContextAvailable()){
             LanguageBehaviour langBehaviour = LanguageBehaviourTools.retrieve(designDB);
             label = langBehaviour.webtmlFetchLabel(manager, (TMLContext) _wga.tmlcontext(), containerRef.getResourceName(), fileName, key);
         }
@@ -463,9 +463,9 @@ public class Design {
             }
             catch (IOException e) {
                 throw new WGAServerException("Exception retrieving label " + containerRef.getResourceName() + "/" + fileName + "/" + key + " for language " + prefLangLocale.toString() + " from DB " + manager.getDb().getDbReference(), e);
-            }
-        	
+            }        	
         }
+        
         // If no label available we return the key prefixed with "#"
         
         Boolean usePlaceholder = (Boolean)config.get("placeholder");
