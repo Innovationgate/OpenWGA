@@ -867,14 +867,14 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     
     private void addAdditionRequest(IndexingRequest request) {
         synchronized (_indexingRequestLock) {
-        // add to list and set service status running for DB
+        	// 	add to list and set service status running for DB
             Queue<IndexingRequest> requests = _additionRequestsMap.get(request.getDbkey());
-        if (requests == null) {
-        	requests = new ConcurrentLinkedQueue<LuceneManager.IndexingRequest>();
-            _additionRequestsMap.put(request.getDbkey(), requests);
-        }        
-        requests.add(request);     
-    }
+	        if (requests == null) {
+	        	requests = new ConcurrentLinkedQueue<LuceneManager.IndexingRequest>();
+	            _additionRequestsMap.put(request.getDbkey(), requests);
+	        }        
+	        requests.add(request);     
+	    }
     }
 
     private void addDBUpdateRequest(IndexingRequest request) {
