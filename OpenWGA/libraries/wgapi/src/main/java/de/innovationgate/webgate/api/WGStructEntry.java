@@ -2333,6 +2333,10 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
             getSessionData().setPerformUserRightsTestsOnSave(performTests);
             boolean result = super.save(lastModified);
             gatherRetrievalKeys();
+            
+            WGContentEvent event = new WGContentEvent(WGContentEvent.TYPE_STRUCTUPDATED, getDocumentKey(), getContentType().getName(), getDatabase());
+            db.fireContentEvent(event);
+            
             return result;
         }
         finally {
