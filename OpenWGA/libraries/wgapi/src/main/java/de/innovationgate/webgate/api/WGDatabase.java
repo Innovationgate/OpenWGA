@@ -3916,6 +3916,9 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
                     return false;
                 }
             }
+            else if (event.getType() == WGContentEvent.TYPE_STRUCTUPDATED && listener instanceof WGContentChangeListener) {
+                ((WGContentChangeListener)listener).structEntryHasBeenSaved(event);
+            }
             else if (event.getType() == WGContentEvent.TYPE_HASBEENSAVED) {
                 listener.contentHasBeenSaved(event);
             }
@@ -7050,6 +7053,8 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         
         // Fire event "content has been moved" for each and every influenced content
         processMovedDocuments(entry, true);        
+
+        updateRevision(WGDatabaseRevision.forValue(getCore().getRevision()));
         
         return true;
 
