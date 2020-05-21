@@ -26,6 +26,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 			replacementReason: c.STATUS==c.content().STATUS_ARCHIVE && c.ersetzungsgrund && WGA.encode("html", c.ersetzungsgrund),
 
 			pagereaders: WGA.app($urlParam_dbkey).isManager() ? pagereaders : null,
+			readprotected: pagereaders.length>0,
 
 			workflow: c.STATUS==c.content().STATUS_REVIEW && c.WORKFLOW 
 					&& c.content().getWorkflow().getWorkflowLevel()
