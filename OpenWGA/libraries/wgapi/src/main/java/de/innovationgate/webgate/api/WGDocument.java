@@ -1226,7 +1226,15 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
         performSaveCheck();
         WGDocumentCore docCore = getCore();
         boolean isNewDoc = !docCore.isSaved();
-        return innerSave(docCore, lastModified, isNewDoc);
+        
+        boolean success = innerSave(docCore, lastModified, isNewDoc);
+
+        if(success){
+            WGDocumentEvent event = new WGDocumentEvent(WGDocumentEvent.TYPE_SAVED, getDocumentKeyObj());
+            db.fireDocumentEvent(event);        	
+        }
+        
+        return success;
         
     }
 
@@ -2327,7 +2335,14 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
             return false;
         }
         
-        return remove(this);
+        boolean success = remove(this);
+
+        if(success){
+        	WGDocumentEvent event = new WGDocumentEvent(WGDocumentEvent.TYPE_DELETED, getDocumentKeyObj());
+	        db.fireDocumentEvent(event);
+        }
+        
+        return success;
     }
     
     /**

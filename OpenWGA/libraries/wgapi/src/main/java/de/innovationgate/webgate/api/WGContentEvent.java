@@ -58,16 +58,6 @@ public class WGContentEvent {
      */
     public static final int TYPE_STATUSCHANGED = 6;
 
-	/**
-	 * A content is to be removed
-	 */
-	public static final int TYPE_WILLBEDELETED = 7;
-
-	/**
-	 * A struct entry was updated
-	 */
-	public static final int TYPE_STRUCTUPDATED = 8;
-
 	private String _documentKey;
 
 	private int _type;
@@ -125,11 +115,8 @@ public class WGContentEvent {
         if (_content != null) {
             return _content;
         }
-        else if (getType() != TYPE_STRUCTUPDATED) {
-            return null;
-        }
         else if (getType() != TYPE_CREATED) {
-            return (WGContent) getDatabase().getDocumentByDocumentKey(getDocumentKey());
+            return (WGContent) getDatabase().getDocumentByKey(getDocumentKey());
         }
         else {
             return null;

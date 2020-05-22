@@ -1970,6 +1970,8 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
 
     private List<WGContentEventListener> contentEventListeners = new CopyOnWriteArrayList<WGContentEventListener>();
 
+    private List<WGDocumentEventListener> documentEventListeners = new CopyOnWriteArrayList<WGDocumentEventListener>();
+
     private List<WGWorkflowEventListener> workflowEventListeners = new CopyOnWriteArrayList<WGWorkflowEventListener>();
     
     private List<WGFileAnnotator> fileAnnotators = new CopyOnWriteArrayList<WGFileAnnotator>();
@@ -3187,12 +3189,6 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         if (document instanceof WGContent) {
             WGContent content = (WGContent) document;
 
-            WGContentEvent event = new WGContentEvent(WGContentEvent.TYPE_WILLBEDELETED, content.getDocumentKey(), null, this);
-            event.setContent(content);
-            if (fireContentEvent(event) == false) {
-                throw new WGCancelledException("Remove operation was canceled by a ContentEventListener");
-            }
-            
             content.removeAllIncomingRelations();
             if (content.getRetrievalStatus().equals(WGContent.STATUS_RELEASE)) {
                 dropQueryCache = true;
@@ -3789,6 +3785,19 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
     }
 
     /**
+     * Adds a listener for content events to the database.
+     * 
+     * @param listener
+     */
+    public void addDocumentEventListener(WGDocumentEventListener listener) {
+
+        if (!documentEventListeners.contains(listener)) {
+            this.documentEventListeners.add(listener);
+        }
+
+    }
+
+    /**
      * Adds a listener for workflow events to the database
      * 
      * @param listener
@@ -3818,9 +3827,14 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
      * Removes a content event listener.
      */
     public void removeContentEventListener(WGContentEventListener listener) {
-
         this.contentEventListeners.remove(listener);
+    }
 
+    /**
+     * Removes a content event listener.
+     */
+    public void removeDocumentEventListener(WGDocumentEventListener listener) {
+        this.documentEventListeners.remove(listener);
     }
 
     /**
@@ -3890,6 +3904,21 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         
     }
 
+    protected void fireDocumentEvent(WGDocumentEvent event) throws WGAPIException {
+
+    	if (!isSessionOpen()) {
+            throw new WGClosedSessionException();
+        }
+
+        if (!getSessionContext().isEventsEnabled()) {
+            return;
+        }
+    	
+        for(WGDocumentEventListener listener: documentEventListeners){
+        	listener.handleEvent(event);
+        }
+    }
+
     protected boolean fireContentEvent(WGContentEvent event) throws WGAPIException {
 
         if (!isSessionOpen()) {
@@ -3910,14 +3939,6 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
                 if (listener.contentSaved(event) == false) {
                     return false;
                 }
-            }
-            else if (event.getType() == WGContentEvent.TYPE_WILLBEDELETED && listener instanceof WGContentChangeListener) {
-                if (((WGContentChangeListener)listener).contentWillBeDeleted(event) == false) {
-                    return false;
-                }
-            }
-            else if (event.getType() == WGContentEvent.TYPE_STRUCTUPDATED && listener instanceof WGContentChangeListener) {
-                ((WGContentChangeListener)listener).structEntryHasBeenSaved(event);
             }
             else if (event.getType() == WGContentEvent.TYPE_HASBEENSAVED) {
                 listener.contentHasBeenSaved(event);
@@ -7055,7 +7076,10 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         processMovedDocuments(entry, true);        
 
         updateRevision(WGDatabaseRevision.forValue(getCore().getRevision()));
-        
+
+        WGDocumentEvent event = new WGDocumentEvent(WGDocumentEvent.TYPE_MOVED, entry.getDocumentKeyObj());
+        fireDocumentEvent(event);
+
         return true;
 
     }
