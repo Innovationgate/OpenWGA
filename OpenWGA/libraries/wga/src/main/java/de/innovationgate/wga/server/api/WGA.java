@@ -60,6 +60,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import de.innovationgate.utils.CountReportingIterator;
@@ -3387,6 +3388,36 @@ public class WGA {
     public WGATempFile TempFile(String filename) throws IOException{
     	return new WGATempFile(this, filename);
     }
- 
+     
+    public WGALogger Logger(String name){
+    	return new WGALogger("wga."+name);
+    }
+   
+    public class WGALogger{
+    	
+    	Logger logger;
+
+		public WGALogger(String name){
+    		logger = Logger.getLogger(name);
+    	}
+    	
+    	public WGALogger setLevel(String level){
+    		if(level.equalsIgnoreCase("debug"))
+    			logger.setLevel(Level.DEBUG);
+    		if(level.equalsIgnoreCase("info"))
+    			logger.setLevel(Level.INFO);
+    		if(level.equalsIgnoreCase("warn"))
+    			logger.setLevel(Level.WARN);
+    		if(level.equalsIgnoreCase("error"))
+    			logger.setLevel(Level.ERROR);
+    		return this;
+    	}
+
+        public Logger getLogger(){
+        	return logger;
+        }
+    	
+    }
+    
 }
  
