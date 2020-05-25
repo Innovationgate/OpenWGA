@@ -202,9 +202,14 @@ public class EventScript extends ActionBase {
 
     private void executeEventScript() {
         
+        String expr = this.getResultString(false);
+        if(expr.isEmpty()){
+        	this.setResult("");
+        	return;
+        }
+        
         ExpressionEngine engine;
         engine = ExpressionEngineFactory.getTMLScriptEngine();
-        String expr = this.getResultString(false);
         
         Map additionalObjects = new HashMap();
         

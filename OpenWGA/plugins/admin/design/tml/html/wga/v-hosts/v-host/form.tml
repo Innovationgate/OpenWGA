@@ -84,28 +84,3 @@
 	<tml:[system:fs-input] o_field="allowAdminApps" o_type="boolean"/>
 	<tml:[system:fs-input] o_field="allowAuthoringApps" o_type="boolean"/>
 </fieldset>	
-
-<tml:script>
-	_hasRobotsTxt=false;
-	for(let el in Iterator(_config_bean.virtualResources)){
-		if(el.name.toLowerCase()=="robots.txt"){
-			_hasRobotsTxt=true;
-			break;
-		}
-	}
-</tml:script>
-
-<tml:case isfalse="_hasRobotsTxt">
-	<fieldset>
-		<legend>Robots</legend>
-		<tml:[system:fs-input] o_field="robotsTxt" o_type="textarea" o_width="350"/>
-	</fieldset>
-</tml:case>
-
-<div id="v-resources-array-list" class="array-list-editor">			
-	<fieldset>
-		<legend>Virtual Resources</legend>
-		<tml:include ref="::form-v-resources" o_list="virtualResources" o_id="v-resources-array-list"/>
-	</fieldset>
-</div>
-

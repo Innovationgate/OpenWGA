@@ -229,10 +229,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
             // Determine sort numbers for operations/doctypes
             int sortNr1 = determineSortNumber(o1);
             int sortNr2 = determineSortNumber(o2);
-            return 2 - 1;
-            
-            
-            
+            return sortNr2 - sortNr1;
         }
 
         private int determineSortNumber(WGUpdateLog o) {
@@ -402,8 +399,6 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
             return _logs;
         }
 	    
-	    
-	    
 	}
 
 	public static class SessionStatus {
@@ -469,8 +464,6 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
     		}
     	} 
 	};
-
-
 
     private static Map<Integer, Class<? extends MainEntity>> _typeToObject = new HashMap<Integer, Class<? extends MainEntity>>();
 
@@ -2864,26 +2857,26 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
             
             List wgLogs = new ArrayList();
             LinkedMap wgLogsByTarget = new LinkedMap();
-            Map conflictTargets = new HashMap();
 
             LogEntry entry;
             
             // First pass: Create update logs
             while (logEntries.hasNext()) {
                 entry = (LogEntry) logEntries.next();
-                WGUpdateLog newLog = null;
-                WGUpdateLog oldLog = null;
-                Date currentTime = null;
+                WGUpdateLog newLog;
                 if (entry.getTarget() != null && !entry.getTarget().equals("#UNKNOWN#")) {
                     newLog = readUpdateLog(entry);
                     wgLogs.add(newLog);
                     
-                    List logsList = (List) wgLogsByTarget.get(entry.getTarget());
-                    if (logsList == null) {
-                        logsList = new ArrayList();
-                        wgLogsByTarget.put(entry.getTarget(), logsList);
+                    if (_ddlVersion < WGDatabase.CSVERSION_WGA5) {
+	                    List logsList = (List) wgLogsByTarget.get(entry.getTarget());
+	                    if (logsList == null) {
+	                        logsList = new ArrayList();
+	                        wgLogsByTarget.put(entry.getTarget(), logsList);
+	                    }
+	                    logsList.add(newLog);
                     }
-                    logsList.add(newLog);
+                    
                 }
             }
             
@@ -2916,7 +2909,6 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                 
             }
             
-            
             return wgLogs;
         }
         catch (HibernateException e) {
@@ -2924,9 +2916,6 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
         }
 
     }
-
-
-
 
 
     protected WGUpdateLog readUpdateLog(LogEntry entry) {

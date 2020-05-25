@@ -23,15 +23,60 @@
  * If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
 
-package de.innovationgate.wgpublisher.lucene;
+package de.innovationgate.wga.config;
 
-import org.apache.lucene.document.Document;
+import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.Root;
 
-import de.innovationgate.webgate.api.WGContent;
-import de.innovationgate.webgate.api.WGException;
+@Root(strict=false)
+public class VirtualHostRedirect {
+    
+    @Attribute
+    @NotNull
+    private String path;
 
-public interface AttachmentAwareLuceneIndexEnhancer extends LuceneIndexEnhancer {
+    @Attribute
+    @NotNull
+    private String redirect;
+    
 
-    public void enhance(Document attachmentDoc, WGContent content, String filename) throws WGException;
+    @Attribute (required=false)
+    private boolean enabled=true;
 
+    @Attribute (required=false)
+    private boolean forward=false;
+
+    public VirtualHostRedirect() {
+    	forward=false;	// default
+    }
+    
+    public String getRedirect() {
+        return redirect;
+    }
+
+    public void setRedirect(String redirect) {
+        this.redirect = redirect;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+    
+    public void setForward(boolean forward){
+    	this.forward = forward;
+    }
+    public boolean isForward(){
+    	return forward;
+    }
+          
+    public void setEnabled(boolean enabled){
+    	this.enabled = enabled;
+    }
+    public boolean isEnabled(){
+    	return enabled;
+    }
 }

@@ -459,7 +459,7 @@ public class Job {
 			}
 		}
 		catch (JobCancelledException e) {
-		    logger.info("Job execution was cancelled");
+			setEndMessage("Job execution was cancelled");
 		}
 		catch (JobFailedException e) {
 		    logger.error("Job " + _name + " failed", e);

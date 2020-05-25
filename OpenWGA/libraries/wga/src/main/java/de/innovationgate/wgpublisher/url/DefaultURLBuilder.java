@@ -801,7 +801,6 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
                 
                 if (!db.isSessionOpen() ||
                         !db.getSessionContext().getUserAccess().mayAccessDirectly()) {
-                    _core.getLog().warn("App '" + db.getDbReference() + "': Internal login page '" + db.getAttribute(WGACore.DBATTRIB_LOGIN_PAGE) + "' cannot be used as the application is not directly accessible anonymously. Falling back to default login page");
                     url = DEFAULT_LOGIN_URL;
                 }
             }

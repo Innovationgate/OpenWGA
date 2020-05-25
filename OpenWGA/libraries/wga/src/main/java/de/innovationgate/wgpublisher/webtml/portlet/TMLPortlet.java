@@ -628,7 +628,7 @@ public class TMLPortlet implements TMLObject, Portlet {
         
         PortletEvent ev = this.tmlContext.createevent(eventName);
         for (Map.Entry<String,Object> param : params.entrySet()) {
-            ev.addParameter(param.getKey(), param.getValue());
+            ev.setParameter(param.getKey(), param.getValue());
         }
         fireevent(ev);
         

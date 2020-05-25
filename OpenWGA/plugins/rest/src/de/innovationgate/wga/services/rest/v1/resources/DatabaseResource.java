@@ -107,8 +107,8 @@ public class DatabaseResource extends EnvelopeReturningResource<RootResource> {
     @Path(CmsApiResource.RESOURCE_TYPE)
     public CmsApiResource getCmsApi() throws WGException {
 
-        if (!_database.db().isSessionOpen()) {
-            throw new WebApplicationException("You have no access to this database", 403);
+        if (!_database.db().isSessionOpen() || getAccessLevel()<WGDatabase.ACCESSLEVEL_AUTHOR) {
+            throw new WebApplicationException("You have no authoring access to this database", 403);
         }
         if (!isApiEnabled(CmsApiResource.RESOURCE_TYPE)) {
             throw new WebApplicationException("This REST API is not enabled for this database", 403);
@@ -312,7 +312,7 @@ public class DatabaseResource extends EnvelopeReturningResource<RootResource> {
     	
         if (_database.db().isSessionOpen()) {
             
-            if (_dbInfo.getEnabledRestAPIs().contains(CmsApiResource.RESOURCE_TYPE)) {
+            if (_dbInfo.getEnabledRestAPIs().contains(CmsApiResource.RESOURCE_TYPE) && getAccessLevel()>WGDatabase.ACCESSLEVEL_READER) {
                 refs.add(new ResourceReference(CmsApiResource.RESOURCE_TYPE, autoSuffix(getCmsApi().getURI()), CmsApiResource.RESOURCE_TYPE));
             }
             

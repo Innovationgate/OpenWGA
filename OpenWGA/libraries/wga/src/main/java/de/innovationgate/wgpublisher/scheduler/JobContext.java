@@ -177,6 +177,9 @@ public class JobContext {
     public void setEndMessage(String msg){
     	_currentJob.setEndMessage(msg);
     }
+    public String getEndMessage(){
+    	return _currentJob.getEndMessage();
+    }
 
     /**
      * Returns the object representing the current task

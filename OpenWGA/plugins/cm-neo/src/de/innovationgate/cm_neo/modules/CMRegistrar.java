@@ -24,6 +24,7 @@
  ******************************************************************************/
 
 package de.innovationgate.cm_neo.modules;
+
 import de.innovationgate.wga.modules.ModuleRegistrar;
 import de.innovationgate.wga.modules.ModuleRegistry;
 
@@ -31,6 +32,7 @@ public class CMRegistrar implements ModuleRegistrar {
 
     public void registerModules(ModuleRegistry registry) {
         registry.addModuleDefinition(new CMHtmlHeadInclusionModuleDefinition());
+        registry.addModuleDefinition(new CMResourceAccessFilterModuleDefinition());
     }
 
 }

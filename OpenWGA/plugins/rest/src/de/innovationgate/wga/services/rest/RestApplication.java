@@ -223,6 +223,7 @@ public class RestApplication extends ResourceConfig implements WGACoreEventListe
     private String _encoding;
     private Map<String,DatabaseInfo> _databaseInfo = new HashMap<String, RestApplication.DatabaseInfo>();
     private boolean _serviceEnabled;
+    
     public Map<String, DatabaseInfo> getDatabaseInfo() {
         return _databaseInfo;
     }

@@ -1970,6 +1970,8 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
 
     private List<WGContentEventListener> contentEventListeners = new CopyOnWriteArrayList<WGContentEventListener>();
 
+    private List<WGDocumentEventListener> documentEventListeners = new CopyOnWriteArrayList<WGDocumentEventListener>();
+
     private List<WGWorkflowEventListener> workflowEventListeners = new CopyOnWriteArrayList<WGWorkflowEventListener>();
     
     private List<WGFileAnnotator> fileAnnotators = new CopyOnWriteArrayList<WGFileAnnotator>();
@@ -3186,6 +3188,7 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         // + look if we need to clear the query cache
         if (document instanceof WGContent) {
             WGContent content = (WGContent) document;
+
             content.removeAllIncomingRelations();
             if (content.getRetrievalStatus().equals(WGContent.STATUS_RELEASE)) {
                 dropQueryCache = true;
@@ -3782,6 +3785,19 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
     }
 
     /**
+     * Adds a listener for content events to the database.
+     * 
+     * @param listener
+     */
+    public void addDocumentEventListener(WGDocumentEventListener listener) {
+
+        if (!documentEventListeners.contains(listener)) {
+            this.documentEventListeners.add(listener);
+        }
+
+    }
+
+    /**
      * Adds a listener for workflow events to the database
      * 
      * @param listener
@@ -3811,9 +3827,14 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
      * Removes a content event listener.
      */
     public void removeContentEventListener(WGContentEventListener listener) {
-
         this.contentEventListeners.remove(listener);
+    }
 
+    /**
+     * Removes a content event listener.
+     */
+    public void removeDocumentEventListener(WGDocumentEventListener listener) {
+        this.documentEventListeners.remove(listener);
     }
 
     /**
@@ -3881,6 +3902,21 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
             }
         }
         
+    }
+
+    protected void fireDocumentEvent(WGDocumentEvent event) throws WGAPIException {
+
+    	if (!isSessionOpen()) {
+            throw new WGClosedSessionException();
+        }
+
+        if (!getSessionContext().isEventsEnabled()) {
+            return;
+        }
+    	
+        for(WGDocumentEventListener listener: documentEventListeners){
+        	listener.handleEvent(event);
+        }
     }
 
     protected boolean fireContentEvent(WGContentEvent event) throws WGAPIException {
@@ -7038,7 +7074,12 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         
         // Fire event "content has been moved" for each and every influenced content
         processMovedDocuments(entry, true);        
-        
+
+        updateRevision(WGDatabaseRevision.forValue(getCore().getRevision()));
+
+        WGDocumentEvent event = new WGDocumentEvent(WGDocumentEvent.TYPE_MOVED, entry.getDocumentKeyObj());
+        fireDocumentEvent(event);
+
         return true;
 
     }

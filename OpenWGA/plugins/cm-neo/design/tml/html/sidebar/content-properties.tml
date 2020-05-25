@@ -116,17 +116,19 @@
 					</div>
 				{{/pagename}}
 				
-				{{#pagereaders.length}}
+				{{#readprotected}}
 					<div class="form-group" style="color:red">
-						<label>Leser</label>
-						<p class="data">
-						{{#pagereaders}}
-							{{name}}<br>
-						{{/pagereaders}}
-						</p>
+						<label>Lesbarkeit eingeschränkt</label>
+						{{#pagereaders.length}}
+							<p class="data">
+							{{#pagereaders}}
+								{{name}}<br>
+							{{/pagereaders}}
+							</p>
+						{{/pagereaders.length}}
 					</div>
-				{{/pagereaders.length}}
-				
+				{{/readprotected}}
+
 				{{#pagepublished}}
 					<div class="form-group">
 						<label>Veröffentlicht seit</label>

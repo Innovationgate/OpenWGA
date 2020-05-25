@@ -41,6 +41,7 @@
 			}
 
 			var url = context(_image.context).fileurl(file);
+			var url_lightbox = WGA.urlBuilder(url).setParameter("derivate", "usage=poster").build();
 			var url_tn = WGA.urlBuilder(url).setParameter("derivate", "usage=poster,width~320").build();
 			
 			var i = parseInt((taginfo('img-loop','iteration')-1)/_count)
@@ -49,6 +50,7 @@
 			_image_rows[i].push({
 				title: metas.title || file,
 				url: url,
+				url_lightbox: url_lightbox,
 				url_tn: url_tn,
 				width: scaler.width,
 				height: scaler.height 
@@ -63,7 +65,8 @@
 					<img src="<tml:script expression="_image.url_tn"/>"
 						title="<tml:script expression="_image.title"/>"
 						alt="<tml:script expression="_image.title"/>"
-						data-image-url="<tml:script expression="_image.url"/>"
+						data-image-url="<tml:script expression="_image.url_lightbox"/>"
+						data-image-download-url="<tml:script expression="_image.url"/>"
 						data-width="<tml:script expression="String(_image.width)"/>"
 						data-height="<tml:script expression="String(_image.height)"/>"
 						style="max-width:<tml:script expression="String(_image.width)"/>px !important;

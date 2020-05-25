@@ -40,7 +40,6 @@
 </tml:action>
 
 <tml:action id="moveFilterUp">
-	log.info("move up: " + tmlparam1);
 	var config = DBM.wgaconfig.clone();
 	var filters = config.filterMappings
 	var idx = tmlparam1-1;
@@ -51,7 +50,6 @@
 </tml:action>
 
 <tml:action id="moveFilterDown">
-	log.info("move down: " + tmlparam1);
 	var config = DBM.wgaconfig.clone();
 	var filters = config.filterMappings
 	var idx = tmlparam1-1;
@@ -59,6 +57,11 @@
 	filters.remove(idx)
 	filters.add(idx+1, filter)
 	DBM.wgaconfig.save(config);
+</tml:action>
+
+<tml:action id="reload-servlet-filter">
+	WGA.Core.getFilter().initFilterChain()
+	_server_message =  "Filter chain reinitialized";
 </tml:action>
 
 <tml:include designdb="@ui" ref="tabview_dynamic">
@@ -79,6 +82,15 @@
 								WGA.ajax.callAction("<tml:action ref="newFilter"/>","<tml:script expression="portlet.portletkey"/>");
 							}
 						}
+						,"->"
+						,{
+							cls:'x-btn-text-icon',						
+							icon: '<tml:url type="file" db="@afw" doc="icons" file="arrow_switch.png"/>',		                
+							text: "Re-Init Servlet Filter Chain",
+							handler: function(){
+								WGA.ajax.callAction("<tml:action ref="reload-servlet-filter"/>","<tml:script expression="portlet.portletkey"/>");
+							}
+						}
 					]
 				</tml:option>
 			
@@ -87,6 +99,12 @@
 				</tml:option>
 				
 				<tml:option name="body">
+
+					<tml:case isdefined="_server_message">
+						<tml:include designdb="@ui" ref="message">
+							<tml:option name="title"><tml:item name="_server_message"/></tml:option>
+						</tml:include>			
+					</tml:case>
 
 					<tml:script>
 						_filters = DBM.wgaconfig.get().filterMappings

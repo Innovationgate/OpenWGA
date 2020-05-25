@@ -3376,6 +3376,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             String debug = System.getProperty(SYSPROPERTY_DEBUG);
             if (debug != null) {
                 for (String target : WGUtils.deserializeCollection(debug, ",", true)) {
+                	log.info("Set log level DEBUG for Logger " + target);
                     Logger logger = Logger.getLogger(target);
                     logger.setLevel(Level.DEBUG);
                 }
@@ -4202,7 +4203,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             this.configFileLastModified = this.configFile.lastModified();
             parseConfigFile();
             adaptWGAConfigurationToVersion();
-                
+            
             initQuartz();
             _deployer.startup();
             _calledSequenceIds = CacheFactory.createCache("WGACore_calledSequenceIds", 10000, null);
@@ -6866,12 +6867,15 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             }
 
             // Initialize title path url manager
-            try {
-                TitlePathManager titlePathManager = new TitlePathManager(db, this, db.getBooleanAttribute(DBATTRIB_TITLEPATHURL, false));
-                db.setAttribute(DBATTRIB_TITLEPATHMANAGER, titlePathManager);
-            }
-            catch (Exception e) {
-                getLog().error("Error initializing title path manager for database " + db.getDbReference(), e);
+            boolean allowPublishing = db.getBooleanAttribute(WGACore.DBATTRIB_ALLOW_PUBLISHING, true);
+            if(allowPublishing){
+	            try {
+	                TitlePathManager titlePathManager = new TitlePathManager(db, this, db.getBooleanAttribute(DBATTRIB_TITLEPATHURL, false));
+	                db.setAttribute(DBATTRIB_TITLEPATHMANAGER, titlePathManager);
+	            }
+	            catch (Exception e) {
+	                getLog().error("Error initializing title path manager for database " + db.getDbReference(), e);
+	            }
             }
             
             // Determine language behaviour

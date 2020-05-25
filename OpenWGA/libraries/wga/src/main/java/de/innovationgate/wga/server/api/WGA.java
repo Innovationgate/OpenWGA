@@ -60,6 +60,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import de.innovationgate.utils.CountReportingIterator;
@@ -1145,6 +1146,27 @@ public class WGA {
     }
 
     /**
+     * encrypts a String
+     * @param text
+     * @return encrytped String
+     * @throws GeneralSecurityException
+     * @throws UnsupportedEncodingException
+     */
+    public String encryptString(String text) throws GeneralSecurityException, UnsupportedEncodingException{
+    	return getCore().getSymmetricEncryptionEngine().encryptBase64Web(text.getBytes("UTF-8"));
+    }
+    /**
+     * decrypts a string
+     * @param secret
+     * @return the decrypted string
+     * @throws GeneralSecurityException
+     * @throws IOException
+     */
+    public String decryptString(String secret) throws GeneralSecurityException, IOException{
+    	return new String(getCore().getSymmetricEncryptionEngine().decryptBase64Web(secret), "UTF-8");
+    }
+    
+    /**
      * Serializes an object to an encrypted string
      * The resulting string is a representation of the given object as string which is compressed as well as encrypted. It works with trivial data objects like {@link String}, {@link Number}, {@link Boolean} or {@link Date}, also with {@link List}, {@link Map} or JavaBeans containing those type of objects.
      * Uses this function to either use complex objects on places that only allow strings (for example on WebTML action parameters) or to prevent any data from being manipulated by the browser user when it needs to be transported to and returned from the browser.
@@ -1175,9 +1197,9 @@ public class WGA {
     public Object deserializeObject(String encrypted) throws WGException {        
         try {
             byte[] zipped = getCore().getSymmetricEncryptionEngine().decryptBase64Web(encrypted);
-        if (zipped == null) {
-            throw new IllegalArgumentException("Undecryptable serialized object");
-        }
+	        if (zipped == null) {
+	            throw new IllegalArgumentException("Undecryptable serialized object");
+	        }
         
             String xml = WGUtils.unzipString(zipped);
             Object obj = getCore().getLibraryXStream().fromXML(xml);
@@ -1977,7 +1999,10 @@ public class WGA {
      * @throws IOException
      */
     public void redirectTo(String url) throws WGException, IOException {
-        ((TMLContext) tmlcontext()).redirectto(url);
+    	if(isIsolated()){
+    		getLog().error("WGA.redirectTo() called in isolated environment. No request/response availabe.");
+    	}
+    	else ((TMLContext) tmlcontext()).redirectto(url);
     }
     
     /**
@@ -3363,6 +3388,36 @@ public class WGA {
     public WGATempFile TempFile(String filename) throws IOException{
     	return new WGATempFile(this, filename);
     }
- 
+     
+    public WGALogger Logger(String name){
+    	return new WGALogger("wga."+name);
+    }
+   
+    public class WGALogger{
+    	
+    	Logger logger;
+
+		public WGALogger(String name){
+    		logger = Logger.getLogger(name);
+    	}
+    	
+    	public WGALogger setLevel(String level){
+    		if(level.equalsIgnoreCase("debug"))
+    			logger.setLevel(Level.DEBUG);
+    		if(level.equalsIgnoreCase("info"))
+    			logger.setLevel(Level.INFO);
+    		if(level.equalsIgnoreCase("warn"))
+    			logger.setLevel(Level.WARN);
+    		if(level.equalsIgnoreCase("error"))
+    			logger.setLevel(Level.ERROR);
+    		return this;
+    	}
+
+        public Logger getLogger(){
+        	return logger;
+        }
+    	
+    }
+    
 }
  

@@ -1,7 +1,10 @@
 function Renderer() {}
 
-Renderer.prototype.render = function($urlParam_context, $urlParam_query, $urlParam_pagesize, $urlParam_page) {
+Renderer.prototype.render = function($urlParam_dbkey, $urlParam_context, $urlParam_query, $urlParam_pagesize, $urlParam_page) {
 
+	if(!$urlParam_dbkey)
+		return;		// access denied 
+		
 	var json = {
 		results: [],
 		pagination: {

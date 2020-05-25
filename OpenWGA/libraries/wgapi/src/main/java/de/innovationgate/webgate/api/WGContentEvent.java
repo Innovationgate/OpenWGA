@@ -58,7 +58,6 @@ public class WGContentEvent {
      */
     public static final int TYPE_STATUSCHANGED = 6;
 
-	
 	private String _documentKey;
 
 	private int _type;
@@ -117,7 +116,7 @@ public class WGContentEvent {
             return _content;
         }
         else if (getType() != TYPE_CREATED) {
-            return (WGContent) getDatabase().getDocumentByDocumentKey(getDocumentKey());
+            return (WGContent) getDatabase().getDocumentByKey(getDocumentKey());
         }
         else {
             return null;

@@ -340,7 +340,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     private final Semaphore _indexSearcherSemaphore = new Semaphore(MAX_CONCURRENT_SEARCHES, true);
 
     private Map<String, List<LuceneIndexEnhancer>> _indexEnhancers = new HashMap<String, List<LuceneIndexEnhancer>>();
-    
+    private AnalyzerSelectingLuceneIndexEnhancer _analyzerSelectingEnhancer = null;
 	
     /**
      * info bean for an indexing run
@@ -725,6 +725,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             }
         }
         _indexEnhancers.remove(db);
+        _analyzerSelectingEnhancer = null;
         
         enhancers = new ArrayList<LuceneIndexEnhancer>();
         ContentStore dbConfig = _core.getWgaConfiguration().getContentStore(db.getDbReference());
@@ -735,11 +736,20 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                 while (enhancerClassNames.hasNext()) {
                     String enhancerClassName = enhancerClassNames.next();
                     try {
-                        Class enhancerClass = Class.forName(enhancerClassName, true, _core.getLibraryLoader());
+                        Class<?> enhancerClass = Class.forName(enhancerClassName, true, WGACore.getLibraryLoader());
                         if (enhancerClass != null) {
                             LuceneIndexEnhancer enhancer = (LuceneIndexEnhancer)enhancerClass.newInstance();
                             enhancer.init(_core, db);
                             enhancers.add(enhancer);
+                            if(enhancer instanceof AnalyzerSelectingLuceneIndexEnhancer){
+                            	if(_analyzerSelectingEnhancer!=null){
+                            		LOG.warn("More than one AnalyzerSelectingLuceneIndexEnhancer configured. Ignoring " + enhancerClassName);
+                            	}
+                            	else{
+                            		_analyzerSelectingEnhancer = (AnalyzerSelectingLuceneIndexEnhancer)enhancer;
+                            		LOG.info(enhancerClassName + " configured as AnalyzerSelectingLuceneIndexEnhancer for database '" + db.getDbReference() + "'");
+                            	}
+                            }
                             LOG.info("LuceneIndexEnhancer '" + enhancerClassName + "' successfully initialized for database '" + db.getDbReference() + "'.");
                         }
                     }
@@ -857,14 +867,14 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     
     private void addAdditionRequest(IndexingRequest request) {
         synchronized (_indexingRequestLock) {
-        // add to list and set service status running for DB
+        	// 	add to list and set service status running for DB
             Queue<IndexingRequest> requests = _additionRequestsMap.get(request.getDbkey());
-        if (requests == null) {
-        	requests = new ConcurrentLinkedQueue<LuceneManager.IndexingRequest>();
-            _additionRequestsMap.put(request.getDbkey(), requests);
-        }        
-        requests.add(request);     
-    }
+	        if (requests == null) {
+	        	requests = new ConcurrentLinkedQueue<LuceneManager.IndexingRequest>();
+	            _additionRequestsMap.put(request.getDbkey(), requests);
+	        }        
+	        requests.add(request);     
+	    }
     }
 
     private void addDBUpdateRequest(IndexingRequest request) {
@@ -942,7 +952,15 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
      * @return configured lucene analyzer for content language or default analyzer
      * @throws WGAPIException 
      */
-    public Analyzer retrieveAnalyzer(WGContent content) throws WGAPIException {            
+    public Analyzer retrieveAnalyzer(WGContent content) throws WGAPIException {
+    	
+    	// if we have a custom analyzerSelectingEnhancer he may want to do the job
+    	if(_analyzerSelectingEnhancer!=null){
+    		Analyzer analyzer = _analyzerSelectingEnhancer.getAnalyzer(content);
+    		if(analyzer!=null)
+    			return analyzer;
+    	}
+    	
         String langCode = content.getLanguage().getName();
         Analyzer analyzer = null;
         if (langCode != null) {

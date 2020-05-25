@@ -196,7 +196,11 @@ public class Scheduler {
 	public Job getJob(String name) {
 		return (Job) _jobs.get(name);
 	}
-	
+
+	public Map<String,Job> getJobs() {
+		return _jobs;
+	}
+
 	public void run(String name, String executor, Map<String,Object> customOptions, JobExecutionContext quartzContext) throws JobFailedException {
 		run(name, executor, customOptions, quartzContext, null);
 	}

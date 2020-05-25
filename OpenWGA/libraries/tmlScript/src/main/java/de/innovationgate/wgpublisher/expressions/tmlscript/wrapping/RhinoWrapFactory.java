@@ -24,6 +24,7 @@
  ******************************************************************************/
 package de.innovationgate.wgpublisher.expressions.tmlscript.wrapping;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -57,7 +58,7 @@ public class RhinoWrapFactory extends WrapFactory {
     
     private Map<Class<?>,WrapMethod<? extends Object>> _wrapMethods = new HashMap<Class<?>, RhinoWrapFactory.WrapMethod<?>>();
     
-    public RhinoWrapFactory() {
+	public RhinoWrapFactory() {
 
         setJavaPrimitiveWrap(false);
         _wrapMethods.put(TMLContext.class, new WrapMethod<TMLContext>() {
@@ -98,9 +99,19 @@ public class RhinoWrapFactory extends WrapFactory {
 
         _wrapMethods.put(HashMap.class, new WrapMethod<HashMap>() {
 
-            @Override
+			@Override
             public Scriptable wrap(Object obj, Scriptable scope) {
                 return new MapWrapper(scope, (HashMap) obj);
+            }
+            
+        });
+
+        _wrapMethods.put(ArrayList.class, new WrapMethod<ArrayList<Object>>() {
+
+            @SuppressWarnings("unchecked")
+			@Override
+            public Scriptable wrap(Object obj, Scriptable scope) {
+                return new ListWrapper(scope, (ArrayList<Object>) obj);
             }
             
         });

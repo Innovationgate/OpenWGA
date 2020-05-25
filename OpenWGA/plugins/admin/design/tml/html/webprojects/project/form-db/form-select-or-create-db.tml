@@ -59,7 +59,7 @@
 		}
 	}
 	catch(e){
-		tmlform.addMessage(e.message);
+		_server_message = "Error creating database:<br>" + e.message;
 		logException(e);
 	}
 </tml:action>
@@ -92,7 +92,13 @@
 	<tml:option name="title">Select or Create Database on selected Server</tml:option>	
 
 	<tml:inline name="body">
-		<div id="create-db" style="display:none">		
+
+		<tml:include designdb="@ui" ref="message" if="_server_message">
+			<tml:option name="title"><tml:item name="_server_message"/></tml:option>
+		</tml:include>			
+
+		<div id="create-db" style="display:none">
+
 			<tml:include ref="::subform-path-options"  o_ns="modal.createDatabase"/>
 			<div class="data">		
 				<tml:button clickaction="createDbOnServer" param1="{option('dbServer')}" param2="{option('implClassName')}" ajax="true">Create database now</tml:button>		

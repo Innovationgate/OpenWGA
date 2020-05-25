@@ -45,7 +45,7 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 			
 			.find("[data-action='create-draft']")[ev.params.may_edit_content ? "removeClass":"addClass"]("disabled")
 			.end()
-			.find("[data-action='content-modules']")[ev.params.status && Sitepanel.getWindow().WGA.CMM.hasSections ? "removeClass" : "addClass"]("disabled")
+			.find("[data-action='content-modules']")[ev.params.status && Sitepanel.getWindow().WGA.CMM && Sitepanel.getWindow().WGA.CMM.hasSections ? "removeClass" : "addClass"]("disabled")
 			.end()
 			.find("[data-action='seo']")[ev.params.status ? "removeClass" : "addClass"]("disabled")
 			.end()

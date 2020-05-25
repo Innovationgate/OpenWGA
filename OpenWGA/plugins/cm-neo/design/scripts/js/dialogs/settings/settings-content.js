@@ -20,7 +20,8 @@ define(["jquery", "cm", "select2"], function($, CM){
 		                query: params.term, // search term
 		                page: params.page||1,
 		                pagesize: 25,
-		                context: $("#form-settings").data("context")
+		                context: $("#form-settings").data("context"),
+		                dbkey: $("#form-settings").data("dbkey")	// used for resource-access-filter
 		            };
 		        }/*,
 		        results: function (data, page) {

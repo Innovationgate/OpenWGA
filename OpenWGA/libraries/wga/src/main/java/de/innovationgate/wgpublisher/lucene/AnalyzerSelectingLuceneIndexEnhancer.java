@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+ * Copyright 2009, 2020 Innovation Gate GmbH. All Rights Reserved.
  * 
  * This file is part of the OpenWGA server platform.
  * 
@@ -25,13 +25,13 @@
 
 package de.innovationgate.wgpublisher.lucene;
 
-import org.apache.lucene.document.Document;
+import org.apache.lucene.analysis.Analyzer;
 
+import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGContent;
-import de.innovationgate.webgate.api.WGException;
 
-public interface AttachmentAwareLuceneIndexEnhancer extends LuceneIndexEnhancer {
+public interface AnalyzerSelectingLuceneIndexEnhancer extends LuceneIndexEnhancer {
 
-    public void enhance(Document attachmentDoc, WGContent content, String filename) throws WGException;
+    public Analyzer getAnalyzer(WGContent content) throws WGAPIException;
 
 }

@@ -5,7 +5,7 @@ plugins {
   id 'nebula.ospackage' version '3.4.0'
 }
 
-def linuxDistros = ['lenny', 'hardy', 'lucid', 'squeeze', 'precise', 'trusty', 'wheezy', 'xenial']
+def linuxDistros = ['lenny', 'hardy', 'lucid', 'squeeze', 'precise', 'trusty', 'wheezy', 'xenial', 'bionic']
 
 configurations {
     server

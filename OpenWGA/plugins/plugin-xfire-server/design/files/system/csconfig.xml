@@ -14,10 +14,10 @@
       <uniqueName>de.innovationgate.xfire-server</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>7</minorVersion>
-        <maintenanceVersion>6</maintenanceVersion>
+        <minorVersion>8</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>691</buildVersion>
+        <buildVersion>692</buildVersion>
       </version>
     </id>
     <title>OpenWGA xFire Server</title>

@@ -408,10 +408,17 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 					"intfile": "Internes Bild",
 					"extfile": "Bild aus anderem Dokument",
 					"undefined": "Undefiniert"
-				}				
-				$("#editor-panel-rtf [data-id=image-type]").html(types[info.type||"undefined"])
-				if(info.type=="exturl")
-					$("#editor-panel-rtf [data-id=image-info]").html($(el).prop("src"))
+				}
+				var type = types[info.type||"undefined"]
+				
+				if(info.type=="exturl"){
+					var src = $(el).prop("src")
+					if(src.indexOf("data:")==0){
+						type = "Eingebettete Bilddaten";
+						src="";
+					}
+					$("#editor-panel-rtf [data-id=image-info]").html(src)
+				}
 				else if(info.type=="intfile")
 					$("#editor-panel-rtf [data-id=image-info]").html(info.key)
 				else if(info.type=="extfile"){
@@ -420,6 +427,7 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 					$("#editor-panel-rtf [data-id=image-info]").html(filename)
 				}
 				else $("#editor-panel-rtf [data-id=image-info]").html("")
+				$("#editor-panel-rtf [data-id=image-type]").html(type)
 			}
 			else{
 				$("#rtf-tab-image [data-action=edit-image]").hide()
