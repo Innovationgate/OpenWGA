@@ -340,7 +340,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     private final Semaphore _indexSearcherSemaphore = new Semaphore(MAX_CONCURRENT_SEARCHES, true);
 
     private Map<String, List<LuceneIndexEnhancer>> _indexEnhancers = new HashMap<String, List<LuceneIndexEnhancer>>();
-    private AnalyzerSelectingLuceneIndexEnhancer _analyzerSelectingEnhancer = null;
+    private Map<String,AnalyzerSelectingLuceneIndexEnhancer> _analyzerSelectingEnhancer = new HashMap<String, AnalyzerSelectingLuceneIndexEnhancer>();
 	
     /**
      * info bean for an indexing run
@@ -724,8 +724,9 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                 }
             }
         }
-        _indexEnhancers.remove(db);
-        _analyzerSelectingEnhancer = null;
+        _indexEnhancers.remove(db.getDbReference());
+        _analyzerSelectingEnhancer.remove(db.getDbReference());;
+        AnalyzerSelectingLuceneIndexEnhancer analyzerSelectingEnhancer = null;
         
         enhancers = new ArrayList<LuceneIndexEnhancer>();
         ContentStore dbConfig = _core.getWgaConfiguration().getContentStore(db.getDbReference());
@@ -742,11 +743,12 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                             enhancer.init(_core, db);
                             enhancers.add(enhancer);
                             if(enhancer instanceof AnalyzerSelectingLuceneIndexEnhancer){
-                            	if(_analyzerSelectingEnhancer!=null){
+                            	if(analyzerSelectingEnhancer!=null){
                             		LOG.warn("More than one AnalyzerSelectingLuceneIndexEnhancer configured. Ignoring " + enhancerClassName);
                             	}
                             	else{
-                            		_analyzerSelectingEnhancer = (AnalyzerSelectingLuceneIndexEnhancer)enhancer;
+                            		analyzerSelectingEnhancer = (AnalyzerSelectingLuceneIndexEnhancer)enhancer;
+                            		_analyzerSelectingEnhancer.put(db.getDbReference(), analyzerSelectingEnhancer);
                             		LOG.info(enhancerClassName + " configured as AnalyzerSelectingLuceneIndexEnhancer for database '" + db.getDbReference() + "'");
                             	}
                             }
@@ -955,8 +957,10 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     public Analyzer retrieveAnalyzer(WGContent content) throws WGAPIException {
     	
     	// if we have a custom analyzerSelectingEnhancer he may want to do the job
-    	if(_analyzerSelectingEnhancer!=null){
-    		Analyzer analyzer = _analyzerSelectingEnhancer.getAnalyzer(content);
+    	String dbkey = content.getDatabase().getDbReference();
+    	AnalyzerSelectingLuceneIndexEnhancer enhancer = _analyzerSelectingEnhancer.get(dbkey); 
+    	if(enhancer!=null){
+    		Analyzer analyzer = enhancer.getAnalyzer(content);
     		if(analyzer!=null)
     			return analyzer;
     	}
