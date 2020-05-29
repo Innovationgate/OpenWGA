@@ -4,7 +4,6 @@
 	request.getSession().removeAttribute(WGAcore.ATTRIB_VIRTUAL_CONTENT_URL);
 	request.getSession().removeAttribute(WGAcore.ATTRIB_NO_CONTENT_NOTIFCATION_URL);
 	request.getSession().removeAttribute("CM.appid");
-	request.getSession().removeAttribute(Packages.de.innovationgate.cm_neo.filter.ResourceAccessFilter.SESSION_ATTRIB_EDITABLE_DATABASES);	
 	
 	WGA.app(portlet.dbkey).domain().auth().logout()
 	
@@ -25,13 +24,6 @@
 	
 		var url = WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL()).build();
 		request.getSession().setAttribute(wgacore.ATTRIB_NO_CONTENT_NOTIFCATION_URL, url + "?dbkey=#DBKEY#&contentkey=#KEY#");
-
-		var dbkeys = request.getSession().getAttribute(Packages.de.innovationgate.cm_neo.filter.ResourceAccessFilter.SESSION_ATTRIB_EDITABLE_DATABASES);
-		if(!dbkeys)
-			dbkeys=WGA.createList()
-		if(!dbkeys.contains(portlet.dbkey))
-			dbkeys.add(portlet.dbkey)
-		request.getSession().setAttribute(Packages.de.innovationgate.cm_neo.filter.ResourceAccessFilter.SESSION_ATTRIB_EDITABLE_DATABASES, dbkeys);	
 
 		var app = WGA.app(portlet.dbkey);
 		var auth = app.domain().auth()
