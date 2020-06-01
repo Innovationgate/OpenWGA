@@ -481,6 +481,9 @@ public class Call {
      * @return
      * @throws WGException
      */
+    public Cookie createCookie(String name) throws WGException {
+    	return createCookie(name, null, -1);
+    }
     public Cookie createCookie(String name, String value) throws WGException {
     	return createCookie(name, value, -1);
     }
@@ -516,7 +519,7 @@ public class Call {
         getJavaResponse().addCookie(c.toJavaCookie());
         fetchCookies().put(c.getName(), c);
     }
-    
+
     /**
      * Adds a new cookie to the call, so it will be send to the client.
      * This is a shortcut for calling {@link #createCookie(String, String)}
@@ -531,7 +534,7 @@ public class Call {
         Cookie c = createCookie(name, value);
         addCookie(c);
     }
-    
+
     private void testResponseHeaderWritable() throws WGException {
         if (getJavaResponse().isCommitted()) {
             throw new WGAServerException("The current environment cannot influence HTTP response headers");

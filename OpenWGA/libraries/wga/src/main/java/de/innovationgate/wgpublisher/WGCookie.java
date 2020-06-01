@@ -65,6 +65,7 @@ import de.innovationgate.utils.WGUtils;
 public class WGCookie extends Cookie {
 
     private boolean _httpOnly = true;
+    private String _sameSite = "Strict";
     
     public static final DateFormat EXPIRES_FORMAT = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss z");
     static {
@@ -81,6 +82,13 @@ public class WGCookie extends Cookie {
 
     public void setHttpOnly(boolean httpOnly) {
         _httpOnly = httpOnly;
+    }
+    
+    public String getSameSite(){
+    	return _sameSite;
+    }
+    public void setSameSite(String value){
+    	_sameSite = value;
     }
     
     public String buildSetCookieHeader() {
@@ -108,6 +116,7 @@ public class WGCookie extends Cookie {
         if (isHttpOnly()) {
             parts.add("HttpOnly");
         }
+        parts.add("SameSite=" + getSameSite()); 
         
         return WGUtils.serializeCollection(parts, "; ");
     }

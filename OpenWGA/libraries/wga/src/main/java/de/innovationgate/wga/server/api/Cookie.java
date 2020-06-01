@@ -25,7 +25,17 @@
 
 package de.innovationgate.wga.server.api;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Map;
+
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.binary.Base64;
+
+import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.common.CodeCompletion;
+import de.innovationgate.wgpublisher.WGACore;
+import de.innovationgate.wgpublisher.WGCookie;
 
 /**
  * Represents an HTTP cookie
@@ -33,6 +43,9 @@ import de.innovationgate.wga.common.CodeCompletion;
 @CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
 public class Cookie {
 
+	public static String BASE64 = "base64";
+	public static String HEX = "hex";
+	
     private String _name;
     private String _path;
     private String _value;
@@ -40,6 +53,7 @@ public class Cookie {
     private int _maxAge = -1;
     private boolean _secure = false;
     private boolean _fromClient = false;
+    private String _sameSite = "Strict";
 
     public Cookie(javax.servlet.http.Cookie c) {
         _name = c.getName();
@@ -52,6 +66,13 @@ public class Cookie {
     }
     
     protected Cookie() {
+    }
+
+    public String getSameSite(){
+    	return _sameSite;
+    }
+    public void setSameSite(String value){
+    	_sameSite = value;
     }
 
     public String getName() {
@@ -70,6 +91,28 @@ public class Cookie {
         return _value;
     }
 
+    public String getValue(String decode) throws UnsupportedEncodingException, DecoderException {
+    	if(decode.equalsIgnoreCase(HEX))
+    		return new String(Hex.decodeHex(_value.toCharArray()), "UTF-8");
+    	else if(decode.equalsIgnoreCase(BASE64))
+    		return new String(Base64.decodeBase64(_value), "UTF-8");
+    	else throw(new UnsupportedEncodingException());
+    }
+    
+    public Cookie setValue(String value) {
+        _value = value;
+        return this;
+    }
+
+    public Cookie setValue(String value, String encode) throws UnsupportedEncodingException {
+    	if(encode.equalsIgnoreCase(HEX))
+    		_value = Hex.encodeHexString(value.getBytes("UTF-8"));
+    	else if(encode.equalsIgnoreCase(BASE64))
+    		_value = Base64.encodeBase64URLSafeString(value.getBytes("UTF-8"));
+    	else throw(new UnsupportedEncodingException());
+        return this;
+    }
+
     public int getMaxAge() {
         return _maxAge;
     }
@@ -82,28 +125,29 @@ public class Cookie {
         return _maxAge != -1;        
     }
 
-    public void setName(String name) {
+    public Cookie setName(String name) {
         _name = name;
+        return this;
     }
 
-    public void setDomain(String domain) {
+    public Cookie setDomain(String domain) {
         _domain = domain;
+        return this;
     }
 
-    public void setPath(String path) {
+    public Cookie setPath(String path) {
         _path = path.isEmpty() ? "/" : path;
+        return this;
     }
 
-    public void setValue(String value) {
-        _value = value;
-    }
-
-    public void setMaxAge(int maxAge) {
+    public Cookie setMaxAge(int maxAge) {
         _maxAge = maxAge;
+        return this;
     }
 
-    public void setSecure(boolean secure) {
+    public Cookie setSecure(boolean secure) {
         _secure = secure;
+        return this;
     }
     
     protected javax.servlet.http.Cookie toJavaCookie() {
@@ -123,4 +167,18 @@ public class Cookie {
         return _fromClient;
     }
 
+    public void write() throws WGException{
+    	WGA wga = WGA.get();
+        WGCookie wgcookie = new WGCookie(getName(), getValue());
+        wgcookie.setPath(getPath());
+        wgcookie.setDomain(getDomain());
+        wgcookie.setSameSite(getSameSite());
+        wgcookie.setSecure(isSecure());
+        wgcookie.setMaxAge(getMaxAge());        
+        wgcookie.addCookieHeader(wga.getResponse());
+        @SuppressWarnings("unchecked")
+		Map<String,Cookie> cookies = (Map<String,Cookie>) wga.getRequest().getAttribute(WGACore.ATTRIB_COOKIES);
+        cookies.put(getName(), this);
+    }
+    
 }
