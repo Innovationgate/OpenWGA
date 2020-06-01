@@ -22,6 +22,13 @@
 ## along with OpenWGA in file COPYING.
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
+
+<tml:action id="clearHttpSessionManagerOptions">
+	_config_bean = DBM.getConfigBean();
+	_config_bean.getHttpSessionManagerConfiguration().options.clear();
+	DBM.tmlform.removeFields("/httpSessionManagerConfiguration/options");
+</tml:action>
+
 <tml:script>
 	_opts = DBM.getModReg().getModulesForType(Packages.de.innovationgate.wga.modules.types.WGAServerOptionsModuleType)	
 	_caths = _opts.keySet();	
@@ -50,3 +57,73 @@
 	</fieldset>
 
 </tml:foreach>
+
+<fieldset>
+	<legend>HTTP Session Management</legend>
+
+		<tml:script>
+			var types_map = DBM.getModReg().getModulesForType(Packages.de.innovationgate.wga.modules.types.HttpSessionManagerModuleType); 
+			var types = types_map.keySet().iterator();
+			
+			_classes = WGA.createList();	
+			
+			var currentValue = DBM.getConfigBean().getHttpSessionManagerConfiguration().implClassName;
+			var match = false;
+			
+			while(types.hasNext()){
+				var type = types.next();
+				if	(currentValue==type) {
+					match=true;
+				}
+				_classes.add(types_map.get(type).getTitle(DBM.locale) + "|" + type);
+			}	
+			
+			if(currentValue && !match) {
+				_classes.add(currentValue);
+			}
+		</tml:script>
+
+
+		<tml:[system:fs-input] o_field="httpSessionManagerConfiguration/enabled" o_type="boolean"/>
+		<tml:[system:fs-input] o_field="httpSessionManagerConfiguration/implClassName" o_type="select" o_options="{_classes}" o_changeaction="clearHttpSessionManagerOptions"
+			o_validation="if (tmlform.field('/httpSessionManagerConfiguration/enabled')) {$E_VALUE!=''} else {true}"
+			o_message="Please select an HTTP session manager"/>																
+		<tml:script>
+			try{
+				setOption("module-definition", null);
+				if (tmlform.field('/httpSessionManagerConfiguration/implClassName')) {
+					var def = DBM.getModuleDefinition("HttpSessionManager", tmlform.field('/httpSessionManagerConfiguration/implClassName'));
+					if (def){	
+						def.testDependencies();	// throws exception on failure
+						if (def.getOptionDefinitions())	{				
+							setOption("module-definition", def);
+						}
+					}
+					else {
+						 _msg = "This HTTP session manager implementation was not found in the OpenWGA module registry";
+					}
+				}
+			}
+			catch(e){
+				_msg = e.javaException ? e.javaException.message : e.message
+			}
+		</tml:script>
+		<tml:if condition="option('module-definition')">
+			<tml:then>
+				<tml:[system:module-options:form] o_title="Additional configuration options">
+					<tml:option name="ns">/httpSessionManagerConfiguration/options</tml:option>
+				</tml:[system:module-options:form]>
+			</tml:then>
+			<tml:elseif condition="_msg">
+				<div class="data" style="color:red">
+					<tml:item name="_msg"/>
+					<br>
+					<tml:input name="not-valid" type="hidden"
+						validation="false"
+						message="The selected HTTP session manager is currently not available on this WGA system"
+					/>
+				</div>
+			</tml:elseif>
+		</tml:if>	
+</fieldset>
+
