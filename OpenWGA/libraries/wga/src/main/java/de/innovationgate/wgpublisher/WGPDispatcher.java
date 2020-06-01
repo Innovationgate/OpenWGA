@@ -814,10 +814,11 @@ public class WGPDispatcher extends HttpServlet {
             if (iPathType == WGPRequestPath.TYPE_FAVICON) {
                 String faviconPath = determineFavicon(request);
                 if (faviconPath != null) {
-                    iPathType = WGPRequestPath.TYPE_REDIRECT;
-                    path.setResourcePath(faviconPath);
+                	request.getRequestDispatcher(faviconPath).forward(request, response);
+                	return;
                 }
                 else {
+                	// should not happen since we have a default favicon
                     response.sendError(HttpServletResponse.SC_NOT_FOUND, "Favicon not defined");
                     return;
                 }
@@ -877,6 +878,7 @@ public class WGPDispatcher extends HttpServlet {
                                 lastRedirectCookie = new WGCookie(COOKIE_LASTREDIRECT, Hex.encodeHexString(redirectPath.getBytes("UTF-8")));
                                 lastRedirectCookie.setMaxAge(-1);
                                 lastRedirectCookie.setPath("/");
+                                lastRedirectCookie.setSecure(request.isSecure());
                                 ((WGCookie)lastRedirectCookie).addCookieHeader(response);
                                 sendRedirect(request, response, redirectPath);
                                 break;
@@ -1055,7 +1057,7 @@ public class WGPDispatcher extends HttpServlet {
             return faviconPath;
         }
         else {
-            return null;
+            return getPublisherURL(request) + "/static/images/brand/favicon.ico";
         }
 
     }
@@ -3011,7 +3013,7 @@ public class WGPDispatcher extends HttpServlet {
 
     private void dispatchStaticTmlRequest(WGPRequestPath path, javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws java.lang.Exception {
 
-        // do not static requests
+        // do not log static requests
         WGARequestInformation info = (WGARequestInformation) request.getAttribute(WGARequestInformation.REQUEST_ATTRIBUTENAME);
         if (info != null) {
             info.setType(WGARequestInformation.TYPE_STATIC);
@@ -3346,7 +3348,8 @@ public class WGPDispatcher extends HttpServlet {
                 return false;
             }
             
-            HttpSession session = request.getSession();
+            // don't touch session bc. JSESSIONID cookie will be creates otherwise even if we have a WGASessionManager
+            //HttpSession session = request.getSession();
             
             // Parse request
             WGPRequestPath path = (WGPRequestPath) request.getAttribute(WGACore.ATTRIB_REQUESTPATH);
@@ -3410,7 +3413,6 @@ public class WGPDispatcher extends HttpServlet {
             request.setAttribute(WGACore.ATTRIB_OUTER_DESIGN, tmlLib.getName());
             request.setAttribute(WGACore.ATTRIB_OUTER_DESIGN_DB, tmlLib.getDatabase().getDbReference());
             request.setAttribute(WGACore.ATTRIB_COOKIES, fetchHttpCookies(request));
-
     
             // TML Cache control
             response.setHeader("Pragma", "No-Cache");
@@ -3430,10 +3432,9 @@ public class WGPDispatcher extends HttpServlet {
             if (request.getAttribute(WGACore.ATTRIB_REDIRECT) != null) {
 
                 if (!response.isCommitted()) {
-                    if (!session.isNew()) { // on new sessions we must not reset
-                                            // the response (#00000147)
-                        response.reset();
-                    }
+//                    if (!session.isNew()) { // on new sessions we must not reset the response (#00000147)
+//                        response.reset();
+//                    }
                     response.sendRedirect(String.valueOf(request.getAttribute(WGACore.ATTRIB_REDIRECT)));
                 }
             }
