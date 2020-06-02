@@ -2985,7 +2985,11 @@ public class WGPDispatcher extends HttpServlet {
     public static String getPublisherURL(javax.servlet.http.HttpServletRequest request, boolean absolute) {
         
         if (absolute) {
-            String protocol = request.getProtocol().substring(0, request.getProtocol().indexOf("/")).toLowerCase();
+            String protocol = request.getProtocol();
+            // format should be something like http/1.1
+        	int slash_index = protocol.indexOf("/");
+            if(slash_index>=0)
+            	protocol = protocol.substring(0, slash_index).toLowerCase();
             if (protocol.equals("http") && request.isSecure()) {
                 protocol = "https";
             }
