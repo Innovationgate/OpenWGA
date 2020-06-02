@@ -325,7 +325,7 @@ public class WGAFilter implements Filter {
 							values = (String[])ArrayUtils.add(values, valueDecoded);
 							_parameters.put(keyDecoded, values);
 						} catch (Exception e) {
-							WGFactory.getLogger().warn("Unable to decode request parameter '" + key + "'.", e);
+							WGFactory.getLogger().warn("Unable to decode request parameter '" + key + "=" + value + "'", e);
 						}
 					}
 											
