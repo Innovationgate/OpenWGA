@@ -37,7 +37,7 @@
 				if(mod){
 					mod.designdb=_config.dbkey;
 					_mods.push(mod);
-					log.info("added content module " + mod.id + " (" + mod.designdb + ")");
+					log.info("Added content module for " + db().getDbReference() + ": " + mod.designdb + "/" + mod.id);
 				}					
 			}
 		</tml:script>
