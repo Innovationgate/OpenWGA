@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.codec.binary.Base64;
 
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.common.CodeCompletion;
@@ -95,7 +94,7 @@ public class Cookie {
     	if(decode.equalsIgnoreCase(HEX))
     		return new String(Hex.decodeHex(_value.toCharArray()), "UTF-8");
     	else if(decode.equalsIgnoreCase(BASE64))
-    		return new String(Base64.decodeBase64(_value), "UTF-8");
+    		return WGA.Base64.decode(_value);
     	else throw(new UnsupportedEncodingException());
     }
     
@@ -108,7 +107,7 @@ public class Cookie {
     	if(encode.equalsIgnoreCase(HEX))
     		_value = Hex.encodeHexString(value.getBytes("UTF-8"));
     	else if(encode.equalsIgnoreCase(BASE64))
-    		_value = Base64.encodeBase64URLSafeString(value.getBytes("UTF-8"));
+    		_value = WGA.Base64.encode(value);
     	else throw(new UnsupportedEncodingException());
         return this;
     }
