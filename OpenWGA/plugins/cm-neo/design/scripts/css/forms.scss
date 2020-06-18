@@ -59,7 +59,10 @@ form{
 			margin-top:9px;
 		}
 		.title{
-			padding-right:30px
+			display: block;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			padding-right: 40px
 		}
 		.placeholder{
 			color:#999;

@@ -203,6 +203,7 @@
 
 			editor.focus();
 			var a = editor.getNearestTagFromSelection("a")
+			a.href="";
 			
 			var form = $("#edit-rtf-link");
 			var type = $("[name=type]", form).val();
@@ -250,7 +251,7 @@
 					$("[name=url]", form).focus();
 					return;
 				}
-				a.href=url;				
+				a.href=url;
 				editor.setURLInfo(a, {
 					type: type, 
 					key: url
@@ -261,7 +262,7 @@
 			var target = $("[name=target]", form).val();
 			if(target)
 				a.target = target;
-			else a.removeAttribute("target") 				
+			else a.removeAttribute("target")
 			
 			Modal.hide();
 				

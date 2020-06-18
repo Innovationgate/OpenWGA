@@ -22,10 +22,11 @@
   along with OpenWGA in file COPYING.
   If not, see <http://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------%>
-<%@page import="de.innovationgate.wgpublisher.WGABrand"%>
-<%@page import="de.innovationgate.wgpublisher.WGAVersion"%>
-<%@page import="org.apache.commons.httpclient.util.URIUtil"%>
-<%@page import="de.innovationgate.wgpublisher.WGACore"%>
+<%@ page session="false" %>
+<%@ page import="de.innovationgate.wgpublisher.WGABrand"%>
+<%@ page import="de.innovationgate.wgpublisher.WGAVersion"%>
+<%@ page import="org.apache.commons.httpclient.util.URIUtil"%>
+<%@ page import="de.innovationgate.wgpublisher.WGACore"%>
 <%@ page language="java" pageEncoding="ISO-8859-1"%>
 <%@ page isThreadSafe="true" errorPage="error.jsp" %>
 <%

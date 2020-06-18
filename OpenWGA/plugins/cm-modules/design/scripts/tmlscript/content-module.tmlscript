@@ -36,6 +36,13 @@ this.registerConfigTML = function(tml){
 	delete modReg[dbkey]
 }
 
+this.registerGlobalConfigTML = function(tml, dbkey){
+	var dbkey = dbkey || db().getDbReference();
+	var def = new Packages.de.innovationgate.wga.cmm.definition.Definition(dbkey, tml);
+	var cmm_def = new Packages.de.innovationgate.wga.cmm.modules.CmmModuleDefinition(def, dbkey)
+	WGA.Core.moduleRegistry.addModuleDefinition(cmm_def)
+}
+
 this.getConfigTMLs = function(dbkey){
 	var mods = WGA.createList();
 	

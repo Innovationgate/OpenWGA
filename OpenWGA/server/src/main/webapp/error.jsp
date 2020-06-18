@@ -22,6 +22,7 @@
   along with OpenWGA in file COPYING.
   If not, see <http://www.gnu.org/licenses/>.
 ------------------------------------------------------------------------------%>
+<%@ page session="false" %>
 <%@ page isErrorPage="true" %>
 <%@ page import="de.innovationgate.wgpublisher.webtml.utils.HttpErrorException,de.innovationgate.wgpublisher.jsputils.*" %>
 <%@ page import="de.innovationgate.wgpublisher.*" %>

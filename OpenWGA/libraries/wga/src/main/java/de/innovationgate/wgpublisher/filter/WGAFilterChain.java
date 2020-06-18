@@ -199,33 +199,33 @@ public class WGAFilterChain implements FilterChain {
 
     }
 
-	   private void createVirtualHostingFilter(WGACore core, List<FilterInfo> filterInfos) {
-	        
-	        try {	            	            
-	            FilterMapping filterMapping = new FilterMapping();
-	            filterMapping.setName("WGA Virtual Hosting Filter");
-	            filterMapping.setEnabled(true);
-	            filterMapping.setImplClassName(WGAVirtualHostingFilter.class.getName());
-	            
-	            List<String> patterns = new ArrayList<String>();
-	            patterns.add("*");
-	            filterMapping.setUrlPatterns(patterns);
-	            
-	            Map<String, String> parameters = new HashMap<String, String>();
-	            filterMapping.setInitParameters(parameters);
-	            
-	            WGAVirtualHostingFilter filter = new WGAVirtualHostingFilter();
-	            WGAFilterConfig filterConfig = WGAFilterConfig.createFromMapping(filterMapping);
-	            filterConfig.setServletContext(core.getServletContext());
-	            filter.init(filterConfig);
-	            FilterInfo info = new FilterInfo(filter, filterConfig, INDEX_WGAVIRTUALHOSTINGFILTER);
-                filterInfos.add(info);                  	            
-	        }
-	        catch (Exception e) {
-	            core.getLog().error("Exception initializing WGA Virtual Hosting Filter", e);
-	        }
+	private void createVirtualHostingFilter(WGACore core, List<FilterInfo> filterInfos) {
+        
+        try {	            	            
+            FilterMapping filterMapping = new FilterMapping();
+            filterMapping.setName("WGA Virtual Hosting Filter");
+            filterMapping.setEnabled(true);
+            filterMapping.setImplClassName(WGAVirtualHostingFilter.class.getName());
+            
+            List<String> patterns = new ArrayList<String>();
+            patterns.add("*");
+            filterMapping.setUrlPatterns(patterns);
+            
+            Map<String, String> parameters = new HashMap<String, String>();
+            filterMapping.setInitParameters(parameters);
+            
+            WGAVirtualHostingFilter filter = new WGAVirtualHostingFilter();
+            WGAFilterConfig filterConfig = WGAFilterConfig.createFromMapping(filterMapping);
+            filterConfig.setServletContext(core.getServletContext());
+            filter.init(filterConfig);
+            FilterInfo info = new FilterInfo(filter, filterConfig, INDEX_WGAVIRTUALHOSTINGFILTER);
+            filterInfos.add(info);                  	            
+        }
+        catch (Exception e) {
+            core.getLog().error("Exception initializing WGA Virtual Hosting Filter", e);
+        }
 
-	    }
+   }
 
    private void createFakeSessionFilter(WGACore core, List<FilterInfo> filterInfos) {
        

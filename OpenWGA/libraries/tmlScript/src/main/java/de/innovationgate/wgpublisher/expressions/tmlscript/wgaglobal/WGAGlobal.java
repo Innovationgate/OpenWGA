@@ -280,6 +280,7 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
     public static final String[] PROPERTIES =  {
         "Auth",
         "Ajax",
+        "Base64",
         "Brand",
         "Call",
         "Core",
@@ -350,7 +351,11 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
     public static NativeJavaClass jsGet_Utils(ScriptableObject thisObj) {
         return new NativeJavaClass(thisObj.getParentScope(), WGUtils.class);
     }
-    
+
+    public static NativeJavaClass jsGet_Base64(ScriptableObject thisObj) {
+        return new NativeJavaClass(thisObj.getParentScope(), WGA.Base64.class);
+    }
+
     public static NativeJavaClass jsGet_Version(ScriptableObject thisObj) {
         return new NativeJavaClass(thisObj.getParentScope(), WGAVersion.class);
     }

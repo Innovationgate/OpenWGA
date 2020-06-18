@@ -27,8 +27,6 @@ package de.innovationgate.cm_neo.filter;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.Collections;
-import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -39,45 +37,35 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import de.innovationgate.wgpublisher.WGACore;
 
 public class ResourceAccessFilter implements Filter {
 
-    private static final String URL_PARAMETER_DBKEY = "dbkey";
-    public static final String SESSION_ATTRIB_EDITABLE_DATABASES = "de.innovationgate.cm_neo.session.EDITABLE_DATABASES";
-
-    private WGACore _core;
+    private Logger log = Logger.getLogger("wga.cm-neo");
     
+    public void init(FilterConfig config) throws ServletException {
+    }
+
     public void destroy() { 
     }
 
-    @SuppressWarnings("unchecked")
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {        
         if (req instanceof HttpServletRequest && res instanceof HttpServletResponse) {
 
         	HttpServletRequest httpReq = (HttpServletRequest) req;
             HttpServletResponse httpRes = (HttpServletResponse) res;
             
-            String urlDBKey = httpReq.getParameter(URL_PARAMETER_DBKEY);
-            if (urlDBKey != null && !urlDBKey.trim().equals("")) {
-            	
-            	List<String> sessionDBKeys = Collections.emptyList();
-                if (httpReq.getSession().getAttribute(SESSION_ATTRIB_EDITABLE_DATABASES) != null) {
-                    sessionDBKeys = (List<String>)httpReq.getSession().getAttribute(SESSION_ATTRIB_EDITABLE_DATABASES);
-                }
-                if (!sessionDBKeys.contains(urlDBKey.trim())) {
-                     _core.getLog().warn("URL '" + httpReq.getRequestURI() + "' has been requested with an invalid database key. (Requested dbkey: '" + urlDBKey + "' != CM dbkeys: '" + sessionDBKeys + "')");
-                     httpRes.sendError(HttpURLConnection.HTTP_FORBIDDEN, "You have no valid content management session to access this resource.");
-                     return;
-                }
+            Object cmSession = httpReq.getSession().getAttribute(WGACore.ATTRIB_BROWSERINTERFACE);
+            if(cmSession==null || (boolean)cmSession!=true){
+                log.warn("URL '" + httpReq.getRequestURI() + "' has been requested outside CM-Session");
+                httpRes.sendError(HttpURLConnection.HTTP_FORBIDDEN, "You have no valid content management session to access this resource.");
+                return;
             }
             
         }
         chain.doFilter(req, res);                      
-    }
-
-    public void init(FilterConfig config) throws ServletException {
-        _core = WGACore.retrieve(config.getServletContext());        
     }
 
 }

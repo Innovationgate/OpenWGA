@@ -28,6 +28,7 @@
 	try{
 		var config = DBM.wgaconfig.clone();
 		config.serverOptions.clear();
+		config.httpSessionManagerConfiguration.options.clear();
 		DBM.tmlform.setConfigProperties(config);		
 		_errors = config.validate()
 		if(_errors.isEmpty()){
