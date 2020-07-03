@@ -114,13 +114,12 @@ task updateDebRepository(dependsOn: buildDeb) << {
         
         println "remove ${distro} openwga${openwga_version_major}.${openwga_version_minor}-ce"
         ant.exec(executable:"/usr/bin/reprepro"){
-        	arg(value: "-Vb ${debian_repository} remove ${distro} openwga${openwga_version_major}.${openwga_version_minor}-ce")
+        	arg(line: "-Vb ${debian_repository} remove ${distro} openwga${openwga_version_major}.${openwga_version_minor}-ce")
         }
         
-        println "add ${distro} openwga${openwga_version_major}.${openwga_version_minor}-ce"
-        ant.exec(executable:"/usr/bin/reprepro"){
-        	arg(value: "-C main -Vb ${debian_repository} includedeb ${distro} ${debFile}")
-        }
+        def reprepro_command = "/usr/bin/reprepro -C main -Vb ${debian_repository} includedeb ${distro} ${debFile}"
+        println reprepro_command
+        ant.exec(command:reprepro_command)
     }
 }
 updateDebRepository.onlyIf{
