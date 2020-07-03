@@ -112,12 +112,12 @@ task updateDebRepository(dependsOn: buildDeb) << {
     println "Publishing debian package: ${debFile}"
     for (distro in linuxDistros) {
         
-        println "remove ${distro} openwga${openwga_version_major}.${openwga_version_minor}-ce"
+        println "remove ${distro} openwga${openwga_version_major}.${openwga_version_minor}-ce from ${debian_repository}"
         ant.exec(executable:"/usr/bin/reprepro"){
         	arg(line: "-Vb ${debian_repository} remove ${distro} openwga${openwga_version_major}.${openwga_version_minor}-ce")
         }
 
-        println "add ${distro} openwga${openwga_version_major}.${openwga_version_minor}-ce"
+        println "add ${distro} openwga${openwga_version_major}.${openwga_version_minor}-ce to ${debian_repository}"
         ant.exec(executable:"/usr/bin/reprepro"){
         	arg(line: "-C main -Vb ${debian_repository} includedeb ${distro} ${debFile}")
         }
