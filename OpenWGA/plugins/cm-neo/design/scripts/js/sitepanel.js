@@ -1,6 +1,7 @@
 define(["cm", "jquery"], function(CM, $){
 	
 	var editItemsVisible=true;
+	var currentURL;
 	
 	WGA.event.addListener("*", "content-changed", init)
 	WGA.event.addListener("*", "CMS_cancel_item_edit", function(){
@@ -17,7 +18,8 @@ define(["cm", "jquery"], function(CM, $){
 		ev.params.filename && _wga && _wga.event.fireEvent("file-metas-updated", "cm-neo", ev.params)
 	})
 	
-	function init(){
+	function init(ev){
+		currentURL = ev.params.href;
 		initItemEditors()
 		showItemEditors(true)
 	}
@@ -28,10 +30,11 @@ define(["cm", "jquery"], function(CM, $){
 	})
 
 	function reload(url){
-		var href = url || $("#site-panel").prop("contentDocument").location;
-		if(CM.loadPage)
-			CM.loadPage(href)
-		else $("#site-panel").attr("src", href);			
+		try{
+			var href = url || currentURL || $("#site-panel").prop("contentDocument").location;
+			$("#site-panel").attr("src", href);
+		}
+		catch(e){}
 	}
 	
 	function initItemEditors(){
