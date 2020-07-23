@@ -2005,6 +2005,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
 	    			this.appendResult("\n\tlanguage:\"" + content.getLanguage().getName() + "\"");
 	    		}
 	    		this.appendResult("\n};");
+	    		this.appendResult("\nwindow.parent.CM && window.parent.CM.pageLoaded(WGA.contentinfo);");
 	    		this.appendResult("\n</script>\n");
 	    		this.appendResult("\n<script>WGA.CMM={sections:{},hasSections:false}</script>");
 			}
