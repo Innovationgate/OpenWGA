@@ -111,6 +111,13 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 				continue;
 			}
 			
+			if(module.singleton){
+				var els = $("#module-tree").find("[data-context='" + module.id + "']")
+				if(els.length){
+					continue;
+				}
+			}
+			
 			if(!mods)
 				mods={}
 			var category = module.category || "_"
