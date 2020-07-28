@@ -15,6 +15,9 @@
 	</div>
 	<div class="clear"></div>
 
+	<tml:[system:fs-input] o_field="forceDefaultHost" o_type="boolean"/>
+	<tml:[system:fs-input] o_field="forceSSL" o_type="boolean"/>
+
 </fieldset>
 
 <fieldset>
