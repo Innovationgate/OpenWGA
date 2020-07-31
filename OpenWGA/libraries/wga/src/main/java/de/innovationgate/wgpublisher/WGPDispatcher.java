@@ -2369,12 +2369,12 @@ public class WGPDispatcher extends HttpServlet {
             // put into cache, then serve
             long threshold = fileCache.getThreshold();
             long fileSize = publishingFile.getFileSize();
-            if (fileSize != -1 && threshold >= fileSize) {
+            if (fileSize > 0 && fileSize <= threshold) {
        
                 // Put into cache
                 InputStream inputStream = publishingFile.getInputStream();
                 try {
-                    ByteArrayOutputStream outCache = new ByteArrayOutputStream((int) fileSize);
+                    ByteArrayOutputStream outCache = new ByteArrayOutputStream(2048);
                     WGUtils.inToOut(inputStream, outCache, 2048);
                     data = outCache.toByteArray();
                     fileCache.putFile(publishingFile, data, lastModified);
