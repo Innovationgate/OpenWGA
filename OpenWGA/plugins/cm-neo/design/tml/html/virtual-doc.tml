@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <tml:script>
 	_contentkey=request.getParameter("contentkey");
 	_structkey=request.getParameter("structkey");
@@ -58,7 +59,7 @@
 				title: "<tml:script expression="AFW.Util.encodeForScript(TITLE)"/>",
 				language: "<tml:meta name="language"/>"
 			}
-			window.parent.CM.pageLoaded(WGA.contentinfo) 
+			window.parent.CM && window.parent.CM.pageLoaded(WGA.contentinfo) 
 		</script>		
 	</head>
 	

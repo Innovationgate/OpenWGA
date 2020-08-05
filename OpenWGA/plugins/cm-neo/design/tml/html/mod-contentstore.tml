@@ -31,7 +31,7 @@
 			auth.applyAccessFilter(db().getAttribute("CM.FilterUids").get(db().ACCESSLEVEL_CHIEF_EDITOR), app);
 	
 	</tml:script>
-	
+
 	<tml:include ref="page" o_title="[{WGA.Brand.name} Content Manager]">
 	
 		<tml:option name="header">
@@ -100,7 +100,4 @@
 	<tml:portlet ref="dialogs:main" name="dialogs" portletmode="view"/>
 	<tml:include ref="content-changed-observer"/>
 	
-	<script>
-		require(["api"])
-	</script>
 </tml:case>
