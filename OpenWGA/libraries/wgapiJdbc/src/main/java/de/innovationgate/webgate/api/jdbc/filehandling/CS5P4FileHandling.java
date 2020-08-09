@@ -205,8 +205,13 @@ public class CS5P4FileHandling extends CS5FileHandling {
             if (getParent().isSaveIsolationActive()) {
                 getParent().getSession().save(cfd);
             }
-        
+
+            /*
+             * #00005586: Das müllt die historylog Tabelle voll.
+             * Ist das wirklich irgendwo für notwendig ???
+
             getParent().createLogEntry(getParent().getSession(), WGUpdateLog.TYPE_UPDATE, WGDocument.TYPENAME_FILEDERIVATE + "/" + cfd.getId(), cfd.getId());
+            */
             getParent().commitHibernateTransaction();
 
             return cfd.getId();
@@ -233,7 +238,12 @@ public class CS5P4FileHandling extends CS5FileHandling {
         }
         
         getParent().getSession().delete(cfd);
+        /*
+         * #00005586: Das müllt die historylog Tabelle voll.
+         * Ist das wirklich irgendwo für notwendig ???
+
         getParent().createLogEntry(getParent().getSession(), WGUpdateLog.TYPE_DELETE, WGDocument.TYPENAME_FILEDERIVATE + "/" + cfd.getId(), cfd.getId());
+        */
         getParent().commitHibernateTransaction();
 
     }
