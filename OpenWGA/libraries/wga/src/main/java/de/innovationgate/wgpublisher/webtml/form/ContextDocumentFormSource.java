@@ -91,17 +91,12 @@ public class ContextDocumentFormSource implements FormSource {
         } 
         
         // Empty field
-        else if (formInfo.getMode().equals(TMLFormInfo.EDIT_MODE)) {
-            if (defaultvalue != null) {
-                return (defaultvalue instanceof List<?> ? (List<?>) defaultvalue : Collections.singletonList(defaultvalue));
-            }
-            else {
-                return doc.getDatabase().getNoItemBehaviour().getForTMLFormEmptyFieldList();
-            }
-        } 
+        if (defaultvalue != null) {
+            return (defaultvalue instanceof List<?> ? (List<?>) defaultvalue : Collections.singletonList(defaultvalue));
+        }
         else {
-            return Collections.EMPTY_LIST;
-        }    
+            return doc.getDatabase().getNoItemBehaviour().getForTMLFormEmptyFieldList();
+        }
         
     }
 
