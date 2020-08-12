@@ -88,6 +88,12 @@ public class VirtualHost extends IdentifiableConfigBean {
     @Element(required=false)
     private String preferedLanguages = null;
 
+    @Attribute (required=false)
+    private boolean forceDefaultHost = false;
+
+    @Attribute (required=false)
+    private boolean forceSSL = false;
+    
     public VirtualHost() {
         super();
     }
@@ -169,6 +175,20 @@ public class VirtualHost extends IdentifiableConfigBean {
 
     public void setHideHomepageURL(boolean proxyDefaultDatabaseInURL) {
         this.hideHomepageURL = proxyDefaultDatabaseInURL;
+    }
+
+    public boolean isForceDefaultHost(){
+    	return this.forceDefaultHost;
+    }
+    public void setForceDefaultHost(boolean value){
+    	this.forceDefaultHost=value;
+    }
+
+    public boolean isForceSSL(){
+    	return this.forceSSL;
+    }
+    public void setForceSSL(boolean value){
+    	this.forceSSL=value;
     }
 
     public String getRobotsTxt(){

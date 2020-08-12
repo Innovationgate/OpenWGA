@@ -55,6 +55,7 @@ import de.innovationgate.wga.config.VirtualHost;
 import de.innovationgate.wga.config.VirtualHostRedirect;
 import de.innovationgate.wga.config.VirtualResource;
 import de.innovationgate.wga.config.WGAConfiguration;
+import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGPRequestPath;
 import de.innovationgate.wgpublisher.WGPDispatcher.PathDispatchingOccasion;
@@ -136,13 +137,37 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 
         VirtualHost vHost = findMatchingHost(_core.getWgaConfiguration(), request);
         if (vHost != null) {
+        	
+        	// check if redirects required
+        	if(vHost.isForceDefaultHost() || vHost.isForceSSL()){
+	        	boolean redirectRequired = false;
+	        	URLBuilder urlBuilder = new URLBuilder(httpRequest);
+	        	
+	        	if(vHost.isForceDefaultHost() && !request.getServerName().equalsIgnoreCase(vHost.getServername())){
+	        		// redirect to default host
+	     			urlBuilder.setHost(vHost.getServername());
+	     			redirectRequired = true;
+	        	}
+	        	if(vHost.isForceSSL() && !request.isSecure()){
+	        		// redirect to https
+	     			urlBuilder.setProtocol("https");
+	     			redirectRequired = true;
+	        	}
+	        	
+	        	if(redirectRequired){
+	        		_core.getLog().info("V-Host forces redirect: " + urlBuilder.build(true));
+	        		httpResponse.sendRedirect(httpResponse.encodeRedirectURL(urlBuilder.build(true)));
+	        		return;
+	        	}
+        	}
+        	
             // handle vhost
             request.setAttribute(REQUESTATTRIB_VIRTUAL_HOST, vHost);
 
             // determine default database key
             String defaultDBKey = getDefaultDBKey(_core, vHost);
 
-            String uri = httpRequest.getServletPath();		//getRequestURI();
+            String uri = httpRequest.getServletPath();
             int semiPos = uri.indexOf(";");
             if (semiPos != -1) {
                 uri = uri.substring(0, semiPos);

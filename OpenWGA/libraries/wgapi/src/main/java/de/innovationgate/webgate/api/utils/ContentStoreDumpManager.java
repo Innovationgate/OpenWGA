@@ -25,7 +25,6 @@
 package de.innovationgate.webgate.api.utils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -44,7 +43,6 @@ import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGLanguage;
 import de.innovationgate.webgate.api.WGStructEntry;
 import de.innovationgate.webgate.api.WGUnavailableException;
-import de.innovationgate.wga.config.FileDerivateManagerConfiguration;
 
 /**
  * Tool class to export and import content store dumps between OpenWGA content stores.
@@ -265,6 +263,10 @@ public class ContentStoreDumpManager {
             WGStructEntry rootEntry;
             while (rootEntries.hasNext()) {
                 rootEntry = (WGStructEntry) rootEntries.next();
+                if(!rootEntry.isRoot()){
+                	_log.info("Struct is no root: " + rootEntry.getTitle() + "/" + rootEntry.getStructKeyPath());
+                	continue;
+                }
                 cloneStructEntryTree(rootEntry, areaClone, _to, _contentClones, _oldToNewContentKeys);
             }
         }
@@ -500,7 +502,7 @@ public class ContentStoreDumpManager {
         // Clone entry
         WGStructEntry entryClone = null;
         validate(rootEntry);
-        _log.info("Cloning struct entry '" + rootEntry.getStructKey() + "'");
+        _log.info("Cloning struct entry '" + rootEntry.getStructKey() + "' (parent=" + cloneParent.getDocumentKey() + ")");
         try {
             entryClone = (WGStructEntry) createDumpClone(rootEntry, cloneParent);
         }

@@ -20,9 +20,9 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>8</minorVersion>
-        <maintenanceVersion>1</maintenanceVersion>
+        <maintenanceVersion>2</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>693</buildVersion>
+        <buildVersion>694</buildVersion>
       </version>
     </id>
     <title>OpenWGA Services REST Server</title>

@@ -24,6 +24,7 @@
  ******************************************************************************/
 package de.innovationgate.wgpublisher.lucene;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
+import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.MultiTermQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
@@ -95,11 +97,30 @@ public class IndexingRuleBasedQueryParser extends MultiFieldQueryParser {
 
     @Override
     protected Query getFieldQuery(String field, String queryText, boolean quoted) throws ParseException {
-        if (field!=null &&  (isMetaKeywordField(field) || isIndexedAsKeyword(field)) ) {
+    	
+    	if (field == null) {
+	        List<BooleanClause> clauses = new ArrayList<BooleanClause>();
+	        for (int i = 0; i < fields.length; i++) {
+	        	Query q = getFieldQuery(fields[i], queryText, quoted);
+	        	if (q != null) {
+	                if (boosts != null) {
+	                    Float boost = boosts.get(fields[i]);
+	                    if (boost != null) {
+	                    	q.setBoost(boost.floatValue());
+	                    }
+	                }
+	        		clauses.add(new BooleanClause(q, BooleanClause.Occur.SHOULD));
+	        	}
+	        }
+	        if (clauses.size() == 0)  // happens for stopwords
+	        	return null;
+	        return getBooleanQuery(clauses, true);
+    	}
+    	
+    	else if (isMetaKeywordField(field) || isIndexedAsKeyword(field))
             return new TermQuery(new Term(field, queryText));
-        } else {
-            return super.getFieldQuery(field, queryText, quoted);
-        }
+        else return super.getFieldQuery(field, queryText, quoted);
+
     }
         
     @Override
@@ -128,13 +149,39 @@ public class IndexingRuleBasedQueryParser extends MultiFieldQueryParser {
     @Override
     protected Query getPrefixQuery(String field, String termStr) throws ParseException {
     	
-    	if(field!=null && !isMetaKeywordField(field) && !isIndexedAsKeyword(field)){
-    		// Use Analyser to stem term
-	    	Query q = getFieldQuery(field, termStr, false);
-	    	if(q!=null)	// may be a stopword
-	    		termStr = q.toString(field);
+    	if(field!=null){
+    		if(isMetaKeywordField(field) || isIndexedAsKeyword(field)){
+                if (!getAllowLeadingWildcard() && termStr.startsWith("*")) {
+                    throw new ParseException("'*' not allowed as first character in PrefixQuery");
+                }
+                Term t = new Term(field, termStr);
+                return newPrefixQuery(t);    			
+    		}
+    		else{
+	    		// Use Analyser to stem term
+		    	Query q = getFieldQuery(field, termStr, false);
+		    	if(q!=null)	// may be a stopword
+		    		termStr = q.toString(field);
+		    	return super.getPrefixQuery(field, termStr);
+	    	}
     	}
-    	return super.getPrefixQuery(field, termStr);
+    	else{
+    		List<BooleanClause> clauses = new ArrayList<BooleanClause>();
+    	    for (int i = 0; i < fields.length; i++) {
+    	    	Query q = getPrefixQuery(fields[i], termStr);
+    	    	if (q != null) {
+    	    		if (boosts != null) {
+    	    			Float boost = boosts.get(fields[i]);
+		                if (boost != null) {
+		                	q.setBoost(boost.floatValue());
+		                }
+    	    		}
+		        	clauses.add(new BooleanClause(q, BooleanClause.Occur.SHOULD));
+		        }
+    	    }
+    	    return getBooleanQuery(clauses, true);
+    		
+    	}
     	
     }
 

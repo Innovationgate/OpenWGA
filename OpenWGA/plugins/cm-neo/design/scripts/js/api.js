@@ -3,8 +3,8 @@ require(["cm", "uploadmanager", "jquery-textarea-autogrow"], function(CM, Upload
 	
 	window.CM = {
 
-		pageLoaded: function(){
-			$("#site-panel").trigger("load.sitepanel")
+		pageLoaded: function(info){
+			WGA.event.fireEvent("page-loaded", "cm-neo", info);
 		},
 		
 		openDialog: CM.openDialog

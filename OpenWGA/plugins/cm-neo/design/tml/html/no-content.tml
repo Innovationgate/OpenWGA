@@ -27,6 +27,7 @@
 					</tml:case>
 				}
 			}
+			window.parent.CM.pageLoaded(WGA.contentinfo)
 		</script>
 		<link rel="stylesheet" href="<tml:url type="css" name="styles"/>">
 	</head>

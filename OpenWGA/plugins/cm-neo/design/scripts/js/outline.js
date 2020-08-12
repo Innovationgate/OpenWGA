@@ -19,6 +19,13 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 		showHeadings(true);
 		updateOutline();
 		Appnav.setContextChangeListener(onContextChange)
+		
+		$("#app-outline .struct").on("click", ".tag", function(){
+			var index = $(this).data("hx_id");
+			var el = $("[data-hx_id=" + index + "]", SitePanel.getDocument());
+			el[0] && el[0].scrollIntoView();
+		})
+		
 	}
 	
 	function updateOutline(){
@@ -42,7 +49,7 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 		else readHeadings($("body", SitePanel.getDocument()))
 			
 		function readHeadings(el){
-			var level, currentLevel = 0;
+			var level, currentLevel, index = 0;
 			var errors = false;
 
 			var struct = $("#app-outline .struct")
@@ -52,6 +59,8 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 			struct.html("");
 			
 			$(el).find("h1, h2, h3, h4, h5, h6").each(function(){
+				index++;
+				this.dataset.hx_id = index;
 				level = Number(this.tagName.substr(1,1));
 				if(level > currentLevel+1){
 					errors = true;
@@ -66,7 +75,7 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 					errors=true;
 					struct.append($("<div/>", {class:"error tag tag-"+this.tagName}).text("leer"));
 				}
-				else struct.append($("<div/>", {class:"tag tag-"+this.tagName}).text(tag_content));
+				else struct.append($("<div/>", {"data-hx_id": index, class:"tag tag-"+this.tagName}).text(tag_content));
 			})
 
 			var h1 = $(el).find("h1").length

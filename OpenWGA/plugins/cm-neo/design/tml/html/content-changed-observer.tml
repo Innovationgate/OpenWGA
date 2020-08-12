@@ -76,6 +76,7 @@
 		var c = context("db:"+dbkey + "/docid:" + contentkey, false);
 		if(c){
 			var Content = AFW.content(c.content());
+			event.setParameter("href", c.contenturl("html", null, true))
 			event.setParameter("status", c.STATUS)
 			event.setParameter("language", c.LANGUAGE)
 			event.setParameter("ismine", c.AUTHOR==c.meta("db", "username"))
@@ -99,21 +100,15 @@
 </tml:action>
 
 <script>
-	require(["jquery"], function($){
-		//console.log("add onload handler",$("#site-panel")); 
-		$("#site-panel").on("load.sitepanel", function(){
-			$("#loading").hide();
-			//console.log("sitepanel load", this.contentWindow.WGA.contentinfo);
-			if(this.contentWindow.WGA.contentinfo){
-				var info = this.contentWindow.WGA.contentinfo
-				location.hash = info.dbkey + (info.contentkey ? "/" + info.contentkey : info.structkey ? "/"+info.structkey : "");
-				WGA.ajax.action({
-					action: "<tml:action ref="content-changed" ajax="norefresh"/>",
-					mode: "norefresh",
-					graydiv: false,
-					params: info
-				})
-			}
+	
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "page-loaded", function(ev){
+		var info = ev.params;
+		location.hash = info.dbkey + (info.contentkey ? "/" + info.contentkey : info.structkey ? "/"+info.structkey : "");
+		WGA.ajax.action({
+			action: "<tml:action ref="content-changed" ajax="norefresh"/>",
+			mode: "norefresh",
+			graydiv: false,
+			params: info
 		})
 	})
 	

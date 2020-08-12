@@ -24,7 +24,7 @@ Controller.prototype.filenames = function($cx) {
 		if(mimetype){
 			for(var filename in Iterator(filenames)){
 				var file_md = $cx.content().getFileMetaData(filename);
-				if(file_md.mimeType.indexOf(mimetype)==0 && !_filenames.contains(filename))
+				if(file_md.mimeType && file_md.mimeType.indexOf(mimetype)==0 && !_filenames.contains(filename))
 					_filenames.add(filename);
 			}
 		}
