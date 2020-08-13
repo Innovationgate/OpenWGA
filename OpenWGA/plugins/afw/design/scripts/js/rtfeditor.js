@@ -46,8 +46,11 @@ define(["jquery"], function($){
 				}
 			},
 			"keyup focus click": function(ev){
-				if(editor.toolbar)
-					setTimeout(editor.toolbar.update, 100);
+				if(editor.toolbar){
+					setTimeout(function(){
+						editor.toolbar.update(editor)
+					}, 100);
+				}
 			},
 			"mousedown click": function(ev){
 				// Safari/chrome/edge/FF64 don't select images
@@ -259,7 +262,7 @@ define(["jquery"], function($){
 		}
 		
 		if(this.toolbar)
-			this.toolbar.update();
+			this.toolbar.update(this);
 	}
 	
 	editor.prototype.getParagraph = function(el){
@@ -422,7 +425,7 @@ define(["jquery"], function($){
 		if(aTag){
 			this.removeNode(aTag, false)
 			if(this.toolbar)
-				this.toolbar.update();
+				this.toolbar.update(this);
 		}
 	}
 
