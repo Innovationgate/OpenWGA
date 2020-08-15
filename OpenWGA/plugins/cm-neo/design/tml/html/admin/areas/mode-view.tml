@@ -8,17 +8,26 @@
 <div class="content">
 	<tml:script>
 		_areas = WGA.createList()
+		_systemAreas = WGA.createList()
 		var areas = db($option_dbkey).getAreas().values();
 		for(let area in Iterator(areas))
-			area.name.indexOf("$")!=0 && _areas.add(area.name);
+			if(area.name.indexOf("$")==0)
+				_systemAreas.add(area.name)
+			else _areas.add(area.name);
 	</tml:script>
-	<ul>
-		<tml:foreach item="_areas" currentvalue="_area">
+	<tml:foreach item="_areas" currentvalue="_area" wrap="ul">
+		<li>
+			<a href="<tml:url action="edit" param1="{_area}"/>"><tml:item name="_area"/></a>
+		</li>			
+	</tml:foreach>
+	<tml:{fieldset} if="_systemAreas.size">
+		<legend>Systembereiche</legend>
+		<tml:foreach item="_systemAreas" currentvalue="_area" wrap="ul">
 			<li>
-				<a href="<tml:url action="edit" param1="{_area}"/>"><tml:item name="_area"/></a>
+				<a href="<tml:url action="edit" param1="{_area}"/>"><tml:label key="[system-area.{_area}]" param1="{_area}"/></a>
 			</li>			
 		</tml:foreach>
-	</ul>
+	</tml:{fieldset}>		
 </div>
 
 <div class="footer">

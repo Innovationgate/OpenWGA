@@ -9,6 +9,14 @@
 		var struct = doc.getStructEntry()
 		struct.setPosition(position)
 		struct.save();
+
+		if(tmlform.template){
+			var sourcecontext=context("db:" + db().getDbReference() + "/docid:"+tmlform.template, false);
+			if(sourcecontext){
+				var sourcedoc = sourcecontext.content();
+				AFW.content(doc).copyRemoteData(sourcedoc, true /*include metas*/, false /*copy attachments*/, false /* copy modules */);
+			}
+		}
 		
 		portlet.fireevent("close-dialog", {
 			redirectto: context(doc).contenturl()

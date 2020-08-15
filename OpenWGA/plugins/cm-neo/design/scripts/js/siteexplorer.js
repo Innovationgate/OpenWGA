@@ -67,11 +67,11 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 			}
 		})
 
-		$("#area-dropdown ul").click("li a", function(ev){
+		$("#area-dropdown ul").on("click", "li a", function(ev){
 			ev.preventDefault();
 			var $this = $(ev.target);
-			area = $this.html()
-			$("#area-dropdown .area-menu .area-title").html(area)
+			area = $this.data("name");
+			$("#area-dropdown .area-menu .area-title").html($this.html())
 			$("#explorer").wga_tree("reload", {
 				url: getURL()
 			});
@@ -107,14 +107,23 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 			//console.log(areas);
 			var el = $("#area-dropdown ul")
 			el.html("");
+			var systemAreas=[];
 			for(var i=0; i<areas.length; i++){
-				el.append("<li><a href='#'>" + areas[i] + "</a></li>"); 
+				if(areas[i].indexOf("$")==0)
+					systemAreas.push(areas[i])
+				else el.append("<li><a href='#' data-name='" + areas[i] + "'>" + getAreaTitle(areas[i]) + "</a></li>"); 
+			}
+			if(systemAreas.length){
+				el.append("<li class='divider'></li>")
+				for(var i=0; i<systemAreas.length; i++){
+					el.append("<li><a href='#' data-name='" + systemAreas[i] + "'>" + getAreaTitle(systemAreas[i]) + "</a></li>");
+				}
 			}
 			
 			if(!area){
 				$("#area-dropdown .area-menu .area-title").html("Kein Bereich ausgewählt");
 			}
-			else $("#area-dropdown .area-menu .area-title").html(area);
+			else $("#area-dropdown .area-menu .area-title").html(getAreaTitle(area));
 			
 			if(callback)
 				callback()
@@ -147,7 +156,7 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 				url: getURL(),
 				selectpath: path
 			});
-			$("#area-dropdown .area-menu .area-title").html(area)
+			$("#area-dropdown .area-menu .area-title").html(getAreaTitle(area))
 		}
 		else if(context.structkey!=structkey){
 			//console.log("struct changed", context.structkey, structkey);
@@ -171,6 +180,14 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 		$("#explorer").wga_tree("removenode", id);
 	})
 
+	function getAreaTitle(area){
+		if(area=="$templates")
+			return "Seitenvorlagen";
+		else if(area=="$trash")
+			return "Papierkorb";
+		else return area;
+	}
+	
 	return{
 		init: init,
 		forceReload: function(){

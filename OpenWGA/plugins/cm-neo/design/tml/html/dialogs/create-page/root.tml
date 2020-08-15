@@ -10,6 +10,14 @@
 		var struct = doc.getStructEntry()
 		struct.setPosition(position)
 		struct.save();
+
+		if(tmlform.template){
+			var sourcecontext=context("docid:"+tmlform.template, false);
+			if(sourcecontext){
+				var sourcedoc = sourcecontext.content();
+				AFW.content(doc).copyRemoteData(sourcedoc, true /*include metas*/, false /*copy attachments*/, false /* copy modules */);
+			}
+		}
 		
 		portlet.fireevent("close-dialog", {
 			redirectto: context(doc).contenturl()
@@ -21,9 +29,13 @@
 
 	<tml:script>
 		setOption("current_lang", LANGUAGE);
-		_areas = WGA.createList()
+		var areas = WGA.createList()		
 		for(let area in Iterator(db().getAreas().values())){
-			if(area.systemArea)
+			if(area.name=="$templates"){
+				if(!WGA.app().isChiefEditor())
+					continue;
+			}
+			else if(area.systemArea)
 				continue;
 			if(area.name=="hdb-content" && !WGA.app().isManager())
 				continue;
@@ -33,17 +45,25 @@
 			if(!area.mayEditPages())
 				continue;
 			if(area.mayReadContent())
-				_areas.add(area.name)
+				areas.add(area.name)
 		}
+		_areas = WGA.createList()
+		var systemAreas = WGA.createList()
+		for(let area in Iterator(areas)){
+			if(area=="$templates")
+				systemAreas.add("Seitenvorlagen|" + area)
+			else _areas.add(area)
+		}
+		_areas.addAll(systemAreas);
 		WGA.TMLPage.setVar("_areas", _areas)
 
-		if(_areas.size()==1)
-			tmlform.area = _areas.get(0);
+		if(areas.size()==1)
+			tmlform.area = areas.get(0);
 		else if(!tmlform.submitted){
 			var struct = !document.isDummy() && document.getStructEntry();
-			if(struct && _areas.contains(struct.getArea().name))
+			if(struct && areas.contains(struct.getArea().name))
 				tmlform.area = struct.getArea().name
-			else tmlform.area = _areas.get(0);
+			else tmlform.area = areas.get(0);
 		}
 	</tml:script>
 
@@ -54,7 +74,7 @@
 
 	<div class="content form-horizontal">
 		<tml:[::form] o_page="root"/>
-		<tml:[form-field] o_label="Websitebereich" o_type="select" o_field="area" o_optionsitem="_areas" o_changeaction="$refresh" o_mode="{_areas.size()==1 ? 'view':'edit'}"/>
+		<tml:[form-field] o_label="Bereich" o_type="select" o_field="area" o_optionsitem="_areas" o_changeaction="$refresh" o_mode="{_areas.size()==1 ? 'view':'edit'}"/>
 	</div>
 
 	<div class="footer">
