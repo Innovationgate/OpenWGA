@@ -26,7 +26,6 @@ package de.innovationgate.wgpublisher.webtml;
 
 import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -35,7 +34,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.tagext.DynamicAttributes;
 
 import org.apache.commons.jxpath.JXPathContext;
@@ -45,7 +43,6 @@ import de.innovationgate.utils.UIDGenerator;
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGAbstractResultSet;
-import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.wga.common.beans.hdbmodel.Content;
 import de.innovationgate.wga.common.beans.hdbmodel.Relation;
@@ -95,6 +92,7 @@ public class Input extends ActionBase implements DynamicAttributes {
 	private String name;
 	private String options;
     private String optionsitem;
+    private String optgroupsitem;
 	private String multiple;
 	private String cssclass;
 	private String cssstyle;
@@ -311,7 +309,7 @@ public class Input extends ActionBase implements DynamicAttributes {
                 else if (type.equals("select") || type.equals("checkbox") || type.equals("radio")) {
                     List<String> textValues = new ArrayList<String>();
                     
-                    List<InputOption> options = this.retrieveInputOptions();
+                    List<InputOption> options = this.retrieveInputOptions(true);
                     if(options.size()>0){
                         // prepare regular list so we can use WGA.alias()
                     	ArrayList<String> optionsValues = new ArrayList<String>();
@@ -477,10 +475,17 @@ public class Input extends ActionBase implements DynamicAttributes {
     }
 
     private List<InputOption> retrieveInputOptions() throws WGAPIException {
+    	return retrieveInputOptions(false);
+    }
+    private List<InputOption> retrieveInputOptions(boolean include_optgroups) throws WGAPIException {
         
         // Fetch options. Possible sources: 1. directly from item (Attribute optionsitem) 2. comma-separated string (Attribute options) 3. HDBModel relation targets
         String optionsItem = getOptionsitem();
         List<String> rawOptionsList = null;
+        List<OptGroup> optgroups = null;
+        if(include_optgroups)
+        	optgroups = retrieveOptGroups();
+                
         if (!WGUtils.isEmpty(optionsItem)) {
             rawOptionsList = WGUtils.toString(getTMLContext().itemlist(optionsItem));
         }
@@ -501,7 +506,7 @@ public class Input extends ActionBase implements DynamicAttributes {
             }
         }
         
-        if (rawOptionsList == null) {
+        if (rawOptionsList==null && optgroups==null) {
             return new ArrayList<InputOption>();
         }
         
@@ -569,6 +574,13 @@ public class Input extends ActionBase implements DynamicAttributes {
             
         }
 
+        if(optgroups!=null){
+        	// add all optgroups
+        	for(OptGroup optgroup: optgroups){
+        		optionList.addAll(optgroup.getOptions());
+        	}
+        }
+        
         return optionList;
     }
     
@@ -695,9 +707,94 @@ public class Input extends ActionBase implements DynamicAttributes {
                 }
             }
 		}
+		this.appendResult(renderOptGroup(values));
 		this.appendResult("</select>");
 	}
 
+	private class OptGroup{
+		private String _label;
+		private List<InputOption> _options = new ArrayList<InputOption>(); 
+		
+		public OptGroup(String label, List<String> options) {
+			_label = label;
+			for(String rawOption: options){
+				String optionText;
+				String optionValue;
+	            int divider = rawOption.lastIndexOf("|");
+	            if (divider != -1) {
+	                optionText = rawOption.substring(0, divider).trim();
+	                optionValue = rawOption.substring(divider + 1).trim();
+	            }
+	            else {
+	                optionText = optionValue = rawOption.trim();
+	            }
+	            _options.add(new InputOption(optionText, optionValue));
+			}
+		}
+		public String getLabel(){
+			return _label;
+		}
+		public List<InputOption> getOptions(){
+			return _options;
+		}
+	}
+	
+	private List<OptGroup> retrieveOptGroups() throws WGAPIException{
+		String itemname = getOptgroupsitem();
+		if (WGUtils.isEmpty(itemname))
+			return null;
+
+		List<OptGroup> result = new ArrayList<OptGroup>();
+		List<Object> optgroups = getTMLContext().itemlist(itemname);
+		for(Object group: optgroups){
+			if(!(group instanceof Map)){
+				addWarning("optiongroupsitem no-map value: " + group.getClass().getName());
+				continue;
+			}
+			@SuppressWarnings("rawtypes")
+			Map groupmap = (Map)group;
+			Object label = groupmap.get("label");
+			Object options = groupmap.get("options");
+			if(options==null || label==null){
+				addWarning("optiongroup without label or options");
+				continue;
+			}
+			if(!(label instanceof String)){
+				addWarning("optiongroup label is no String");
+				continue;				
+			}
+			if(!(options instanceof List)){
+				addWarning("optiongroup options is no List");
+				continue;				
+			}
+			result.add(new OptGroup((String)label, WGUtils.toString((List)options)));
+		}
+		
+		return result;
+	}
+	
+	private String renderOptGroup(List<Object> values) throws WGAPIException{
+		
+		List<OptGroup> optgroups = retrieveOptGroups();
+		if(optgroups==null)
+			return "";
+		
+		StringBuffer result = new StringBuffer();
+		for(OptGroup optgroup: optgroups){
+			result.append("<optgroup label=\"" + optgroup.getLabel() + "\">");
+			for(InputOption option: optgroup.getOptions()){
+				result.append("<option value=\"" + option.getValue() + "\"");
+    			if (values.contains(option.getValue())) {
+    				result.append(" selected");
+    			}
+				result.append(">" + option.getText() + "</option>");				
+			}
+			result.append("</optgroup>");
+		}
+
+		return result.toString();
+	}
+	
     private void createChangeActionJS(String name, FormInputRegistrator form, String event) throws WGAPIException, TMLException {
         String changeaction = this.getChangeaction();
 		if (!WGUtils.isEmpty(changeaction)) {
@@ -1282,6 +1379,14 @@ public class Input extends ActionBase implements DynamicAttributes {
         this.optionsitem = optionsitem;
     }
     
+    public String getOptgroupsitem(){
+    	return getTagAttributeValue("optgroupsitem", optgroupsitem, null);
+    }
+
+    public void setOptgroupsitem(String value){
+    	this.optgroupsitem = value;
+    }
+
     public String getStore() {
         return getTagAttributeValue("store" , store, "true");
     }

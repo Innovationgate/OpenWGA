@@ -2844,6 +2844,12 @@
           <valueHelpEnabled>false</valueHelpEnabled>
         </attribute>
         <attribute>
+          <name>optgroupsitem</name>
+          <required>false</required>
+          <values/>
+          <valueHelpEnabled>false</valueHelpEnabled>
+        </attribute>
+        <attribute>
           <name>focus</name>
           <required>false</required>
           <values>
