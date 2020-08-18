@@ -1,6 +1,6 @@
 <div id="sidepanel-content">
 	
-	<div _style="text-align:center" class="panel-set">
+	<div class="panel-set">
 		<ul class="pagination" id="panel-set-content">
 			<li>
 				<a href="#section-content-properties" data-toggle="tab">
@@ -30,7 +30,7 @@
 	<div class="tab-content">
 		<div id="section-content-properties" class="tab-pane">
 
-			<tml:include ref="sidebar:content-properties"/>
+			<tml:include ref="::content-properties"/>
 			
 			<div class="panel panel-default" style="display:none">
 				<div class="panel-heading">
@@ -40,13 +40,13 @@
 					</a>
 				</div>
 				<div class="panel-body collapse" id="pannel-content-versions">
-					<tml:include ref="sidebar:content-versions"/>
+					<tml:include ref="::content-versions"/>
 				</div>
 			</div>
 		</div>
 		
 		<div id="section-content-attachments" class="tab-pane">
-			<tml:include ref="sidebar:content-attachments"/>
+			<tml:include ref="::content-attachments"/>
 		</div>
 
 		<div id="section-edit" class="tab-pane">
