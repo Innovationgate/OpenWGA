@@ -24,6 +24,7 @@
 				labeled=			"{option('labeled') || VOID}"
 				options=			"{option('options')==null ? VOID : option('options')}"
 				optionsitem=		"{option('optionsitem') || ($option_optionvalues ? '$option_optionvalues' : VOID)}"
+				optgroupsitem=		"{option('optgroupsitem') || ($option_optgroups ? '$option_optgroups' : VOID)}"
 				optionstitle=		"{option('optionstitle')==null ? VOID : option('optionstitle')}"
 				meta=				"{option('meta')||'false'}"
 				store=				"{option('store')||(_mode=='edit'?'true':'false')}"
