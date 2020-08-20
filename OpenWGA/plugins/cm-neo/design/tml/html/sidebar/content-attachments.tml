@@ -10,6 +10,10 @@
 					{{#files}}
 						<div class="thumb{{#isPrimary}} primary{{/isPrimary}}" draggable="true" 
 								title="{{filetitle}}"
+								data-type="{{type}}"
+								data-key="{{key}}"
+								data-dbkey="{{dbkey}}"
+								data-container="{{container}}"
 								data-filetitle="{{filetitle}}"
 								data-filename="{{filename}}"
 								data-filesize="{{filesize}}"
@@ -66,7 +70,7 @@
 			</div>
 		
 			<div class="sidebar-toolbar">
-				<a href="#" data-action="upload-file" title="Neue Datei hochladen">
+				<a href="#" class="disabled" data-action="upload-file" title="Neue Datei hochladen">
 					<span class="fas fa-plus"></span>
 				</a>
 				

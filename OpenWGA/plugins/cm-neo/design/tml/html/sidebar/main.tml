@@ -46,6 +46,7 @@
 		</div>
 		
 		<div id="section-content-attachments" class="tab-pane">
+			<tml:include ref="::attachment-sources"/>
 			<tml:include ref="::content-attachments"/>
 		</div>
 

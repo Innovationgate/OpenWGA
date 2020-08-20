@@ -33,6 +33,7 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 		updateContentProperties(ev.params);
 		updateContentAttachments(ev.params);
 		updateContentVersions(ev.params);
+		updateAttachmentSources();
 		
 		editor=null;
 		WGA.event.fireEvent('CMS_cancel_item_edit')
@@ -119,7 +120,7 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 	WGA.event.addListener("*", "attachments-updated", function(ev){
 		updateContentAttachments()
 	})
-	
+
 	function updateContentProperties(context){
 		var url = CM.jsonURL("content-properties");
 		var template = CM.template("sidepannel-content-properties")
@@ -135,15 +136,14 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 		var initial_waitForDerivates=null;		
 		var count = 0;
 		context = context || template.getContext();
-		if(!context.may_update_content){
-			$("#sidepannel-content-attachments .sidebar-toolbar [data-action]").addClass("disabled")
-			$("#sidepannel-content-attachments .drop-here").hide();
-		}
 		readAttachments()
 		
 		function readAttachments(){
 			$.getJSON(url, context, function(result){
 				template.render(result, context)
+				if(context.may_update_content)
+					$("#sidepannel-content-attachments .sidebar-toolbar [data-action='upload-file']").removeClass("disabled")
+				
 				if(initial_waitForDerivates==null){
 					initial_waitForDerivates=[]
 					$("#sidepannel-content-attachments .thumb[data-waiting=true]").each(function(){
@@ -201,8 +201,40 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 	}
 
 	/*
-	 * Content Attachment event handler
+	 * image lib 
 	 */
+	function updateAttachmentSources(context){
+		// read and render img-lib sources
+		var url = CM.jsonURL("imglib-attachments");
+		var template = CM.template("sidepannel-attachment-source")
+		$.getJSON(url, context, function(result){
+			template.render(result, context)
+			if(result.context){
+				template = CM.template("sidepannel-content-attachments")
+				template.render(result, context)
+				$("#sidepannel-content-attachments .sidebar-toolbar").hide()
+			}
+			else if(contentInfo){
+				$("#sidepannel-content-attachments .sidebar-toolbar").show()
+				updateContentAttachments(contentInfo)
+			}
+		})
+	}
+	
+	$("#sidepannel-attachment-source").on("click", ".dropdown-menu a", function(ev){
+		ev.preventDefault();
+		var $this = $(this);
+		updateAttachmentSources({
+			dbkey: $this.data("dbkey"),
+			contentkey: $this.data("contentkey")
+		})
+	})
+
+	
+	/*
+	 * Content Attachment event handler
+	 */	
+	
 	$("#sidepanel-content").wga_drophandler({
 		onDesktopDrop: function(files){
 			if(contentInfo.may_update_content){
@@ -224,18 +256,17 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 				panel.find(".thumb").removeClass("selected");	// de-select all
 				el.addClass("selected")
 			}
+			var method = panel.find(".thumb.selected").length ? "removeClass":"addClass";
+			panel.find(".sidebar-toolbar [data-action=edit-file-metas]")[method]("disabled")
 			if(contentInfo.may_update_content){
-				var method = panel.find(".thumb.selected").length ? "removeClass":"addClass";
 				panel.find(".sidebar-toolbar [data-action=delete]")[method]("disabled")
-				
-				panel.find(".sidebar-toolbar [data-action=edit-file-metas]")[method]("disabled")
-				
 			}
 		},
 		dblclick: function(e){
-			CM.openDialog("attachment-metas", {
-				filename: $(this).data("filename")
-			})
+			if($(this).data("type")!="extfile")
+				CM.openDialog("attachment-metas", {
+					filename: $(this).data("filename")
+				})
 		}		
 	}, ".thumb")
 	.on({
@@ -246,6 +277,10 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 				$(this).find(".thumb.selected").each(function(){
 					var $this = $(this) 
 					data.push({
+						type: $this.data("type") || "int",
+						key: $this.data("key"),
+						dbkey: $this.data("dbkey"),
+						container: $this.data("container"),
 						name: $this.data("filename"),
 						title: $this.data("filetitle"),
 						size: $this.data("filesize"),
@@ -256,6 +291,10 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 			}
 			else{	// single img drag 
 				data.push({
+					type: el.data("type") || "int",
+					key: el.data("key"),
+					dbkey: el.data("dbkey"),
+					container: el.data("container"),
 					name: el.data("filename"),
 					title: el.data("filetitle"),
 					size: el.data("filesize"),

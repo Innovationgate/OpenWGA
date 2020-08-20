@@ -1,0 +1,111 @@
+function Renderer() {}
+
+Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey) {
+	
+	//console.log("imglib", $urlParam_dbkey, $urlParam_contentkey)
+	
+	var result = {
+		sources: [],
+		folder: [],
+		selected: {
+			app: "Lokal"
+		}
+	}
+
+	var imgLibs = getImgLibs();
+	for(let [index,dbkey] in imgLibs){
+		result.sources.push({
+			key: dbkey,
+			title: db(dbkey).getTitle()
+		})
+	}
+	
+	if($urlParam_dbkey){
+		result.selected.app = db($urlParam_dbkey).getTitle(); 
+		result.selected.dbkey = $urlParam_dbkey;
+		result.context = AFW.Util.serializeJsObject({
+			dbkey: $urlParam_dbkey,
+			contentkey: $urlParam_contentkey
+		})
+		
+		var root = WGA.app($urlParam_dbkey).getPublisherOption("ImageLibraryRoot")
+		var docs = WGA.nav("db:"+$urlParam_dbkey+"/docid:"+root).children();
+		if(!docs.isEmpty()){
+			result.selected.folder = docs.firstResult.TITLE
+			if(!$urlParam_contentkey)
+				$urlParam_contentkey = docs.firstResult.KEY
+			for(let doc in Iterator(docs)){
+				result.folder.push({
+					dbkey: $urlParam_dbkey, 
+					key: doc.KEY,
+					title: doc.TITLE
+				})
+			}
+		}
+		if($urlParam_contentkey){
+			var doc = WGA.context("db:"+$urlParam_dbkey+"/docid:"+$urlParam_contentkey);
+			result.selected.folder = doc.TITLE
+			result.selected.contentkey = doc.KEY
+			
+			var files = [];
+			var docs = WGA.nav(doc).children()
+			for(let doc in Iterator(docs)){
+				var filenames = doc.content().getFileNames();
+				if(!filenames.size())
+					continue;
+				var filename = doc.content().getPrimaryFileName() || filenames.get(0)
+				var Attachment = AFW.content(doc.content()).attachment(filename);
+				if(Attachment.isImage()){
+					files.push({
+						type: "extfile",
+						key: doc.STRUCTKEY+"."+doc.LANGUAGE+".0/"+filename+"/"+$urlParam_dbkey,
+						container: doc.STRUCTKEY+"."+doc.LANGUAGE+".0",
+						dbkey: $urlParam_dbkey,
+						filename: WGA.encode("JSON", filename),
+						filetitle: WGA.encode("JSON", doc.content().getFileMetaData(filename).getTitle() || filename),
+						url: doc.fileurl(filename),
+						filesize: WGA.format(Attachment.fileSize, "0"),
+						poster: Attachment.getPosterURL({checksum:true}),
+						thumbnail: Attachment.getThumbnailURL({width:200,checksum:true}),
+						mimetype: Attachment.mimeType,
+						isImage: Attachment.isImage(),
+						isVideo: Attachment.isVideo()					
+					})
+				}
+			}
+			
+			result.filetypes = [{
+				filetype: "Bilder",
+				files: files
+			}]
+			
+		}
+		
+	}
+	
+	WGA.TMLPage.write(JSON.stringify(result))	
+
+	// helper
+	function getImgLibs(){
+	
+		var dbs=wgacore.getContentdbs().values().iterator();
+		var imageLibDbs = [];
+		
+		while(dbs.hasNext()){
+			// Fetch database
+			var database = dbs.next();
+			var Database = AFW.database(database);
+			
+			var imgLibRoot = database.getAttribute("ImageLibraryRoot")
+			if(imgLibRoot && Database.isPublishingAllowed()){
+				if (!database.isSessionOpen())
+					wgacore.openContentDB(database, request, false);
+				if(AFW.database(database).isReader())
+					imageLibDbs.push(Database.getKey());
+			} 
+		}
+		return imageLibDbs; 
+	}
+
+}
+
