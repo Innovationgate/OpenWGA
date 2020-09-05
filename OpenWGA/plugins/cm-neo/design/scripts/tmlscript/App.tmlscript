@@ -6,9 +6,11 @@ App.prototype.getIconURL = function(doc) {
 
 	var AFW = WGA.design("plugin-wga-app-framework").getGlobal("AFW")
 	doc = AFW.structentry(doc.getStructEntry()).getBestContent(doc.language.name)
-	//doc=WGA.context("db:"+ doc.database.dbReference + "/docid:"+doc.structKey+"<"+doc.language.name+">").content()
 	
-	return doc.getMetaData("VIRTUALLINK") ? "/plugin-wga-app-framework/file/icons/page_white_link.png" : "/plugin-wga-app-framework/file/icons/page_white_text.png"
+	var icon = "page_white";
+	if(doc.mayEditContent())
+		icon = "page_white_text";
+	return doc.getMetaData("VIRTUALLINK") ? "/plugin-wga-app-framework/file/icons/page_white_link.png" : "/plugin-wga-app-framework/file/icons/" + icon + ".png"
 }
 
 App.prototype.getCssClass = function(doc) {
