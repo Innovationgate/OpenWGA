@@ -34,22 +34,22 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 	
 			pageworkflow: c.content().getStructEntry().getWorkflowName(), 
 
-			created: c.STATUS==c.content().STATUS_DRAFT ? WGA.format(c.CREATED, "d. MMMMM yyyy, HH:mm") + " Uhr" : "",
-			modified: c.STATUS==c.content().STATUS_ARCHIVE || (c.PUBLISHED && c.PUBLISHED==c.MODIFIED) || c.MODIFIED==c.CREATED ? '' : WGA.format(c.MODIFIED, 'd. MMMMM yyyy, HH:mm') + " Uhr",
+			created: c.STATUS==c.content().STATUS_DRAFT ? WGA.format(c.CREATED, "d. MMMMM yyyy, HH:mm", "de") + " Uhr" : "",
+			modified: c.STATUS==c.content().STATUS_ARCHIVE || (c.PUBLISHED && c.PUBLISHED==c.MODIFIED) || c.MODIFIED==c.CREATED ? '' : WGA.format(c.MODIFIED, "d. MMMMM yyyy, HH:mm", "de") + " Uhr",
 			published: getPublished(c),
 
 			pagepublished: c.content().getStructEntry().getReleasedContent(c.LANGUAGE) && c.PAGEPUBLISHED 
-				? WGA.format(c.PAGEPUBLISHED, 'd. MMMMM yyyy, HH:mm') + " Uhr" 
+				? WGA.format(c.PAGEPUBLISHED, 'd. MMMMM yyyy, HH:mm', 'de') + " Uhr" 
 				: "",
 			
 			
 			geplant: c.STATUS!=c.content().STATUS_ARCHIVE && c.VALIDFROM && c.VALIDFROM.after(now()),
-			abgelaufen: c.STATUS!=c.content().STATUS_ARCHIVE && c.VALIDTO && c.VALIDTO.before(now()) ? WGA.format(c.VALIDTO, "d. MMMMM yyyy") : "",
+			abgelaufen: c.STATUS!=c.content().STATUS_ARCHIVE && c.VALIDTO && c.VALIDTO.before(now()) ? WGA.format(c.VALIDTO, "d. MMMMM yyyy", "de") : "",
 			
-			wirdablaufen: c.STATUS!=c.content().STATUS_ARCHIVE && c.VALIDTO && c.VALIDTO.after(now()) ? WGA.format(c.VALIDTO, "d. MMMMM yyyy") : "",
+			wirdablaufen: c.STATUS!=c.content().STATUS_ARCHIVE && c.VALIDTO && c.VALIDTO.after(now()) ? WGA.format(c.VALIDTO, "d. MMMMM yyyy", "de") : "",
 			
 			pending: c.content().isPendingRelease(),
-			validfromto: c.STATUS==c.content().STATUS_ARCHIVE ? "" : AFW.Util.dateRange(c.VALIDFROM, c.VALIDTO)
+			validfromto: c.STATUS==c.content().STATUS_ARCHIVE ? "" : AFW.Util.dateRange(c.VALIDFROM, c.VALIDTO, "de")
 		}
 
 		var script = WGA.design($urlParam_dbkey).resolveSystemScriptModule("content-manager:validate", "tmlscript")

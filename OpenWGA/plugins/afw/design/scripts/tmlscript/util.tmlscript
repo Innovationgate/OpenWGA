@@ -412,31 +412,34 @@ this.timeElapsed = function(d){
 	}
 }
 
-this.dateRange = function(start_date, end_date){
+this.dateRange = function(start_date, end_date, lang){
+	
+	if(!lang)
+		lang = null;
 	
 	if(!start_date && !end_date)
 		return ""
 	if(start_date==end_date){
-		var h = WGA.format(end_date, "HH:mm")
-		var ret = WGA.format(start_date, "d. MMMMM yyyy")
+		var h = WGA.format(end_date, "HH:mm", lang)
+		var ret = WGA.format(start_date, "d. MMMMM yyyy", lang)
 		if(h!="00:00")
 			ret += ", " + h + " " + WGA.design(this).label("date-range.h") 
 		return ret
 	}
 	if(!start_date){
 		// output end date
-		var h = WGA.format(end_date, "HH:mm")
+		var h = WGA.format(end_date, "HH:mm", lang)
 		var ret = WGA.design(this).label("date-range.to") 
-			+ " " + WGA.format(end_date, "d. MMMMM yyyy")
+			+ " " + WGA.format(end_date, "d. MMMMM yyyy", lang)
 		if(h!="23:59")
 			ret += ", " + h + " " + WGA.design(this).label("date-range.h") 
 		return ret
 	}
 	if(!end_date){
 		// output start date
-		var h = WGA.format(start_date, "HH:mm")
+		var h = WGA.format(start_date, "HH:mm", lang)
 		var ret = WGA.design(this).label("date-range.from") 
-			+ " " + WGA.format(start_date, "d. MMMMM yyyy")
+			+ " " + WGA.format(start_date, "d. MMMMM yyyy", lang)
 		if(h!="00:00")
 			ret += ", " + h + " " + WGA.design(this).label("date-range.h") 
 		return ret
@@ -449,27 +452,27 @@ this.dateRange = function(start_date, end_date){
 		if(start.get(start.MONTH)==end.get(end.MONTH)){
 			if(start.get(start.DAY_OF_MONTH)==end.get(end.DAY_OF_MONTH)){
 				// same day
-				return WGA.format(start.time, "d. MMM yyyy, HH:mm")
+				return WGA.format(start.time, "d. MMM yyyy, HH:mm", lang)
 					+ " " + WGA.design(this).label("date-range.to") + " "
-					+ WGA.format(end.time, "HH:mm")
+					+ WGA.format(end.time, "HH:mm", lang)
 					+ " " + WGA.design(this).label("date-range.h")
 			}
 			else{	// same month
-				return WGA.format(start.time, "d.")
+				return WGA.format(start.time, "d.", lang)
 					+ " " + WGA.design(this).label("date-range.to") + " "
-					+ WGA.format(end.time, "d. MMM yyyy")
+					+ WGA.format(end.time, "d. MMM yyyy", lang)
 			}
 		}
 		else{	// same year
-			return WGA.format(start.time, "d. MMM")
+			return WGA.format(start.time, "d. MMM", lang)
 				+ " " + WGA.design(this).label("date-range.to") + " "
-				+ WGA.format(end.time, "d. MMM yyyy")
+				+ WGA.format(end.time, "d. MMM yyyy", lang)
 			
 		}
 	}
-	else return WGA.format(start.time, "d. MMM yyyy")
+	else return WGA.format(start.time, "d. MMM yyyy", lang)
 		+ " " + WGA.design(this).label("date-range.to") + " "
-		+ WGA.format(end.time, "d. MMM yyyy") 
+		+ WGA.format(end.time, "d. MMM yyyy", lang) 
 }
 
 this.renderFileSize = function(value) {
