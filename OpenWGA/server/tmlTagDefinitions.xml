@@ -1047,6 +1047,12 @@
       <bodycontent>JSP</bodycontent>
       <attributes>
         <attribute>
+          <name>type</name>
+          <required>false</required>
+          <values/>
+          <valueHelpEnabled>false</valueHelpEnabled>
+        </attribute>
+        <attribute>
           <name>portletmode</name>
           <required>false</required>
           <values/>

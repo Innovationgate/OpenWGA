@@ -52,6 +52,7 @@ public class Button extends ActionBase implements DynamicAttributes {
 	private String cssclass = null;
 	private String cssstyle = null;
 	private String confirm = null;
+	private String type = null;
 
 	/**
 	 * Returns the clickaction.
@@ -80,7 +81,11 @@ public class Button extends ActionBase implements DynamicAttributes {
 
 		this.appendResult("<button");
 		this.appendResult(buildDynamicHtmlAttributes());
-		this.appendResult(" type=\"button\" ");
+		
+		String type = getType();
+		if(type==null)
+			type = "button";
+		this.appendResult(" type=\"" + type + "\" ");
         
         // support id attribute - htmlUnit access for tml:button
         String id = this.getId();
@@ -226,6 +231,13 @@ public class Button extends ActionBase implements DynamicAttributes {
 		this.param5 = param5;
 	}
 
+	public String getType(){
+		return this.getTagAttributeValue("type", type, null);
+	}
+	public void setType(String type){
+		this.type=type;
+	}
+	
 	/**
 	 * Returns the cssclass.
 	 * @return String
