@@ -4,6 +4,7 @@ define(["cm", "jquery"], function(CM, $){
 	var currentURL;
 
 	$("#site-panel").load(function(){
+		$("#loading").hide();
 		initItemEditors()
 		showItemEditors(true)
 		WGA.event.fireEvent("page-rendered", "sitepanel.js", getWindow().WGA.contentinfo)
