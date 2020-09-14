@@ -2,8 +2,17 @@ define(["cm", "jquery"], function(CM, $){
 	
 	var editItemsVisible=true;
 	var currentURL;
+
+	$("#site-panel").load(function(){
+		$("#loading").hide();
+		initItemEditors()
+		showItemEditors(true)
+		WGA.event.fireEvent("page-rendered", "sitepanel.js", getWindow().WGA.contentinfo)
+	})
 	
-	WGA.event.addListener("*", "content-changed", init)
+	WGA.event.addListener("*", "content-changed", function(ev){
+		currentURL = ev.params.href;
+	})
 	WGA.event.addListener("*", "CMS_cancel_item_edit", function(){
 		showItemEditors(true);
 	})
@@ -18,12 +27,6 @@ define(["cm", "jquery"], function(CM, $){
 		ev.params.filename && _wga && _wga.event.fireEvent("file-metas-updated", "cm-neo", ev.params)
 	})
 	
-	function init(ev){
-		currentURL = ev.params.href;
-		initItemEditors()
-		showItemEditors(true)
-	}
-
 	$(document).on("click", "a[data-wgakey]", function(ev){
 		ev.preventDefault();
 		reload(this.href);

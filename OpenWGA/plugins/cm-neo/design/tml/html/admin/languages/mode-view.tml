@@ -7,7 +7,6 @@
 <div class="content">
 	<tml:script>
 		_defaultLang = db().getDefaultLanguage()
-		console.log("_defaultLang", _defaultLang);
 		_langs = WGA.createList()
 		var langs = db($option_dbkey).getLanguages().values();
 		for(let lang in Iterator(langs))

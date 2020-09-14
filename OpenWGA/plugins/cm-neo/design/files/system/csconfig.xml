@@ -2,7 +2,7 @@
   <connectionScript>connect</connectionScript>
   <anonymousAccessLevel>10</anonymousAccessLevel>
   <defaultAccessLevel>10</defaultAccessLevel>
-  <versionCompliance>wga7.6</versionCompliance>
+  <versionCompliance>wga7.8</versionCompliance>
   <publisherOptions>
     <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
       <name>DesignEncoding</name>
@@ -48,9 +48,9 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>8</minorVersion>
-        <maintenanceVersion>2</maintenanceVersion>
+        <maintenanceVersion>3</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>694</buildVersion>
+        <buildVersion>695</buildVersion>
       </version>
     </id>
     <title>OpenWGA Content Manager</title>
@@ -97,7 +97,7 @@
   <staticClasspath>false</staticClasspath>
   <minimumWGAVersion>
     <majorVersion>7</majorVersion>
-    <minorVersion>6</minorVersion>
+    <minorVersion>8</minorVersion>
     <maintenanceVersion>0</maintenanceVersion>
     <patchVersion>0</patchVersion>
     <buildVersion>0</buildVersion>

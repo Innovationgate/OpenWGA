@@ -165,7 +165,7 @@
 				<span class="icon glyphicon glyphicon-education"></span>
 				<div class="text">SEO</div>
 			</a>
-			<a class="btn button" href="#" data-action="content-modules">
+			<a class="btn button disabled" href="#" data-action="content-modules">
 				<span class="icon glyphicon glyphicon-modal-window"></span>
 				<div class="text">Inhaltsmodule</div>
 			</a>

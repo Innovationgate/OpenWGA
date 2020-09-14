@@ -5,7 +5,11 @@ Renderer.prototype.render = function($urlParam_dbkey) {
 	var database = db($urlParam_dbkey);
 	var areas = []; 
 	for(let area in Iterator(database.getAreas().values())){
-		if(!WGA.app($urlParam_dbkey).isManager()){
+		if(area.name=="$templates"){
+			if(!WGA.app($urlParam_dbkey).isChiefEditor())
+				continue;
+		}
+		else if(!WGA.app($urlParam_dbkey).isManager()){
 			if(area.systemArea || area.name.indexOf("$")==0 || area.name=="hdb-content")
 				continue;
 		}
@@ -16,7 +20,6 @@ Renderer.prototype.render = function($urlParam_dbkey) {
 			areas.push(area.name);
 	}
 
-
 	WGA.TMLPage.write(JSON.stringify(areas))
-	//WGA.TMLPage.renderDefault();
+	
 }

@@ -1,0 +1,32 @@
+<tml:[template] o_id="sidepannel-attachment-source">
+	{{#sources.length}}
+		<div class="wrapper">
+			<div class="dropdown">
+				<a href="#" data-toggle="dropdown">
+					<span>{{selected.app}}</span>
+					<span class="caret"></span>
+				</a>
+				<ul class="dropdown-menu">
+					<li><a href="#">Lokal</a></li>
+					<li class="divider"></li>
+					{{#sources}}
+						<li><a data-dbkey="{{key}}" href="#">{{title}}</a></li>
+					{{/sources}}			
+				</ul>
+			</div>
+			{{#folder.length}}
+				<div class="dropdown">
+					<a href="#" data-toggle="dropdown">
+						<span>{{selected.folder}}</span>
+						<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						{{#folder}}
+							<li><a data-dbkey="{{dbkey}}" data-contentkey="{{key}}" href="#">{{title}}</a></li>
+						{{/folder}}			
+					</ul>
+				</div>
+			{{/folder.length}}
+		</div>
+	{{/sources.length}}
+</tml:[template]>

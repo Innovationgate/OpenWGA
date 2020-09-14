@@ -90,6 +90,9 @@
 								</tml:else>
 							</tml:if>
 						></iframe>
+						<script>
+							require(["sitepanel"]);
+						</script>
 					</div>
 				</div>
 			</div>

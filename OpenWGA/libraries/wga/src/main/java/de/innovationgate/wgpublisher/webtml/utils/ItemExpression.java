@@ -114,6 +114,9 @@ public class ItemExpression {
             allNamedParams.putAll(params);
         }
         
+        if(object instanceof ListVarContainer)
+        	object = ((ListVarContainer) object).getList();
+        
         Object value = wga.tmlscript().callMethod(object, _itemCall, allNamedParams, unnamedParams);
         
         if (value instanceof List<?>) {

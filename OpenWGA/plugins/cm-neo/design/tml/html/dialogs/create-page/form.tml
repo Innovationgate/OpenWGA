@@ -34,7 +34,7 @@
 	WGA.TMLPage.setVar("_languages", _languages)
 	if(_languages.size()==1)
 		tmlform.language = _languages.get(0).split("|")[1];
-	
+
 	if(_pagetypes.size() && _languages.size())
 		WGA.TMLPage.setVar("_isValid", true)
 	else{
@@ -53,8 +53,27 @@
 		o_focus="true"
 		o_store="false"
 	/>
-	<tml:[form-field] o_label="Sprache" o_type="select" o_field="language" o_optionsitem="_languages" o_mode="{_languages.size()>1?'edit':'view'}"/>
+	
+	<tml:[form-field] o_label="Sprache" 
+		o_type="select" 
+		o_field="language" 
+		o_optionsitem="_languages" 
+		o_changeaction="$refresh"
+		o_mode="{_languages.size()>1?'edit':'view'}"
+	/>
 
-	<tml:[form-field] o_label="Seitentyp" o_type="select" o_field="contenttype" o_optionsitem="_pagetypes" o_mode="{$option_dialog_options.pagetype || _pagetypes.size()==1 ? 'view':'edit'}"/>	
+	<tml:[form-field] o_label="Seitentyp" 
+		o_type="select" 
+		o_field="contenttype" 
+		o_optionsitem="_pagetypes" 
+		o_mode="{$option_dialog_options.pagetype || _pagetypes.size()==1 ? 'view':'edit'}"
+		o_changeaction="$refresh"
+	/>
+	
+	<tml:[form-field] o_label="Vorlage" if="$mc.templates.size"
+		o_type="select" 
+		o_field="template" 
+		o-optionvalues="$mc.templates" 
+	/>	
 	
 </tml:case>	

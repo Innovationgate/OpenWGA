@@ -9,8 +9,13 @@ Controller.prototype.prepare = function($cx) {
 
 	// Areas
 	var areas = WGA.createList()
+	var systemAreas = WGA.createList()
 	for(let area in Iterator($cx.db().getAreas().values())){
-		if(area.systemArea)
+		if(area.name=="$templates"){
+			if(!WGA.app($cx).isChiefEditor())				
+				continue
+		}
+		else if(area.systemArea)
 			continue;
 		if(area.name=="hdb-content" && !WGA.app($cx).isManager())
 			continue;
@@ -19,9 +24,13 @@ Controller.prototype.prepare = function($cx) {
 			continue;
 		if(!area.mayEditPages())
 			continue;
-		if(area.mayReadContent())
-			areas.add(area.name)
+		if(area.mayReadContent()){
+			if(area.name=="$templates")
+				systemAreas.add("Seitenvorlagen|" + area.name)
+			else areas.add(area.name)
+		}
 	}
+	areas.addAll(systemAreas)
 
 	return {
 		$options: {

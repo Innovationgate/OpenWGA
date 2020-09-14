@@ -1,0 +1,25 @@
+function Controller() {
+}
+
+Controller.prototype.prepare = function() {
+}
+
+Controller.prototype.templates = function(AFW, $field_contenttype, $field_language, $field_area) {
+	var templates = WGA.createList();
+	if($field_area && $field_area.indexOf("$")==0)
+		return templates;
+	var templateArea = AFW.database(database).getTemplateArea();
+	if(templateArea && $field_contenttype && $field_language){
+		for(let struct in Iterator(templateArea.getRootEntries())){
+			if(struct.getContentType().getName() == $field_contenttype){
+				var c = struct.getReleasedContent($field_language)
+				if(c)
+					templates.add(c.getTitle() + "|" + c.getContentKey());
+			}
+		} 
+	}
+	if(templates.size())
+		templates.add(0, "-|");						
+	
+	return templates
+}
