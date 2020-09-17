@@ -71,6 +71,8 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey)
 		var docs = WGA.app($urlParam_dbkey).query("content.status='g'", {
 			onlypublished: false,
 		}).filter(function(doc){
+			if(doc.content().isPendingRelease())
+				return false;
 			var wf = doc.content().getWorkflow();
 			return wf && wf.isApprovableByUser(); 		
 		})
