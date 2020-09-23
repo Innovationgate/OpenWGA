@@ -137,9 +137,15 @@ public class WGPRequestPath {
 		this.basePath = this.getBasePath(request, dispatcher);
 		if (this.basePath.equals("") || this.basePath.equals("/")) {
 			if (core.getWgaConfiguration().getDefaultDatabase() == null) {
-				this.pathType = TYPE_REDIRECT;
-				this.resourcePath = this.publisherURL + this.core.getStartPageURL();
-				return;
+				if(core.getWgaConfiguration().isStartPageEnabled()){
+					this.pathType = TYPE_REDIRECT;
+					this.resourcePath = this.publisherURL + this.core.getStartPageURL();
+					return;
+				}
+				else{
+					this.pathType = TYPE_INVALID;
+					return;
+				}
 			}
 			else {
 				this.basePath = "/" + core.getWgaConfiguration().getDefaultDatabase();
