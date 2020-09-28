@@ -75,6 +75,7 @@ public class WGPRequestPath {
 	public static final int TYPE_UNAVAILABLE_DB = -3;
 
     public static final int TYPE_UNKNOWN = 0;
+    public static final int TYPE_FORWARD = 1;
 	public static final int TYPE_TML = 2;
 	public static final int TYPE_RESOURCE = 3;
 	public static final int TYPE_FILE = 4;
@@ -133,12 +134,12 @@ public class WGPRequestPath {
 		this.completeURL = buildCompleteURL(request);
 		this.publisherURL = WGPDispatcher.getPublisherURL(request);
 		
-		// Extract the base part of the path - Redirect to start.jsp if no path information given
+		// Extract the base part of the path - Redirect to start page if no path information given
 		this.basePath = this.getBasePath(request, dispatcher);
 		if (this.basePath.equals("") || this.basePath.equals("/")) {
 			if (core.getWgaConfiguration().getDefaultDatabase() == null) {
 				if(core.getWgaConfiguration().isStartPageEnabled()){
-					this.pathType = TYPE_REDIRECT;
+					this.pathType = TYPE_FORWARD;
 					this.resourcePath = this.publisherURL + this.core.getStartPageURL();
 					return;
 				}
@@ -482,7 +483,7 @@ public class WGPRequestPath {
             }
         }
         else if (this.pathCommand.equalsIgnoreCase(PATHCMD_STARTPAGE) && core.getWgaConfiguration().isStartPageEnabled()) {
-        	this.pathType = TYPE_REDIRECT;
+        	this.pathType = TYPE_FORWARD;
         	this.resourcePath = this.publisherURL + core.getStartPageURL();
         }
         else if (this.pathCommand.equalsIgnoreCase("wgadmin") || this.pathCommand.equalsIgnoreCase("admin")) {

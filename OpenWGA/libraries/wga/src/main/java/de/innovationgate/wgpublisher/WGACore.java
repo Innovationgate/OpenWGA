@@ -8813,7 +8813,7 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
     public String getStartPageURL() {
         String url = WGABrand.get("startpage.url");
         if (url == null) {
-            url = "/plugin-management/homepage:main";
+            url = "/plugin-management/html/homepage:main.int.html";
         }
         return url;
             

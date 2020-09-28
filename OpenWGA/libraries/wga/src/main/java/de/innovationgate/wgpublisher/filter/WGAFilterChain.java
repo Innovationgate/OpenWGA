@@ -99,7 +99,7 @@ public class WGAFilterChain implements FilterChain {
 		//_blacklistURLPatterns.add("/domainkey*");			// what is /domainkey???
 		//_blacklistURLPatterns.add("*.jsp");				// JSPs never reach this filter chain
 		//_blacklistURLPatterns.add("/plugin-management*");	// why this special handling?
-		_blacklistURLPatterns.add("/start");
+		//_blacklistURLPatterns.add("/start");				// this avoids having an area or root page with this name
 		_blacklistURLPatterns.add("/joblog*");
 		_blacklistURLPatterns.add("/favicon.ico");
 		_blacklistURLPatterns.add("/tmlform/*");

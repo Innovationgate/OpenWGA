@@ -811,6 +811,12 @@ public class WGPDispatcher extends HttpServlet {
                 iPathType = WGPRequestPath.TYPE_REDIRECT;
             }
 
+            if (iPathType == WGPRequestPath.TYPE_FORWARD) {
+            	String url = path.getResourcePath();
+            	request.getRequestDispatcher(url).forward(request, response);
+            	return;
+            }
+            
             if (iPathType == WGPRequestPath.TYPE_FAVICON) {
                 String faviconPath = determineFavicon(request);
                 if (faviconPath != null) {
