@@ -76,6 +76,8 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 		
 		$("#toolbars [data-action='settings-user-defined']").parent()[ev.params.has_userdefined_settings ? "removeClass" : "addClass"]("disabled")
 		
+		$("#toolbars [data-action='paste-content']").parent()[ev.params.may_update_content ? "removeClass" : "addClass"]("disabled")
+		
 	})
 
 	/* Click handler */
