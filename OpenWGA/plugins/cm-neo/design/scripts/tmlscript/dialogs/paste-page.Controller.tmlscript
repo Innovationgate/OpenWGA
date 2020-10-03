@@ -52,7 +52,7 @@ Controller.prototype.pageType = function($cx, $item__CM_clipboard_context) {
 Controller.prototype.isAllowedPageType = function(AFW, $cx, $item__CM_clipboard_context, $field_root_or_child, $field_area) {
 	
 	var source = $cx.context($item__CM_clipboard_context).content().structEntry;
-	var dest = $cx.content().structEntry;
+	var dest = $cx.document instanceof Packages.de.innovationgate.webgate.api.WGStructEntry ? $cx.document : $cx.content().structEntry;
 
 	var Contenttype = AFW.contenttype(source.getContentType().name);
 
@@ -74,7 +74,7 @@ Controller.prototype.isAllowedPageType = function(AFW, $cx, $item__CM_clipboard_
 Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context, $form) {
 	
 	var source = $cx.context($item__CM_clipboard_context).content().structEntry;
-	var dest = $cx.content().structEntry;
+	var dest = $cx.document instanceof Packages.de.innovationgate.webgate.api.WGStructEntry ? $cx.document : $cx.content().structEntry;
 	
 	if($form.root_or_child=="root"){
 		// #00005454
