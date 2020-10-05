@@ -33,7 +33,14 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 	
 	WGA.event.addListener("*", "clipboard-changed", function(ev){
 		$("#toolbars .clipboard-paste-actions").show();
-		$("#toolbars .clipboard-content").html("Seite '" + ev.params.title + "' - " + ev.params.lang);
+		$("#toolbars .clipboard-page-content").html("Seite '" + ev.params.title + "'");
+		if(ev.params.lang){
+			$("#toolbars .clipboard-paste-content-actions").show();
+			$("#toolbars .clipboard-content").html("Version " + ev.params.version + " - " + ev.params.lang + " - " + ev.params.status);
+		}
+		else{
+			$("#toolbars .clipboard-paste-content-actions").hide();
+		}
 	})
 	
 	WGA.event.addListener("*", "page-rendered", function(ev){
