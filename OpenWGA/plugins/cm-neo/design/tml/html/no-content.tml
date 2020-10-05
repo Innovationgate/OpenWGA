@@ -2,11 +2,20 @@
 <tml:script>
 	_structkey=$urlParam_structkey;
 	_lang = $urlParam_lang;
-	if(!_structkey && $urlParam_contentkey){
-		var c = context("db:" + $urlParam_dbkey + "/docid:" + $urlParam_contentkey, false);
+	if(!_structkey && $urlParam_key){
+		// called by WGPDispatcher
+		var c = context("db:" + $urlParam_dbkey + "/docid:" + $urlParam_key, false);
 		if(c){
+			// should not happen bc. we are in the no-content page.
 			_structkey = c.STRUCTKEY;
 			_lang = c.LANGUAGE;
+		}
+		else{
+			// try structkey
+			var c = context("db:" + $urlParam_dbkey + "/$struct:" + $urlParam_key, false);
+			if(c){
+				_structkey = c.KEY;
+			}
 		}
 	}
 </tml:script>
@@ -16,8 +25,8 @@
 			WGA={
 				contentinfo:{
 					dbkey: "<tml:item name="$urlParam_dbkey"/>"
-					<tml:case condition="$urlParam_contentkey && $urlParam_contentkey!='null'">
-						,contentkey: "<tml:item name="$urlParam_contentkey"/>"
+					<tml:case condition="$urlParam_key">
+						,contentkey: "<tml:item name="$urlParam_key"/>"
 					</tml:case>
 					<tml:case condition="_structkey">
 						,structkey: "<tml:item name="_structkey"/>"
@@ -48,13 +57,28 @@
 					</tml:then>
 					<tml:else>
 						<h1>{%label:no-content.title%}</h1>
-						<tml:label key="no-content.message" param1="{TITLE}" param2="{_lang}"/>
+						<tml:if condition="_lang">
+							<tml:then>
+								<tml:label key="no-content.message" param1="{TITLE}" param2="{_lang}"/>
+							</tml:then>
+							<tml:else>
+								<tml:label key="no-content.no-lang.message" param1="{TITLE}"/>
+							</tml:else>
+						</tml:if>
 					</tml:else>
 				</tml:if>
 			</tml:then>
 			<tml:else>
 				<h1>{%label:no-content-found.title%}</h1>
-				<tml:label key="no-content-found.message" param1="{_structkey}"/>
+				<tml:if condition="_struckey">
+					<tml:then>
+						<tml:label key="no-content-found.message" param1="{_structkey}"/>
+					</tml:then>
+					<tml:else>
+						<tml:label key="no-content-found.no-struct.message"/>
+					</tml:else>
+				</tml:if>
+				
 			</tml:else>
 		</tml:if>
 		

@@ -23,7 +23,7 @@
 		request.getSession().setAttribute(wgacore.ATTRIB_VIRTUAL_CONTENT_URL, url + "?contentkey=#CONTENTKEY_UNIQUE_MODE#&structkey=#STRUCTKEY#&dbkey=#DBKEY#");
 	
 		var url = WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL()).build();
-		request.getSession().setAttribute(wgacore.ATTRIB_NO_CONTENT_NOTIFCATION_URL, url + "?dbkey=#DBKEY#&contentkey=#KEY#");
+		request.getSession().setAttribute(wgacore.ATTRIB_NO_CONTENT_NOTIFCATION_URL, url + "?dbkey=#DBKEY#&key=#KEY#");
 
 		var app = WGA.app(portlet.dbkey);
 		var auth = app.domain().auth()
