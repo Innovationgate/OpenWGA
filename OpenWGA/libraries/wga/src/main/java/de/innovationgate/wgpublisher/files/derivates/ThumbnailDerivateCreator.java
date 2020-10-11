@@ -69,7 +69,7 @@ public class ThumbnailDerivateCreator implements FileDerivateCreator {
         }
     }
     //100, 320, 768 und 1024
-    public static final String DEFAULT_THUMBNAIL_SIZES = "2048x-1,1024x-1,768x-1,320x-1,100x-1";
+    public static final String DEFAULT_THUMBNAIL_SIZES = "2048x-1,1536x-1,1024x-1,768x-1,320x-1,100x-1";
     
     public static final Set<String> SUPPORTED_MIMETYPES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(new String[] {"image/jpeg", "image/jpg", "image/png"})));
    
