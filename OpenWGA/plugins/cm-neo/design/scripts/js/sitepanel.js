@@ -3,12 +3,14 @@ define(["cm", "jquery"], function(CM, $){
 	var editItemsVisible=true;
 	var currentURL;
 
-	$("#site-panel").load(function(){
-		$("#loading").hide();
-		initItemEditors()
-		showItemEditors(true)
-		WGA.event.fireEvent("page-rendered", "sitepanel.js", getWindow().WGA.contentinfo)
-	})
+	function init(){
+		$("#site-panel").load(function(){
+			$("#loading").hide();
+			initItemEditors()
+			showItemEditors(true)
+			WGA.event.fireEvent("page-rendered", "sitepanel.js", getWindow().WGA.contentinfo)
+		})
+	}
 	
 	WGA.event.addListener("*", "content-changed", function(ev){
 		currentURL = ev.params.href;
@@ -232,6 +234,7 @@ define(["cm", "jquery"], function(CM, $){
 		,showItemEditors: showItemEditors
 		
 		,reload: reload
+		,init: init
 	}
 
 })

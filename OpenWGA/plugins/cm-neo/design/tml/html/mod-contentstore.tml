@@ -91,7 +91,9 @@
 							</tml:if>
 						></iframe>
 						<script>
-							require(["sitepanel"]);
+							require(["sitepanel"], function(S){
+								S.init();
+							});
 						</script>
 					</div>
 				</div>
