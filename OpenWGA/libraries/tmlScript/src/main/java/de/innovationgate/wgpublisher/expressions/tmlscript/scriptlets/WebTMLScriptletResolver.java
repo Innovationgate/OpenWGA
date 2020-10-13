@@ -596,7 +596,9 @@ public class WebTMLScriptletResolver {
             baseDesign = wga.design(dbkey);
         }
         else {
-            baseDesign = wga.design();
+            baseDesign = wga.design(context.getDesignContext());
+            if(baseDesign==null)
+            	baseDesign = wga.design();
         }
         
         Design scriptletDesign = baseDesign.resolveSystemScriptModule(actionID, WGScriptModule.CODETYPE_TMLSCRIPT, true);
