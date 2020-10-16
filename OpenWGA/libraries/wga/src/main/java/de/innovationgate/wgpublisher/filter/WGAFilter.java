@@ -608,7 +608,18 @@ public class WGAFilter implements Filter {
 	}
 
     public void setupFilterChain() {
+
+        if (_wgaFilterChain != null) {
+            _core.getLog().info("Shutting down filter chain");
+            _wgaFilterChain.destroy();
+        }
         
+        _core.getLog().info("Initializing filter chain");
+        _wgaFilterChain = new WGAFilterChain(_core, _servletContext);
+
+        /*
+         * Don't lock bc. of possible deadlock
+         * See #00005621         
         _holdRequestsLock.writeLock().lock();
         try {
             if (_wgaFilterChain != null) {
@@ -622,6 +633,7 @@ public class WGAFilter implements Filter {
         finally {
             _holdRequestsLock.writeLock().unlock();
         }
+        */
         
     }
 
@@ -674,21 +686,24 @@ public class WGAFilter implements Filter {
 	        
 	        FinalCharacterEncodingResponseWrapper wrappedResponse =  createResponseWrapper(response, wrappedRequest);
 	        
-	        _holdRequestsLock.readLock().lock();
-	        try {
-	            _wgaFilterChain.doFilter(wrappedRequest, wrappedResponse);
-	        }
-	        finally {
-	            _holdRequestsLock.readLock().unlock();
-	        }
+	        _wgaFilterChain.doFilter(wrappedRequest, wrappedResponse);
+	        
+	        // Don't lock bc. of possible deadlock - See #00005621
+//	        _holdRequestsLock.readLock().lock();
+//	        try {
+//	            _wgaFilterChain.doFilter(wrappedRequest, wrappedResponse);
+//	        }
+//	        finally {
+//	            _holdRequestsLock.readLock().unlock();
+//	        }
 	      
-	       info.setStatusCode(wrappedResponse.getStatusCode());
-	       info.setStatusMessage(wrappedResponse.getStatusMessage());	
+	        info.setStatusCode(wrappedResponse.getStatusCode());
+	        info.setStatusMessage(wrappedResponse.getStatusMessage());	
 	       
-	       AbstractWGAHttpSessionManager sessionManager = _core.getHttpSessionManager();
-           if (sessionManager != null) {
-               sessionManager.requestFinished(wrappedRequest, wrappedResponse);
-           }
+	        AbstractWGAHttpSessionManager sessionManager = _core.getHttpSessionManager();
+	        if (sessionManager != null) {
+	        	sessionManager.requestFinished(wrappedRequest, wrappedResponse);
+	        }
 		}
 		catch (ServletException e) {
 			info.setStatusCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
