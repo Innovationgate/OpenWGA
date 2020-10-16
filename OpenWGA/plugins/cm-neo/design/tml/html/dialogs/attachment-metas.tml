@@ -1,5 +1,10 @@
 <tml:action id="update-file-metas">
 
+	if(!tmlform.filename.trim()){
+		tmlform.addmessage("Dateiname darf nicht leer sein")
+		return;
+	}
+
 	try{
 
 		if(tmlform.filename != portlet.filename){
@@ -59,6 +64,8 @@
 	</div>
 	
 	<div class="content clearfix">
+
+		<tml:include ref="form-messages"/>
 
 		<div class="poster">
 			<tml:script>
