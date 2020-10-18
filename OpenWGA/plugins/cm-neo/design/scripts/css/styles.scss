@@ -1,8 +1,11 @@
 $header_height: 75px;
 $appnav_width: 320px;
+$appnav_toolbar_width: 40px;
 $base_blue: #286090;
 
 $width_breakpoint: 1200px;
+
+$blue: #2e6da4;
 
 /* Font-awesome 5 */
 
@@ -68,7 +71,7 @@ body {
 		bottom: 0;
 		top: $header_height;
 		bottom: 0;
-		left: 0;
+		left: $appnav_toolbar_width;
 		transition: left .2s ease-in;
 	}
 
@@ -105,6 +108,7 @@ body {
 @import "appnav:outline";
 @import "appnav:child-docs";
 @import "appnav:dashboard";
+@import "appnav:responsive";
 
 @import "forms";
 
