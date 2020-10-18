@@ -48,11 +48,12 @@
 			<a href="#" title="Unterseiten" data-view="child-docs">
 				<i class="icon fas fa-clone"></i>
 			</a>
-			
+			<a href="#" title="Responsive" data-view="responsive">
+				<i class="icon fas fa-mobile-alt"></i>
+			</a>			
 			<a href="#" title="Dashboard" data-view="dashboard">
 				<i class="icon fas fa-tachometer-alt"></i>
-			</a>
-			
+			</a>			
 		</tml:option>
 	
 		<tml:option name="appnav">
