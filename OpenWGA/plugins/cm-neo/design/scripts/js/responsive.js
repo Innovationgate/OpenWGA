@@ -1,16 +1,16 @@
 define(["jquery"], function($){
 
 	var width = $("#app-responsive a.phone").data("width");
-		
+	
 	function setWidth(){
 		$("#app-responsive a").removeClass("selected");
 		var selected;
 		if(width){
-			$(".sitepanel-wrapper").css("width", width);
+			$(".sitepanel-wrapper").css("width", width).addClass("responsive");
 			selected = $("#app-responsive a[data-width=" + width +"]");
 		}
 		else {
-			$(".sitepanel-wrapper").css("width", "");
+			$(".sitepanel-wrapper").css("width", "").removeClass("responsive");
 			selected = $("#app-responsive a.desktop");
 		}
 		selected.addClass("selected");
@@ -19,6 +19,7 @@ define(["jquery"], function($){
 
 	function init(portletkey){
 	
+		$("#toolbars .scale").hide();
 		setWidth();
 
 		$("#app-responsive a").click(function(ev){
@@ -30,7 +31,8 @@ define(["jquery"], function($){
 
 		WGA.portlet.registerObject(portletkey, {
 			destroy: function(){
-				$(".sitepanel-wrapper").css("width", "").data("width", "");
+				$(".sitepanel-wrapper").css("width", "").removeClass("responsive");
+				$("#toolbars .scale").show();
 			}
 		})
 

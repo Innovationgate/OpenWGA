@@ -30,7 +30,7 @@
 			</ul>
 		</div>
 		
-		<div class="btn-group">
+		<div class="btn-group scale">
 			<a class="btn button" href="#" data-toggle="dropdown">
 				<span class="icon"><tml:script expression="profile.scale||100"/>%</span>
 				<div class="text">

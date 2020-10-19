@@ -71,14 +71,14 @@
 				overflow-y: auto;
 				-webkit-overflow-scrolling: touch;
 
-				&.scale80{
+				&.scale80:not(.responsive){
 					right: -25%;
 					bottom: -25%;
 					height: 125%;
 					transform: scale(0.8, 0.8);
 					-webkit-transform: scale(0.8, 0.8);
 				}
-				&.scale50{
+				&.scale50:not(.responsive){
 					right: -100%;
 					bottom: -100%;
 					height: 200%;
