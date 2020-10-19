@@ -7,10 +7,12 @@ define(["jquery"], function($){
 		var selected;
 		if(width){
 			$(".sitepanel-wrapper").css("width", width).addClass("responsive");
+			$("#toolbars .scale").hide();
 			selected = $("#app-responsive a[data-width=" + width +"]");
 		}
 		else {
 			$(".sitepanel-wrapper").css("width", "").removeClass("responsive");
+			$("#toolbars .scale").show();
 			selected = $("#app-responsive a.desktop");
 		}
 		selected.addClass("selected");
@@ -18,8 +20,7 @@ define(["jquery"], function($){
 	}
 
 	function init(portletkey){
-	
-		$("#toolbars .scale").hide();
+			
 		setWidth();
 
 		$("#app-responsive a").click(function(ev){
