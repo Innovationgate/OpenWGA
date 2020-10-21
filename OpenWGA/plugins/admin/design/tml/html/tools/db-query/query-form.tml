@@ -113,6 +113,9 @@
 								html_autocapitalize="off" 
 								html_spellcheck="false"
 						/>
+						<script>
+							$("#<tml:script expression="tmlform.formid"/> textarea[name=query]").tabhandler().autogrow()
+						</script>					
 					</div>
 					<div class="clear"></div>
 					
