@@ -105,13 +105,14 @@
 	
 					<label>Query:</label>
 					<div class="data">
-						<div style="width:100%">
-							<tml:input type="textarea" name="query"
+						<tml:input name="query" type="textarea" encode="none" cssclass="source-code" cssstyle="width:99%"
 								validation="$E_VALUE!=''"
 								message="Please enter a query"
-							/>
-						</div>
-						<tml:include ref="system:convert-to-ext-field" o_fieldname="query" o_type="textarea"/>
+								html_autocomplete="off" 
+								html_autocorrect="off" 
+								html_autocapitalize="off" 
+								html_spellcheck="false"
+						/>
 					</div>
 					<div class="clear"></div>
 					
