@@ -25,16 +25,15 @@
 
 package de.innovationgate.wgpublisher.auth;
 
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.log4j.Logger;
@@ -49,6 +48,7 @@ import de.innovationgate.wgpublisher.WGADomain;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.cluster.tasks.ClearFailedLoginAttemptsTask;
 import de.innovationgate.wgpublisher.cluster.tasks.DistributeFailedLoginAttemptInformationTask;
+import de.innovationgate.wgpublisher.filter.WGAFilter;
 import de.innovationgate.wgpublisher.mail.WGAMailNotification;
 
 public class BruteForceLoginBlocker {
@@ -144,13 +144,21 @@ public class BruteForceLoginBlocker {
         return (LoginAttemptInformation) _failedLoginAttempts.get(LoginAttemptInformation.createLoginAttemptKey(domain, user));
     }
     
-
-    
     public AuthenticationSession login(WGADomain domain, String username, Object credentials) throws AuthenticationException {
+    	return login(domain, username, credentials, null);
+    }
+    
+    public AuthenticationSession login(WGADomain domain, String username, Object credentials, HttpServletRequest request) throws AuthenticationException {
         
+    	String ip=null;
+        if(request!=null)
+        	ip = (String)request.getAttribute(WGAFilter.REQATTRIB_ORIGINAL_IP);
+
         LoginAttemptInformation inf = getLoginAttemptInformation(domain.getName(), username);
         if (inf != null && inf.isBlocked()) {
-            LOG.warn("Failed login for '" + username + "': Username is blocked because of too many wrong login attempts (Brute force login blocker on domain " + domain.getName() + ")");
+            LOG.warn("Login" 
+            		+ (ip!=null ? " from IP " + ip : "")
+            		+ " for username '" + username + "' is blocked because of too many wrong login attempts (Brute force login blocker on domain " + domain.getName() + ")");
             return null;
         }
         
@@ -176,10 +184,12 @@ public class BruteForceLoginBlocker {
                 _core.getLog().error("Distribution of blocked login failed." , e);
             }
             
-            
         	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_LOGIN_BLOCKED);
         	mail.setSubject("Logins has been blocked");
-        	mail.append("Login for user <b>[" + username + "]</b> has been blocked in authentication domain <b>" + domain.getName() + "</b> because of " + inf.getFailedAttempts() + " failed login attemps.");
+        	mail.append("Login for user <b>" + username + "</b>"
+        			+ " has been blocked in authentication domain <b>" + domain.getName() + "</b> because of " + inf.getFailedAttempts() + " failed login attemps.");
+        	if(ip!=null)
+        		mail.append("<br>Login has been requested from IP <b>" + ip + "</b>");
         	_core.send(mail);
         }
         
@@ -233,11 +243,17 @@ public class BruteForceLoginBlocker {
         
     }
     
-    public boolean login(Administrator admin, String password) {
+    public boolean login(Administrator admin, String password, HttpServletRequest request) {
         
+    	String ip=null;
+        if(request!=null)
+        	ip = (String)request.getAttribute(WGAFilter.REQATTRIB_ORIGINAL_IP);
+
         LoginAttemptInformation inf = getLoginAttemptInformation(DOMAIN_ADMINLOGINS, admin.getUsername());
         if (inf != null && inf.isBlocked()) {
-            LOG.warn("Failed login for administrator '" + admin + "': Username is blocked because of too many wrong login attempts (Brute force login blocker for admin login)");
+            LOG.warn("Admin-Login"
+            		+ (ip!=null ? " from IP " + ip : "")
+            		+ " for administrator account '" + admin.getUsername() + "' is blocked because of too many wrong login attempts (Brute force login blocker for admin logins)");
             return false;
         }
         
@@ -268,8 +284,11 @@ public class BruteForceLoginBlocker {
             }
             
         	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_LOGIN_BLOCKED);
-        	mail.setSubject("WGA Administrator login '" + admin.getUsername() + "' has been blocked bc. of '" + inf.getFailedAttempts() + "' failed login attemps.");
-        	mail.append("WGA Administrator login <b>'" + admin.getUsername() + "'</b> has been blocked bc. of <b>'" + inf.getFailedAttempts() + "'</b> failed login attemps.");        	
+        	mail.setSubject("OpenWGA Administrator login '" + admin.getUsername() + "' has been blocked.");
+        	mail.append("OpenWGA Administrator login <b>'" + admin.getUsername() + "'</b> has been blocked bc. of <b>'" + inf.getFailedAttempts() + "'</b> failed login attemps.");
+        	if(ip!=null)
+        		mail.append("<br>Login has been requested from IP <b>" + ip + "</b>");
+
         	_core.send(mail);
         }
         

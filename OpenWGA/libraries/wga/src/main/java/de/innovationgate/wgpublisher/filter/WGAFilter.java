@@ -82,7 +82,9 @@ public class WGAFilter implements Filter {
 	
 	public static final String REQATTRIB_ORIGINAL_URI = WGAFilter.class.getName() + ".originalRequestURI";
 	public static final String REQATTRIB_ORIGINAL_URL = WGAFilter.class.getName() + ".originalRequestURL";
+	public static final String REQATTRIB_ORIGINAL_IP = WGAFilter.class.getName() + ".originalRequestIP";
 	public static final String REQATTRIB_ORIGINAL_QUERYSTRING = WGAFilter.class.getName() + ".originalQueryString";
+	
 	public static final String REQATTRIB_REQUEST_WRAPPER = WGAFilter.class.getName() + ".requestWrapper";
 	public static final String REQATTRIB_RESPONSE_WRAPPER = WGAFilter.class.getName() + ".responseWRapper";
 	public static final String SESATTRIB_MOCK_CERT = WGAFilter.class.getName() + ".mockCert";
@@ -282,8 +284,7 @@ public class WGAFilter implements Filter {
      */
     public class RequestWrapper extends HttpServletRequestWrapper {
 
-
-    	private String _forwardedProtocol;
+		private String _forwardedProtocol;
 
         private Map<String,String[]> _parameters = new HashMap<>();
 		
@@ -300,6 +301,8 @@ public class WGAFilter implements Filter {
 			_response = reponse;
 			_forwardedProtocol = request.getHeader("X-Forwarded-Proto");			
 
+			request.setAttribute(REQATTRIB_ORIGINAL_IP, request.getRemoteAddr());
+			
 			String queryString = request.getQueryString();
 			// decode query string parameters with wga character encoding
 			if (queryString != null) {

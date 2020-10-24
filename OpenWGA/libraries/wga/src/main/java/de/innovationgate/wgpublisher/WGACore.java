@@ -1278,10 +1278,10 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             return false;
         }
         
-        boolean loggedIn = getBruteForceLoginBlocker().login(admin, password);
+        boolean loggedIn = getBruteForceLoginBlocker().login(admin, password, request);
         if (request != null) {
             if (!loggedIn) {
-            	log.warn("Failed admin login attempt for account '" + name + "' from '" + request.getRemoteAddr() + "'.");
+            	log.warn("Failed admin login attempt for account '" + name + "' from '" + request.getAttribute(WGAFilter.REQATTRIB_ORIGINAL_IP) + "'.");
             }
         }
         return loggedIn;
@@ -8001,7 +8001,7 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
         if (domainConfig.getAuthModule() != null) {
             // Do a login on the domain's auth module
             try {
-                AuthenticationSession authSession = getBruteForceLoginBlocker().login(domainConfig, user, password);
+                AuthenticationSession authSession = getBruteForceLoginBlocker().login(domainConfig, user, password, request);
                 if (authSession != null) {
                     isLoginSuccessful = true;
                 }
