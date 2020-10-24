@@ -26,6 +26,7 @@
 package de.innovationgate.wgpublisher.auth;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -46,10 +47,20 @@ public class LoginAttemptInformation implements Serializable {
     private boolean _blocked = false;
     private Date _blockedDate;
     private int _maxAttempts;
+    
+    private ArrayList<String> _ips = new ArrayList<String>();
+    
     public LoginAttemptInformation(String domain, String name, int maxAttempts) {
         _domain = domain;
         _name = name;
         _maxAttempts = maxAttempts;
+    }
+    
+    /**
+     * @return Returns the list of ip-s
+     */
+    public ArrayList<String> getIps(){
+    	return _ips;
     }
     /**
      * @return Returns the failedAttempts.
@@ -64,8 +75,10 @@ public class LoginAttemptInformation implements Serializable {
         return _name;
     }
     
-    public void addFailedAttempt() {
+    public void addFailedAttempt(String ip) {
         _failedAttempts++;
+        if(ip!=null && !_ips.contains(ip))
+        	_ips.add(ip);
         if (_maxAttempts > 0 && _failedAttempts >= _maxAttempts) {
             _blocked = true;
             _blockedDate = new Date();
@@ -105,6 +118,7 @@ public class LoginAttemptInformation implements Serializable {
         _blocked = false;
         _blockedDate = null;
         _failedAttempts = 0;
+        _ips.clear();
     }
     
     

@@ -174,7 +174,7 @@ public class BruteForceLoginBlocker {
             inf = new LoginAttemptInformation(domain.getName(), username, domain.getConfig().getMaximumLoginAttempts());
             inf.map(_failedLoginAttempts);
         }
-        inf.addFailedAttempt();
+        inf.addFailedAttempt(ip);
         
         if (inf.isBlocked()) {
             try {
@@ -186,10 +186,15 @@ public class BruteForceLoginBlocker {
             
         	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_LOGIN_BLOCKED);
         	mail.setSubject("Logins has been blocked");
-        	mail.append("Login for user <b>" + username + "</b>"
-        			+ " has been blocked in authentication domain <b>" + domain.getName() + "</b> because of " + inf.getFailedAttempts() + " failed login attemps.");
-        	if(ip!=null)
-        		mail.append("<br>Login has been requested from IP <b>" + ip + "</b>");
+        	mail.append("<p>Login for user <b>" + username + "</b>"
+        			+ " has been blocked in authentication domain <b>" + domain.getName() + "</b> because of " + inf.getFailedAttempts() + " failed login attemps.</p>");
+        	if(inf.getIps().size()>0){
+        		mail.append("<p>Logins has been requested from the following IP(s):</p>");
+        		mail.append("<ul>");
+        		for(String requested_from_ip: inf.getIps())
+        			mail.append("<li>" + requested_from_ip + "</li>");
+        		mail.append("</ul>");
+        	}
         	_core.send(mail);
         }
         
@@ -219,7 +224,7 @@ public class BruteForceLoginBlocker {
                 inf = new LoginAttemptInformation(domainName, username, domain.getConfig().getMaximumLoginAttempts());
                 inf.map(_failedLoginAttempts);
             }
-            inf.addFailedAttempt();
+            inf.addFailedAttempt(null);
             
             if (inf.isBlocked()) {
                 try {
@@ -275,7 +280,7 @@ public class BruteForceLoginBlocker {
             inf = new LoginAttemptInformation(DOMAIN_ADMINLOGINS, username, LoginAttemptInformation.DEFAULT_MAX_FAILED_ATTEMPTS);
             inf.map(_failedLoginAttempts);
         }
-        inf.addFailedAttempt();
+        inf.addFailedAttempt(ip);
         
         if (inf.isBlocked()) {
             try {
@@ -287,12 +292,16 @@ public class BruteForceLoginBlocker {
             
         	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_LOGIN_BLOCKED);
         	mail.setSubject("OpenWGA Administrator login '" + username + "' has been blocked.");
-        	mail.append("OpenWGA Administrator login <b>'" + username + "'</b> has been blocked bc. of <b>'" + inf.getFailedAttempts() + "'</b> failed login attemps.");
+        	mail.append("<p>OpenWGA Administrator login <b>'" + username + "'</b> has been blocked bc. of <b>'" + inf.getFailedAttempts() + "'</b> failed login attemps.</p>");
         	if(admin==null)
-        		mail.append("<br>This account does not exist but has been blocked anyway.");
-        	if(ip!=null)
-        		mail.append("<br>Login has been requested from IP <b>" + ip + "</b>.");
-
+        		mail.append("<p><b>This account does not exist but has been blocked anyway.</b></p>");
+        	if(inf.getIps().size()>0){
+        		mail.append("<p>Logins has been requested from the following IP(s):</p>");
+        		mail.append("<ul>");
+        		for(String requested_from_ip: inf.getIps())
+        			mail.append("<li>" + requested_from_ip + "</li>");
+        		mail.append("</ul>");
+        	}
         	_core.send(mail);
         }
         

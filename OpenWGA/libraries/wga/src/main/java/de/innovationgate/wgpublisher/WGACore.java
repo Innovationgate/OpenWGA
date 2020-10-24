@@ -8225,15 +8225,14 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
 		        strBody.append(notification.getMessage());
 		        String rootURL = getWgaConfiguration().getRootURL();
 		        if (rootURL != null) {
-		        	//strBody.append("<br><br>");
-		        	strBody.append("<p><a href=\"" + rootURL + "/plugin-admin\">" + WGABrand.getName() + " admin client ...</a></p>");
+		        	strBody.append("<p><a href=\"" + rootURL + "/plugin-admin\">Open " + WGABrand.getName() + " Admin Client ...</a></p>");
 		        }
 		        // append footer
-				strBody.append("<br><br><b>System information:</b><br><br>");
+		        strBody.append("<hr>");
 				strBody.append("<b>Server:</b> " + serverName + " / " + WGACore.getReleaseString() + "<br>");
 				strBody.append("<b>Host:</b> " + hostname + "<br>");
-				strBody.append("<b>Operation System:</b> " + System.getProperty("os.name") + " Version " + System.getProperty("os.version") + " (" + System.getProperty("os.arch") + ")<br>");						
-		        strBody.append("<b>Java virtual machine:</b> " + System.getProperty("java.vm.name") + " Version " + System.getProperty("java.vm.version") + " (" + System.getProperty("java.vm.vendor") + ")");
+				//strBody.append("<b>Operation System:</b> " + System.getProperty("os.name") + " Version " + System.getProperty("os.version") + " (" + System.getProperty("os.arch") + ")<br>");						
+		        //strBody.append("<b>Java virtual machine:</b> " + System.getProperty("java.vm.name") + " Version " + System.getProperty("java.vm.version") + " (" + System.getProperty("java.vm.vendor") + ")");
 		        
 		        strBody.append("</body></html>");		        	  
 		        body.setText(strBody.toString());
