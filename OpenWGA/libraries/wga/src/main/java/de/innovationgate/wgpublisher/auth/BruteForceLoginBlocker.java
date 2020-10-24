@@ -243,22 +243,24 @@ public class BruteForceLoginBlocker {
         
     }
     
-    public boolean login(Administrator admin, String password, HttpServletRequest request) {
+    public boolean adminLogin(String username, String password, Administrator admin, HttpServletRequest request) {
         
     	String ip=null;
         if(request!=null)
         	ip = (String)request.getAttribute(WGAFilter.REQATTRIB_ORIGINAL_IP);
 
-        LoginAttemptInformation inf = getLoginAttemptInformation(DOMAIN_ADMINLOGINS, admin.getUsername());
+        LoginAttemptInformation inf = getLoginAttemptInformation(DOMAIN_ADMINLOGINS, username);
         if (inf != null && inf.isBlocked()) {
             LOG.warn("Admin-Login"
             		+ (ip!=null ? " from IP " + ip : "")
-            		+ " for administrator account '" + admin.getUsername() + "' is blocked because of too many wrong login attempts (Brute force login blocker for admin logins)");
+            		+ " for"
+            		+ (admin==null ? " (not existing)" : "")
+            		+ " account '" + username + "' is blocked because of too many wrong login attempts (Brute force login blocker for admin logins)");
             return false;
         }
         
         try {
-			if (admin.isPasswordCorrect(password, _core.getModuleRegistry())) {
+			if (admin != null && admin.isPasswordCorrect(password, _core.getModuleRegistry())) {
 			    if (inf != null) {
 			        inf.reset();
 			    }
@@ -270,7 +272,7 @@ public class BruteForceLoginBlocker {
 		}
         
         if (inf == null) {
-            inf = new LoginAttemptInformation(DOMAIN_ADMINLOGINS, admin.getUsername(), LoginAttemptInformation.DEFAULT_MAX_FAILED_ATTEMPTS);
+            inf = new LoginAttemptInformation(DOMAIN_ADMINLOGINS, username, LoginAttemptInformation.DEFAULT_MAX_FAILED_ATTEMPTS);
             inf.map(_failedLoginAttempts);
         }
         inf.addFailedAttempt();
@@ -284,10 +286,12 @@ public class BruteForceLoginBlocker {
             }
             
         	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_LOGIN_BLOCKED);
-        	mail.setSubject("OpenWGA Administrator login '" + admin.getUsername() + "' has been blocked.");
-        	mail.append("OpenWGA Administrator login <b>'" + admin.getUsername() + "'</b> has been blocked bc. of <b>'" + inf.getFailedAttempts() + "'</b> failed login attemps.");
+        	mail.setSubject("OpenWGA Administrator login '" + username + "' has been blocked.");
+        	mail.append("OpenWGA Administrator login <b>'" + username + "'</b> has been blocked bc. of <b>'" + inf.getFailedAttempts() + "'</b> failed login attemps.");
+        	if(admin==null)
+        		mail.append("<br>This account does not exist but has been blocked anyway.");
         	if(ip!=null)
-        		mail.append("<br>Login has been requested from IP <b>" + ip + "</b>");
+        		mail.append("<br>Login has been requested from IP <b>" + ip + "</b>.");
 
         	_core.send(mail);
         }

@@ -1274,14 +1274,10 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         }
 
         Administrator admin = (Administrator) _wgaConfiguration.getAdministrator(name);
-        if (admin == null) {
-            return false;
-        }
-        
-        boolean loggedIn = getBruteForceLoginBlocker().login(admin, password, request);
+        boolean loggedIn = getBruteForceLoginBlocker().adminLogin(name, password, admin, request);
         if (request != null) {
             if (!loggedIn) {
-            	log.warn("Failed admin login attempt for account '" + name + "' from '" + request.getAttribute(WGAFilter.REQATTRIB_ORIGINAL_IP) + "'.");
+            	log.warn("Failed admin login attempt for account '" + name + "' from IP '" + request.getAttribute(WGAFilter.REQATTRIB_ORIGINAL_IP) + "'.");
             }
         }
         return loggedIn;
