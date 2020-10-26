@@ -15,12 +15,15 @@ define(["jquery"], function($){
 		this.doc = this.editelement.ownerDocument;
 		
 		this.el.prop("contenteditable", true);
-		this.el.focus();
 
 		this.doc.execCommand("styleWithCSS", false, true);
 		this.doc.execCommand("defaultParagraphSeparator", false, "p");
 		
 		this.el.on({
+			"blur": function(ev){
+				if(editor.toolbar && editor.toolbar.editorLostFocus)
+					editor.toolbar.editorLostFocus(ev)
+			},
 			"keydown": function(ev){
 				//console.log("keypress", ev.key, ev.which);
 				$("img", el).removeClass("womodo-img-selected")

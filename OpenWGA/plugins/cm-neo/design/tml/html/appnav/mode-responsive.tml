@@ -1,0 +1,23 @@
+<div id="app-responsive">
+
+	<a href="#" class="desktop">
+		<i class="icon fas fa-desktop"></i>
+		Desktop
+	</a>
+	<a href="#" data-width="768">
+		<i class="icon fas fa-tablet-alt"></i>
+		Tablet
+	</a>
+	<a href="#" data-width="400" class="phone">
+		<i class="icon fas fa-mobile-alt"></i>
+		Phone
+	</a>
+
+</div>
+
+<script>
+	require(["jquery", "responsive"], function($, R){
+		R.init("<tml:script expression="portlet.portletkey"/>");
+	})
+
+</script>

@@ -279,9 +279,8 @@ public class PortletEvent implements Serializable {
 
     @CodeCompletion
     public void setParameters(Map<String,Object> parameters) {
-        _parameters = parameters;
+    	_parameters.putAll(parameters);
     }
-
     
 
 }

@@ -6,12 +6,26 @@
 		id: struct.getStructKey() 
 	})
 
+	var redirecturl = WGA.app().getHomepageURL()
 	var parent = struct.getParentEntry()
+	if(parent){
+		var c = context("/docid:" + parent.getStructKey() + "<" + LANGUAGE + ">", false);
+		if(c)
+			redirecturl = c.contenturl();
+		else {
+			redirecturl = WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
+					.setParameter({
+						dbkey: WGA.app().dbKey,
+						structkey: parent.getStructKey(),
+						lang: LANGUAGE
+					}).build()			 			
+		}
+	}
 	portlet.fireevent("close-dialog", {
-		redirectto: parent ? WGA.app().getBaseURL() + "/html/default/" + parent.getStructKey() : WGA.app().getHomepageURL()
+		redirectto: redirecturl
 	})
 
-	struct.remove()
+	struct.remove();
 	portlet.setmode("hidden");
 
 </tml:action>

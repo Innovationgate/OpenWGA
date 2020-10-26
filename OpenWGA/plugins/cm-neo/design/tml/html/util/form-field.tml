@@ -1,0 +1,95 @@
+<tml:script>
+	_field = option("name")||option("field");
+	_wrap = null;
+	_mode = option('mode') || (tmlform && tmlform.mode()) || "view"
+	_divider = option('divider')
+	_type = option("type") || "text";
+	_isCeckbox=_isRadio=false;
+	_id = AFW.Util.generateUID();
+	if(_mode!="view" && (
+		_type=="checkbox" 
+		|| 
+		(_type=="boolean" && (option("options")||"").split(",").length==1)
+	)){
+		_divider = "</label><br><label>"
+		_wrap_class="checkbox"
+		_wrap="label"
+	}
+	else if(_mode!="view" && (
+		_type=="radio"
+		|| 
+		(_type=="boolean" && (option("options")||"").split(",").length>1)
+	)){
+		_divider = "</label><br><label>"
+		_wrap_class="radio"
+		_wrap="label"
+	}
+</tml:script>
+
+<div class="form-group<tml:case condition="_field && tmlform.hasmessage(_field)"> error</tml:case>">
+	<label class="col-md-4 control-label" for="<tml:item name="_id"/>"><tml:script expression="option('label')?option('label')+':' : ''"/></label>
+	<div class="col-md-8<tml:case condition="_mode=='view'"> form-control-static</tml:case>">
+
+		<tml:case hasoptions="name">
+			<tml:{div} wrapif="_wrap" html-class="_wrap_class">
+			<tml:input name="{option:name}"
+			
+				type=				"{_type}"
+				options=			"{option('options')==null ? VOID : option('options')}"
+				optionsitem=		"{option('optionsitem') || ($option_optionvalues ? '$option_optionvalues' : VOID)}"
+				optionstitle=		"{option('optionstitle')==null ? VOID : option('optionstitle')}"
+				meta=				"{option('meta')||'false'}"
+				store=				"{option('store')||'true'}"
+				default=			"{option('default')==null ? VOID : option('default')}"
+				defaultexpression=	"{option('defaultexpression')==null ? VOID : option('defaultexpression')}"
+				validation=			"{option('validation')==null ? VOID : option('validation')}"
+				message=			"{option('message')==null ? VOID : option('message')}"
+				multiple=			"{option('multiple')==null ? VOID : option('multiple')}"
+				focus=				"{option('focus')==null ? VOID : option('focus')}"
+				format=				"{option('format') || (option('type')=='date' ? 'dd.MM.yyyy' : '')}"
+				encode=				"{$option_encode || VOID}"
+				changeaction=		"{option('changeaction')==null ? VOID : option('changeaction')}"
+			
+				mode=				"{_mode}"
+				divider=			"{_divider==null ? VOID : _divider}"
+				cssclass=			"{_wrap ? '' : 'form-control'}"
+				
+				wrap="{_wrap}"
+			
+			>
+				id="<tml:item name="_id"/>"
+				<tml:case hasoptions="placeholder">
+					placeholder="<tml:option name="placeholder"/>"
+				</tml:case>
+				<tml:option name="attributes"/>
+			</tml:input>
+			</tml:{div}>
+		</tml:case>
+		<tml:option name="body" wrap="div"/>
+	</div>
+</div>
+
+<tml:select>
+	<tml:case condition="option('type')=='date'">
+		<script>
+			require([
+				"jquery", 
+				"jquery-ui-datepicker"
+			], function($){
+				$("#<tml:script expression="tmlform.formid"/> [name=<tml:option name="name"/>]").datepicker({
+					changeMonth: true,
+					changeYear: true
+				})
+			})
+		</script>
+	</tml:case>
+	
+	<tml:case condition="option('type')=='textarea'">
+		<script>
+			require(["jquery", "jquery-textarea-autogrow"], function($){
+				$("#<tml:script expression="tmlform.formid"/> [name=<tml:option name="name"/>]").autogrow()
+			})
+		</script>
+	</tml:case>
+	
+</tml:select>

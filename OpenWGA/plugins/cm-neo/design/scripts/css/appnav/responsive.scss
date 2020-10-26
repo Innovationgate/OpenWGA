@@ -1,0 +1,29 @@
+#app-responsive {
+
+	padding: 30px;
+
+	a{
+		color: $blue;
+		text-align: center;
+		display: block;
+		padding: 10px;
+		
+		border: solid transparent 4px;
+		border-radius: 10px;
+		&.selected{
+			border-color: $blue;
+		}
+		&:hover, &:focus{
+			outline: none;
+			text-decoration: none;
+		}
+
+		.icon{
+			margin: 10px 0;
+			display: block;
+			font-size: 5em;
+		}
+
+	}
+
+}

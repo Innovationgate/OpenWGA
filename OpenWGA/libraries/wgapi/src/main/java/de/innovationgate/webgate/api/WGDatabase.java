@@ -4112,7 +4112,7 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         
         // Anonymous login
         else if (user.equals(WGDatabase.ANONYMOUS_USER)) {
-        	if(authModule!=null && authModule instanceof AnonymousAwareAuthenticationModule)
+        	if(authModule!=null && authModule instanceof AnonymousAwareAuthenticationModule && request!=null)
         		authSession = ((AnonymousAwareAuthenticationModule)authModule).anonymousLogin(request);
         	else authSession = AnonymousAuthSession.getInstance();
         }

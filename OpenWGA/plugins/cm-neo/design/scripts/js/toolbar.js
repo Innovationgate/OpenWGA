@@ -33,7 +33,14 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 	
 	WGA.event.addListener("*", "clipboard-changed", function(ev){
 		$("#toolbars .clipboard-paste-actions").show();
-		$("#toolbars .clipboard-content").html("Seite '" + ev.params.title + "' - " + ev.params.lang);
+		$("#toolbars .clipboard-page-content").html("Seite '" + ev.params.title + "'");
+		if(ev.params.lang){
+			$("#toolbars .clipboard-paste-content-actions").show();
+			$("#toolbars .clipboard-content").html("Version " + ev.params.version + " - " + ev.params.lang + " - " + ev.params.status);
+		}
+		else{
+			$("#toolbars .clipboard-paste-content-actions").hide();
+		}
 	})
 	
 	WGA.event.addListener("*", "page-rendered", function(ev){
@@ -75,6 +82,8 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 		$("#toolbars [data-action-group='clipboard']")[ev.params.structkey && ev.params.page_visible ? "removeClass" : "addClass"]("disabled")
 		
 		$("#toolbars [data-action='settings-user-defined']").parent()[ev.params.has_userdefined_settings ? "removeClass" : "addClass"]("disabled")
+		
+		$("#toolbars [data-action='paste-content']").parent()[ev.params.may_update_content ? "removeClass" : "addClass"]("disabled")
 		
 	})
 

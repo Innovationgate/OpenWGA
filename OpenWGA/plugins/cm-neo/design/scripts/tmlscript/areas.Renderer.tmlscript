@@ -4,6 +4,11 @@ Renderer.prototype.render = function($urlParam_dbkey) {
 
 	var database = db($urlParam_dbkey);
 	var areas = []; 
+	if(!database){
+		console.error("database not found", $urlParam_dbkey);
+		WGA.TMLPage.write(JSON.stringify(areas))
+		return;
+	}
 	for(let area in Iterator(database.getAreas().values())){
 		if(area.name=="$templates"){
 			if(!WGA.app($urlParam_dbkey).isChiefEditor())

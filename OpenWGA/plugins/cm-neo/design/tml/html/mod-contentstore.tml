@@ -23,7 +23,7 @@
 		request.getSession().setAttribute(wgacore.ATTRIB_VIRTUAL_CONTENT_URL, url + "?contentkey=#CONTENTKEY_UNIQUE_MODE#&structkey=#STRUCTKEY#&dbkey=#DBKEY#");
 	
 		var url = WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL()).build();
-		request.getSession().setAttribute(wgacore.ATTRIB_NO_CONTENT_NOTIFCATION_URL, url + "?dbkey=#DBKEY#&contentkey=#KEY#");
+		request.getSession().setAttribute(wgacore.ATTRIB_NO_CONTENT_NOTIFCATION_URL, url + "?dbkey=#DBKEY#&key=#KEY#");
 
 		var app = WGA.app(portlet.dbkey);
 		var auth = app.domain().auth()
@@ -48,11 +48,12 @@
 			<a href="#" title="Unterseiten" data-view="child-docs">
 				<i class="icon fas fa-clone"></i>
 			</a>
-			
+			<a href="#" title="Responsive" data-view="responsive">
+				<i class="icon fas fa-mobile-alt"></i>
+			</a>			
 			<a href="#" title="Dashboard" data-view="dashboard">
 				<i class="icon fas fa-tachometer-alt"></i>
-			</a>
-			
+			</a>			
 		</tml:option>
 	
 		<tml:option name="appnav">
@@ -91,7 +92,9 @@
 							</tml:if>
 						></iframe>
 						<script>
-							require(["sitepanel"]);
+							require(["sitepanel"], function(S){
+								S.init();
+							});
 						</script>
 					</div>
 				</div>

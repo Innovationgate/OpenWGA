@@ -30,7 +30,7 @@
 			</ul>
 		</div>
 		
-		<div class="btn-group">
+		<div class="btn-group scale">
 			<a class="btn button" href="#" data-toggle="dropdown">
 				<span class="icon"><tml:script expression="profile.scale||100"/>%</span>
 				<div class="text">
@@ -60,18 +60,27 @@
 				</a></li>
 				
 				<li class="divider clipboard-paste-actions" <tml:case isempty="_CM_clipboard_context">style="display:none"</tml:case>></li>
-				<li class="dropdown-header clipboard-content clipboard-paste-actions" <tml:case isempty="_CM_clipboard_context">style="display:none"</tml:case>>
+				<li class="dropdown-header clipboard-page-content clipboard-paste-actions" <tml:case isempty="_CM_clipboard_context">style="display:none"</tml:case>>
 					<tml:case condition="_CM_clipboard_context" context="{_CM_clipboard_context}" iscontextvalid="true">
-						Seite '<tml:meta name="title" encode="html"/>' - <tml:meta name="language"/>
+						Seite '<tml:meta name="title" encode="html"/>'
 					</tml:case>
 				</li>
 				<li class="clipboard-paste-actions" <tml:case isempty="_CM_clipboard_context">style="display:none"</tml:case>><a data-action="paste-page" href="#">
 					<span class="fas fa-file-import"></span>
 					Kopie dieser Seite einfügen ...
 				</a></li>
-				<li class="clipboard-paste-actions" <tml:case isempty="_CM_clipboard_context">style="display:none"</tml:case>><a data-action="paste-content" href="#">
+				<tml:script>
+					var ctx = _CM_clipboard_context && context(_CM_clipboard_context, false)
+					_display =  ctx && ctx.LANGUAGE ? "block" : "none"
+				</tml:script>
+				<li class="dropdown-header clipboard-content clipboard-paste-content-actions" style="display:<tml:item name="_display"/>">
+					<tml:case condition="_CM_clipboard_context" context="{_CM_clipboard_context}" iscontextvalid="true">
+						Version <tml:meta name="version"/> - <tml:meta name="language"/> - <tml:label key="[content-properties.status.{STATUS}]"/>
+					</tml:case>
+				</li>
+				<li class="clipboard-paste-content-actions" style="display:<tml:item name="_display"/>"><a data-action="paste-content" href="#">
 					<span class="fas fa-file-import"></span>					
-					Inhaltselemente dieser Seite einfügen ...
+					Inhaltselemente dieser Version einfügen ...
 				</a></li>
 				
 			</ul>

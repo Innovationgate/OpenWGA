@@ -25,7 +25,8 @@
 		
 		".filesize": {
 			"float": "right",
-			text_align: "right"
+			text_align: "right",
+			margin_left: 20
 		}
 
 	},

@@ -277,7 +277,7 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 				$(this).find(".thumb.selected").each(function(){
 					var $this = $(this) 
 					data.push({
-						type: $this.data("type") || "int",
+						type: $this.data("type") || "intfile",
 						key: $this.data("key"),
 						dbkey: $this.data("dbkey"),
 						container: $this.data("container"),
@@ -291,7 +291,7 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 			}
 			else{	// single img drag 
 				data.push({
-					type: el.data("type") || "int",
+					type: el.data("type") || "intfile",
 					key: el.data("key"),
 					dbkey: el.data("dbkey"),
 					container: el.data("container"),
