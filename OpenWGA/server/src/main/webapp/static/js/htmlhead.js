@@ -94,6 +94,18 @@ WGA = function() {
 
 }();
 
+WGA.focus = function(el){
+	try{
+		el.focus();
+		var value=el.value;
+		if(value){
+			el.value=null;
+			el.value=value;
+		}
+	}
+	catch(e){}
+}
+
 WGA.contextpath = WGA.contextpath || ""; 
 WGA.getUriHash = function(){
 	/*
