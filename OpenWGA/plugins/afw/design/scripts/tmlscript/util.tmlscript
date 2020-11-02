@@ -731,6 +731,9 @@ this.csvReader = function(config){
 				
 				for(let [index, column] in config.columns){
 					
+					if(!column)
+						continue;
+					
 					if(typeof(column)=="string"){
 						// check for "key(type)" format:
 						var match = /(\w+)\s*\(\s*(\w+)\s*\)/.exec(column)
