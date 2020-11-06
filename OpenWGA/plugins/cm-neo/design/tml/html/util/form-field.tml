@@ -52,7 +52,7 @@
 			
 				mode=				"{_mode}"
 				divider=			"{_divider==null ? VOID : _divider}"
-				cssclass=			"{_wrap ? '' : 'form-control'}"
+				cssclass=			"{_wrap ? VOID : 'form-control'}"
 				
 				wrap="{_wrap}"
 			
