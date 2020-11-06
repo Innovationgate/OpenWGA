@@ -1,4 +1,5 @@
 <de.innovationgate.wga.common.beans.csconfig.v5.CSConfig>
+  <initScript>init:init</initScript>
   <connectionScript>init:connect</connectionScript>
   <anonymousAccessLevel>10</anonymousAccessLevel>
   <defaultAccessLevel>10</defaultAccessLevel>
