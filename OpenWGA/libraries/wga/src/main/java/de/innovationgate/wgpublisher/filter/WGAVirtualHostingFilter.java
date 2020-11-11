@@ -111,7 +111,6 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
         BLACK_LIST.add("/tempdwn*");
         BLACK_LIST.add("/services");
         BLACK_LIST.add("/webdav/*");
-        BLACK_LIST.add("/plugin-*");
         BLACK_LIST.add("/" + WGPRequestPath.PATHCMD_TMLFORM + "/*");
     }
     
@@ -244,7 +243,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                 else {
                     // normal db request
                     String requestedDBKey = pathElements[1];
-                    if (vHost.isHideDefaultDatabaseInURL() && defaultDBKey != null) {
+                    if (vHost.isHideDefaultDatabaseInURL() && defaultDBKey != null && !requestedDBKey.startsWith("plugin-")) {
                     	// we need to know if requestedDBKey really is a DBKEY or part of a content path in a title path url 
                     	boolean hasValidTitlePath = false;
                     	try{
