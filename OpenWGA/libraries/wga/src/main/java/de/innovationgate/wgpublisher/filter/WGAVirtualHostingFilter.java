@@ -111,6 +111,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
         BLACK_LIST.add("/tempdwn*");
         BLACK_LIST.add("/services");
         BLACK_LIST.add("/webdav/*");
+        BLACK_LIST.add("/plugin-*");
         BLACK_LIST.add("/" + WGPRequestPath.PATHCMD_TMLFORM + "/*");
     }
     
