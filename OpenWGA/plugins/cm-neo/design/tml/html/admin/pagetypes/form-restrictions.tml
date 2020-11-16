@@ -35,7 +35,11 @@
 	/>
 </tml:case>
 
-<tml:[form-field] o_label="Bevorzugter Parent" o_meta="true" o_name="preferredparent"/>
+<tml:[form-field] o_label="Bevorzugter Parent">	
+	<tml:portlet name="select-parent" ref="util:select-document" o_meta="true" o_fieldname="preferredparent">
+		<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
+	</tml:portlet>
+</tml:[form-field]>
 
 <script>
 	require(["jquery", "bootstrap", "jquery-textarea-autogrow"], function($){
