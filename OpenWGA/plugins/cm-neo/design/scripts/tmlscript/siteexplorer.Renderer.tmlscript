@@ -79,6 +79,7 @@ Renderer.prototype.render = function(App, $urlParam_id, $urlParam_dbkey, $urlPar
 			contenttype: struct.getContentType().getName(),
 			ctPositioning: struct.getContentType().getPositioning(),
 			allowedPositions: allowedPositions,
+			mayMovePage: struct.mayMovePage(),
 			mayEditChildren: struct.mayEditChildren()==null
 		}
 

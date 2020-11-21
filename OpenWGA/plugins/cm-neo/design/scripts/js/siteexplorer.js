@@ -17,6 +17,10 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 		
 		$("#explorer").wga_tree({
 			dragdrop: true,
+			mayDrag: function(source){
+				var sourceStruct = source.context
+				return sourceStruct.mayMovePage;
+			},
 			mayDrop: function(source, target){
 				
 				var sourceStruct = source.context
