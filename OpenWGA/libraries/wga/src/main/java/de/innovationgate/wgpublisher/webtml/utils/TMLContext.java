@@ -5367,12 +5367,6 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         DesignResourceReference currentModule = getDesignContext().getBaseReference();
         final Design mcDesign = WGA.get(this).design().resolve(currentModule).resolve("::" + currentModule.getResourceLocalName() + ".controller");
         
-        // Inside WebTML page return the existing module controller from option
-         ManagedObject mc = (ManagedObject) option(Base.OPTION_MODULE_CONTROLLER);
-        if (mc != null && mc.getDesign().equals(mcDesign.getBaseReference())) {
-            return mc;
-        }
-        
         TMLContext controllerContext = designContext(mcDesign.getBaseReference().toString());
         WGA wga = WGA.get(controllerContext);
 
@@ -5388,6 +5382,12 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
             }
         }
         
+        // Inside WebTML page return the existing module controller from option
+        ManagedObject mc = (ManagedObject) option(Base.OPTION_MODULE_CONTROLLER);
+        if (mc != null && mc.getDesign().equals(mcDesign.getBaseReference())) {
+        	return mc;
+        }
+       
         // Create module controller
         WGScriptModule rendererModule = mcDesign.getScriptModule(WGScriptModule.CODETYPE_TMLSCRIPT);
         if (rendererModule == null) {
