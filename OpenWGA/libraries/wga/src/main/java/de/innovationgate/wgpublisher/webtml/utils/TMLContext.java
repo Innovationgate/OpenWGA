@@ -2980,6 +2980,15 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
             return createlist();
         }
 	}
+
+	public List createlist(Collection<Object> objects) {
+        if (objects != null) {
+            return WGA.get(this).createList(objects);
+        }
+        else {
+            return createlist();
+        }
+	}
 	
 	@CodeCompletion
 	public List createlist(String listString, String delimiter) {

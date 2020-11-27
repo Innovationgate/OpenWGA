@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -1034,8 +1035,9 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
             return get(thisObj).getWga().createList();
         }
         if (args.length == 1) {
-            Object[] array = (Object[]) Context.jsToJava(args[0], Object[].class);
-            return get(thisObj).getWga().createList(array);
+        	@SuppressWarnings("unchecked")
+			Collection<Object> objects = (Collection<Object>) Context.jsToJava(args[0], Collection.class);
+        	return get(thisObj).getWga().createList(objects);
         }
         else if (args.length == 2) {
             Object arg1 = args[0];
