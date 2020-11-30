@@ -1036,8 +1036,15 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
         }
         if (args.length == 1) {
         	@SuppressWarnings("unchecked")
-			Collection<Object> objects = (Collection<Object>) Context.jsToJava(args[0], Collection.class);
-        	return get(thisObj).getWga().createList(objects);
+        	Object arg = args[0];
+        	if(arg instanceof Collection){
+				Collection<Object> objects = (Collection<Object>) Context.jsToJava(args[0], Collection.class);
+	        	return get(thisObj).getWga().createList(objects);
+        	}
+        	else {
+				Object[] objects = (Object[]) Context.jsToJava(args[0], Object[].class);
+	        	return get(thisObj).getWga().createList(objects);
+        	}
         }
         else if (args.length == 2) {
             Object arg1 = args[0];
