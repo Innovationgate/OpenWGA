@@ -42,7 +42,9 @@ import de.innovationgate.utils.security.HashingException;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.auth.AuthenticationException;
+import de.innovationgate.webgate.api.auth.AuthenticationModule;
 import de.innovationgate.webgate.api.auth.AuthenticationSession;
+import de.innovationgate.webgate.api.auth.RequestAwareAuthenticationModule;
 import de.innovationgate.wga.config.Administrator;
 import de.innovationgate.wgpublisher.WGADomain;
 import de.innovationgate.wgpublisher.WGACore;
@@ -162,7 +164,11 @@ public class BruteForceLoginBlocker {
             return null;
         }
         
-        AuthenticationSession authSession = domain.getAuthModule().login(username, credentials);
+        AuthenticationModule auth = domain.getAuthModule();
+        AuthenticationSession authSession;
+        if(auth instanceof RequestAwareAuthenticationModule)
+        	authSession = ((RequestAwareAuthenticationModule)auth).login(username, credentials, request);
+        else authSession = auth.login(username, credentials);
         if (authSession != null) {
             if (inf != null) {
                 inf.reset();
