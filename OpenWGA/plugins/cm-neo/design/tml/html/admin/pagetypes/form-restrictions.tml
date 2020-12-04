@@ -8,7 +8,7 @@
 <tml:[form-field] o_label="Erlaubte Positionen" o_type="select" o_name="positioning"
 	o_meta="true" 
 	o_mode="{$pc.getMode('positioning')}"
-	o_options="Überall|all,nur Hauptseiten|root,nur Unterseiten|child,nur Seiten mit festem Parent:|fixParentDocs,Nur Seiten folgender Seitentypen:|fixDocTypes"
+	o_options="Überall|all,nur Hauptseiten|root,nur Unterseiten|child,nur als Unterseite folgender übergeordneter Seiten:|fixParentDocs,nur als Unterseite folgender Seitentypen:|fixDocTypes"
 	o_changeaction="$refresh"
 />
 <tml:case condition="tmlform.positioning=='fixParentDocs'">
@@ -35,7 +35,7 @@
 	/>
 </tml:case>
 
-<tml:[form-field] o_label="Bevorzugter Parent">	
+<tml:[form-field] o_label="Bevorzugte übergeordnete Seite">	
 	<tml:portlet name="select-parent" ref="util:select-document" o_meta="true" o_fieldname="preferredparent">
 		<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
 	</tml:portlet>
