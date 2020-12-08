@@ -450,7 +450,7 @@ public class Input extends ActionBase implements DynamicAttributes {
         }
         
         if(formBase!=null && this.getFocus().equals("true")){
-        	this.appendResult("<script>try{document.forms['" + formBase.getId() + "'].elements['"+this.getName()+"'].focus()}catch(e){}</script>");
+        	this.appendResult("<script>WGA.focus(document.forms['" + formBase.getId() + "'].elements['"+this.getName()+"'])</script>");
         }
         
         getStatus().divider = "";

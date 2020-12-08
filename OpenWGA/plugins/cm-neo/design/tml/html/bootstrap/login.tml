@@ -23,8 +23,11 @@
 	}
 	else {
 		// is logon blocked?
-		if(WGACore.getBruteForceLoginBlocker().isLoginBlocked(domain, tmlform.username))
-			tmlform.addmessage(label("login.login-blocked", [tmlform.username]))
+		var inf = WGACore.getBruteForceLoginBlocker().getLoginAttemptInformation(domain, tmlform.username);
+		if(inf.isBlocked()){
+			var minutes = inf.BLOCKED_MINUTES - (now() - inf.getBlockedDate().getTime())/(1000*60);
+			tmlform.addmessage(label("login.login-blocked", [tmlform.username, WGA.format(minutes, "0")]))
+		}
 		else tmlform.addmessage(label("login.login-error"))
 	}
 </tml:action>

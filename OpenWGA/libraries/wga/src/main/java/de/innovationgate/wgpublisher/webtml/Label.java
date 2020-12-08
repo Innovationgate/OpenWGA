@@ -51,6 +51,7 @@ public class Label extends Base {
     private String param4;
     private String param5;
     private String language;
+    private String designdb;
 	
  
 
@@ -76,7 +77,10 @@ public class Label extends Base {
 
     public String getWebTMLLabel() throws WGException {
 
-        Design design = WGA.get(getTMLContext()).design();
+        Design design;
+        if(getDesigndb()!=null)
+        	design = WGA.get(getTMLContext()).design(getDesigndb());
+        else design = WGA.get(getTMLContext()).design();
 
     	HashMap<String,Object> config = new HashMap<String,Object>();
     	config.put("container", getContainer());
@@ -233,6 +237,22 @@ public class Label extends Base {
     public void setLanguage(String language) {
         this.language = language;
     }
+
+	/**
+	 * Returns the designdb.
+	 * @return String
+	 */
+	public String getDesigndb() {
+		return this.getTagAttributeValue("designdb", designdb, null);
+	}
+
+	/**
+	 * Sets the designdb.
+	 * @param designdb The designdb to set
+	 */
+	public void setDesigndb(String designdb) {
+		this.designdb = designdb;
+	}
 
 }
 

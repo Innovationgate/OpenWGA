@@ -41,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -1505,10 +1506,18 @@ public class WGA {
      * Creates a list object from an array..
      * This method is provided for TMLScript. In Java one can simply use {@link Arrays#asList(Object...)}.
      */
+    
     public List<Object> createList(Object[] array) {
         return new ArrayList<Object>(Arrays.asList(array));
     }
-    
+
+    /**
+     * Creates a list object from a collection..
+     */
+    public List<Object> createList(Collection<Object> objects) {
+        return new ArrayList<Object>(objects);
+    }
+
     /**
      * Creates an list object from a collection string with delimiter.
      * This method is provided for TMLScript. In Java one can simply use {@link WGUtils#deserializeCollection(String, String)} and variants.

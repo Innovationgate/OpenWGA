@@ -8,6 +8,7 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 	
 	var baseurl;
 	var area_json_url;
+	var path;
 
 	var dbkey, area, structkey, language;
 	
@@ -17,6 +18,10 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 		
 		$("#explorer").wga_tree({
 			dragdrop: true,
+			mayDrag: function(source){
+				var sourceStruct = source.context
+				return sourceStruct.mayMovePage;
+			},
 			mayDrop: function(source, target){
 				
 				var sourceStruct = source.context
@@ -132,7 +137,7 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 
 	function onContextChange(context){
 		
-		var path = context.path;
+		path = context.path;
 		//console.log("siteexplorer content changed event", context);
 		if(context.dbkey!=dbkey){
 			dbkey = context.dbkey
@@ -192,6 +197,12 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 		init: init,
 		forceReload: function(){
 			area=null;
+		},
+		reload: function(){
+			$("#explorer").wga_tree("reload", {
+				url: getURL(),
+				selectpath: path
+			});			
 		}
 	}
 	

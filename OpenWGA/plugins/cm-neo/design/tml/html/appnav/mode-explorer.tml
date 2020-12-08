@@ -1,5 +1,8 @@
 <div id="app-siteexplorer">
 	<div class="dropdown" id="area-dropdown">
+		<a href="#" data-action="reload" title="Siteexplorer neu laden">
+			<i class="fas fa-sync"></i>
+		</a>
 		<a class="area-menu" href="#" data-toggle="dropdown">
 			<span class="area-title"></span>
 		    <span class="caret"></span>
@@ -12,5 +15,9 @@
 <script>
 	require(["siteexplorer"], function(Explorer){
 		Explorer.init("<tml:url type="tml" medium="json" name="siteexplorer"/>", "<tml:url type="tml" medium="json" name="areas"/>");
+		$("#area-dropdown a[data-action=reload]").on("click", function(ev){
+			ev.preventDefault();
+			Explorer.reload();
+		})
 	})
 </script>

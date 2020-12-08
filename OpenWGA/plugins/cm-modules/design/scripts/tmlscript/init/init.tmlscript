@@ -1,0 +1,13 @@
+var acl = db().getACL();
+
+var entry = acl.getEntry("anonymous");
+if(!entry)
+	entry = acl.createUserEntry("anonymous", db().ACCESSLEVEL_EDITOR);
+else entry.setLevel(db().ACCESSLEVEL_EDITOR)
+acl.save(entry);
+
+entry = acl.getEntry("*");
+if(!entry)
+	entry = acl.createUserEntry("*", db().ACCESSLEVEL_EDITOR);
+else entry.setLevel(db().ACCESSLEVEL_EDITOR);
+acl.save(entry);

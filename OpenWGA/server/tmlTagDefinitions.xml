@@ -2378,6 +2378,13 @@
       <bodycontent>JSP</bodycontent>
       <attributes>
         <attribute>
+          <name>designdb</name>
+          <required>false</required>
+          <values/>
+          <valueLookupClass>de.innovationgate.eclipse.editors.helpers.DesignDBLookup</valueLookupClass>
+          <valueHelpEnabled>false</valueHelpEnabled>
+        </attribute>
+        <attribute>
           <name>file</name>
           <required>false</required>
           <values/>

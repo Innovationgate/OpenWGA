@@ -1,22 +1,39 @@
 #app-siteexplorer{
 
-	.area-menu {
-		display: block;
-		height: 40px;
-		line-height: 40px;
+	#area-dropdown{
+	
 		border-bottom: solid silver 1px;
-		background: white;
-		padding: 0 15px;
-		font-size: 1.2em;
-	}
-	.dropdown-menu {
-		margin-left: 10px;
-	}
 
+		.area-menu {
+			display: block;
+			height: 40px;
+			line-height: 40px;
+			background: white;
+			padding: 0 0 0 15px;
+			margin-right: 35px;
+			font-size: 1.2em;
+			.area-title{
+				max-width: 215px;
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				float: left;
+			}
+		}
+		a[data-action=reload]{
+			float: right;
+			line-height: 40px;
+			margin-right: 8px;
+		}
+		.dropdown-menu {
+			margin-left: 10px;
+		}
+	}
+	
 	#explorer {
 		position: absolute;
 		width: 100%;
-		top: 40px;
+		top: 42px;
 		bottom: 0px;
 		overflow: auto;
 		-ms-overflow-style: none;

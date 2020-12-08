@@ -440,7 +440,8 @@
 					dragstart: function(e){
 						//console.log("dragstart", e, e.target);
 						drag_el = $(e.target).parentsUntil(".wga-tree", "li.node").first();
-						if(drag_el.length==0){
+						var mayDrag = config.mayDrag ? config.mayDrag(drag_el.data()) : true;
+						if(drag_el.length==0 || !mayDrag){
 							return drag_el=null;
 						}						
 						drag_el_id = drag_el.data("id");
@@ -510,7 +511,7 @@
 								mayDrop=false
 								el.removeClass("drop-add-children");
 								placeholder.remove()
-								return 
+								return;
 							}
 							if(el.prev("li").data("id")!=drag_el_id){
 								placeholder.insertBefore(el);

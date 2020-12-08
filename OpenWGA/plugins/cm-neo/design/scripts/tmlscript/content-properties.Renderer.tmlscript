@@ -97,9 +97,9 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 	
 	function getPublished(c){
 		if(c.STATUS==c.content().STATUS_ARCHIVE)
-			return AFW.Util.dateRange(c.PUBLISHED, c.MODIFIED)
+			return AFW.Util.dateRange(c.PUBLISHED, c.MODIFIED, "de")
 		else if(c.STATUS==c.content().STATUS_RELEASE)
-			return WGA.format(c.PUBLISHED, "d. MMMMM yyyy, HH:mm") + " Uhr"
+			return WGA.format(c.PUBLISHED, "d. MMMMM yyyy, HH:mm", "de") + " Uhr"
 		else return ""
 	}
 	

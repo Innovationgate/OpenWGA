@@ -1,4 +1,5 @@
 <de.innovationgate.wga.common.beans.csconfig.v5.CSConfig>
+  <initScript>init:init</initScript>
   <connectionScript>init:connect</connectionScript>
   <anonymousAccessLevel>10</anonymousAccessLevel>
   <defaultAccessLevel>10</defaultAccessLevel>
@@ -70,9 +71,9 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>8</minorVersion>
-        <maintenanceVersion>4</maintenanceVersion>
+        <maintenanceVersion>5</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>696</buildVersion>
+        <buildVersion>697</buildVersion>
       </version>
     </id>
     <title>OpenWGA Content Management Modules</title>

@@ -157,6 +157,9 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
 					props.put(entry.getKey().substring("jdbc.".length()), entry.getValue());
 				}
 			}
+
+			if(!props.contains("useSSL"))
+				props.put("useSSL", "false");	// per default we don't use SSL
 			
 			if (!props.containsKey("user")) {
 				props.put("user", masterUser);

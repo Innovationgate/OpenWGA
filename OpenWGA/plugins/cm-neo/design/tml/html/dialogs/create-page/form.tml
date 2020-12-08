@@ -10,8 +10,16 @@
 		else if(AFW.contenttype(ct).isAllowed(document))
 			pagetypes.add(ct.name)
 	}
-	if($option_dialog_options.pagetype && pagetypes.contains($option_dialog_options.pagetype))
-		tmlform.contenttype=$option_dialog_options.pagetype
+	if($option_dialog_options.pagetype){
+	 	if(pagetypes.contains($option_dialog_options.pagetype))
+			tmlform.contenttype=$option_dialog_options.pagetype
+		else{
+			WGA.TMLPage.setVar("_isValid", false)
+			var ct = db().getContentType($option_dialog_options.pagetype)
+			tmlform.addmessage("Der Seitentyp '" + ct.getNameForLanguage("de") + "' ist an dieser Positions nicht erlaubt. Bitte prüfen Sie die Einstellungen für diesen Seitentyp.")
+			return;
+		}
+	}
 	else if(!tmlform.submitted && $option_current_pagetype && pagetypes.contains($option_current_pagetype))
 		tmlform.contenttype=$option_current_pagetype
 	else if(pagetypes.size()==1)

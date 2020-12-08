@@ -25,7 +25,6 @@
 package de.innovationgate.webgate.api;
 
 import java.io.BufferedInputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -38,7 +37,6 @@ import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -90,6 +88,7 @@ import de.innovationgate.webgate.api.auth.CertAuthCapableAuthModule;
 import de.innovationgate.webgate.api.auth.LabeledNamesProvider;
 import de.innovationgate.webgate.api.auth.MasterLoginAuthSession;
 import de.innovationgate.webgate.api.auth.RedirectionAuthModule;
+import de.innovationgate.webgate.api.auth.RequestAwareAuthenticationModule;
 import de.innovationgate.webgate.api.fake.WGFakeDatabase;
 import de.innovationgate.webgate.api.fake.WGFakeDocument;
 import de.innovationgate.webgate.api.fake.WGFakeLanguage;
@@ -109,7 +108,6 @@ import de.innovationgate.webgate.api.schemadef.WGSchemaDocumentDefinition;
 import de.innovationgate.webgate.api.servers.WGDatabaseServer;
 import de.innovationgate.webgate.api.utils.MasterSessionTask;
 import de.innovationgate.webgate.api.workflow.WGDefaultWorkflowEngine;
-import de.innovationgate.webgate.api.workflow.WGWorkflow;
 import de.innovationgate.webgate.api.workflow.WGWorkflowEngine;
 import de.innovationgate.webgate.api.workflow.WGWorkflowEvent;
 import de.innovationgate.webgate.api.workflow.WGWorkflowEventListener;
@@ -4123,7 +4121,9 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
                 authSession = ((CertAuthCapableAuthModule) authModule).login((X509Certificate) credentials);
             }
             else {
-                authSession = authModule.login(user, credentials);
+            	if(authModule instanceof RequestAwareAuthenticationModule)
+            		authSession = ((RequestAwareAuthenticationModule)authModule).login(user, credentials, request);
+            	else authSession = authModule.login(user, credentials);
             }
             
             if (authSession == null) {

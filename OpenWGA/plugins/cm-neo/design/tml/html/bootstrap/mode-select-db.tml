@@ -7,7 +7,33 @@
 		return;
 	}
 
+	var wgaconfig = WGA.Core.getWgaConfiguration()
+	var vhost_filter = Packages.de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
+	var vHost = vhost_filter.findMatchingHost(wgaconfig, request);
+
+	if(!portlet.dbkey && vHost){
+		// check if we have only one contentstore
+		var allowedDbKeys = WGA.createList()
+		for(let uid in Iterator(vHost.getAllowedDatabases())){
+			if(uid=="$all")
+				break;;
+			var dbkey = wgaconfig.getByUid(uid).getKey();
+			var Database = AFW.database(dbkey);
+			if(Database.isValid() && Database.isAuthoringAllowed())
+				allowedDbKeys.add(dbkey);
+		}		
+		if(allowedDbKeys.size()==1)
+			portlet.dbkey = allowedDbKeys.get(0);
+	}
+
 	if(portlet.dbkey){
+	
+		// check v-host
+		if(vHost && !vhost_filter.isDBKeyAllowed(wgaconfig, vHost, portlet.dbkey)){
+			_msg = "Website '" + portlet.dbkey + "' ist für über den Host '" + vHost.servername + "' nicht erreichbar."
+			return;
+		}
+	
 		var App = WGA.app(portlet.dbkey);
 		_Database = AFW.database(portlet.dbkey);
 		if(!_Database.isValid()){
@@ -15,7 +41,7 @@
 			return;
 		}
 		else if(!_Database.isAuthoringAllowed()){
-			_msg = "Diese Website ist nicht zur Bearbeitung vorgesehen."
+			_msg = "Diese Website ist nicht zur Bearbeitung im Content Manager vorgesehen."
 			return;
 		}
 		else if(!_Database.isAuthor() && App.isOpen() && !App.isAnonymous()){

@@ -1593,7 +1593,14 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
         }
         
     }
-    
+
+    /**
+     * Tests if the current user generally may move this struct entry.
+     */
+    public boolean mayMovePage() throws WGBackendException {
+    	return mayEditPage() && getDatabase().getSessionContext().getUserAccess().mayMoveStructEntries();
+    }
+
 
     protected WGDocument testEditPageHierarchyRights() throws WGAPIException {
         // returns null if user may edit Entry

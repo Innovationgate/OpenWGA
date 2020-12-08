@@ -4,6 +4,10 @@ form{
 		padding: 6px;
 	}
 
+	label[for]{
+		cursor: pointer;
+	}
+
 	select.form-control{
 		
 		@if($isGecko){
