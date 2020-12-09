@@ -3,9 +3,14 @@
 		var ct = db().getContentType(tmlform.contenttype)
 		var area = db().getArea(tmlform.area)
 
+		var position=0;
 		var rootEntries = area.getRootEntries();
-		var position = (rootEntries.size() && rootEntries.getByIndex(rootEntries.size()-1).getPosition()+100) || 0;
-
+		if(rootEntries.size()){
+			if(tmlform.position=="end")
+				position = rootEntries.getByIndex(rootEntries.size()-1).getPosition()+100;
+			else position = rootEntries.getByIndex(0).getPosition()-100;
+		}
+		
 		var doc = area.createRootPage(ct, tmlform.title, tmlform.language)
 		var struct = doc.getStructEntry()
 		struct.setPosition(position)
@@ -87,6 +92,9 @@
 			o-optgroups="_optgroups"
 			o_changeaction="$refresh" 
 			o_mode="{_areas.size()==1 ? 'view':'edit'}"/>
+		<tml:case condition="tmlform.area && db().getArea(tmlform.area).getRootEntries().size()">
+			<tml:[form-field] o_label="Position" o_name="position" o_type="select" o_options="Am Anfang der Liste|start,Am Ende der Liste|end"/>
+		</tml:case>
 	</div>
 
 	<div class="footer">

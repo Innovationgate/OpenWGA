@@ -71,6 +71,17 @@ Controller.prototype.isAllowedPageType = function(AFW, $cx, $item__CM_clipboard_
 	return true;
 }
 
+Controller.prototype.destinationHasChildren = function($cx, $form){
+	if($form.root_or_child=="root"){
+		var dest = $cx.db().getArea($form.area)
+		return dest.getRootEntries().size() > 0;
+	}
+	else{
+		var dest = $cx.document instanceof Packages.de.innovationgate.webgate.api.WGStructEntry ? $cx.document : $cx.content().structEntry;
+		return dest.hasChildren();
+	}
+} 
+
 Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context, $form) {
 	
 	var source = $cx.context($item__CM_clipboard_context);
@@ -84,7 +95,7 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 	}
 
 	try{
-		var struct = copyStruct(source, dest, $form.recursive, $form.publish)
+		var struct = copyStruct(source, dest, $form.recursive, $form.publish, $form.position)
 		var url;
 		try{
 			url = $cx.context("docid:"+struct.structKey).contenturl()
@@ -109,7 +120,7 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 		logException(e);
 	}
 
-	function copyStruct(source, dest, recursive, publish){
+	function copyStruct(source, dest, recursive, publish, position){
 		//console.log("copy", source.title, "to", dest.title || dest.name, recursive, publish)
 
 		var Contenttype = AFW.contenttype(source.getContentType().name);
@@ -123,13 +134,6 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 			message: "Seitentyp nicht erlaubt"
 		}
 		
-		/*
-		if(source.getAllReleasedContent().isEmpty()){
-			console.warn("no published versions in page '" + source.title + "'", source.structKey);
-			return false;
-		}
-		*/
-
 		// copy struct
 		var struct;
 		
@@ -140,15 +144,24 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 		struct.setReaders(source.getReaders())
 		struct.setPageEditors(source.getPageEditors())
 		
-		if(dest instanceof Packages.de.innovationgate.webgate.api.WGArea){
-			var rootEntries = dest.getRootEntries();
-			if(rootEntries.size())
-				struct.setPosition(rootEntries.getByIndex(rootEntries.size()-1).getPosition()+100);	// APPEND TO END
+		if(position){
+			if(dest instanceof Packages.de.innovationgate.webgate.api.WGArea){
+				var rootEntries = dest.getRootEntries();
+				if(rootEntries.size()){
+					if(position=="end")
+						struct.setPosition(rootEntries.getByIndex(rootEntries.size()-1).getPosition()+100);	// APPEND TO END
+					else struct.setPosition(rootEntries.getByIndex(0).getPosition()-100);	// APPEND TO START
+				}
+			}
+			else if(dest.hasChildren()){
+				var children = dest.getChildEntries();
+				if(position=="end")
+					struct.setPosition(children.getByIndex(children.size()-1).getPosition()+100);	// APPEND TO END
+				else struct.setPosition(children.getByIndex(0).getPosition()-100);	// APPEND TO START
+			}
 		}
-		else if(dest.hasChildren()){
-			var children = dest.getChildEntries();
-			struct.setPosition(children.getByIndex(children.size()-1).getPosition()+100);	// APPEND TO END
-		}
+		else struct.setPosition(source.getPosition());	// default
+		
 		struct.save();
 		
 		// copy contents
