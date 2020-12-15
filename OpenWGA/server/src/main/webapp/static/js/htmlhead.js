@@ -2036,17 +2036,23 @@ WGA.websocket = {
 		
 		errorCallbacks: {},
 		
-		start: function(url, pageId, sessionId, noCloseHandler) {
+		// setup is called from OpenWGA if websockets are configured.
+		setup: function(url, pageId, sessionId) {
 			this.url = url;
 			this.pageId = pageId;
 			this.sessionId = sessionId;
-			this.noCloseHandler = noCloseHandler;
-			if (!this.startService()) {
-				this.noSupport();
-			} 
 		},
 		
-		startService: function() {
+		stopService: function() {
+			if(this.socket){
+				this.socket.close();
+			}
+		},
+		
+		startService: function(onopen) {
+			
+			if(!this.url)
+				return console.log("No url configured to start servive");
 			
 			if (!WGA.hasLocalStorage()){
 				return false;
@@ -2066,7 +2072,8 @@ WGA.websocket = {
 			}
 			
 			var completeUrl = this.url + (this.url.indexOf("?") != -1 ? "&" : "?") + WGA.toQueryString(urlParams);
-
+			console.log("WebSocket start service", completeUrl)
+			
 			if(this.socket)
 				this.socket.close();
 
@@ -2086,11 +2093,9 @@ WGA.websocket = {
 				return false;
 			}
 			
+			this.socket.onopen = onopen
 			this.socket.onmessage = this.onMessage;
-			this.socket.onopen = this.onOpen;
-			if (!this.noCloseHandler) {
-				this.socket.onclose = this.onClose;
-			}
+			this.socket.onclose = this.onClose;
 			
 			return true;
 			
