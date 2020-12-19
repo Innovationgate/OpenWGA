@@ -191,7 +191,7 @@ public class BruteForceLoginBlocker {
             }
             
         	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_LOGIN_BLOCKED);
-        	mail.setSubject("Logins has been blocked");
+        	mail.setSubject("Login has been blocked");
         	mail.append("<p>Login for user <b>" + username + "</b>"
         			+ " has been blocked in authentication domain <b>" + domain.getName() + "</b> because of " + inf.getFailedAttempts() + " failed login attemps.</p>");
         	if(inf.getIps().size()>0){
@@ -213,7 +213,6 @@ public class BruteForceLoginBlocker {
     }
     
     public int login(WGDatabase db, String username, Object credentials, String filter) throws WGAPIException {
-        
         
         String domainName = (String) db.getAttribute(WGACore.DBATTRIB_DOMAIN);
         WGADomain domain = _core.getDomains(domainName);
@@ -241,8 +240,24 @@ public class BruteForceLoginBlocker {
                 }
                 
             	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_LOGIN_BLOCKED);
-            	mail.setSubject("Login for user '" + domainName + "/" + username + "' has been blocked bc. of '" + inf.getFailedAttempts() + "' failed login attemps.");
-            	mail.append("Login for user <b>'" + domainName + "/" + username + "'</b> has been blocked bc. of <b>'" + inf.getFailedAttempts() + "'</b> failed login attemps.");
+            	
+            	mail.setSubject("Login has been blocked");
+            	
+            	mail.append("Username: " + username);
+            	mail.append("<br>Domain: " + domainName);
+            	mail.append("<br>");
+            	mail.append("<br>Failed Login-Attempts: " + inf.getFailedAttempts());
+            	mail.append("<br>Last Login-Application-Key: " + db.getDbReference());
+            	mail.append("<br>Last Used Credentials (Password): " + credentials);
+
+            	if(inf.getIps().size()>0){
+            		mail.append("<p>Logins has been requested from the following IP(s):</p>");
+            		mail.append("<ul>");
+            		for(String requested_from_ip: inf.getIps())
+            			mail.append("<li>" + requested_from_ip + "</li>");
+            		mail.append("</ul>");
+            	}
+
             	_core.send(mail);
             }
         }
