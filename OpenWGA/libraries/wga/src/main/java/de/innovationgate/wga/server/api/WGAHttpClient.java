@@ -14,6 +14,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.methods.DeleteMethod;
 
 import de.innovationgate.utils.Base64;
@@ -84,6 +85,11 @@ public class WGAHttpClient {
 		_headers.putAll(map);
 		return this;
 	}
+	
+	public WGAHttpClient setDefaultCharset(String charset){
+		_default_charset = charset;
+		return this;
+	}
 
 	public WGAHttpClient setCredentials(String username, String password) throws PasswordEncodingException{
 		String authString = (new Base64()).encodePassword(username + ":" + password);
@@ -95,6 +101,10 @@ public class WGAHttpClient {
 		for(Entry<String,String> entry: _headers.entrySet()){
 			method.setRequestHeader(entry.getKey(), entry.getValue());
 		}
+		// set default charset to be used if no charset is defined in response content-type
+		HttpMethodParams params = new HttpMethodParams();
+		params.setContentCharset(_default_charset);
+		method.setParams(params);
 		// execute
 		try{
 			int status = _client.executeMethod(method);
