@@ -175,7 +175,7 @@ public class WGAFilterChain implements FilterChain {
         try {
             // Create and init the filter (which we do anyway, even if there are no protocol implementation)
             FilterMapping filterMapping = new FilterMapping();
-            filterMapping.setName("WGAServices SOAP Request Filter");
+            filterMapping.setName("WGA Services Filter");
             filterMapping.setEnabled(true);
             filterMapping.setImplClassName(WGAWebServicesFilter.class.getName());
             

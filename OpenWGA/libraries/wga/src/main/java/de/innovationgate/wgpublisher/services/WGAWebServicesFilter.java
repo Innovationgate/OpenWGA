@@ -116,7 +116,7 @@ public class WGAWebServicesFilter implements Filter {
                 registeredService.getService().service(httpReq, res);
             }
             else {
-                httpRes.sendError(404, "Unknown OpenWGA service '" + serviceName + "'");
+            	filterChain.doFilter(req, res);
             }
         }
     }
