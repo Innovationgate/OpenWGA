@@ -180,9 +180,7 @@ public class WGAFilterChain implements FilterChain {
             filterMapping.setImplClassName(WGAWebServicesFilter.class.getName());
             
             List<String> patterns = new ArrayList<String>();
-            patterns.add(WGAWebServicesFilter.BASEPATH);
             patterns.add(WGAWebServicesFilter.BASEPATH + "/*");
-            // patterns.add("//services/*"); // Really necessary? Breaks internal rewritings of the services filter
             filterMapping.setUrlPatterns(patterns);
             
             WGAWebServicesFilter filter = new WGAWebServicesFilter();
@@ -194,7 +192,7 @@ public class WGAFilterChain implements FilterChain {
             filterInfos.add(info);
         }
         catch (Exception e) {
-            core.getLog().error("Exception initializing WGAServices SOAP protocol", e);
+            core.getLog().error("Exception initializing WGA Services Filter", e);
         }
 
     }

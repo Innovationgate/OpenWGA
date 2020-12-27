@@ -102,12 +102,9 @@ public class WGAWebServicesFilter implements Filter {
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpReq = (HttpServletRequest) req;
-        HttpServletResponse httpRes = (HttpServletResponse) res;
         String servicePath = httpReq.getServletPath().substring(BASEPATH.length());
-        if ("".equals(servicePath) || "/".equals(servicePath)) {
-            showServiceOverview(httpRes, httpReq);
-        }
-        else {
+        if(servicePath.startsWith("/")){
+        	// should (now #00005649) always start with / - but we test it just to be sure and avoid errors
             List<String> pathParts = WGUtils.deserializeCollection(servicePath.substring(1), "/");
             String serviceName = pathParts.get(0);
             RegisteredService registeredService = _services.get(serviceName);
@@ -119,49 +116,33 @@ public class WGAWebServicesFilter implements Filter {
             	filterChain.doFilter(req, res);
             }
         }
-    }
-
-    private void showServiceOverview(HttpServletResponse httpRes, HttpServletRequest httpReq) throws IOException {
-
-        PrintWriter out = httpRes.getWriter();
-        out.write("<!doctype html>\n<html lang=\"en\">\n");
-        out.write("<head><meta charset=\"UTF-8\"><title>OpenWGA Web Services</title></head>\n");
-        out.write("<body>\n");
-        out.write("<h1>OpenWGA Web Services</h1>\n");
-        out.write("<ul>");
-        
-        for (Map.Entry<String, RegisteredService> serviceEntry : _services.entrySet()) {
-            out.write("<li><b>" + serviceEntry.getKey() + "</b>: " + serviceEntry.getValue().getService().getName());
-        }
-        
-        out.write("</ul>");
-        out.write("\n</body>\n</html>");
-        
+        else {
+        	filterChain.doFilter(req, res);
+        } 
     }
 
     public void init(FilterConfig fc) throws ServletException {
         
-            WGAFilterConfig wgaFc = (WGAFilterConfig) fc;
-            _core = WGACore.retrieve(wgaFc.getServletContext());
-            
-            Iterator<ModuleDefinition> impls = _core.getModuleRegistry().getModulesForType(WGAWebServiceModuleType.class).values().iterator();
-            while (impls.hasNext()) {
-                KeyBasedModuleDefinition serviceMod = (KeyBasedModuleDefinition) impls.next();
-                try {
-                    WGAWebService servlet = (WGAWebService) _core.getModuleRegistry().instantiate(serviceMod);
-                    WGAWebServiceProperties props = (WGAWebServiceProperties) serviceMod.getProperties();
-                    if (props == null) {
-                        props = new WGAWebServiceProperties();
-                    }
-                    ServletConfig sc = props.buildServletConfig(fc.getServletContext(), serviceMod);
-                    servlet.init(sc);
-                    _services.put(serviceMod.getRegistrationKey().toLowerCase(), new RegisteredService(servlet, props));
+        WGAFilterConfig wgaFc = (WGAFilterConfig) fc;
+        _core = WGACore.retrieve(wgaFc.getServletContext());
+        
+        Iterator<ModuleDefinition> impls = _core.getModuleRegistry().getModulesForType(WGAWebServiceModuleType.class).values().iterator();
+        while (impls.hasNext()) {
+            KeyBasedModuleDefinition serviceMod = (KeyBasedModuleDefinition) impls.next();
+            try {
+                WGAWebService servlet = (WGAWebService) _core.getModuleRegistry().instantiate(serviceMod);
+                WGAWebServiceProperties props = (WGAWebServiceProperties) serviceMod.getProperties();
+                if (props == null) {
+                    props = new WGAWebServiceProperties();
                 }
-                catch (Throwable e) {
-                    LOG.error("Exception creating servlet for WGA service '" + serviceMod.getRegistrationKey() + "'", e);
-                }
+                ServletConfig sc = props.buildServletConfig(fc.getServletContext(), serviceMod);
+                servlet.init(sc);
+                _services.put(serviceMod.getRegistrationKey().toLowerCase(), new RegisteredService(servlet, props));
             }
-            
+            catch (Throwable e) {
+                LOG.error("Exception creating servlet for WGA service '" + serviceMod.getRegistrationKey() + "'", e);
+            }
+        }
         
     }
 
