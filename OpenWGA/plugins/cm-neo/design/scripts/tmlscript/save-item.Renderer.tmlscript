@@ -49,8 +49,10 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 			}
 			break;
 
-		case "rtf":
 		case "textblock":
+			result.value_encoded = value;
+			break;
+		case "rtf":
 			var ctx = WGA.context(doc);
 			ctx.setoption(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES, "usage=poster")
 			result.value = WGA.encode("rtfsystem", value, ctx)
@@ -71,5 +73,4 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 	//console.log($urlParam_data_type, JSON.stringify(result))
 
 	WGA.TMLPage.write(JSON.stringify(result))
-	//WGA.TMLPage.renderDefault();
 }
