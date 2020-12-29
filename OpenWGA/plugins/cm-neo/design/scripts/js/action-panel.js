@@ -263,10 +263,12 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 			}
 		},
 		dblclick: function(e){
-			if($(this).data("type")!="extfile")
-				CM.openDialog("attachment-metas", {
-					filename: $(this).data("filename")
-				})
+			CM.openDialog("attachment-metas", {
+				dbkey: $(this).data("dbkey"),
+				container: $(this).data("container"),
+				type: $(this).data("type"), 
+				filename: $(this).data("filename")
+			})
 		}		
 	}, ".thumb")
 	.on({
