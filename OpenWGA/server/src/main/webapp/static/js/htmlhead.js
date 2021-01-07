@@ -2072,7 +2072,8 @@ WGA.websocket = {
 			}
 			
 			var completeUrl = this.url + (this.url.indexOf("?") != -1 ? "&" : "?") + WGA.toQueryString(urlParams);
-			console.log("WebSocket start service", completeUrl)
+			if(WGA.debug)
+				console.log("WebSocket start service", completeUrl)
 			
 			if(this.socket)
 				this.socket.close();
