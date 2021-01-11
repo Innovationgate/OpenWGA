@@ -1975,8 +1975,6 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     	if(!getWGPPath().isEmpty())
     		jscodeBuilder.append("WGA.contextpath=\"" + getWGPPath() + "\";");    // used by htmlhead.js since wga-4
 
-    	//jscodeBuilder.append("WGA.uriHash =\"" + getTMLContext().getUriHash() + "\";");
-    	
     	initPageConnectionClient(jscodeBuilder);
     	
     	if (getStatus().debugNode != null) {
