@@ -3,6 +3,7 @@ package de.innovationgate.wga.server.api;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,6 +94,18 @@ public class WGAFile {
 		_file = file;
 	}
 	
+	public boolean exists(){
+		if(_file==null)
+			return false;
+		return _file.exists();
+	}
+	
+	public InputStream getInputStream() throws FileNotFoundException{
+		if(_file==null)
+			return null;
+		return new FileInputStream(_file);
+	}
+	
 	public String toString(){
 		if(_file!=null)
 			return _file.toString();
@@ -100,7 +113,7 @@ public class WGAFile {
 	}
 	
 	public ZipStream createZipStream() throws IOException{
-		return new ZipStream(new java.io.FileOutputStream(_file));
+		return new ZipStream(new FileOutputStream(_file));
 	}
 	
 	/**

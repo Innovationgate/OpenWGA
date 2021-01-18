@@ -25,9 +25,9 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>8</minorVersion>
-        <maintenanceVersion>5</maintenanceVersion>
+        <maintenanceVersion>6</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>697</buildVersion>
+        <buildVersion>698</buildVersion>
       </version>
     </id>
     <title>OpenWGA Content Store Maintenance</title>

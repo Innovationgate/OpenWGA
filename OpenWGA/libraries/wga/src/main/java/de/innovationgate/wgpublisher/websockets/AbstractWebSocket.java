@@ -258,6 +258,9 @@ public abstract class AbstractWebSocket {
                 session.close(new CloseReason(CloseReason.CloseCodes.VIOLATED_POLICY, "The HTTP session belonging to the page is gone."));
             }
         }
+        else if (t instanceof java.io.EOFException){
+       		session.close();
+        }
         else {
             LOG.error("Exception on Web Socket session " + session.getId(), t);
         }

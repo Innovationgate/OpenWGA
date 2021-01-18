@@ -46,20 +46,27 @@
 	_dialog_closed=true
 </tml:action>
 
-<tml:form id="form-edit-filemetas" source="none" unless="_dialog_closed" mode="{App.mayUpdateContent(this) ? 'edit':'view'}">
+<tml:form id="form-edit-filemetas" source="none" unless="_dialog_closed" mode="{!$urlParam_container && App.mayUpdateContent(this) ? 'edit':'view'}">
 
 	<tml:script>
 		var filename = request.getParameter("filename")
+		var container = request.getParameter("container")
+		var dbkey = request.getParameter("dbkey")
+		
+		_ctx = this;
+		if(dbkey && container)
+			_ctx = WGA.context("db:"+dbkey + "/docid:"+container);
+		
 		if(filename)
 			portlet.filename = filename
-		_file_md = content().getFileMetaData(portlet.filename)
-		_Attachment = AFW.content().attachment(portlet.filename)
-		_derivates = content().getFileDerivates(filename, ["poster"])
-		_isPrimary = (content().getPrimaryFileName()==filename)
+		_file_md = _ctx.content().getFileMetaData(portlet.filename)
+		_Attachment = AFW.content(_ctx).attachment(portlet.filename)
+		_derivates = _ctx.content().getFileDerivates(filename, ["poster"])
+		_isPrimary = (_ctx.content().getPrimaryFileName()==filename)
 	</tml:script>
 
 	<div class="header">
-		Dateianhang
+		<tml:case condition="$urlParam_type=='extfile'">Externer </tml:case>Dateianhang
 		<a data-modal="hide">&times;</a>
 	</div>
 	
@@ -79,7 +86,7 @@
 				}
 			</tml:script>
 			<tml:case condition="_url">
-				<a href="<tml:url type="file" file="{portlet.filename}"/>" target="_blank">
+				<a href="<tml:url type="file" file="{portlet.filename}" context="{_ctx}"/>" target="_blank">
 					<img src="<tml:item name="_url"/>" srcset="<tml:item name="_srcset"/>" title="<tml:script expression="_file_md.mimeType"/>">
 				</a>
 			</tml:case>
@@ -89,7 +96,7 @@
 				<tml:script expression="AFW.Util.renderFileSize(_file_md.size)"/>
 				<tml:case condition="_file_md && _file_md.displayWidth>0">
 					<br>
-					<a href="<tml:url type="file" file="{portlet.filename}"/>" target="_blank" title="in neuem Fenster öffnen">
+					<a href="<tml:url type="file" file="{portlet.filename}" context="{_ctx}"/>" target="_blank" title="in neuem Fenster öffnen">
 						<tml:script expression="_file_md.displayWidth"/>
 						x
 						<tml:script expression="_file_md.displayHeight"/>
@@ -106,7 +113,7 @@
 					<p style="margin-top:20px">Poster Derivate:</p>
 	    			<tml:foreach item="_derivates" currentvalue="_derivate" sortexpression="_derivate.displayWidth" sortorder="descending">
 	    				<tml:script>
-							_url = WGA.urlBuilder(fileurl(portlet.filename))
+							_url = WGA.urlBuilder(_ctx.fileurl(portlet.filename))
 										.setParameter("derivate", "id="+_derivate.id)
 										.build(true);
 	    				</tml:script>
@@ -129,20 +136,22 @@
 			<tml:[form-field] o_label="Titel / ALT-Text" o_name="title" o_default="{_file_md.title}"/>
 			<tml:[form-field] o_label="Copyright" o_name="copyright" o_default="{_file_md.copyright}"/>
 			<tml:[form-field] o_label="Beschreibung" o_name="description" o_default="{_file_md.description}" o_type="textarea"/>
-			<tml:[form-field] o_label="Primäre Datei" o_name="primary_file" o_type="boolean" o_labeled="true" o_default="{_isPrimary}" o_options="Diese Datei ist primäre Datei dieser Inhaltsversion|true"/>
+			<tml:case condition="$urlParam_type!='extfile'">
+				<tml:[form-field] o_label="Primäre Datei" o_name="primary_file" o_type="boolean" o_labeled="true" o_default="{_isPrimary}" o_options="Diese Datei ist primäre Datei dieser Inhaltsversion|true"/>
+			</tml:case>
 		</div>
 		
 	</div>
 	
 	<div class="footer">
 		<div class="pull-left">
-			<tml:case condition="_Attachment.isVideo()">
+			<tml:case condition="_Attachment.isVideo() && tmlform.iseditable()">
 				<tml:button cssclass="btn btn-default" clickaction="edit-video">
 					<i class="fa fa-edit"></i>
 					Video bearbeiten
 				</tml:button>
 			</tml:case>
-			<a class="btn btn-default" href="<tml:url type="file" file="{portlet.filename}" u_forcedownload="true"/>">
+			<a class="btn btn-default" href="<tml:url type="file" file="{portlet.filename}" context="{_ctx}" u_forcedownload="true"/>">
 				<i class="fas fa-download"></i>
 				Download
 			</a>

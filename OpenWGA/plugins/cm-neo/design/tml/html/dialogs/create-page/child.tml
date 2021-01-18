@@ -2,8 +2,13 @@
 	if(tmlform.validate()){
 		var ct = db().getContentType(tmlform.contenttype)
 
+		var position = 0;
 		var children = document.getChildEntries();
-		var position = (children.size() && children.getByIndex(0).getPosition()-100) || 0;
+		if(children.size()){
+			if(tmlform.position=="end")
+				position = children.getByIndex(children.size()-1).getPosition()+100;
+			else position = children.getByIndex(0).getPosition()-100;
+		}		
 
 		var doc = document.createChildPage(ct, tmlform.title, tmlform.language)
 		var struct = doc.getStructEntry()
@@ -40,6 +45,7 @@
 	<div class="content form-horizontal">
 
 		<tml:[::form]/>
+		<hr>
 		<tml:[form-field] o_label="Erstellen unter" o_mode="view">
 			<tml:script encode="html">
 				var c = context("docid:"+document.getStructKey(), false)
@@ -48,6 +54,9 @@
 				else return document.title
 			</tml:script>			
 		</tml:[form-field]>
+		<tml:case condition="document.hasChildren()">
+			<tml:[form-field] o_label="Position" o_name="position" o_type="select" o_options="Am Anfang der Liste|start,Am Ende der Liste|end"/>
+		</tml:case> 
 	</div>
 
 	<div class="footer">

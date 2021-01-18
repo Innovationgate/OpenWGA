@@ -107,23 +107,6 @@ WGA.focus = function(el){
 }
 
 WGA.contextpath = WGA.contextpath || ""; 
-WGA.getUriHash = function(){
-	/*
-	 * not sure why we need this. Just in case we do ;-)
-	 * for hashCode() see https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0 
-	 */
-	function hashCode(s) {
-		var h = 0, l = s.length, i = 0;
-		if ( l > 0 )
-			while (i < l)
-				h = (h << 5) - h + s.charCodeAt(i++) | 0;
-		return h;
-	};
-	if(!WGA.urihash)
-		WGA.urihash = hashCode(location.href)
-	return WGA.urihash;
-}
-WGA.urihash = WGA.getUriHash();		// init with current location.href
 
 WGA.responsive = {
 	breakpoints:{
@@ -1731,14 +1714,14 @@ WGA.portlet = function() {
 				});
 				
 				if (WGA.hasLocalStorage()) {
-					window.sessionStorage.setItem(PORTLETSTATE_PREFIX +  WGA.getUriHash() + "." + pKey, stateObject);
+					window.sessionStorage.setItem(PORTLETSTATE_PREFIX + pKey, stateObject);
 					var parentKeys = parentRegistry[pKey];
 					if (parentKeys) {
 						
 						var parentKey = parentKeys[0];
 						if (parentKey) {
 							var children = [];
-							var childrenStr = window.sessionStorage.getItem(CHILDPORTLETS_PREFIX +  WGA.getUriHash() + "." + parentKey);
+							var childrenStr = window.sessionStorage.getItem(CHILDPORTLETS_PREFIX + parentKey);
 							if (childrenStr) {
 								children = childrenStr.split(",");
 							}
@@ -1755,7 +1738,7 @@ WGA.portlet = function() {
 							if (!foundChild) {
 								children.push(pKey);
 							}
-							window.sessionStorage.setItem(CHILDPORTLETS_PREFIX +  WGA.getUriHash() + "." + parentKey, children.join(","));
+							window.sessionStorage.setItem(CHILDPORTLETS_PREFIX + parentKey, children.join(","));
 						}
 					}
 				}
@@ -1771,7 +1754,7 @@ WGA.portlet = function() {
 		
 		,fetchState : function(pKey) {
 			if (WGA.hasLocalStorage()){
-				return JSON.parse(window.sessionStorage.getItem(PORTLETSTATE_PREFIX + WGA.getUriHash() + "." + pKey));
+				return JSON.parse(window.sessionStorage.getItem(PORTLETSTATE_PREFIX + pKey));
 			}
 			else if (portletStates[pKey]){
 				return JSON.parse(portletStates[pKey]);
@@ -1782,7 +1765,7 @@ WGA.portlet = function() {
 		// Remove state of a portlet that has been explicitly unregistered
 		,disposeState : function(pKey) {
 			if (WGA.hasLocalStorage()){
-				window.sessionStorage.removeItem(PORTLETSTATE_PREFIX + WGA.getUriHash() + "." + pKey);
+				window.sessionStorage.removeItem(PORTLETSTATE_PREFIX + pKey);
 			}
 			else {
 				delete portletStates[pKey];
@@ -1816,7 +1799,7 @@ WGA.portlet = function() {
 			}
 			
 			if (WGA.hasLocalStorage()){
-				var childrenStr = window.sessionStorage.getItem(CHILDPORTLETS_PREFIX + WGA.getUriHash() + "." + pKey);
+				var childrenStr = window.sessionStorage.getItem(CHILDPORTLETS_PREFIX + pKey);
 				var children = [];
 				if (childrenStr) {
 					children = childrenStr.split(",");
@@ -2036,17 +2019,23 @@ WGA.websocket = {
 		
 		errorCallbacks: {},
 		
-		start: function(url, pageId, sessionId, noCloseHandler) {
+		// setup is called from OpenWGA if websockets are configured.
+		setup: function(url, pageId, sessionId) {
 			this.url = url;
 			this.pageId = pageId;
 			this.sessionId = sessionId;
-			this.noCloseHandler = noCloseHandler;
-			if (!this.startService()) {
-				this.noSupport();
-			} 
 		},
 		
-		startService: function() {
+		stopService: function() {
+			if(this.socket){
+				this.socket.close();
+			}
+		},
+		
+		startService: function(onopen) {
+			
+			if(!this.url)
+				return console.log("No url configured to start servive");
 			
 			if (!WGA.hasLocalStorage()){
 				return false;
@@ -2066,7 +2055,9 @@ WGA.websocket = {
 			}
 			
 			var completeUrl = this.url + (this.url.indexOf("?") != -1 ? "&" : "?") + WGA.toQueryString(urlParams);
-
+			if(WGA.debug)
+				console.log("WebSocket start service", completeUrl)
+			
 			if(this.socket)
 				this.socket.close();
 
@@ -2086,11 +2077,9 @@ WGA.websocket = {
 				return false;
 			}
 			
+			this.socket.onopen = onopen
 			this.socket.onmessage = this.onMessage;
-			this.socket.onopen = this.onOpen;
-			if (!this.noCloseHandler) {
-				this.socket.onclose = this.onClose;
-			}
+			this.socket.onclose = this.onClose;
 			
 			return true;
 			

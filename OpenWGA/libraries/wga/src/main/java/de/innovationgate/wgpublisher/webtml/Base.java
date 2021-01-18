@@ -1975,8 +1975,6 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     	if(!getWGPPath().isEmpty())
     		jscodeBuilder.append("WGA.contextpath=\"" + getWGPPath() + "\";");    // used by htmlhead.js since wga-4
 
-    	//jscodeBuilder.append("WGA.uriHash =\"" + getTMLContext().getUriHash() + "\";");
-    	
     	initPageConnectionClient(jscodeBuilder);
     	
     	if (getStatus().debugNode != null) {
@@ -2048,14 +2046,13 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     	    url.setPort(port);
     	}
     	
-    	boolean noCloseHandler = "true".equals(System.getProperty("de.innovationgate.wga.unittest"));
-    	
-    	out.append("WGA.onload.register(function() {WGA.websocket.start('")
-    	.append(WGUtils.encodeJS(url.build(true))).append("', '")
-    	.append(WGUtils.encodeJS(pageConn.getPageId())).append("', '")
-    	.append(getTMLContext().gethttpsession().getId()).append("', ")
-    	.append(noCloseHandler)
-    	.append(")});");
+    	out.append("WGA.websocket.setup('")
+    	.append(WGUtils.encodeJS(url.build(true)))
+    	.append("','")
+    	.append(WGUtils.encodeJS(pageConn.getPageId()))
+    	.append("','")
+    	.append(getTMLContext().gethttpsession().getId())
+    	.append("');");
     	
     	pageConn.setClientInited(true);
     }

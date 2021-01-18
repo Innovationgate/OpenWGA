@@ -20,16 +20,18 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 					"cssclass": c.STATUS
 				})
 			}
-			else docs.push({
-				title: doc.title,
-				href: WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
-							.setParameter({
-								dbkey: dbkey,
-								structkey: doc.getStructKey(),
-								lang: "de"
-							})
-							.build()
-			})
+			else if(doc.mayReadContent()){
+				docs.push({
+					title: doc.title,
+					href: WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
+								.setParameter({
+									dbkey: dbkey,
+									structkey: doc.getStructKey(),
+									lang: "de"
+								})
+								.build()
+				})
+			}
 		}
 	}
 
