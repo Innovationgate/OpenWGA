@@ -3187,7 +3187,11 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         if (document instanceof WGContent) {
             WGContent content = (WGContent) document;
 
-            content.removeAllIncomingRelations();
+            /*
+             * We can't remove relations here because we need to update relation source contents and may not have sufficient rights for that.
+             */
+            //content.removeAllIncomingRelations();
+            
             if (content.getRetrievalStatus().equals(WGContent.STATUS_RELEASE)) {
                 dropQueryCache = true;
             }
