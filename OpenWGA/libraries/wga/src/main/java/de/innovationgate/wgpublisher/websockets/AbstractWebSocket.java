@@ -284,8 +284,11 @@ public abstract class AbstractWebSocket {
                     _session.getBasicRemote().sendText(msg.toString());   
                 }
             }
-            else {
-                LOG.error("Invalid message type for websocket: " + msgObj.getClass().getName());
+            else if(msgObj!=null){
+                LOG.error("Invalid message type for websocket: " + msgObj.getClass());
+            }
+            else{
+                LOG.error("NULL message type for websocket");
             }
         }
         catch (IllegalStateException e) {
