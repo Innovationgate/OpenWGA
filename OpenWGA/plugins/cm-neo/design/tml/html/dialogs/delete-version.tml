@@ -5,7 +5,14 @@
 	var dbkey = meta("db", "dbkey");
 	var struct = content().structEntry;
 
-	content().remove();
+	try{
+		content().remove();
+	}
+	catch(e){
+		logException(e);
+		_msg = e.message;
+		return;
+	}
 	
 	var clist=AFW.structentry(structkey).getAllContent(lang, false);
 	if(clist.isEmpty()){
@@ -37,6 +44,12 @@
 	</div>
 	
 	<div class="content form-horizontal">
+	
+		<tml:{div} html_class="alert alert-danger" if="_msg">
+			<h4>Version kann nicht gelöscht werden</h4>
+			<tml:item name="_msg"/>
+		</tml:{div}>
+	
 		<tml:[form-field] o_label="Titel">
 			<tml:metadata name="title"/>
 		</tml:[form-field]>
