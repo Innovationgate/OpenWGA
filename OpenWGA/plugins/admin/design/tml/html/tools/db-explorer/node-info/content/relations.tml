@@ -42,16 +42,21 @@
 				<label><tml:item name="_relation_name"/>:</label>			
 				<div class="data">
 					<tml:script expression="content().getRelationData(_relation_name)" var="_data"/>
+					<tml:item name="_data.targetStructkey"/> / <tml:item name="_data.targetLanguage"/>
+					<br>
 					<tml:if context="[relation:{_relation_name}]" iscontextvalid="true">
 						<tml:then>
 							<a href="javascript:DBM.switchToObject('tools.db-explorer', '<tml:meta type="db" name="dbkey"/>', 'db:<tml:meta type="db" name="dbkey"/>/docid:<tml:meta name="key"/>')"
 								title="<tml:metadata name="title" encode="html,javascript"/>"
 							>
-								<tml:metadata name="key"/>
+								<tml:path>
+									<tml:meta name="title"/>
+									<tml:between> / </tml:between>
+								</tml:path>
 							</a>
 						</tml:then>
 						<tml:else>
-							<tml:script expression="_data.getTargetStructkey()"/> (invalid)
+							- target not available -
 						</tml:else>
 					</tml:if>
 					<tml:case condition="_data.getType()==content().RELATIONTYPE_PROTECTED">
@@ -71,16 +76,21 @@
 			<tml:foreach type="itemvalue" item="_relations" currentvalue="_relation">
 				<label><tml:script expression="_relation.name"/>:</label>
 				<div class="data">
+					<tml:item name="_relation.parentContentKey"/>
+					<br>
 					<tml:if context="[docid:{_relation.getParentContentKey()}]" iscontextvalid="true">
 						<tml:then>
 							<a href="javascript:DBM.switchToObject('tools.db-explorer', '<tml:meta type="db" name="dbkey"/>', '<tml:script expression="path"/>')"
 								title="<tml:metadata name="title" encode="html,javascript"/>"
 							>
-								<tml:metadata name="key"/>						
+								<tml:path>
+									<tml:meta name="title"/>
+									<tml:between> / </tml:between>
+								</tml:path>
 							</a>
 						</tml:then>
 						<tml:else>
-							<tml:script expression="_relation.getParentContentKey()"/> (invalid)
+							- source not available or no read access -
 						</tml:else>
 					</tml:if>
 					<tml:case condition="_relation.getType()==content().RELATIONTYPE_PROTECTED">
