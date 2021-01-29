@@ -2039,6 +2039,8 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 
 	/**
 	 * Removes all incoming relations to this content from parents/sources
+	 * Be careful and think twice before using this method. This changes the sources of all relations.
+	 * It typically better to remove relations on the source content.
 	 * @throws WGAPIException 
 	 */
 	public void removeAllIncomingRelations() throws WGAPIException  {
