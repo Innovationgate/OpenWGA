@@ -741,7 +741,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	    
 	public Object item(String name, Map<String,Object> params) throws WGAPIException {
 
-		Object value = flattenList(retrieveItem(name, params), !getDesignContext().getVersionCompliance().isAtLeast(7,2));
+		Object value = retrieveItem(name, params);
+		value = flattenList(value, !getDesignContext().getVersionCompliance().isAtLeast(7,2));
         if (value instanceof NullPlaceHolder) {
             value = db().getNoItemBehaviour().getForTMLItem();
         }
@@ -1471,6 +1472,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		if (value == null) {
 			return new ArrayList<Object>();
 		}
+		else if (ExpressionEngineFactory.getTMLScriptEngine().isUndefined(value))
+			return new ArrayList<Object>();
 		else if (value instanceof Object[]) {
 			List<Object> list = new ArrayList<Object>();
 			list.addAll(Arrays.asList((Object[]) value));

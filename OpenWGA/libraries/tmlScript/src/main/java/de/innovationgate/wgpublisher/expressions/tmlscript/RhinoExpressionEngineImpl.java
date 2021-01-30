@@ -1916,5 +1916,11 @@ public class RhinoExpressionEngineImpl implements ExpressionEngine, RhinoExpress
         return ScriptRuntime.eq(o1, o2);
     }
 
+
+	@Override
+	public boolean isUndefined(Object value) {
+		return value instanceof Undefined;
+	}
+
 }
 
