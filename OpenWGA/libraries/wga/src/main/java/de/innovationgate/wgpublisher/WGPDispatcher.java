@@ -1163,12 +1163,14 @@ public class WGPDispatcher extends HttpServlet {
             }
 
             if (content.isVirtual()) {
-                if (isBrowserInterface(session)) {
-                    if (!content.getStatus().equals(WGContent.STATUS_DRAFT) && request.getParameter("forceVLink") == null) {
 
+            	if (isBrowserInterface(session)) {
+                    if (!content.getStatus().equals(WGContent.STATUS_DRAFT) && request.getParameter("forceVLink") == null) {
                         String url = getVirtualContentURL(request, database, path, content);
-                        sendRedirect(request, response, url);
-                        return;
+                        if(url!=null){
+	                        sendRedirect(request, response, url);
+	                        return;
+                        }
                     }
                 }
                 else {
@@ -1517,17 +1519,18 @@ public class WGPDispatcher extends HttpServlet {
 
             if (isBrowserInterface(request.getSession()) && (path.getPathType() == WGPRequestPath.TYPE_TML || path.getPathType() == WGPRequestPath.TYPE_UNKNOWN_CONTENT)) {
                 String url = getNoContentNotificationURL(request, database, path);
-                sendRedirect(request, response, url);
+                if(url!=null){
+                	sendRedirect(request, response, url);
+                	return;
+                }
+            }
+            if (path.getTitlePathURL() != null) {
+                throw new HttpErrorException(404, "Content '" + path.getTitlePathURL().getPath() + "' does not exist or is not visible for user '"
+                        + database.getSessionContext().getUser() + "'", path.getDatabaseKey());
             }
             else {
-                if (path.getTitlePathURL() != null) {
-                    throw new HttpErrorException(404, "Content '" + path.getTitlePathURL().getPath() + "' does not exist or is not visible for user '"
-                            + database.getSessionContext().getUser() + "'", path.getDatabaseKey());
-                }
-                else {
-                    throw new HttpErrorException(404, "Content of name/id '" + path.getContentKey() + "' does not exist or is not visible for user '" + database.getSessionContext().getUser() + "'",
-                            path.getDatabaseKey());
-                }
+                throw new HttpErrorException(404, "Content of name/id '" + path.getContentKey() + "' does not exist or is not visible for user '" + database.getSessionContext().getUser() + "'",
+                        path.getDatabaseKey());
             }
 
         }
@@ -1655,29 +1658,22 @@ public class WGPDispatcher extends HttpServlet {
     }
 
     /**
-     * retrieves a relative url from session attribute
-     * WGACore.ATTRIB_NO_CONTENT_NOTIFCATION_URL to use as
-     * NoContentNotificationURL in sendNoContentNotification(...) default is
-     * "/statictml/#DBKEY#/dispNoContent?key=#KEY#" parameters #DBKEY# and
-     * #TKEY# are replaced by the corresponding values,
-     * 
+     * retrieves a relative url from session attribute WGACore.ATTRIB_NO_CONTENT_NOTIFCATION_URL to use as
+     * NoContentNotificationURL in sendNoContentNotification(...)
+     * parameters #DBKEY# and #KEY# are replaced by the corresponding values.
      * @param request
      * @param database
      * @param path
      * @return URL starting with getContextPath();
      */
     private String getNoContentNotificationURL(HttpServletRequest request, WGDatabase database, WGPRequestPath path) {
-        // default URL used by old BI
-        String defaultURL = "/statictml/#DBKEY#/dispNoContent?key=#KEY#";
 
-        String relativeURL = null;
-        if (request.getSession().getAttribute(WGACore.ATTRIB_NO_CONTENT_NOTIFCATION_URL) != null) {
-            relativeURL = (String) request.getSession().getAttribute(WGACore.ATTRIB_NO_CONTENT_NOTIFCATION_URL);
-        }
-        else {
-            relativeURL = defaultURL;
-        }
+    	String relativeURL = (String) request.getSession().getAttribute(WGACore.ATTRIB_NO_CONTENT_NOTIFCATION_URL);
 
+    	if (relativeURL == null) {
+    		return null;
+    	}
+    	
         // replace variables in relative URL
         relativeURL = relativeURL.replaceAll("#DBKEY#", database.getAttribute(WGACore.DBATTRIB_DBKEY).toString());
         String contentKey = path.getContentKey();
@@ -1688,15 +1684,14 @@ public class WGPDispatcher extends HttpServlet {
         StringBuffer url = new StringBuffer();
         url.append(getContextPath());
         url.append(relativeURL);
+        
         return url.toString();
     }
 
     /**
      * retrieves a relative url from session attribute
-     * WGACore.ATTRIB_VIRTUAL_CONTENT_URL to use instead of the default static
-     * tml for vitual content in BI default is
-     * "/statictml/#DBKEY#/dispVirtual/#CONTENTKEY_URL_MODE#" parameters
-     * #DBKEY#, #CONTENTKEY_URL_MODE#, #CONTENTKEY_UNIQUE_MODE# and #STRUCTKEY#
+     * WGACore.ATTRIB_VIRTUAL_CONTENT_URL to use for virtual content in BI 
+     * parameters #DBKEY#, #CONTENTKEY_URL_MODE#, #CONTENTKEY_UNIQUE_MODE# and #STRUCTKEY#
      * are replaced by the corresponding values
      * 
      * @param request
@@ -1707,17 +1702,11 @@ public class WGPDispatcher extends HttpServlet {
      * @throws WGAPIException
      */
     private String getVirtualContentURL(HttpServletRequest request, WGDatabase database, WGPRequestPath path, WGContent content) throws WGAPIException {
-        // default URL used by old BI
-        String defaultURL = "/statictml/#DBKEY#/dispVirtual/#CONTENTKEY_URL_MODE#";
 
-        String relativeURL = null;
-        if (request.getSession().getAttribute(WGACore.ATTRIB_VIRTUAL_CONTENT_URL) != null) {
-            relativeURL = (String) request.getSession().getAttribute(WGACore.ATTRIB_VIRTUAL_CONTENT_URL);
-        }
-        else {
-            relativeURL = defaultURL;
-        }
-
+        String relativeURL = (String)request.getSession().getAttribute(WGACore.ATTRIB_VIRTUAL_CONTENT_URL);
+        if(relativeURL==null)
+        	return null;
+        
         // replace variables in relative URL
         relativeURL = relativeURL.replaceAll("#DBKEY#", database.getAttribute(WGACore.DBATTRIB_DBKEY).toString());
         relativeURL = relativeURL.replaceAll("#CONTENTKEY_URL_MODE#", content.getContentKey(false).toString());
