@@ -68,16 +68,25 @@
 		}
 		
 		function prev(){
-			col-=cols;
+			if(config.singleStep)
+				col--;
+			else col-=cols;
 			if(col<0)
 				col=0;
 			scroll();
 		}
 		
 		function next(){
-			col+=cols;
-			if(col>=cols_total){
-				col=parseInt((cols_total-1)/cols)*cols;
+			if(config.singleStep){
+				col++;
+				if(col>cols_total-cols)
+					col--
+			}
+			else{
+				col+=cols;
+				if(col>=cols_total){
+					col=parseInt((cols_total-1)/cols)*cols;
+				}
 			}
 			scroll();
 		}
@@ -134,7 +143,7 @@
 					effect_fade(new_left);
 				else effect_slide(new_left);
 			}
-			
+						
 			$cols.find(".control a").removeClass("active").each(function(i){
 				if(i>=col && i<col+cols)
 					$(this).addClass("active");
@@ -145,7 +154,7 @@
 				var prev_col = $wrapper.find("> .column").eq(col-cols)
 				$cols.find(".prev").removeClass("disabled").attr("title", prev_col.data("title"));
 			}
-			if(col==parseInt((cols_total-1)/cols)*cols)
+			if(col>=cols_total-cols)
 				$cols.find(".next").addClass("disabled").attr("title", "");
 			else {
 				var next_col = $wrapper.find("> .column").eq(col+cols)

@@ -9,25 +9,18 @@
 
 .column-slider{
 
-	overflow: hidden;		
+	overflow: hidden;
 
 	.columns {
 		
 		width: 20000px;
 		position: relative;
 		left: 0;
+		display: flex;
 		
 		.column {
-			float: left;
 			margin: 0 10px 0 0;
-		}
-
-		&:after {
-		    clear: both;
-		    content: ".";
-		    display: block;
-		    height: 0;
-		    visibility: hidden;
+			box-sizing: border-box;
 		}
 		
 	}
