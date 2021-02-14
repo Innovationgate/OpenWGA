@@ -1463,7 +1463,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         
         // HTTP basic authentication login
         else if (httpLoginInfo != null) {
-            getBruteForceLoginBlocker().login(db, httpLoginInfo.getUserName(), httpLoginInfo.getCredentials(), accessFilter);
+            getBruteForceLoginBlocker().login(db, httpLoginInfo.getUserName(), httpLoginInfo.getCredentials(), accessFilter, request);
             if (db.isSessionOpen() && session != null) {
                 updateLoginInfo(db, request, DBLoginInfo.AuthType.PASSWORD);
             }
@@ -8023,7 +8023,7 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
                 db = dbs.next();
                 String compareDomain = (String) db.getAttribute(WGACore.DBATTRIB_DOMAIN);
                 if (compareDomain != null && compareDomain.equalsIgnoreCase(domain)) {
-                    accessLevel = getBruteForceLoginBlocker().login(db, user, password);
+                    accessLevel = getBruteForceLoginBlocker().login(db, user, password, request);
                     if (accessLevel > WGDatabase.ACCESSLEVEL_NOTLOGGEDIN) {
                         isLoginSuccessful = true;
                         if (db.isSessionOpen()) {
