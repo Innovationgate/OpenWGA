@@ -23,10 +23,14 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 				return sourceStruct.mayMovePage;
 			},
 			mayDrop: function(source, target){
-				
+
+				var accesslevel = $("#page").data("accesslevel");				
 				var sourceStruct = source.context
 				var targetStruct = target && target.context
-
+				
+				if(accesslevel==90)
+					return true;	// no restrictions for managers
+				
 				if(targetStruct && !targetStruct.mayEditChildren)
 					return false;		// user is not allowed to create children.
 				
@@ -35,9 +39,8 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 					case POSITIONING_EVERYWHERE:
 						return true;
 					case POSITIONING_FIXEDPARENTS:
-						if(target && allowedPositions.indexOf(target.id)>=0){
+						if(target && allowedPositions.indexOf(target.id)>=0)
 							return true;
-						}
 						break;
 					case POSITIONING_FIXEDPARENTTYPES:
 						if(targetStruct && allowedPositions.indexOf(targetStruct.contenttype)>=0)
