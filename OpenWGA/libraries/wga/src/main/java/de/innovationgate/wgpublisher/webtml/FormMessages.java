@@ -105,11 +105,11 @@ public class FormMessages extends Base {
         } else {
             formBase = (FormStatus) getStatus().getAncestorTag(FormBase.class);
         }        
-                
+        
         if (formBase == null) {
-            this.getTMLContext().addwarning("Could not find corresponding form or item.", true);
-            return;
-        } else {
+        	status._tmlForm = getTMLContext().gettmlform();
+        } 
+        else {
         	String formId = formBase.formInfo.getFormId();        		
         	status._tmlForm = this.getTMLContext().tmlformbyid(formId);
         }
