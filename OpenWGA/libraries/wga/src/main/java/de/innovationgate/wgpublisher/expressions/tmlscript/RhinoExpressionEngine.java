@@ -129,6 +129,7 @@ public interface RhinoExpressionEngine extends ExpressionEngine, SingleValueConv
     public TMLScriptObjectMetadata getTmlscriptObjectMetadata(WGA wga, Design design) throws WGException;
     public Class<?> getScriptableType();
     public Object getUndefined();
+    public boolean isUndefined(Object value);
     public boolean scriptableEquals(Object o1, Object o2);
     
 

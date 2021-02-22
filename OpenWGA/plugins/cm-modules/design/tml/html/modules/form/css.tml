@@ -33,10 +33,6 @@
 		}
 	},
 
-	".buttons": {
-		margin_top: 10
-	},
-	
 	fieldset: {
 		border: "solid silver 1px",
 		padding: 10,
@@ -53,6 +49,8 @@
 	
 		"input[type=text], input[type=password], textarea": {
 			width: "100%",
+			padding: "5px 10px",
+			border: "solid silver 1px",
 			font: "inherit",
 			box_sizing: "border-box"
 		},
@@ -76,6 +74,12 @@
 			background: "#ffe2e2"
 		},
 		
+		">label.required": {
+			"&::before": {
+				content: "\"* \""
+			}
+		},
+		
 		".data": {
 			label: {
 				"float": "none",
@@ -84,7 +88,7 @@
 		}
 
 	},
-	
+
 	".buttons": {
 		margin_top: 15
 	}

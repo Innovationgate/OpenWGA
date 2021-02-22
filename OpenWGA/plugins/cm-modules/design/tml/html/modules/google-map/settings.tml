@@ -33,7 +33,7 @@
 	<tml:input name="[map_height_{option('ns')}]" type="number" default="200" cssstyle="width:100%" mode="{option('mode')}"/>
 </div>
 
-<label><tml:label key="google-maps.settings.zoom-factor"/> (0-15):</label>
+<label><tml:label key="google-maps.settings.zoom-factor"/>:</label>
 <div style="margin:10px">
 	<tml:input name="[map_zoom_{option('ns')}]" type="number" default="15" cssstyle="width:100%" mode="{option('mode')}"/>
 </div>

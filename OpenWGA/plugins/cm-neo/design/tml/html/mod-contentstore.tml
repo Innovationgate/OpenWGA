@@ -32,7 +32,7 @@
 	
 	</tml:script>
 
-	<tml:include ref="page" o_title="[{WGA.Brand.name} Content Manager]">
+	<tml:include ref="page" o_title="[{WGA.Brand.name} Content Manager]" o_accesslevel="{WGA.app(portlet.dbkey).accessLevel}">
 	
 		<tml:option name="header">
 			<tml:include ref="toolbar"/>

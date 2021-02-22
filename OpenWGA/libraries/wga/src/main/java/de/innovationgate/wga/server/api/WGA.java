@@ -3279,7 +3279,7 @@ public class WGA {
             return new OpenDatabaseService() {
                 @Override
                 public void openDatabase(WGDatabase db) throws WGException {
-                    getCore().openContentDB(db, null, session, false, null);
+                    getCore().openContentDB(db, req, session, false, null);
                 }
             };
         }

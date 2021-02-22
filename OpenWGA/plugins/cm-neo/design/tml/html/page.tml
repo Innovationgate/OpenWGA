@@ -1,4 +1,4 @@
-<div id="page" <tml:case hasoptions="appnav">class="appnav"</tml:case>>
+<div id="page" data-accesslevel="<tml:item name="$option_accesslevel"/>" <tml:case hasoptions="appnav">class="appnav"</tml:case>>
 	<div id="header" class="btn-primary">
 		<tml:option name="header"/>
 		<tml:case hasoptions="title">

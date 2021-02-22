@@ -209,11 +209,23 @@ public class BruteForceLoginBlocker {
     }
     
     public int login(WGDatabase db, String username, Object credentials) throws WGAPIException {
-        return login(db, username, credentials, null);
+        return login(db, username, credentials, null, null);
     }
     
     public int login(WGDatabase db, String username, Object credentials, String filter) throws WGAPIException {
-        
+    	return login(db, username, credentials, filter, null);
+    }
+    
+    public int login(WGDatabase db, String username, Object credentials, HttpServletRequest request) throws WGAPIException {
+    	return login(db, username, credentials, null, request);
+    }
+    
+    public int login(WGDatabase db, String username, Object credentials, String filter, HttpServletRequest request) throws WGAPIException {
+
+    	String ip=null;
+        if(request!=null)
+        	ip = (String)request.getAttribute(WGAFilter.REQATTRIB_ORIGINAL_IP);
+
         String domainName = (String) db.getAttribute(WGACore.DBATTRIB_DOMAIN);
         WGADomain domain = _core.getDomains(domainName);
         LoginAttemptInformation inf = getLoginAttemptInformation(domainName, username);
@@ -229,7 +241,7 @@ public class BruteForceLoginBlocker {
                 inf = new LoginAttemptInformation(domainName, username, domain.getConfig().getMaximumLoginAttempts());
                 inf.map(_failedLoginAttempts);
             }
-            inf.addFailedAttempt(null);
+            inf.addFailedAttempt(ip);
             
             if (inf.isBlocked()) {
                 try {

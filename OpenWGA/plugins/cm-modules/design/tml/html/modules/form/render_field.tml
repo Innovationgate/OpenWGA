@@ -31,9 +31,16 @@
 	_fieldname = CMM.setting('fieldname').trim();
 	_label = CMM.setting("label");
 
+	var fieldtype = CMM.setting('fieldtype');
+	if(fieldtype=="date")
+		_format = label("format.date.short");
+	else _format="";
+
 	var validation = CMM.setting('validation')
 	if(validation == "required"){
-		_validation = "$E_VALUE!=''"
+		_validation = "$E_VALUE.trim()!=''"
+		if(fieldtype=="checkbox")
+			_validation = "$E_VALUE.size()"
 		_message = _message || label("form.validation.message.required", [_label||_fieldname]) 
 	}
 	else if(validation=="mail"){
@@ -42,11 +49,6 @@
 	}
 	else _validation=null;
 	
-	var fieldtype = CMM.setting('fieldtype');
-	if(fieldtype=="date")
-		_format = label("format.date.short");
-	else _format="";
-		
 	var fieldinfo =  WGA.createLookupTable();
 	fieldinfo.put("label", CMM.setting("label"))
 	fieldinfo.put("name", _fieldname);
@@ -59,10 +61,11 @@
 </tml:script>
 
 <div class="clearfix formfield field-type-<tml:script expression="CMM.setting('fieldtype')"/><tml:case condition="tmlform.hasmessage(_fieldname)"> error</tml:case>">
-	<label for="<tml:option name="ns"/>">
-		<tml:case condition="_validation">* </tml:case> 
-		<tml:[setting] o_name="label"/>
-	</label>
+	<tml:case condition="_label">
+		<label for="<tml:option name="ns"/>" <tml:case condition="_validation">class="required"</tml:case>>
+			<tml:item name="_label"/>
+		</label>
+	</tml:case>
 	<div class="data">
 		<tml:input name="{_fieldname}"
 			id="{option('ns')}"

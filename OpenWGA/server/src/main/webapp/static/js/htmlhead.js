@@ -2034,6 +2034,12 @@ WGA.websocket = {
 		
 		startService: function(onopen) {
 			
+			if(this.socket && this.socket.readyState==WebSocket.OPEN){	// already started
+				if(onopen)
+					onopen();	// just call callback
+				return;
+			}
+			
 			if(!this.url)
 				return console.log("No url configured to start servive");
 			
@@ -2057,10 +2063,7 @@ WGA.websocket = {
 			var completeUrl = this.url + (this.url.indexOf("?") != -1 ? "&" : "?") + WGA.toQueryString(urlParams);
 			if(WGA.debug)
 				console.log("WebSocket start service", completeUrl)
-			
-			if(this.socket)
-				this.socket.close();
-
+				
 			if ('WebSocket' in window) {
 				if (WGA.debug && console && console.log) {
 					console.log("Building socket connection, pageId: " + this.pageId);
@@ -2144,7 +2147,6 @@ WGA.websocket = {
 				console.log("Socket connection closed, pageId: " + WGA.websocket.pageId, event, "event.code", event.code);
 			}
 			
-			
 			WGA.websocket.socket.onmessage = null;
 			WGA.websocket.socket.onopen = null;
 			WGA.websocket.socket.onclose = null;
@@ -2152,7 +2154,7 @@ WGA.websocket = {
 			this.socket=null;
 			
 			// Reason codes that should prevent reconnect.
-			if (event.code <= 1001) { // Normal closing
+			if (event.code <= 1005) { // Normal closing
 				return;
 			}
 			else if (event.code == -9825) {
