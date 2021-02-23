@@ -392,8 +392,9 @@ public class Input extends ActionBase implements DynamicAttributes {
         Object singleValue = (values.size() == 0 ? "" : values.get(0));
         
         String tagContent = this.getResultString(false);
-        if(getTMLContext().gettmlform().hasmessage(getName()))
-        		tagContent += "data-error=\"true\"";
+        TMLForm form = getTMLContext().gettmlform();
+        if(form!=null && form.hasmessage(getName()))
+        		tagContent += " data-error=\"true\"";
         this.clearResult();
         
         // Render
