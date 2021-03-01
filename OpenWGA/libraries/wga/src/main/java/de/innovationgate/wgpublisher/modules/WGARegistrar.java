@@ -46,6 +46,7 @@ import de.innovationgate.wgpublisher.modules.formsources.NewContentFormSourceMod
 import de.innovationgate.wgpublisher.modules.formsources.NoneFormSourceModuleDefinition;
 import de.innovationgate.wgpublisher.modules.formsources.PortletConfigFormSourceModuleDefinition;
 import de.innovationgate.wgpublisher.modules.formsources.PortletSessionVarsFormSourceModuleDefinition;
+import de.innovationgate.wgpublisher.modules.formsources.RequestFormSourceModuleDefinition;
 import de.innovationgate.wgpublisher.modules.formsources.UserProfileFormSourceModuleDefinition;
 import de.innovationgate.wgpublisher.modules.imagescaler.ImgScalrFactoryModuleDefinition;
 import de.innovationgate.wgpublisher.modules.imagescaler.ImgScalrScalerModuleDefinition;
@@ -145,6 +146,7 @@ public class WGARegistrar implements ModuleRegistrar {
         
         // WebTML form sources
         registry.addModuleDefinition(new NoneFormSourceModuleDefinition());
+        registry.addModuleDefinition(new RequestFormSourceModuleDefinition());
         registry.addModuleDefinition(new NewContentFormSourceModuleDefinition());
         registry.addModuleDefinition(new ContextDocumentFormSourceModuleDefinition());
         registry.addModuleDefinition(new UserProfileFormSourceModuleDefinition());
