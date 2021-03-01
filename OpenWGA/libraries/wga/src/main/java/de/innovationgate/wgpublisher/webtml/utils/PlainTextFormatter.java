@@ -35,7 +35,7 @@ public class PlainTextFormatter implements ObjectFormatter {
 
     public String format(Object obj) throws FormattingException {
         try {
-            return WGUtils.toPlainText(String.valueOf(obj), "", false);
+            return WGUtils.toPlainText(String.valueOf(obj));
         }
         catch (IOException e) {
             throw new FormattingException(e);
