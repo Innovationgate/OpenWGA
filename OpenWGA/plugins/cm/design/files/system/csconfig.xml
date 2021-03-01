@@ -67,9 +67,9 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>8</minorVersion>
-        <maintenanceVersion>7</maintenanceVersion>
-        <patchVersion>1</patchVersion>
-        <buildVersion>700</buildVersion>
+        <maintenanceVersion>8</maintenanceVersion>
+        <patchVersion>0</patchVersion>
+        <buildVersion>701</buildVersion>
       </version>
     </id>
     <title>OpenWGA Content Manager - Classico</title>
