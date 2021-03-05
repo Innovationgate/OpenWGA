@@ -684,11 +684,17 @@ public class Input extends ActionBase implements DynamicAttributes {
 	            			numberValue = getTMLContext().parsenumber(optionValue, format);
 	            		}
             		} catch (Exception e) {
-            			addWarning("Unable to parse date for input option. Exception: " + e.getMessage());
+            			addWarning("Unable to parse number for input option. Exception: " + e.getMessage());
             		}
-            		if (numberValue != null && values.contains(numberValue)) {
+            		
+            		/*
+            		 * #00005673
+            		 * "values" always is a list of doubles. We therefore need to convert numberValue to a double
+            		 */
+            		if (numberValue != null && values.contains(numberValue.doubleValue())) {
 	    				this.appendResult(" selected=\"true\"");
 	    			}
+	    			
             	} 
             	else {
 	    			if ((optionValue != null && values.contains(optionValue)) || (optionValue == null && values.contains(optionText))) {
