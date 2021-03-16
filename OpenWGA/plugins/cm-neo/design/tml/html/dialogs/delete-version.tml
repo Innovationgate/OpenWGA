@@ -57,7 +57,7 @@
 			<tml:metadata name="language"/>
 		</tml:[form-field]>
 		<tml:[form-field] o_label="Status">
-			<tml:label key="[content-properties.status.{STATUS}]"/>
+			<tml:label key="[content-properties.status.{content().isPendingRelease() ? 'pending':STATUS}]"/>
 		</tml:[form-field]>
 		<tml:[form-field] o_label="Version">
 			<tml:metadata name="version"/>
