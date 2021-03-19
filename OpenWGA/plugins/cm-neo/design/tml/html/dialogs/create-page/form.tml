@@ -20,10 +20,23 @@
 			return;
 		}
 	}
+	else{
+		if(pagetypes.size()==1)
+			tmlform.contenttype = pagetypes.get(0);
+		else if(!tmlform.submitted){
+			console.log("$option_current_pagetype", $option_current_pagetype);
+			if($option_current_pagetype && pagetypes.contains($option_current_pagetype))
+				tmlform.contenttype=$option_current_pagetype
+			else tmlform.contenttype = pagetypes.get(0);
+		}		
+	}
+	
+	/*
 	else if(!tmlform.submitted && $option_current_pagetype && pagetypes.contains($option_current_pagetype))
 		tmlform.contenttype=$option_current_pagetype
 	else if(pagetypes.size()==1)
 		tmlform.contenttype = pagetypes.get(0);
+	*/
 	
 	WGA.TMLPage.setVar("_pagetypes", WGA.createList())
 	for(let name in Iterator(pagetypes)){
@@ -52,14 +65,14 @@
 	
 </tml:script>
 
-<tml:[form-messages]/>
-
 <tml:case istrue="_isValid">
-	<tml:[form-field] o_label="Titel" o_field="title"
-		o_validation="$E_VALUE!=''"
-		o_message="Bitte geben Sie einen Titel ein"
-		o_focus="true"
-		o_store="false"
+	
+	<tml:[form-field] o_label="Seitentyp" 
+		o_type="select" 
+		o_field="contenttype" 
+		o_optionsitem="_pagetypes" 
+		o_mode="{$option_dialog_options.pagetype || _pagetypes.size()==1 ? 'view':'edit'}"
+		o_changeaction="$refresh"
 	/>
 	
 	<tml:[form-field] o_label="Sprache" 
@@ -70,18 +83,17 @@
 		o_mode="{_languages.size()>1?'edit':'view'}"
 	/>
 
-	<tml:[form-field] o_label="Seitentyp" 
-		o_type="select" 
-		o_field="contenttype" 
-		o_optionsitem="_pagetypes" 
-		o_mode="{$option_dialog_options.pagetype || _pagetypes.size()==1 ? 'view':'edit'}"
-		o_changeaction="$refresh"
-	/>
-	
 	<tml:[form-field] o_label="Vorlage" if="$mc.templates.size"
 		o_type="select" 
 		o_field="template" 
 		o-optionvalues="$mc.templates" 
 	/>	
+
+	<tml:[form-field] o_label="Titel" o_field="title"
+		o_validation="$E_VALUE!=''"
+		o_message="Bitte geben Sie einen Titel ein"
+		o_focus="true"
+		o_store="false"
+	/>
 	
 </tml:case>	
