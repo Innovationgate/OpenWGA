@@ -1,0 +1,6 @@
+<tml:case if="$mc.settingsTML">
+	<tml:include ref="{item:$mc.settingsTML}" designdb="{meta('db', 'dbkey')}">
+		<tml:option name="cm_dbkey" expression="context('main').meta('db', 'dbkey')"/>
+		<tml:option name="label-width">250</tml:option>
+	</tml:include>
+</tml:case>

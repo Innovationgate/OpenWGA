@@ -23,6 +23,24 @@
 				AFW.content(doc).copyRemoteData(sourcedoc, true /*include metas*/, false /*copy attachments*/, false /* copy modules */);
 			}
 		}
+		// remove form-fields als store-in-content
+		tmlform.removefield("title")
+		tmlform.removefield("position")
+		tmlform.removefield("contenttype")
+		tmlform.removefield("language")
+		tmlform.removefield("template")
+		tmlform.removefield("area")
+		tmlform.storeincontent(doc)
+
+		for(let [index, handler] in App.settingsSaveHandler){
+			try{
+				handler.call(context(doc), tmlform);
+			}
+			catch(e){
+				console.log(e);
+			}		
+		}
+		App.settingsSaveHandler=[];
 		
 		portlet.fireevent("close-dialog", {
 			redirectto: context(doc).contenturl()
@@ -34,6 +52,7 @@
 
 	<tml:script>
 		setOption("current_lang", LANGUAGE);
+		setOption("current_pagetype", CONTENTTYPE);
 		var areas = WGA.createList()		
 		for(let area in Iterator(db().getAreas().values())){
 			if(area.name=="$templates"){
@@ -84,7 +103,7 @@
 	</div>
 
 	<div class="content form-horizontal">
-		<tml:[::form] o_page="root"/>
+		<tml:comment><tml:[form-messages] o_title="Seite kann nicht erstellt werden"/></tml:comment>
 		<tml:[form-field] o_label="Bereich" 
 			o_type="select" 
 			o_field="area" 
@@ -95,6 +114,8 @@
 		<tml:case condition="tmlform.area && db().getArea(tmlform.area).getRootEntries().size()">
 			<tml:[form-field] o_label="Position" o_name="position" o_type="select" o_options="Am Anfang der Liste|start,Am Ende der Liste|end"/>
 		</tml:case>
+		<tml:[::form] o_page="root"/>
+		<tml:include ref="::required-settings" o_page="root"/>
 	</div>
 
 	<div class="footer">
