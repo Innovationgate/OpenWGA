@@ -42,11 +42,17 @@
 	}
 	
 	var exports={
-		activate: activate
+		activate: activate,
+		expand: expand,
+		collapse: collapse
 	}	
 	
 	$.fn.wga_accordion = function(config){
 		var config = config||{};
+		var args = [];
+		for(i=1; i<arguments.length; i++)
+			args.push(arguments[i]);
+
 		return this.each(function(){
 			var el = $(this);
 
@@ -55,8 +61,8 @@
 					var f = exports[config.toLowerCase()]
 					return f.apply(el, [el].concat(args));
 				}
-				catch(e){
-					throw("jquery plugin wga_accordion: method '" + config + "' not found.")
+				catch(e){					
+					throw("jquery plugin wga_accordion: method '" + config + "' not found or error.")
 					return null;
 				}
 			}
