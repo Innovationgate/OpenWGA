@@ -62,31 +62,52 @@
 				
 				<tml:script>
 					WGA.TMLPage.setVar("_dbs", CMM.getDbKeys());
-					_dbkey = meta("db", "dbkey");
-					if($option_dialog_options.key){
+					_dbs.add(0, "- aktuelle App -|this");
+					_dbkey = "this";
+					if($option_dialog_options.key && !tmlform.submitted){
 						var parts = $option_dialog_options.key.split("/");
 						if(parts.length==3){
 							_container = parts[0];
 							_filename = parts[1];
 							_dbkey = parts[2];
 						}
+						if(parts.length==2){
+							_container = parts[0];
+							_filename = parts[1];
+							_dbkey = "this"
+						}
+						_container = _container.split(".")[0]		// ensure _container is structkey
 					}
 				</tml:script>
 				
 				<tml:[form-field] o_label="App" o_name="dbkey" o_default="{_dbkey}" o_type="select" o_optionsitem="_dbs" o_changeaction="$refresh"/>
 
 				<tml:[form-field] o_label="Dokument">
-					<tml:include ref="util:select-document" o_fieldname="container" o_default="{_container}" o_dbkey="{tmlform.dbkey}">
-						<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
+					<tml:include ref="util:select-document" o_fieldname="container" o_default="{_container}" o_dbkey="{tmlform.dbkey=='this'?VOID:tmlform.dbkey}">
+						<tml:option name="changeaction"><tml:action>
+							tmlform.removeField("filename")
+						</tml:action></tml:option>
 					</tml:include>
 				</tml:[form-field]>
 
-				<tml:case condition="tmlform.container" context="[db:{tmlform.dbkey}/docid:{tmlform.container}]" iscontextvalid="true">
-				
-					<tml:[form-field] o_label="Datei">
-						<tml:include ref="util:select-file" o_fieldname="filename" o_default="{_filename}" o_placeholder="Bitte auswählen ..."/>
-					</tml:[form-field]>
-					
+				<tml:case condition="tmlform.container">
+					<tml:script>
+						_ctx = (tmlform.dbkey=='this' ? "" : "db:"+tmlform.dbkey + "/")
+							+ "docid:" + tmlform.container
+							+ "<" + LANGUAGE + ">"
+					</tml:script>
+					<tml:if context="{_ctx}" iscontextvalid="true">
+						<tml:then>
+							<tml:[form-field] o_label="Datei">
+								<tml:include ref="util:select-file" o_fieldname="filename" o_default="{_filename}" o_placeholder="Bitte auswählen ..."/>
+							</tml:[form-field]>
+						</tml:then>
+						<tml:else>
+							<tml:[form-field] o_label="Datei" o_mode="view">
+								<p style="color:red">Die ausgewählte Seite ist in der Sprache '<tml:meta name="languagetitle"/>' nicht verfügbar.</p>
+							</tml:[form-field]>
+						</tml:else>
+					</tml:if>
 				</tml:case>
 				
 			</tml:case>
@@ -167,7 +188,11 @@
 					return;
 				}
 				a = editor.createLink(filename, filename, "extfile");
-				editor.setURLInfo(a, {type:type, key:container+"/"+filename+"/"+dbkey})
+				editor.setURLInfo(a, {
+					type: type,
+					key: container+".<tml:meta name="language"/>.0/"+filename 
+							+ (dbkey=="this" ? "" :  "/"+dbkey)
+				})
 			}
 			else if(type=="int"){
 				var key = $("[name=key]", form).val();
@@ -241,7 +266,11 @@
 					alert("Bitte wählen Sie eine Datei aus.");
 					return;
 				}
-				editor.setURLInfo(a, {type:type, key:container+"/"+filename+"/"+dbkey})
+				editor.setURLInfo(a, {
+					type: type, 
+					key: container+".<tml:meta name="language"/>.0/"+filename
+							+ (dbkey=="this" ? "" :  "/"+dbkey)
+				})
 			}
 
 			else{	// exturl
