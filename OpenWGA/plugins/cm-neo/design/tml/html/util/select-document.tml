@@ -10,7 +10,7 @@
 			<a href="#" id="select-key-<tml:option name="fieldname"/>" class="form-control">
 				<span class="title">
 					<tml:case condition="tmlform.field($option_fieldname)">
-						<tml:if context="[db:{_dbkey}/docid:{tmlform.field($option_fieldname)}]" iscontextvalid="true">
+						<tml:if context="[db:{_dbkey}/docid:{tmlform.field($option_fieldname)}<{$option_language||LANGUAGE}>]" iscontextvalid="true">
 							<tml:then>
 								<tml:script>
 									var struct = content().getStructEntry();
@@ -36,7 +36,7 @@
 			</a>
 			<a href="#" style="display:none" class="clear-key-field" id="clear-key-<tml:option name="fieldname"/>" title="Auswahl löschen">&times</a>
 			<div class="select-tree">
-				<div class="tree" id="tree-<tml:option name="fieldname"/>" data-url="<tml:url type="tml" medium="json" layout="siteexplorer" u-dbkey="_dbkey" u_language="{LANGUAGE}"/>"></div>
+				<div class="tree" id="tree-<tml:option name="fieldname"/>" data-url="<tml:url type="tml" medium="json" layout="siteexplorer" u-dbkey="_dbkey" u_language="{$option_language||LANGUAGE}"/>"></div>
 			</div>
 		</div>
 		
