@@ -23,6 +23,12 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
+<tml:action id="app-changed">
+	tmlform.removeField(WGA.scoped('image'))
+	tmlform.removeField(WGA.scoped('image_mo'))
+	tmlform.removeField(WGA.scoped('lang'))
+</tml:action>
+
 <tml:action id="clearImages">
 	tmlform.removeField(WGA.scoped('image'))
 	tmlform.removeField(WGA.scoped('image_mo'))
@@ -43,18 +49,39 @@
 	<div style="margin:10px">
 		<tml:script>
 			_dbs = CMM.getDbKeys()
+			_dbs.remove(meta("db", "dbkey"))
+			_dbs.add(0, meta("db", "dbkey") + " (aktuelle App)|this");
+
+			_lang = LANGUAGE;
+			var database = db()
+			if(tmlform.field(WGA.scoped("dbkey")) && tmlform.field(WGA.scoped("dbkey"))!="this")
+				database = db(tmlform.field(WGA.scoped("dbkey")))
+			var langs = database.getLanguages().keySet();
+			
+			if(!langs.contains(_lang))
+				_lang = langs.iterator().next();
+
+			_langs = WGA.createList()
+			for(let lang in Iterator(database.getLanguages().entrySet())){
+				_langs.add(lang.value.title + "|" + lang.key) 
+			}
+
 		</tml:script>
 		<tml:input name="{scoped:dbkey}" type="select" optionsitem="_dbs"
-			changeaction="clearImages" ajax="true"
-			default="{meta('db', 'dbkey')}"
+			changeaction="app-changed" ajax="true"
+			default="this"
 			mode="{option:mode}"
 			cssclass="form-control"
 		/>
 	</div>
+
+	<div style="margin:10px">
+		<tml:input name="{scoped:lang}" default="{_lang}" type="select" optionsitem="_langs" changeaction="$refresh" cssclass="form-control"/>
+	</div>
 	
 	<div style="margin:10px">
-		<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document">
-			<tml:option name="dbkey" expression="tmlform.field(WGA.scoped('dbkey'))"/>
+		<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document" o_language="{tmlform.field(WGA.scoped('lang'))}">
+			<tml:option name="dbkey" expression="tmlform.field(WGA.scoped('dbkey'))=='this' ? null : tmlform.field(WGA.scoped('dbkey'))"/>
 			<tml:option name="fieldname" expression="WGA.scoped('sourcedoc')"/>
 			<tml:option name="changeaction"><tml:action ref="clearImages"/></tml:option>
 		</tml:include>
@@ -67,7 +94,11 @@
 	var source = tmlform.field(WGA.scoped('source')) 
 	if(!source)
 		_context= CMM.settingSource()=="template" ? CMM.getTemplateContextPath() : "this";
-	else _context='db:'+tmlform.field(WGA.scoped('dbkey'))+'/docid:'+tmlform.field(WGA.scoped('sourcedoc'))
+	else {
+		_context="docid:"+tmlform.field(WGA.scoped('sourcedoc'))+"<"+ tmlform.field(WGA.scoped('lang')) + ">"
+		if(tmlform.field(WGA.scoped('dbkey'))!='this')
+			_context = "db:"+tmlform.field(WGA.scoped("dbkey"))+"/" + _context
+	}
 </tml:script>
 <tml:case context="{_context}" iscontextvalid="true">
 	<label><tml:label key="image"/>:</label>

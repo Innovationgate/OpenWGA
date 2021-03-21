@@ -34,7 +34,12 @@
 	if(!CMM.setting("source")){
 		c = CMM.settingSource()=="template" ? CMM.getTemplateContext() : this;
 	}
-	else c = context("db:" + CMM.setting("dbkey") + "/docid:" + CMM.setting("sourcedoc"), false);
+	else {
+		c = context(
+			(CMM.setting("dbkey")!="this" ? "db:" + CMM.setting("dbkey") + "/" : "")
+			+ "docid:" + CMM.setting("sourcedoc") + "." + CMM.setting("lang") + ".0"
+		, false);
+	}
 
 	if(filename && c && c.content().hasFile(filename)){
 		_url = c.fileurl(filename);
