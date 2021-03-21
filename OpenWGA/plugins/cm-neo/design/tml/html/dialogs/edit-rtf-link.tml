@@ -107,7 +107,7 @@
 							o_dbkey="{tmlform.dbkey=='this'?VOID:tmlform.dbkey}" 
 							o_language="{tmlform.lang}"
 					>
-						<<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
+						<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
 					</tml:include>
 				</tml:[form-field]>
 
