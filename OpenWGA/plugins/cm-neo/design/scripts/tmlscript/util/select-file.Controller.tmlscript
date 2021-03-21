@@ -1,8 +1,14 @@
 function Controller() {
 }
 
-Controller.prototype.prepare = function($option_fieldname) {
+Controller.prototype.prepare = function($option_fieldname, $form, $cx) {
 	this.fieldname = WGA.scoped($option_fieldname || "image");
+	
+	var filename = $form.field(this.fieldname)
+	if(filename && !$cx.content().getFileNames().contains(filename))
+		$form.removeField(this.fieldname)
+	
+	
 }.nonIsolated()
 
 Controller.prototype.filenames = function($cx) {
