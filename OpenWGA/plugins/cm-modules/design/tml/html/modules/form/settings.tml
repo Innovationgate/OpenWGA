@@ -91,24 +91,9 @@
 	<tml:case value="redirect">
 		<label><tml:label key="form.settings.redirect-page"/>:</label>
 		<div style="margin:10px">
-			<tml:input type="hidden" name="{scoped:redirect}" mode="{option('mode')}"/>
-			<div id="link-view"></div>
-			<script>
-				var combotree = new BI.ComboTree({
-				    width: 265,
-				    disabled: <tml:script expression="option('mode')=='view'"/>,
-					valueField: 'id',
-					displayField: 'text',
-					emptyText:'<tml:label key="form.settings.select-document"/>'
-					<tml:case context="{'docid:'+tmlform.field(WGA.scoped('redirect'))}" iscontextvalid="true">
-			        	,path: "/root/<tml:script expression="AFW.structentry().getPath('node-', '/')"/>"
-			 	   </tml:case>
-				});
-				combotree.on("select", function(ctree, node, e) {
-					document.forms['<tml:script expression="tmlform.formid"/>'].elements["<tml:script expression="WGA.scoped('redirect')"/>"].value = ctree.getValue();
-				});
-				combotree.render("link-view");
-			</script>
+			<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document" o_default="{STRUCTKEY}">
+				<tml:option name="fieldname" expression="WGA.scoped('redirect')"/>
+			</tml:include>
 		</div>
 	</tml:case>
 </tml:select>
