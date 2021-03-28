@@ -25,6 +25,10 @@
 this.Util =  createObject(this, "util");
 this.Handlebars = createObject(this, "handlebars");
 
+this.handlebars = function(design){
+	return createObject(this, "handlebars", design);
+}
+
 this.request = function(){
 	return createObject(this, "request");
 }

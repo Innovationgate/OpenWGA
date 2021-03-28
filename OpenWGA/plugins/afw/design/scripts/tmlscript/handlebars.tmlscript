@@ -1,11 +1,14 @@
 var Handlebars;
 var self;
+var wga_design;
 
-this.init = function(){
+this.init = function(design){
 	self=this;
 	if(!require)
 		return;
-
+		
+	wga_design = design;
+	
 	try{
 		Handlebars = require("handlebars-v2.0.0")
 		Handlebars.registerHelper({
@@ -148,7 +151,8 @@ this.fileTemplate = function(container, file, data){
 	
 	var c = container; 
 	if(typeof(container)=="string"){
-		c = db().getFileContainer(container)
+		var database = wga_design ? wga_design.db() : db();
+		c = database.getFileContainer(container)
 	}
 	if(!c)
 		throw "file container " + container + " not found."
@@ -174,8 +178,13 @@ this.fileTemplate = function(container, file, data){
 this.resourceTemplate = function(resource, data){
 
 	var ResourceRef = Packages.de.innovationgate.wga.additional_script_langs.ResourceRef;
-	var ref = new ResourceRef(resource);
-
+	var ref;
+	if(wga_design){
+		ref = new ResourceRef(wga_design, "file");
+		ref = new ResourceRef(ref, resource);
+	}
+	else ref = new ResourceRef(resource);
+	
 	if(ref.getDesignDocument()==null)
 		throw "Design container not found: " + ref.toString()
 
