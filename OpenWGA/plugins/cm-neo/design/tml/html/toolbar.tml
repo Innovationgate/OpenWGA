@@ -234,9 +234,7 @@
 			</tml:script>
 			<span class="icon fas <tml:item name="_iconClass"/>"></span>
 			<div class="text username">
-				<tml:script context="[db:{portlet.dbkey}]">
-					return WGA.app().domain().auth().fetchCommonName(meta("db", "username"))
-				</tml:script>
+				<tml:meta type="db" name="usercommonname" context="[db:{portlet.dbkey}]"/>
 			</div>
 		</a>
 	</div>
