@@ -2228,6 +2228,9 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         else if (name.equals("email")) {
             return content.getAuthorEMail();
         }
+        else if (name.equals("authorname")) {
+        	return WGA.get(this).app().domain().auth().fetchCommonName(content.getAuthor());
+        }
 		else {
 			Object result = null;
 			String upperName = name.toUpperCase();
