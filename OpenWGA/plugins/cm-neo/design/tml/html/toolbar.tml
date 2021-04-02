@@ -233,7 +233,11 @@
 					: "fa-user";  
 			</tml:script>
 			<span class="icon fas <tml:item name="_iconClass"/>"></span>
-			<div class="text username"><tml:meta type="database" name="username" context="[db:{portlet.dbkey}]"/></div>
+			<div class="text username">
+				<tml:script context="[db:{portlet.dbkey}]">
+					return WGA.app().domain().auth().fetchCommonName(meta("db", "username"))
+				</tml:script>
+			</div>
 		</a>
 	</div>
 </div>
