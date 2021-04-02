@@ -61,7 +61,6 @@ import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGContentEvent;
 import de.innovationgate.webgate.api.WGContentEventListener;
 import de.innovationgate.webgate.api.WGDatabase;
-import de.innovationgate.webgate.api.WGDatabaseRevision;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGFactory;
 import de.innovationgate.webgate.api.WGFileContainer;
@@ -99,9 +98,6 @@ import de.innovationgate.wgpublisher.problems.ProblemScope;
 import de.innovationgate.wgpublisher.problems.ProblemSeverity;
 import de.innovationgate.wgpublisher.problems.ProblemType;
 import de.innovationgate.wgpublisher.problems.SimpleProblemOccasion;
-import de.innovationgate.wgpublisher.scheduler.JobContext;
-import de.innovationgate.wgpublisher.scheduler.JobFailedException;
-import de.innovationgate.wgpublisher.scheduler.TaskImplementation;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 
 public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthModule, WGACoreEventListener, WGContentEventListener {
@@ -1486,8 +1482,13 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
                 }
             }
             catch (Exception e) {
-                _core.getLog().error("Exception creating common name from TMLScript expression" ,e);
+                _core.getLog().error("Exception creating common name from TMLScript expression", e);
             }
+        }
+        else{
+    		String cn_item = (String) content.getDatabase().getAttribute("commonnameItem");
+			if(cn_item!=null)
+				login.addLabeledName(AuthenticationModule.USERLABEL_COMMONNAME, content.getItemValue(cn_item));
         }
         
         for (String labeledName : _labeledNames) {
