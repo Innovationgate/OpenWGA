@@ -2341,6 +2341,14 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	    if (name.equals("username")) {
             return userAccess.getPrimaryName();
         }
+	    else if(name.equals("usercommonname")) {	    	
+	    	if (userDetails != null) {
+	    		String cn = userDetails.getLabeledNames().get(AuthenticationModule.USERLABEL_COMMONNAME);
+	    		if(cn!=null)
+	    			return cn;
+	    	}
+	    	return userAccess.getPrimaryName();
+	    }
 	    else if (name.equals("useraccess")) {
             return new Integer(userAccess.getAccessLevel());
         }
