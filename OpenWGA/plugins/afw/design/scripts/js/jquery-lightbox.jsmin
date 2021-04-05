@@ -57,6 +57,22 @@
 			')
 
 			lightbox = $("#lightbox");
+			lightbox.swipehandler && lightbox.swipehandler({
+				touchMove: function(dx){
+					lightbox.css("overflow", "hidden")
+					$("a.lightbox-close", lightbox).hide();
+					$("> img", lightbox).css("left", 10+dx)
+				},
+				touchEnd: function(dx){
+					if(dx<-60)
+						nextImage()
+					else if(dx>60)
+						prevImage();
+					$("> img", lightbox).css("left", 10);
+					lightbox.css("overflow", "visible")
+					$("a.lightbox-close", lightbox).show();
+				}								
+			})
 			$("#lightbox a.lightbox-close").on("click", hideImage);
 			$("#lightbox a.image-prev").on("click.next", prevImage)
 			$("#lightbox a.image-next").on("click.next", nextImage)
