@@ -192,7 +192,7 @@
 
 <tml:case condition="CMM.setting('onclick')=='zoom'">
 	<tml:[script]>
-		require(["jquery-lightbox"], function(){
+		require(["jquery-lightbox", "jquery-swipehandler"], function(){
 			$("#module-<tml:option name="ns"/> img").css("cursor", "pointer").lightbox({
 				group: "<tml:script expression="CMM.setting('image_group')||'default'"/>"
 			})
