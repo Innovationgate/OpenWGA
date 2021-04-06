@@ -39,7 +39,11 @@
 		<tml:[form-messages] o-close="true"/>
 		
 		<tml:[form-field] o_label="Benutzer" o_mode="view">
-			<tml:script expression="_Database.getUserName()"/>
+			<tml:script>
+				var dn = _Database.getUserName();
+				var cn = WGA.app().domain().auth().fetchCommonName(_Database.getUserName());
+				return dn + (dn!=cn ? "<br>"+cn : "")
+			</tml:script>
 		</tml:[form-field]>
 
 		<tml:case condition="_Database.getUserGroups().size()">

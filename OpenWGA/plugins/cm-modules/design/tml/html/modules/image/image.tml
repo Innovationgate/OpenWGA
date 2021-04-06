@@ -34,7 +34,12 @@
 	if(!CMM.setting("source")){
 		c = CMM.settingSource()=="template" ? CMM.getTemplateContext() : this;
 	}
-	else c = context("db:" + CMM.setting("dbkey") + "/docid:" + CMM.setting("sourcedoc"), false);
+	else {
+		c = context(
+			(CMM.setting("dbkey")!="this" ? "db:" + CMM.setting("dbkey") + "/" : "")
+			+ "docid:" + CMM.setting("sourcedoc") + "." + CMM.setting("lang") + ".0"
+		, false);
+	}
 
 	if(filename && c && c.content().hasFile(filename)){
 		_url = c.fileurl(filename);
@@ -187,7 +192,7 @@
 
 <tml:case condition="CMM.setting('onclick')=='zoom'">
 	<tml:[script]>
-		require(["jquery-lightbox"], function(){
+		require(["jquery-lightbox", "jquery-swipehandler"], function(){
 			$("#module-<tml:option name="ns"/> img").css("cursor", "pointer").lightbox({
 				group: "<tml:script expression="CMM.setting('image_group')||'default'"/>"
 			})

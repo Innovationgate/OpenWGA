@@ -70,8 +70,9 @@ public class Cookie {
     public String getSameSite(){
     	return _sameSite;
     }
-    public void setSameSite(String value){
+    public Cookie setSameSite(String value){
     	_sameSite = value;
+    	return this;
     }
 
     public String getName() {

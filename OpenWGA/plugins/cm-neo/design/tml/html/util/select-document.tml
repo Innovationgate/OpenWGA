@@ -9,34 +9,34 @@
 		<div class="select-tree-wrapper">
 			<a href="#" id="select-key-<tml:option name="fieldname"/>" class="form-control">
 				<span class="title">
-					<tml:if context="[db:{_dbkey}/docid:{tmlform.field($option_fieldname)}]" iscontextvalid="true">
-						<tml:then>
-							<tml:script>
-								var struct = content().getStructEntry();
-								var path=[struct.getStructKey()];
-								for(var parent=struct.getParentEntry(); parent; parent=parent.getParentEntry())
-									path.push(parent.getStructKey().toString());
-							
-								path.push("area-"+struct.getArea().getName());
-								_path = path.reverse().join("/");
-							</tml:script>
-							<tml:path role="none">
-								<tml:meta name="title"/>
-								<tml:between> / </tml:between>
-							</tml:path>
-						</tml:then>
-						<tml:else>
-							<span class="placeholder"><tml:script expression="$option_placeholder || 'Dokument auswählen ...'"/></span>
-						</tml:else>
-					</tml:if>
+					<tml:case condition="tmlform.field($option_fieldname)">
+						<tml:if context="[db:{_dbkey}/docid:{tmlform.field($option_fieldname)}<{$option_language||LANGUAGE}>]" iscontextvalid="true">
+							<tml:then>
+								<tml:script>
+									var struct = content().getStructEntry();
+									var path=[struct.getStructKey()];
+									for(var parent=struct.getParentEntry(); parent; parent=parent.getParentEntry())
+										path.push(parent.getStructKey().toString());
+								
+									path.push("area-"+struct.getArea().getName());
+									_path = path.reverse().join("/");
+								</tml:script>
+								<tml:path role="none">
+									<tml:meta name="title"/>
+									<tml:between> / </tml:between>
+								</tml:path>
+							</tml:then>
+							<tml:else>
+								- ausgewählte Seite nicht vorhanden -
+							</tml:else>
+						</tml:if>
+					</tml:case>
 				</span>
-						
+				<span class="placeholder" style="display:none"><tml:script expression="$option_placeholder || 'Dokument auswählen ...'"/></span>
 			</a>
-			<tml:case condition="tmlform.field($option_fieldname)">
-				<a href="#" class="clear-key-field" id="clear-key-<tml:option name="fieldname"/>" title="Auswahl löschen">&times</a>
-			</tml:case>
+			<a href="#" style="display:none" class="clear-key-field" id="clear-key-<tml:option name="fieldname"/>" title="Auswahl löschen">&times</a>
 			<div class="select-tree">
-				<div class="tree" id="tree-<tml:option name="fieldname"/>" data-url="<tml:url type="tml" medium="json" layout="siteexplorer" u-dbkey="_dbkey" u_language="{LANGUAGE}"/>"></div>
+				<div class="tree" id="tree-<tml:option name="fieldname"/>" data-url="<tml:url type="tml" medium="json" layout="siteexplorer" u-dbkey="_dbkey" u_language="{$option_language||LANGUAGE}"/>"></div>
 			</div>
 		</div>
 		
@@ -45,6 +45,12 @@
 		
 				var el = $("#select-key-<tml:option name="fieldname"/>");
 				var field = $("[name='<tml:option name="fieldname"/>']");
+				
+				if(!field.val()){
+					$(".placeholder", el).show();
+				}
+				else $("#clear-key-<tml:option name="fieldname"/>").show();
+				
 				el.on("focus click", function(ev){
 					ev.preventDefault();
 					tree.show();
@@ -53,7 +59,11 @@
 				$("#clear-key-<tml:option name="fieldname"/>").on("click", function(ev){
 					ev.preventDefault();
 					field.val("");
+					$(".title", el).html("");
+					$(".placeholder", el).show();
+					$("#clear-key-<tml:option name="fieldname"/>").hide();
 					<tml:case hasoptions="changeaction">
+						console.log("callAction")
 						WGA.ajax.callAction("<tml:option name="changeaction"/>");
 					</tml:case>
 				})
@@ -70,8 +80,19 @@
 					<tml:case hasoptions="changeaction">
 						WGA.ajax.callAction("<tml:option name="changeaction"/>");
 					</tml:case>
-					$(".title", el).html(node.title);
+					var path = node.node.parents(".node").map(function(){
+						if($(this).data("id").indexOf("area-")==0)
+							return null;		// ignore area 
+						return $(this).data("title")
+					}).get().reverse()
+					path.push(node.title)
+					$(".title", el).html(path.join(" / "));
+					//$(".title", el).html(node.title);
 					tree.hide();
+
+					$(".placeholder", el).hide();
+					$("#clear-key-<tml:option name="fieldname"/>").show();
+
 				})
 		
 				$(document).on("focusin click", function(ev){

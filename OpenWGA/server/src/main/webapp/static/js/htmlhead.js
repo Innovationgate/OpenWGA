@@ -828,7 +828,9 @@ WGA.getQueryString = function(win) {
 				value = decode(value);
 			}
 			if (name.length > 0) {
-				map[name] = value;
+				if(!map[name])
+					map[name]=[];
+				map[name].push(value);
 			}
 		});
 	}
@@ -860,7 +862,7 @@ WGA.toQueryString = function(customParams, keepParams, encodeParams, removeParam
 		var currentParams = WGA.getQueryString(window);
 		for ( var key in currentParams) {
 			if (currentParams[key] != null) {
-				params[String(key)] = String(currentParams[key]);
+				params[String(key)] = currentParams[key];
 			} else {
 				params[String(key)] = null;
 			}
@@ -897,7 +899,7 @@ WGA.pushQueryParameter = function(key, value, paramsArray, encodeParams) {
 		paramsArray.push(key);
 	}
 	
-	else if (WGA.isObjectType(value, "Array")) {
+	else if (value instanceof Array){ 
 		for (var idx=0; idx < value.length; idx++) {
 			WGA.pushQueryParameter(key, value[idx], paramsArray, encodeParams);
 		}

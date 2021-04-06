@@ -1,6 +1,7 @@
-<tml:action id="clearFilename">
+<tml:action id="app-changed">
+	tmlform.removefield("lang")
+	tmlform.removefield("container")
 	tmlform.removefield("filename")
-	tmlform.removefield("alt")
 </tml:action>
 
 <tml:form id="edit-rtf-image">
@@ -50,39 +51,76 @@
 
 				<tml:script>
 					WGA.TMLPage.setVar("_dbs", CMM.getDbKeys());
-					_dbkey = meta("db", "dbkey");
+					_dbs.add(0, "- aktuelle App -|this");
+					_dbkey = "this";
+					_lang = LANGUAGE;
 					if($option_dialog_options.key && !tmlform.submitted){
 						var parts = $option_dialog_options.key.split("/");
+						if(parts.length==3){
+							_container = parts[0];
+							_filename = parts[1];
+							_dbkey = parts[2];
+						}
+						if(parts.length==2){
+							_container = parts[0];
+							_filename = parts[1];
+							_dbkey = "this"
+						}
+						parts = _container.split(".")
 						_container = parts[0];
-						_filename = parts[1];
-						_dbkey = parts[2];
-						tmlform.filename = _filename;
+						if(parts.length>1)
+							_lang = parts[1];
 					}
+
+					var database = db()
+					if(tmlform.dbkey && tmlform.dbkey!="this")
+						database = db(tmlform.dbkey)
+					WGA.TMLPage.setVar("_langs", database.getLanguages().keySet());
+					
+					if(!_langs.contains(_lang))
+						_lang = _langs.iterator().next();
 				</tml:script>
 				
-				<tml:[form-field] o_label="App" o_name="dbkey" o_default="{_dbkey}" o_type="select" o_optionsitem="_dbs" o_changeaction="$refresh"/>
+				<tml:[form-field] o_label="App" o_name="dbkey" o_default="{_dbkey}" o_type="select" o_optionsitem="_dbs" o_changeaction="app-changed"/>
+				<tml:[form-field] o_label="Sprache" o_name="lang" o_default="{_lang}" o_type="select" o_optionsitem="_langs" o_changeaction="$refresh"/>
 
 				<tml:[form-field] o_label="Dokument">
-					<tml:include ref="util:select-document" o_fieldname="container" o_default="{_container}" o_dbkey="{tmlform.dbkey}">
-						<tml:option name="changeaction"><tml:action ref="clearFilename"/></tml:option>
+					<tml:include ref="util:select-document" o_fieldname="container" o_default="{_container}" 
+							o_dbkey="{tmlform.dbkey=='this'?VOID:tmlform.dbkey}"
+							o_language="{tmlform.lang}"
+					>
+						<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
 					</tml:include>
 				</tml:[form-field]>
 
-				<tml:case condition="tmlform.container" context="[db:{tmlform.dbkey}/docid:{tmlform.container}]" iscontextvalid="true">
-
-					<tml:[form-field] o_label="Bild-Datei">
-						<tml:include ref="util:select-file" o_derivate="usage=poster" o_fieldname="filename" o_placeholder="Bitte auswählen ..."/>
-					</tml:[form-field]>
-
-					<tml:case condition="tmlform.filename">
-						<tml:script>
-							var Attachment = AFW.content().attachment(tmlform.filename);
-							tmlform.url = Attachment.getPosterURL()
-							tmlform.alt = Attachment.fileMetaData.title;
-						</tml:script>
-					</tml:case>
-
-					<tml:input name="url" type="hidden"/>
+				<tml:case condition="tmlform.container">
+					<tml:script>
+						_ctx = (tmlform.dbkey=='this' ? "" : "db:"+tmlform.dbkey + "/")
+							+ "docid:" + tmlform.container
+							+ "<" + tmlform.lang + ">"
+					</tml:script>
+					<tml:if context="{_ctx}" iscontextvalid="true">
+						<tml:then>
+							<tml:[form-field] o_label="Bild-Datei">
+								<tml:include ref="util:select-file" o_derivate="usage=poster" o_fieldname="filename" o_default="{_filename}" o_placeholder="Bitte auswählen ..."/>
+							</tml:[form-field]>
+		
+							<tml:case condition="tmlform.filename">
+								<tml:script>
+									var Attachment = AFW.content().attachment(tmlform.filename);
+									tmlform.url = Attachment.getPosterURL()
+									tmlform.alt = Attachment.fileMetaData.title;
+								</tml:script>
+							</tml:case>
+		
+							<tml:input name="url" type="hidden"/>
+						</tml:then>
+						<tml:else>
+							<tml:[form-field] o_mode="view">
+								<p style="color:red">Die Seite ist in der Sprache '<tml:item name="lang" type="tmlform"/>' nicht verfügbar.</p>
+							</tml:[form-field]>
+						</tml:else>
+					</tml:if>
 
 				</tml:case>
 				
@@ -156,12 +194,17 @@
 				var dbkey = $("[name=dbkey]", form).val();
 				var container = $("[name=container]", form).val();
 				var filename = $("[name=filename]", form).val();
+				var lang = $("[name=lang]", form).val();
 				if(!filename){
 					alert("Bitte wählen Sie ein Bild aus.");
 					return;
 				}
 				el = editor.createImg(url, "extfile");
-				editor.setURLInfo(el, {type:type, key:container+"/"+filename+"/"+dbkey})
+				editor.setURLInfo(el, {
+					type: type, 
+					key: container+"." + lang + ".0/"+filename
+							+ (dbkey=="this" ? "" :  "/"+dbkey)
+				})
 			}
 			else{
 				alert("Unbekannter Bild-Typ: " + type);
@@ -212,12 +255,17 @@
 				var dbkey = $("[name=dbkey]", form).val();
 				var container = $("[name=container]", form).val();
 				var filename = $("[name=filename]", form).val();
+				var lang = $("[name=lang]", form).val();
 				if(!filename){
 					alert("Bitte wählen Sie ein Bild aus.");
 					return;
 				}
 				el.src=url;				
-				editor.setURLInfo(el, {type:type, key:container+"/"+filename+"/"+dbkey})
+				editor.setURLInfo(el, {
+					type: type, 
+					key: container+"." + lang + ".0/"+filename
+							+ (dbkey=="this" ? "" :  "/"+dbkey)
+				})
 			}
 			else{
 				alert("Unbekannter Bild-Typ: " + type);

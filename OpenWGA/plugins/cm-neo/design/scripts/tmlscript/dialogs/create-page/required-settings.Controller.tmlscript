@@ -1,0 +1,14 @@
+function Controller(AFW, $field_contenttype) {
+
+	// check for requires settings
+	var tmls = WGA.createList([
+		"wga:content-manager:required:"+$field_contenttype,
+		"wga:content-manager:required:default",
+		"overlay:wga:content-manager:required:"+$field_contenttype,
+		"overlay:wga:content-manager:required:default"
+	])
+	var tml = AFW.database().checkforTML(tmls);
+	console.log("required tmls", $field_contenttype, tml);
+	this.settingsTML = tml;
+
+}

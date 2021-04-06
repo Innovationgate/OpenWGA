@@ -61,7 +61,6 @@ import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGContentEvent;
 import de.innovationgate.webgate.api.WGContentEventListener;
 import de.innovationgate.webgate.api.WGDatabase;
-import de.innovationgate.webgate.api.WGDatabaseRevision;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGFactory;
 import de.innovationgate.webgate.api.WGFileContainer;
@@ -99,9 +98,6 @@ import de.innovationgate.wgpublisher.problems.ProblemScope;
 import de.innovationgate.wgpublisher.problems.ProblemSeverity;
 import de.innovationgate.wgpublisher.problems.ProblemType;
 import de.innovationgate.wgpublisher.problems.SimpleProblemOccasion;
-import de.innovationgate.wgpublisher.scheduler.JobContext;
-import de.innovationgate.wgpublisher.scheduler.JobFailedException;
-import de.innovationgate.wgpublisher.scheduler.TaskImplementation;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 
 public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthModule, WGACoreEventListener, WGContentEventListener {
@@ -584,6 +580,7 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
     private boolean _certAuth = false;
 
     private String _commonNameExpression;
+	private String _commonNameItem;
 
     private Object _collectMode = COLLECTMODE_PRELOAD;
 
@@ -602,6 +599,7 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
     private AuthCollector _authCollector;
 
     private List<String> _aliasItemNames;
+
 
     public static final String CSAUTH_PROPERTIES_FILE = "csauth.properties";
 
@@ -626,6 +624,7 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
      * Determines a TMLScript expression by which to calculate the common name
      */
     public static final String COPTION_COMMONNAME_EXPRESSION = "auth.cs.commonname.expression";
+	private static final Object COPTION_COMMONNAME_ITEM = "auth.cs.commonname.item";
     
 
     public void init(Map<String,String> params, WGDatabase db) throws ConfigurationException {
@@ -688,6 +687,7 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
         }
         
          _commonNameExpression = WGUtils.getValueOrDefault((String) params.get(COPTION_COMMONNAME_EXPRESSION), _commonNameExpression);
+         _commonNameItem = WGUtils.getValueOrDefault((String) params.get(COPTION_COMMONNAME_ITEM), _commonNameItem);
     }
 
     private synchronized void registerWithTargetDatabase(final WGDatabase dbTarget) {
@@ -1486,8 +1486,16 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
                 }
             }
             catch (Exception e) {
-                _core.getLog().error("Exception creating common name from TMLScript expression" ,e);
+                _core.getLog().error("Exception creating common name from TMLScript expression", e);
             }
+        }
+        else if (_commonNameItem != null) {
+			login.addLabeledName(AuthenticationModule.USERLABEL_COMMONNAME, content.getItemValue(_commonNameItem));        	
+        }
+        else{
+    		String cn_item = (String) content.getDatabase().getAttribute("commonNameItem");
+			if(cn_item!=null)
+				login.addLabeledName(AuthenticationModule.USERLABEL_COMMONNAME, content.getItemValue(cn_item));
         }
         
         for (String labeledName : _labeledNames) {

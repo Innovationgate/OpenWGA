@@ -35,6 +35,7 @@ import de.innovationgate.webgate.api.WGIllegalArgumentException;
 import de.innovationgate.webgate.api.WGQueryException;
 import de.innovationgate.webgate.api.auth.AuthenticationModule;
 import de.innovationgate.webgate.api.auth.CustomCredentials;
+import de.innovationgate.webgate.api.auth.LabeledNamesProvider;
 import de.innovationgate.webgate.api.auth.UserGroupInfo;
 import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wgpublisher.DBLoginInfo;
@@ -236,6 +237,14 @@ public class Auth {
         }
         return (UserGroupInfo) mod.query(dn, AuthenticationModule.QUERY_USER_DN);
         
+    }
+    
+    public String fetchCommonName(String dn) throws WGException{
+    	String cn=null;
+    	UserGroupInfo info = lookupDN(dn);
+    	if(info != null && info instanceof LabeledNamesProvider)
+    		cn = (String)((LabeledNamesProvider)info).getLabeledNames().get(AuthenticationModule.USERLABEL_COMMONNAME);
+    	return cn != null ? cn : dn;
     }
     
     /**

@@ -196,7 +196,7 @@
 	}
 }
 
-#dialog-settings_content, #dialog-settings_user-defined {
+#dialog-settings_content, #dialog-settings_user-defined, #dialog-create-page_child, #dialog-create-page_root {
 	width: 900px;
 	margin-left: -450px;
 }
@@ -334,6 +334,9 @@ form .select-tree{
 			padding: 5px 0;
 			border: solid silver 1px;
 			border-radius: 4px;
+		}
+		.not-visible{
+			color: silver;
 		}
 
 	}

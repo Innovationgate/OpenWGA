@@ -2228,6 +2228,9 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         else if (name.equals("email")) {
             return content.getAuthorEMail();
         }
+        else if (name.equals("authorname")) {
+        	return WGA.get(this).app().domain().auth().fetchCommonName(content.getAuthor());
+        }
 		else {
 			Object result = null;
 			String upperName = name.toUpperCase();
@@ -2338,6 +2341,14 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	    if (name.equals("username")) {
             return userAccess.getPrimaryName();
         }
+	    else if(name.equals("usercommonname")) {	    	
+	    	if (userDetails != null) {
+	    		String cn = userDetails.getLabeledNames().get(AuthenticationModule.USERLABEL_COMMONNAME);
+	    		if(cn!=null)
+	    			return cn;
+	    	}
+	    	return userAccess.getPrimaryName();
+	    }
 	    else if (name.equals("useraccess")) {
             return new Integer(userAccess.getAccessLevel());
         }

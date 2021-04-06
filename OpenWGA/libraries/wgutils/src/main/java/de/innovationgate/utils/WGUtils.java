@@ -70,6 +70,8 @@ import java.util.zip.ZipOutputStream;
 
 import javax.swing.JList;
 import javax.swing.ListModel;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.html.HTML;
 import javax.swing.text.html.parser.ParserDelegator;
 
 import org.apache.commons.collections.MapIterator;
@@ -171,26 +173,68 @@ public abstract class WGUtils {
 
         private boolean _ignoreWhitespace = false;
 
-        private String _divider = "";
+        private String _divider = " ";
+        private boolean _formatted=false;    
+        private boolean dividerAdded=false;
 
         private StringBuffer _text = new StringBuffer();
 
         public PlainTextParserCallback(boolean ignoreWhitespace, String divider) {
             _ignoreWhitespace = ignoreWhitespace;
-            _divider = divider;
+            _divider = divider;            
         }
 
-        public void handleText(char[] arg0, int arg1) {
+        public PlainTextParserCallback(boolean ignoreWhitespace, String divider, boolean formatted) {
+            _ignoreWhitespace = ignoreWhitespace;
+            _divider = divider;
+            _formatted = formatted;
+        }
 
-            String newText = new String(arg0);
+        private boolean insertLf(HTML.Tag t){
+        	return (t == HTML.Tag.P
+                || t == HTML.Tag.H1
+                || t == HTML.Tag.H2
+                || t == HTML.Tag.H3
+                || t == HTML.Tag.H4
+                || t == HTML.Tag.H5
+                || t == HTML.Tag.H6
+                || t == HTML.Tag.BLOCKQUOTE
+                || t == HTML.Tag.UL
+                || t == HTML.Tag.OL
+                || t == HTML.Tag.LI);
+        }
+        
+        public void handleSimpleTag(HTML.Tag t, MutableAttributeSet a, int pos) {
+        	if(t == HTML.Tag.BR){
+        		_text.append(_divider);
+        		dividerAdded=true;
+        	}
+        }
+        
+        public void handleStartTag(HTML.Tag t, MutableAttributeSet a, int pos) {
+            if(!getText().isEmpty() && !dividerAdded && insertLf(t)){
+            	_text.append(_divider);
+            	dividerAdded = true;
+            }
+        	if(_formatted && t == HTML.Tag.LI)
+        		_text.append("- ");
+        }
+        public void handleEndTag(HTML.Tag t, int pos) {
+            if(insertLf(t) && !dividerAdded){
+            	_text.append(_divider);
+            	dividerAdded=true;
+            }        	
+        }
+        
+        public void handleText(char[] data, int pos) {
+
+            String newText = new String(data);
             if (this._ignoreWhitespace == true && newText.trim().equals("")) {
                 return;
             }
 
-            if (this._text.length() > 0) {
-                this._text.append(this._divider);
-            }
-            this._text.append(newText);
+            _text.append(newText);
+            dividerAdded = false;
         }
 
         public String getText() {
@@ -1338,19 +1382,54 @@ public abstract class WGUtils {
 
     /**
      * Converts a HTML to plain text by removing all HTML tags.
-     * 
      * @param html
-     *            The html
+     * 		The html
+     * @return The plain text
+     * @throws IOException
+     */
+    public static String toPlainText(String html) throws IOException {
+    	return toPlainText(html, " ", false, false);
+    }
+    /**
+     * Converts a HTML to plain text by removing all HTML tags.
+     * @param html
+     * 		The html
+     * @param lfDivider
+     *      The divider by which separate block elements
+     * @return The plain text
+     * @throws IOException
+     */
+    public static String toFormattedPlainText(String html) throws IOException {
+    	return toPlainText(html, "\n", false, true);
+    }
+    /**
+     * Converts a HTML to plain text by removing all HTML tags.
+     * @param html
+     * 		The html
      * @param divider
-     *            The divider by which separate text fragments that were parsed
-     *            from the HTML should be divided.
+     *      The divider by which separate text fragments that were parsed from the HTML should be divided.
      * @param ignoreWhitespace
-     *            Specify true if pure whitespace text fragments should be
-     *            ignored
+     *      Specify true if pure whitespace text fragments should be ignored
      * @return The plain text
      * @throws IOException
      */
     public static String toPlainText(String html, String divider, boolean ignoreWhitespace) throws IOException {
+    	return toPlainText(html, divider, ignoreWhitespace, false);
+    }
+    /**
+     * Converts a HTML to plain text by removing all HTML tags.
+     * @param html
+     * 		The html
+     * @param divider
+     *      The divider by which separate text fragments that were parsed from the HTML should be divided.
+     * @param lfDivider
+     *      The divider by which separate block elements
+     * @param ignoreWhitespace
+     *      Specify true if pure whitespace text fragments should be ignored
+     * @return The plain text
+     * @throws IOException
+     */
+    public static String toPlainText(String html, String divider, boolean ignoreWhitespace, boolean formatted) throws IOException {
 
         // First remove data URLs from code which may bloat the process
         html = WGUtils.strReplace(html, "src=\"data:", new ReplaceProcessor() {
@@ -1388,7 +1467,7 @@ public abstract class WGUtils {
         }, true);
         
         // Convert to plaintext
-        PlainTextParserCallback callback = new PlainTextParserCallback(ignoreWhitespace, divider);
+        PlainTextParserCallback callback = new PlainTextParserCallback(ignoreWhitespace, divider, formatted);
         ParserDelegator parserDelegator = new javax.swing.text.html.parser.ParserDelegator();
         parserDelegator.parse(new java.io.StringReader(html), callback, true);
         return callback.getText();

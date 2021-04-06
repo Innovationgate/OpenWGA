@@ -21,7 +21,7 @@
 
 		<div>
 			<label>Autor</label>
-			<p>@{AUTHOR}</p>
+			<p>@{AUTHORNAME}</p>
 		</div>
 
 		<tml:{div} if="WORKFLOW">

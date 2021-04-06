@@ -27,12 +27,12 @@
 </tml:script>
 
 <div class="form-group<tml:case condition="_field && tmlform.hasmessage(_field)"> error</tml:case>">
-	<label class="col-md-4 control-label" for="<tml:item name="_id"/>"><tml:script expression="option('label')?option('label')+':' : ''"/></label>
+	<label class="col-md-4 control-label" for="<tml:item name="_id"/>"><tml:option name="label"/></label>
 	<div class="col-md-8<tml:case condition="_mode=='view'"> form-control-static</tml:case>">
 
-		<tml:case hasoptions="name">
+		<tml:case condition="_field">
 			<tml:{div} wrapif="_wrap" html-class="_wrap_class">
-			<tml:input name="{option:name}"
+			<tml:input name="{_field}"
 			
 				type=				"{_type}"
 				options=			"{option('options')==null ? VOID : option('options')}"
@@ -63,6 +63,10 @@
 				</tml:case>
 				<tml:option name="attributes"/>
 			</tml:input>
+			<tml:case condition="tmlform.hasmessage(_field)">
+	    		<tml:script expression="tmlform.getmessage(_field)"/>
+	    	</tml:case>
+			
 			</tml:{div}>
 		</tml:case>
 		<tml:option name="body" wrap="div"/>

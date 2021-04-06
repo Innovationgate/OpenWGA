@@ -16,7 +16,28 @@
 	var viewport={};
 	var current_url, current_group;
 	var images = {}
+	var resizeTimer=null
 
+	$(window).resize(function(){
+		if(bodyMask && !resizeTimer){
+			resizeTimer = setTimeout(function(){
+				viewport={
+					width: bodyMask.width(),
+					height: bodyMask.height()
+				}
+				var img = $("#lightbox img")[0];
+				scaleImg(img);
+				lightbox.css({
+					left: (viewport.width-img.width)/2-10,
+					width: img.width,
+					top: (viewport.height-img.height)/2-40,
+					height: img.height+60
+				})
+				resizeTimer = null;
+			}, 100);
+		}
+	})
+	
 	function keyHandler(e){
 		//console.log("key", e);
         var keyCode = e.keyCode
@@ -57,6 +78,22 @@
 			')
 
 			lightbox = $("#lightbox");
+			lightbox.swipehandler && lightbox.swipehandler({
+				touchMove: function(dx){
+					lightbox.css("overflow", "hidden")
+					$("a.lightbox-close", lightbox).hide();
+					$("> img", lightbox).css("left", 10+dx)
+				},
+				touchEnd: function(dx){
+					if(dx<-60)
+						nextImage()
+					else if(dx>60)
+						prevImage();
+					$("> img", lightbox).css("left", 10);
+					lightbox.css("overflow", "visible")
+					$("a.lightbox-close", lightbox).show();
+				}								
+			})
 			$("#lightbox a.lightbox-close").on("click", hideImage);
 			$("#lightbox a.image-prev").on("click.next", prevImage)
 			$("#lightbox a.image-next").on("click.next", nextImage)
@@ -156,12 +193,11 @@
 
 	function scaleImg(img){
 		
-		/*
-		img.removeAttribute("width");
-		img.removeAttribute("height");
-		*/
-
 		var $img = $(img);
+		$img.css({
+			width: "auto",
+			height: "auto"			
+		})
 		
 		var wMax = viewport.width-70;
 		var hMax = viewport.height-120;

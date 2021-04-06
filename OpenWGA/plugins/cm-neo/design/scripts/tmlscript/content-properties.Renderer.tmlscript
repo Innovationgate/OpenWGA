@@ -2,7 +2,7 @@ function Renderer() {}
 
 Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey, $urlParam_structkey ) {
 	
-	var result = {}
+	var result = {};
 
 	var c = context("db:" + $urlParam_dbkey + "/docid:" + $urlParam_contentkey, false)
 	if(c){
@@ -21,7 +21,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 			language: c.LANGUAGE,
 			languagetitle: WGA.encode("JSON", c.LANGUAGETITLE),
 			status: label("content-properties.status." + (c.content().isPendingRelease() ? 'pending' : c.STATUS)),
-			author: WGA.encode("JSON", c.AUTHOR),
+			author: WGA.encode("JSON", c.AUTHORNAME),
 
 			replacementReason: c.STATUS==c.content().STATUS_ARCHIVE && c.ersetzungsgrund && WGA.encode("html", c.ersetzungsgrund),
 
