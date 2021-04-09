@@ -40,8 +40,8 @@
 		
 		<tml:[form-field] o_label="Benutzer" o_mode="view">
 			<tml:script>
-				var dn = _Database.getUserName();
-				var cn = WGA.app().domain().auth().fetchCommonName(_Database.getUserName());
+				var dn = meta("db", "username");
+				var cn = meta("db", "usercommonname"); 
 				return dn + (dn!=cn ? "<br>"+cn : "")
 			</tml:script>
 		</tml:[form-field]>

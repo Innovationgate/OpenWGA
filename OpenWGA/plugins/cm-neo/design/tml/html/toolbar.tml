@@ -225,7 +225,7 @@
 			<i class="icon fas fa-search"></i>
 			<div class="text">Suchen</div>
 		</a>
-		<a class="btn button" href="#" data-action="userinfo" title="<tml:meta type="database" name="username" context="[db:{portlet.dbkey}]"/>">
+		<a class="btn button" href="#" data-action="userinfo" title="<tml:meta type="database" name="usercommonname" context="[db:{portlet.dbkey}]"/>">
 			<tml:script>
 				var app = WGA.app(portlet.dbkey)
 				_iconClass = app.isManager() ? "fa-user-cog"
