@@ -15,10 +15,14 @@
 		margin: 5px 0;
 		padding: 2px 5px;
 		overflow: hidden;
+		border: solid transparent 1px;
+		border-radius: 4px;
 		&.selected{
-			border: solid silver 1px;
-			border-radius: 4px;
+			border-color: silver;
 			background: #efefef;
+		}
+		&:hover{
+			border-color: silver;
 		}
 		.info{
 			font-size: 0.8em;
@@ -26,6 +30,10 @@
 		}
 		a {
 			display: block;
+			text-decoration: none;
+		}
+		ul{
+			padding: 2px 15px; 
 		}
 	}
 	
