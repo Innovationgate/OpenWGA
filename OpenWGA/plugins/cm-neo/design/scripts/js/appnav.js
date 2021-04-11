@@ -7,9 +7,11 @@ define(["jquery"], function($){
 		
 		context = ev.params;
 
+		/*
 		$("#appnav [data-view='outline']")[ev.params.contentkey ? "show" : "hide"]();
 		$("#appnav [data-view='responsive']")[ev.params.contentkey ? "show" : "hide"]();
-
+		*/
+		
 		contextChangeListener && contextChangeListener(context);
 		
 		$("#appnav").show();
