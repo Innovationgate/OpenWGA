@@ -1,4 +1,4 @@
-define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitepanel, $, Outline){
+define(["cm", "sitepanel", "jquery", "bootstrap"], function(CM, Sitepanel, $){
 
 	WGA.event.addListener("*", "CMS_item_edit", function(ev){
 		$("#toolbars")
@@ -196,47 +196,24 @@ define(["cm", "sitepanel", "jquery", "outline", "bootstrap"], function(CM, Sitep
 			button.parents(".btn-group").find(".icon").html(scale+"%");
 			WGA.event.fireEvent("scale", "*", {scale:scale})
 		}
-
-		,"toggle-appnav": function(button){
-			$('#page').toggleClass('appnav')
-			button.html("Panel " + ($('#page').hasClass("appnav") ? "ausblenden" : "einblenden"))
-		},
-
-		"view-show-siteexplorer": function(){
-			$("#app-outline").hide()
-			$("#app-child-docs").hide()
-			$("#app-siteexplorer").show()
-			Outline.showHeadings(false);
-		},
-		"view-show-outline": function(){
-			$("#app-siteexplorer").hide()
-			$("#app-child-docs").hide()
-			$("#app-outline").show()
-			Outline.showHeadings(true);
-		},
-		"view-show-child-docs": function(){
-			$("#app-siteexplorer").hide()
-			$("#app-outline").hide()
-			$("#app-child-docs").show()
-		},
-
-		"content-modules": function(button){
+		
+		,"content-modules": function(button){
 			CM.openDialog("content-modules");
-		},
+		}
 
-		"delete-page": function(){
+		,"delete-page": function(){
 			CM.openDialog("delete-page")
-		},
+		}
 
-		"seo": function(){
+		,"seo": function(){
 			CM.openDialog("seo")
-		},
+		}
 
-		"logout": function(){
+		,"logout": function(){
 			WGA.event.fireEvent("logout")
-		},
+		}
 
-		"exit": function(){
+		,"exit": function(){
 			WGA.event.fireEvent("exit")
 		}
 
