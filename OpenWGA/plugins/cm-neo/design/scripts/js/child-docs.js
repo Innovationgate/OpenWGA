@@ -4,7 +4,7 @@ define(["cm", "appnav"], function(CM, Appnav){
 	var template;
 
 	function onContextChange(context){
-		template && $.getJSON(url, context, function(result){
+		context && template && $.getJSON(url, context, function(result){
 			template.render(result)
 		})		
 	}
@@ -21,6 +21,7 @@ define(["cm", "appnav"], function(CM, Appnav){
 		onContextChange(Appnav.getContext());
 		
 		Appnav.setContextChangeListener(onContextChange)
+		Appnav.selectView("child-docs");
 
 	}
 	

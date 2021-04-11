@@ -2,4 +2,14 @@
 	var view = portletEvent.getParameter("view")
 	portlet.setmode(view);
 </tml:eventscript>
+
+<tml:script>
+	if(portlet.mode=="view"){
+		var dashboard = (new $["dashboard.Renderer"]()).getData(AFW, portlet.parent().dbkey, portlet.parent().contentkey)
+		if(dashboard.drafts.length || dashboard.toapprove.length)
+			portlet.setmode("dashboard")
+		else portlet.setmode("explorer")
+	}
+</tml:script>
+
 <tml:include ref="{'::mode-' + portlet.mode}"/>

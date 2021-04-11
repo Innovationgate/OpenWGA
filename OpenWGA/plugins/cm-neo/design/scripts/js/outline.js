@@ -26,11 +26,14 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 			el[0] && el[0].scrollIntoView();
 		})
 		
+		Appnav.selectView("outline")
 	}
 	
 	function updateOutline(){
 		
 		var context = Appnav.getContext();
+		if(!context)
+			return;
 		
 		if(context.status=="w"){
 			// read page with URL param $clean to get clean HTML without item-editors
