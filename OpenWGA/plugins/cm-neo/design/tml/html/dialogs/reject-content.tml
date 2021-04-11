@@ -25,7 +25,7 @@
 			<tml:metadata name="title"/>
 		</tml:[form-field]>
 		<tml:[form-field] o_label="Author" o_mode="view">
-			<tml:metadata name="author"/>
+			<tml:metadata name="authorname"/>
 		</tml:[form-field]>
 		<tml:[form-field] o_label="Kommentar" o_field="comment" o_type="textarea">
 			Der Autor wird über die Ablehnung benachrichtigt.

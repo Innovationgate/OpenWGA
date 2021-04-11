@@ -23,11 +23,11 @@
 	</div>
 	
 	<div class="content form-horizontal">
-		<tml:[form-field] o_label="Titel">
+		<tml:[form-field] o_label="Titel" o_mode="view">
 			<tml:metadata name="title"/>
 		</tml:[form-field]>
-		<tml:[form-field] o_label="Author">
-			<tml:metadata name="author"/>
+		<tml:[form-field] o_label="Author" o_mode="view">
+			<tml:metadata name="authorname"/>
 		</tml:[form-field]>
 		<tml:[form-field] o_label="Kommentar" o_field="comment" o_type="textarea">
 			Der Autor wird über die Freigabe benachrichtigt.
