@@ -72,6 +72,7 @@ Renderer.prototype.getData = function(AFW, $urlParam_dbkey, $urlParam_contentkey
 		
 		var docs = WGA.app($urlParam_dbkey).query("content.status='g'", {
 			onlypublished: false,
+			alllanguages: true
 		}).filter(function(doc){
 			if(doc.content().isPendingRelease())
 				return false;
