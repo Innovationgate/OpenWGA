@@ -130,9 +130,13 @@
 					_mode = "view";
 				else _mode = option("mode");
 
-				_classes = WGA.createList()
+				_classes = null;
 				if(tmlform.module_id){
-					_classes.addAll(CMM.getModuleCssClasses(tmlform.module_id))
+					_classes = CMM.getModuleCssClasses(tmlform.module_id);
+					if(_classes && _classes.classes)
+						_classes_classes = _classes.classes
+					if(_classes && _classes.options)
+						_classes_options = _classes.options
 				}
 
 			</tml:script>
@@ -143,11 +147,24 @@
 					<tml:option name="parent-scope" expression="tmlform.parent_mod_id"/>
 					<tml:option name="cm_dbkey" expression="context('main').meta('db', 'dbkey')"/>
 				</tml:include>
-				<tml:case condition="_classes.size()">
+				<tml:case condition="_classes && (_classes.classes.size() || _classes.options.size())">
 					<label><tml:label key="module-style"/></label>
-					<div style="margin:10px">
-						<tml:input name="{WGA.scoped('module_css_classes', tmlform.mod_id)}" type="checkbox" optionsitem="_classes"/>
-					</div>
+					<tml:case condition="_classes_classes.size()">
+						<div style="margin:10px">
+							<tml:input name="{WGA.scoped('module_css_classes', tmlform.mod_id)}" type="checkbox" optionsitem="_classes_classes" mode="{option:mode}"/>
+						</div>
+					</tml:case>
+					<tml:foreach item="_classes_options" currentvalue="_option">
+						<div style="margin:10px">
+							<tml:script>
+								console.log("_option", _option.values)
+								_label = _option.label;
+								_values = _option.values;
+							</tml:script>
+							<label><tml:item name="_label"/>:</label>
+							<tml:input name="{WGA.scoped('module_css_classes', tmlform.mod_id)}" type="select" optionsitem="_values" mode="{option:mode}"/>
+						</div>
+					</tml:foreach>
 				</tml:case>					
 			</div>
 		</tml:case>
