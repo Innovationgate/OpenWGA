@@ -6,9 +6,11 @@
 	},
 
 	">.tiles": {
-		display: "flex",
-		
 		margin: "0 -10px",
+		
+		"&.keep": {
+			display: "flex",		
+		},
 		
 		">.tile":{
 			box_sizing: "border-box",
