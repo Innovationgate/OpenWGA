@@ -1,6 +1,6 @@
 <tml:input name="{$mc.fieldname}" default="{$option_default}" type="hidden"/>
 
-<tml:if condition="tmlform.mode()=='edit' && $option_mode!='view'">
+<tml:if condition="tmlform.mode()=='edit' && $option_mode!='view' && $option_mode!='readonly'">
 	<tml:then>
 		<div class="select-image-wrapper">
 			<a href="#" id="select-image-<tml:item name="$mc.fieldname"/>" class="form-control">
@@ -90,9 +90,9 @@
 			})
 		</script>
 	</tml:then>
-	<tml:else>
-		<tml:script expression="tmlform.field($mc.fieldname) || 'Keine Datei ausgewählt'"/>
-	</tml:else>
+	<tml:elseif condition="!tmlform.field($mc.fieldname)">
+		<tml:script expression="option('placeholder') || option('empty-text') || 'Keine Datei ausgewählt'"/>
+	</tml:elseif>
 </tml:if>
 
 <tml:case condition="tmlform.field($mc.fieldname)">

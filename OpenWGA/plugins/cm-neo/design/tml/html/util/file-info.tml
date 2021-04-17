@@ -12,10 +12,12 @@
 	}					
 </tml:script>
 <tml:{div} if="_url" html_class="clearfix">
-	<div style="float:left;width:60px;margin-top:5px">
-		<img style="max-width:60px;max-height:40px" src="@{_url}" title="@{_mimetype}">
+	<div style="float:left;width:70px;margin-top:5px">
+		<img style="max-width:70px;max-height:50px" src="@{_url}" title="@{_mimetype}">
 	</div>
-	<div style="margin-left:70px">
+	<div style="margin-left:80px">
+		@{$option_filename}
+		<br>
 		@{_type} - @{_size encode="none"}
 		<br>
 		@{_date}
