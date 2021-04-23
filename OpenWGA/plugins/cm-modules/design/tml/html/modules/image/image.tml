@@ -37,7 +37,8 @@
 	else {
 		c = context(
 			(CMM.setting("dbkey")!="this" ? "db:" + CMM.setting("dbkey") + "/" : "")
-			+ "docid:" + CMM.setting("sourcedoc") + "." + CMM.setting("lang") + ".0"
+			+ "docid:" + CMM.setting("sourcedoc") 
+			+ (CMM.setting("lang") ? "." + CMM.setting("lang") + ".0" : "")
 		, false);
 	}
 
