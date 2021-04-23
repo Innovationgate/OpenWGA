@@ -190,7 +190,8 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
             	if(redirect.isForward())
             		httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, redirect.getUrl());
             	else{
-	            	httpResponse.sendRedirect(httpResponse.encodeRedirectURL(redirect.getUrl()));
+            		httpResponse.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+            		httpResponse.setHeader("Location", httpResponse.encodeRedirectURL(redirect.getUrl()));
 	            	return;
             	}
             }
