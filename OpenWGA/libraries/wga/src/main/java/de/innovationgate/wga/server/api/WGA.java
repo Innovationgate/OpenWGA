@@ -3074,6 +3074,18 @@ public class WGA {
      * @return The found aliases or the original string value if no alias was found
      */
     public ArrayList<String> aliases(List<String> values, List<String> aliases) {
+    	return aliases(values, aliases, false);
+    }
+
+    /**
+     * Returns a list of alias for a string list
+     * The list of aliases given as parameter is expected to contain elements of value plus corresponding alias, divided by a pipe symbol: alias|value
+     * If values is null or empty the alias for an empty string is returned (if found)
+     * @param values The list of value
+     * @param aliases The list of aliases
+     * @return The found aliases or the original string value
+     */
+    public ArrayList<String> aliases(List<String> values, List<String> aliases, boolean alias_values_only) {
     	ArrayList<String> result = new ArrayList<String>();
     	HashMap<String,String> options = new HashMap<String,String>();
         for (String alias : aliases) {
@@ -3095,7 +3107,8 @@ public class WGA {
         	String alias = options.get(value);
         	if(alias!=null)
         		result.add(alias);
-        	else result.add(value); 
+        	else if(!alias_values_only)
+        		result.add(value); 
         }
         return result;
     }

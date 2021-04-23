@@ -326,7 +326,7 @@ public class Input extends ActionBase implements DynamicAttributes {
                     	else{
 	                    	WGA wga = WGA.get();
 	                        List<String> stringValues = WGUtils.toString(values);
-	                        textValues.addAll(wga.aliases(stringValues, optionsValues));
+	                        textValues.addAll(wga.aliases(stringValues, optionsValues, true));
                     	}
                         this.setResult(textValues);
                         getStatus().divider = getMultiValueDivider();
