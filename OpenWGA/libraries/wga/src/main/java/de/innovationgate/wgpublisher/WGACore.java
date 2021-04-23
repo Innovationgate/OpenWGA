@@ -8000,6 +8000,7 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
                 AuthenticationSession authSession = getBruteForceLoginBlocker().login(domainConfig, user, password, request);
                 if (authSession != null) {
                     isLoginSuccessful = true;
+                    user = authSession.getDistinguishedName();
                 }
             }
             catch (AuthenticationException e) {
