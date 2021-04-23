@@ -11,15 +11,15 @@
 		_mimetype = file.getMimeType()					
 	}					
 </tml:script>
-<tml:{div} if="_url" html_class="clearfix">
-	<div style="float:left;width:70px;margin-top:5px">
-		<img style="max-width:70px;max-height:50px" src="@{_url}" title="@{_mimetype}">
+<tml:{div} if="_url" html_class="clearfix" html_style="display:flex;align-items:center">
+	<div style="width:70px">
+		<img style="max-width:70px;max-height:70px" src="@{_url}" title="@{_mimetype}">
 	</div>
-	<div style="margin-left:80px">
+	<div style="margin-left:20px">
 		@{$option_filename}
 		<br>
 		@{_type} - @{_size encode="none"}
-		<br>
-		@{_date}
+		<tml:comment><br>
+		@{_mimetype}</tml:comment>
 	</div>					
 </tml:{div}>
