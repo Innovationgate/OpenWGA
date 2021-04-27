@@ -4205,6 +4205,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	                if(md!=null && md instanceof WGFileDerivateMetaData){
 	                	fileIn = content().getFileDerivateData(((WGFileDerivateMetaData)md).getId());
 	                	fileSize = (int)md.getSize();
+	                	contentType=md.getMimeType();
 	                }
                 }
                 if (fileIn == null) {
@@ -4250,6 +4251,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	                if(md!=null && md instanceof WGFileDerivateMetaData){
 	                	fileIn = container.getFileDerivateData(((WGFileDerivateMetaData)md).getId());
 	                	fileSize = (int)md.getSize();
+	                	contentType=md.getMimeType();
 	                }
                 }
                 if (fileIn == null){
@@ -4297,7 +4299,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         
         if (contentType == null && getEnvironment().isPageContextAvailable()) {
             // try to determine mime type
-            contentType = getwgacore().getServletContext().getMimeType(fileName);            
+        	contentType = getwgacore().getServletContext().getMimeType(fileName);            
         }
         
         String url = createDataURL(fileData, contentType);
@@ -4305,7 +4307,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         	addwarning("File " + fileName + ": data url size exeeds 65 KB: " + url.length()/1000 + " KB.");
         }
         
-        return createDataURL(fileData, contentType);        
+        return url;
     }
     
     /**
