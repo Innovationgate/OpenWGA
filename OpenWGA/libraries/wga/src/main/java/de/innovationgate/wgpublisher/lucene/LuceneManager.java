@@ -441,10 +441,13 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
         }
     }
     
-    private void init() throws IOException, DocumentException {              
+    private void init() throws IOException, DocumentException {
+    	init(1000 * 60);
+    }
+    private void init(long delay) throws IOException, DocumentException {              
         _indexer = new Indexer();
         _timer = new Timer();
-        _timer.schedule(_indexer, 1000 * 60, _indexInterval);
+        _timer.schedule(_indexer, delay, _indexInterval);
         
         _indexConfig = new LuceneIndexConfiguration(_core, _dir);
         _indexDirectory = FSDirectory.open(_dir);  
@@ -519,7 +522,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             }
 
             // reinit
-            this.init();
+            this.init(0);
             
             this.startup();
         }
