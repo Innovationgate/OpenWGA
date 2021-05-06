@@ -2440,7 +2440,6 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 			tag = tag.getTagStatusById(tagId);
 			if (tag == null) {
 				String msg = "taginfo: Could not find tag with id = " + tagId;
-				getlog().error(msg);
 				this.setLastError(msg);
 			}
 		}
