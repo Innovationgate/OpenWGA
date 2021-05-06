@@ -27,6 +27,11 @@
 		else document.setReaders(WGA.createList());
 	
 		tmlform.store();
+		
+		if(tmlform.area && document.getArea().getName()!=tmlform.area){
+			var database = document.getDatabase();
+			database.moveStructEntry(document, database.getArea(tmlform.area)); 
+		}
 	
 		portlet.fireevent("close-dialog");
 		portlet.fireevent("content-metas-changed", {
@@ -49,6 +54,35 @@
 			pagetypes.add(ct.getNameForLanguage("de") + "|" + ct.name)
 		}
 		WGA.TMLPage.setVar("_pagetypes", pagetypes)
+
+		var areas = WGA.createList()
+		var systemAreas = WGA.createList()		
+		for(let area in Iterator(db().getAreas().values())){
+			if(area.name=="$templates"){
+				if(WGA.app().isChiefEditor())
+					systemAreas.add("Seitenvorlagen|" + area.name)
+				continue;
+			}
+			else if(area.systemArea)
+				continue;
+			if(area.name=="hdb-content" && !WGA.app().isManager())
+				continue;
+			var visiblefor = area.getExtensionData("CM_area_visible")
+			if(visiblefor && visiblefor.size() && !db().isMemberOfUserList(visiblefor))
+				continue;
+			if(!area.mayEditPages())
+				continue;
+			if(area.mayReadContent())
+				areas.add(area.name)
+		}
+		WGA.TMLPage.setVar("_areas", areas)
+		WGA.TMLPage.setVar("_areas_optgroups", [
+			{
+				label: "Systembereiche",
+				options: systemAreas
+			}
+		])
+
 	</tml:script>
 
 	<div class="header">
@@ -83,6 +117,15 @@
 				<tml:[form-field] o_label="Seitentyp" o_name="contenttype" o_meta="true" o_type="select" o_optionsitem="_pagetypes"
 					o_mode="{WGA.app().isManager() ? 'edit':'view'}" 
 					o_changeaction="$refresh"/>
+				
+				<tml:case condition="document.isRoot()">
+					<tml:[form-field] o_label="Website-Bereich" o_name="area" o_type="select" 
+						o_optionsitem="_areas"
+						o-optgroups="_areas_optgroups" 
+						o_default="{AREA}"
+						o_store="false"
+					/>
+				</tml:case>
 				
 				<tml:script>
 					if(OVERRIDE_WORKFLOW==null)
