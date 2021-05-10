@@ -62,6 +62,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -3445,6 +3446,10 @@ public class WGA {
     public static class Base64{
     	public static String encode(String text) throws UnsupportedEncodingException{
     		return org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(text.getBytes("UTF-8"));
+    	}
+    	public static String encode(InputStream in) throws IOException{
+    		byte[] bytes = IOUtils.toByteArray(in);
+    		return org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(bytes);
     	}
     	public static String decode(String text) throws UnsupportedEncodingException{
     		return new String(org.apache.commons.codec.binary.Base64.decodeBase64(text), "UTF-8");
