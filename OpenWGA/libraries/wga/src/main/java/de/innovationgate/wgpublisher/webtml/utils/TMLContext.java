@@ -5506,4 +5506,35 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		WGContent c = getcontent().getRelation(relname);
 		return c!=null && c.isVisibleNow();
 	}
+
+	public InputStream getfiledata(String filename) throws WGAPIException {
+		return content().getFileData(filename);
+	}
+
+	public InputStream getfiledata(String filename, String derivate) throws WGAPIException {
+    	// search for derivate:
+    	FileDerivateManager fdm = getwgacore().getFileDerivateManager();
+    	DerivateQuery derivateQuery;
+    	WGFileAnnotations md;
+		try {
+			derivateQuery = fdm.parseDerivateQuery(derivate);
+			md = fdm.queryDerivate(content(), filename, derivateQuery, new ClientHints(), true);
+	        if(md!=null && md instanceof WGFileDerivateMetaData){
+	        	return content().getFileDerivateData(((WGFileDerivateMetaData)md).getId());
+	        }
+		} catch (WGException e) {
+			e.printStackTrace();
+		}
+		return getfiledata(filename);
+	}
+
+	public String getprimaryfilename() throws WGAPIException {
+		return content().getPrimaryFileName();
+	}
+
+	public List<String> getfilenames() throws WGAPIException {
+		return content().getFileNames();
+	}
+
+
 } 
