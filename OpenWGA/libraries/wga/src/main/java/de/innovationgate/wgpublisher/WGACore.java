@@ -4143,12 +4143,10 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
                 }
             }
             catch (GeneralSecurityException e) {
-                // VM does not support 'des' algorithm - should not happen in
-                // wga supported VMs
+                // VM does not support 'des' algorithm - should not happen in wga supported VMs
                 log.error("Unable to create DESEncrypter.", e);
                 throw new ServletException("wga publisher initialization failure");
             }
-
             
             // init symmetric encryption engine
             File keyFile = new File(configFilePath, "openwga.key");
@@ -4176,8 +4174,6 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
                 log.error("Unable to init symmetric encryption engine.", e);
                 throw new ServletException("Unable to init symmetric encryption engine", e);
             }
-
-            
             
             // get config xml document
             boolean configMigrated = false;
@@ -4972,9 +4968,14 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             getLog().error("Exception searching module definitions", e);
         }
 
-        // Initialize other mandatory dependent objects
+        initPasswordEncoding();
+        
+    }
+    
+    private void initPasswordEncoding(){
         PasswordOptionEncoder encoder;
         String passwordEncoderKey = _wgaConfiguration.getPasswordEncoding();
+    	getLog().info("init password encoding: " + passwordEncoderKey);
         try {
             ModuleDefinition passwordEncoderModDef = _moduleRegistry.getModuleDefinitionByKey(PasswordEncodingType.class, passwordEncoderKey);
             if (passwordEncoderModDef != null) {
@@ -4992,8 +4993,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             getLog().error("Falling back to Base64 encoder for encoding new passwords");
             encoder = new Base64();
         }
-        _moduleRegistry.getContextObjects().put(PasswordEncodingType.class, encoder);
-       
+        _moduleRegistry.getContextObjects().put(PasswordEncodingType.class, encoder);    	
     }
     
     private void logModuleRegistry() {
@@ -5904,6 +5904,9 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         
         parseConfigFile();
 
+        // password endoding
+        initPasswordEncoding();
+        
         // Update general config
         initReadGeneralConfig(true);
         

@@ -71,6 +71,7 @@ import de.innovationgate.wgpublisher.modules.serveroptions.ServiceApisModuleDefi
 import de.innovationgate.wgpublisher.modules.serveroptions.ServicesCollector;
 import de.innovationgate.wgpublisher.modules.serveroptions.VariousOptionsCollector;
 import de.innovationgate.wgpublisher.modules.servers.HsqlDefaultDatabaseServerModuleDefinition;
+import de.innovationgate.wgpublisher.modules.serviceapis.AESEncodingModuleDefinition;
 import de.innovationgate.wgpublisher.modules.serviceapis.AdminNotificationApiModuleDefinition;
 import de.innovationgate.wgpublisher.modules.serviceapis.AppLogApiModuleDefinition;
 import de.innovationgate.wgpublisher.modules.serviceapis.HashedPassswordServiceApiModuleDefinition;
@@ -164,6 +165,7 @@ public class WGARegistrar implements ModuleRegistrar {
         registry.addModuleDefinition(new SrcSetCreatorApiModuleDefinition());
         registry.addModuleDefinition(new HashedPassswordServiceApiModuleDefinition());
         registry.addModuleDefinition(new SessionManagerApiModuleDefinition());
+        registry.addModuleDefinition(new AESEncodingModuleDefinition());
         
         // WebTML Encoders
         registry.addModuleDefinition(new OneLineEncoderModuleDefinition());
