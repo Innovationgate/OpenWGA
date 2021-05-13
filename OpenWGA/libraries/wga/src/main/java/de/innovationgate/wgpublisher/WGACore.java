@@ -4975,7 +4975,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
     private void initPasswordEncoding(){
         PasswordOptionEncoder encoder;
         String passwordEncoderKey = _wgaConfiguration.getPasswordEncoding();
-    	getLog().info("init password encoding: " + passwordEncoderKey);
+    	getLog().info("Setup Password Encoding: " + passwordEncoderKey);
         try {
             ModuleDefinition passwordEncoderModDef = _moduleRegistry.getModuleDefinitionByKey(PasswordEncodingType.class, passwordEncoderKey);
             if (passwordEncoderModDef != null) {

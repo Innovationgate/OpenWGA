@@ -60,7 +60,7 @@ public class AESEncodingModuleDefinition implements ModuleDefinition, KeyBasedMo
     }
 
     public String getRegistrationKey() {
-        return "AES";
+        return "AES128";
     }
 
 }

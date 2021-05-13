@@ -30,7 +30,7 @@ public class AESPasswordEncoder implements PasswordOptionEncoder{
 
 	@Override
 	public String getEncodingKey() {
-		return "AES";
+		return "AES128";
 	}
 
 }
