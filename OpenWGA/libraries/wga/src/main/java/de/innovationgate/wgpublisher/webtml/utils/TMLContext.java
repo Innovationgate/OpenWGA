@@ -415,8 +415,10 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 			}
 		}
 
-		// Set params
-        
+		// Set params: remove previous tmlparam-vars (##00005720) and set new ones:
+		for (int idx = 0; idx < 5; idx++) {
+			removevar("tmlparam" + (idx + 1));
+		}
 		for (int idx = 0; idx < actionLink.getUnnamedParams().size(); idx++) {
 			setvar("tmlparam" + (idx + 1), actionLink.getUnnamedParams().get(idx));
 		}
