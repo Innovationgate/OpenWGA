@@ -102,7 +102,6 @@ public class WebTMLScriptletResolver {
     
         // User macros and real scriptlets
         if (level.intValue() >= RhinoExpressionEngine.LEVEL_MACROS.intValue()) {
-            returnValue = parseForScriptlets(context, returnValue, "<br>{@", "@}", (level.intValue() >= RhinoExpressionEngine.LEVEL_SCRIPTLETS.intValue()), engineParams);
             returnValue = parseForScriptlets(context, returnValue, "{@", "@}", (level.intValue() >= RhinoExpressionEngine.LEVEL_SCRIPTLETS.intValue()), engineParams);
         }
     
