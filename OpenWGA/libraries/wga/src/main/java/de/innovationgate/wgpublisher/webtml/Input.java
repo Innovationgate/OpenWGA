@@ -918,13 +918,21 @@ public class Input extends ActionBase implements DynamicAttributes {
 		String tagContent,
         String disabled) throws FormattingException, WGException {
         
+		String html_type=getDynamicHtmlAttribute("type");
+		if(html_type!=null)
+			type=html_type;
+		
         singleValue = new TagOutputFormatter(format, getTMLContext(), stringToBoolean(getTrim())).format(singleValue);
                 				
-		this.appendResult("<input").appendResult(buildDynamicHtmlAttributes()).appendResult(" name=\"").appendResult(name).appendResult("\" type=\"").appendResult(type).appendResult("\" ");
+		this.appendResult("<input").appendResult(buildDynamicHtmlAttributes()).appendResult(" name=\"").appendResult(name).appendResult("\" ");
+		if(getDynamicHtmlAttribute("type")==null)
+			this.appendResult("type=\"").appendResult(type).appendResult("\" ");
 		String theId = getId();
 		if (theId!=null)
 			this.appendResult("id=\"" + theId + "\" ");
-		this.appendResult(" value=\"").appendResult(WGUtils.encodeHTML(String.valueOf(singleValue), true, false)).appendResult("\" ").appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">");
+		this.appendResult("value=\"").appendResult(WGUtils.encodeHTML(String.valueOf(singleValue), true, false)).appendResult("\" ");
+		
+		this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">");
 	}
 	
 	private void renderDateInput(
@@ -941,12 +949,16 @@ public class Input extends ActionBase implements DynamicAttributes {
 			format="yyyy/MM/dd HH:mm:ss";	
 		}			
 		renderSimpleInput("text", name, format, cssClass, cssStyle, singleValue, tagContent, disabled);
+		/*
+		 * The following Code seems to do nothing.
+		 * May be a relict 
 		FormInputRegistrator formBase = (FormInputRegistrator) getStatus().getAncestorTag(FormBase.class);	
         if (formBase != null) {
             if (formBase.getFormMode().equals(TMLFormInfo.READONLY_MODE) || formBase.getFormMode().equals(TMLFormInfo.VIEW_MODE)) {
                 return;		// no calendar control if form is in readonly- or view-mode.
             }
         }
+        */
 	}
 		
 	private void renderTextArea( String name, String format, String cssClass, String cssStyle, Object value, String tagContent, boolean multiple, String disabled) throws FormattingException, WGException {

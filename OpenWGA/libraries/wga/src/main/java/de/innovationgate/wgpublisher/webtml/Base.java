@@ -2195,6 +2195,23 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     	return buildDynamicHtmlAttributes("html");
     }
     
+    protected String getDynamicHtmlAttribute(String attname) throws WGException{
+    	return getDynamicHtmlAttribute("html", attname);
+    }
+    
+    protected String getDynamicHtmlAttribute(String prefix, String attname) throws WGException{
+        Map<String,DynamicAttribute> dynAtts = getStatus().dynamicOptions;
+        if (dynAtts == null) {
+            return null;
+        }
+        for (DynamicAttribute att : dynAtts.values()) {
+            if (att.getPrefix().equals(prefix)) {
+                return (String)att.getDynamicValue(getTMLContext());
+            }
+        }
+    	return null;
+    }
+    
     protected String buildDynamicHtmlAttributes(String prefix) throws WGException {
         
         Map<String,DynamicAttribute> dynAtts = getStatus().dynamicOptions;

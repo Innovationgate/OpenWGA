@@ -3142,7 +3142,19 @@ public class WGA {
         
         // For default patterns
         String lcPattern = pattern.toLowerCase();
-        if (lcPattern.endsWith("date") || lcPattern.endsWith("time")) {
+        if (lcPattern.equals("htmldate")) {
+        	return new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        }
+        else if (lcPattern.equals("htmldatetime")) {
+        	return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.ENGLISH);
+        }
+        else if (lcPattern.equals("htmltime")) {
+        	return new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+        }
+        else if (lcPattern.equals("iso8601")) {
+            return new ISO8601DateFormat();
+        }
+        else if (lcPattern.endsWith("date") || lcPattern.endsWith("time")) {
             int patternLength;
             if (lcPattern.startsWith("short")) {
                 patternLength = DateFormat.SHORT;
@@ -3167,9 +3179,6 @@ public class WGA {
                 return new TextualDateFormat(locale, DateFormat.getDateInstance(patternLength, locale));
             }
             
-        }
-        else if (lcPattern.equals("iso8601")) {
-            return new ISO8601DateFormat();
         }
         
         // For custom patterns
