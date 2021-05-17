@@ -2205,7 +2205,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
             return null;
         }
         for (DynamicAttribute att : dynAtts.values()) {
-            if (att.getPrefix().equals(prefix)) {
+            if (att.getPrefix().equals(prefix) && att.getBaseName().equalsIgnoreCase(attname)) {
                 return (String)att.getDynamicValue(getTMLContext());
             }
         }
