@@ -84,8 +84,8 @@
       <uniqueName>de.innovationgate.wga-app-framework</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>8</minorVersion>
-        <maintenanceVersion>9</maintenanceVersion>
+        <minorVersion>9</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
         <buildVersion>702</buildVersion>
       </version>

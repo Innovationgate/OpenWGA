@@ -50,8 +50,8 @@
       <uniqueName>de.innovationgate.app-ui-3-1</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>8</minorVersion>
-        <maintenanceVersion>9</maintenanceVersion>
+        <minorVersion>9</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
         <buildVersion>702</buildVersion>
       </version>
