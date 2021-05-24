@@ -1,4 +1,4 @@
-define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-drophandler"], function(CM, $, Editors, UploadManager, Sitepanel){
+define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-drophandler", "bootstrap"], function(CM, $, Editors, UploadManager, Sitepanel){
 
 	var editor;
 	var edit_item;

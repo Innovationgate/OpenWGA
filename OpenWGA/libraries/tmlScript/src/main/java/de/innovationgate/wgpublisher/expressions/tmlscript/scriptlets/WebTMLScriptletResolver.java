@@ -102,7 +102,6 @@ public class WebTMLScriptletResolver {
     
         // User macros and real scriptlets
         if (level.intValue() >= RhinoExpressionEngine.LEVEL_MACROS.intValue()) {
-            returnValue = parseForScriptlets(context, returnValue, "<br>{@", "@}", (level.intValue() >= RhinoExpressionEngine.LEVEL_SCRIPTLETS.intValue()), engineParams);
             returnValue = parseForScriptlets(context, returnValue, "{@", "@}", (level.intValue() >= RhinoExpressionEngine.LEVEL_SCRIPTLETS.intValue()), engineParams);
         }
     
@@ -295,19 +294,25 @@ public class WebTMLScriptletResolver {
 
     private String macroContentURL(TMLContext context, String param) throws UnsupportedEncodingException, WGException {
         
-        List<String> parms = WGUtils.deserializeCollection(param, ",", true);
+        
         String dbKey = null;
         String contentKey = null;
     	String defaultMediaKey;
     	String anker = "";
 
-        if (parms.size() == 2) {
-            dbKey = (String) parms.get(0);
-            contentKey = (String) parms.get(1);
-        }
-        else {
-            contentKey = (String) parms.get(0);
-        }
+    	if(param!=null){
+    		List<String> parms = WGUtils.deserializeCollection(param, ",", true);
+	        if (parms.size() == 2) {
+	            dbKey = (String) parms.get(0);
+	            contentKey = (String) parms.get(1);
+	        }
+	        else if (parms.size() == 1) {
+	            contentKey = (String) parms.get(0);
+	        }
+	        if(contentKey.startsWith("#"))	// anker only param
+	        	contentKey = context.content().getContentKey().toString() + contentKey; 
+    	}
+        else contentKey = context.content().getContentKey().toString();
 
         String[] parts = contentKey.split("#");
         if(parts.length>1){
@@ -455,14 +460,14 @@ public class WebTMLScriptletResolver {
 
     private String macroLink(TMLContext context, String param) throws WGException, WGAPIException {
         StringBuffer out = new StringBuffer();
-        out.append("<a href=\"").append(context.contenturl(null, null)).append("\"");
+        String defaultMediaKey = (String) context.getwgacore().readPublisherOptionOrDefault(context.db(), WGACore.DBATTRIB_DEFAULT_MEDIAKEY);
+        out.append("<a href=\"").append(context.contenturl(defaultMediaKey, null)).append("\"");
         if (param != null) {
             out.append(" class=\"").append(param).append("\"");
         }
         out.append(">");
         
         out.append(context.meta("title"));
-        
         
         out.append("</a>");
         return out.toString();
@@ -485,7 +490,8 @@ public class WebTMLScriptletResolver {
         String contextExpr = (dbKey != null ? "db:" + dbKey + "/" : "") + "name:" + uniqueName;
         TMLContext targetContext = context.context(contextExpr, false);
         if (targetContext != null) {
-            return targetContext.contenturl(null, null);
+        	String defaultMediaKey = (String) context.getwgacore().readPublisherOptionOrDefault(targetContext.db(), WGACore.DBATTRIB_DEFAULT_MEDIAKEY);
+            return targetContext.contenturl(defaultMediaKey, null);
         }
         
         return createFallBackContentURL(context, dbKey, uniqueName);

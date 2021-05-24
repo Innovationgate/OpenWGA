@@ -7,7 +7,7 @@
 	settingstml:	'modules:tiles:settings',
 	type:			'container',
 	allowedchildren: ["cm_tile"],
-	module_classes:	["Nahtlos / no margins|no-margins"],
+	module_classes:	["Nahtlos|no-margins"],
 	includes: {
 		css: 'modules:tiles:css'
 	}	

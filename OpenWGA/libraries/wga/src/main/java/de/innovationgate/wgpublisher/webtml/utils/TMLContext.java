@@ -415,8 +415,10 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 			}
 		}
 
-		// Set params
-        
+		// Set params: remove previous tmlparam-vars (##00005720) and set new ones:
+		for (int idx = 0; idx < 5; idx++) {
+			removevar("tmlparam" + (idx + 1));
+		}
 		for (int idx = 0; idx < actionLink.getUnnamedParams().size(); idx++) {
 			setvar("tmlparam" + (idx + 1), actionLink.getUnnamedParams().get(idx));
 		}
@@ -2440,7 +2442,6 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 			tag = tag.getTagStatusById(tagId);
 			if (tag == null) {
 				String msg = "taginfo: Could not find tag with id = " + tagId;
-				getlog().error(msg);
 				this.setLastError(msg);
 			}
 		}
@@ -4205,6 +4206,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	                if(md!=null && md instanceof WGFileDerivateMetaData){
 	                	fileIn = content().getFileDerivateData(((WGFileDerivateMetaData)md).getId());
 	                	fileSize = (int)md.getSize();
+	                	contentType=md.getMimeType();
 	                }
                 }
                 if (fileIn == null) {
@@ -4250,6 +4252,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	                if(md!=null && md instanceof WGFileDerivateMetaData){
 	                	fileIn = container.getFileDerivateData(((WGFileDerivateMetaData)md).getId());
 	                	fileSize = (int)md.getSize();
+	                	contentType=md.getMimeType();
 	                }
                 }
                 if (fileIn == null){
@@ -4297,7 +4300,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         
         if (contentType == null && getEnvironment().isPageContextAvailable()) {
             // try to determine mime type
-            contentType = getwgacore().getServletContext().getMimeType(fileName);            
+        	contentType = getwgacore().getServletContext().getMimeType(fileName);            
         }
         
         String url = createDataURL(fileData, contentType);
@@ -4305,7 +4308,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         	addwarning("File " + fileName + ": data url size exeeds 65 KB: " + url.length()/1000 + " KB.");
         }
         
-        return createDataURL(fileData, contentType);        
+        return url;
     }
     
     /**
@@ -5505,4 +5508,35 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		WGContent c = getcontent().getRelation(relname);
 		return c!=null && c.isVisibleNow();
 	}
+
+	public InputStream getfiledata(String filename) throws WGAPIException {
+		return content().getFileData(filename);
+	}
+
+	public InputStream getfiledata(String filename, String derivate) throws WGAPIException {
+    	// search for derivate:
+    	FileDerivateManager fdm = getwgacore().getFileDerivateManager();
+    	DerivateQuery derivateQuery;
+    	WGFileAnnotations md;
+		try {
+			derivateQuery = fdm.parseDerivateQuery(derivate);
+			md = fdm.queryDerivate(content(), filename, derivateQuery, new ClientHints(), true);
+	        if(md!=null && md instanceof WGFileDerivateMetaData){
+	        	return content().getFileDerivateData(((WGFileDerivateMetaData)md).getId());
+	        }
+		} catch (WGException e) {
+			e.printStackTrace();
+		}
+		return getfiledata(filename);
+	}
+
+	public String getprimaryfilename() throws WGAPIException {
+		return content().getPrimaryFileName();
+	}
+
+	public List<String> getfilenames() throws WGAPIException {
+		return content().getFileNames();
+	}
+
+
 } 

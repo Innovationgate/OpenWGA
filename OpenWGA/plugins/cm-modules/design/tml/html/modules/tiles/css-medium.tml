@@ -1,0 +1,7 @@
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_tiles">
+
+	">.tiles:not(.medium-clear)": {
+		display: "flex"		
+	}
+	
+ </tml:include>

@@ -102,8 +102,8 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 		}
 		
 		$("#app-siteexplorer").show();
-		Appnav.setContextChangeListener(onContextChange)
-		
+		Appnav.setContextChangeListener(onContextChange);
+		Appnav.selectView("explorer"); 
 	}
 	
 	function getURL(){

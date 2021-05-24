@@ -13,12 +13,12 @@
 					<div class="entry {{cssclass}}">
 						<a href="{{href}}">
 							{{{title}}}
+							<div class="info">
+								zur Genehmigung vorgelegt <b>{{modified}}</b> von <b>{{initiator}}</b>
+								<br>
+								Workflow: {{workflow}}
+							</div>
 						</a>
-						<div class="info">
-							zur Genehmigung vorgelegt <b>{{modified}}</b> von <b>{{initiator}}</b>
-							<br>
-							Workflow: {{workflow}}
-						</div>
 					</div>
 				{{/toapprove}}
 			</fieldset>
@@ -31,14 +31,19 @@
 					<div class="entry {{cssclass}}">
 						<a href="{{href}}">
 							{{{title}}}
+							<div class="info">
+								zur Genehmigung vorgelegt <b>{{modified}}</b>
+								<br>
+								Workflow: {{workflow}}
+								<br>
+								Genehmiger:
+								<ul>
+									{{#approver}}
+										<li>{{.}}
+									{{/approver}}
+								</ul>
+							</div>
 						</a>
-						<div class="info">
-							zur Genehmigung vorgelegt <b>{{modified}}</b>
-							<br>
-							Workflow: {{workflow}}
-							<br>
-							Genehmiger: {{approver}}
-						</div>
 					</div>
 				{{/waiting}}
 			</fieldset>
@@ -50,12 +55,12 @@
 				<div class="entry {{cssclass}}">
 					<a href="{{href}}">
 						{{{title}}}
+						<div class="info">
+							Version {{version}} / {{language}}
+							<br>
+							zuletzt geändert <b>{{modified}}</b> 
+						</div>
 					</a>
-					<div class="info">
-						<tml:comment>Version {{version}} / {{language}}
-						<br></tml:comment>
-						zuletzt geändert <b>{{modified}}</b> 
-					</div>
 				</div>
 			{{/drafts}}
 			{{^drafts}}

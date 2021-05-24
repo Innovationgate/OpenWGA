@@ -1,19 +1,18 @@
 function Renderer() {}
 
-Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey) {
+Renderer.prototype.getData = function(AFW, $urlParam_dbkey, $urlParam_contentkey) {
 
 	var query;
 	var drafts=[],
 		toapprove=[],
 		waiting=[];
 
-	var _context = context("db:"+$urlParam_dbkey+"/docid:"+$urlParam_contentkey);
 	var me = WGA.app($urlParam_dbkey).getUserName();
-
+	var auth = WGA.app($urlParam_dbkey).domain().auth();
+	
 	var docs = WGA.app($urlParam_dbkey).query("content.status='w' AND content.author = :me order by content.lastmodified DESC", {
 		onlypublished: false,
-		//alllanguages: true,
-		context: _context,
+		alllanguages: true,
 		p_me: me
 	})
 	for(let doc in Iterator(docs)){
@@ -37,8 +36,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey)
 		query = "content.items[:item].text=:me AND content.status='g'"
 		var docs = WGA.app($urlParam_dbkey).query(query, {
 			onlypublished: false,
-			//alllanguages: true,
-			context: _context,
+			alllanguages: true,
 			p_item: initiator_item,
 			p_me: me
 		}).filter(function(doc) !doc.content().isPendingRelease())
@@ -56,13 +54,17 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey)
 				}
 			}
 		
+			var approverNames=[];
+			for(let [index, id] in approver)
+				approverNames.push(auth.fetchCommonName(id))
+		
 			waiting.push({
 				title: WGA.encode("html", doc.TITLE),
 				href: doc.contenturl('html', null, true),
 				modified: AFW.Util.timeElapsed(doc.MODIFIED),
 				workflow: doc.wfname + " / " + doc.wflevelnr,
 				cssclass: doc.KEY==$urlParam_contentkey ? "selected":"",
-				approver: approver
+				approver: approverNames
 			})
 		}
 		
@@ -70,6 +72,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey)
 		
 		var docs = WGA.app($urlParam_dbkey).query("content.status='g'", {
 			onlypublished: false,
+			alllanguages: true
 		}).filter(function(doc){
 			if(doc.content().isPendingRelease())
 				return false;
@@ -83,17 +86,21 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey)
 				href: doc.contenturl('html', null, true),
 				modified: AFW.Util.timeElapsed(doc.MODIFIED),
 				workflow: doc.wfname + " / " + doc.wflevelnr,
-				initiator: doc.item(initiator_item),
+				initiator: auth.fetchCommonName(doc.item(initiator_item)),
 				cssclass: doc.KEY==$urlParam_contentkey ? "selected":""
 			})
 		}
 		
 	}
 	
-	WGA.TMLPage.write(JSON.stringify({
+	return {
 		drafts: drafts,
 		waiting: waiting,
 		toapprove: toapprove
-	}))
+	}
 
+}
+
+Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey) {
+	WGA.TMLPage.write(JSON.stringify(this.getData(AFW, $urlParam_dbkey, $urlParam_contentkey)))
 }

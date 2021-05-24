@@ -339,6 +339,7 @@ this.getModuleConfig = function(id){
 
 this.getModuleCssClasses = function(id){
 	var classes = WGA.createList();
+	var options = WGA.createList();
 	var config = this.getModuleConfig(id);
 	if(config && config.module_classes){
 		classes.addAll(config.module_classes)
@@ -348,12 +349,24 @@ this.getModuleCssClasses = function(id){
 		var mod = script.getTMLScriptModule()
 		try{
 			var result = mod && WGA.tmlscript().runScript(mod.getCode())
-			if(result && result[id])
-				classes.addAll(result[id]);
+			if(result && result[id]){
+				for(let [index, value] in result[id]){
+					if(typeof(value)=="string")
+						classes.add(value);
+					else {
+						value.values.unshift("-|");
+						options.add(value)
+					}
+				}
+				//classes.addAll(result[id]);
+			}
 		}
 		catch(e){
 			logException(e);
 		}
 	}
-	return classes;
+	return {
+		classes: classes,
+		options: options
+	};
 }

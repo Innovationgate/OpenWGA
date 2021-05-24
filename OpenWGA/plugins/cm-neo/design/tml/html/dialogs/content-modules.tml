@@ -15,7 +15,7 @@
 	</tml:script>
 
 	<tml:include ref="::content-modules:main">
-		<tml:option name="mode" expression="_mayEdit ? 'edit':'view'"/>
+		<tml:option name="mode" expression="_mayEdit ? 'edit':'readonly'"/>
 	</tml:include>
 	
 </tml:form>

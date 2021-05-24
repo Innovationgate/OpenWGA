@@ -39,7 +39,7 @@
 		</tml:option>
 	
 		<tml:option name="view-toolbar">
-			<a href="#" title="Explorer" data-view="explorer" class="selected">
+			<a href="#" title="Explorer" data-view="explorer">
 				<i class="icon fas fa-sitemap"></i>
 			</a>
 			<a href="#" title="Outline" data-view="outline">
@@ -57,7 +57,7 @@
 		</tml:option>
 	
 		<tml:option name="appnav">
-			<tml:portlet name="appnav" ref="appnav:portlet" portletmode="explorer"/>
+			<tml:portlet name="appnav" ref="appnav:portlet"/>
 		</tml:option>
 	
 		<tml:option name="body">

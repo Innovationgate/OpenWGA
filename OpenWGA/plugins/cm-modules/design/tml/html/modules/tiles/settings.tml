@@ -1,0 +1,10 @@
+<tml:script>
+	_responsive = WGA.design(db()).getGlobal("RESPONSIVE")
+</tml:script>
+
+<tml:case condition="_responsive">
+	<label><tml:label key="columns.settings.responsive"/>:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:responsive}" type="select" cssclass="form-control" options="{label('columns.settings.responsive.options')}" default="clear" mode="{option('mode')}"/>
+	</div>
+</tml:case>

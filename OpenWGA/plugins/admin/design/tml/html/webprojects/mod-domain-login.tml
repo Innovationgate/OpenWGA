@@ -43,7 +43,17 @@
 				<div class="clear"></div>
 
 				<label>Current User:</label>
-				<div class="data"><tml:meta type="[domain:{_domain.name}]" name="username"/></div>
+				<div class="data">
+					<tml:meta type="[domain:{_domain.name}]" name="username" var="_username" output="true"/>
+					<tml:script>
+						var auth = WGA.domain(_domain.name).auth()
+						if(auth.getModule()){
+							var cn = auth.fetchCommonName(_username)
+							if(cn!=_username)
+								return "<br>"+cn
+						}
+					</tml:script>
+				</div>
 				<div class="clear"></div>
 				
 				<label>Groups:</label>

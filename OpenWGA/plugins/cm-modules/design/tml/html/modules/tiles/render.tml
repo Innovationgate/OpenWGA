@@ -6,8 +6,9 @@
 		var w = CMM.setting("width", id.getText()) || "1";
 		_total += Number(w);
 	}
+	_class= CMM.setting('responsive') || "clear";
 </tml:script>
 
-<div class="tiles">
+<div class="tiles <tml:item name="_class"/>">
 	<tml:include ref="system:include-child-modules" o-margins="false" o-raw="true" o-total="_total"/>
 </div>

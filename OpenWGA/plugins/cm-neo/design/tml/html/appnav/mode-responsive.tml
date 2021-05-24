@@ -16,7 +16,7 @@
 </div>
 
 <script>
-	require(["jquery", "responsive"], function($, R){
+	require(["responsive"], function(R){
 		R.init("<tml:script expression="portlet.portletkey"/>");
 	})
 

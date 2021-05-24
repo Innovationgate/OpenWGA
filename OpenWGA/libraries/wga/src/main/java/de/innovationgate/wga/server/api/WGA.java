@@ -62,6 +62,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -3074,6 +3075,18 @@ public class WGA {
      * @return The found aliases or the original string value if no alias was found
      */
     public ArrayList<String> aliases(List<String> values, List<String> aliases) {
+    	return aliases(values, aliases, false);
+    }
+
+    /**
+     * Returns a list of alias for a string list
+     * The list of aliases given as parameter is expected to contain elements of value plus corresponding alias, divided by a pipe symbol: alias|value
+     * If values is null or empty the alias for an empty string is returned (if found)
+     * @param values The list of value
+     * @param aliases The list of aliases
+     * @return The found aliases or the original string value
+     */
+    public ArrayList<String> aliases(List<String> values, List<String> aliases, boolean alias_values_only) {
     	ArrayList<String> result = new ArrayList<String>();
     	HashMap<String,String> options = new HashMap<String,String>();
         for (String alias : aliases) {
@@ -3095,7 +3108,8 @@ public class WGA {
         	String alias = options.get(value);
         	if(alias!=null)
         		result.add(alias);
-        	else result.add(value); 
+        	else if(!alias_values_only)
+        		result.add(value); 
         }
         return result;
     }
@@ -3128,7 +3142,19 @@ public class WGA {
         
         // For default patterns
         String lcPattern = pattern.toLowerCase();
-        if (lcPattern.endsWith("date") || lcPattern.endsWith("time")) {
+        if (lcPattern.equals("htmldate")) {
+        	return new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        }
+        else if (lcPattern.equals("htmldatetime")) {
+        	return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.ENGLISH);
+        }
+        else if (lcPattern.equals("htmltime")) {
+        	return new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+        }
+        else if (lcPattern.equals("iso8601")) {
+            return new ISO8601DateFormat();
+        }
+        else if (lcPattern.endsWith("date") || lcPattern.endsWith("time")) {
             int patternLength;
             if (lcPattern.startsWith("short")) {
                 patternLength = DateFormat.SHORT;
@@ -3153,9 +3179,6 @@ public class WGA {
                 return new TextualDateFormat(locale, DateFormat.getDateInstance(patternLength, locale));
             }
             
-        }
-        else if (lcPattern.equals("iso8601")) {
-            return new ISO8601DateFormat();
         }
         
         // For custom patterns
@@ -3432,6 +3455,10 @@ public class WGA {
     public static class Base64{
     	public static String encode(String text) throws UnsupportedEncodingException{
     		return org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(text.getBytes("UTF-8"));
+    	}
+    	public static String encode(InputStream in) throws IOException{
+    		byte[] bytes = IOUtils.toByteArray(in);
+    		return org.apache.commons.codec.binary.Base64.encodeBase64URLSafeString(bytes);
     	}
     	public static String decode(String text) throws UnsupportedEncodingException{
     		return new String(org.apache.commons.codec.binary.Base64.decodeBase64(text), "UTF-8");

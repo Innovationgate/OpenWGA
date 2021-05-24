@@ -114,10 +114,18 @@
 					_mode = "view";
 				else _mode = option("mode");
 				
+				/*
 				_classes = WGA.createList()
 				if(tmlform.module_id){
 					_classes.addAll(CMM.getModuleCssClasses(tmlform.module_id))
 				}
+				*/
+				_classes = null;
+				if(tmlform.module_id){
+					_classes=CMM.getModuleCssClasses(tmlform.module_id)
+				}
+				_hasClasses = $option_mode=="view" ? tmlform.fieldlist(WGA.scoped('module_css_classes', tmlform.mod_id)).size() 
+					: _classes && (_classes.classes.size() || _classes.options.size())
 				
 			</tml:script>
 	
@@ -127,13 +135,27 @@
 						<tml:option name="parent-scope" expression="tmlform.parent_mod_id"/>
 						<tml:option name="cm_dbkey" expression="context('main').meta('db', 'dbkey')"/>
 					</tml:include>
-					<tml:case condition="_classes.size()">
+					<tml:case condition="_hasClasses">
 						<label>Stil</label>
-						<div style="margin:10px">
-							<tml:input name="{WGA.scoped('module_css_classes', tmlform.mod_id)}" type="checkbox" optionsitem="_classes" mode="{option:mode}"/>
+						<div style="margin:10px;padding:10px;background:#eee;border:solid #ccc 1px;border-radius:4px;display:flex">
+							<tml:case condition="_classes.classes.size()">
+								<div style="flex:1">
+									<tml:input labeled="true" name="{WGA.scoped('module_css_classes', tmlform.mod_id)}" type="checkbox" optionsitem="_classes.classes" mode="{option:mode}"/>
+								</div>
+							</tml:case>
+							<div style="flex:1">
+								<tml:foreach item="_classes.options" currentvalue="_option">							
+									<div style="margin:5px 0">
+										<label><tml:item name="_option.label"/></label>
+										<div>
+											<tml:input cssclass="form-control" name="{WGA.scoped('module_css_classes', tmlform.mod_id)}" type="select" optionsitem="_option.values" mode="{option:mode}"/>
+										</div>
+									</div>
+								</tml:foreach>
+							</div>
 						</div>
 					</tml:case>
-					<tml:case condition="!_classes.size() && !_tml">
+					<tml:case condition="!_hasClasses && !_tml">
 						Dieses Modul besitzt keine Einstellungsmöglichkeiten.
 					</tml:case>
 				</tml:range>

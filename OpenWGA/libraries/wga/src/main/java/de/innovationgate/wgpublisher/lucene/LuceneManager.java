@@ -441,10 +441,13 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
         }
     }
     
-    private void init() throws IOException, DocumentException {              
+    private void init() throws IOException, DocumentException {
+    	init(1000 * 60);
+    }
+    private void init(long delay) throws IOException, DocumentException {              
         _indexer = new Indexer();
         _timer = new Timer();
-        _timer.schedule(_indexer, 1000 * 60, _indexInterval);
+        _timer.schedule(_indexer, delay, _indexInterval);
         
         _indexConfig = new LuceneIndexConfiguration(_core, _dir);
         _indexDirectory = FSDirectory.open(_dir);  
@@ -519,7 +522,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             }
 
             // reinit
-            this.init();
+            this.init(0);
             
             this.startup();
         }
@@ -984,10 +987,16 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
 
         private long _lastFullIndexingRun = System.currentTimeMillis();
 
+        public String dbkey;
+        public long toIndex=0;
+        public long indexed=0;
+        public boolean isRunning=false;
+        
         public synchronized void run() {
 
             try {
                 _indexerIsRunning = true;
+                isRunning = true;
                 
                 Thread.currentThread().setName("WGA Lucene Indexer");
                 Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
@@ -1091,7 +1100,12 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                 } catch (Exception e) {
                     // keep timer alive
                 }
-                _indexerIsRunning = false;                
+                _indexerIsRunning = false;   
+                
+                isRunning = false;
+                dbkey=null;
+                toIndex=0;
+                indexed=0;
             }
         }
            
@@ -1108,6 +1122,8 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             if (currentListSize <= 0) {
                 return;
             }
+            getIndexer().dbkey=dbKey;
+            getIndexer().toIndex=currentListSize;
             
             IndexingRequest request = null;
             WGDatabase db;
@@ -1262,6 +1278,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                         if (j != 0 && j % 100 == 0) {
                             LOG.info("Performed " + WGUtils.DECIMALFORMAT_STANDARD.format(j) + " of " + WGUtils.DECIMALFORMAT_STANDARD.format(currentListSize) + " queued index addition requests for app '" + dbKey + "'");
                         }
+                        getIndexer().indexed = j;
                     }
                 }
                 finally {

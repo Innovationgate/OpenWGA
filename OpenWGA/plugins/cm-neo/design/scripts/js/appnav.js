@@ -3,12 +3,15 @@ define(["jquery"], function($){
 	var context,
 		contextChangeListener;
 	
-	WGA.event.addListener("siteexplorer", "content-changed", function(ev){
+	WGA.event.addListener("appnav", "content-changed", function(ev){
 		
 		context = ev.params;
 
-		$("#appnav [data-view='outline']")[ev.params.contentkey ? "show" : "hide"]()
-
+		/*
+		$("#appnav [data-view='outline']")[ev.params.contentkey ? "show" : "hide"]();
+		$("#appnav [data-view='responsive']")[ev.params.contentkey ? "show" : "hide"]();
+		*/
+		
 		contextChangeListener && contextChangeListener(context);
 		
 		$("#appnav").show();
@@ -18,22 +21,18 @@ define(["jquery"], function($){
 
 		ev.preventDefault();
 		$this = $(this)
-		var selected = $this.hasClass("selected")
-		
-		$this.siblings().removeClass("selected");
-		if(selected){
+
+		if($this.hasClass("selected")){
 			$this.removeClass("selected");
 			$("#page").removeClass("appnav")
 		}
 		else {			
-			$this.addClass("selected");
 			$("#page").addClass("appnav")
+			WGA.event.fireEvent("appnav-view-change", "appnav", {
+				view: $this.data("view")
+			})
 		}
 		
-		WGA.event.fireEvent("appnav-view-change", "appnav", {
-			view: $this.data("view")
-		})
-
 	})
 	
 	return {
@@ -43,6 +42,10 @@ define(["jquery"], function($){
 		},
 		setContextChangeListener: function(listener){
 			contextChangeListener = listener;
+		},
+		selectView: function(view){
+			$("#appnav .toolbar [data-view]").removeClass("selected")
+			$("#appnav .toolbar [data-view=" + view + "]").addClass("selected");
 		}
 		
 	}

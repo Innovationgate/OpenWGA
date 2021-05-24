@@ -29,6 +29,11 @@
 	color: black; 
 }
 
+.google-map .no-api-key{
+ 	margin: 50px;
+ 	text-align:center
+}
+
 .google-map img{
 	max-width: none !important;
 	max-height: none !important;

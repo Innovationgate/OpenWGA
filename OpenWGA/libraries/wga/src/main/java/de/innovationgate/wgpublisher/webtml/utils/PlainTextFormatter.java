@@ -26,20 +26,30 @@
 package de.innovationgate.wgpublisher.webtml.utils;
 
 import java.io.IOException;
+import java.util.List;
 
 import de.innovationgate.utils.FormattingException;
 import de.innovationgate.utils.ObjectFormatter;
 import de.innovationgate.utils.WGUtils;
 
-public class PlainTextFormatter implements ObjectFormatter {
+public class PlainTextFormatter implements ObjectFormatter, FlagAwareFormatter {
 
+	private boolean _formatted;
+	
     public String format(Object obj) throws FormattingException {
         try {
-            return WGUtils.toPlainText(String.valueOf(obj));
+            return _formatted ? WGUtils.toFormattedPlainText(String.valueOf(obj)) : WGUtils.toPlainText(String.valueOf(obj));
         }
         catch (IOException e) {
             throw new FormattingException(e);
         }
     }
+
+	@Override
+	public void setFlags(List<String> flags) throws FormattingException {
+		if(flags.size()>0)
+			_formatted = flags.get(0).equalsIgnoreCase("formatted");
+		
+	}
 
 }

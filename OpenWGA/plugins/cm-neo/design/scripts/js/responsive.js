@@ -1,4 +1,4 @@
-define(["jquery"], function($){
+define(["jquery", "appnav"], function($, Appnav){
 
 	var width = $("#app-responsive a.phone").data("width");
 	
@@ -36,7 +36,7 @@ define(["jquery"], function($){
 				$("#toolbars .scale").show();
 			}
 		})
-
+		Appnav.selectView("responsive");
 	}
 
 	return {

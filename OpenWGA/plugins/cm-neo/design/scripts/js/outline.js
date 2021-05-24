@@ -26,11 +26,14 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 			el[0] && el[0].scrollIntoView();
 		})
 		
+		Appnav.selectView("outline")
 	}
 	
 	function updateOutline(){
 		
 		var context = Appnav.getContext();
+		if(!context)
+			return;
 		
 		if(context.status=="w"){
 			// read page with URL param $clean to get clean HTML without item-editors
@@ -38,7 +41,15 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 			$("#app-outline .struct").html('<span class="loading">loading clean HTML...</span>');
 			
 			var win = SitePanel.getWindow();
-			var href = ((win.location && win.location.href) || SitePanel.iframe().attr("src")) + "?$clean"
+			var href;
+			
+			if(win.location && win.location.href){
+				href = win.location.href;
+				if(win.location.search)
+					href += "&$clean"
+				else href += "?$clean"
+			}
+			else href = SitePanel.iframe().attr("src") + "?$clean"
 			
 			$.get(href).success(function(html){
 				var el = document.createElement("div");
