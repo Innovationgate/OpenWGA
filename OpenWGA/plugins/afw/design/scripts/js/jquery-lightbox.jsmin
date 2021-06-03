@@ -126,6 +126,7 @@
 			
 		}
 		bodyMask.show()
+		$("body").css("overflow", "hidden");
 		viewport={
 			width: bodyMask.width(),
 			height: bodyMask.height()
@@ -139,6 +140,7 @@
 	}
 	function unmaskBody(){
 		bodyMask && bodyMask.fadeOut();
+		$("body").css("overflow", "");
 		$(document).off("keydown.image");
 	}
 
