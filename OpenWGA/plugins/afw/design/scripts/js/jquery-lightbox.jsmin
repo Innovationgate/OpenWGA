@@ -71,7 +71,7 @@
 						<div class="image-title"></div>\
 						<a class="lightbox-close">&times;</a>\
 					</div>\
-					<div class="image-loading">Loading ...</div>\
+					<div class="image-loading"></div>\
 					<div class="image-info">\
 						<div class="image-group"></div>\
 						<div class="image-download"><a href="#">Download</a></div>\
