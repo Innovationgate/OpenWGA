@@ -1,8 +1,25 @@
 #app-child-docs {
-
-	padding: 10px;
+		
+	.child-docs-toolbar{
+		position: absolute;
+		bottom: 0;
+		height: 46px;
+		width: 100%;
+		line-height: 40px;
+		border-top: solid silver 1px;
+		box-sizing: border-box;
+		padding: 0 10px;
+		text-align: right;
+	}
 
 	#appnav-child-docs{
+
+		padding: 10px;
+		position: absolute;
+		top: 0;
+		bottom: 45px;
+		width: 100%;
+		overflow: auto;
 	
 		.current{
 			margin: 20px 5px 10px;
@@ -13,13 +30,23 @@
 			margin: 15px 0 5px;
 		}
 	
-		a {
-			display: block;
-			margin: 5px 0;
-			padding: 2px 5px;
-			border: solid silver 1px;
-			border-radius: 4px;
-			background: #efefef;
+		.entry{
+			display: flex;
+	
+			a {
+				flex: 1;
+				display: block;
+				margin: 5px 0;
+				padding: 2px 5px;
+				border: solid silver 1px;
+				border-radius: 4px;
+				background: #efefef;
+			}
+			
+			input{
+				margin-right:10px;
+				display:none;
+			}
 		}
 	}
 }
