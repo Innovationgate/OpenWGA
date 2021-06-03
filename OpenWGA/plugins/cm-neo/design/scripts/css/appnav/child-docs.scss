@@ -26,10 +26,13 @@
 			font-size: 1.5em;
 		}
 	
-		legend{
-			margin: 15px 0 5px;
+		fieldset{
+			margin-top: 20px;
+			legend{
+				margin: 5px 0;
+			}
 		}
-	
+		
 		.entry{
 			display: flex;
 			align-items: center;
