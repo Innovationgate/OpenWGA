@@ -15,7 +15,7 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-	background: black;
+	background: white;
 	opacity: .7;
 	filter: alpha(opacity = 70);
 	display: none;
@@ -26,16 +26,46 @@
 
 	z-index: 102;
 	position: fixed;
-	background: white;
-	padding: 10px;
-	box-shadow: 0 0 20px black;
+	background: #efefef;
+	color: black;
+	padding: 0px;
+	box-shadow: 0 0 15px gray;
 	box-sizing: content-box;
+	
+	.title{
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 60px;
+		line-height: 60px;
+		font-size: 18px; 
+		padding: 0 10px;
+		box-sizing: border-box;
+		display: flex;
+		white-space: nowrap;
+		
+		.image-title{
+			flex: 1;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.lightbox-close{
+			text-align: center;
+			width: 25px;
+			cursor: pointer;
+			font-size: 1.5em; 
+		}
+	}
 	
 	img {
 		max-width: none;
 		max-height: none;
 		position: absolute;
-		left: 10px;
+		left: 0px;
+		top: 60px;
+		display: block;
 	}
 
 	.image-loading {
@@ -45,23 +75,12 @@
 		text-align: center;
 	}
 
-	a.lightbox-close {
-		cursor: pointer;
-		background: url(wga_file_url("images", "apple-close.png")) no-repeat;
-		background-size: contain;
-		position: absolute;
-		width: 28px;
-		height: 28px;
-		top: -10px;
-		left: -12px;
-	}
-	
 	.image-prev, .image-next {
 		cursor: pointer;
 		position: absolute;
 		padding: 10px 20px;
 		border: solid white 1px;
-		top: 40%;
+		top: 45%;
 		width: 15px;
 		height: 20px;
 		text-decoration: none;
@@ -107,29 +126,21 @@
 		left: 0;
 		right: 0;
 		height: 40px;
+		line-height: 40px;
 		white-space: nowrap;
-		box-sizing: content-box;
-		padding: 10px;
-		background: #efefef;
-		border-top: solid #dddddd 1px;
+		box-sizing: border-box;
+		padding: 0 10px;
 		font-size: 14px;
-		.image-title, .image-group {
+		display: flex;
+		.image-group {
 			overflow: hidden;
 			text-overflow: ellipsis;
-		}
-		.image-group {
-			margin-top: 7px;
+			flex: 1;
 		}
 		.image-download {
 			display: none;
-			position: absolute;
-			bottom: 10px;
-			right: 10px;
-			padding: 2px 10px;
-			background: #efefef;
-			box-shadow: 0 0 2px gray;
 			a {
-				text-decoration: none;
+				text-decoration: underline;
 			}
 		}
 	}

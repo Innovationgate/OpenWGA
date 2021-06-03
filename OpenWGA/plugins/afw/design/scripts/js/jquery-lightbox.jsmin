@@ -28,10 +28,10 @@
 				var img = $("#lightbox img")[0];
 				scaleImg(img);
 				lightbox.css({
-					left: (viewport.width-img.width)/2-10,
+					left: (viewport.width-img.width)/2,
 					width: img.width,
-					top: (viewport.height-img.height)/2-40,
-					height: img.height+60
+					top: (viewport.height-(img.height+100))/2,
+					height: img.height+100
 				})
 				resizeTimer = null;
 			}, 100);
@@ -63,16 +63,18 @@
 			$("body").append('\
 				<div id="lightbox">\
 					<div class="controls">\
-						<a class="lightbox-close"></a>\
 						<a class="image-prev"></a>\
 						<a class="image-next"></a>\
 					</div>\
 					<img>\
+					<div class="title">\
+						<div class="image-title"></div>\
+						<a class="lightbox-close">&times;</a>\
+					</div>\
 					<div class="image-loading">Loading ...</div>\
 					<div class="image-info">\
-						<div class="image-title"></div>\
-						<div class="image-download"><a href="#">Download</a></div>\
 						<div class="image-group"></div>\
+						<div class="image-download"><a href="#">Download</a></div>\
 					</div>\
 				</div>\
 			')
@@ -82,14 +84,14 @@
 				touchMove: function(dx){
 					lightbox.css("overflow", "hidden")
 					$("a.lightbox-close", lightbox).hide();
-					$("> img", lightbox).css("left", 10+dx)
+					$("> img", lightbox).css("left", dx)
 				},
 				touchEnd: function(dx){
 					if(dx<-60)
 						nextImage()
 					else if(dx>60)
 						prevImage();
-					$("> img", lightbox).css("left", 10);
+					$("> img", lightbox).css("left", 0);
 					lightbox.css("overflow", "visible")
 					$("a.lightbox-close", lightbox).show();
 				}								
@@ -99,23 +101,23 @@
 			$("#lightbox a.image-next").on("click.next", nextImage)
 			
 			$("#lightbox img").on("load", function(){
-				$("#lightbox .image-loading").hide();
 				scaleImg(this);
 				
 				var img=$(this);
 				lightbox.animate({
-					left: (viewport.width-this.width)/2-10,
+					left: (viewport.width-this.width)/2,
 					width: this.width
 				}, {
 					duration: 200
 				})
 				.animate({
-					top: (viewport.height-this.height)/2-40,
-					height: this.height+60
+					top: (viewport.height-(this.height+100))/2,
+					height: this.height+100
 				}, {
 					duration: 200,
 					complete: function(){
-						img.animate({opacity: 1});						
+						$("#lightbox .image-loading").hide();
+						img.animate({opacity: 1}, "fast");						
 						$("#lightbox .controls").show();
 						$("#lightbox .image-info").fadeIn();
 					}
@@ -199,8 +201,8 @@
 			height: "auto"			
 		})
 		
-		var wMax = viewport.width-70;
-		var hMax = viewport.height-120;
+		var wMax = viewport.width;
+		var hMax = viewport.height-140;
 	
 		var ratio = $img.height()/$img.width();
 
