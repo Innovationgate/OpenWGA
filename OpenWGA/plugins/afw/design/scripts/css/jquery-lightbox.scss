@@ -13,7 +13,7 @@
 	bottom: 0;
 	left: 0;
 	right: 0;
-	background: white;
+	background: black;
 	opacity: .7;
 	filter: alpha(opacity = 70);
 	display: none;
@@ -27,7 +27,7 @@
 	background: #e8e8e8;
 	color: black;
 	padding: 0px;
-	box-shadow: 0 0 15px gray;
+	box-shadow: 0 0 15px black;
 	box-sizing: content-box;
 	
 	.title{
@@ -76,48 +76,15 @@
 	}
 
 	.image-prev, .image-next {
+		display: inline-block;
 		cursor: pointer;
-		position: absolute;
-		padding: 10px 20px;
-		border: solid white 1px;
-		top: 45%;
 		width: 15px;
-		height: 20px;
-		text-decoration: none;
-		opacity: 0;
-		filter: alpha(opacity = 0);
-		box-sizing: content-box;
-		z-index: 1;
-		
+		font-weight: bold;
+		font-size: 1.25em;
 	}
 	
-	a.image-prev {
-		left: 0;
-		background: rgba(255, 255, 255, 0.3) url(wga_file_url("images", "prev.png")) no-repeat 18px 5px;
-		&:hover {
-			background-image: url(wga_file_url("images", "prev_mo.png"));
-		}
-		border-top-right-radius: 20px;
-		border-bottom-right-radius: 20px;
-		border-left-width: 0
-	}
-	
-	a.image-next {
-		right: 0;
-		background: rgba(255, 255, 255, 0.3) url(wga_file_url("images", "next.png")) no-repeat 6px 5px;
-		&:hover {
-			background-image: url(wga_file_url("images", "next_mo.png"));
-		}
-		border-top-left-radius: 20px;
-		border-bottom-left-radius: 20px;
-		border-right-width: 0;
-	}
-
-	&:hover {
-		.image-prev, .image-next {
-			opacity: 1;
-			filter: alpha(opacity = 100);
-		}
+	.image-next{
+		text-align: right;
 	}
 	
 	.image-info {
@@ -132,10 +99,9 @@
 		padding: 0 10px;
 		font-size: 14px;
 		display: flex;
-		.image-group {
-			overflow: hidden;
-			text-overflow: ellipsis;
+		.info{
 			flex: 1;
+			display: flex;
 		}
 		.image-download {
 			display: none;
