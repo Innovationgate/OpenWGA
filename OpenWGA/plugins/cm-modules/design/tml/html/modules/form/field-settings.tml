@@ -42,7 +42,7 @@
 
 <label><tml:label key="form.settings.field-type"/>:</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:fieldtype}" type="select" options="{label('form.settings.field-type.options')}"
+	<tml:input name="{scoped:fieldtype}" cssclass="form-control" type="select" options="{label('form.settings.field-type.options')}"
 		default="text"
 		changeaction="$refresh" ajax="true"
 		mode="{option('mode')}"
@@ -64,7 +64,7 @@
 			if(tmlform.field(WGA.scoped('fieldtype'))=="text")
 				_opts += label('form.settings.validation.options.mail');
 		</tml:script>
-		<tml:input name="{scoped:validation}" type="select" options="{_opts}"
+		<tml:input name="{scoped:validation}" cssclass="form-control" type="select" options="{_opts}"
 			changeaction="$refresh" ajax="true"
 			mode="{option('mode')}"
 		/>	
