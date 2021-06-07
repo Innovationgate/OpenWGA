@@ -1,0 +1,61 @@
+<tml:script>
+	_tabs = _tab_pages || WGA.createList()
+	
+	if(portlet.active_tab){
+		var active_tab_found = false;
+		for(let value in Iterator(_tabs)){
+			if(value.id == portlet.active_tab){
+				active_tab_found = true;
+				break;
+			}
+		}
+		if(!active_tab_found)
+			portlet.active_tab=null;
+	}
+</tml:script>
+
+<ul class="nav nav-tabs">
+	<tml:foreach item="_tabs" currentvalue="_tab">
+		<li
+			<tml:case condition="(isfirstloop() && !portlet.active_tab) || portlet.active_tab==_tab.id">
+				class="active"
+			</tml:case>
+		>
+			<a href="#<tml:script expression="_tab.id"/>" data-toggle="tab"><tml:script expression="_tab.title"/></a>
+		</li>
+	</tml:foreach>
+</ul>
+
+<div class="tab-content">
+	<tml:foreach item="_tabs" currentvalue="_tab">
+		<div class="tab-pane 
+			<tml:case condition="(isfirstloop() && !portlet.active_tab) || portlet.active_tab==_tab.id">
+				active
+			</tml:case>"
+			style="margin-top:5px"
+			id="<tml:script expression="_tab.id"/>">
+			<tml:script expression="_tab.body"/>
+		</div>
+	</tml:foreach>
+</div>
+
+<script>
+	require(["jquery"], function($){
+		$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {		
+			var tab_id = this.hash.substr(1);
+			WGA.ajax.action({
+				action: "<tml:action ajax="norefresh">
+					portlet.active_tab = request.getParameter("tab")
+					var ev = createevent("appkit.tab-changed")
+					ev.addParameter("tab", portlet.active_tab)
+					portlet.fireevent(ev)
+				</tml:action>",
+				mode: "norefresh",
+				graydiv: false,
+				params: {
+					tab: tab_id
+				}
+			})
+		})
+	})
+</script>
