@@ -1,0 +1,149 @@
+## LICENSE START ###############################################################
+## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
+## 
+## This file is part of the OpenWGA server platform.
+## 
+## OpenWGA is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+## 
+## In addition, a special exception is granted by the copyright holders
+## of OpenWGA called "OpenWGA plugin exception". You should have received
+## a copy of this exception along with OpenWGA in file COPYING.
+## If not, see <http://www.openwga.com/gpl-plugin-exception>.
+## 
+## OpenWGA is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## 
+## You should have received a copy of the GNU General Public License
+## along with OpenWGA in file COPYING.
+## If not, see <http://www.gnu.org/licenses/>.
+## LICENSE END #################################################################
+
+<tml:action id="app-changed">
+	tmlform.removeField(WGA.scoped('image'))
+	tmlform.removeField(WGA.scoped('image_mo'))
+	tmlform.removeField(WGA.scoped('lang'))
+</tml:action>
+
+<tml:action id="clearImages">
+	tmlform.removeField(WGA.scoped('image'))
+	tmlform.removeField(WGA.scoped('image_mo'))
+</tml:action>
+
+<ul class="nav nav-tabs">
+	<li class="active"><a data-toggle="tab" href="#basic">Basisdaten</a></li>
+	<li><a data-toggle="tab" href="#mouse-over">Mouse-Over</a></li>
+	<li><a data-toggle="tab" href="#click">Klick</a></li>
+	<tml:{li} if="$option_cmm_styles">
+		<a data-toggle="tab" href="#style">Stil</a>
+	</tml:{li}>
+</ul>
+<div class="tab-content">
+
+	<div class="tab-pane active" id="basic">
+		
+		<label><tml:label key="image.settings.datasource"/>:</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:source}" type="select" options="{label(CMM.settingSource()=='template'?'image.settings.source.template':'image.settings.source')}"
+				changeaction="clearImages" ajax="true"
+				mode="{option:mode}"
+				cssclass="form-control"
+			/>
+		</div>
+		
+		<tml:case condition="tmlform.field(WGA.scoped('source'))=='container'">
+		
+			<label><tml:label key="image.settings.database"/>:</label>
+			<div style="margin:10px">
+				<tml:script>
+					_dbs = CMM.getDbKeys()
+					_dbs.remove(meta("db", "dbkey"))
+					_dbs.add(0, meta("db", "dbkey") + " (aktuelle App)|this");
+		
+					_lang = LANGUAGE;
+					var database = db()
+					if(tmlform.field(WGA.scoped("dbkey")) && tmlform.field(WGA.scoped("dbkey"))!="this")
+						database = db(tmlform.field(WGA.scoped("dbkey")))
+					var langs = database.getLanguages().keySet();
+					
+					if(!langs.contains(_lang))
+						_lang = langs.iterator().next();
+		
+					_langs = WGA.createList()
+					for(let lang in Iterator(database.getLanguages().entrySet())){
+						_langs.add(lang.value.title + "|" + lang.key) 
+					}
+		
+				</tml:script>
+				<tml:input name="{scoped:dbkey}" type="select" optionsitem="_dbs"
+					changeaction="app-changed" ajax="true"
+					default="this"
+					mode="{option:mode}"
+					cssclass="form-control"
+				/>
+			</div>
+		
+			<div style="margin:10px">
+				<tml:input name="{scoped:lang}" default="{_lang}" type="select" optionsitem="_langs" changeaction="$refresh" cssclass="form-control"/>
+			</div>
+			
+			<div style="margin:10px">
+				<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document" o_language="{tmlform.field(WGA.scoped('lang'))}">
+					<tml:option name="dbkey" expression="tmlform.field(WGA.scoped('dbkey'))=='this' ? null : tmlform.field(WGA.scoped('dbkey'))"/>
+					<tml:option name="fieldname" expression="WGA.scoped('sourcedoc')"/>
+					<tml:option name="changeaction"><tml:action ref="clearImages"/></tml:option>
+				</tml:include>
+			</div>
+			
+		</tml:case>
+		
+		<tml:script>
+			_context = null;
+			var source = tmlform.field(WGA.scoped('source')) 
+			if(!source)
+				_context= CMM.settingSource()=="template" ? CMM.getTemplateContextPath() : "this";
+			else {
+				_context="docid:"+tmlform.field(WGA.scoped('sourcedoc'))+"<"+ tmlform.field(WGA.scoped('lang')) + ">"
+				if(tmlform.field(WGA.scoped('dbkey'))!='this')
+					_context = "db:"+tmlform.field(WGA.scoped("dbkey"))+"/" + _context
+			}
+		</tml:script>
+		<tml:case context="{_context}" iscontextvalid="true">
+			<label><tml:label key="image"/>:</label>
+			<div style="margin:10px">
+				<tml:include ref="util:select-image" o_derivate="usage=poster" o_empty-text="Kein Bild"/>
+			</div>
+		</tml:case>
+		
+		<label><tml:label key="image.settings.labeling"/>:</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:descriptions}" type="checkbox" labeled="true" options="{label('image.settings.descriptions.options')}" changeaction="$refresh" ajax="true" mode="{option:mode}"/>
+			<tml:case condition="tmlform.fieldList(WGA.scoped('descriptions')).contains('subtitle')">
+				<br>
+				<tml:input name="{scoped:subtitle}" type="textarea" cssstyle="width:100%" mode="{option:mode}"/>
+			</tml:case>
+		</div>
+
+	</div>
+	
+	<div class="tab-pane" id="mouse-over">
+		<tml:portlet name="mouse-over" ref="::mouse-over" o-context="_context"/>
+	</div>
+	
+	<div class="tab-pane" id="click">
+		<tml:portlet name="click" ref="::click"/>
+	</div>
+
+	<tml:{div} if="$option_cmm_styles" html_class="tab-pane" html_id="style">
+		<tml:option name="cmm_styles"/>
+		<tml:script>
+			$option_module_styles.included=true;
+		</tml:script>
+	</tml:{div}>
+	
+</div>
+

@@ -1,0 +1,66 @@
+<ul class="nav nav-tabs">
+	<li <tml:case condition="!portlet.active_tab || portlet.active_tab=='basic'">class="active"</tml:case>>
+		<a data-toggle="tab" href="#basic">Layout</a>
+	</li>
+	<li <tml:case condition="portlet.active_tab=='link'">class="active"</tml:case>>
+		<a data-toggle="tab" href="#link">Klick</a>
+	</li>
+	<tml:{li} if="$option_cmm_styles" html_class="{portlet.active_tab=='style'?'active':VOID}">
+		<a data-toggle="tab" href="#style">Stil</a>
+	</tml:{li}>
+</ul>
+<div class="tab-content">
+
+	<div class="tab-pane <tml:case condition="!portlet.active_tab || portlet.active_tab=='basic'">active</tml:case>" id="basic">		
+		
+		<label><tml:label key="tiles.tile.setting.width"/></label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:width}" type="number" default="1" mode="{option:mode}"/>
+		</div>
+		
+		<label><tml:label key="tiles.tile.setting.background-image"/></label>
+		<div style="margin:10px">
+			<tml:include ref="util:select-image" o_empty-text="Kein Hintergrundbild" o_derivate="usage=poster" o_mode="{option:mode}"/>
+		</div>
+		
+		<label><tml:label key="tiles.tile.setting.vertical-align"/></label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:justify_content}" type="select" 
+				options="{label('tiles.tile.setting.vertical-align.options')}"
+				mode="{option:mode}"
+				cssclass="form-control"
+			/>
+		</div>
+		
+	</div>
+	
+	<div class="tab-pane <tml:case condition="portlet.active_tab=='link'">active</tml:case>" id="link">
+		<tml:portlet name="link" ref="::link"/>
+	</div>
+
+	<tml:{div} if="$option_cmm_styles" html_class="[tab-pane {portlet.active_tab=='style' ? 'active':VOID}]" html_id="style" html_style="padding:20px 10px">
+		<tml:option name="cmm_styles"/>
+		<tml:script>
+			$option_module_styles.included=true;
+		</tml:script>
+	</tml:{div}>
+	
+</div>
+
+<script>
+	require(["jquery"], function($){
+		$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {		
+			var tab_id = this.hash.substr(1);
+			WGA.ajax.action({
+				action: "<tml:action ajax="norefresh">
+					portlet.active_tab = request.getParameter("tab")
+				</tml:action>",
+				mode: "norefresh",
+				graydiv: false,
+				params: {
+					tab: tab_id
+				}
+			})
+		})	
+	})
+</script>

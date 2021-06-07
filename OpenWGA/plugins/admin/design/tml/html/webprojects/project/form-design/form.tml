@@ -29,17 +29,9 @@
 	_config_bean.design = new Packages.de.innovationgate.wga.config.Design()
 </tml:action>
 
-<tml:comment><tml:action id="OverlayNameChanged">
-	if(tmlform.field("overlay/name")){
-		_config_bean.overlay = new Packages.de.innovationgate.wga.config.Design()
-		_config_bean.overlay.source = "fs-designs";
-	}
-	else _config_bean.overlay = null;						
-</tml:action></tml:comment>
-
 <tml:action id="DesignChanged">
-		var event = createEvent("cs-design-changed");
-		portlet.fireEvent(event);
+	var event = createEvent("cs-design-changed");
+	portlet.fireEvent(event);
 </tml:action>
 
 <tml:action id="createDesign">
@@ -144,7 +136,7 @@
 					<div class="clear"></div>
 				</tml:case>
 				
-				<tml:[system:module-options:form] o_title="optionale weitere Design Parameter">
+				<tml:[system:module-options:form] o_title="optional Design Parameter">
 					<tml:option name="ns">/design/options</tml:option>
 					<tml:option name="module-definition" expression="option('base-module-definition')"/>
 				</tml:[system:module-options:form]>
@@ -204,7 +196,7 @@
 					
 					<tml:case condition="!tmlform.isEmpty('/overlay/name')">
 					
-						<tml:[system:module-options:form] o_title="optionale weitere Design Parameter">
+						<tml:[system:module-options:form] o_title="optional Overlay-Design Parameter">
 							<tml:option name="ns">/overlay/options</tml:option>
 							<tml:option name="module-definition" expression="option('overlay-module-definition')"/>
 						</tml:[system:module-options:form]>
