@@ -24,7 +24,6 @@
 		if(pagetypes.size()==1)
 			tmlform.contenttype = pagetypes.get(0);
 		else if(!tmlform.submitted){
-			console.log("$option_current_pagetype", $option_current_pagetype);
 			if($option_current_pagetype && pagetypes.contains($option_current_pagetype))
 				tmlform.contenttype=$option_current_pagetype
 			else tmlform.contenttype = pagetypes.get(0);
