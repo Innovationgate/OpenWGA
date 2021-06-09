@@ -203,7 +203,7 @@
 			height: "auto"			
 		})
 		
-		var wMax = viewport.width;
+		var wMax = viewport.width-50;
 		var hMax = viewport.height-140;
 	
 		var ratio = $img.height()/$img.width();
