@@ -23,7 +23,7 @@
 				AFW.content(doc).copyRemoteData(sourcedoc, true /*include metas*/, false /*copy attachments*/, false /* copy modules */);
 			}
 		}
-		// remove form-fields als store-in-content
+		// remove form-fields for store-in-content
 		tmlform.removefield("title")
 		tmlform.removefield("position")
 		tmlform.removefield("contenttype")
@@ -42,18 +42,22 @@
 		}
 		App.settingsSaveHandler=[];
 		
+		_dialogClosed=true		
 		portlet.fireevent("close-dialog", {
 			redirectto: context(doc).contenturl()
 		})
+		
 	}
 </tml:action>
 
-<tml:form id="form-create-page" source="portlet">
+<tml:form id="form-create-page" source="portlet" unless="_dialogClosed">
 
 	<tml:script>
 		setOption("current_lang", LANGUAGE);
 		setOption("current_pagetype", CONTENTTYPE);
-		var areas = WGA.createList()		
+		var areas = WGA.createList();
+		var systemAreas = WGA.createList();
+		var allAreas = WGA.createList();
 		for(let area in Iterator(db().getAreas().values())){
 			if(area.name=="$templates"){
 				if(!WGA.app().isChiefEditor())
@@ -68,18 +72,17 @@
 				continue;
 			if(!area.mayEditPages())
 				continue;
-			if(area.mayReadContent())
-				areas.add(area.name)
+			if(area.mayReadContent()){
+				allAreas.add(area.name)
+				if(area.name=="$templates")
+					systemAreas.add("Seitenvorlagen|" + area.name)
+				else areas.add(area.name)
+			}
 		}
-		_areas = WGA.createList()
-		var systemAreas = WGA.createList()
-		for(let area in Iterator(areas)){
-			if(area=="$templates")
-				systemAreas.add("Seitenvorlagen|" + area)
-			else _areas.add(area)
-		}
-		//_areas.addAll(systemAreas);
-		WGA.TMLPage.setVar("_areas", _areas)
+		
+		console.log("areas", areas, "systemAreas", systemAreas)
+		
+		WGA.TMLPage.setVar("_areas", areas)
 		WGA.TMLPage.setVar("_optgroups", [
 			{
 				label: "Systembereiche",
@@ -87,14 +90,20 @@
 			}
 		])
 
-		if(areas.size()==1)
-			tmlform.area = areas.get(0);
-		else if(!tmlform.submitted){
-			var struct = !document.isDummy() && document.getStructEntry();
-			if(struct && areas.contains(struct.getArea().name))
+		if(!tmlform.submitted){
+			var struct;
+			if(document instanceof Packages.de.innovationgate.webgate.api.WGStructEntry)
+				struct = document;
+			else struct = !document.isDummy() && document.getStructEntry();
+			if(struct && allAreas.contains(struct.getArea().name))
 				tmlform.area = struct.getArea().name
-			else tmlform.area = areas.get(0);
+			else if(areas.size())
+				tmlform.area = areas.get(0);
+			else if(systemAreas.size())
+				tmlform.area = "$templates";
 		}
+
+		_areasCount = allAreas.size();
 	</tml:script>
 
 	<div class="header">
@@ -102,21 +111,26 @@
 		<a data-modal="hide">&times;</a>
 	</div>
 
-	<div class="content form-horizontal">
-		<tml:comment><tml:[form-messages] o_title="Seite kann nicht erstellt werden"/></tml:comment>
+	<tml:{div} html_class="content form-horizontal" if="_areasCount">
 		<tml:[form-field] o_label="Bereich" 
 			o_type="select" 
 			o_field="area" 
 			o_optionsitem="_areas" 
 			o-optgroups="_optgroups"
 			o_changeaction="$refresh" 
-			o_mode="{_areas.size()==1 ? 'view':'edit'}"/>
+			o_mode="{_areasCount==1 ? 'view':'edit'}"/>
 		<tml:case condition="tmlform.area && db().getArea(tmlform.area).getRootEntries().size()">
 			<tml:[form-field] o_label="Position" o_name="position" o_type="select" o_options="Am Anfang der Liste|start,Am Ende der Liste|end"/>
 		</tml:case>
 		<tml:[::form] o_page="root"/>
 		<tml:include ref="::required-settings" o_page="root"/>
-	</div>
+		<tml:[form-messages] o_title="Seite kann nicht erstellt werden"/>
+	</tml:{div}>
+	<tml:{div} html_class="content" unless="_areasCount">
+		<div class="alert alert-danger">
+			Es stehen keine Bereiche zur Verfügung, in denen Sie Seiten erstellen können.
+		</div>
+	</tml:{div}>
 
 	<div class="footer">
 		<a class="btn btn-default" data-modal="hide">Abbrechen</a>

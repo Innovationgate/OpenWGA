@@ -60,7 +60,7 @@
 		<tml:include ref="::select-db" o_msg="{_msg}"/>
 	</tml:elseif>
 	
-	<tml:elseif condition="!_Database.isAuthor() || (!_Database.hasDesign() && !_Database.isManager())">
+	<tml:elseif condition="!_Database.isAuthor()/">
 		<tml:include ref="::login" o_msg="{_msg}"/>
 	</tml:elseif>
 

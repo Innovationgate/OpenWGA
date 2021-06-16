@@ -51,11 +51,12 @@
 				tmlform.language = _languages.get(0).split("|")[1];
 			
 		</tml:script>
+		<tml:[form-field] o_label="Sprache" o_type="select" o_field="language" o_optionsitem="_languages" o_mode="{_languages.size()>1?'edit':'view'}"/>
 		<tml:[form-field] o_label="Titel" o_field="title"
 			o_validation="$E_VALUE!=''"
 			o_message="Bitte geben Sie einen Titel ein"
+			o_focus="true"
 		/>
-		<tml:[form-field] o_label="Sprache" o_type="select" o_field="language" o_optionsitem="_languages" o_mode="{_languages.size()>1?'edit':'view'}"/>
 
 		<tml:case condition="content()">
 			<hr>
@@ -73,5 +74,14 @@
 		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
 		<tml:button cssclass="btn btn-primary" clickaction="create-content">Erstellen</tml:button>
 	</div>
+
+	<script>
+		require(["jquery"], function($){		
+			$("#form-create-content").submit(function(ev){
+				ev.preventDefault();
+				WGA.ajax.callAction("<tml:action ref="create-content"/>");
+			})
+		})
+	</script>	
 	
 </tml:form>
