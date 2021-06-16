@@ -27,7 +27,7 @@
 				
 				color: "inherit",
 				text_decoration: "none",
-				overflow: "hidden",
+				//overflow: "hidden",
 				".module-cm_image": {
 					overflow: "hidden"		// IE11 needs this.
 				},
