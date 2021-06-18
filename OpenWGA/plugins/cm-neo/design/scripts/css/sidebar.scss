@@ -205,9 +205,16 @@
 	}
 
 	#sidepannel-content-properties{
-		a[data-action=reload]{
-			float: right;
-			margin: 0 0 10px 10px;
+		.panel-heading{
+			display: flex;
+			.title{
+				flex: 1;
+				overflow: hidden;
+				text-overflow: ellipsis
+			}
+			a[data-action=reload]{
+				margin-left: 10px;
+			}
 		}
 	}
 
