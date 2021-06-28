@@ -56,6 +56,7 @@ import org.apache.commons.lang.ArrayUtils;
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.utils.URLBuilder;
 import de.innovationgate.webgate.api.WGFactory;
+import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGCookie;
 import de.innovationgate.wgpublisher.WGPDeployer;
@@ -233,15 +234,16 @@ public class WGAFilter implements Filter {
 		@Override
 		public void sendRedirect(String location) throws IOException {
 
-			// #00005730
-			// All redirects now use status 301 instead of 302
-    		setStatus(SC_MOVED_PERMANENTLY);
-    		setHeader("Location", location);
-			
-			/*
-			super.sendRedirect(location);
-			setStatus(SC_MOVED_TEMPORARILY);
-			*/
+			if(WGACore.isDevelopmentModeEnabled()){
+				super.sendRedirect(location);
+				setStatus(SC_MOVED_TEMPORARILY);				
+			}
+			else{			
+				// #00005730
+				// All redirects now use status 301 instead of 302
+	    		setStatus(SC_MOVED_PERMANENTLY);
+	    		setHeader("Location", location);
+			}
 		}
         
     }
