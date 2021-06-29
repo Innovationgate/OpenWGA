@@ -533,7 +533,7 @@ this.attachment = function(filename){
 		,mimeType: file_md.mimeType || Packages.de.innovationgate.webgate.api.WGFactory.getMimetypeDeterminationService().determineByFilename(filename)
 	
 		,isImage: function(){
-			return ["image/png","image/gif","image/jpeg", "image/svg+xml"].indexOf(this.mimeType)>=0
+			return ["image/png","image/gif","image/jpeg", "image/webp", "image/svg+xml"].indexOf(this.mimeType)>=0
 		}
 		,isVideo: function(){
 			return this.mimeType.indexOf("video")==0
