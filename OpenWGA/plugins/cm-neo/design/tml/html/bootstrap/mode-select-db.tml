@@ -16,7 +16,7 @@
 		var allowedDbKeys = WGA.createList()
 		for(let uid in Iterator(vHost.getAllowedDatabases())){
 			if(uid=="$all")
-				break;;
+				break;
 			var dbkey = wgaconfig.getByUid(uid).getKey();
 			var Database = AFW.database(dbkey);
 			if(Database.isValid() && Database.isAuthoringAllowed())
