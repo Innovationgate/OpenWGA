@@ -23,6 +23,9 @@
 		else if(tmlform.allowedDbsOption=="none")
 			host.defaultDatabase="";
 
+		if(!tmlform.field("/hideDefaultDatabaseInURL"))
+			host.hideHomepageURL=false;
+
 		host.virtualResources.clear();
 		host.virtualResources.addAll(vr);
 
