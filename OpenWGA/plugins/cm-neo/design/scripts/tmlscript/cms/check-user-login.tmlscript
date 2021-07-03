@@ -27,6 +27,8 @@
 	var database = wgacore.contentdbs.get(tmlparam1);	
 	var accessLevel = database.openSession(tmlform.username, tmlform.password);
 
+	console.log("check accessLevel", tmlform.username, accessLevel)
+
 	if(accessLevel==database.ACCESSLEVEL_NOTLOGGEDIN){
 		tmlform.addmessage(label("login.login-error"));
 		return false;
