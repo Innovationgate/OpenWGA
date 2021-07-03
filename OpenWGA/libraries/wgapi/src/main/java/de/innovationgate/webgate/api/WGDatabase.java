@@ -4051,7 +4051,7 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
             if (user == null && getSessionContext().isMasterSession()) {
                 return this.getSessionContext().getAccessLevel();
             }
-            else if (isMemberOfUserList(Collections.singletonList(user))) {
+            else if (!getSessionContext().isMasterSession() && isMemberOfUserList(Collections.singletonList(user))) {
                 return this.getSessionContext().getAccessLevel();
             }
             else {
