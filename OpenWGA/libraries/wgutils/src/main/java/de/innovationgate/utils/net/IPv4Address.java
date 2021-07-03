@@ -83,6 +83,8 @@ public IPv4Address() {
     // each segment of the array representing the IP addr
     for (int x=0; x < 4; x++) {
       nextDotIndex = (x<3) ? ip.indexOf('.', dotIndex) :ip.length();
+      if(nextDotIndex<0)
+    	  break;
       tempIP[x] = Integer.parseInt(ip.substring(dotIndex,nextDotIndex));
       dotIndex = nextDotIndex + 1;
     }
