@@ -61,6 +61,14 @@ public class Domain {
         return _wga.getCore().getDomains(_name);
     }
     
+    /**
+     * Returns the optional pwd selfservice url
+     * @return url or NULL
+     * @throws WGException
+     */
+    public String getPwdSelfserviceURL() throws WGException{
+    	return getCore().getConfig().getPwdSelfserviceURL();
+    }
     
     /**
      * Returns a List of database keys of the OpenWGA applications in this domain, excluding data sources

@@ -63,7 +63,7 @@
 		<tml:portlet name="domain-form-auth" ref="::form-auth:portlet" ajax="true">
 			<tml:option name="ns">/authenticationSource</tml:option>
 		</tml:portlet>
-		
+		<tml:[system:fs-input] o_field="pwdSelfserviceURL" o_type="text" o_allowblank="true" o_emptytext="optional URL to password selfservice"/>
 	</tml:case>
 </fieldset>
 

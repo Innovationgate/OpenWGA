@@ -26,9 +26,6 @@ import org.simpleframework.xml.Root;
 @Root(strict=false)
 public class Domain extends IdentifiableConfigBean {
 	
-	/**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     @Attribute
@@ -41,7 +38,10 @@ public class Domain extends IdentifiableConfigBean {
 	
 	@Element(required=false)
 	private int maximumLoginAttempts = 5;
-	
+
+	@Element(required=false)
+	private String pwdSelfserviceURL;
+
 	@Element(required=false)
 	private AuthenticationSource authenticationSource;
 
@@ -60,6 +60,14 @@ public class Domain extends IdentifiableConfigBean {
 	public Domain(String uid) {
 	    super();
 	    setUid(uid);
+	}
+
+	public String getPwdSelfserviceURL(){
+		return pwdSelfserviceURL;
+	}
+
+	public void setPwdSelfserviceURL(String url){
+		pwdSelfserviceURL= url;
 	}
 
 	public String getDefaultManager() {
