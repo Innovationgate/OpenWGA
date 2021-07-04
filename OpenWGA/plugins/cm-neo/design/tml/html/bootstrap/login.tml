@@ -43,6 +43,7 @@
 			<tml:script>
 				if(option("msg"))
 					tmlform.addmessage(option('msg'))
+				_pwdSelfserviceURL = WGA.app(portlet.dbkey).domain().getPwdSelfserviceURL();
 			</tml:script>
 			
 			<tml:if istrue="$option_dbkey_auto_selected">
@@ -69,6 +70,12 @@
 			<div class="form-group">
 				<button id="login-button" type="submit" class="btn btn-primary">Anmelden ...</button>
 			</div>
+			
+			<tml:{div} if="_pwdSelfserviceURL">
+				<hr>
+				<a target="_blank" href="<tml:item name="_pwdSelfserviceURL"/>">Neues Kennwort anfordern ...</a>
+			</tml:{div}>
+			
 			<div id="loading" style="display:none">
 				<tml:image doc="images" file="ajax-loader-bar.gif"/>
 			</div>
