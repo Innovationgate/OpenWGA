@@ -71,7 +71,7 @@
 				<button id="login-button" type="submit" class="btn btn-primary">Anmelden ...</button>
 			</div>
 			
-			<tml:{div} if="_pwdSelfserviceURL">
+			<tml:{div} if="_pwdSelfserviceURL" html_class="request-pwd">
 				<hr>
 				<a target="_blank" href="<tml:item name="_pwdSelfserviceURL"/>">Neues Kennwort anfordern ...</a>
 			</tml:{div}>
@@ -84,7 +84,7 @@
 				require(["jquery"], function($){
 					$("#login-form").submit(function(ev){
 						ev.preventDefault();
-						$(".form-group, .alert", this).hide();
+						$(".form-group, .alert, .request-pwd", this).hide();
 						$("#loading").show();
 						WGA.ajax.action({
 							action: "<tml:action ref="login"/>"
