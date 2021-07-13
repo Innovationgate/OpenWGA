@@ -121,10 +121,13 @@
 			
 			columnWidth = parseInt(width/cols - ((cols-1)*margin)/cols);	// width without right margin
 			$wrapper.find("> .column").outerWidth(columnWidth);
+			
 			scroll();
 		}
 		function scroll(autoslide){
 
+			if(cols_total < cols)
+				return;		// nothing to do
 			// Korrektur, damit die letzte Seite immer vollständig angezeigt wird.
 			if(col<0)
 				col=0;
