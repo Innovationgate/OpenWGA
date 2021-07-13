@@ -71,23 +71,13 @@
 			if(config.singleStep)
 				col--;
 			else col-=cols;
-			if(col<0)
-				col=0;
 			scroll();
 		}
 		
 		function next(){
-			if(config.singleStep){
+			if(config.singleStep)
 				col++;
-				if(col>cols_total-cols)
-					col--
-			}
-			else{
-				col+=cols;
-				if(col>=cols_total){
-					col=parseInt((cols_total-1)/cols)*cols;
-				}
-			}
+			else col+=cols;
 			scroll();
 		}
 		
@@ -102,9 +92,10 @@
 		
 		$cols.find(".control a").click(function(e){
 			e.preventDefault();
+			if($(this).hasClass("active"))
+				return;
 			var index = $(this).data("col")-1
-			col = parseInt(index/cols)*cols;
-			scroll();
+			scrollToCol(index);
 		})
 		
 		function scrollToCol(index){
@@ -133,10 +124,17 @@
 			scroll();
 		}
 		function scroll(autoslide){
+
+			// Korrektur, damit die letzte Seite immer vollständig angezeigt wird.
+			if(col<0)
+				col=0;
+			if(col>cols_total-cols)
+				col = cols_total-cols
+				
 			var new_left = -col*(columnWidth+margin);
 
 			if(new_left==0 && autoslide){
-				effect_fade(new_left);	// allways fade to pos 0 if autoslide.
+				effect_fade(new_left);	// always fade to position 0 if autoslide.
 			}
 			else{			
 				if(config.effect=="fade")
