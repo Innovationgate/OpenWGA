@@ -8,7 +8,6 @@ function Controller(AFW, $field_contenttype) {
 		"overlay:wga:content-manager:required:default"
 	])
 	var tml = AFW.database().checkforTML(tmls);
-	console.log("required tmls", $field_contenttype, tml);
 	this.settingsTML = tml;
 
 }

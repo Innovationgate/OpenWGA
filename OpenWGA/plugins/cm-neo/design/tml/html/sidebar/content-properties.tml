@@ -3,10 +3,10 @@
 	{{#title}}
 	<div class="panel panel-default">
 		<div class="panel-heading">
+			<div class="title">{{{title}}}</div>
 			<a href="#" title="Seite neu laden" data-action="reload">
 				<i class="fas fa-sync"></i>
-			</a>
-			{{{title}}}
+			</a>			
 		</div>
 	
 		<div class="panel-body">

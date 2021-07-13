@@ -6,17 +6,23 @@
 		id: struct.getStructKey() 
 	})
 
-	var redirecturl = WGA.app().getHomepageURL()
-	var parent = struct.getParentEntry()
-	if(parent){
-		var c = context("/docid:" + parent.getStructKey() + "<" + LANGUAGE + ">", false);
+	var redirecturl = WGA.app().getHomepageURL() || "/"+WGA.app().dbKey;
+	
+	var redirectStruct = struct.getPreviousSibling();
+	if(!redirectStruct)
+		redirectStruct = struct.getNextSibling();
+	if(!redirectStruct)
+		redirectStruct = struct.getParentEntry()
+		
+	if(redirectStruct){
+		var c = context("/docid:" + redirectStruct.getStructKey() + "<" + LANGUAGE + ">", false);
 		if(c)
 			redirecturl = c.contenturl();
 		else {
 			redirecturl = WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
 					.setParameter({
 						dbkey: WGA.app().dbKey,
-						structkey: parent.getStructKey(),
+						structkey: redirectStruct.getStructKey(),
 						lang: LANGUAGE
 					}).build()			 			
 		}
@@ -56,7 +62,7 @@
 						Die Website wird nicht mehr korrekt funktionieren, wenn Sie diese Seite löschen.
 					</div> 
 				</tml:case>
-				Möchten Sie die Seite "<tml:meta name="title"/>" inklusiver aller Inhlatsversionen und Unterseiten wirklich löschen?
+				Möchten Sie die Seite "<tml:meta name="title"/>" inklusiver aller Inhaltsversionen und Unterseiten wirklich löschen?
 			</div>
 			
 			<div class="footer">

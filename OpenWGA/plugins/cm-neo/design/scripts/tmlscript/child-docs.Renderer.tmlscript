@@ -14,15 +14,17 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 			var c = context("db:"+dbkey+"/docid:"+doc.getStructKey(), false)
 			if(c){
 				docs.push({
-					"title": WGA.encode("html", c.TITLE),
-					"id": c.STRUCTKEY,
-					"href": c.contenturl('html', null, true),
-					"cssclass": c.STATUS
+					title: WGA.encode("html", c.TITLE),
+					id: doc.getStructKey(),
+					mayNotDelete: !AFW.structentry(doc).mayDeletePage(),
+					href: c.contenturl('html', null, true)
 				})
 			}
 			else if(doc.mayReadContent()){
 				docs.push({
-					title: doc.title,
+					title: WGA.encode("html", doc.title),
+					id: doc.getStructKey(),
+					mayNotDelete: !AFW.structentry(doc).mayDeletePage(),
 					href: WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
 								.setParameter({
 									dbkey: dbkey,
@@ -45,8 +47,7 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 			current = {
 				"title": c.TITLE,
 				"id": c.STRUCTKEY,
-				"href": c.contenturl('html', null, true),
-				"cssclass": c.STATUS
+				"href": c.contenturl('html', null, true)
 			}
 		}
 	}
@@ -62,8 +63,7 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 			parent = {
 				"title": c.TITLE,
 				"id": c.STRUCTKEY,
-				"href": c.contenturl('html', null, true),
-				"cssclass": c.STATUS
+				"href": c.contenturl('html', null, true)
 			}
 		}
 	}

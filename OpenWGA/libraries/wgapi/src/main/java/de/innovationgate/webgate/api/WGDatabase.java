@@ -4050,7 +4050,7 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         if (this.isSessionOpen()) {
             if (user == null && getSessionContext().isMasterSession()) {
                 return this.getSessionContext().getAccessLevel();
-            }
+            }            
             else if (isMemberOfUserList(Collections.singletonList(user))) {
                 return this.getSessionContext().getAccessLevel();
             }

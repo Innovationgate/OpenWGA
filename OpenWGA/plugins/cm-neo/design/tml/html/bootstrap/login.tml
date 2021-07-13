@@ -16,6 +16,8 @@
 				return;
 			}
 			log.info("user '" + tmlform.username + "' is logged in as " + AFW.database(database).getAccessLevelText())
+			if(!WGA.app(database).isAuthor())
+				tmlform.addmessage("Der User <b>" + tmlform.username + "</b> ist kein Autor dieser Website.")
 		}
 		catch(e){
 			tmlform.addmessage(e.message)
@@ -41,8 +43,14 @@
 			<tml:script>
 				if(option("msg"))
 					tmlform.addmessage(option('msg'))
+				_pwdSelfserviceURL = WGA.app(portlet.dbkey).domain().getPwdSelfserviceURL();
 			</tml:script>
-			<h1>Anmelden an Website <tml:item name="dbkey" type="portlet"/></h1>
+			
+			<tml:if istrue="$option_dbkey_auto_selected">
+				<tml:then><h1>Anmelden als Website-Autor</h1></tml:then>
+				<tml:else><h1>Anmelden an Website <tml:item name="dbkey" type="portlet"/></h1></tml:else>
+			</tml:if>
+			
 			<tml:case condition="tmlform.hasmessages()">
 				<div class="alert alert-danger">
 					<h4>Die Anmeldung konnte nicht durchgeführt werden:</h4>
@@ -62,6 +70,12 @@
 			<div class="form-group">
 				<button id="login-button" type="submit" class="btn btn-primary">Anmelden ...</button>
 			</div>
+			
+			<tml:{div} if="_pwdSelfserviceURL" html_class="request-pwd">
+				<hr>
+				<a target="_blank" href="<tml:item name="_pwdSelfserviceURL"/>">Neues Kennwort anfordern ...</a>
+			</tml:{div}>
+			
 			<div id="loading" style="display:none">
 				<tml:image doc="images" file="ajax-loader-bar.gif"/>
 			</div>
@@ -70,7 +84,7 @@
 				require(["jquery"], function($){
 					$("#login-form").submit(function(ev){
 						ev.preventDefault();
-						$(".form-group, .alert", this).hide();
+						$(".form-group, .alert, .request-pwd", this).hide();
 						$("#loading").show();
 						WGA.ajax.action({
 							action: "<tml:action ref="login"/>"

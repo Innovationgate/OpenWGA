@@ -107,7 +107,7 @@
 		entry.append(twisty);
 
 		var icon = $("<span/>", {
-			"class": "icon",
+			"class": "icon " + (data.iconclass||""),
 			html: "&nbsp;"
 		})
 		if(data.iconurl)
@@ -411,7 +411,9 @@
 				var url = config.url || $this.data("url");
 				if(url){
 					$this.data("url", url)
-					loadJson($this);
+					loadJson($this, function(){
+						$this.trigger("tree-loaded");
+					});
 				}
 				if(config.data)
 					addNodes($this, config.data)

@@ -1,3 +1,5 @@
+<tml:eventscript onevent="child-pages-updated"/>
+
 <div id="app-child-docs">
 
 	<tml:[template] o_id="appnav-child-docs">
@@ -13,13 +15,30 @@
 			<legend>{{current.title}}</legend>
 			
 			{{#children}}
-				<a href="{{href}}">				
-					{{{title}}}
-				</a>
+				<div class="entry">
+					<input type="checkbox" value="{{id}}" {{#mayNotDelete}}disabled{{/mayNotDelete}}>
+					<a href="{{href}}">				
+						{{{title}}}
+					</a>
+				</div>
 			{{/children}}
 		</fieldset>
 		
 	</tml:[template]>
+	
+	<div class="child-docs-toolbar">
+		<button class="btn btn-default" data-action="edit">
+			<i class="fa fa-tasks"></i>
+			Bearbeiten
+		</button>
+		<button class="btn btn-default" data-action="cancel" style="display:none">
+			Abbrechen
+		</button>
+		<button class="btn btn-danger" data-action="delete" disabled style="display:none">
+			<i class="fa fa-trash"></i>
+			Löschen
+		</button>
+	</div>
 	
 </div>
 

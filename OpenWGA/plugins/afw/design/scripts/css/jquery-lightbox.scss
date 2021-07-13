@@ -5,8 +5,6 @@
  This file is part of the OpenWGA server platform.
  (c) Innovation Gate
 
- BETA - not finished
-
 */ 
 
 #lightbox-body-mask {
@@ -26,79 +24,66 @@
 
 	z-index: 102;
 	position: fixed;
-	background: white;
-	padding: 10px;
-	box-shadow: 0 0 20px black;
+	background: #e8e8e8;
+	color: black;
+	padding: 0px;
+	box-shadow: 0 0 15px black;
 	box-sizing: content-box;
+	
+	.title{
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 60px;
+		line-height: 60px;
+		font-size: 18px; 
+		padding: 0 10px;
+		box-sizing: border-box;
+		display: flex;
+		white-space: nowrap;
+		
+		.image-title{
+			flex: 1;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		.lightbox-close{
+			text-align: center;
+			width: 25px;
+			cursor: pointer;
+			font-size: 1.5em; 
+		}
+	}
 	
 	img {
 		max-width: none;
 		max-height: none;
 		position: absolute;
-		left: 10px;
+		left: 0px;
+		top: 60px;
+		display: block;
 	}
 
 	.image-loading {
 		position: absolute;
-		top: 45%;
-		width: 100%;
-		text-align: center;
-	}
-
-	a.lightbox-close {
-		cursor: pointer;
-		background: url(wga_file_url("images", "apple-close.png")) no-repeat;
-		background-size: contain;
-		position: absolute;
-		width: 28px;
-		height: 28px;
-		top: -10px;
-		left: -12px;
-	}
-	
-	.image-prev, .image-next {
-		cursor: pointer;
-		position: absolute;
-		padding: 10px 20px;
-		border: solid white 1px;
 		top: 40%;
-		width: 15px;
-		height: 20px;
-		text-decoration: none;
-		opacity: 0;
-		filter: alpha(opacity = 0);
-		box-sizing: content-box;
-		z-index: 1;
-		
-	}
-	
-	a.image-prev {
-		left: 0;
-		background: rgba(255, 255, 255, 0.3) url(wga_file_url("images", "prev.png")) no-repeat 18px 5px;
-		&:hover {
-			background-image: url(wga_file_url("images", "prev_mo.png"));
-		}
-		border-top-right-radius: 20px;
-		border-bottom-right-radius: 20px;
-		border-left-width: 0
-	}
-	
-	a.image-next {
-		right: 0;
-		background: rgba(255, 255, 255, 0.3) url(wga_file_url("images", "next.png")) no-repeat 6px 5px;
-		&:hover {
-			background-image: url(wga_file_url("images", "next_mo.png"));
-		}
-		border-top-left-radius: 20px;
-		border-bottom-left-radius: 20px;
-		border-right-width: 0;
+		width: 100%;
+		height: 100px;
+		text-align: center;
+		background: url(wga_file_url('tree', 'ajax-loader.gif')) no-repeat center center;
 	}
 
-	&:hover {
-		.image-prev, .image-next {
-			opacity: 1;
-			filter: alpha(opacity = 100);
-		}
+	.image-prev, .image-next {
+		display: inline-block;
+		cursor: pointer;
+		width: 15px;
+		font-weight: bold;
+	}
+	
+	.image-next{
+		text-align: right;
 	}
 	
 	.image-info {
@@ -107,29 +92,20 @@
 		left: 0;
 		right: 0;
 		height: 40px;
+		line-height: 40px;
 		white-space: nowrap;
-		box-sizing: content-box;
-		padding: 10px;
-		background: #efefef;
-		border-top: solid #dddddd 1px;
+		box-sizing: border-box;
+		padding: 0 10px;
 		font-size: 14px;
-		.image-title, .image-group {
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-		.image-group {
-			margin-top: 7px;
+		display: flex;
+		.info{
+			flex: 1;
+			display: flex;
 		}
 		.image-download {
 			display: none;
-			position: absolute;
-			bottom: 10px;
-			right: 10px;
-			padding: 2px 10px;
-			background: #efefef;
-			box-shadow: 0 0 2px gray;
 			a {
-				text-decoration: none;
+				text-decoration: underline;
 			}
 		}
 	}

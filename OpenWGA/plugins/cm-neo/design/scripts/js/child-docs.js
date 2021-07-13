@@ -6,6 +6,12 @@ define(["cm", "appnav"], function(CM, Appnav){
 	function onContextChange(context){
 		context && template && $.getJSON(url, context, function(result){
 			template.render(result)
+			$("#app-child-docs [data-action=cancel]").hide();
+			$("#app-child-docs [data-action=delete]").hide();
+			$("#app-child-docs [data-action=edit]").show()
+			if(result.children.length)
+				$("#app-child-docs [data-action=edit]").removeProp("disabled")
+			else $("#app-child-docs [data-action=edit]").prop("disabled", true)			
 		})		
 	}
 	
@@ -23,6 +29,38 @@ define(["cm", "appnav"], function(CM, Appnav){
 		Appnav.setContextChangeListener(onContextChange)
 		Appnav.selectView("child-docs");
 
+		// edit & remove UI handling
+		function enableDelete(){
+			var checked = $("#app-child-docs input:checked")
+			if(checked.length)
+				$("#app-child-docs [data-action=delete]").removeProp("disabled")
+			else $("#app-child-docs [data-action=delete]").prop("disabled", true)			
+		}
+		
+		$("#app-child-docs [data-action=edit]").click(function(){
+			$("#app-child-docs input").show()
+			$("#app-child-docs [data-action=edit]").hide()
+			$("#app-child-docs [data-action=cancel]").show();
+			$("#app-child-docs [data-action=delete]").show()
+			enableDelete()
+		})
+		$("#app-child-docs [data-action=cancel]").click(function(){
+			$("#app-child-docs input").hide()
+			$("#app-child-docs [data-action=cancel]").hide();
+			$("#app-child-docs [data-action=delete]").hide();
+			$("#app-child-docs [data-action=edit]").show()
+		})
+		$("#app-child-docs").on("click", "input", enableDelete)
+
+		$("#app-child-docs [data-action=delete]").click(function(){
+			var checked = $("#app-child-docs input:checked").map(function(){
+				return this.value;
+			}).get();
+			CM.openDialog("delete-pages", {
+				pages: checked.join()
+			})
+		})
+		
 	}
 	
 	return {

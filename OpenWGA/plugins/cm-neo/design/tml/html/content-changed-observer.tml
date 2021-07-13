@@ -16,7 +16,9 @@
 	var may_create_root_page = false;
 	if(dbkey){
 		for(let area in Iterator(db(dbkey).getAreas().values())){
-			if(area.name.indexOf("$")==0)
+			if(area.name=="$trash")
+				continue;
+			if(area.name=="$templates" && !WGA.app(dbkey).isChiefEditor())
 				continue;
 			if(area.mayEditPages()){
 				may_create_root_page = hasAllowedContentTypes(area);

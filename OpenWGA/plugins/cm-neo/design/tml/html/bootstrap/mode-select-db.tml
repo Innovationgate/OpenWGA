@@ -16,14 +16,16 @@
 		var allowedDbKeys = WGA.createList()
 		for(let uid in Iterator(vHost.getAllowedDatabases())){
 			if(uid=="$all")
-				break;;
+				break;
 			var dbkey = wgaconfig.getByUid(uid).getKey();
 			var Database = AFW.database(dbkey);
 			if(Database.isValid() && Database.isAuthoringAllowed())
 				allowedDbKeys.add(dbkey);
 		}		
-		if(allowedDbKeys.size()==1)
+		if(allowedDbKeys.size()==1){
 			portlet.dbkey = allowedDbKeys.get(0);
+			setOption("dbkey_auto_selected", true);
+		}
 	}
 
 	if(portlet.dbkey){
@@ -44,9 +46,6 @@
 			_msg = "Diese Website ist nicht zur Bearbeitung im Content Manager vorgesehen."
 			return;
 		}
-		else if(!_Database.isAuthor() && App.isOpen() && !App.isAnonymous()){
-			_msg = "Der angemeldete User <b>" + context("db:"+portlet.dbkey).meta("db", "username") + "</b> ist kein Autor dieser Website. Bitte melden Sie sich als Autor an."
-		}
 	}
 </tml:script>
 
@@ -60,7 +59,7 @@
 		<tml:include ref="::select-db" o_msg="{_msg}"/>
 	</tml:elseif>
 	
-	<tml:elseif condition="!_Database.isAuthor() || (!_Database.hasDesign() && !_Database.isManager())">
+	<tml:elseif condition="!_Database.isAuthor()">
 		<tml:include ref="::login" o_msg="{_msg}"/>
 	</tml:elseif>
 

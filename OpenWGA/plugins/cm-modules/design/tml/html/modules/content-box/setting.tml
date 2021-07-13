@@ -30,7 +30,7 @@
 
 <label><tml:label key="content-box.settings.background-image"/>:</label>
 <div style="margin:10px">
-	<tml:include ref="util:select-image" o_mode="{option:mode}"/>
+	<tml:include ref="util:select-image" o_empty-text="Kein Hintergrundbild" o_mode="{option:mode}"/>
 </div>
 
 <label><tml:label key="content-box.settings.margin"/>:</label>

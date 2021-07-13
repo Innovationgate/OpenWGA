@@ -3,7 +3,7 @@
 <tml:script>
 	var url = null,
 		link_title = "", 
-		link_target = "";
+		link_target = CMM.setting("link_target");
 	if(CMM.setting("link")=="int"){
 		var ctx = context("docid:"+CMM.setting("wgakey")) 
 		url = ctx.contenturl()
@@ -12,7 +12,6 @@
 	else if(CMM.setting("link")=="ext"){
 		url = CMM.setting("url");
 		link_title = url
-		link_target = "_blank"
 	}
 
 	_wrap_tag = url ? "a" : "div";

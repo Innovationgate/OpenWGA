@@ -23,11 +23,7 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:action id="form-action-mail">
-
-	var mailto = tmlparam1.split(",");
-	var redirect = tmlparam2;
-	var title = tmlparam3;
+<tml:action id="submit">
 
 	if(tmlform.hasfield("_captcha_answer")){
 		var service = WGA.db('plugin-cm-modules').getAttribute('captchaService');
@@ -42,131 +38,117 @@
 	if(!tmlform.validate())
 		return;
 
-	var mail_addresses = {
-		to: WGA.createList(),
-		cc: WGA.createList(),
-		bcc: WGA.createList()
-	};
+	tmlform.removefield("_captcha_verified")
 
-	if(!mailto.length){
-		tmlform.addmessage("No mail address specified in form");
-		log.error("module 'form' in document '" + TITLE + "': No mail address specified.");
-		return;
-	}
-
-	// analyse mailto input:
-	for(var i=0; i < mailto.length; i++){
-		var addr = mailto[i];
-		if(!addr)
-			continue;
-		var parts = addr.split(":");
-		if(parts.length>1 && parts[1]){
-			var a = AFW.Util.list(tmlform.fieldList(parts[1])).trim();
-			if(a.size()){
-				mail_addresses[parts[0]].addAll(a)
+	var action = CMM.settingList("action");
+	if(action.contains("mail")){
+		console.log("send mail", CMM.setting("mail"));
+		var mailto = CMM.settingList("mail")
+		if(!mailto.size()){
+			tmlform.addmessage("No mail address specified in form");
+			log.error("module 'form' in document '" + TITLE + "': No mail address specified.");
+			return;
+		}
+		
+		var mail_addresses = {
+			to: WGA.createList(),
+			cc: WGA.createList(),
+			bcc: WGA.createList()
+		};
+	
+		// analyse mailto input:
+		for(let addr in Iterator(mailto)){
+			if(!addr)
+				continue;
+			/*
+			 * possible special format:
+			 * to:<fieldname>
+			 * cc:<fieldname>
+			 * bcc:<fieldname>
+			 */			
+			var parts = addr.split(":");
+			if(parts.length>1 && parts[1]){
+				var a = AFW.Util.list(tmlform.fieldList(parts[1])).trim();
+				if(a.size()){
+					mail_addresses[parts[0]].addAll(a)
+				}
+			}
+			else {
+				mail_addresses.to.add(addr);
 			}
 		}
-		else {
-			mail_addresses.to.add(addr);
-		}
-	}
-	
-	tmlform.removefield("_captcha_verified")
+		console.log("to", mail_addresses.to); 
 
-	log.info("mailing form '" + title + "' to " + mail_addresses.to + ", cc:" + mail_addresses.cc + ", bcc:" + mail_addresses.bcc);
-
-	try{
-		var mail=WGA.createMail();
-		mail.setMimeType("text/html");
+		try{
+			var mail=WGA.createMail();
+			mail.setMimeType("text/html");			
+			mail.to=mail_addresses.to;
+			mail.cc=mail_addresses.cc;
+			mail.bcc=mail_addresses.bcc;			
+			mail.subject=$option_title;
 		
-		mail.to=mail_addresses.to;
-		mail.cc=mail_addresses.cc;
-		mail.bcc=mail_addresses.bcc;
-		
-		mail.subject=title
-	
-		var mailbody="";
-		var forminfo = tmlform.processcontext.get("forminfo");
-		var fields = forminfo.keySet().iterator();
-		while(fields.hasNext()){
-			var fieldinfo = forminfo.get(fields.next());
-			var field = fieldinfo.get("name").trim();
-			var label = fieldinfo.get("label");
+			var mailbody="";
+			var forminfo = tmlform.processcontext.get("forminfo");
+			var fields = forminfo.keySet().iterator();
+			while(fields.hasNext()){
+				var fieldinfo = forminfo.get(fields.next());
+				var field = fieldinfo.get("name").trim();
+				var label = fieldinfo.get("label");
+				
+				var values = tmlform.fieldList(field).iterator();
+				mailbody += "<b>" + label + "</b> (" + field + "):<br>";
+				while(values.hasNext())
+					mailbody += (encode("html", values.next()) +"<br>");
+				mailbody += "<br>";
+			}
 			
-			var values = tmlform.fieldList(field).iterator();
-			mailbody += "<b>" + label + "</b> (" + field + "):<br>";
-			while(values.hasNext())
-				mailbody += (encode("html", values.next()) +"<br>");
-			mailbody += "<br>";
+			if(tmlform.getfilenames().size()){
+				mailbody += "<hr>"
+				for(let filename in Iterator(tmlform.getfilenames())){
+					mail.addAttachment(tmlform.getfile(filename))
+				} 
+			}
+			mail.body = mailbody;
+			mail.send();
 		}
-		
-		if(tmlform.getfilenames().size()){
-			mailbody += "<hr>"
-			for(let filename in Iterator(tmlform.getfilenames())){
-				mail.addAttachment(tmlform.getfile(filename))
-			} 
+		catch(e){
+			log.info("Unable to send Mail: " + e.javaException);
+			logException(e);
 		}
-		mail.body = mailbody;
-		mail.send();
 	}
-	catch(e){
-		log.info("Unable to send Mail: " + e.javaException);
-		logException(e);
+	if(action.contains("store")){
+
+		var dbkey = CMM.setting("dbkey") || db().getDbReference();;
+		var id = WGA.scoped('formid');
+
+		WGA.Master.runFunction(function(id, title, dbkey){
+			var ctx = context("db:"+dbkey, false);
+			if(!ctx){
+				log.info("Unable to open database " + dbkey);
+				return tmlform.addMessage("Unable to open database " + dbkey);
+			}
+			var hdb = WGA.hdb(dbkey);
+			var root = hdb.getOrCreateStorage("forms")
+			var s = hdb.getOrCreateStorage(root, id + "-" + STRUCTKEY)
+			var forminfo = tmlform.processcontext.get("forminfo");
+			s.setItemValue("forminfo", forminfo)
+			var fields = createlist();
+			fields.addAll(forminfo.keySet());
+			s.setItemValue("fieldinfos", fields)
+			s.setTitle(title);
+			s.save();
+			var doc = hdb.createContent(s, createdate())
+			tmlform.attach(doc)
+			tmlform.storeincontent(doc);
+			log.info("form " + id + " stored in db " + dbkey);
+		}, id, $option_title, dbkey);
+
 	}
-		
-	if(redirect)
-		redirectto(context("docid:"+redirect).contenturl(null, null));
+	
+	if(CMM.setting('aftersubmit')=="redirect")
+		redirectto(context("docid:"+CMM.setting('redirect')).contenturl(null, null));	
 	tmlform.successmessage=true
-</tml:action>
-
-<tml:action id="form-action-store">
-	//log.info("storing form in db " + tmlparam1);
 	
-	var dbkey = tmlparam1;
-	var redirect = tmlparam2;
-	var title = tmlparam3;
-	var id = tmlparam4;
-	
-	if(tmlform.hasfield("_captcha_answer")){
-		var service = WGA.db('plugin-cm-modules').getAttribute('captchaService');
-		if(service.validateResponse(this, tmlform._captcha_answer))
-			tmlform._captcha_verified=true;
-		else {
-			_captcha_error=true;
-			return tmlform.validate();
-		}	
-	}
-	
-	if(!tmlform.validate())
-		return;
-
-	tmlform.removefield("_captcha_verified")
-
-	WGA.Master.runFunction(function(id, title, dbkey){
-		var ctx = context("db:"+dbkey, false);
-		if(!ctx){
-			log.info("Unable to open database " + dbkey);
-			return tmlform.addMessage("Unable to open database " + dbkey);
-		}
-		var hdb = WGA.hdb(dbkey);
-		var root = hdb.getOrCreateStorage("forms")
-		var s = hdb.getOrCreateStorage(root, id + "-" + STRUCTKEY)
-		var forminfo = tmlform.processcontext.get("forminfo");
-		s.setItemValue("forminfo", forminfo)
-		var fields = createlist();
-		fields.addAll(forminfo.keySet());
-		s.setItemValue("fieldinfos", fields)
-		s.setTitle(title);
-		s.save();
-		var doc = hdb.createContent(s, createdate())
-		tmlform.attach(doc)
-		tmlform.storeincontent(doc);
-		log.info("form " + id + " stored in db " + dbkey);
-	}, id, title, dbkey);
-	
-	if(redirect)
-		redirectto(context("docid:"+redirect).contenturl(null, null));	
-	tmlform.successmessage=true
 </tml:action>
 
 <tml:include ref="init"/>
@@ -202,18 +184,7 @@
 			</tml:include>
 			
 			<div class="buttons clearfix">
-				<tml:script>
-					var action = CMM.setting('action');
-					if(action=="mail")
-						_param1 = CMM.settingList('mail');
-					else if(action=="store")
-						_param1 = CMM.setting('dbkey') || db().getDbReference();
-					if(CMM.setting('aftersubmit')=="redirect")
-						_param2 = CMM.setting('redirect');
-					else _param2="";
-					_button_action = "form-action-"+action;
-				</tml:script>
-				<tml:button cssclass="btn btn-default" clickaction="{_button_action}" param1="{_param1}" param2="{_param2}" param3="{option('title')}" param4="{WGA.scoped('formid')}" ajax="true">
+				<tml:button cssclass="btn btn-default" clickaction="submit">
 					<tml:[setting] o_name="submit-button-text"/>
 				</tml:button>
 			</div>

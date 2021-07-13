@@ -1,0 +1,11 @@
+<tml:case context="{$option_context}" iscontextvalid="true">
+	<label><tml:label key="image.img-mouse-over"/>:</label>
+	<div style="margin:10px">
+		<tml:include ref="util:select-image" o_derivate="usage=poster" o_fieldname="image_mo" o_empty-text="Original"/>
+	</div>
+</tml:case>
+
+<label><tml:label key="image.settings.title"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:title}" type="text" cssclass="form-control" mode="{option:mode}"/>
+</div>

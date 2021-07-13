@@ -24,20 +24,13 @@
 		if(pagetypes.size()==1)
 			tmlform.contenttype = pagetypes.get(0);
 		else if(!tmlform.submitted){
-			console.log("$option_current_pagetype", $option_current_pagetype);
 			if($option_current_pagetype && pagetypes.contains($option_current_pagetype))
 				tmlform.contenttype=$option_current_pagetype
-			else tmlform.contenttype = pagetypes.get(0);
+			else if(pagetypes.size())
+				tmlform.contenttype = pagetypes.get(0);
 		}		
 	}
-	
-	/*
-	else if(!tmlform.submitted && $option_current_pagetype && pagetypes.contains($option_current_pagetype))
-		tmlform.contenttype=$option_current_pagetype
-	else if(pagetypes.size()==1)
-		tmlform.contenttype = pagetypes.get(0);
-	*/
-	
+		
 	WGA.TMLPage.setVar("_pagetypes", WGA.createList())
 	for(let name in Iterator(pagetypes)){
 		var ct = db().getContentType(name)
@@ -60,7 +53,10 @@
 		WGA.TMLPage.setVar("_isValid", true)
 	else{
 		WGA.TMLPage.setVar("_isValid", false)
-		tmlform.addmessage("Es steht kein erlaubter Seitentyp oder keine erlaubte Sprache für diese Position zur Verfügung")
+		if(!_pagetypes.size())
+			tmlform.addmessage("Es steht kein erlaubter Seitentyp für diese Position zur Verfügung")
+		if(!_languages.size())
+			tmlform.addmessage("Es steht keine erlaubte Sprache zur Verfügung")
 	}
 	
 </tml:script>

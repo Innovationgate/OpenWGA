@@ -63,7 +63,6 @@
 					$(".placeholder", el).show();
 					$("#clear-key-<tml:option name="fieldname"/>").hide();
 					<tml:case hasoptions="changeaction">
-						console.log("callAction")
 						WGA.ajax.callAction("<tml:option name="changeaction"/>");
 					</tml:case>
 				})

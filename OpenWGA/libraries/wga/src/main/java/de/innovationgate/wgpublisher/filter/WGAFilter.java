@@ -56,6 +56,7 @@ import org.apache.commons.lang.ArrayUtils;
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.utils.URLBuilder;
 import de.innovationgate.webgate.api.WGFactory;
+import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGCookie;
 import de.innovationgate.wgpublisher.WGPDeployer;
@@ -139,7 +140,7 @@ public class WGAFilter implements Filter {
      * - ignores all calls to setCharacterEncoding
      * - replace parameter charset=<XY> during setContentType with <wrappedResponse>.getCharacterEncoding()
      * Therefore the output encoding can be final set on the original response. 
-     *
+     * - overwrites sendRedirect() to use status code 301 instead of 302
      */
     public class FinalCharacterEncodingResponseWrapper extends HttpServletResponseWrapper {
 
@@ -150,8 +151,6 @@ public class WGAFilter implements Filter {
 		private int _statusCode = HttpServletResponse.SC_OK;
 
 		private String _statusMessage;
-
-
     	
         public FinalCharacterEncodingResponseWrapper(RequestWrapper reqWrapper, HttpServletResponse arg0) {
             super(arg0);
@@ -234,45 +233,18 @@ public class WGAFilter implements Filter {
 
 		@Override
 		public void sendRedirect(String location) throws IOException {
-			super.sendRedirect(location);
-			setStatus(SC_MOVED_TEMPORARILY);
+
+			if(WGACore.isDevelopmentModeEnabled()){
+				super.sendRedirect(location);
+				setStatus(SC_MOVED_TEMPORARILY);				
+			}
+			else{			
+				// #00005730
+				// All redirects now use status 301 instead of 302
+	    		setStatus(SC_MOVED_PERMANENTLY);
+	    		setHeader("Location", location);
+			}
 		}
-
-
-
-//        @Override
-//        public String encodeRedirectUrl(String url) {
-//            return encodeRedirectURL(url);
-//        }
-//        
-//
-//        @Override
-//        public String encodeUrl(String url) {
-//            return encodeRedirectURL(url);
-//        }
-//
-//        @Override
-//        public String encodeURL(String url) {
-//            if (_core.getHttpSessionManager() == null) {
-//                return super.encodeURL(url);
-//            }
-//            
-//            HttpSession session = _reqWrapper.getSession(false);
-//            if (session != null && session.isNew()) {
-//                return url + ";jsessionid=" + session.getId();
-//            }
-//            return url;
-//        }
-//
-//
-//        @Override
-//        public String encodeRedirectURL(String url) {
-//            if (_core.getHttpSessionManager() == null) {
-//                return super.encodeRedirectUrl(url);
-//            }
-//            
-//            return encodeURL(url);
-//        }
         
     }
     

@@ -1,39 +1,46 @@
-## LICENSE START ###############################################################
-## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
-## 
-## This file is part of the OpenWGA server platform.
-## 
-## OpenWGA is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-## 
-## In addition, a special exception is granted by the copyright holders
-## of OpenWGA called "OpenWGA plugin exception". You should have received
-## a copy of this exception along with OpenWGA in file COPYING.
-## If not, see <http://www.openwga.com/gpl-plugin-exception>.
-## 
-## OpenWGA is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-## 
-## You should have received a copy of the GNU General Public License
-## along with OpenWGA in file COPYING.
-## If not, see <http://www.gnu.org/licenses/>.
-## LICENSE END #################################################################
+<tml:script>
+	_action_opts = ["Daten per Mail senden|mail"];
+	_dbkeys_options = createlist()
+	var ctx = context("db:"+WGA.design().db().getDbReference()+"/name:cm_form", false)
+	if(ctx){
+		_dbkeys_options = ctx.itemlist("dbkeys");
+		_dbkeys_options.size() && _action_opts.push("Daten in Datenbank speichern|store")
+	}
+</tml:script>
 
 <label><tml:label key="form.settings.action"/>:</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:action}" type="select" options="{label('form.settings.action.options')}"
-		cssclass="form-control"
+	<tml:input name="{scoped:action}" type="checkbox" optionsitem="_action_opts"
 		default="mail" 
 		changeaction="$refresh" ajax="true"
 		mode="{option('mode')}"
 	/>
 </div>
 
-<tml:select switch="tmlform.field(WGA.scoped('action'))">
+<tml:case condition="tmlform.fieldlist(WGA.scoped('action')).contains('mail')">
+	<label><tml:label key="form.settings.email"/>:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:mail}" type="textarea" multiple="true" cssstyle="width:100%" mode="{option('mode')}"/>
+	</div>	
+</tml:case>
+
+<tml:case condition="tmlform.fieldlist(WGA.scoped('action')).contains('store')">
+	<tml:if condition="_dbkeys_options.size()">
+		<tml:then>
+			<label><tml:label key="form.settings.database"/>:</label>
+			<div style="margin:10px">
+				<tml:input name="{scoped:dbkey}" type="select" cssclass="form-control" optionsitem="_dbkeys_options" mode="{option:mode}"/>
+			</div>
+		</tml:then>
+		<tml:else>
+			<tml:script>
+				tmlform.setfield(WGA.scoped("dbkey"), "");
+			</tml:script>
+		</tml:else>
+	</tml:if>
+</tml:case>
+
+<tml:comment><tml:select switch="tmlform.field(WGA.scoped('action'))">
 	<tml:case value="mail">
 		<label><tml:label key="form.settings.email"/>:</label>
 		<div style="margin:10px">
@@ -62,7 +69,7 @@
 		</tml:if>
 	</tml:case>
 	
-</tml:select>
+</tml:select></tml:comment>
 
 <label><tml:label key="form.settings.submit-button-text"/>:</label>
 <div style="margin:10px">

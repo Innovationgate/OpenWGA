@@ -1,0 +1,37 @@
+<tml:[util:tabs] designdb="plugin-cm-neo">
+	
+	<tml:[util:tab-page] designdb="plugin-cm-neo" o_id="basic" o_title="Layout">
+		<label><tml:label key="tiles.tile.setting.width"/></label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:width}" type="number" default="1" mode="{option:mode}"/>
+		</div>
+		
+		<label><tml:label key="tiles.tile.setting.background-image"/></label>
+		<div style="margin:10px">
+			<tml:include ref="util:select-image" o_empty-text="Kein Hintergrundbild" o_derivate="usage=poster" o_mode="{option:mode}"/>
+		</div>
+		
+		<label><tml:label key="tiles.tile.setting.vertical-align"/></label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:justify_content}" type="select" 
+				options="{label('tiles.tile.setting.vertical-align.options')}"
+				mode="{option:mode}"
+				cssclass="form-control"
+			/>
+		</div>
+	</tml:[util:tab-page]>
+
+	<tml:[util:tab-page] designdb="plugin-cm-neo" o_id="link" o_title="Link">
+		<tml:portlet name="link" ref="::link"/>
+	</tml:[util:tab-page]>
+
+	<tml:[util:tab-page] designdb="plugin-cm-neo" o_id="style" o_title="Stil" if="$option_cmm_styles">
+		<div style="padding:0px 10px">
+			<tml:option name="cmm_styles"/>
+		</div>
+		<tml:script>
+			$option_module_styles.included=true;
+		</tml:script>
+	</tml:[util:tab-page]>
+	
+</tml:[util:tabs]>

@@ -36,7 +36,10 @@
 		if(tmlform.auth_enabled){
 			domain.authenticationSource = new Packages.de.innovationgate.wga.config.AuthenticationSource();
 		}
-		else domain.authenticationSource = null;
+		else {
+			domain.authenticationSource = null;
+			tmlform.removeField("/pwdSelfserviceURL")
+		}
 
 		// Personalisation
 		if(tmlform.pers_enabled){

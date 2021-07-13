@@ -319,6 +319,9 @@ public class JspHelper {
         writer.append("title: " + titleStr);
         writer.append("}");
         writer.append("}");
+        
+        writer.append("\nwindow.parent.CM && window.parent.CM.pageLoaded(WGA.contentinfo);");
+        
         writer.append("</script>");
         
         return writer.toString();

@@ -1,0 +1,39 @@
+<tml:action id="delete-pages">
+	//console.log("delete-pages", $option_dialog_options.pages)
+	var keys = $option_dialog_options.pages.split(",");
+	try{
+		for(let [index, key] in keys){
+			var struct = db().getStructEntryByKey(key);
+			struct.remove();			
+		}
+		portlet.fireevent("close-dialog");
+	}
+	catch(e){
+		_msg = e.message;
+	}
+	portlet.fireevent("child-pages-updated");
+</tml:action>
+
+<tml:script>
+	_pages = $option_dialog_options.pages.split(",");
+</tml:script>
+
+<div class="header">
+	<tml:if condition="_pages.length==1">
+		<tml:then>Seite löschen</tml:then>
+		<tml:else><tml:item name="_pages.length"/> Seiten löschen</tml:else>
+	</tml:if>
+	<a data-modal="hide">&times;</a>
+</div>
+
+<div class="content">	
+	<tml:item name="_msg" if="_msg" wrap="div" wrap_class="alert alert-danger"/>
+	<tml:{div} unless="_msg">
+		Möchten Sie die ausgewählte(n) Seite(n) inklusiver aller Inhaltsversionen und Unterseiten wirklich löschen?
+	</tml:{div}>
+</div>
+
+<div class="footer">
+	<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+	<tml:button cssclass="btn btn-primary" clickaction="delete-pages" unless="_msg">Löschen</tml:button>
+</div>

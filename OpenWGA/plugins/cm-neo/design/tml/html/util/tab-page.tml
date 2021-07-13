@@ -1,0 +1,9 @@
+<tml:script>
+	var tab_pages = _tab_pages || WGA.createList()
+	tab_pages.add({
+		id: option("id"),
+		title: option("title"),
+		body: option("body")
+	})
+	WGA.TMLPage.setVar("_tab_pages", tab_pages)
+</tml:script>
