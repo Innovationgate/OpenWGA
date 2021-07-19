@@ -53,22 +53,24 @@ public class DBLoginInfo implements java.io.Serializable {
         private static final long serialVersionUID = 3L;
         
         private String _userName;
+        private String _dn;
 		private Object _credentials;
 		private String _accessFilter;
 		private AuthType _authenticationType;
 		
 		private Map<String,String> _dbAccessFilters;
 		
-		public DBLoginInfo(String name, Object credentials, AuthType loginType) {
-		    this(name, credentials, loginType, null, null);
+		public DBLoginInfo(String name, Object credentials, AuthType loginType, String dn) {
+		    this(name, credentials, loginType, null, null, dn);
 		}
-		
-		public DBLoginInfo(String name, Object credentials, AuthType loginType, String accessFilter, Map<String,String> dbAccessFilters) {
+
+		public DBLoginInfo(String name, Object credentials, AuthType loginType, String accessFilter, Map<String,String> dbAccessFilters, String dn) {
 			_userName = name;
 			_credentials = credentials;
 			_authenticationType = loginType;
 			_accessFilter = accessFilter;
 			_dbAccessFilters = (dbAccessFilters != null ? dbAccessFilters : new ConcurrentHashMap<String, String>());
+			_dn = dn;
 		}
 		
 		public static DBLoginInfo createFromHttpCredentials(String usercredentials) throws IOException {
@@ -90,7 +92,7 @@ public class DBLoginInfo implements java.io.Serializable {
 			String userName = userPass.substring(0, p);
 			String credentials = userPass.substring(p+1);
 			
-			return new DBLoginInfo(userName, credentials, AuthType.PASSWORD);
+			return new DBLoginInfo(userName, credentials, AuthType.PASSWORD, null);
 		}
 		
 	/**
@@ -204,6 +206,15 @@ public class DBLoginInfo implements java.io.Serializable {
 
     public boolean isAnonymous(){
     	return getUserName().equals(WGDatabase.ANONYMOUS_USER);
+    }
+    
+    public String getDN(){
+    	if(_dn!=null)
+    		return _dn;
+    	else return _userName;
+    }
+    void setDN(String name){
+    	_dn = name;
     }
     
 }

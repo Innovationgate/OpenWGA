@@ -123,6 +123,9 @@ public class WGUserAccess {
     public String getPrimaryName() {
     	return _primaryName;
     }
+    void setPrimaryName(String name) {
+    	_primaryName = name;
+    }
 
     protected WGUserAccess applyUserAccessFilter(UserAccessFilter filter) throws WGAPIException {
 
