@@ -35,7 +35,8 @@
 					<div class="url"><tml:script>
 						var url = WGA.urlBuilder(this);
 						url.setHost("meine-domain.com");
-						url.setPort(80);
+						url.setProtocol("https");
+						url.setPort(443);
 						// check titlePath
 						var tpm = db().getAttribute(WGA.getCore().DBATTRIB_TITLEPATHMANAGER);
 						if(tpm && url.getPath()!="/"){
