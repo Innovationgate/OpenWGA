@@ -85,26 +85,41 @@ public class LuceneIndexConfiguration extends ConfigBean {
     }
 
     public List<LuceneIndexItemRule> getItemRules() {
-    	if (itemRules != null) {
-    		Iterator<LuceneIndexItemRule> itemRulesIt = itemRules.iterator();
-    		boolean hasDefaultRule = false;
-    		while (itemRulesIt.hasNext()) {
-    			LuceneIndexItemRule rule = itemRulesIt.next();
-    			if (rule.getItemExpression().equals(LuceneIndexItemRule.DEFAULT_RULE.getItemExpression())) {
-    				hasDefaultRule = true;
-    				break;
-    			}
-    		}
-    		if (!hasDefaultRule) {
-    			itemRules.add(LuceneIndexItemRule.DEFAULT_RULE);
-    		}
-    		Collections.sort(itemRules, LuceneIndexItemRule.COMPARATOR);
-    	}
         return itemRules;
     }
 
     public List<LuceneIndexFileRule> getFileRules() {
-    	if (fileRules != null) {
+        return fileRules;
+    }
+    
+	public void setItemRules(List<LuceneIndexItemRule> itemRules) {
+		if (itemRules == null) {
+			this.itemRules = new ArrayList<LuceneIndexItemRule>();
+			this.itemRules.add(LuceneIndexItemRule.DEFAULT_RULE);
+		} else {
+			boolean hasDefaultRule = false;
+			Iterator<LuceneIndexItemRule> itemRulesIt = itemRules.iterator();
+			while (itemRulesIt.hasNext()) {
+				LuceneIndexItemRule rule = itemRulesIt.next();
+				if (rule.getItemExpression().equals(LuceneIndexItemRule.DEFAULT_RULE.getItemExpression())) {
+					hasDefaultRule = true;
+					break;
+				}
+			}
+			if (!hasDefaultRule) {
+				itemRules.add(LuceneIndexItemRule.DEFAULT_RULE);
+			}
+			this.itemRules = itemRules;
+		}
+
+		Collections.sort(itemRules, LuceneIndexItemRule.COMPARATOR);
+	}
+
+	public void setFileRules(List<LuceneIndexFileRule> fileRules) {
+		if (fileRules == null) {
+			this.fileRules = new ArrayList<LuceneIndexFileRule>();
+			this.fileRules.add(LuceneIndexFileRule.DEFAULT_RULE);
+		} else {
     		Iterator<LuceneIndexFileRule> fileRulesIt = fileRules.iterator();
     		boolean hasDefaultRule = false;
     		while (fileRulesIt.hasNext()) {
@@ -117,26 +132,6 @@ public class LuceneIndexConfiguration extends ConfigBean {
     		if (!hasDefaultRule) {
     			fileRules.add(LuceneIndexFileRule.DEFAULT_RULE);
     		}
-    		Collections.sort(fileRules, LuceneIndexFileRule.COMPARATOR);
-    	}
-        return fileRules;
-    }
-    
-	public void setItemRules(List<LuceneIndexItemRule> itemRules) {
-		if (itemRules == null) {
-			this.itemRules = new ArrayList<LuceneIndexItemRule>();
-			this.itemRules.add(LuceneIndexItemRule.DEFAULT_RULE);
-		} else {
-			this.itemRules = itemRules;
-		}
-		Collections.sort(itemRules, LuceneIndexItemRule.COMPARATOR);
-	}
-
-	public void setFileRules(List<LuceneIndexFileRule> fileRules) {
-		if (fileRules == null) {
-			this.fileRules = new ArrayList<LuceneIndexFileRule>();
-			this.fileRules.add(LuceneIndexFileRule.DEFAULT_RULE);
-		} else {
 			this.fileRules = fileRules;
 		}
 		Collections.sort(fileRules, LuceneIndexFileRule.COMPARATOR);
@@ -150,8 +145,8 @@ public class LuceneIndexConfiguration extends ConfigBean {
 		if (errors.size() - errorCount <= 0) {
 			// no integrity errors so far			
 			// sort rules
-			Collections.sort(itemRules, LuceneIndexItemRule.COMPARATOR);
-			Collections.sort(fileRules, LuceneIndexFileRule.COMPARATOR);
+			//Collections.sort(itemRules, LuceneIndexItemRule.COMPARATOR);
+			//Collections.sort(fileRules, LuceneIndexFileRule.COMPARATOR);
 		
 			if (!integrityCheckOnly) {
 				// check for duplicate item rules and default rule
