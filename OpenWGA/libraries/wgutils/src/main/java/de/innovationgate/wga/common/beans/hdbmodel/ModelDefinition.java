@@ -71,7 +71,9 @@ public class ModelDefinition implements DocumentParent, CustomParamsCarrier {
             @Override
             public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
 
-                if (systemId.equals("http://doc.openwga.com/hdb-model-definition-6.0.dtd")) {
+                if (systemId.equals("http://doc.openwga.com/hdb-model-definition-6.0.dtd")
+                		|| systemId.equals("https://doc.openwga.com/hdb-model-definition-6.0.dtd")
+                ) {
                     return new InputSource(ModelDefinition.class.getClassLoader().getResourceAsStream(WGUtils.getPackagePath(ModelDefinition.class) + "/hdb-model-definition-6.0.dtd"));
                 } else {
                     // use the default behaviour
