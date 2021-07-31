@@ -62,7 +62,19 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 		
 		$("#dialog-content-modules").on("click", "[data-button=expand-all]", function(e){
 			e.preventDefault();
-			$("#module-tree .node").removeClass("collapsed")
+			if(selected_tree_node){
+				selected_tree_node.find(".node").removeClass("collapsed")
+				selected_tree_node.removeClass("collapsed")
+			}
+			else $("#module-tree .node").removeClass("collapsed")
+		})
+		$("#dialog-content-modules").on("click", "[data-button=collapse-all]", function(e){
+			e.preventDefault();
+			if(selected_tree_node){
+				selected_tree_node.find(".node").addClass("collapsed")
+				selected_tree_node.addClass("collapsed")
+			}
+			else $("#module-tree .node").addClass("collapsed")
 		})
 		$("#dialog-content-modules").on("click", "[data-button=delete]", deleteModuleClick)
 		$("#dialog-content-modules").on("click", "[data-action=save-modules]", saveModulesClick)
