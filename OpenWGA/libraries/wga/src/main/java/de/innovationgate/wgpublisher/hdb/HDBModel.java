@@ -824,7 +824,9 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
         
         Iterator<Content> modelList = getModelsForContentClass(contentClass, potentialParent, forceRelative).iterator();
         while (modelList.hasNext()) {
-            Document contentClassModel = (Document) modelList.next();
+        	Content contentClassModel = modelList.next();
+        	if(contentClassModel.isRecursive())
+        		return potentialParent;
             DocumentParent parentModel = _definition.getDocumentParent(contentClassModel);
             WGContent parent = findContentForModel(potentialParent, parentModel, false);
             if (parent != null) {

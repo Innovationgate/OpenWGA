@@ -26,7 +26,6 @@
 package de.innovationgate.wga.common.beans.hdbmodel;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,7 +38,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.ElementList;
-import org.simpleframework.xml.ElementMap;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.core.Commit;
 import org.simpleframework.xml.util.Dictionary;
@@ -60,6 +58,10 @@ public class Content implements Document, DocumentParent, CustomParamsCarrier {
     @Attribute(name="contentclass")
     @XmlAttribute(name="contentClass")
     private String _contentClass;
+
+    @Attribute(name="recursive",required=false)
+    @XmlAttribute(name="recursive")
+    private boolean _recursive;
     
     @ElementList(inline=true,required=false)
     @XmlElementWrapper(name="items")
@@ -131,6 +133,8 @@ public class Content implements Document, DocumentParent, CustomParamsCarrier {
         List<Document> docs = new ArrayList<Document>();
         docs.addAll(getChildStorages());
         docs.addAll(getChildSingletonContents());
+        if(isRecursive())
+        	docs.add(this);
         return docs;
     }
     
@@ -170,5 +174,11 @@ public class Content implements Document, DocumentParent, CustomParamsCarrier {
         return getContentClass();
     }
 
+    public boolean isRecursive(){
+    	return _recursive;
+    }
+    void setRecursive(boolean value){
+    	_recursive = value;
+    }
 
 }
