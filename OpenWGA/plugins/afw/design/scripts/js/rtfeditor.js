@@ -43,9 +43,13 @@ define(["jquery"], function($){
 						editor.insertHTML("<br>")
 						ev.preventDefault();
 					}
+					/*
 					else if(!para){
-						editor.execCmd("formatBlock", "p")
+						if(editor.textblock)
+							editor.insertHTML("<br>");
+						else editor.execCmd("formatBlock", "p")
 					}
+					*/
 				}
 			},
 			"keyup focus click": function(ev){
