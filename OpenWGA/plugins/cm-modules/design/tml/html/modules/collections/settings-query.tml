@@ -59,7 +59,7 @@
 <label><tml:label key="collections.layout"/>:</label>
 <div style="margin:10px">
 	<tml:input type="select" name="{scoped:layout}" 
-			options="Link-List|link-list,News collection|news-list,Caroussel|caroussel"
+			options="Link-List|link-list,News collection|news-list,Karoussel|caroussel,Kacheln|tiles"
 			changeaction="$refresh" ajax="true"
 			cssstyle="width:100%" mode="{option('mode')}"/>
 </div>

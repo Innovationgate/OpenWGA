@@ -1,0 +1,13 @@
+function Controller() {
+}
+
+Controller.prototype.prepare = function() {
+}
+
+Controller.prototype.bg_image_style = function($cx) {
+	var filename = $cx.content().getPrimaryFileName();
+	if(filename)
+		return "background-image:url('" + $cx.fileURL(filename) + "')"
+	else return ""
+}
+
