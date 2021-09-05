@@ -488,6 +488,11 @@ define(["jquery"], function($){
 			key: url
 		}
 		
+		/*
+		 * The Link may be created via paste from another OpenWGA website.
+		 * In this case we treat the link as "exturl" although linkinfo says something else.
+		 * We check this by comparing the domain part of the url with the currently used domain. 
+		 */
 		var urlinfo = tag.getAttribute("data-wga-urlinfo") || tag.getAttribute("wga:urlinfo");
 		if(urlinfo && domain==document.domain) {
 			var parts = urlinfo.split("|");
