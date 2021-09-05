@@ -34,7 +34,8 @@
 	
 	<div class="content form-horizontal">
 	
-		<tml:[form-field] o_label="Typ" o_name="type" o_type="select" o_options="Externer Link|exturl,Interner Link|int,Link auf Datei aus diesem Dokument|intfile,Link auf Datei aus beliebigem Dokument|extfile" o_default="{$option_dialog_options.type||'exturl'}"
+		<tml:[form-field] o_label="Typ" o_name="type" o_type="select" o-optionvalues="$mc.link_types" 
+			o-default="$mc.defaultLinkType"
 			o_changeaction="clear-key"
 		/>
 		<tml:select switch="tmlform.type">
@@ -55,6 +56,18 @@
 				<tml:[form-field] o_label="URL" o_name="url" 
 					o_default="{$option_dialog_options.key || $option_dialog_options.url}"
 					o_placeholder="vollständige absolute URL ..."
+				/>
+			</tml:case>
+			<tml:case value="layout">
+				<tml:[form-field] o_label="Layout" o_name="layout" 
+					o_default="{$option_dialog_options.key}"
+					o_placeholder="Name des Layouts ..."
+				/>
+			</tml:case>
+			<tml:case value="scriptlet">
+				<tml:[form-field] o_label="Link" o_name="scriptlet" o_type="select" o-optionvalues="$mc.scriptlet_links"
+					o_default="{$option_dialog_options.key}"
+					o_placeholder="Name des Links ..."
 				/>
 			</tml:case>
 
@@ -191,6 +204,26 @@
 				a = editor.createLink(url, url, "exturl");
 				editor.setURLInfo(a, {type:"exturl", key:url})
 			}
+			else if(type=="layout"){
+				var layout = $("[name=layout]", form).val();
+				if(!layout){
+					alert("Bitte geben Sie ein Layout ein.");
+					$("[name=layout]", form).focus();
+					return;
+				}
+				a = editor.createLink("layouturl", layout, "layout");
+				editor.setURLInfo(a, {type:"layout", key:layout})
+			}
+			else if(type=="scriptlet"){
+				var scriptlet = $("[name=scriptlet]", form).val();
+				if(!scriptlet){
+					alert("Bitte wählen Sie einen Link aus.");
+					$("[name=scriptlet]", form).focus();
+					return;
+				}
+				a = editor.createLink("scriptlet", scriptlet, "scriptlet");
+				editor.setURLInfo(a, {type:"scriptlet", key:scriptlet})
+			}
 			else if(type=="intfile"){
 				var key = $("[name=key]", form).val();	// filename
 				if(!key){
@@ -294,6 +327,26 @@
 					key: container+"." + lang + ".0/"+filename
 							+ (dbkey=="this" ? "" :  "/"+dbkey)
 				})
+			}
+
+			else if(type=="layout"){
+				var layout = $("[name=layout]", form).val();
+				if(!layout){
+					alert("Bitte geben Sie ein Layout ein.");
+					$("[name=layout]", form).focus();
+					return;
+				}
+				editor.setURLInfo(a, {type:"layout", key:layout})
+			}
+
+			else if(type=="scriptlet"){
+				var scriptlet = $("[name=scriptlet]", form).val();
+				if(!scriptlet){
+					alert("Bitte wählen Sie einen Link aus.");
+					$("[name=scriptlet]", form).focus();
+					return;
+				}
+				editor.setURLInfo(a, {type:"scriptlet", key:scriptlet})
 			}
 
 			else{	// exturl

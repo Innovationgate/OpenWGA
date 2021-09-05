@@ -9,7 +9,6 @@ define([
 	
 	function makeScriptlets(html){
 		// use browsers dom as HTML parser:
-		
 		var el = $("<div></div>").html(html);
 		
 		$("a", el).each(function(){
@@ -35,6 +34,14 @@ define([
 					break;
 				case "intfile":
 					link.setAttribute("wga:href", "{%!fileurl:"+wgakey+"%}");
+					link.removeAttribute("href");
+					break;
+				case "layout":
+					link.setAttribute("wga:href", "{%!layouturl:"+wgakey+"%}");
+					link.removeAttribute("href");
+					break;
+				case "scriptlet":
+					link.setAttribute("wga:href", "{%!"+wgakey+"%}");
 					link.removeAttribute("href");
 					break;
 				case "file":
