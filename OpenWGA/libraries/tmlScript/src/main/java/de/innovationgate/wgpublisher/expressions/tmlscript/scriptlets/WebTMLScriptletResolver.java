@@ -46,6 +46,7 @@ import de.innovationgate.wga.server.api.GlobalExpressionScope;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGPDispatcher;
+import de.innovationgate.wgpublisher.design.OverlayDesignProvider;
 import de.innovationgate.wgpublisher.expressions.ExpressionEngine;
 import de.innovationgate.wgpublisher.expressions.ExpressionResult;
 import de.innovationgate.wgpublisher.expressions.tmlscript.RhinoExpressionEngine;
@@ -258,6 +259,9 @@ public class WebTMLScriptletResolver {
         else if (command.equalsIgnoreCase("filelink") || command.equalsIgnoreCase("fileurl") || command.equalsIgnoreCase("imgurl")) {
             return macroFileURL(context, command, param, engineParams);            
         }
+        else if (command.equalsIgnoreCase("layouturl")) {
+            return macroLayoutURL(context, param, engineParams);
+        }
         else if (command.equalsIgnoreCase("srcset")) {
             return macroSrcset(context, param, engineParams);
         }
@@ -292,7 +296,29 @@ public class WebTMLScriptletResolver {
         
     }
 
-    private String macroContentURL(TMLContext context, String param) throws UnsupportedEncodingException, WGException {
+    private String macroLayoutURL(TMLContext context, String param, Map<String, Object> engineParams) throws WGException {
+    	String dbKey = context.db().getDbReference();
+    	String layout = null;
+    	String defaultMediaKey = (String) context.getwgacore().readPublisherOptionOrDefault(context.db(), WGACore.DBATTRIB_DEFAULT_MEDIAKEY);
+    	if(param==null)
+    		return "";
+		List<String> parms = WGUtils.deserializeCollection(param, ",", true);
+        if (parms.size() == 2) {
+            dbKey = (String) parms.get(0);
+            layout = (String) parms.get(1);
+        }
+        else if (parms.size() == 1) {
+        	layout = (String) parms.get(0);
+        }
+        else return "";
+        
+        Design design = WGA.get(context).design(dbKey);
+        if(design.isCustomized())
+        	design = design.resolve(OverlayDesignProvider.OVERLAY_FOLDER);
+        return design.resolve(layout).layoutURL(defaultMediaKey);
+	}
+
+	private String macroContentURL(TMLContext context, String param) throws UnsupportedEncodingException, WGException {
         
         
         String dbKey = null;
