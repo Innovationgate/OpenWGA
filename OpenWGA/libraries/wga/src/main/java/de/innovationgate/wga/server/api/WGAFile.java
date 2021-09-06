@@ -39,15 +39,8 @@ public class WGAFile {
 		public ZipStream(OutputStream out){
 			_out = new ZipOutputStream(out);
 		}
-		
-		public ZipStream addEntry(String filename, InputStream in) throws IOException{
-			return addEntry(filename, in, null);
-		}
-		
-		public ZipStream addEntry(String filename, InputStream in, String folder) throws IOException{
-			String path = filename;
-			if(folder!=null)
-				path = folder + "/" + filename;
+				
+		public ZipStream addEntry(String path, InputStream in) throws IOException{
 			_out.putNextEntry(new ZipEntry(path));
 			IOUtils.copy(in, _out);
 			_out.closeEntry();
@@ -61,34 +54,34 @@ public class WGAFile {
 		}
 
 		public ZipStream addFile(WGAFile wgafile) throws IOException{
-			return addFile(wgafile, null);
+			return addFile(wgafile, wgafile.getFile().getName());
 		}
-		public ZipStream addFile(WGAFile wgafile, String folder) throws IOException{
-			return addFile(wgafile.getFile(), folder);
+		public ZipStream addFile(WGAFile wgafile, String path) throws IOException{
+			return addFile(wgafile.getFile(), path);
 		}
 		
 		public ZipStream addFile(File file) throws IOException{
-			return addFile(file, null);
+			return addFile(file, file.getName());
 		}
-		public ZipStream addFile(File file, String folder) throws IOException{
+		public ZipStream addFile(File file, String path) throws IOException{
 			try(FileInputStream in = new FileInputStream(file)){
-				addEntry(file.getName(), in, folder);
+				addEntry(path, in);
 			}
 			return this;
 		}
 		
 		public ZipStream addFile(WGDocument doc, String filename) throws IOException, WGAPIException{
-			return addFile(doc, filename, null);
+			return addFile(doc, filename, filename);
 		}
-		public ZipStream addFile(WGDocument doc, String filename, String folder) throws IOException, WGAPIException{
-			return addEntry(filename, doc.getFileData(filename), folder);
+		public ZipStream addFile(WGDocument doc, String filename, String path) throws IOException, WGAPIException{
+			return addEntry(path, doc.getFileData(filename));
 		}
 		
 		public ZipStream addFile(TMLContext ctx, String filename) throws IOException, WGAPIException{
-			return addFile(ctx, filename, null);
+			return addFile(ctx, filename, filename);
 		}
-		public ZipStream addFile(TMLContext ctx, String filename, String folder) throws IOException, WGAPIException{
-			return addFile(ctx.content(), filename, folder);
+		public ZipStream addFile(TMLContext ctx, String filename, String path) throws IOException, WGAPIException{
+			return addFile(ctx.content(), filename, path);
 		}
 		
 		public void close() throws IOException{
