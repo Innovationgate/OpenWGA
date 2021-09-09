@@ -39,30 +39,49 @@ public class WGAFile {
 		public ZipStream(OutputStream out){
 			_out = new ZipOutputStream(out);
 		}
-		
-		public ZipStream addEntry(String filename, InputStream in) throws IOException{
-			_out.putNextEntry(new ZipEntry(filename));
+				
+		public ZipStream addEntry(String path, InputStream in) throws IOException{
+			_out.putNextEntry(new ZipEntry(path));
 			IOUtils.copy(in, _out);
 			_out.closeEntry();
 			return this;
 		}
 		
+		// must only be used for empty folder
+		public ZipStream addFolder(String folder) throws IOException{
+			_out.putNextEntry(new ZipEntry(folder+"/"));
+			return this;
+		}
+
 		public ZipStream addFile(WGAFile wgafile) throws IOException{
-			return addFile(wgafile.getFile());
+			return addFile(wgafile, wgafile.getFile().getName());
+		}
+		public ZipStream addFile(WGAFile wgafile, String path) throws IOException{
+			return addFile(wgafile.getFile(), path);
 		}
 		
 		public ZipStream addFile(File file) throws IOException{
+			return addFile(file, file.getName());
+		}
+		public ZipStream addFile(File file, String path) throws IOException{
 			try(FileInputStream in = new FileInputStream(file)){
-				addEntry(file.getName(), in);
+				addEntry(path, in);
 			}
 			return this;
 		}
 		
 		public ZipStream addFile(WGDocument doc, String filename) throws IOException, WGAPIException{
-			return addEntry(filename, doc.getFileData(filename));
+			return addFile(doc, filename, filename);
 		}
+		public ZipStream addFile(WGDocument doc, String filename, String path) throws IOException, WGAPIException{
+			return addEntry(path, doc.getFileData(filename));
+		}
+		
 		public ZipStream addFile(TMLContext ctx, String filename) throws IOException, WGAPIException{
-			return addFile(ctx.content(), filename);
+			return addFile(ctx, filename, filename);
+		}
+		public ZipStream addFile(TMLContext ctx, String filename, String path) throws IOException, WGAPIException{
+			return addFile(ctx.content(), filename, path);
 		}
 		
 		public void close() throws IOException{

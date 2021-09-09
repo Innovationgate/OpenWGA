@@ -1743,7 +1743,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	    else if (name.equalsIgnoreCase("username")) {
 	        DBLoginInfo loginInfo = WGACore.getSessionLogins(gethttpsession()).get(domainName);
 	        if (loginInfo != null) {
-	            return loginInfo.getUserName();
+	            return loginInfo.getDN();
 	        }
 	        else {
 	            return WGDatabase.ANONYMOUS_USER;

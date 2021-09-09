@@ -1615,10 +1615,15 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         DBLoginInfo oldLoginInfo = sessionLoginsMap.get(db.getAttribute(DBATTRIB_DOMAIN));
         DBLoginInfo loginInfo;
         if (oldLoginInfo != null) {
-            loginInfo = new DBLoginInfo(db.getSessionContext().getUser(), db.getSessionContext().getCredentials(), authType, oldLoginInfo.getAccessFilter(), oldLoginInfo.getDbAccessFilters());
+            loginInfo = new DBLoginInfo(db.getSessionContext().getUser(), 
+            		db.getSessionContext().getCredentials(), 
+            		authType, 
+            		oldLoginInfo.getAccessFilter(), 
+            		oldLoginInfo.getDbAccessFilters(),
+            		oldLoginInfo.getDN());
         }
         else {
-            loginInfo = new DBLoginInfo(db.getSessionContext().getUser(), db.getSessionContext().getCredentials(), authType);
+            loginInfo = new DBLoginInfo(db.getSessionContext().getUser(), db.getSessionContext().getCredentials(), authType, null);
         }
         
         if (oldLoginInfo == null || !oldLoginInfo.equals(loginInfo)) {
@@ -7989,7 +7994,8 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
     }
     
     public boolean login(String user, Object password, String domain, HttpServletRequest request, HttpServletResponse response) throws WGException {
-        // Get the domain configuration
+    	String dn=null;
+    	// Get the domain configuration
         WGADomain domainConfig = getDomains(domain);
         if (domainConfig == null) {
             throw new LoginException("The domain '" + domain + "' does not exist");
@@ -8003,7 +8009,7 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
                 AuthenticationSession authSession = getBruteForceLoginBlocker().login(domainConfig, user, password, request);
                 if (authSession != null) {
                     isLoginSuccessful = true;
-                    user = authSession.getDistinguishedName();
+                    dn = authSession.getDistinguishedName();
                 }
             }
             catch (AuthenticationException e) {
@@ -8053,7 +8059,7 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
             // First do a logout for sure
             logout(domain, request.getSession(), request, response, true);
             
-            getSessionLogins(request.getSession()).put(domain, new DBLoginInfo(user, password, DBLoginInfo.AuthType.PASSWORD));
+            getSessionLogins(request.getSession()).put(domain, new DBLoginInfo(user, password, DBLoginInfo.AuthType.PASSWORD, dn));
             
             WGA wga = WGA.get(request, response, this);
             

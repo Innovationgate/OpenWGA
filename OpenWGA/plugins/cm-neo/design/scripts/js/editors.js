@@ -9,7 +9,6 @@ define([
 	
 	function makeScriptlets(html){
 		// use browsers dom as HTML parser:
-		
 		var el = $("<div></div>").html(html);
 		
 		$("a", el).each(function(){
@@ -35,6 +34,14 @@ define([
 					break;
 				case "intfile":
 					link.setAttribute("wga:href", "{%!fileurl:"+wgakey+"%}");
+					link.removeAttribute("href");
+					break;
+				case "layout":
+					link.setAttribute("wga:href", "{%!layouturl:"+wgakey+"%}");
+					link.removeAttribute("href");
+					break;
+				case "scriptlet":
+					link.setAttribute("wga:href", "{%!"+wgakey+"%}");
 					link.removeAttribute("href");
 					break;
 				case "file":
@@ -74,11 +81,11 @@ define([
 						if(img.style.width){
 							var w = img.style.width.indexOf("px");
 							if(w)
-								filename += "?width~"+img.style.width.substr(0, w);
+								filename += "?width~"+parseInt(img.style.width.substr(0, w));
 						}
 						else if(img.style.height){
 							var h = img.style.height.indexOf("px");
-							filename += "?height~"+img.style.height.substr(0, h);
+							filename += "?height~"+parseInt(img.style.height.substr(0, h));
 						}
 					}
 					
@@ -102,11 +109,11 @@ define([
 						if(img.style.width){
 							var index = img.style.width.indexOf("px");
 							if(index)
-								wgakey += "?width~"+img.style.width.substr(0, index);
+								wgakey += "?width~"+parseInt(img.style.width.substr(0, index));
 						}
 						else if(img.style.height){
 							var index = img.style.height.indexOf("px");
-							wgakey += "?height~"+img.style.height.substr(0, index);
+							wgakey += "?height~"+parseInt(img.style.height.substr(0, index));
 						}
 					}
 					
@@ -415,7 +422,7 @@ define([
 			else item_el.append($("<input>", {
 				"type": "text",
 				"class": "text-editor-input",
-				"style": "width:" + (this.data_type=="number"||this.data_type=="date" ? "100px" : "100%")
+				"style": "width:" + (this.data_type=="number"||this.data_type=="date" ? "5em" : "100%")
 			}))
 			var unencoded_val = $(".WGA-Item-Value-Unencoded", item_el).text()
 			edit_el = item_el.find("input,textarea")

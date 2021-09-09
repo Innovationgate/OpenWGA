@@ -592,7 +592,7 @@ this.csvWriter = function(config){
 		if(value instanceof Packages.java.util.Date)
 			line += WGA.format(value, config.dateFormat || "yyyy-MM-dd HH:mm:ss")
 		else if(typeof(value)=="string")
-			line += '"' + (value||"").replace(/\"/g, "'").replace(/[\r\n]/g, "") + '"';
+			line += '"' + (value||"").replace(/\"/g, "'").replace(/[\r]/g, "") + '"';
 		else line += (value==null ? "" : value)
 	}
 

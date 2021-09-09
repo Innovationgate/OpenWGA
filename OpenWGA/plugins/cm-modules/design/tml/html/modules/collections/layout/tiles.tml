@@ -1,0 +1,13 @@
+<tml:foreach sourcetag="{scoped:child-collection}" 
+		id="{scoped:child-collection-loop}"
+		pagesize="{$option_entries||0}"
+		offset="{$option_offset}"
+>
+	<div class="tile">
+		<a href="<tml:url/>" class="content">
+			<div class="bg" style="<tml:item name="$mc.bg_image_style"/>"></div>
+			<p class="title"><tml:script expression="BROWSERTITLE||TITLE" encode="html"/></p>
+			<p class="intro"><tml:meta name="DESCRIPTION"/></p>
+		</a>
+	</div>
+</tml:foreach>

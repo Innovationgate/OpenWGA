@@ -1,0 +1,7 @@
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_children, .module-cm_query">
+
+	".tiles .tile": {
+		width: "100%",
+	}
+
+</tml:include>

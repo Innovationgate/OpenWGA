@@ -43,9 +43,13 @@ define(["jquery"], function($){
 						editor.insertHTML("<br>")
 						ev.preventDefault();
 					}
+					/*
 					else if(!para){
-						editor.execCmd("formatBlock", "p")
+						if(editor.textblock)
+							editor.insertHTML("<br>");
+						else editor.execCmd("formatBlock", "p")
 					}
+					*/
 				}
 			},
 			"keyup focus click": function(ev){
@@ -484,6 +488,11 @@ define(["jquery"], function($){
 			key: url
 		}
 		
+		/*
+		 * The Link may be created via paste from another OpenWGA website.
+		 * In this case we treat the link as "exturl" although linkinfo says something else.
+		 * We check this by comparing the domain part of the url with the currently used domain. 
+		 */
 		var urlinfo = tag.getAttribute("data-wga-urlinfo") || tag.getAttribute("wga:urlinfo");
 		if(urlinfo && domain==document.domain) {
 			var parts = urlinfo.split("|");

@@ -23,6 +23,36 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_children .tiles, .module-cm_query .tiles">
+
+	display: "flex",
+	"flex-wrap": "wrap",
+	margin: "0 -10px",
+	".tile": {
+		"box-sizing": "border-box",
+		padding: "10px",
+		".content": {
+			display: "block",
+			"text-decoration": "none",
+			"box-sizing": "border-box",
+			border: "solid silver 1px",
+			height: "100%",
+			".bg": {
+				height: 200,
+				background_:{
+					size: "cover",
+					repeat: "no-repeat",
+					position: "center center"
+				}
+			},
+			".title, .intro":{
+				margin: "10px"
+			}		
+		}
+	}
+
+</tml:include>
+
 .module .news-collection .news{
 	clear: both;
 	border-bottom: dotted silver 1px;
@@ -89,6 +119,8 @@
 	border-top: none;
 	margin-top: 0px;
 }
+
+
 
 .caroussel{
 	text-align: left;

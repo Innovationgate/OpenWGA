@@ -22,6 +22,8 @@
 <!-- singleton-content=1 | filter=6 | relation=8 | custom=1 | item=3 | storage=8 -->
 	<!-- contentclass : ... -->
 	<!ATTLIST content contentclass CDATA #REQUIRED>
+	<!-- recursive : ... -->
+	<!ATTLIST content recursive (true|false) #IMPLIED>
 <!ELEMENT item (custom)* >
 <!-- custom=2 -->
 	<!-- name : ... -->

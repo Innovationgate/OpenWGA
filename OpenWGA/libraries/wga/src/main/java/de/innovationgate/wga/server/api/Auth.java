@@ -239,7 +239,15 @@ public class Auth {
         
     }
     
+    /**
+     * Fetches the common name if available
+     * @param dn
+     * @return common name if available or dn if not available
+     * @throws WGException
+     */
     public String fetchCommonName(String dn) throws WGException{
+    	if(dn.equalsIgnoreCase(WGDatabase.ANONYMOUS_USER))
+    		return dn;	// don't lookup anonymous user
     	String cn=null;
     	UserGroupInfo info = lookupDN(dn);
     	if(info != null && info instanceof LabeledNamesProvider)
@@ -343,8 +351,6 @@ public class Auth {
                 return logins.get(_domain);
             }
         }
-        
-        
         
         return null;
     }
@@ -458,7 +464,22 @@ public class Auth {
             return null;
         }
     }
-    
+
+    /**
+     * Returns the distinguished name of the current user. This may differ from the login-name.
+     * @return distinguished name (DN)
+     * @throws WGException
+     */
+    public String getUserName() throws WGException {
+        DBLoginInfo loginInfo = getLoginInfo();
+        if (loginInfo != null) {
+            return loginInfo.getDN();
+        }
+        else {
+            return null;
+        }
+    }
+
     /**
      * Returns the type of authentication that the user used to authenticate to the current domain. null if the user is not logged in.
      * Valid values: "password" (classic login via username/password), "cert" (client certificate), "request" (request metadata, like on most SSO solutions)

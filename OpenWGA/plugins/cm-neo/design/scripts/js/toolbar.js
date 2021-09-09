@@ -205,6 +205,10 @@ define(["cm", "sitepanel", "jquery", "bootstrap"], function(CM, Sitepanel, $){
 			CM.openDialog("delete-page")
 		}
 
+		,"preview": function(){
+			window.open(Sitepanel.getDocument().location.href, "preview")
+		}
+
 		,"seo": function(){
 			CM.openDialog("seo")
 		}

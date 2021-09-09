@@ -98,21 +98,20 @@ if (manager.isDisplayDefaultErrorPage()) {
 			
 			<% if (interpreter.getErrorCode() == 403 && interpreter.getDbHint() != null) {
 				
-				 de.innovationgate.wga.server.api.Domain domain = wga.database(interpreter.getDbHint()).domain();
-				 if (domain != null) {
-					 de.innovationgate.wga.server.api.Auth auth = domain.auth();
-					 if (auth.getLoginName() != null && auth.getAuthenticationType().equals("password")) {		
-			 %>
-	    <% } %>
-	    
-		<p style="padding:5px 0 25px 0">
-			Your are currently logged in as user '<%= wga.encode("html", auth.getLoginName()) %>'.
-			<br>
-			<button onclick="location.href='<%= wga.getRequest().getContextPath() %>/<%= interpreter.getDbHint() %>/logout'">Logout</button>
-		</p>
-		<%     }
-		 	 }
-		   } %>
+				de.innovationgate.wga.server.api.Domain domain = wga.database(interpreter.getDbHint()).domain();
+				if (domain != null) {
+					de.innovationgate.wga.server.api.Auth auth = domain.auth();
+					if (auth.getLoginName() != null && auth.getAuthenticationType().equals("password")) {		
+					%>
+						<p style="padding:5px 0 25px 0">
+							Your are currently logged in as user '<%= wga.encode("html", auth.getLoginName()) %>'.
+							<br>
+							<button onclick="location.href='<%= wga.getRequest().getContextPath() %>/<%= interpreter.getDbHint() %>/logout'">Logout</button>
+						</p>
+					<%}
+				 }
+			}
+		} %>
 		
 		<a href="#" onclick="document.getElementById('stackTrace').style.display='block';this.style.display='none';return false">Show details</a>
 		<div id="stackTrace" style="display:none">

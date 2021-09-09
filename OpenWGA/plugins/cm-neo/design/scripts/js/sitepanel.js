@@ -26,7 +26,7 @@ define(["cm", "jquery"], function(CM, $){
 
 	WGA.event.addListener("*", "attachments-updated", function(ev){
 		var _wga = getWindow().WGA
-		ev.params.filename && _wga && _wga.event.fireEvent("file-metas-updated", "cm-neo", ev.params)
+		ev.params.filename && _wga && _wga.event && _wga.event.fireEvent("file-metas-updated", "cm-neo", ev.params)
 	})
 	
 	$(document).on("click", "a[data-wgakey]", function(ev){

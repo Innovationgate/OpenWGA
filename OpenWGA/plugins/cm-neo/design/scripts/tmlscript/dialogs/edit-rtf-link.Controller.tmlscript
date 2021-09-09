@@ -1,0 +1,36 @@
+function Controller() {
+}
+
+Controller.prototype.prepare = function($cx) {
+	this.scriptlet_links = null;
+	var script = WGA.design($cx.db()).resolveSystemScriptModule("content-manager:scriptlet-links", "tmlscript")
+	if(script){
+		var mod = script.getTMLScriptModule()
+		try{
+			this.scriptlet_links = mod && WGA.tmlscript().runScript(mod.getCode())
+		}
+		catch(e){
+			logException(e);
+		}
+	}
+
+	this.link_types=[
+		"Externer Link|exturl",
+		"Interner Link|int",
+		"Link auf Datei aus diesem Dokument|intfile",
+		"Link auf Datei aus beliebigem Dokument|extfile"
+	]
+	if(this.scriptlet_links)
+		this.link_types.push("Projekt-Link|scriptlet")
+}
+
+Controller.prototype.defaultLinkType = function($option_dialog_options) {
+	if($option_dialog_options){
+		for(let i=0; i<this.link_types.length; i++){
+			var parts = this.link_types[i].split("|");
+			if($option_dialog_options.type == parts[1])
+				return $option_dialog_options.type
+		}
+	}
+	return "exturl"
+}

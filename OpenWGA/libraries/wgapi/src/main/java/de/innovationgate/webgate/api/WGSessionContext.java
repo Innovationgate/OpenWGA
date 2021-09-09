@@ -224,6 +224,7 @@ public class WGSessionContext implements LockOwner {
 		    this._user = authSession.getDistinguishedName();
 		    this._credentials = credentials;
 		}
+		userAccess.setPrimaryName(this._user);
 		
 		this._userAccess = userAccess;
 		this._originalUserAccess = originalUserAccess;

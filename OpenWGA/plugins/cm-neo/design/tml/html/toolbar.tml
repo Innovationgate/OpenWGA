@@ -168,8 +168,18 @@
 			<span class="icon glyphicon glyphicon-cloud-download"></span>
 			<div class="text">Ablehnen</div>
 		</a>
+
+		<div class="spacer"></div>
+		<a class="btn button" href="#" data-action="preview">
+			<span class="icon far fa-window-restore"></span>
+			<div class="text">Vorschau</div>
+		</a>
 		
 		<div class="pull-right">
+			<tml:comment><a class="btn button" href="#" data-action="preview">
+				<span class="icon far fa-window-restore"></span>
+				<div class="text">Vorschau</div>
+			</a></tml:comment>
 			<a class="btn button" href="#" data-action="seo">
 				<span class="icon glyphicon glyphicon-education"></span>
 				<div class="text">SEO</div>

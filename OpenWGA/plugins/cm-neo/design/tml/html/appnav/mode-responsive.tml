@@ -8,7 +8,7 @@
 		<i class="icon fas fa-tablet-alt"></i>
 		Tablet
 	</a>
-	<a href="#" data-width="400" class="phone">
+	<a href="#" data-width="375" class="phone">
 		<i class="icon fas fa-mobile-alt"></i>
 		Phone
 	</a>

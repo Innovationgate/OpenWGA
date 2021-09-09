@@ -117,18 +117,27 @@
 					</button>
 					<div class="dropdown-menu content-module-list"></div>
 				</div>
-				<button class="btn btn-default disabled" data-button="delete" title="Modul löschen">
-					<i class="far fa-trash-alt"></i>
-				</button>
-				<button class="btn btn-default disabled" data-button="duplicate" title="Modul duplizieren">
-					<i class="far fa-copy"></i>
-				</button>
+				<div class="btn-group">
+					<button class="btn btn-default disabled" data-button="delete" title="Modul löschen">
+						<i class="far fa-trash-alt"></i>
+					</button>
+					<button class="btn btn-default disabled" data-button="duplicate" title="Modul duplizieren">
+						<i class="far fa-copy"></i>
+					</button>
+				</div>
 			</tml:case>
-			<button class="btn btn-default"
-					title="Alle Bereiche ausklappen" 
-					data-button="expand-all" <tml:case condition="$option_mode=='edit'">style="margin-left:30px"</tml:case>>
-				<i class="fas fa-arrows-alt-v" style="transform: rotate(135deg)"></i>
-			</button>
+			<div class="btn-group" <tml:case condition="$option_mode=='edit'">style="margin-left:100px"</tml:case>>
+				<button class="btn btn-default"
+						title="Alle Bereiche ausklappen" 
+						data-button="expand-all">
+					<i class="fas fa-arrow-up" style="transform: rotate(135deg)"></i>
+				</button>
+				<button class="btn btn-default"
+						title="Alle Bereiche einklappen" 
+						data-button="collapse-all">
+					<i class="fas fa-arrow-down" style="transform: rotate(135deg)"></i>
+				</button>
+			</div>
 		</div>
 		
 		<div class="pull-right">
