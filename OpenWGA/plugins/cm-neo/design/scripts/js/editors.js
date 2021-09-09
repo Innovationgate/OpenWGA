@@ -81,11 +81,11 @@ define([
 						if(img.style.width){
 							var w = img.style.width.indexOf("px");
 							if(w)
-								filename += "?width~"+img.style.width.substr(0, w);
+								filename += "?width~"+parseInt(img.style.width.substr(0, w));
 						}
 						else if(img.style.height){
 							var h = img.style.height.indexOf("px");
-							filename += "?height~"+img.style.height.substr(0, h);
+							filename += "?height~"+parseInt(img.style.height.substr(0, h));
 						}
 					}
 					
@@ -109,11 +109,11 @@ define([
 						if(img.style.width){
 							var index = img.style.width.indexOf("px");
 							if(index)
-								wgakey += "?width~"+img.style.width.substr(0, index);
+								wgakey += "?width~"+parseInt(img.style.width.substr(0, index));
 						}
 						else if(img.style.height){
 							var index = img.style.height.indexOf("px");
-							wgakey += "?height~"+img.style.height.substr(0, index);
+							wgakey += "?height~"+parseInt(img.style.height.substr(0, index));
 						}
 					}
 					

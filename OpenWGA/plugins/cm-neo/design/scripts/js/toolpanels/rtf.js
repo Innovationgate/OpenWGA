@@ -256,9 +256,9 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 			w_el.css("color", img.prop("style").width ? "brown" : "gray")
 			
 			if(h_el.val() != img.height())
-				h_el.val(img.height());
+				h_el.val(parseInt(img.height()));
 			if(w_el.val() != img.width())
-				w_el.val(img.width());
+				w_el.val(parseInt(img.width()));
 		}
 	})
 	$("#rtf-tab-image [name=height]").on({
@@ -287,9 +287,9 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 			w_el.css("color", img.prop("style").width ? "brown" : "gray")
 			
 			if(h_el.val() != img.height())
-				h_el.val(img.height());
+				h_el.val(parseInt(img.height()));
 			if(w_el.val() != img.width())
-				w_el.val(img.width());
+				w_el.val(parseInt(img.width()));
 		}
 	})
 	
@@ -394,8 +394,8 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 				$("#editor-panel-rtf .img-options").show()
 				$("#editor-panel-rtf [data-id=image-info-wrapper]").show()
 				
-				$("#rtf-tab-image [name=width]").val(el.width).css("color", el.style.width?"brown":"gray")
-				$("#rtf-tab-image [name=height]").val(el.height).css("color", el.style.height?"brown":"gray")
+				$("#rtf-tab-image [name=width]").val(parseInt(el.width)).css("color", el.style.width?"brown":"gray")
+				$("#rtf-tab-image [name=height]").val(parseInt(el.height)).css("color", el.style.height?"brown":"gray")
 
 				var classes = el.className.split(" ");
 				if(options && options.imageStyleList && options.imageStyleList.length){
