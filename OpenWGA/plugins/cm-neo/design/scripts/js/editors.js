@@ -503,6 +503,7 @@ define([
 				$(".WGA-Custom-Form form input", item_el).first().focus();
 			},
 			update: function(){
+				Sitepanel.getWindow().onbeforeunload=null;
 				var form = $(".WGA-Custom-Form form", item_el)
 				form.submit()
 			}
