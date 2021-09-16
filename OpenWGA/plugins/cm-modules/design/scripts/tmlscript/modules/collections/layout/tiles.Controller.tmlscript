@@ -6,8 +6,37 @@ Controller.prototype.prepare = function() {
 
 Controller.prototype.bg_image_style = function($cx) {
 	var filename = $cx.content().getPrimaryFileName();
-	if(filename)
-		return "background-image:url('" + $cx.fileURL(filename) + "')"
+	if(filename){
+		var styles=[];
+		var url = $cx.fileURL(filename)
+		var option_imagederivates = $cx.option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES)
+		if(option_imagederivates){
+			var derivate = option_imagederivates; 
+			var max_width;
+			var match = /width~([0-9]+)/.exec(option_imagederivates)
+			if(match && match.length>0)
+				max_width = match[1]
+	
+			if(max_width){
+				var responsive = WGA.design($cx.db()).getGlobal("RESPONSIVE");
+				var imagederivates = max_width / 3;
+				if(responsive){
+					imagederivates = Math.max((responsive.small && responsive.small.maxPageWidth)||responsive.medium.width, imagederivates);
+					imagederivates = Math.max(imagederivates, responsive.medium.width/2);
+					derivate = "width~" + WGA.format(imagederivates, "0")
+				}
+			}
+		
+			url = WGA.urlBuilder(url).setParameter("derivate", derivate).build()
+			styles.push("background-image:url('" + url + "')")		
+			var imgSet = $cx.createImgSet(filename, derivate);
+			if(imgSet){
+				styles.push("background-image:image-set(" + imgSet + ")");
+			}
+		}
+		else styles.push("background-image:url('" + url + "')")
+		return styles.join(";")
+	}
 	else return ""
 }
 
