@@ -59,9 +59,13 @@ public class ContextWrapper extends NativeJavaObject {
             
             // Return props and methods of this TMLContext object
             if (super.has(argLC, arg1)) {
+            	// compatible with older version: try lower case 
                 return RhinoWrapFactory.notFoundToNull(super.get(argLC, arg1));
             }
-            
+            else if (super.has(arg0, arg1)) {
+            	// preferred: exact case
+                return RhinoWrapFactory.notFoundToNull(super.get(arg0, arg1));
+            }            
     		else {
     		    
     		    // Use as item or meta short form
