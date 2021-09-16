@@ -34,9 +34,7 @@ import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGFileAnnotations;
-import de.innovationgate.webgate.api.WGFileDerivateMetaData;
 import de.innovationgate.webgate.api.WGFileMetaData;
-import de.innovationgate.wga.config.FileDerivateManagerConfiguration;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wga.server.api.WGAAwareService;
 import de.innovationgate.wgpublisher.WGPDispatcher;
@@ -49,7 +47,7 @@ import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager.Derivat
  */
 public class SrcSetCreator implements WGAAwareService {
     
-    public static final List<Float> RATIOS = Arrays.asList(new Float[] {1.5f, 2f, 3f, 4f});
+    public static final List<Float> RATIOS = Arrays.asList(new Float[] {2f, 3f, 4f});
 
     private WGA _wga;
     
@@ -60,9 +58,23 @@ public class SrcSetCreator implements WGAAwareService {
      * @param md The file metadata of the original file
      * @param Usage of the derivate requested
      * @return The size of the largest visual representation of the given usage or null if no representation was found.
+     * @deprecated Use {@link #getMaxAvailableSize(WGFileMetaData, String)} instead: Parameter WGContent has never been used!
      * @throws WGException 
      */
     public Dimension getMaxAvailableSize(WGContent content, WGFileMetaData fileMeta, String usage) throws WGException {
+    	return getMaxAvailableSize(fileMeta, usage);
+    }
+
+    /**
+     * Creates a dimension object from the given file metadata, representing the maximum size that a visual representation of this file is available.
+     * May be the dimensions of the original file if it is an image.
+     * @param content The document holding the file
+     * @param md The file metadata of the original file
+     * @param Usage of the derivate requested
+     * @return The size of the largest visual representation of the given usage or null if no representation was found.
+     * @throws WGException 
+     */
+    public Dimension getMaxAvailableSize(WGFileMetaData fileMeta, String usage) throws WGException {
 
         if (fileMeta == null) {
             return null;
@@ -100,10 +112,22 @@ public class SrcSetCreator implements WGAAwareService {
      * May be the dimensions of the original file if it is an image.
      * @param content The document holding the file
      * @param md The file metadata of the original file
+     * @deprecated Use {@link #getMaxAvailableSize(WGFileMetaData)} instead: Parameter WGContent has never been used!
      * @throws WGException 
      */
     public Dimension getMaxAvailablePosterSize(WGContent content, WGFileMetaData fileMeta) throws WGException {
         return getMaxAvailableSize(content, fileMeta, WGFileAnnotations.USAGE_POSTER);
+    }
+
+    /**
+     * Creates a dimension object from the given file metadata, representing the maximum size that a poster representation of this file is available.
+     * May be the dimensions of the original file if it is an image.
+     * @param content The document holding the file
+     * @param md The file metadata of the original file
+     * @throws WGException 
+     */
+    public Dimension getMaxAvailablePosterSize(WGFileMetaData fileMeta) throws WGException {
+        return getMaxAvailableSize(fileMeta, WGFileAnnotations.USAGE_POSTER);
     }
     
     /**
@@ -117,6 +141,11 @@ public class SrcSetCreator implements WGAAwareService {
     public static String createSrcSet(WGA wga, URLBuilder fileUrl, boolean absoluteUrls) throws WGException {        
         return wga.service(SrcSetCreator.class).createSrcSet(fileUrl, absoluteUrls, null);
     }
+
+    public static String createSrcSet(WGA wga, URLBuilder fileUrl, boolean absoluteUrls, Dimension dim) throws WGException {        
+        return wga.service(SrcSetCreator.class).createSrcSet(fileUrl, absoluteUrls, dim);
+    }
+
     
     /**
      * Create srcset content for the given image URL.
@@ -126,6 +155,9 @@ public class SrcSetCreator implements WGAAwareService {
      * @throws WGException
      */
     public String createSrcSet(URLBuilder fileUrl, boolean absoluteUrls, Dimension maxAvailableSize) throws WGException {
+    	return createSrcSet(fileUrl, absoluteUrls, maxAvailableSize, false);
+    }
+    public String createSrcSet(URLBuilder fileUrl, boolean absoluteUrls, Dimension maxAvailableSize, boolean imgSet) throws WGException {
         
         try {
             // Pre-parse derivate query
@@ -181,7 +213,6 @@ public class SrcSetCreator implements WGAAwareService {
                             break;
                         }
                         
-                        DerivateQueryTerm heightTerm = derivateQuery.get(DerivateQuery.QUERYTERM_HEIGHT);
                         if (heightTermValue != -1 && (heightTermValue * ratio) > maxAvailableSize.getHeight()) {
                             break;
                         }
@@ -208,6 +239,8 @@ public class SrcSetCreator implements WGAAwareService {
                 }
                 
                 String url = absoluteUrls ? srcUrl.build(true) : srcUrl.buildLikeGiven();
+                if(imgSet)
+                	url = "url('" + url + "')";
                 sources.add(url + " " + ratio + "x");
             }
             
@@ -220,6 +253,7 @@ public class SrcSetCreator implements WGAAwareService {
         
     }
 
+    
     @Override
     public void injectWGA(WGA wga) {
         _wga = wga;
@@ -279,5 +313,43 @@ public class SrcSetCreator implements WGAAwareService {
         return createSrcSet(_wga.urlBuilder(fileUrl), false, maxAvailableSize);
     }
     
+    /**
+     * Static private method to create img-set or src-set for the given image
+     * @param ctx the TMLContext
+     * @param filename The file name
+     * @param derivateQuery the derivate query to be used
+     * @throws WGException
+     */
+    private static String createSrcSet(TMLContext ctx, String filename, String derivateQuery, boolean imgSet) throws WGException {
+    	WGA wga = WGA.get(ctx);
+    	SrcSetCreator ssc = wga.service(SrcSetCreator.class);
+    	WGFileMetaData fileMeta = ctx.content().getFileMetaData(filename);
+    	Dimension maxAvailableSize = ssc.getMaxAvailablePosterSize(fileMeta);
+    	URLBuilder builder = wga.urlBuilder(ctx.fileurl(filename));
+    	builder.setParameter(WGPDispatcher.URLPARAM_DERIVATE, derivateQuery);
+        return ssc.createSrcSet(builder, false, maxAvailableSize, imgSet);
+    }
 
+    /**
+     * Static method to create src-set for the given image
+     * @param ctx the TMLContext
+     * @param filename The file name
+     * @param derivateQuery the derivate query to be used
+     * @throws WGException
+     */
+    public static String createSrcSet(TMLContext ctx, String filename, String derivateQuery) throws WGException {
+    	return createSrcSet(ctx, filename, derivateQuery, false);
+    }
+
+    /**
+     * Static method to create img-set for the given image
+     * @param ctx the TMLContext
+     * @param filename The file name
+     * @param derivateQuery the derivate query to be used
+     * @throws WGException
+     */
+    public static String createImgSet(TMLContext ctx, String filename, String derivateQuery) throws WGException {
+    	return createSrcSet(ctx, filename, derivateQuery, true);
+    }
+    
 }

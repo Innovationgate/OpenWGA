@@ -4123,6 +4123,26 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         return lucenesearch(phrase, "db");
     }
     
+    /**
+     * create img-set for the given image
+     * @param filename The file name
+     * @param derivateQuery the derivate query to be used
+     * @throws WGException
+     */    
+    public String createImgSet(String filename, String derivateQuery) throws WGException{
+    	return SrcSetCreator.createImgSet(this, filename, derivateQuery);
+    }
+
+    /**
+     * create src-set for the given image
+     * @param filename The file name
+     * @param derivateQuery the derivate query to be used
+     * @throws WGException
+     */    
+    public String createSrcSet(String filename, String derivateQuery) throws WGException{
+    	return SrcSetCreator.createSrcSet(this, filename, derivateQuery);
+    }
+    
     /* (non-Javadoc)
      * @see de.innovationgate.wgpublisher.webtml.utils.Context#fileurl(java.lang.String, java.lang.String)
      */
