@@ -198,10 +198,10 @@
 					</div>
 				</a>
 				<ul class="dropdown-menu">
-					<li><a data-action="settings-user-defined" href="#">Benutzerdefinierte Eigenschaften</a></li>
+					<li><a data-action="settings-user-defined" href="#">Seitentyp <span></span></a></li>
 					<li class="divider"></li>
-					<li><a data-action="settings-content" href="#">Inhaltseigenschaften</a></li>
-					<li><a data-action="settings-page" href="#">Seiteneigenschaften</a></li>					
+					<li><a data-action="settings-content" href="#">Inhaltsversion</a></li>
+					<li><a data-action="settings-page" href="#">Seite</a></li>					
 				</ul>
 			</div>
 

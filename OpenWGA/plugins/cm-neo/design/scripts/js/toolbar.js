@@ -61,6 +61,7 @@ define(["cm", "sitepanel", "jquery", "bootstrap"], function(CM, Sitepanel, $){
 			.find("[data-action='seo']")[ev.params.status ? "removeClass" : "addClass"]("disabled")
 			.end()
 
+		$("#toolbars [data-action='settings-user-defined'] span").html("'"+ev.params.pagetype+"'")
 		$("#toolbars [data-action='create-draft']")[ev.params.may_edit_content ? "show" : "hide"]()
 		$("#toolbars [data-action='publish-page']")[ev.params.status=='w' && ev.params.ismine ? "show" : "hide"]()
 		$("#toolbars [data-action='approve-content']")[ev.params.may_approve_version ? "show" : "hide"]()

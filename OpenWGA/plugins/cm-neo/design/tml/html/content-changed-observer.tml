@@ -52,6 +52,7 @@
 	}
 	
 	var Struct = AFW.structentry(struct);
+	var pagetype = struct.getContentType();
 	var area = struct.getArea().name;
 	while(struct){
 		path.unshift(struct.getStructKey())
@@ -65,6 +66,8 @@
 	event.setParameter("area", area)
 	event.setParameter("structkey", structkey)
 	event.setParameter("language", language)
+	
+	event.setParameter("pagetype", pagetype.getNameForLanguage("de"));
 	
 	event.setParameter("may_create_content", Struct.mayCreateContent());
 	event.setParameter("may_create_child_page", Struct.mayCreatePage());
