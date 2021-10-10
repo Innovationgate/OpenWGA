@@ -427,6 +427,7 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
 
     private boolean _includeKeys;
     private boolean _useStructKeysInPath;
+    private boolean _enhancedFormat;
     
     public PathTitle parseURLPathTitle(String title) throws UnsupportedEncodingException {
         return new URLPathTitle(title);
@@ -446,6 +447,7 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
         _includeKeys = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_INCLUDEKEYS, false);
         _useStructKeysInPath = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_USESTRUCTKEYS, false);
         _allowUmlaute = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_ALLOW_UMLAUTE, false);
+        _enhancedFormat = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_ENHENCED_FORMAT, false);
         _db = db;
         
         if(_shortcutArea!=null && db.getArea(_shortcutArea)==null){
@@ -538,6 +540,19 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
 
         title = title.toLowerCase();
 
+        if(_includeKeys || _enhancedFormat){
+        	// OpenWGA 7.9.3
+        	// #00005772
+    		if(!_allowUmlaute){
+    			title = title.replaceAll("ä", "ae")
+    					.replaceAll("ö", "oe")
+    					.replaceAll("ü", "ue")
+    					.replaceAll("ß", "ss");
+    		}
+    		return title.replaceAll("[^äöüßa-z0-9_()\\[\\]]+", "-");
+    	}
+    	
+
         StringBuffer name = new StringBuffer();
         for (int i = 0; i < title.length(); i++) {
             char c = title.charAt(i);
@@ -565,10 +580,7 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
             else if (Character.isLetterOrDigit(c)) {
                 name.append(c);
             }
-            else if (c == '-') {
-                name.append(c);
-            }
-            else if (c == '_') {
+            else if (c=='-' || c=='_') {
                 name.append(c);
             }
 
@@ -623,7 +635,7 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
 
         // Look if we have a valid URLID on the last element
         String lastElement = (String) path.get(path.size() - 1);
-        WGPDispatcher.URLID urlid = new WGPDispatcher.URLID(lastElement, _db);
+        WGPDispatcher.URLID urlid = new WGPDispatcher.URLID(lastElement, _db, _includeKeys);
         if (urlid.getSuffix() == null || _core.getMediaKey(urlid.getSuffix()) == null) {
             return null;
         }
@@ -973,10 +985,11 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
                 		baseContentSuffix.append("~").append(String.valueOf(content.getStructKey()));
                 	else{
                 		// use page sequence as key
+                		// #00005772: use dot instead of tilde now
 	                	long seq = content.getStructEntry().getPageSequence();
 	                	if(seq!=0)
-	                		baseContentSuffix.append("~").append(Long.toHexString(seq));
-	                	else baseContentSuffix.append("~").append(String.valueOf(content.getStructKey()));
+	                		baseContentSuffix.append(".").append(Long.toHexString(seq));
+	                	else baseContentSuffix.append(".").append(String.valueOf(content.getStructKey()));
                 	}
                 	
                 }
