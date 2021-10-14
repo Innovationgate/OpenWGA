@@ -78,6 +78,25 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 			editor.close();
 	})
 
+	WGA.event.addListener("*", "CMS_save_image_item", function(ev){
+		var url = CM.url.json + "/save-image-item.int.json"
+		var params = $.extend({}, contentInfo, {
+			item: ev.params.item,
+			filename: ev.params.filename,
+			container: ev.params.container,
+			title: ev.params.title || "",
+			alt: ev.params.alt || "",
+			image_dbkey: ev.params.dbkey
+		}) 
+		//console.log("saving item", params);
+		$.ajax({
+			method: "POST",
+			url: url, 
+			data: params,
+			dataType: "json"
+		}) 
+	})
+
 	WGA.event.addListener("*", "CMS_save_item", function(ev){
 		if(editor){
 			var close_editor = ev.params.close_editor;

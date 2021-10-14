@@ -1,0 +1,33 @@
+function Renderer() {
+}
+
+Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $urlParam_item, $urlParam_filename, $urlParam_container, 
+	$urlParam_image_dbkey, $urlParam_title, $urlParam_alt) {
+
+	//console.log($urlParam_dbkey, $urlParam_contentkey, $urlParam_item, $urlParam_filename, $urlParam_container, $urlParam_image_dbkey);
+
+	if(!$urlParam_dbkey)
+		return;		// access denied 
+
+	var iliReader = WGA.service(Packages.de.innovationgate.wgpublisher.webtml.utils.ImageLinkReader);
+	var ili = iliReader.create($urlParam_filename);
+	ili.setTitle($urlParam_filename);
+	if($urlParam_container)
+		ili.setDoc($urlParam_container);
+	if($urlParam_image_dbkey)
+		ili.setDb($urlParam_image_dbkey);
+
+	ili.setTitle($urlParam_title);
+	ili.setAlt($urlParam_alt);
+	
+	var c = context("db:"+$urlParam_dbkey + "/docid:"+$urlParam_contentkey, false);
+	if(c){
+		c.content().setItemValue($urlParam_item, iliReader.write(ili));
+		c.content().save();
+		log.info("saved '" + $urlParam_filename + "' in image-item " + $urlParam_item); 
+	}
+	else log.info("save image-item: invalid context")
+
+	WGA.TMLPage.write("{}")
+
+}
