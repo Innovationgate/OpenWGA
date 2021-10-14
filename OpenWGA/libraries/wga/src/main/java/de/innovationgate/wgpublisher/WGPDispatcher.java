@@ -316,8 +316,22 @@ public class WGPDispatcher extends HttpServlet {
             // openwga 7-9-3
             // #00005772
             if (titlepath_with_key && tokens.size() >= 4) {
-                _resourceExtraKey = (String) tokens.get(2);
-                contentStartsAt = 3;
+            	
+            	String resourceKeyCandidat = (String) tokens.get(2);
+            	// test if we have a structkey or sequence
+            	WGStructEntry entry = contentDb.getStructEntryByKey(resourceKeyCandidat);
+            	if(entry==null){
+            		try{
+		            	long seq = Long.parseLong(resourceKeyCandidat, 16);
+		            	entry = contentDb.getStructEntryBySequence(seq);
+            		}
+            		catch(Exception e){}	// ignore number format exceptions
+            	}
+            	if(entry!=null){
+	                _resourceExtraKey = (String) tokens.get(2);
+	                contentStartsAt = 3;
+            	}
+            
             }
 
             List<String> contentIdTokens = tokens.subList(contentStartsAt, tokens.size());
