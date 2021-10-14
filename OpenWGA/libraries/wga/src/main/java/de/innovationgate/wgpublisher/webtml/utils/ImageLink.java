@@ -25,16 +25,8 @@
 
 package de.innovationgate.wgpublisher.webtml.utils;
 
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.Collections;
-import java.util.List;
-
 import org.simpleframework.xml.Attribute;
 import org.simpleframework.xml.Root;
-import org.simpleframework.xml.core.Persister;
-
-import de.innovationgate.utils.WGUtils;
 
 /**
  * An image link, pointing to any image file in any OpenWGA database. It is normally stored in the context of an OpenWGA content document (like an item), which is used to complete missing data on an incomplete image link.
@@ -53,7 +45,10 @@ public class ImageLink {
     
     @Attribute(name="title",required=false)
     private String _title = null;
-    
+
+    @Attribute(name="alt",required=false)
+    private String _alt = null;
+
     @Attribute(name="border",required=false)
     private String _border = null;
     
@@ -123,6 +118,13 @@ public class ImageLink {
      */
     public void setTitle(String alt) {
         _title = alt;
+    }
+
+    public void setAlt(String alt) {
+        _alt = alt;
+    }
+    public String getAlt() {
+        return _alt;
     }
 
     /**
