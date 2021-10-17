@@ -348,7 +348,8 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     public static final MetaInfo METAINFO_UNIQUE_NAME = new MetaInfo(META_UNIQUE_NAME, String.class, null);
     static { 
         METAINFO_UNIQUE_NAME.setLowerCase(true);
-        METAINFO_UNIQUE_NAME.addSynonym("NAME");METAINFO_UNIQUE_NAME.addSynonym("DOCNAME");
+        METAINFO_UNIQUE_NAME.addSynonym("NAME");
+        METAINFO_UNIQUE_NAME.addSynonym("DOCNAME");
     };
     
 	public static final String META_IS_HIDDEN_FROM = "ISHIDDENFROM";
