@@ -234,6 +234,13 @@ public class WGAFilter implements Filter {
 		@Override
 		public void sendRedirect(String location) throws IOException {
 
+			super.sendRedirect(location);
+			setStatus(SC_MOVED_TEMPORARILY);				
+
+			/*
+			 * #00005778
+			 * Because 301 redirects are chached by browsers we reverted this change
+			 * 
 			if(WGACore.isDevelopmentModeEnabled()){
 				super.sendRedirect(location);
 				setStatus(SC_MOVED_TEMPORARILY);				
@@ -244,6 +251,7 @@ public class WGAFilter implements Filter {
 	    		setStatus(SC_MOVED_PERMANENTLY);
 	    		setHeader("Location", location);
 			}
+			*/
 		}
         
     }

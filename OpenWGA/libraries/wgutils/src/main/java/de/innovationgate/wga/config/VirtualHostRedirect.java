@@ -46,8 +46,12 @@ public class VirtualHostRedirect {
     @Attribute (required=false)
     private boolean forward=false;
 
+    @Attribute (required=false)
+    private boolean permanentRedirect=false;	// use 301 instead of 302
+
     public VirtualHostRedirect() {
     	forward=false;	// default
+    	permanentRedirect=false;
     }
     
     public String getRedirect() {
@@ -78,5 +82,12 @@ public class VirtualHostRedirect {
     }
     public boolean isEnabled(){
     	return enabled;
+    }
+
+    public void setPermanentRedirect(boolean value){
+    	this.permanentRedirect = value;
+    }
+    public boolean isPermanentRedirect(){
+    	return permanentRedirect;
     }
 }
