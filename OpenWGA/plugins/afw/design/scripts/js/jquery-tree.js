@@ -309,15 +309,15 @@
 		var collapsed = selected_node.hasClass("collapsed");
 		var selected_id = selected_node.data("id");
 		var node = selected_node.parents(".node").first();
-		if(node.length){
-			node.find("ul").remove();
-			expandNode(node, function(node){
-				var node = node.find("[data-id="+selected_id + "]")
-				selectNode(node);
-				if(!collapsed)
-					expandNode(node);
-			});
-		}
+		if(!node.length)
+			node=this;
+		node.find("ul").remove();
+		expandNode(node, function(node){
+			var node = node.find("[data-id="+selected_id + "]")
+			selectNode(node);
+			if(!collapsed)
+				expandNode(node);
+		});
 	}
 
 	function findNode(root, node_or_id){		
