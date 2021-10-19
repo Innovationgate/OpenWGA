@@ -48,10 +48,14 @@
 			];
 			var image = CMM.setting("image")
 			if(image){
+				var derivate = "usage=poster" + (_imagederivates ? ",width~"+WGA.format(_imagederivates, '0') :"")
 				var url = WGA.urlBuilder(fileurl(image))
-					.setParameter("derivate", "usage=poster" + (_imagederivates ? ",width~"+WGA.format(_imagederivates, '0') :""))
+					.setParameter("derivate", derivate)
 					.build()
 				styles.push("background-image:url('" + url + "')");
+				var imgSet = createImgSet(image, derivate);
+				if(imgSet)
+					styles.push("background-image:image-set(" + imgSet + ")");
 			}
 			return styles.join(";");
 		</tml:script>"

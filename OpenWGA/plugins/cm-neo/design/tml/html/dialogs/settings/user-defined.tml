@@ -30,7 +30,7 @@
 <tml:form id="form-user-defined-settings" mode="{App.mayUpdateContent(this) ? 'edit':'view'}" html_data-context="{path}" unless="_dialog_closed">
 
 	<div class="header">
-		Benutzerdefinierte Eigenschaften
+		Eigenschaften für '<tml:meta name="contenttypetitle"/>'
 		<a data-modal="hide">&times;</a>
 	</div>
 	

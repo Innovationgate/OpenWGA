@@ -422,7 +422,7 @@ define([
 			else item_el.append($("<input>", {
 				"type": "text",
 				"class": "text-editor-input",
-				"style": "width:" + (this.data_type=="number"||this.data_type=="date" ? "5em" : "100%")
+				"style": "width:" + (this.data_type=="number"||this.data_type=="date" ? "10ch" : "100%")
 			}))
 			var unencoded_val = $(".WGA-Item-Value-Unencoded", item_el).text()
 			edit_el = item_el.find("input,textarea")
@@ -503,6 +503,7 @@ define([
 				$(".WGA-Custom-Form form input", item_el).first().focus();
 			},
 			update: function(){
+				Sitepanel.getWindow().onbeforeunload=null;
 				var form = $(".WGA-Custom-Form form", item_el)
 				form.submit()
 			}

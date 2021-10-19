@@ -144,6 +144,7 @@ public class Image extends Base implements DynamicAttributes {
             String cssClass = null;
             String cssStyle = null;
             
+            String titleAttribute = null;
             String altAttribute = null;
             String srcSetAttribute ="";
             String imgAlign = "";
@@ -175,7 +176,10 @@ public class Image extends Base implements DynamicAttributes {
             	    cssStyle =getCssstyle();
             	}
             	
-                altAttribute = ili.getTitle();
+            	titleAttribute = ili.getTitle();
+            	altAttribute = ili.getAlt();
+            	if(altAttribute==null || altAttribute.isEmpty())
+            		altAttribute = file;
 
                 if( !WGUtils.isEmpty(ili.getBorder())){
                     borderAttributesHTML.append(" border=\"");
@@ -202,8 +206,12 @@ public class Image extends Base implements DynamicAttributes {
             }
             
             String titleAttributeString="";
+            if(titleAttribute!=null && !titleAttribute.equals("")) {
+            	titleAttributeString=" title=\"" + titleAttribute + "\" ";
+            }
+            String altAttributeString="";
             if(altAttribute!=null && !altAttribute.equals("")) {
-            	titleAttributeString=" alt=\"" + altAttribute + "\" title=\"" + altAttribute + "\" ";
+            	altAttributeString=" alt=\"" + altAttribute + "\"";
             }
             
             // Cleanup file and doc
@@ -296,7 +304,7 @@ public class Image extends Base implements DynamicAttributes {
                 }
                 
                 String fileurlStr = (stringToBoolean(getAbsolute()) ? fileurl.build(true) : fileurl.buildLikeGiven());
-                imageHTML = "<img" + buildDynamicHtmlAttributes() + imgAlign + borderAttributesHTML.toString() + titleAttributeString + " src=\"" + fileurlStr + "\" " + srcSetAttribute + css.toString() + this.getResultString(false) + ">";
+                imageHTML = "<img" + buildDynamicHtmlAttributes() + imgAlign + borderAttributesHTML.toString() + altAttributeString + titleAttributeString + " src=\"" + fileurlStr + "\" " + srcSetAttribute + css.toString() + this.getResultString(false) + ">";
             }
             
             // If in edit mode, show editing link

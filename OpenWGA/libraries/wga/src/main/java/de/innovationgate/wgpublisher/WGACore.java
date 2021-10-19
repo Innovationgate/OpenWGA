@@ -231,7 +231,6 @@ import de.innovationgate.wga.config.Share;
 import de.innovationgate.wga.config.WGAConfiguration;
 import de.innovationgate.wga.config.WGAConfigurationMigrator;
 import de.innovationgate.wga.model.ValidationError;
-import de.innovationgate.wga.model.VersionCompliance;
 import de.innovationgate.wga.modules.ModuleDefinition;
 import de.innovationgate.wga.modules.ModuleDependencyException;
 import de.innovationgate.wga.modules.ModuleInstantiationException;
@@ -2834,7 +2833,8 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
 
     private UserAgentVerifier userAgentVerifier;
 
-    private DESEncrypter desEncrypter;
+    @SuppressWarnings("deprecation")
+	private DESEncrypter desEncrypter;
 
     private List<WGACoreEventListener> coreEventListeners = Collections.synchronizedList(new LinkedList<WGACoreEventListener>());
     private List<WGAConfigurationUpdateListener> configUpdateListeners = Collections.synchronizedList(new LinkedList<WGAConfigurationUpdateListener>());
@@ -3965,6 +3965,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
     
     public static final String DBATTRIB_TITLEPATHURL_INCLUDEKEYS = "TitlePathURL.IncludeKeys";    
     public static final String DBATTRIB_TITLEPATHURL_USESTRUCTKEYS = "TitlePathURL.UseStructkeysAsKey";
+    public static final String DBATTRIB_TITLEPATHURL_ENHENCED_FORMAT = "TitlePathURL.EnhancedFormat";
     
     public static final String DBATTRIB_TITLEPATHURL_ALLOW_UMLAUTE = "TitlePathURL.AllowUmlaute";
 

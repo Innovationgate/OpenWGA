@@ -277,6 +277,9 @@ public class WGPDispatcher extends HttpServlet {
         private WGDatabase _db;
         
         public URLID(String id, WGDatabase contentDb) throws WGAPIException {
+        	this(id, contentDb, false);
+        }
+        public URLID(String id, WGDatabase contentDb, boolean titlepath_with_key) throws WGAPIException {
 
             _db = contentDb;
 
@@ -284,6 +287,12 @@ public class WGPDispatcher extends HttpServlet {
                 throw new WGIllegalArgumentException("The given id is empty or null");
             }
 
+            /*
+             * #00005772: id now has format 
+             * path/to/content[.key].language.mediakey
+             * or
+             * structkey.language.version
+             */
             List<String> tokens = WGUtils.deserializeCollection(id, WGContentKey.TOKEN_DIVIDER);
             Collections.reverse(tokens);
             if (tokens.size() < 3) {
@@ -304,15 +313,42 @@ public class WGPDispatcher extends HttpServlet {
                 }
             }
 
+            // openwga 7-9-3
+            // #00005772
+            if (titlepath_with_key && tokens.size() >= 4) {
+            	
+            	String resourceKeyCandidat = (String) tokens.get(2);
+            	// test if we have a structkey or sequence
+            	WGStructEntry entry = contentDb.getStructEntryByKey(resourceKeyCandidat);
+            	if(entry==null){
+            		try{
+		            	long seq = Long.parseLong(resourceKeyCandidat, 16);
+		            	entry = contentDb.getStructEntryBySequence(seq);
+            		}
+            		catch(Exception e){}	// ignore number format exceptions
+            	}
+            	if(entry!=null){
+	                _resourceExtraKey = (String) tokens.get(2);
+	                contentStartsAt = 3;
+            	}
+            
+            }
+
             List<String> contentIdTokens = tokens.subList(contentStartsAt, tokens.size());
             Collections.reverse(contentIdTokens);
             _resourceId = WGUtils.serializeCollection(contentIdTokens, WGContentKey.TOKEN_DIVIDER);
-            int tildePos = _resourceId.indexOf("~");
-            if (tildePos != -1) {
-                _resourceExtraKey = _resourceId.substring(tildePos + 1);
-                _resourceId = _resourceId.substring(0, tildePos);
-            }
 
+            if (titlepath_with_key){
+            	// #00005772
+            	// compatibility with oder title path urls:
+            	// find ~ char and interpret as key
+	            int tildePos = _resourceId.indexOf("~");
+	            if (tildePos != -1) {
+	                _resourceExtraKey = _resourceId.substring(tildePos + 1);
+	                _resourceId = _resourceId.substring(0, tildePos);
+	            }
+            }
+            
             StringBuffer completeId = new StringBuffer();
             completeId.append(_resourceId);
             if (_language != null) {

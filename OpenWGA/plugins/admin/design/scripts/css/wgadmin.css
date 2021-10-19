@@ -60,10 +60,11 @@ button{
 .List.disabled td{
 	background: white;
 }
-.List.disabled td, .List.disabled td *{
+.List.disabled td, .List.disabled td *:not(button){
 	font-style: italic;
 	color: silver;
 }
+
 .List.system td{
 	background: #efefef;
 }

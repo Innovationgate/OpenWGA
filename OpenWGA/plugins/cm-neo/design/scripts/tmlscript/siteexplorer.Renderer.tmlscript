@@ -33,6 +33,12 @@ Renderer.prototype.render = function(App, $urlParam_id, $urlParam_dbkey, $urlPar
 		else {
 			// return area list
 			var database = db($urlParam_dbkey);
+			if(!database){
+				console.log("app not found", $urlParam_dbkey)
+				WGA.TMLPage.write("[]")
+				return;
+			}
+			
 			var areas = database.getAreas();
 			for(let area in Iterator(areas.values())){
 

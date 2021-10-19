@@ -1,0 +1,166 @@
+<tml:action id="clear-item">
+	content().removeItem($option_dialog_options.item)
+	content().save();
+	portlet.fireevent("close-dialog", {
+		redirectto: contenturl()	// reload page
+	})
+</tml:action>
+
+<tml:action id="app-changed">
+	tmlform.removefield("lang")
+	tmlform.removefield("container")
+	tmlform.removefield("filename")
+</tml:action>
+
+<tml:action id="lang-changed">
+	tmlform.removefield("container")
+	tmlform.removefield("filename")
+</tml:action>
+
+<tml:form id="edit-image-item">
+
+	<div class="header">
+		<tml:comment><tml:item name="$option_dialog_options.item"/>:</tml:comment>
+		Bild einfügen / ändern
+		<a data-modal="hide">&times;</a>
+	</div>
+
+	<div class="content form-horizontal">
+
+		<tml:input name="key" defaultexpression="STRUCTKEY" type="hidden"/>
+
+		<tml:script>
+			var iliReader = WGA.service(Packages.de.innovationgate.wgpublisher.webtml.utils.ImageLinkReader);
+			_imageItem = iliReader.read(itemList($option_dialog_options.item))
+
+			WGA.TMLPage.setVar("_dbs", CMM.getDbKeys());
+			_dbs.add(0, "- aktuelle App -|this");
+			//_dbkey = "this";
+			//_lang = LANGUAGE;
+			//_container = KEY;
+			if(!tmlform.submitted){
+				_container = _imageItem.getDoc() || KEY;
+				_filename = _imageItem.getFile();
+				_dbkey = _imageItem.getDb();
+				_title = _imageItem.getTitle();
+				_alt = _imageItem.getAlt();
+				var doc = context((_dbkey ? "db:"+_dbkey + "/" : "") + "docid:"+_container, false)
+				if(doc){
+					_lang = doc.LANGUAGE;
+					_container = doc.STRUCTKEY;
+				}
+				if(!_dbkey || _dbkey==meta("db", "dbkey"))
+					_dbkey = "this";
+				console.log("_container", _container, _lang, _dbkey);
+			}
+			
+			var database = db()
+			if(tmlform.dbkey && tmlform.dbkey!="this")
+				database = db(tmlform.dbkey)
+			WGA.TMLPage.setVar("_langs", database.getLanguages().keySet());
+			
+			if(!_langs.contains(_lang))
+				_lang = _langs.iterator().next();
+		</tml:script>
+		
+		<tml:[form-field] o_label="App" o_name="dbkey" o_default="{_dbkey}" o_type="select" o_optionsitem="_dbs" o_changeaction="app-changed"/>
+		<tml:[form-field] o_label="Sprache" o_name="lang" o_default="{_lang}" o_type="select" o_optionsitem="_langs" o_changeaction="lang-changed"/>
+
+		<tml:[form-field] o_label="Dokument">
+			<tml:include ref="util:select-document" o_fieldname="container" o_default="{_container}" 
+					o_dbkey="{tmlform.dbkey=='this'?VOID:tmlform.dbkey}"
+					o_language="{tmlform.lang}"
+			>
+				<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
+			</tml:include>
+		</tml:[form-field]>
+
+		<tml:case condition="tmlform.container">
+			<tml:script>
+				_ctx = (tmlform.dbkey=='this' ? "" : "db:"+tmlform.dbkey + "/")
+					+ "docid:" + tmlform.container
+					+ "<" + tmlform.lang + ">"
+			</tml:script>
+			<tml:if context="{_ctx}" iscontextvalid="true">
+				<tml:then>
+					<tml:[form-field] o_label="Bild-Datei">
+						<tml:include ref="util:select-file" o_derivate="usage=poster" o_fieldname="filename" o_default="{_filename}" o_placeholder="Bitte auswählen ..."/>
+					</tml:[form-field]>
+
+					<tml:case condition="tmlform.filename">
+						<tml:script>
+							var Attachment = AFW.content().attachment(tmlform.filename);
+							tmlform.url = Attachment.getPosterURL()
+							//tmlform.alt = Attachment.fileMetaData.title;
+						</tml:script>
+					</tml:case>
+
+					<tml:input name="url" type="hidden"/>
+				</tml:then>
+				<tml:else>
+					<tml:[form-field] o_mode="view">
+						<p style="color:red">Die Seite ist in der Sprache '<tml:item name="lang" type="tmlform"/>' nicht verfügbar.</p>
+					</tml:[form-field]>
+				</tml:else>
+			</tml:if>
+
+		</tml:case>
+
+		<hr>
+		<tml:[form-field] o_label="ALT-Text" o_name="alt" o_default="{_alt}" o_placeholder="Alternate Text für das Bild ..."/>
+		<tml:[form-field] o_label="Titel" o_name="title" o_default="{_title}" o_placeholder="Optionaler Mouse-Over-Titel des Bildes ..."/>
+
+	</div>
+
+	<div class="footer">
+		<div class="pull-left">
+			<tml:button cssclass="btn btn-default" clickaction="clear-item">
+				Bild löschen
+			</tml:button>
+		</div>
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<a class="btn btn-primary" data-action="save">Speichern</a>
+	</div>
+
+</tml:form>
+
+<script>
+	require(["jquery", "jquery-modal", "sitepanel"], function($, Modal, SP){
+		
+		$("#edit-image-item [data-action=save").on("click", function(ev){
+			ev.preventDefault();
+			var form = $("#edit-image-item");
+			
+			var dbkey = $("[name=dbkey]", form).val();
+			var url = $("[name=url]", form).val();
+			var container = $("[name=container]", form).val();
+			var lang = $("[name=lang]", form).val();
+			
+			if(container==$("[name=key]", form).val())
+				container="";
+			else container += "."+lang+".0"
+			
+			WGA.event.fireEvent("CMS_save_image_item", "edit-image-item.js", {
+				item: "<tml:item name="$option_dialog_options.item"/>",
+				filename: $("[name=filename]", form).val(),
+				container: container,
+				title: $("[name=title]", form).val(),
+				alt: $("[name=alt]", form).val(),
+				dbkey: dbkey=="this" ? "" : dbkey
+			});
+
+			var item_el = $("#item_<tml:item name="$option_dialog_options.item"/>", SP.getDocument());
+			var img_el = item_el.find("img");
+			if(img_el.length){
+				img_el.attr("src", url);
+			}
+			else{
+				item_el.prepend('<img src="'+url+'">')
+				item_el.parent().find(".WGA-Item-Label").css("display", "none");
+			}
+			
+			Modal.hide();
+			
+		})
+	})
+</script>

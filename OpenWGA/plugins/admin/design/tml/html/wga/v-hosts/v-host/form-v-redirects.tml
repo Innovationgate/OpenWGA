@@ -35,10 +35,12 @@
 	obj.path=tmlform.path;
 	obj.forward=tmlform.forward;
 	obj.enabled=tmlform.enabled;
+	obj.permanentRedirect=tmlform.permanentRedirect;
 
 	tmlform.removeField("redirect");
 	tmlform.removeField("path");
 	tmlform.removeField("forward");
+	tmlform.removeField("permanentRedirect");
 	tmlform.removeField("enabled");
 	tmlform.removeField("_action");
 	tmlform.removeField("_idx");
@@ -58,6 +60,7 @@
 	tmlform.path = redirect.path;
 	tmlform.forward = redirect.forward;
 	tmlform.enabled = redirect.enabled;
+	tmlform.permanentRedirect = redirect.permanentRedirect;
 	
 	tmlform._idx = idx;
 	tmlform._action = "edit_redirect"
@@ -102,6 +105,7 @@
 				<td width="30%">Path Expression</td>
 				<td>URL</td>
 				<td>Forward/Proxy</td>
+				<td>Permanent</td>
 				<td align="right">Status</td>
 				<tml:case condition="tmlform.mode()=='edit'">
 					<td></td>
@@ -109,10 +113,11 @@
 			</tr>
 		
 			<tml:foreach id="array-list-loop_redirect" type="itemvalue" item="_entry_list" currentvalue="_entry">
-				<tr class="List<tml:case condition="tmlform._idx==taginfo('array-list-loop_redirect', 'iteration')-1"> selected</tml:case>">
+				<tr class="List<tml:case condition="!_entry.enabled"> disabled</tml:case><tml:case condition="tmlform._idx==taginfo('array-list-loop_redirect', 'iteration')-1"> selected</tml:case>">
 					<td><tml:item name="_entry.path"/></td>
 					<td><tml:item name="_entry.redirect"/></td>
 					<td><tml:script expression="_entry.forward ? 'proxy' : ''"/></td>
+					<td><tml:script expression="_entry.permanentRedirect ? 'true' : ''"/></td>
 					<td align="right"><tml:script expression="!_entry.enabled ? 'disabled' : ''"/></td>
 					<tml:case condition="tmlform.mode()=='edit'">
 						<td nowrap align="right" width="1%">
@@ -179,6 +184,12 @@
 			</div>		
 			<div class="clear"></div>		
 
+			<label>Permanently redirect using http-status 301:</label>
+			<div class="data">
+				<tml:input name="permanentRedirect" type="boolean" cssstyle="margin-top:4px"/>
+			</div>		
+			<div class="clear"></div>		
+			
 			<div class="data" style="margin-top:5px">		
 				<tml:if condition="tmlform._action=='new_redirect'">		
 					<tml:then>		

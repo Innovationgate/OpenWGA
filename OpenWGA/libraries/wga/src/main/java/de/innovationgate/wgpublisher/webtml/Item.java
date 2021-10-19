@@ -198,6 +198,14 @@ public class Item extends FormBase implements DynamicAttributes {
 		if( attribEdit != null 
 			&& getEditor() != null
 			&& attribEdit.equals(this.getTMLContext().getcontent().getContentKey().toString()) ){
+				if(getEditor().equals("custom")){
+		            // if aliases are defined, replace values with aliases
+		            List aliases = this.retrieveAliases();
+		            if(!aliases.isEmpty()){		            	
+		            	WGA wga = WGA.get();
+		            	result = wga.aliases(WGUtils.toString(result), aliases);
+		            }
+				}
 			    buildEditor(itemName, result);
 	            setResult(result);  
 		}

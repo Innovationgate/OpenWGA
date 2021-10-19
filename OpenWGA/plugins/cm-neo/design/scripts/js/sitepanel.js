@@ -75,6 +75,83 @@ define(["cm", "jquery"], function(CM, $){
 				openItemEditor.call({el:item, item:params[0], editor:params[1], options:editor_options});
 			})
 	
+			if(params[1]=="image")
+				initImgDropHandler(params[0], item)
+	
+		})
+	}
+	
+	function initImgDropHandler(itemname, item){
+		//console.log("initImgDropHandler", itemname, item);
+
+		function isDesktopDrop(dt){
+			return dt.types.indexOf ? (dt.types.indexOf("Files")>=0) 
+				: dt.types.contains ? (dt.types.contains("Files"))
+				: false;
+		}
+		function isFilesDrop(dt){
+			return dt.types.indexOf ? (dt.types.indexOf("wga/files")>=0) 
+				: dt.types.contains ? (dt.types.contains("wga/files"))
+				: false;
+		}
+
+		function setDropEffect(ev){
+			var dt = ev.originalEvent.dataTransfer;
+
+			if(!isFilesDrop(dt) && !isDesktopDrop(dt))
+				dt.dropEffect = "none"
+			else dt.dropEffect = "copy";
+		}
+		
+		function dragover(e) {
+			setDropEffect(e);
+		    e.preventDefault();
+		    //console.log("img dragover")
+		}
+		function dragenter(e) {
+			setDropEffect(e);
+		    e.preventDefault();
+		    //console.log("img dragenter")
+		}
+
+		function drop(ev){
+			//console.log("drop", ev);
+			ev.preventDefault();
+
+			var dt = ev.originalEvent.dataTransfer;
+			if(dt.getData("wga/files")){
+				var data = JSON.parse(dt.getData("wga/files"))
+				var file = data[0]
+				//console.log("image drop", this, file);
+				
+				var img_el = $(this).find(".WGA-Item-Value img")
+				if(img_el.length){
+					img_el.attr("src", file.url);
+				}
+				else{
+					$(this).find(".WGA-Item-Value").prepend('<img src="'+file.url+'">')
+					$(this).find(".WGA-Item-Label").css("display", "none");
+				}
+				storeFilenameToItem(file.name, file.container, file.dbkey, file.title || file.name);
+			}
+
+		}
+
+		function storeFilenameToItem(filename, container, dbkey, alt){
+			WGA.event.fireEvent("CMS_save_image_item", "sitepanel.js", {
+				item: itemname,
+				filename: filename,
+				container: container,
+				dbkey: dbkey,
+				title: "",
+				alt: alt
+			});
+		}
+
+		item.on({
+			"drop": drop,
+			"dragenter": dragenter,
+			"dragover": dragover
 		})
 	}
 	
@@ -106,6 +183,12 @@ define(["cm", "jquery"], function(CM, $){
 	function openItemEditor(){
 		if(this.editor=="upload"||this.editor=="file"){
 			CM.openDialog("upload-file")
+			return;
+		}
+		if(this.editor=="image"){
+			CM.openDialog("edit-image-item", {
+				item: this.item
+			})
 			return;
 		}
 		this.el.find(".WGA-Item-Label").hide()

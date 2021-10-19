@@ -55,7 +55,6 @@ import de.innovationgate.wga.config.VirtualHost;
 import de.innovationgate.wga.config.VirtualHostRedirect;
 import de.innovationgate.wga.config.VirtualResource;
 import de.innovationgate.wga.config.WGAConfiguration;
-import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGPRequestPath;
 import de.innovationgate.wgpublisher.WGPDispatcher.PathDispatchingOccasion;
@@ -189,9 +188,13 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
             if(redirect!=null){
             	if(redirect.isForward())
             		httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, redirect.getUrl());
-            	else{
-            		httpResponse.sendRedirect(httpResponse.encodeRedirectURL(redirect.getUrl()));
-	            	return;
+            	else {
+            		if(redirect.isPermanentRedirect()){
+	            		httpResponse.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+	            		httpResponse.setHeader("Location", httpResponse.encodeRedirectURL(redirect.getUrl()));            		
+            		}
+            		else httpResponse.sendRedirect(httpResponse.encodeRedirectURL(redirect.getUrl()));
+            		return;
             	}
             }
             else if(resource!=null)
@@ -494,16 +497,21 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 
     private class Redirect{
     	boolean _forward;
+    	boolean _permanent;
     	String _url;
-    	public Redirect(String url, boolean forward) {
+    	public Redirect(String url, boolean forward, boolean permanent) {
 			_forward = forward;
 			_url = url;
+			_permanent = permanent;
 		}
     	String getUrl(){
     		return _url;
     	}
     	boolean isForward(){
     		return _forward;
+    	}
+    	boolean isPermanentRedirect(){
+    		return _permanent;
     	}
     }
     
@@ -526,7 +534,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                     	redirectURL = redirectURL.replace("$"+i, matcher.group(i));
                     }
                 }
-                return new Redirect(redirectURL, redirect.isForward());
+                return new Redirect(redirectURL, redirect.isForward(), redirect.isPermanentRedirect());
             }
     	}
     	return null;
