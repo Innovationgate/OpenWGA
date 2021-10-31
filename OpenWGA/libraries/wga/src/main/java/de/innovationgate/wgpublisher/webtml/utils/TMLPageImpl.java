@@ -110,7 +110,7 @@ public class TMLPageImpl implements TMLPage {
                 return false;
             }
             
-            if (path.getPathType() != WGPRequestPath.TYPE_TML && path.getPathType() != WGPRequestPath.TYPE_TITLE_PATH) {
+            if (path.getPathType() != WGPRequestPath.TYPE_TML && path.getPathType() != WGPRequestPath.TYPE_TITLE_PATH && path.getPathType() != WGPRequestPath.TYPE_APP_DISPATCHER) {
                 return false;
             }
             
