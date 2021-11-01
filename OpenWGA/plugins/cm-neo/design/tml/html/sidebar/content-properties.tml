@@ -104,7 +104,14 @@
 					<a href="#" data-dialog="page-settings:render" title="Seiteneigenschaften bearbeiten">Seite</a>
 				</legend>
 				<div class="form-group">
-					<p class="data"><a href="#" data-dialog="settings:user-defined" title="Seitentyp-Eigenschaften bearbeiten">{{pagetype}}</a></p>
+					<p class="data">
+						{{#version}}
+							<a href="#" data-dialog="settings:user-defined" title="Seitentyp-Eigenschaften bearbeiten">{{pagetype}}</a>
+						{{/version}}
+						{{^version}}
+							{{pagetype}}
+						{{/version}}
+					</p>
 				</div>
 				{{#pageworkflow}}
 					<div class="form-group">
