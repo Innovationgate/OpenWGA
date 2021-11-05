@@ -21,10 +21,17 @@ Controller.prototype.filenames = function($cx) {
 	var _filenames = WGA.createList();
 	
 	if(derivate || extensions || mimetype){
-		if(derivate && $cx.db().hasFeature($cx.db().FEATURE_CONTENT_FILE_DERIVATES)){
-			for(var filename in Iterator(filenames)){
-				if(WGA.selectDerivate(filename, derivate))
-					_filenames.add(filename);
+		if(derivate){
+			if($cx.db().hasFeature($cx.db().FEATURE_CONTENT_FILE_DERIVATES)){
+				for(var filename in Iterator(filenames)){
+					if(WGA.selectDerivate(filename, derivate))
+						_filenames.add(filename);
+					else console.log("no derivate", filename)
+				}
+			}
+			else{
+				//no derivates: take all images
+				mimetype="image"
 			}
 		}
 		if(mimetype){
@@ -44,6 +51,7 @@ Controller.prototype.filenames = function($cx) {
 		}
 	}
 	else _filenames = filenames;	// take it all
+	
 	return WGA.sortList(_filenames);
 	
 }.nonIsolated()
