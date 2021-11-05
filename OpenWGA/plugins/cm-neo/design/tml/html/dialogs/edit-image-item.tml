@@ -35,9 +35,6 @@
 
 			WGA.TMLPage.setVar("_dbs", CMM.getDbKeys());
 			_dbs.add(0, "- aktuelle App -|this");
-			//_dbkey = "this";
-			//_lang = LANGUAGE;
-			//_container = KEY;
 			if(!tmlform.submitted){
 				_container = _imageItem.getDoc() || KEY;
 				_filename = _imageItem.getFile();
@@ -51,7 +48,6 @@
 				}
 				if(!_dbkey || _dbkey==meta("db", "dbkey"))
 					_dbkey = "this";
-				console.log("_container", _container, _lang, _dbkey);
 			}
 			
 			var database = db()
@@ -61,6 +57,7 @@
 			
 			if(!_langs.contains(_lang))
 				_lang = _langs.iterator().next();
+						
 		</tml:script>
 		
 		<tml:[form-field] o_label="App" o_name="dbkey" o_default="{_dbkey}" o_type="select" o_optionsitem="_dbs" o_changeaction="app-changed"/>
