@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import de.innovationgate.utils.Base64;
 import de.innovationgate.webgate.api.WGDatabase;
+import de.innovationgate.webgate.api.auth.AuthenticationSession;
 
 public class DBLoginInfo implements java.io.Serializable {
     
@@ -57,6 +58,7 @@ public class DBLoginInfo implements java.io.Serializable {
 		private Object _credentials;
 		private String _accessFilter;
 		private AuthType _authenticationType;
+		private AuthenticationSession _authSession = null;
 		
 		private Map<String,String> _dbAccessFilters;
 		
@@ -213,9 +215,18 @@ public class DBLoginInfo implements java.io.Serializable {
     		return _dn;
     	else return _userName;
     }
-    void setDN(String name){
+    public void setDN(String name){
     	_dn = name;
     }
+
+
+    public void setAuthSession(AuthenticationSession session){
+    	_authSession = session;
+    }
     
+    public AuthenticationSession getAuthSession(){
+    	return _authSession;
+    }
+
 }
 

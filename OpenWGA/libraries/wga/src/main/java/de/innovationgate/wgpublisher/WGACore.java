@@ -1630,7 +1630,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             if (db.hasFeature(WGDatabase.FEATURE_FULLCONTENTFEATURES)) {
                 WGA.get(request, null, this).app(db).createEvent("auth=login")
                 .param("userName", loginInfo.getUserName())
-                .param("authType", DBLoginInfo.AuthType.CERTIFICATE)
+                .param("authType", loginInfo.getAuthenticationType()) 
                 .fireOnSession();
             }
         }
@@ -7996,6 +7996,8 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
     
     public boolean login(String user, Object password, String domain, HttpServletRequest request, HttpServletResponse response) throws WGException {
     	String dn=null;
+    	AuthenticationSession authSession = null;
+    	
     	// Get the domain configuration
         WGADomain domainConfig = getDomains(domain);
         if (domainConfig == null) {
@@ -8007,7 +8009,7 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
         if (domainConfig.getAuthModule() != null) {
             // Do a login on the domain's auth module
             try {
-                AuthenticationSession authSession = getBruteForceLoginBlocker().login(domainConfig, user, password, request);
+                authSession = getBruteForceLoginBlocker().login(domainConfig, user, password, request);
                 if (authSession != null) {
                     isLoginSuccessful = true;
                     dn = authSession.getDistinguishedName();
@@ -8060,7 +8062,9 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
             // First do a logout for sure
             logout(domain, request.getSession(), request, response, true);
             
-            getSessionLogins(request.getSession()).put(domain, new DBLoginInfo(user, password, DBLoginInfo.AuthType.PASSWORD, dn));
+            DBLoginInfo loginInfo =  new DBLoginInfo(user, password, DBLoginInfo.AuthType.PASSWORD, dn);
+            loginInfo.setAuthSession(authSession);
+            getSessionLogins(request.getSession()).put(domain, loginInfo);
             
             WGA wga = WGA.get(request, response, this);
             
