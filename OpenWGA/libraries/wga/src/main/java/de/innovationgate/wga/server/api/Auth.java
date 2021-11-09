@@ -27,6 +27,7 @@ package de.innovationgate.wga.server.api;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGDatabase;
@@ -479,6 +480,19 @@ public class Auth {
         else {
             return null;
         }
+    }
+
+    /**
+     * Returns the groups of the current user.
+     * @return groups
+     * @throws WGException
+     */
+    public Set<String> getUserGroups() throws WGException {
+    	AuthenticationSession session = getAuthSession();        
+        if (session != null) {
+            return session.getGroups();
+        }
+        return null;
     }
 
     /**
