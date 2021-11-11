@@ -253,7 +253,7 @@ public class Image extends Base implements DynamicAttributes {
             String imageHTML = null;
             if (file != null) { // May be empty if an image item is not yet available
             	
-            	String url = urlRetrievalContext.getURLBuilder().buildFileURL(urlRetrievalContext, db, doc, file);
+            	String url = urlRetrievalContext.fileImageURL(db, doc, file);
             	
                 URLBuilder fileurl = wga.urlBuilder(url);
                 boolean doSrcSet = false;
