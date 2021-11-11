@@ -85,6 +85,7 @@ import de.innovationgate.webgate.api.WGArea;
 import de.innovationgate.webgate.api.WGCSSJSModule;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGContentEventListener;
+import de.innovationgate.webgate.api.WGContentKey;
 import de.innovationgate.webgate.api.WGContentNavigator;
 import de.innovationgate.webgate.api.WGContentType;
 import de.innovationgate.webgate.api.WGDatabase;
@@ -4141,6 +4142,49 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      */    
     public String createSrcSet(String filename, String derivateQuery) throws WGException{
     	return SrcSetCreator.createSrcSet(this, filename, derivateQuery);
+    }
+    
+    /**
+     * return image url for a given file
+     * This method is identical to fileurl() if the file is an image (mimetype=image/*)
+     * For non-image files we add a derivate usage=poster to hopefully get an url for an image.
+     */
+    public String fileImageURL(String container, String filename) throws WGException{
+    	return fileImageURL(null, container, filename);
+    }
+    
+    public String fileImageURL(String dbkey, String container, String filename) throws WGException{
+    	String url = getURLBuilder().buildFileURL(toUnlockedVersion(), dbkey, container, filename);
+    	
+    	WGContent c = content();
+    	if(container!=null){
+	    	// check, if we have a content key
+        	WGDatabase database = (dbkey==null ? db() : db(dbkey));
+    		WGContentKey key = null;
+	        try {
+	            key = WGContentKey.parse(container, database);
+		        if(key==null)
+		        	return url;	// container is no valid content key
+	        } catch (Exception e) {
+	            // container is no valid content key
+	        	return url;
+	        }
+	        c = database.getContentByKey(key);
+    	}
+        try{
+	    	String mimeType = c.getFileMetaData(filename).getMimeType();
+	    	if(mimeType.startsWith("image")){
+	    		return url;
+	    	}
+	    	// now we know that we have a content file that is no image.
+	    	// -> add derivate
+	    	URLBuilder builder = WGA.get(this).urlBuilder(url);
+	    	builder.setParameter(WGPDispatcher.URLPARAM_DERIVATE, "usage=poster");
+	    	return builder.build();
+        }
+        catch(Exception e){
+        	return url;
+        }
     }
     
     /* (non-Javadoc)
