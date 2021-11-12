@@ -1163,13 +1163,16 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
      * @throws WGException 
      */
     public WGContent createContent(String contentClass) throws WGException {
-    	return createContent(contentClass, WGA.get().tmlcontext());
+    	Context ctx = WGA.get().tmlcontext();
+    	if(ctx.db().getDbReference().equalsIgnoreCase(_db.getDbReference()))
+    		return createContent(contentClass, ctx);
+    	else return createContent(contentClass, null);	// current context is not in this hdb app.
     }
     
     /**
      * Create a HDBModel content
      * @param contentClass Content class of the content to create
-     * @param ref Reference document (Context|contex-expression|WGContent|null) for the creation below which the content is to be created
+     * @param ref Reference document (Context|context-expression|WGContent|null) for the creation below which the content is to be created
      * @return The created content
      * @throws WGException 
      */
