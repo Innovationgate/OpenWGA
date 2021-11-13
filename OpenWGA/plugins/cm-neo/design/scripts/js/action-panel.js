@@ -1,5 +1,5 @@
 define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-drophandler", "bootstrap"], function(CM, $, Editors, UploadManager, Sitepanel){
-
+	
 	var editor;
 	var edit_item;
 	var edit_item_format;
@@ -240,118 +240,128 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 		})
 	}
 	
-	$("#sidepannel-attachment-source").on("click", ".dropdown-menu a", function(ev){
-		ev.preventDefault();
-		var $this = $(this);
-		updateAttachmentSources({
-			dbkey: $this.data("dbkey"),
-			contentkey: $this.data("contentkey")
-		})
-	})
+	function initDomEvents(){
+		
+		/*
+		 * Image Library Event Handler
+		 */
 
+		$("#sidepannel-attachment-source").on("click", ".dropdown-menu a", function(ev){
+			ev.preventDefault();
+			var $this = $(this);
+			updateAttachmentSources({
+				dbkey: $this.data("dbkey"),
+				contentkey: $this.data("contentkey")
+			})
+		})
 	
-	/*
-	 * Content Attachment event handler
-	 */	
-	
-	$("#sidepanel-content").wga_drophandler({
-		onDesktopDrop: function(files){
-			if(contentInfo.may_update_content){
-				$("#sidepanel-content a[href='#section-content-attachments']").tab("show");
-				for(var i=0; i<files.length; i++){
-					UploadManager.upload(files[i])
+		/*
+		 * Content Attachment event handler
+		 */	
+		
+		$("#sidepanel-content").wga_drophandler({
+			onDesktopDrop: function(files){
+				if(contentInfo.may_update_content){
+					$("#sidepanel-content a[href='#section-content-attachments']").tab("show");
+					for(var i=0; i<files.length; i++){
+						UploadManager.upload(files[i])
+					}
 				}
 			}
-		}
-	})
-	$("#sidepannel-content-attachments").on({
-		click: function(e){
-			var panel = $("#sidepannel-content-attachments");
-			var el = $(this);
-			if(e.metaKey){
-				el.toggleClass("selected")
-			}
-			else{
-				panel.find(".thumb").removeClass("selected");	// de-select all
-				el.addClass("selected")
-			}
-			var method = panel.find(".thumb.selected").length ? "removeClass":"addClass";
-			panel.find(".sidebar-toolbar [data-action=edit-file-metas]")[method]("disabled")
-			if(contentInfo.may_update_content){
-				panel.find(".sidebar-toolbar [data-action=delete]")[method]("disabled")
-			}
-		},
-		dblclick: function(e){
-			CM.openDialog("attachment-metas", {
-				dbkey: $(this).data("dbkey"),
-				container: $(this).data("container"),
-				type: $(this).data("type"), 
-				filename: $(this).data("filename")
-			})
-		}		
-	}, ".thumb")
-	.on({
-		dragstart: function(e){
-			var el = $(e.target);
-			var data = [];
-			if(el.hasClass("selected")){
-				$(this).find(".thumb.selected").each(function(){
-					var $this = $(this) 
-					data.push({
-						type: $this.data("type") || "intfile",
-						key: $this.data("key"),
-						dbkey: $this.data("dbkey"),
-						container: $this.data("container"),
-						name: $this.data("filename"),
-						title: $this.data("filetitle"),
-						size: $this.data("filesize"),
-						url: $this.data("fileurl"),
-						poster: $this.data("poster")
-					})
-				})
-			}
-			else{	// single img drag 
-				data.push({
-					type: el.data("type") || "intfile",
-					key: el.data("key"),
-					dbkey: el.data("dbkey"),
-					container: el.data("container"),
-					name: el.data("filename"),
-					title: el.data("filetitle"),
-					size: el.data("filesize"),
-					url: el.data("fileurl"),
-					poster: el.data("poster")
-				})
-			}
-			try{
-				// try-catch bc. IE Edge
-				e.originalEvent.dataTransfer.effectAllowed = "copyLink"
-				e.originalEvent.dataTransfer.setData("wga/files", JSON.stringify(data))
-			}
-			catch(e){}
-		},
-	})
-	.on("click.toolbar", ".sidebar-toolbar [data-action]", function(ev){
-		switch($(this).data("action")){
-			case "delete": 
-				ev.preventDefault();
-				var filenames = [];
-				$("#sidepannel-content-attachments .thumb.selected").each(function(){
-					filenames.push($(this).data("filename"))
-				})
-				CM.openDialog("delete-attachments", {
-					filenames: filenames.join(",")
-				})
-				break;
-			case "upload-file":
-				CM.openDialog("upload-file")
-				break;
-			case "edit-file-metas":
+		})
+		$("#sidepannel-content-attachments").on({
+			click: function(e){
+				var panel = $("#sidepannel-content-attachments");
+				var el = $(this);
+				if(e.metaKey){
+					el.toggleClass("selected")
+				}
+				else{
+					panel.find(".thumb").removeClass("selected");	// de-select all
+					el.addClass("selected")
+				}
+				var method = panel.find(".thumb.selected").length ? "removeClass":"addClass";
+				panel.find(".sidebar-toolbar [data-action=edit-file-metas]")[method]("disabled")
+				if(contentInfo.may_update_content){
+					panel.find(".sidebar-toolbar [data-action=delete]")[method]("disabled")
+				}
+			},
+			dblclick: function(e){
 				CM.openDialog("attachment-metas", {
-					filename: $("#sidepannel-content-attachments .thumb.selected").data("filename")
+					dbkey: $(this).data("dbkey"),
+					container: $(this).data("container"),
+					type: $(this).data("type"), 
+					filename: $(this).data("filename")
 				})
-				break;
-		}
-	})
+			}		
+		}, ".thumb")
+		.on({
+			dragstart: function(e){
+				var el = $(e.target);
+				var data = [];
+				if(el.hasClass("selected")){
+					$(this).find(".thumb.selected").each(function(){
+						var $this = $(this) 
+						data.push({
+							type: $this.data("type") || "intfile",
+							key: $this.data("key"),
+							dbkey: $this.data("dbkey"),
+							container: $this.data("container"),
+							name: $this.data("filename"),
+							title: $this.data("filetitle"),
+							size: $this.data("filesize"),
+							url: $this.data("fileurl"),
+							poster: $this.data("poster")
+						})
+					})
+				}
+				else{	// single img drag 
+					data.push({
+						type: el.data("type") || "intfile",
+						key: el.data("key"),
+						dbkey: el.data("dbkey"),
+						container: el.data("container"),
+						name: el.data("filename"),
+						title: el.data("filetitle"),
+						size: el.data("filesize"),
+						url: el.data("fileurl"),
+						poster: el.data("poster")
+					})
+				}
+				try{
+					// try-catch bc. IE Edge
+					e.originalEvent.dataTransfer.effectAllowed = "copyLink"
+					e.originalEvent.dataTransfer.setData("wga/files", JSON.stringify(data))
+				}
+				catch(e){}
+			},
+		})
+		.on("click.toolbar", ".sidebar-toolbar [data-action]", function(ev){
+			switch($(this).data("action")){
+				case "delete": 
+					ev.preventDefault();
+					var filenames = [];
+					$("#sidepannel-content-attachments .thumb.selected").each(function(){
+						filenames.push($(this).data("filename"))
+					})
+					CM.openDialog("delete-attachments", {
+						filenames: filenames.join(",")
+					})
+					break;
+				case "upload-file":
+					CM.openDialog("upload-file")
+					break;
+				case "edit-file-metas":
+					CM.openDialog("attachment-metas", {
+						filename: $("#sidepannel-content-attachments .thumb.selected").data("filename")
+					})
+					break;
+			}
+		})
+	}
+		
+	return {
+		initDomEvents: initDomEvents
+	}
 	
 })

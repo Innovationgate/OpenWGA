@@ -65,6 +65,7 @@
 </div>
 
 <script>
-	require(["action-panel"]);
+	require(["action-panel"], function(Sidebar){
+		Sidebar.initDomEvents();
+	});
 </script>
-
