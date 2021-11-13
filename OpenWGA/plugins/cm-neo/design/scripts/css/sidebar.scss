@@ -162,36 +162,29 @@
 			margin: 10px 0 20px 0;
 		}
 		.filetype {
-			margin-bottom: 20;
+			margin: 0 -10px 20px;
 			&:last-child {
-				margin-bottom: 0;
+				margin-bottom: 10px;
 			}
+			display: flex;
+			flex-wrap: wrap;
 
 			.thumb {
 			    cursor: pointer;
 			    text-align: center;
-			    float: left;
-			    margin-right: 10px;
-			    margin-bottom: 10px;
-			    width: 93px;
-			    &:nth-child(even) {
-			    	margin-right: 0;
-			    }
-			    &:nth-child(odd) {
-			    	clear: left;
-			    }
-
+			    width: 50%;
+			    padding: 5px;
 				.attachment {
-				    background-color: #efefef;
+				    background-color: rgba($base_blue, .1);	//#efefef;
 				    background-position: center center;
 				    background-repeat: no-repeat;
 				    background-size: contain;
-				    border: 5px solid #efefef;
+				    border: 5px solid rgba($base_blue, .1);	//#efefef;
 				    height: 80px;
 				}
 				&.selected .attachment {
 					border-color: $base_blue;
-					box-shadow: 0 0 5px gray;
+					//box-shadow: 0 0 5px gray;
 				}
 				span {
 					display: block;

@@ -5,8 +5,8 @@
 		<div class="panel-body">
 
 			{{#filetypes}}
-				<h1 style="clear:left">{{filetype}}</h1>
-				<div class="clearfix filetype">
+				<h1>{{filetype}}</h1>
+				<div class="filetype">
 					{{#files}}
 						<div class="thumb{{#isPrimary}} primary{{/isPrimary}}" draggable="true" 
 								title="{{filetitle}}"
@@ -30,7 +30,7 @@
 								{{/waiting_for_derivates}}
 								url('{{thumbnail}}')
 							"></div>
-							<span>{{filename}}</span>
+							<span>{{filetitle}}</span>
 						</div>
 					{{/files}}
 				</div>
