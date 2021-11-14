@@ -7,7 +7,24 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 
 	/* Click handler */
 	var actions = {
-		"reload": Sitepanel.reload
+		"reload": Sitepanel.reload,
+		"upload-file": function(){
+			CM.openDialog("upload-file")
+		},
+		"edit-file-metas": function(){
+			CM.openDialog("attachment-metas", {
+				filename: $("#sidepannel-content-attachments .thumb.selected").data("filename")
+			})
+		},
+		"delete-attachments": function(){ 
+			var filenames = [];
+			$("#sidepannel-content-attachments .thumb.selected").each(function(){
+				filenames.push($(this).data("filename"))
+			})
+			CM.openDialog("delete-attachments", {
+				filenames: filenames.join(",")
+			})	
+		}	
 	}
 
 	$(document).on("click.action-panel", "#sidepanel-content [data-action]", function(ev){
@@ -283,7 +300,7 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 				var method = panel.find(".thumb.selected").length ? "removeClass":"addClass";
 				panel.find(".sidebar-toolbar [data-action=edit-file-metas]")[method]("disabled")
 				if(contentInfo.may_update_content){
-					panel.find(".sidebar-toolbar [data-action=delete]")[method]("disabled")
+					panel.find(".sidebar-toolbar [data-action=delete-attachments]")[method]("disabled")
 				}
 			},
 			dblclick: function(e){
@@ -335,28 +352,6 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 				}
 				catch(e){}
 			},
-		})
-		.on("click.toolbar", ".sidebar-toolbar [data-action]", function(ev){
-			switch($(this).data("action")){
-				case "delete": 
-					ev.preventDefault();
-					var filenames = [];
-					$("#sidepannel-content-attachments .thumb.selected").each(function(){
-						filenames.push($(this).data("filename"))
-					})
-					CM.openDialog("delete-attachments", {
-						filenames: filenames.join(",")
-					})
-					break;
-				case "upload-file":
-					CM.openDialog("upload-file")
-					break;
-				case "edit-file-metas":
-					CM.openDialog("attachment-metas", {
-						filename: $("#sidepannel-content-attachments .thumb.selected").data("filename")
-					})
-					break;
-			}
 		})
 	}
 		
