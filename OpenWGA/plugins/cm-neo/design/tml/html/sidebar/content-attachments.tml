@@ -9,7 +9,7 @@
 				<div class="filetype">
 					{{#files}}
 						<div class="thumb{{#isPrimary}} primary{{/isPrimary}}" draggable="true" 
-								title="{{filetitle}}"
+								title="{{filename}}"
 								data-type="{{type}}"
 								data-key="{{key}}"
 								data-dbkey="{{dbkey}}"
