@@ -4160,6 +4160,10 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     	if(container!=null){
 	    	// check, if we have a content key
         	WGDatabase database = (dbkey==null ? db() : db(dbkey));
+        	if(database==null){
+        		// just return empty string. buildFileURL already adds a warning.
+        		return "";
+        	}
     		WGContentKey key = null;
 	        try {
 	            key = WGContentKey.parse(container, database);
