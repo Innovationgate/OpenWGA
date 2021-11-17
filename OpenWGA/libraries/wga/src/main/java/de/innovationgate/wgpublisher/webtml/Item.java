@@ -308,14 +308,6 @@ public class Item extends FormBase implements DynamicAttributes {
 		
 		// Calculate output
 		
-		PropertyResourceBundle labels = null;
-		try{
-			labels = (PropertyResourceBundle)ResourceBundle.getBundle("de.innovationgate.wgpublisher.labels.common" , pageContext.getRequest().getLocale() ,this.getClass().getClassLoader());
-		}
-		catch(MissingResourceException e){	
-			System.out.println( e.getMessage() );
-		}
-		
 		status.mode = TMLFormInfo.EDIT_MODE; 
 		
 		String frmId = status.formInfo.getFormId();
