@@ -87,6 +87,11 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 	var source = $cx.context($item__CM_clipboard_context);
 	source = source.document instanceof Packages.de.innovationgate.webgate.api.WGStructEntry ? source.document : source.content().structEntry;
 	
+	if(source.getAllReleasedContent().isEmpty()){
+		$form.addMessage("Die Quellseite enthält keine freigegebenen Inhaltsversionen und kann daher nicht eingefügt werden.");
+		return;
+	}
+	
 	var dest = $cx.document instanceof Packages.de.innovationgate.webgate.api.WGStructEntry ? $cx.document : $cx.content().structEntry;
 	
 	if($form.root_or_child=="root"){
