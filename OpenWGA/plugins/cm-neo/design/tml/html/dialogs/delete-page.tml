@@ -7,6 +7,7 @@
 	})
 
 	var redirecturl = WGA.app().getHomepageURL() || "/"+WGA.app().dbKey;
+	var lang = $option_dialog_options.language || WGA.app().db().getDefaultLanguage();
 	
 	var redirectStruct = struct.getPreviousSibling();
 	if(!redirectStruct)
@@ -15,7 +16,7 @@
 		redirectStruct = struct.getParentEntry()
 		
 	if(redirectStruct){
-		var c = context("/docid:" + redirectStruct.getStructKey() + "<" + LANGUAGE + ">", false);
+		var c = context("/docid:" + redirectStruct.getStructKey() + "<" + lang + ">", false);
 		if(c)
 			redirecturl = c.contenturl();
 		else {
@@ -23,7 +24,7 @@
 					.setParameter({
 						dbkey: WGA.app().dbKey,
 						structkey: redirectStruct.getStructKey(),
-						lang: LANGUAGE
+						lang: lang
 					}).build()			 			
 		}
 	}
