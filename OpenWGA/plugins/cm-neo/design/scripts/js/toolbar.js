@@ -1,5 +1,7 @@
 define(["cm", "sitepanel", "jquery", "bootstrap"], function(CM, Sitepanel, $){
 
+	var language;
+	
 	WGA.event.addListener("*", "CMS_item_edit", function(ev){
 		$("#toolbars")
 			.find("[data-toolbar=content]").hide()
@@ -34,6 +36,9 @@ define(["cm", "sitepanel", "jquery", "bootstrap"], function(CM, Sitepanel, $){
 	WGA.event.addListener("*", "clipboard-changed", function(ev){
 		$("#toolbars .clipboard-paste-actions").show();
 		$("#toolbars .clipboard-page-content").html("Seite '" + ev.params.title + "'");
+		
+		$("#toolbars [data-action='paste-page").parent()[ev.params.has_released_contents ? "removeClass" : "addClass"]("disabled")
+		
 		if(ev.params.lang){
 			$("#toolbars .clipboard-paste-content-actions").show();
 			$("#toolbars .clipboard-content").html("Version " + ev.params.version + " - " + ev.params.lang + " - " + ev.params.status);
@@ -49,6 +54,8 @@ define(["cm", "sitepanel", "jquery", "bootstrap"], function(CM, Sitepanel, $){
 	
 	WGA.event.addListener("*", "content-changed", function(ev){
 		
+		language = ev.params.language;
+		
 		$("#header .title").hide();
 		$("#toolbars")
 			
@@ -56,8 +63,6 @@ define(["cm", "sitepanel", "jquery", "bootstrap"], function(CM, Sitepanel, $){
 			
 			.find("[data-action='create-draft']")[ev.params.may_edit_content ? "removeClass":"addClass"]("disabled")
 			.end()
-			//.find("[data-action='content-modules']")[ev.params.status && Sitepanel.getWindow().WGA.CMM && Sitepanel.getWindow().WGA.CMM.hasSections ? "removeClass" : "addClass"]("disabled")
-			//.end()
 			.find("[data-action='seo']")[ev.params.status ? "removeClass" : "addClass"]("disabled")
 			.end()
 
@@ -203,7 +208,9 @@ define(["cm", "sitepanel", "jquery", "bootstrap"], function(CM, Sitepanel, $){
 		}
 
 		,"delete-page": function(){
-			CM.openDialog("delete-page")
+			CM.openDialog("delete-page", {
+				language: language				
+			})
 		}
 
 		,"preview": function(){
