@@ -417,7 +417,9 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		}
 
 		// Set params: remove previous tmlparam-vars (##00005720) and set new ones:
+		ArrayList<Object> old_params = new ArrayList<Object>();
 		for (int idx = 0; idx < 5; idx++) {
+			old_params.add(getvar("tmlparam" + (idx + 1)));
 			removevar("tmlparam" + (idx + 1));
 		}
 		for (int idx = 0; idx < actionLink.getUnnamedParams().size(); idx++) {
@@ -454,7 +456,13 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         // Run action
         ExpressionEngine engine = ExpressionEngineFactory.getEngine(ExpressionEngineFactory.ENGINE_TMLSCRIPT);
         ExpressionResult result = engine.evaluateExpression(tmlAction.getCode(), actionContext, ExpressionEngine.TYPE_SCRIPT, additionalObjects);
-		return processActionResult(result);
+
+        // Restore old action params:
+		for (int idx = 0; idx < 5; idx++) {
+			setvar("tmlparam" + (idx + 1), old_params.get(idx));
+		}
+        
+        return processActionResult(result);
 		
 	}
 
