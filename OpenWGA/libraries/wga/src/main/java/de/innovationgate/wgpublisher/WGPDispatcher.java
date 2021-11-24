@@ -1076,15 +1076,14 @@ public class WGPDispatcher extends HttpServlet {
     	}
     	catch (WGExpressionException e){
     		TMLScriptException scriptException = WGUtils.getCauseOfType(e, TMLScriptException.class);
-    		Integer status=500;
-    		String msg = "Unknown exception in app.Dispacher";
     		if(scriptException!=null){
 	    		@SuppressWarnings("rawtypes")
 				Map result = (Map)scriptException.getErrorValue();
-	    		status = (Integer)result.get("code");
-	    		msg = (String)result.get("message");
+	    		int status = (int)result.get("code");
+	    		String msg = (String)result.get("message");
+	    		throw new HttpErrorException(status, msg, path.getDatabaseKey());
     		}
-    		throw new HttpErrorException(status, msg, path.getDatabaseKey());
+    		else throw e;
     	}
         catch (Exception e) {
             throw e;

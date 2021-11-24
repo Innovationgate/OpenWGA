@@ -365,8 +365,6 @@ public class WGPRequestPath {
 				if (tmlscript.hasProperty(dispatcherObject, designKey)) {
 					//core.getLog().info("Dispatcher method found: " + designKey);
 					this.pathType = TYPE_APP_DISPATCHER;
-					URLID urlid = new URLID(this.pathElements.get(this.pathElements.size()-1), database);
-					this.requestLanguage = urlid.getLanguage();
 					this.appDispatcher = new AppDispatcher(dispatcherObject, designKey, this.pathElements.subList(idx+1, this.pathElements.size()));
 					return;
 				}
