@@ -45,7 +45,7 @@
 		</div>
 	</tml:case>
 	<tml:case value="zoom">
-		<tml:case context="{_context}" iscontextvalid="true">
+		<tml:case context="{$option_context}" iscontextvalid="true">
 			<label>Lightbox-Image:</label>
 				<div style="margin:10px">
 					<tml:include ref="util:select-image" o_fieldname="lightbox_image" o_empty-text="Original"/>
