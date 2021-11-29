@@ -134,7 +134,12 @@ public class DefaultURLBuilder implements WGAURLBuilder, WGASpecificFileURLBuild
             }
         }
 
-   		if(request!=null && mediaKey.equalsIgnoreCase(defaultMediaKey) && context.ishomepage() && !context.isbrowserinterface()){
+        // check for homepage 
+   		if(request!=null 
+   				&& (layoutKey==null || layoutKey.equalsIgnoreCase("default")) 
+   				&& mediaKey.equalsIgnoreCase(defaultMediaKey) 
+   				&& context.ishomepage() 
+   				&& !context.isbrowserinterface()){
     		// check v-host config
             WGAConfiguration config = _core.getWgaConfiguration();
             VirtualHost vHost = WGAVirtualHostingFilter.findMatchingHost(config, request);
