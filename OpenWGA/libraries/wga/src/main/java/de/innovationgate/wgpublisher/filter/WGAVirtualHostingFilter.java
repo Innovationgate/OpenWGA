@@ -135,35 +135,9 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 
         VirtualHost vHost = findMatchingHost(_core.getWgaConfiguration(), request);
         if (vHost != null) {
-        	
-        	// check if redirects required
-        	if(vHost.isForceDefaultHost() || vHost.isForceSSL()){
-	        	boolean redirectRequired = false;
-	        	URLBuilder urlBuilder = new URLBuilder(httpRequest);
-	        	
-	        	if(vHost.isForceDefaultHost() && !request.getServerName().equalsIgnoreCase(vHost.getServername())){
-	        		// redirect to default host
-	     			urlBuilder.setHost(vHost.getServername());
-	     			redirectRequired = true;
-	        	}
-	        	if(vHost.isForceSSL() && !request.isSecure()){
-	        		// redirect to https
-	     			urlBuilder.setProtocol("https");
-	     			redirectRequired = true;
-	        	}
-	        	
-	        	if(redirectRequired){
-	        		_core.getLog().info("V-Host forces redirect: " + urlBuilder.build(true));
-	        		httpResponse.sendRedirect(httpResponse.encodeRedirectURL(urlBuilder.build(true)));
-	        		return;
-	        	}
-        	}
-        	
+
             // handle vhost
             request.setAttribute(REQUESTATTRIB_VIRTUAL_HOST, vHost);
-
-            // determine default database key
-            String defaultDBKey = getDefaultDBKey(_core, vHost);
 
             String uri = httpRequest.getServletPath();
             int semiPos = uri.indexOf(";");
@@ -171,35 +145,66 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                 uri = uri.substring(0, semiPos);
             }
 
+        	// check if redirects required
+        	URLBuilder redirectUrlBuilder = new URLBuilder(httpRequest);
+        	boolean redirectRequired = false;
+        	boolean isPermanentRedirect = false;
+        	boolean forwardRequest=false;
+
+        	// set redirect path
+        	Redirect redirect = findRedirect(vHost, request.getServerName(), uri);
+            if(redirect!=null && !uri.equalsIgnoreCase(redirect.getPath())){
+            	if(redirect.isForward()){
+            		httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, redirect.getPath());
+            		forwardRequest=true;
+            	}
+            	else {
+            		redirectRequired = true;
+            		redirectUrlBuilder.setPath(redirect.getPath());
+            		isPermanentRedirect = redirect.isPermanentRedirect();
+            	}
+            }
+            
+        	// set redirect host
+        	if(vHost.isForceDefaultHost() && !request.getServerName().equalsIgnoreCase(vHost.getServername())){
+    			redirectRequired = true;
+    			redirectUrlBuilder.setHost(vHost.getServername());
+    		}
+        	
+        	// set redirect protocol
+            if(vHost.isForceSSL() && !request.isSecure()){
+            	redirectRequired = true;
+            	redirectUrlBuilder.setProtocol("https");
+            }
+            
+        	if(redirectRequired){
+        		if(isPermanentRedirect){
+            		httpResponse.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+            		httpResponse.setHeader("Location", httpResponse.encodeRedirectURL(redirectUrlBuilder.build(true)));        			
+        		}
+        		else httpResponse.sendRedirect(httpResponse.encodeRedirectURL(redirectUrlBuilder.build(true)));
+        		return;
+        	}
+
             if (uri.equalsIgnoreCase("/robots.txt") && findVirtualResource(vHost, "robots.txt")==null){
             	response.getWriter().print(vHost.getRobotsTxt());
             	return;
             }
 
-            // check for redirects            
-            Redirect redirect = findRedirect(vHost, uri);
-
-            // check for virtual root resource request
+            // check for virtual root resource request (old style)
             String resource_path = uri;
             if(resource_path.startsWith("/"))
             	resource_path = resource_path.substring(1);
             VirtualResource resource = findVirtualResource(vHost, resource_path);
-
-            if(redirect!=null){
-            	if(redirect.isForward())
-            		httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, redirect.getUrl());
-            	else {
-            		if(redirect.isPermanentRedirect()){
-	            		httpResponse.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-	            		httpResponse.setHeader("Location", httpResponse.encodeRedirectURL(redirect.getUrl()));            		
-            		}
-            		else httpResponse.sendRedirect(httpResponse.encodeRedirectURL(redirect.getUrl()));
-            		return;
-            	}
-            }
-            else if(resource!=null)
+            if(resource!=null){
             	httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, resource.getPath());
-            else {
+            	forwardRequest=true;
+            }
+            
+            if(!forwardRequest){
+                // determine default database key
+                String defaultDBKey = getDefaultDBKey(_core, vHost);
+                
                 String[] pathElements = uri.split("/");
                 if (pathElements == null || pathElements.length < 1) {
                     // root url request - redirect to default database or hide db
@@ -504,7 +509,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 			_url = url;
 			_permanent = permanent;
 		}
-    	String getUrl(){
+    	String getPath(){
     		return _url;
     	}
     	boolean isForward(){
@@ -515,7 +520,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
     	}
     }
     
-    private Redirect findRedirect(VirtualHost vHost, String uri){
+    private Redirect findRedirect(VirtualHost vHost, String serverName, String path){
 
     	List<VirtualHostRedirect> redirects = vHost.getRedirects();
     	if(redirects==null || redirects.size()==0)
@@ -524,18 +529,37 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
     	for(VirtualHostRedirect redirect: redirects){
     		if(!redirect.isEnabled())
     			continue;
-    		Pattern pattern = Pattern.compile(redirect.getPath(), Pattern.CASE_INSENSITIVE);
-        	Matcher matcher= pattern.matcher(uri);
-            if(matcher.find()) {
-                String redirectURL = redirect.getRedirect();
-                Integer count = matcher.groupCount();
-                if(count > 0) {
-                    for(Integer i = 1; i <= count; i++) {
-                    	redirectURL = redirectURL.replace("$"+i, matcher.group(i));
-                    }
-                }
-                return new Redirect(redirectURL, redirect.isForward(), redirect.isPermanentRedirect());
-            }
+    		
+    		// Check Request Hosts
+    		boolean hostMatch = false;
+    		List<String> hosts = redirect.getRequestHosts();
+    		if(hosts!=null && hosts.size()>0){
+    			for(String host: hosts){
+    				if (Pattern.matches(convertToRegExp(host), serverName)) {
+    					hostMatch=true;
+    					break;
+    				}
+    			}
+    		}
+    		else hostMatch=true;	// no hosts: any serverName matches
+    		
+    		if(hostMatch){
+    			String redirectPath = redirect.getPath();
+    			if(redirectPath.isEmpty())
+    				redirectPath = ".*";	// any path
+	    		Pattern pattern = Pattern.compile(redirect.getPath(), Pattern.CASE_INSENSITIVE);
+	        	Matcher matcher= pattern.matcher(path);
+	            if(matcher.find()) {
+	                String redirectURL = redirect.getRedirect();
+	                Integer count = matcher.groupCount();
+	                if(count > 0) {
+	                    for(Integer i = 1; i <= count; i++) {
+	                    	redirectURL = redirectURL.replace("$"+i, matcher.group(i));
+	                    }
+	                }
+	                return new Redirect(redirectURL, redirect.isForward(), redirect.isPermanentRedirect());
+	            }
+    		}
     	}
     	return null;
     }

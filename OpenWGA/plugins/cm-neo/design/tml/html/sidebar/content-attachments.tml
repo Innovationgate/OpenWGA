@@ -5,11 +5,11 @@
 		<div class="panel-body">
 
 			{{#filetypes}}
-				<h1 style="clear:left">{{filetype}}</h1>
-				<div class="clearfix filetype">
+				<h1>{{filetype}}</h1>
+				<div class="filetype">
 					{{#files}}
 						<div class="thumb{{#isPrimary}} primary{{/isPrimary}}" draggable="true" 
-								title="{{filetitle}}"
+								title="{{filename}}"
 								data-type="{{type}}"
 								data-key="{{key}}"
 								data-dbkey="{{dbkey}}"
@@ -30,7 +30,7 @@
 								{{/waiting_for_derivates}}
 								url('{{thumbnail}}')
 							"></div>
-							<span>{{filename}}</span>
+							<span>{{filetitle}}</span>
 						</div>
 					{{/files}}
 				</div>
@@ -78,7 +78,7 @@
 					<i class="far fa-file-alt"></i>
 				</a>
 				
-				<a class="pull-right disabled" href="#" data-action="delete" title="Ausgewählte Datei(en) löschen">
+				<a class="pull-right disabled" href="#" data-action="delete-attachments" title="Ausgewählte Datei(en) löschen">
 					<span class="glyphicon glyphicon-trash"></span>
 				</a>					
 			</div>

@@ -41,6 +41,7 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -85,6 +86,7 @@ import de.innovationgate.webgate.api.WGContentKey;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
+import de.innovationgate.webgate.api.WGExpressionException;
 import de.innovationgate.webgate.api.WGFactory;
 import de.innovationgate.webgate.api.WGFileDerivateMetaData;
 import de.innovationgate.webgate.api.WGIllegalArgumentException;
@@ -115,6 +117,7 @@ import de.innovationgate.wgpublisher.design.conversion.PostProcessResult;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessor;
 import de.innovationgate.wgpublisher.design.fs.DesignFileDocument;
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptAppGlobalRegistry;
+import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptException;
 import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager.DerivateQuery;
 import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager.DerivateQueryTerm;
 import de.innovationgate.wgpublisher.files.derivates.TypeQueryTermProcessor;
@@ -871,6 +874,11 @@ public class WGPDispatcher extends HttpServlet {
                 return;
             }          
 
+            if (iPathType == WGPRequestPath.TYPE_APP_DISPATCHER) { 
+                appDispatcher(path, request, response);
+                return;
+            }          
+
 
             // Treatment of base URL Types
             if (iPathType == WGPRequestPath.TYPE_REDIRECT) {
@@ -1006,7 +1014,86 @@ public class WGPDispatcher extends HttpServlet {
         }
     }
 
-    public boolean isRedirectable(HttpServletRequest request, String redirectPath, Cookie lastRedirectCookie) {
+    private void appDispatcher(WGPRequestPath path, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	
+        WGA wga = WGA.get(request, response, getCore());
+        
+        // Set some basic attributes for WebTML processing
+        request.setAttribute(WGACore.ATTRIB_WGPPATH, path.getPublisherURL());
+        request.setAttribute(WGACore.ATTRIB_TAGIDS, new ConcurrentHashMap<String,BaseTagStatus>());
+        request.setAttribute(WGACore.ATTRIB_REQUESTURL, path.getCompleteURL());
+        request.setAttribute(WGACore.ATTRIB_REQUESTTYPE, REQUESTTYPE_TML);
+        request.setAttribute(WGACore.ATTRIB_URI_HASH, WGUtils.createMD5HEX(request.getRequestURI().getBytes("UTF-8")));
+        request.setAttribute(WGACore.ATTRIB_COOKIES, fetchHttpCookies(request));
+
+        // Determine requested mime type and type key
+        String mediaKey = path.getMediaKey();
+        if (mediaKey == null) {
+            mediaKey = path.getDatabase().getAttribute(WGACore.DBATTRIB_DEFAULT_MEDIAKEY).toString();
+        }
+        // Set these here for once, so the following scripts can fetch them. Might be changed by the renderer.
+        MediaKey mediaKeyObj = _core.getMediaKey(mediaKey);
+        request.setAttribute(WGACore.ATTRIB_MIMETYPE, mediaKeyObj.getMimeType());
+        request.setAttribute(WGACore.ATTRIB_MEDIAKEY, mediaKeyObj.getKey());
+
+        // Read ajax information, to be able to determine AJAX requests
+        String encAjaxInfo = request.getParameter("$ajaxInfo");
+        AjaxInfo ajaxInfo = null;
+        if (encAjaxInfo != null) {
+        	ajaxInfo = readAjaxInformation(request, path.getDatabase(), encAjaxInfo);
+        }
+
+    	try{
+        	// Prepare WebTML environment
+        	WGContent content = path.getDatabase().getDummyContent(path.getRequestLanguage());
+            TMLUserProfile tmlUserProfile = null;
+            try {
+                tmlUserProfile = getCore().getPersManager().prepareUserProfileForRequest(request, response, content, path.getDatabase(), null, ajaxInfo != null);
+            } 
+            catch (Exception e) {
+                _log.error("Unable to personalize WebTML request " + path.getCompleteURL(), e);
+            }
+	    	TMLContext mainContext = new WebTMLEnvironmentBuilder(getCore(), content, request, response, tmlUserProfile, ajaxInfo).prepareWebTmlEnvironment();
+	    	
+	    	if (ajaxInfo != null) {
+	            // If AJAX read the AJAX data and use WebTML module from there
+	        	WGTMLModule tmlLib = getAjaxTMLModule(request, path.getDatabase(), ajaxInfo);
+	        	Design outerLayout = wga.design(tmlLib.getDatabase()).resolve(tmlLib.getName());
+	        	mediaKey = tmlLib.getMediaKey();
+	        	rootDispatch(wga, outerLayout, mainContext, mediaKey);
+	    	}
+	    	else{
+		    	TMLScript tmlscript = wga.tmlscript();
+		    	ArrayList<Object> params = new ArrayList<Object>();
+		    	params.add(path);
+		    	params.add(path.appDispatcher.getPathElements());
+	    		tmlscript.callMethod(path.appDispatcher.getScriptObject(), path.appDispatcher.getLayoutKey(), null, params);
+	    	}
+            // Eventually do redirect
+            if (request.getAttribute(WGACore.ATTRIB_REDIRECT) != null) {
+            	response.sendRedirect(String.valueOf(request.getAttribute(WGACore.ATTRIB_REDIRECT)));
+            }
+    	}
+    	catch (WGExpressionException e){
+    		TMLScriptException scriptException = WGUtils.getCauseOfType(e, TMLScriptException.class);
+    		if(scriptException!=null){
+	    		@SuppressWarnings("rawtypes")
+				Map result = (Map)scriptException.getErrorValue();
+	    		int status = (int)result.get("code");
+	    		String msg = (String)result.get("message");
+	    		throw new HttpErrorException(status, msg, path.getDatabaseKey());
+    		}
+    		else throw e;
+    	}
+        catch (Exception e) {
+            throw e;
+        }
+        finally {
+            TMLContext.clearThreadMainContext();
+        }
+	}
+
+	public boolean isRedirectable(HttpServletRequest request, String redirectPath, Cookie lastRedirectCookie) {
         
         // Only redirect GET and HEAD requests
         if (!request.getMethod().equalsIgnoreCase("get") && !request.getMethod().equalsIgnoreCase("head")) {

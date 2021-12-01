@@ -27,6 +27,7 @@ package de.innovationgate.wga.server.api;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGDatabase;
@@ -34,6 +35,7 @@ import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGIllegalArgumentException;
 import de.innovationgate.webgate.api.WGQueryException;
 import de.innovationgate.webgate.api.auth.AuthenticationModule;
+import de.innovationgate.webgate.api.auth.AuthenticationSession;
 import de.innovationgate.webgate.api.auth.CustomCredentials;
 import de.innovationgate.webgate.api.auth.LabeledNamesProvider;
 import de.innovationgate.webgate.api.auth.UserGroupInfo;
@@ -339,7 +341,7 @@ public class Auth {
      * @throws UnavailableResourceException
      */
     @CodeCompletion
-    private DBLoginInfo getLoginInfo() throws WGException {
+    public DBLoginInfo getLoginInfo() throws WGException {
         
         if (_domain == null) {
             throw new WGAServerException("Unavailable operation for domain-independent Auth object");
@@ -481,6 +483,29 @@ public class Auth {
     }
 
     /**
+     * Returns the groups of the current user.
+     * @return groups
+     * @throws WGException
+     */
+    public Set<String> getUserGroups() throws WGException {
+    	AuthenticationSession session = getAuthSession();        
+        if (session != null) {
+            return session.getGroups();
+        }
+        return null;
+    }
+
+    /**
+     * Returns the current auth session
+     */
+    public AuthenticationSession getAuthSession() throws WGException{
+    	DBLoginInfo loginInfo = getLoginInfo();
+    	if(loginInfo==null)
+    		return null;
+    	return loginInfo.getAuthSession();
+    }
+
+    /**
      * Returns the type of authentication that the user used to authenticate to the current domain. null if the user is not logged in.
      * Valid values: "password" (classic login via username/password), "cert" (client certificate), "request" (request metadata, like on most SSO solutions)
      * @throws WGException
@@ -504,6 +529,5 @@ public class Auth {
         String loginName = getLoginName();
         return (loginName == null || loginName.equals(WGDatabase.ANONYMOUS_USER));
     }
-
     
 }

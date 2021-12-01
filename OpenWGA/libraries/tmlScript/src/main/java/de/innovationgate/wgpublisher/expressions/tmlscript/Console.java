@@ -41,6 +41,9 @@ public class Console {
 				all+= str0.substring(0, index);
 				str0= str0.substring(index);
 				
+				if(str0.length()==1)
+					break;
+				
 				if(str0.charAt(1) == 's') {
 					all += obj[i];
 					str0= str0.substring(2);

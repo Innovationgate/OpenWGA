@@ -240,6 +240,10 @@ this.mayCreateContent=function(){
 	return _false(label("reason.no-more-languages"));
 }
 
+this.hasReleasedContents = function(){
+	return !struct.getAllReleasedContent().isEmpty()
+}
+
 this.contentHasReaders=function(lang){
 	var lang = lang || Database.getPreferedLanguage();
 	var bestContent=this.getAllContent(lang, false);

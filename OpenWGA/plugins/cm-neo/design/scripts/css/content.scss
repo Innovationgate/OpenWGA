@@ -112,7 +112,7 @@
 			bottom: 0;
 			overflow: auto;
 			width: 0;
-			background: #EBEBEB;
+			background: rgba(40,96,144,0.1);	// #EBEBEB;
 			transition: width .3s ease-in;
 			&.dark {
 				background: black;

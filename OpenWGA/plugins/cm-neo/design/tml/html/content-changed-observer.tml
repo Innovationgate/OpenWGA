@@ -76,6 +76,8 @@
 	event.setParameter("page_visible", Struct.isVisible());
 	event.setParameter("may_create_root_page", may_create_root_page);
 	
+	event.setParameter("has_released_contents", Struct.hasReleasedContents());
+	
 	if(Struct.isVisible() && contentkey){
 		event.setParameter("contentkey", contentkey)
 		var c = context("db:"+dbkey + "/docid:" + contentkey, false);
@@ -134,14 +136,21 @@
 		WGA.ajax.action({
 			action: "<tml:action ajax="norefresh">
 				var path = "db:"+portlet.dbkey + (portlet.contentkey ? "/docid:"+portlet.contentkey : "/$struct:" + portlet.structkey)
-				if(context(path, false)){
+				var ctx = context(path, false);
+				if(ctx){
 					setsessionvar("_CM_clipboard_context", path)
+					var struct;
+					if(ctx.document instanceof Packages.de.innovationgate.webgate.api.WGStructEntry)
+						struct = ctx.document;
+					else struct = ctx.content().getStructEntry()
+					var has_released_contents = !struct.getAllReleasedContent().isEmpty();
 					portlet.fireevent("clipboard-changed", {
-						title: WGA.encode("html", context(path).TITLE),
-						lang: context(path).LANGUAGE || "",
-						version: context(path).VERSION || 0,
-						status: label("content-properties.status." + context(path).STATUS), 
-						contenttpe: context(path).CONTENTTYPE || ""
+						title: WGA.encode("html", ctx.TITLE),
+						lang: ctx.LANGUAGE || "",
+						version: ctx.VERSION || 0,
+						has_released_contents: has_released_contents,
+						status: label("content-properties.status." + ctx.STATUS), 
+						contenttpe: ctx.CONTENTTYPE || ""
 					})
 				}
 			</tml:action>",

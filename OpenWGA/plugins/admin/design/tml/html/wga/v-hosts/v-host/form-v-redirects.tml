@@ -1,10 +1,11 @@
 <tml:action id="addEntry_redirect">
-	if(!tmlform.path){
-		_redirect_form_msg = "Please enter path"
+	if(!tmlform.redirect){
+		_redirect_form_msg = "Please enter redirect Path"
 		return;
 	}
-	if(!tmlform.redirect){
-		_redirect_form_msg = "Please enter redirect URL"
+
+	if(tmlform.fieldList("requestHosts").isEmpty() && !tmlform.path){
+		_redirect_form_msg = "Please enter either request hosts or a request path";
 		return;
 	}
 
@@ -16,12 +17,13 @@
 </tml:action>
 
 <tml:action id="updateEntry_redirect">
-	if(!tmlform.path){
-		_redirect_form_msg = "Please enter path"
+	if(!tmlform.redirect){
+		_redirect_form_msg = "Please enter redirect Path"
 		return;
 	}
-	if(!tmlform.redirect){
-		_redirect_form_msg = "Please enter redirect URL"
+
+	if(tmlform.fieldList("requestHosts").isEmpty() && !tmlform.path){
+		_redirect_form_msg = "Please enter either request hosts or a request path";
 		return;
 	}
 
@@ -36,12 +38,14 @@
 	obj.forward=tmlform.forward;
 	obj.enabled=tmlform.enabled;
 	obj.permanentRedirect=tmlform.permanentRedirect;
+	obj.requestHosts=tmlform.fieldList("requestHosts") || WGA.createList();
 
 	tmlform.removeField("redirect");
 	tmlform.removeField("path");
 	tmlform.removeField("forward");
 	tmlform.removeField("permanentRedirect");
 	tmlform.removeField("enabled");
+	tmlform.removeField("requestHosts");
 	tmlform.removeField("_action");
 	tmlform.removeField("_idx");
 </tml:action>
@@ -61,6 +65,8 @@
 	tmlform.forward = redirect.forward;
 	tmlform.enabled = redirect.enabled;
 	tmlform.permanentRedirect = redirect.permanentRedirect;
+	
+	tmlform.requestHosts = redirect.requestHosts;
 	
 	tmlform._idx = idx;
 	tmlform._action = "edit_redirect"
@@ -102,8 +108,9 @@
 	<tml:else>
 		<table class="collection" width="100%" style="margin-bottom:20px">
 			<tr class="collection-title">
-				<td width="30%">Path Expression</td>
-				<td>URL</td>
+				<td>Request Hosts</td>
+				<td>Request Path</td>
+				<td>Redirect Path</td>
 				<td>Forward/Proxy</td>
 				<td>Permanent</td>
 				<td align="right">Status</td>
@@ -114,8 +121,11 @@
 		
 			<tml:foreach id="array-list-loop_redirect" type="itemvalue" item="_entry_list" currentvalue="_entry">
 				<tr class="List<tml:case condition="!_entry.enabled"> disabled</tml:case><tml:case condition="tmlform._idx==taginfo('array-list-loop_redirect', 'iteration')-1"> selected</tml:case>">
-					<td><tml:item name="_entry.path"/></td>
+					<td><tml:script expression="_entry.requestHosts && _entry.requestHosts.size() ? _entry.requestHosts : '*'" divider="<br>"/></td>
+
+					<td><tml:script expression="_entry.path || '*'"/></td>
 					<td><tml:item name="_entry.redirect"/></td>
+
 					<td><tml:script expression="_entry.forward ? 'proxy' : ''"/></td>
 					<td><tml:script expression="_entry.permanentRedirect ? 'true' : ''"/></td>
 					<td align="right"><tml:script expression="!_entry.enabled ? 'disabled' : ''"/></td>
@@ -156,25 +166,28 @@
 			</div>		
 			<div class="clear"></div>		
 
-			<label>Path Expression:</label>		
+			<label>Request Hosts (optional, empty=any):</label>		
 			<div class="data">
-				<tml:input name="path" type="text" cssstyle="width:500px"
-					validation="$E_VALUE!=''"
-					message = "Please enter a path."
-					trim="true"
-				/>		
-				<tml:include ref="system:convert-to-ext-field" o_fieldname="path" o_msgtarget="title"/>			
+				<tml:input name="requestHosts" type="textarea" multiple="true"/>
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="requestHosts" o_type="textarea" o_emptytext="any"/>			
 			</div>		
 			<div class="clear"></div>		
 
-			<label>URL:</label>		
+			<label>Request Path:</label>		
 			<div class="data">
-				<tml:input name="redirect" type="text" cssstyle="width:500px"
+				<tml:input name="path" type="text" trim="true"/>	
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="path" o_msgtarget="title" o_width="500"/>			
+			</div>		
+			<div class="clear"></div>		
+
+			<label>Redirect Path:</label>		
+			<div class="data">
+				<tml:input name="redirect" type="text"
 					validation="$E_VALUE!=''"
-					message = "Please enter a redirect URL."
+					message = "Please enter a redirect Path."
 					trim="true"
 				/>		
-				<tml:include ref="system:convert-to-ext-field" o_fieldname="redirect" o_msgtarget="title"/>			
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="redirect" o_msgtarget="title" o_width="500"/>			
 			</div>		
 			<div class="clear"></div>		
 

@@ -65,7 +65,22 @@
 						Seite '<tml:meta name="title" encode="html"/>'
 					</tml:case>
 				</li>
-				<li class="clipboard-paste-actions" <tml:case isempty="_CM_clipboard_context">style="display:none"</tml:case>><a data-action="paste-page" href="#">
+				<tml:script>
+					_has_released_contents = false;
+					if(_CM_clipboard_context){
+						var ctx = context(_CM_clipboard_context, false);
+						if(ctx){
+							var struct;
+							if(ctx.document instanceof Packages.de.innovationgate.webgate.api.WGStructEntry)
+								struct = ctx.document;
+							else struct = ctx.content().getStructEntry()
+							_has_released_contents = !struct.getAllReleasedContent().isEmpty();						
+						}
+					}			
+				</tml:script>
+				<li class="clipboard-paste-actions<tml:case isfalse="_has_released_contents"> disabled</tml:case>" 
+					<tml:case isempty="_CM_clipboard_context">style="display:none"</tml:case>
+				><a data-action="paste-page" href="#">
 					<span class="fas fa-file-import"></span>
 					Kopie dieser Seite einfügen ...
 				</a></li>

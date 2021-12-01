@@ -451,7 +451,11 @@ public class WebTMLScriptletResolver {
         	if (derivates == null)
         		derivates = (String) context.option(Base.OPTION_IMAGE_DERIVATES);
             return context.filedataurl(null, containerName, fileName, null, derivates);
-        } else {
+        }
+        else if (command.equalsIgnoreCase("imgurl")) {
+        	url = context.fileImageURL(containerName, fileName);
+        }
+        else {        	
         	url = context.fileurl(containerName, fileName);
         }
         

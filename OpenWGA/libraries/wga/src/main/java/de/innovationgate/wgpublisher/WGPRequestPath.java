@@ -49,6 +49,9 @@ import de.innovationgate.webgate.api.WGTMLModule;
 import de.innovationgate.webgate.api.WGUnavailableException;
 import de.innovationgate.wga.common.beans.csconfig.v1.MediaKey;
 import de.innovationgate.wga.config.VirtualHost;
+import de.innovationgate.wga.server.api.Design;
+import de.innovationgate.wga.server.api.TMLScript;
+import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGPDispatcher.URLID;
 import de.innovationgate.wgpublisher.filter.WGAFilter;
 import de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
@@ -61,7 +64,6 @@ import de.innovationgate.wgpublisher.url.TitlePathManager.TitlePath;
 import de.innovationgate.wgpublisher.webtml.utils.HttpErrorException;
 
 public class WGPRequestPath {
-
 	
     public static final String PATHCMD_JOBLOG = "joblog";
     public static final String PATHCMD_WEBTML_DEBUGGER = "tmldebug";
@@ -92,6 +94,8 @@ public class WGPRequestPath {
     public static final int TYPE_UNDEFINED_HOMEPAGE = 15;
     public static final int TYPE_JS = 16;
     public static final int TYPE_UNKNOWN_CONTENT = 17;
+    public static final int TYPE_APP_DISPATCHER = 18;
+
     // Working variables
 	private URL completeURL = null;
 	private String basePath = null;
@@ -122,6 +126,27 @@ public class WGPRequestPath {
     private boolean proceedRequest = true;
     private WGACore core;
     private WGContent content;
+    
+    public class AppDispatcher{
+		private Object _scriptObject;
+		private String _layoutKey;
+		private List _pathElements;    		
+    	public AppDispatcher(Object scriptObject, String layoutKey, List pathElements){
+    		_scriptObject = scriptObject;
+    		_layoutKey = layoutKey;
+    		_pathElements = pathElements;
+    	}
+    	String getLayoutKey(){
+    		return _layoutKey;
+    	}
+    	Object getScriptObject(){
+    		return _scriptObject;
+    	}
+    	List getPathElements(){
+    		return _pathElements;
+    	}
+    }    
+	public AppDispatcher appDispatcher;
     
     public static final String PATHCMD_TEMP_DOWNLOAD = "tempdwn";
 	
@@ -315,6 +340,40 @@ public class WGPRequestPath {
 			this.containerKey = this.database.toLowerCaseMeta(WGUtils.serializeCollection(this.pathElements.subList(2, fileNameIndex), ":"));			
 			this.fileName = WGUtils.serializeCollection(this.pathElements.subList(fileNameIndex, elementsSize), "/");			
 			return;
+		}
+
+		// Check custom app.Dispatcher module
+		WGA wga = WGA.get(request, response, core);
+		Design design = wga.design(database);
+		WGScriptModule dispatcherScriptModule=null;
+		
+		if(design.isCustomized()){
+			design = wga.design(database).resolve("overlay:wga:dispatcher");
+			dispatcherScriptModule = design.getScriptModule(WGScriptModule.CODETYPE_TMLSCRIPT);			
+		}
+		if(dispatcherScriptModule==null){
+			design = wga.design(database).resolve("wga:dispatcher");
+			dispatcherScriptModule = design.getScriptModule(WGScriptModule.CODETYPE_TMLSCRIPT);						
+		}
+		if(dispatcherScriptModule!=null){			
+	        int idx = readMediaKey(core, this.pathElements, 1);
+	        this.completePath=true;	// readMediaKey() may set completePath to false. This is not true in this case. 
+	        String designKey = this.pathElements.get(idx);
+			TMLScript tmlscript = wga.tmlscript();
+			try{
+				Object dispatcherObject = tmlscript.createObject(design, TMLScript.ObjectType.V2, null, null);
+				if (tmlscript.hasProperty(dispatcherObject, designKey)) {
+					//core.getLog().info("Dispatcher method found: " + designKey);
+					this.pathType = TYPE_APP_DISPATCHER;
+					this.appDispatcher = new AppDispatcher(dispatcherObject, designKey, this.pathElements.subList(idx+1, this.pathElements.size()));
+					return;
+				}
+				//else core.getLog().info("Dispatcher method not found: " + designKey);
+			}
+			catch(Exception e){
+				core.getLog().error("Unable to construct app.Dispacher", e);
+				this.pathType = TYPE_UNKNOWN;
+			}
 		}
 		
 		// Find out if we have a title path URL

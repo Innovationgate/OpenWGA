@@ -25,7 +25,11 @@
 
 package de.innovationgate.wga.config;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.simpleframework.xml.Attribute;
+import org.simpleframework.xml.ElementList;
 import org.simpleframework.xml.Root;
 
 @Root(strict=false)
@@ -39,6 +43,8 @@ public class VirtualHostRedirect {
     @NotNull
     private String redirect;
     
+    @ElementList (required=false)
+    private List<String> requestHosts = new ArrayList<String>(); 
 
     @Attribute (required=false)
     private boolean enabled=true;
@@ -90,4 +96,12 @@ public class VirtualHostRedirect {
     public boolean isPermanentRedirect(){
     	return permanentRedirect;
     }
+
+    public List<String> getRequestHosts(){
+    	return requestHosts;
+    }
+    public void setRequestHosts(List<String> hosts){
+    	requestHosts = hosts;
+    }
+
 }

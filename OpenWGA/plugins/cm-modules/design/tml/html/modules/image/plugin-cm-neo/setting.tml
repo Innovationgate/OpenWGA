@@ -100,7 +100,7 @@
 	</tml:[util:tab-page]>
 
 	<tml:[util:tab-page] designdb="plugin-cm-neo" o_id="click" o_title="Klick">
-		<tml:portlet name="click" ref="::click"/>
+		<tml:portlet name="click" ref="::click" o-context="_context"/>
 	</tml:[util:tab-page]>
 
 	<tml:[util:tab-page] designdb="plugin-cm-neo" o_id="style" o_title="Stil" if="$option_cmm_styles">
