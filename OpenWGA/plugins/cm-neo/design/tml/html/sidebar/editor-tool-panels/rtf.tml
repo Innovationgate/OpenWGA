@@ -26,9 +26,9 @@
 <fieldset>
 	<legend>Text</legend>
 	<div class="btn-group" style="display:block">
-		<a style="width:33.333%" href="#" data-cmd="Bold" class="btn btn-default btn-sm"><b>B</b></a>
-		<a style="width:33.333%" href="#" data-cmd="Italic" class="btn btn-default btn-sm"><i>I</i></a>
-		<a style="width:33.333%" href="#" data-cmd="Underline" class="btn btn-default btn-sm"><u>U</u></a>
+		<a style="width:33.333%" href="#" data-cmd="Bold" class="btn btn-default btn-sm" title="Fett"><b>B</b></a>
+		<a style="width:33.333%" href="#" data-cmd="Italic" class="btn btn-default btn-sm" title="Kursiv""><i>I</i></a>
+		<a style="width:33.333%" href="#" data-cmd="Underline" class="btn btn-default btn-sm" title="Unterstrichen"><u>U</u></a>
 	</div>
 </fieldset>
 	
@@ -36,26 +36,26 @@
 	<legend>Ausrichtung</legend>
 	<div class="btn-toolbar">
 		<div class="btn-group">
-			<a data-cmd="JustifyLeft" href="#" class="btn btn-default btn-sm">
+			<a data-cmd="JustifyLeft" href="#" class="btn btn-default btn-sm" title="Linksbündig">
 				<span class="fas fa-align-left"></span>
 			</a>
-			<a data-cmd="JustifyCenter" href="#" class="btn btn-default btn-sm">
+			<a data-cmd="JustifyCenter" href="#" class="btn btn-default btn-sm" title="Zentriert">
 				<span class="fas fa-align-center"></span>
 			</a>
-			<a data-cmd="JustifyRight" href="#" class="btn btn-default btn-sm">
+			<a data-cmd="JustifyRight" href="#" class="btn btn-default btn-sm" title="Rechtsbündig">
 				<span class="fas fa-align-right"></span>
 			</a>
-			<a data-cmd="JustifyFull" href="#" class="btn btn-default btn-sm">
+			<a data-cmd="JustifyFull" href="#" class="btn btn-default btn-sm" title="Blocksatz">
 				<span class="fas fa-align-justify"></span>
 			</a>
 		</div>
 
 		<div class="btn-group pull-right">
-			<a data-cmd="Indent" href="#" class="btn btn-default btn-sm">
+			<a data-cmd="Indent" href="#" class="btn btn-default btn-sm" title="Einrücken">
 				<tml:comment><span class="glyphicon glyphicon-indent-left"></span></tml:comment>
 				<span class="fa fa-indent"></span>
 			</a>
-			<a data-cmd="Outdent" href="#" class="btn btn-default btn-sm">
+			<a data-cmd="Outdent" href="#" class="btn btn-default btn-sm" title="Ausrücken">
 				<tml:comment><span class="glyphicon glyphicon-indent-right"></span></tml:comment>
 				<i class="fa fa-outdent"></i>
 			</a>
@@ -65,13 +65,17 @@
 
 <fieldset>
 	<legend>Liste</legend>
-	<div class="btn-group" style="display:block">
-		<a data-cmd="InsertUnorderedList" style="width:50%" href="#" class="btn btn-default btn-sm">
+	<div class="btn-group clearfix" style="display:block">
+		<a data-cmd="InsertUnorderedList" style="width:50%" href="#" class="btn btn-default btn-sm" title="Liste">
 			<i class="fa fa-list-ul"></i>
 		</a>
-		<a data-cmd="InsertOrderedList" style="width:50%" href="#" class="btn btn-default btn-sm">
+		<a data-cmd="InsertOrderedList" style="width:50%" href="#" class="btn btn-default btn-sm" title="Aufzählung">
 			<i class="fa fa-list-ol"></i>
 		</a>
+	</div>
+	<div style="margin:10px 0 0" class="list-options">
+		<tml:comment><label>Listenstil:</label></tml:comment>
+		<select name="list-style" style="width:100%" multiple="multiple"></select> 
 	</div>
 </fieldset>
 
