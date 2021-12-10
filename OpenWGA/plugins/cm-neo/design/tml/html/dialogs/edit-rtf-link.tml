@@ -25,6 +25,11 @@
 	tmlform.removefield("filename")
 </tml:action>
 
+<tml:action id="setTargetWindow">
+	if(tmlform.target=="_blank")
+		tmlform.removefield("target")
+</tml:action>
+
 <tml:form id="edit-rtf-link">
 
 	<div class="header">
@@ -53,7 +58,7 @@
 				/>
 			</tml:case>
 			<tml:case value="exturl">
-				<tml:[form-field] o_label="URL" o_name="url" 
+				<tml:[form-field] o_label="Zieladresse" o_name="url" 
 					o_default="{$option_dialog_options.key || $option_dialog_options.url}"
 					o_placeholder="vollständige absolute URL ..."
 				/>
@@ -156,9 +161,26 @@
 		<tml:[form-field] o_label="Titel" o_name="title" o_default="{$option_dialog_options.title}"
 			o_placeholder="Titel des Links ..."
 		/>
-		<tml:[form-field] o_label="Zielfenster" o_name="target" o_default="{$option_dialog_options.target}"
-			o_placeholder="Name des Zielfensters ..."
+		
+		<tml:script>
+			if(!tmlform.submitted){
+				tmlform.target = $option_dialog_options.target;
+				if(!$option_dialog_options.target || $option_dialog_options.target=="_self")
+					tmlform.target_window = "self";
+				else if($option_dialog_options.target=="_blank")
+					tmlform.target_window = "blank";
+				else tmlform.target_window = "custom";
+			}
+		</tml:script>
+		<tml:[form-field] o_label="Zielfenster" o_name="target_window" o_type="select" 
+			o_options="gleiches Fenster|self,neues Fenster|blank,neues Fenster mit eigenem Fensternamen|custom"
+			o_changeaction="setTargetWindow"
 		/>
+		
+		<tml:case condition="tmlform.target_window=='custom'">
+			<tml:[form-field] o_label="Name des Zielfensters" o_name="target" o_placeholder="Name eingeben ..."/>
+		</tml:case>
+		
 	</div>
 	
 	<div class="footer">
@@ -197,6 +219,14 @@
 				
 			var form = $("#edit-rtf-link");
 			var type = $("[name=type]", form).val();
+			var target = $("[name=target]", form).val();
+			var target_window = $("[name=target_window]", form).val();
+			
+			if(target_window=="custom" && !target){
+				alert("Bitte geben Sie einen Fensternamen ein.");
+				$("[name=target]", form).focus();
+				return;
+			}
 			
 			if(type=="exturl"){
 				var url = $("[name=url]", form).val();
@@ -275,9 +305,12 @@
 				return;
 			}
 			a.title = $("[name=title]", form).val();
-			var target = $("[name=target]", form).val();
-			if(target)
+
+			if(target_window=="blank")
+				a.target = "_blank"
+			else if(target_window=="custom"){
 				a.target = target;
+			}
 
 			Modal.hide();
 
@@ -291,6 +324,14 @@
 			
 			var form = $("#edit-rtf-link");
 			var type = $("[name=type]", form).val();
+			var target = $("[name=target]", form).val();
+			var target_window = $("[name=target_window]", form).val();
+			
+			if(target_window=="custom" && !target){
+				alert("Bitte geben Sie einen Fensternamen ein.");
+				$("[name=target]", form).focus();
+				return;
+			}
 			
 			if(type=="int"){
 				var key = $("[name=key]", form).val();
@@ -368,9 +409,12 @@
 			}
 			
 			a.title = $("[name=title]", form).val();
-			var target = $("[name=target]", form).val();
-			if(target)
+			
+			if(target_window=="blank")
+				a.target = "_blank"
+			else if(target_window=="custom"){
 				a.target = target;
+			}
 			else a.removeAttribute("target")
 			
 			Modal.hide();
