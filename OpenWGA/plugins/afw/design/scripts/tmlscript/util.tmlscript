@@ -718,6 +718,8 @@ this.csvReader = function(config){
 			var inputstream;
 			if(stream_or_file instanceof Packages.java.io.File)
 				inputstream = new Packages.java.io.FileInputStream(stream_or_file);
+			else if(stream_or_file instanceof Packages.de.innovationgate.wga.server.api.WGAFile)
+				inputstream = stream_or_file.inputStream;
 			else inputstream = stream_or_file;
 			 
 			var reader = new Packages.java.io.BufferedReader(new Packages.java.io.InputStreamReader(inputstream, encoding || "UTF-8"));
@@ -766,7 +768,7 @@ this.csvReader = function(config){
 						else if(column.type=="number")
 							value = WGA.parseNumber(value, config.numberFormat || "#")
 						else if(column.type=="boolean"){
-							value = (value.toLowerCase()=="true" || value=="1") ? true : false;
+							value = (value.toLowerCase()=="true" || value.toLowerCase()=="ja" || value=="1") ? true : false;
 						}
 						data[column.key]=value
 					}
