@@ -16,7 +16,8 @@ Controller.prototype.filenames = function($cx) {
 	var derivate = $cx.option("derivate");
 	var extensions = $cx.option("file-extensions");
 	var mimetype = $cx.option("mimetype");
-
+	var ratio = Number($cx.option("ratio") || 0);
+	
 	var filenames = $cx.content().getFileNames();
 	var _filenames = WGA.createList();
 	
@@ -37,8 +38,15 @@ Controller.prototype.filenames = function($cx) {
 		if(mimetype){
 			for(var filename in Iterator(filenames)){
 				var file_md = $cx.content().getFileMetaData(filename);
-				if(file_md.mimeType && file_md.mimeType.indexOf(mimetype)==0 && !_filenames.contains(filename))
-					_filenames.add(filename);
+				if(file_md.mimeType && file_md.mimeType.indexOf(mimetype)==0 && !_filenames.contains(filename)){
+					if(ratio){
+						var width = file_md.getDisplayWidth();
+						var height = file_md.getDisplayHeight();
+						if(width>0 && height>0 && (width/height).toFixed(3)==ratio.toFixed(3))
+							_filenames.add(filename);
+					}
+					else _filenames.add(filename);
+				}
 			}
 		}
 		if(extensions){
