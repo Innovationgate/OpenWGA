@@ -68,6 +68,29 @@
 			</tml:then>
 			<tml:else>
 
+				<div style="color:red;margin-bottom:20px;display:none;align-items:center" id="empty_h">
+					<i style="font-size:2em;margin-right:15px" class="fas fa-exclamation-triangle"></i>
+					<div style="flex:1">
+						Die Dokumentstruktur enthält Fehler.
+						<br>Bitte prüfen Sie die Seite mit Hilfe der <a style="text-decoration:underline;color:inherit" href="#"><i class="fa fa-arrow-right"></i> Outline-Ansicht</a>.
+					</div>
+				</div>
+				<script>
+					require(["jquery", "outline"], function($, Outline){
+						Outline.analyzeDocument(function(errors){
+							if(errors)
+								$("#empty_h").css("display", "flex");
+						})
+						$("#empty_h a").click(function(ev){
+							ev.preventDefault();
+							WGA.event.fireEvent("appnav-view-change", "publish-page-dialog", {
+								view: "outline"
+							})
+							WGA.event.fireEvent("close-dialog", "publish-page-dialog", {});
+						})
+					})
+				</script>
+
 				<tml:[form-field] o_label="Sichtbar ab">
 					<div class="clear-field-wrapper<tml:case condition="VALIDFROM"> col-sm-8</tml:case>">
 						<tml:input type="date" name="validfrom" meta="true" cssclass="date form-control" html_placeholder="sofort" format="dd.MM.yyyy"/>
