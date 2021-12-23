@@ -10,7 +10,8 @@
 .column-slider{
 
 	overflow: hidden;
-
+	margin: 0 -5px;
+	
 	.columns {
 		
 		width: 20000px;
@@ -19,15 +20,18 @@
 		display: flex;
 		
 		.column {
-			margin: 0 10px 0 0;
+			margin: 0 5px;
 			box-sizing: border-box;
+			&:not(.active){
+				cursor: pointer;
+			}
 		}
 		
 	}
 	
 	.nav{
 	
-		margin-top: 10px;
+		margin: 10px 5px;
 		
 		.prev, .next{
 			cursor: pointer;
