@@ -38,6 +38,11 @@
 					<tml:button cssclass="btn btn-primary" clickaction="$mc.cmlogin" html_type="submit">Anmelden ...</tml:button>
 				</div>
 				
+				<tml:{div} if="$mc.pwdSelfserviceURL">
+					<hr>
+					<a target="_blank" href="<tml:item name="$mc.pwdSelfserviceURL"/>">Neues Kennwort anfordern ...</a>
+				</tml:{div}>
+				
 			</tml:form>
 			
 		</div>	
