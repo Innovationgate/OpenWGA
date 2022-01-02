@@ -1470,7 +1470,7 @@ public abstract class WGUtils {
         PlainTextParserCallback callback = new PlainTextParserCallback(ignoreWhitespace, divider, formatted);
         ParserDelegator parserDelegator = new javax.swing.text.html.parser.ParserDelegator();
         parserDelegator.parse(new java.io.StringReader(html), callback, true);
-        return callback.getText();
+        return callback.getText().trim();
 
     }
 
