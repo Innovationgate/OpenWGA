@@ -5,6 +5,7 @@
 	</tml:script>
 	<a class="title" data-id="<tml:item name="$option_mod.id"/>">
 		<tml:script expression="String($option_mod.title)"/>
+		<tml:option name="title"/>
 		<tml:case isempty="_config">- Inhaltsmodul nicht gefunden</tml:case>
 	</a>
 	<tml:option name="body"/>

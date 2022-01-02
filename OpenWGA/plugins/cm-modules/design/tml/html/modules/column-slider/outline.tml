@@ -1,6 +1,9 @@
 <tml:include ref="system:outline">
 	<div class="cols">
-		<tml:include ref="system:include-child-outlines" o_max="{Math.min(CMM.setting('cols_l'), 4)}"/>
+		<tml:script>
+			_cols = (tmlform && tmlform.field(WGA.scoped("cols_l"))) || CMM.setting('cols_l') || 3;
+		</tml:script>
+		<tml:include ref="system:include-child-outlines" o_max="{Math.min(_cols, 4)}"/>
 	</div>
 	<div style="text-align:center;line-height:10px;margin-top:10px">
 		<span style="display:inline-block;width:10px;height:10px;border:solid gray 1px;border-radius:10px"></span> 
