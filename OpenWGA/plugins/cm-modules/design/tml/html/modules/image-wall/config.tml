@@ -5,6 +5,7 @@
 	type:			'container',
 	tml:			'modules:image-wall:render',
 	settingstml: 	'modules:image-wall:settings',
+	outlinetml: 	'modules:image-wall:outline',
 	allowedchildren: ["cm_image-wall-image"],
 	icon:			'<tml:url db="plugin-wga-app-framework" type="file" doc="icons@base" file="photos.png"/>',
 	includes: {
@@ -19,5 +20,6 @@
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="photo.png"/>",
 	tml:			'modules:image-wall:render-image',
 	settingstml: 	'modules:image-wall:settings-image',
+	outlinetml: 	'modules:image:outline',
 	allowedparents: ["cm_image-wall"]
 }

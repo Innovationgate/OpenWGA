@@ -93,6 +93,11 @@
       <type>1</type>
       <shortcut>afw</shortcut>
     </de.innovationgate.wga.common.beans.csconfig.v2.Shortcut>
+    <de.innovationgate.wga.common.beans.csconfig.v2.Shortcut>
+      <reference>de.innovationgate.cm-modules</reference>
+      <type>1</type>
+      <shortcut>cmm</shortcut>
+    </de.innovationgate.wga.common.beans.csconfig.v2.Shortcut>
   </shortcuts>
   <staticClasspath>false</staticClasspath>
   <minimumWGAVersion>

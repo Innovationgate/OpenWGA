@@ -1,0 +1,5 @@
+<tml:include ref="system:outline" o_style="background:#efefef">
+	<div style="text-align:center;font-size:4em;color:silver">
+		<i class="fa fa-film"></i>
+	</div>
+</tml:include>

@@ -6,6 +6,7 @@
 	type:			'container',
 	tml:			'modules:column-slider:render',
 	settingstml: 	'modules:column-slider:settings',
+	outlinetml:		'modules:column-slider:outline',
 	allowedchildren: ["cm_column-slider-page","ig_column-slider-page"],
 	icon:			'<tml:url db="plugin-wga-app-framework" type="file" doc="icons@base" file="application_side_contract.png"/>',
 	includes: {

@@ -53,13 +53,19 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 			moved: contentModuleMoved
 		})
 		
-		if(section)
-			$("#module-tree").wga_tree("expandnode", "section."+section, function(node){
-				$("#module-tree").wga_tree("selectnode", node, true);
-			});
+		// default selection:
+		var node;
+		if(last_selected && $("#module-tree .node[data-id='" + last_selected + "']").length)
+			node = last_selected;
+		else if(section)
+			node = "section."+section;
+		else node = $("#module-tree .node").first().data("id");
 		
-		last_selected && $("#module-tree").wga_tree("selectnode", last_selected, true); 
+		$("#module-tree").wga_tree("expandnode", node, function(node){
+			$("#module-tree").wga_tree("selectnode", node, true);
+		});
 		
+		// event handler
 		$("#dialog-content-modules").on("click", "[data-button=expand-all]", function(e){
 			e.preventDefault();
 			if(selected_tree_node){
@@ -339,9 +345,16 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 
 	}
 	
-	function saveModulesClick(e){
-		
+	function saveModulesClick(e){		
 		e.preventDefault();
+		WGA.event.fireEvent("save-modules", "*", {
+			selected: selected_tree_node && selected_tree_node.data("id"),
+			mods: JSON.stringify(getModules()),
+			deleted_mods: JSON.stringify(deleted_mods)
+		})
+	}
+	
+	function getModules(){
 		var els = $("#module-tree").find(">ul>li")
 		var data = {};
 		els.each(function(){
@@ -349,11 +362,7 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 			var section = $this.data("id").split(".")[1];
 			data[section]=getNodes($this)
 		})
-		WGA.event.fireEvent("save-modules", "*", {
-			selected: selected_tree_node && selected_tree_node.data("id"),
-			mods: JSON.stringify(data),
-			deleted_mods: JSON.stringify(deleted_mods)
-		})
+		return data;
 		
 		function getNodes(el){
 			var els = el.find(">ul>li")
@@ -369,14 +378,18 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 				})
 			})
 			return data;
-		}
-				
+		}		
 	}
 
+	function selectNode(id){
+		$("#module-tree").wga_tree("selectnode", id, true);
+	}
 	
 	// public interface:
 	return {
-		init: init
+		init: init,
+		selectNode: selectNode,
+		getModules: getModules
 	}
 
 })

@@ -5,6 +5,7 @@
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="text_columns.png"/>",
 	tml:			'modules:tiles:render',
 	settingstml:	'modules:tiles:settings',
+	outlinetml:		'modules:tiles:outline',
 	type:			'container',
 	allowedchildren: ["cm_tile"],
 	module_classes:	["Nahtlos|no-margins"],

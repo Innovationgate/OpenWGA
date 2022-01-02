@@ -1,0 +1,5 @@
+<tml:include ref="system:outline">
+	<div class="cols wrap">
+		<tml:include ref="system:include-child-outlines"/>
+	</div>
+</tml:include>

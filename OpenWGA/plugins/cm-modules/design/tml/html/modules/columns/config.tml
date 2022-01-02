@@ -30,6 +30,7 @@
 	type:			'container',				
 	tml:			'plugin-cm-modules/modules:columns:render',
 	settingstml:	'plugin-cm-modules/modules:columns:settings',
+	outlinetml:		'modules:tiles:outline',
 	allowedchildren: ["cm_column"],
 	includes: {
 		css: 	'plugin-cm-modules/modules:columns:css'

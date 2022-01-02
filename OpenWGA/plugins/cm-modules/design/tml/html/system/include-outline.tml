@@ -1,0 +1,3 @@
+<tml:include ref="::outline">
+	<tml:include ref="::include-child-outlines"/>
+</tml:include>

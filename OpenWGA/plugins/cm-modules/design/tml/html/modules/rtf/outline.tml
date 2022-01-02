@@ -1,0 +1,14 @@
+<tml:include ref="system:outline">
+	<tml:script>
+		_body = item(WGA.scoped("body")) || "";
+		try{
+			_body = WGA.encode("plaintext:formatted", _body);
+			_body = WGA.encode("abbrev:50", _body);
+			_body = WGA.encode("lftobr", _body);
+		}
+		catch(e){
+			_body = _body.substr(0, 50)
+		}
+	</tml:script>
+	<tml:item name="_body" encode="none"/>
+</tml:include>

@@ -1,0 +1,3 @@
+<tml:include ref="system:outline">
+	<tml:script expression="CMM.setting('filename')"/>
+</tml:include>
