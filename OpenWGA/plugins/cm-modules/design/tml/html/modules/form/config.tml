@@ -54,6 +54,7 @@
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="textfield.png"/>",
 	tml:			'plugin-cm-modules/modules:form:render_field',
 	settingstml:	'plugin-cm-modules/modules:form:field-settings',
+	outlinetml:		'modules:form:outline-field',
 	allowedparents: ["cm_form", "cm_fieldset"],
 	allowedchildren: []
 },
