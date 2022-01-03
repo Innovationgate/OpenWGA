@@ -1,6 +1,5 @@
 <div class="module" style="<tml:option name="style"/>">
 	<tml:script>
-		setOption("style", null)
 		_config = CMM.getModuleConfig($option_mod.module_id)
 	</tml:script>
 	<a class="title" data-id="<tml:item name="$option_mod.id"/>">
