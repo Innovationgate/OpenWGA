@@ -10,11 +10,12 @@
 			var doc = Packages.org.jsoup.Jsoup.parseBodyFragment($option_dialog_options.html);
 			var settings = new Packages.org.jsoup.nodes.Document.OutputSettings();
 			settings.indentAmount​(4);
+			settings.outline(true);
 			doc.outputSettings(settings);
-			_html = doc.body().html()
-			//_html = Packages.org.jsoup.Jsoup.parseBodyFragment($option_dialog_options.html).body().html();
+			if(!tmlform.submitted)
+				tmlform.html = doc.body().html()
 		</tml:script>
-		<tml:input name="html" cssstyle="font-family:Monospace" type="textarea" defaultexpression="_html" cssclass="form-control" html_spellcheck="false" html_data-focus="true"/>
+		<tml:input name="html" cssstyle="font-family:Monospace;white-space:pre" type="textarea" cssclass="form-control" html_spellcheck="false" html_data-focus="true"/>
 	</div>
 	
 	<div class="footer">
@@ -26,7 +27,7 @@
 
 <script>
 	require(["jquery", "jquery-tabhandler"], function($){
-		$("#edit-html textarea").tabhandler();
+		$("#edit-html textarea").tabhandler().autogrow();
 		$("#edit-html [data-action=save]").on("click", function(ev){
 			ev.preventDefault();
 			var html = $("#edit-html [name=html]").val()
