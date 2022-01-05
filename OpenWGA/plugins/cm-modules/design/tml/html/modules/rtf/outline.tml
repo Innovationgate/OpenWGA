@@ -2,7 +2,7 @@
 	<tml:script>
 		_body = item(WGA.scoped("body")) || "";
 		try{
-			_body = WGA.encode("plaintext:formatted", _body);
+			_body = WGA.encode("plaintext:formatted,html", _body);
 			_body = WGA.encode("abbrev:50", _body);
 			_body = WGA.encode("lftobr", _body);
 		}
