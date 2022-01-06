@@ -19,6 +19,7 @@
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="table.png"/>",
 	tml:			'modules:tiles:render-tile',
 	settingstml:	'modules:tiles:settings-tile',
+	outlinetml:		'modules:tiles:outline-tile',
 	type:			'container',
 	module_classes:	["Abstand zum Rand / Padding|padding","Rahmen / Border|border"],
 	allowedparents: ["cm_tiles"]

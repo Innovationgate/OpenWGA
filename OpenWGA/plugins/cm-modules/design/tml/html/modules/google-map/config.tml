@@ -31,6 +31,7 @@
 	tml:			'modules:google-map:render',
 	settingstml:	'modules:google-map:settings',
 	setuptml:		'modules:google-map:setup',
+	outlinetml:		'modules:google-map:outline',
 	allowedchildren: ["cm_google_map_marker"],
 	includes:		{
 		tml:	'modules:google-map:google-maps-api',
@@ -43,5 +44,6 @@
 	title:			'<tml:label key="module.google-map-marker"/>',
 	icon:			'<tml:url type="file" doc="icons" file="google-marker.png"/>',
 	settingstml:	'modules:google-map:settings-marker',
+	outlinetml:		'modules:google-map:outline-marker',
 	allowedparents: ["cm_google_map"]
 }
