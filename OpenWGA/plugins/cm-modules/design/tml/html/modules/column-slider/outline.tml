@@ -1,4 +1,9 @@
 <tml:include ref="system:outline">
+	<tml:option name="title" scope="local">
+		/
+		<tml:script expression="$option_mod.children.length"/>
+		Spalten
+	</tml:option>
 	<div class="cols">
 		<tml:script>
 			_cols = (tmlform && tmlform.field(WGA.scoped("cols_l"))) || CMM.setting('cols_l') || 3;
