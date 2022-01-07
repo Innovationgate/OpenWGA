@@ -76,8 +76,9 @@ public class JSMinPostProcessor implements PostProcessor{
 			}
 		} catch (Exception e) {
 			convertedCode.append("// unable to read JSMin module\n");
-			wga.getLog().error("jsmin: unable to read module: " + e);
+			wga.getLog().error("jsmin: unable to process module " + base_ref + ": " + e);
 			data.setCacheable(false);
+			e.printStackTrace();
 		}
 
 		if(WGACore.isDevelopmentModeEnabled() || !data.isCompress()){
