@@ -2,13 +2,16 @@
 	<tml:script>
 		_body = item(WGA.scoped("body")) || "";
 		try{
-			_body = WGA.encode("plaintext:formatted,html", _body);
+			_body = WGA.encode("plaintext:formatted", _body);
 			_body = WGA.encode("abbrev:50", _body);
-			_body = WGA.encode("lftobr", _body);
+			/*
+				plaintext encode may produce html if html-entities are contained: &lt;tag&gt; is encoded to <tag>
+				The result therefore should be html-encoded (which also translates \n to <br>)
+			*/
 		}
 		catch(e){
 			_body = _body.substr(0, 50)
 		}
 	</tml:script>
-	<tml:item name="_body" encode="none"/>
+	<tml:item name="_body"/>
 </tml:include>
