@@ -1097,7 +1097,7 @@ public class WGPDispatcher extends HttpServlet {
         
         // Only redirect GET and HEAD requests
         if (!request.getMethod().equalsIgnoreCase("get") && !request.getMethod().equalsIgnoreCase("head")) {
-            getCore().getLog().warn("Unredirectable request with incomplete URL: " + request.getRequestURI() + ". Reason: No GET or HEAD request. Request method was " + request.getMethod());
+            //getCore().getLog().warn("Unredirectable request with incomplete URL: " + request.getRequestURI() + ". Reason: No GET or HEAD request. Request method was " + request.getMethod());
             return false;
         }
         
