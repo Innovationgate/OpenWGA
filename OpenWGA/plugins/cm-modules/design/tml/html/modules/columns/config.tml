@@ -24,7 +24,7 @@
 ## LICENSE END #################################################################
 {
 	id:				'cm_columns',
-	category:		'Container',
+	category:		'Spalten',
 	title:			'<tml:label key="module.columns"/>',
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="text_columns.png"/>",
 	type:			'container',				

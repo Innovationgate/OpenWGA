@@ -1,0 +1,5 @@
+<tml:script>
+	if($option_anzahl==1)
+		return $option_einzahl;
+	return $option_anzahl + " " + $option_mehrzahl;
+</tml:script>

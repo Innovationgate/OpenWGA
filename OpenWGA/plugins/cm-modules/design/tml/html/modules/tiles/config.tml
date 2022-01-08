@@ -1,6 +1,6 @@
 {
 	id:				'cm_tiles',
-	category:		'Container',
+	category:		'Spalten',
 	title:			'<tml:label key="tiles.tiles.title"/>',
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="text_columns.png"/>",
 	tml:			'modules:tiles:render',

@@ -1,8 +1,9 @@
 <tml:include ref="system:outline">
 	<tml:option name="title" scope="local">
-		/
+		<tml:comment>/
 		<tml:script expression="$option_mod.children.length"/>
-		Spalten
+		Spalte(n)</tml:comment>
+		/ <tml:include ref="util:anzahl" o-anzahl="$option_mod.children.length" o_einzahl="eine Spalte" o_mehrzahl="Spalten"/>
 	</tml:option>
 	<div class="cols">
 		<tml:script>

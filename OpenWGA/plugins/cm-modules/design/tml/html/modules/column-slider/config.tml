@@ -2,7 +2,7 @@
 	id_alias:		'ig_column-slider',
 	id:				'cm_column-slider',
 	title:			'<tml:label key="module.column-slider"/>',
-	category:		'Container',
+	category:		'Spalten',
 	type:			'container',
 	tml:			'modules:column-slider:render',
 	settingstml: 	'modules:column-slider:settings',

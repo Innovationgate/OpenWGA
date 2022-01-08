@@ -24,6 +24,7 @@
 ## LICENSE END #################################################################
 {
 	id:				'cm_html_fragment',
+	category:		'Tools',
 	title:			'<tml:label key="module.html-fragment"/>',
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="html.png"/>",
 	tml:			'plugin-cm-modules/modules:html-fragment:render',
