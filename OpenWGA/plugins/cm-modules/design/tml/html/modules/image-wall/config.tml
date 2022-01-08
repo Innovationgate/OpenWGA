@@ -1,7 +1,7 @@
 {
 	id:				'cm_image-wall',
+	category:		'<tml:label key="module.category.media"/>',
 	title:			'<tml:label key="module.image-wall"/>',
-	category:		'Container',
 	type:			'container',
 	tml:			'modules:image-wall:render',
 	settingstml: 	'modules:image-wall:settings',
