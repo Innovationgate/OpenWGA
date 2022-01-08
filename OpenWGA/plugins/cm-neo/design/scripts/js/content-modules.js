@@ -204,8 +204,11 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 		else $("#dialog-content-modules .content-modules-toolbar button[data-button=add]").removeClass("disabled")
 		
 		if(modules._ && modules._.length){
-			for(var i=0; i<modules._.length; i++){
-				var module = modules._[i];
+			var cat_mods = modules._.sort(function(a,b){
+				return a.text > b.text
+			});
+			for(var i=0; i<cat_mods.length; i++){
+				var module = cat_mods[i];
 				content_modules_list.append('<a data-module-id="' + module.id + '">'
 						+ '<img src="' + module.icon + '">  '
 						+ module.text 
