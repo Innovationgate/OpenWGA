@@ -213,16 +213,26 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 			}
 		}
 
+		var cats = [];
 		for(var c in modules){
 			if(c=="_")
 				continue;
+			cats.push(c);
+		}
+		cats = cats.sort();
+		
+		for(var ci=0; ci<cats.length; ci++){
+			var c = cats[ci];
 			var c_link = $('<a class="container-toggle">' + c + '</a>')
 			content_modules_list.append(c_link)
 			if(modules[c].length){
 				var s = $('<ul class="collapse module-list">')
 				content_modules_list.append(s)
-				for(var i=0; i<modules[c].length; i++){
-					var module = modules[c][i];
+				var cat_mods = modules[c].sort(function(a,b){
+					return a.text > b.text
+				});
+				for(var i=0; i<cat_mods.length; i++){
+					var module = cat_mods[i];
 					s.append('<li><a data-module-id="' + module.id + '">'
 							+ '<img src="' + module.icon + '">  '
 							+ module.text 
