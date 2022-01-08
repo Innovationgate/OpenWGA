@@ -48,7 +48,7 @@
 			if(config){
 				form.designdb.value = config.designdb;
 				form.settingstml.value = config.settingstml||"";
-				form.title.value=(config.category ? config.category + "/": "") + config.title;
+				form.title.value=(config.category ? "[" +config.category + "] ": "") + config.title;
 				form.module_id.value = config.id;
 			}
 			else if(module.level==1){
