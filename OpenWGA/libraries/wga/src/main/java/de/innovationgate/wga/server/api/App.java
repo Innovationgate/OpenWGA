@@ -207,7 +207,7 @@ public class App extends Database {
 	    	VirtualHost vhost = WGAVirtualHostingFilter.findMatchingHost(_wga.getCore().getWgaConfiguration(), request);
 	    	if(vhost!=null && vhost.isHideDefaultDatabaseInURL()){
 	    		String defaultDBKey = WGAVirtualHostingFilter.getDefaultDBKey(_wga.getCore(), vhost);
-	    		if(defaultDBKey.equals(getDbKey()))
+	    		if(defaultDBKey!=null && defaultDBKey.equals(getDbKey()))
 	    			return _wga.server().getBaseURL(absolute);
 	    	}
     	}
