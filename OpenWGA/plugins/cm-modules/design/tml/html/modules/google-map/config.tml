@@ -25,7 +25,7 @@
 {
 	id:				'cm_google_map',
 	title:			'<tml:label key="module.google-map"/>',
-	category:		"<tml:label key="module.category.social"/>",
+	category:		"Verschiedenes",
 	icon:			'<tml:url db="@afw" type="file" doc="icons" file="map.png"/>',
 	type:			'container',
 	tml:			'modules:google-map:render',
