@@ -54,7 +54,7 @@
 <div style="margin:10px">
 	<tml:input type="select" name="{scoped:layout}" 	
 			cssclass="form-control"
-			options="Link-List|link-list,News collection|news-list,Karoussel|caroussel,Kacheln|tiles"
+			options="Link-Liste|link-list,News Kollektion|news-list,Karoussel|caroussel,Kacheln|tiles"
 			default="link-list"
 			changeaction="$refresh" ajax="true"
 			mode="{option('mode')}"/>

@@ -1,7 +1,7 @@
 <tml:script>
 	_layout = (tmlform && tmlform.field(WGA.scoped("layout"))) || CMM.setting('layout');
 </tml:script>
-<tml:include ref="system:outline" o_title="[/ {WGA.alias(_layout, 'Link-List|link-list,News collection|news-list,Karoussel|caroussel,Kacheln|tiles')}]">
+<tml:include ref="system:outline" o_title="[/ {WGA.alias(_layout, 'Link-Liste|link-list,News Kollektion|news-list,Karoussel|caroussel,Kacheln|tiles')}]">
 	<tml:if condition="_layout=='tiles'">
 		<tml:then>
 			<div class="cols wrap">
