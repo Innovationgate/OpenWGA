@@ -78,7 +78,7 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 			})
 
 			var h1 = $(el).find("h1").length
-			if(h1!=1)
+			if(h1>1)
 				errors++;
 			if(callback)
 				callback(errors)
