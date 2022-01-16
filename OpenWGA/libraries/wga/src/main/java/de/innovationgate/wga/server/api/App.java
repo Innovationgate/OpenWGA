@@ -49,7 +49,6 @@ import de.innovationgate.wga.server.api.tml.UserProfile;
 import de.innovationgate.wgpublisher.PersonalisationManager;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGAServerException;
-import de.innovationgate.wgpublisher.WGPDispatcher;
 import de.innovationgate.wgpublisher.api.Unlocker;
 import de.innovationgate.wgpublisher.events.ApplicationEvent;
 import de.innovationgate.wgpublisher.events.ApplicationEventPath;
@@ -297,7 +296,6 @@ public class App extends Database {
         }
         
         PersonalisationManager persManager = unlocked.getCore().getPersManager();
-        WGPDispatcher dispatcher = unlocked.getCore().getDispatcher();
         WGDatabase persDB = persManager.fetchPersonalisationDatabase(db());
         Integer persMode =  persManager.getPersonalisationMode(persDB);
         
@@ -309,6 +307,13 @@ public class App extends Database {
         
         return null;
         
+    }
+    
+    public WGDatabase getPersDb() throws WGAPIException{
+    	return _wga.getCore().getPersManager().fetchPersonalisationDatabase(db());
+    }
+    public WGUserProfile getUserProfile(String name) throws WGAPIException{
+    	return getPersDb().getUserProfile(name);
     }
     
     /**
