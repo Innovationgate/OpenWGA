@@ -97,10 +97,10 @@
 		</tml:then>
 	
 		<tml:elseif condition="tmlform.settingstml=='root'">
-			<div class="outline">
-				<tml:script>
-					_mods = JSON.parse(tmlform.modules)
-				</tml:script>
+			<tml:script>
+				_mods = JSON.parse(tmlform.modules)
+			</tml:script>
+			<tml:{div} html_class="outline" if="_mods.length">
 				<tml:include designdb="@cmm" ref="system:include-child-outlines" o-modules="_mods"/>
 				<script>
 					require(["jquery", "content-modules"], function($, M){
@@ -110,10 +110,10 @@
 						})
 					})
 				</script>
-			</div>			
-			<tml:comment><div class="alert alert-info">
-				Wählen Sie ein Inhaltsmodul im linken Modulbaum aus oder fügen Sie ein neues Inhaltsmodul ein.
-			</div> </tml:comment>
+			</tml:{div}>
+			<tml:{div} unless="_mods.length">
+				- keine Inhaltsmodule -
+			</tml:{div}>
 		</tml:elseif>
 		
 		<tml:else>

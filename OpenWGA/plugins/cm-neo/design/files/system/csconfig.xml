@@ -2,7 +2,7 @@
   <connectionScript>connect</connectionScript>
   <anonymousAccessLevel>10</anonymousAccessLevel>
   <defaultAccessLevel>10</defaultAccessLevel>
-  <versionCompliance>wga7.8</versionCompliance>
+  <versionCompliance>wga7.9</versionCompliance>
   <publisherOptions>
     <de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption>
       <name>DesignEncoding</name>
@@ -73,7 +73,7 @@
     </minimumJavaVersion>
     <pluginHomepage>main</pluginHomepage>
     <dependencies/>
-    <personalisationMode>1</personalisationMode>
+    <personalisationMode>4</personalisationMode>
     <usageAsDesignProvider>false</usageAsDesignProvider>
     <usageAsAuthSource>false</usageAsAuthSource>
     <usageAsContentStore>true</usageAsContentStore>
@@ -102,7 +102,7 @@
   <staticClasspath>false</staticClasspath>
   <minimumWGAVersion>
     <majorVersion>7</majorVersion>
-    <minorVersion>8</minorVersion>
+    <minorVersion>9</minorVersion>
     <maintenanceVersion>0</maintenanceVersion>
     <patchVersion>0</patchVersion>
     <buildVersion>0</buildVersion>
