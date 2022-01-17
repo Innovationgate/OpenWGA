@@ -118,7 +118,7 @@
 	}
 	if(action.contains("store")){
 
-		var dbkey = CMM.setting("dbkey") || db().getDbReference();;
+		var dbkey = CMM.setting("dbkey");
 		var id = WGA.scoped('formid');
 
 		WGA.Master.runFunction(function(id, title, dbkey){
