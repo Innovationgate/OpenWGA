@@ -399,7 +399,7 @@ public class TMLContextExpression {
             }
         }
     
-        else if (contextExpression.equals("this") || contextExpression.equals("")) {
+        else if (contextExpression.equals("this")) {
             
             if (!_explicitLanguageChoice) {
                 return context;
