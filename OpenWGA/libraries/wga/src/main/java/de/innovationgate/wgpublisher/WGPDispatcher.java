@@ -72,6 +72,7 @@ import javax.servlet.http.HttpSessionBindingListener;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.log4j.Logger;
 
 import de.innovationgate.utils.TemporaryFile;
@@ -2277,7 +2278,17 @@ public class WGPDispatcher extends HttpServlet {
         
             String derivate = request.getParameter(URLPARAM_DERIVATE);
             if (derivate != null) {
-                DerivateQuery derivateQuery = getCore().getFileDerivateManager().parseDerivateQuery(derivate);
+            	
+                DerivateQuery derivateQuery=null;
+                try{
+                	derivateQuery = getCore().getFileDerivateManager().parseDerivateQuery(derivate);
+                }
+                catch(WGInvalidDerivateQueryException e){
+                	// parameter may be encoded. Try with decoded version
+                	String decoded = URIUtil.decode(derivate);
+                	derivateQuery = getCore().getFileDerivateManager().parseDerivateQuery(decoded);
+                }
+                
                 if (publishingFile instanceof DocumentPublishingFile) {
                     DocumentPublishingFile docPublishingFile = (DocumentPublishingFile) publishingFile;
                     WGFileDerivateMetaData derivateMd = docPublishingFile.queryDerivate(derivateQuery, clientHints);
