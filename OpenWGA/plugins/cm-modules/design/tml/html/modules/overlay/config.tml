@@ -31,6 +31,7 @@
 	type:			'container',				
 	tml:			'modules:overlay:render',
 	settingstml:	'modules:overlay:setting',
+	outlinetml:		'modules:overlay:outline',
 	includes: {
 		css: 	'modules:overlay:css',
 		jquery_plugins: ["modal"]

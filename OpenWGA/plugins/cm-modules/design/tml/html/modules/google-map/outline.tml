@@ -1,0 +1,9 @@
+<tml:include ref="system:outline">
+	<tml:option name="style" scope="local">
+		background-image: url(<tml:url type="file" doc="images" file="google-maps.png"/>);
+		background-size: cover;
+		background-position: center center;
+		min-height: 200px;
+	</tml:option>
+	<tml:include ref="system:include-child-outlines"/>"
+</tml:include>

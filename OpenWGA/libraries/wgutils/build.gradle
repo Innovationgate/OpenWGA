@@ -29,6 +29,9 @@ dependencies {
     compile fileTree(dir: '../../customLibs/simpleXml', include: ['*.jar'])
     compile 'com.thoughtworks.xstream:xstream:1.4.7'
     
+    // used for CMYK JPEG images
+    compile 'com.twelvemonkeys.imageio:imageio-jpeg:3.8.1'
+    
     compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
 
 }

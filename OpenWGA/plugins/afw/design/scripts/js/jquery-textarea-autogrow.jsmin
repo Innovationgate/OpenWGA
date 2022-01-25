@@ -21,7 +21,8 @@
 		    fontSize:   ta.css('fontSize'),
 		    fontFamily: ta.css('fontFamily'),
 		    fontWeight: ta.css('fontWeight'),
-		    lineHeight: ta.css('lineHeight')
+		    lineHeight: ta.css('lineHeight'),
+		    whiteSpace: ta.css('whiteSpace')
 		})
 		if(config.minHeight)
 			shadow.css("min-height", config.minHeight); 
@@ -84,7 +85,7 @@
 				return initShadow({});
 			}
 			ta.css({
-				overflow: "hidden",
+				overflowY: "hidden",
 	    		resize: 'none',
 	    		"-webkit-transition": "height .05s",
 	    		"-moz-transition": "height .05s",

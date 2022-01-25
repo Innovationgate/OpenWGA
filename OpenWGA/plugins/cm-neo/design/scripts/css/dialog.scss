@@ -90,6 +90,51 @@
 	margin-left: -30%;
 	height: 80%;
 
+	.outline{
+		.module{
+			position: relative;
+			border: solid silver 1px;
+			padding:10px;
+			margin:10px 0;
+			background: white;
+			hyphens: auto;
+			.title{
+				position: absolute;
+				z-index: 1;
+				top: -10px;
+				left: 10px;
+				background: white;
+				color: brown;
+				padding: 2px 5px;
+				border-radius: 10px;
+				font-size: .7em;
+				cursor: pointer;
+				&:hover{
+					display: block;
+					background: gray;
+					color: white;
+					z-index: 2;
+				}
+			}
+			&:last-child{
+				margin-bottom: 0;
+			}
+			.cols{
+				display: flex;
+				> .module{
+					flex: 1;
+					margin: 10px 5px 0;
+				}
+				&.wrap {
+					flex-wrap: wrap;
+					> .module{
+						flex-basis: 125px;
+					}
+				}
+			}
+		}
+	}
+
 	.header {
 		position: absolute;
 		height: 70px;
@@ -196,7 +241,7 @@
 	}
 }
 
-#dialog-page-settings_render, #dialog-settings_content, #dialog-settings_user-defined, #dialog-create-page_child, #dialog-create-page_root {
+#dialog-page-settings_render, #dialog-settings_content, #dialog-settings_user-defined, #dialog-create-page_child, #dialog-create-page_root, #dialog-edit-html {
 	width: 900px;
 	margin-left: -450px;
 }
@@ -305,7 +350,7 @@
 	}
 }
 
-#dialog-edit-html, #dialog-edit-rtf-link, #dialog-edit-rtf-image {
+#dialog-edit-rtf-link, #dialog-edit-rtf-image {
 	width: 800px;
 	margin-left: -400px;
 	

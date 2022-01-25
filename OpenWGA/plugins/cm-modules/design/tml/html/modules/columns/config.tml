@@ -24,12 +24,13 @@
 ## LICENSE END #################################################################
 {
 	id:				'cm_columns',
-	category:		'Container',
+	category:		'Spalten',
 	title:			'<tml:label key="module.columns"/>',
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="text_columns.png"/>",
 	type:			'container',				
 	tml:			'plugin-cm-modules/modules:columns:render',
 	settingstml:	'plugin-cm-modules/modules:columns:settings',
+	outlinetml:		'modules:tiles:outline',
 	allowedchildren: ["cm_column"],
 	includes: {
 		css: 	'plugin-cm-modules/modules:columns:css'

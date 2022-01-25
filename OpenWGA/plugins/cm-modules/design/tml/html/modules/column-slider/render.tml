@@ -30,7 +30,7 @@
 <tml:case condition="CMM.setting('show_title')">
 	<h2><tml:option name="title"/></h2>
 </tml:case>
-<div class="column-slider" style="opacity:0;transition: opacity .2s">
+<div class="column-slider" style="opacity:0">
 	<div class="columns">
 		<tml:include ref="system:include-child-modules" o-raw="true"
 			o_cols_l="{CMM.setting('cols_l')}"

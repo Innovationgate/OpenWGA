@@ -22,7 +22,7 @@ case "$1" in
     configure)        
     mv /var/lib/openwga/server.conf /etc/openwga
     
-    invoke-rc.d openwga stop
+    invoke-rc.d openwga stop || true
     
 	addgroup --system openwga
 	adduser --system --home /var/lib/openwga --no-create-home --ingroup openwga --disabled-login openwga

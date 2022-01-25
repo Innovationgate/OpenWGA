@@ -1,10 +1,11 @@
 {
 	id:				'cm_tiles',
-	category:		'Container',
+	category:		'Spalten',
 	title:			'<tml:label key="tiles.tiles.title"/>',
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="text_columns.png"/>",
 	tml:			'modules:tiles:render',
 	settingstml:	'modules:tiles:settings',
+	outlinetml:		'modules:tiles:outline',
 	type:			'container',
 	allowedchildren: ["cm_tile"],
 	module_classes:	["Nahtlos|no-margins"],
@@ -18,6 +19,7 @@
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="table.png"/>",
 	tml:			'modules:tiles:render-tile',
 	settingstml:	'modules:tiles:settings-tile',
+	outlinetml:		'modules:tiles:outline-tile',
 	type:			'container',
 	module_classes:	["Abstand zum Rand / Padding|padding","Rahmen / Border|border"],
 	allowedparents: ["cm_tiles"]

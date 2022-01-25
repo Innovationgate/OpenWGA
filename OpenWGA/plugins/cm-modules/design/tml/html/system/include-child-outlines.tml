@@ -1,0 +1,27 @@
+<tml:script>
+	_mods = ($option_mod && $option_mod.children) || $option_modules; 
+</tml:script>
+<tml:foreach item="_mods" currentvalue="_mod" pagesize="{$option_max||0}">
+	<tml:script>
+		_config = CMM.getModuleConfig(_mod.module_id)
+		if(_config){
+			_tml = _config.outlinetml || "";
+			if(_tml){
+				_designdb = _config.designdb;
+				var parts = _tml.split("/");	
+				if(parts.length>1){
+					_designdb = parts[0];
+					_tml = parts[1];
+				}
+			}
+			else{
+				_tml = "system:include-outline"
+				_designdb = "plugin-cm-modules"
+			}
+		}
+	</tml:script>
+	<tml:include designdb="{_designdb || VOID}" ref="{_tml}" tmlscope="{_mod.id}" o-mod="_mod" if="_tml"/>
+	<tml:{div} unless="_tml">
+		Modul <tml:item name="_mod.module_id"/> nicht gefunden
+	</tml:{div}>
+</tml:foreach>

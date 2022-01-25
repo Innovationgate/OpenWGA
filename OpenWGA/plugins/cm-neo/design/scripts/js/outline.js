@@ -29,20 +29,19 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 		Appnav.selectView("outline")
 	}
 	
-	function updateOutline(){
+	function analyzeDocument(callback, validate){
 		
 		var context = Appnav.getContext();
 		if(!context)
 			return;
 		
+		if(!validate)
+			validate = validateErrors;
+		
 		if(context.status=="w"){
 			// read page with URL param $clean to get clean HTML without item-editors
-		
-			$("#app-outline .struct").html('<span class="loading">loading clean HTML...</span>');
-			
 			var win = SitePanel.getWindow();
 			var href;
-			
 			if(win.location && win.location.href){
 				href = win.location.href;
 				if(win.location.search)
@@ -54,20 +53,51 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 			$.get(href).success(function(html){
 				var el = document.createElement("div");
 				el.innerHTML = html;
-				readHeadings(el)
+				validate(el);
 			})
 		}
-		else readHeadings($("body", SitePanel.getDocument()))
-			
-		function readHeadings(el){
-			var level, currentLevel, index = 0;
-			var errors = false;
+		else validate($("body", SitePanel.getDocument()))
+		
+		function validateErrors(el){
+			// default validation: just return errors
+			var level, 
+				currentLevel=0, 
+				errors = 0;
 
-			var struct = $("#app-outline .struct")
-			var alert = $("#app-outline .alert")
+			$(el).find("h1, h2, h3, h4, h5, h6").each(function(){
+				level = Number(this.tagName.substr(1,1));
+				if(level > currentLevel+1){
+					errors++;
+				}
+				currentLevel = level
+				// be carefull not to add <script>s or other tag>s
+				var tag_content = $(this).text().trim();
+				if(!tag_content){
+					errors++;
+				}
+			})
+
+			var h1 = $(el).find("h1").length
+			if(h1>1)
+				errors++;
+			if(callback)
+				callback(errors)
 			
-			alert.hide().html("");
-			struct.html("");
+		}
+		
+	}
+	
+	function updateOutline(){
+
+		var struct = $("#app-outline .struct")
+		var alert = $("#app-outline .alert")
+		
+		alert.hide().html("");
+		struct.html("");
+
+		analyzeDocument(null, function(el){
+			var level, currentLevel=0, index = 0;
+			var errors = false;
 			
 			$(el).find("h1, h2, h3, h4, h5, h6").each(function(){
 				index++;
@@ -80,7 +110,6 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 					}
 				}
 				currentLevel = level
-				// be carefull not to add <script>s or other tag>s
 				var tag_content = $(this).text().trim();
 				if(!tag_content){
 					errors=true;
@@ -96,8 +125,7 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 				alert.append("<p>Die Dokumentstruktur enthält Fehler</p>").show();
 			}
 			
-		}
-
+		})
 			
 	}
 	
@@ -111,6 +139,7 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 	
 	return {
 		init: init,
-		showHeadings: showHeadings
+		showHeadings: showHeadings,
+		analyzeDocument: analyzeDocument
 	}
 })

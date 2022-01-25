@@ -156,7 +156,11 @@ public class WebTMLFunctionArgumentSubstitutor implements FunctionArgumentSubsti
         else if (argumentName.startsWith("$urlParam_")) {
             if (_wga.call().isAvailable()) {
                 return _wga.call().getParam(argumentName.substring(10));
-                
+            }
+        }
+        else if (argumentName.startsWith("$urlParams_")) {
+            if (_wga.call().isAvailable()) {
+                return _wga.call().getParamValues(argumentName.substring(11));
             }
         }
         else if (argumentName.equals("$pEvent") || argumentName.equals("$portletEvent")) {

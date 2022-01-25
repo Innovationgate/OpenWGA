@@ -1,0 +1,41 @@
+<tml:script>
+	_layout = (tmlform && tmlform.field(WGA.scoped("layout"))) || CMM.setting('layout');
+</tml:script>
+<tml:include ref="system:outline" o_title="[/ {WGA.alias(_layout, 'Link-Liste|link-list,News Kollektion|news-list,Karoussel|caroussel,Kacheln|tiles')}]">
+	<tml:if condition="_layout=='tiles'">
+		<tml:then>
+			<div class="cols wrap">
+				<tml:foreach count="6">
+					<div class="module" style="text-align:center;width:calc(25% - 10px);flex:unset">
+						<div style="font-size:4em;color:silver"">
+							<i class="far fa-image"></i>
+						</div>
+						Seitentitel
+					</div>
+				</tml:foreach>
+			</div>
+		</tml:then>
+		<tml:elseif condition="_layout=='link-list' || _layout=='news-list'">
+			<ul>
+				<li>Link</li>
+				<li>Link</li>
+				<li>Link</li>
+				<li>...</li>
+			</ul>
+		</tml:elseif>
+		<tml:elseif condition="_layout=='caroussel'">
+			<div class="module" style="text-align:center">
+				<div style="font-size:4em;color:silver"">
+					<i class="far fa-image"></i>
+				</div>
+				Datum
+				<br>Seitentitel
+			</div>
+			<div style="text-align:center;line-height:10px;margin-top:10px">
+				<span style="display:inline-block;width:10px;height:10px;border:solid gray 1px;border-radius:10px"></span> 
+				<span style="display:inline-block;width:10px;height:10px;border:solid gray 1px;border-radius:10px;background:gray"></span> 
+				<span style="display:inline-block;width:10px;height:10px;border:solid gray 1px;border-radius:10px"></span> 
+			</div>			
+		</tml:elseif>
+	</tml:if>
+</tml:include>

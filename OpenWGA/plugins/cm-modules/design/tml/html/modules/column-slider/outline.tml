@@ -1,0 +1,19 @@
+<tml:include ref="system:outline">
+	<tml:option name="title" scope="local">
+		<tml:comment>/
+		<tml:script expression="$option_mod.children.length"/>
+		Spalte(n)</tml:comment>
+		/ <tml:include ref="util:anzahl" o-anzahl="$option_mod.children.length" o_einzahl="eine Spalte" o_mehrzahl="Spalten"/>
+	</tml:option>
+	<div class="cols">
+		<tml:script>
+			_cols = (tmlform && tmlform.field(WGA.scoped("cols_l"))) || CMM.setting('cols_l') || 3;
+		</tml:script>
+		<tml:include ref="system:include-child-outlines" o_max="{Math.min(_cols, 4)}"/>
+	</div>
+	<div style="text-align:center;line-height:10px;margin-top:10px">
+		<span style="display:inline-block;width:10px;height:10px;border:solid gray 1px;border-radius:10px"></span> 
+		<span style="display:inline-block;width:10px;height:10px;border:solid gray 1px;border-radius:10px;background:gray"></span> 
+		<span style="display:inline-block;width:10px;height:10px;border:solid gray 1px;border-radius:10px"></span> 
+	</div>
+</tml:include>

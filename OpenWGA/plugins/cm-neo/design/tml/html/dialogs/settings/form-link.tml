@@ -53,13 +53,17 @@
 </tml:select>
 
 <tml:case condition="tmlform.VIRTUALLINKTYPE">
-	<tml:[form-field] o_label="Zielfenster" o_name="LINKTARGET" o_meta="true" o_placeholder="Optionaler Name eines neuen Fensters"/>
+	<tml:script>
+		if(LINKTARGET && LINKTARGET!="_self")
+			tmlform.LINKTARGET = "_blank" 
+	</tml:script>
+	<tml:[form-field] o_label="Zielfenster" o_name="LINKTARGET" o_meta="true" o_type="select" o_options="gleiches Fenster|_self,neues Fenster|_blank"/>
 	<tml:case condition="tmlform.VIRTUALLINKTYPE=='int' || tmlform.VIRTUALLINKTYPE=='exp'">
 		<tml:[form-field] o_label="Sprungmarke" o_name="LINKANCHOR" o_meta="true" o_placeholder="Optionaler Name einer Sprungmarke (Anker)"/>
 	</tml:case>
 </tml:case>
 
-<tml:case condition="!_link_inserted && tmlform.mode()=='edit'" context="{_CM_clipboard_context}" iscontextvalid="true">
+<tml:case condition="!_link_inserted && tmlform.mode()=='edit' && _CM_clipboard_context" context="{_CM_clipboard_context}" iscontextvalid="true">
 	<tml:[form-field] o_mode="view">
 		<tml:button clickaction="insert-link" cssclass="btn btn-default">
 			<i class="fas fa-paste"></i>

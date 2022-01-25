@@ -20,6 +20,10 @@ Controller.prototype.hasDefaultDbKey = function() {
 	return this.defaultDbKey()!=null
 }
 
+Controller.prototype.pwdSelfserviceURL = function(){
+	return this.hasDefaultDbKey() && WGA.app(this.defaultDbKey()).domain().getPwdSelfserviceURL();
+}
+
 Controller.prototype.hasMessages = function($form) {
 	return $form.hasmessages()
 }

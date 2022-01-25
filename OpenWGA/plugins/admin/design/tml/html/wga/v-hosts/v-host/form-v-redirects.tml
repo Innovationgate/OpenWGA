@@ -121,9 +121,9 @@
 		
 			<tml:foreach id="array-list-loop_redirect" type="itemvalue" item="_entry_list" currentvalue="_entry">
 				<tr class="List<tml:case condition="!_entry.enabled"> disabled</tml:case><tml:case condition="tmlform._idx==taginfo('array-list-loop_redirect', 'iteration')-1"> selected</tml:case>">
-					<td><tml:script expression="_entry.requestHosts && _entry.requestHosts.size() ? _entry.requestHosts : '*'" divider="<br>"/></td>
+					<td><tml:script expression="_entry.requestHosts && _entry.requestHosts.size() ? _entry.requestHosts : '- any -'" divider="<br>"/></td>
 
-					<td><tml:script expression="_entry.path || '*'"/></td>
+					<td><tml:script expression="_entry.path || '- any -'"/></td>
 					<td><tml:item name="_entry.redirect"/></td>
 
 					<td><tml:script expression="_entry.forward ? 'proxy' : ''"/></td>
@@ -166,17 +166,17 @@
 			</div>		
 			<div class="clear"></div>		
 
-			<label>Request Hosts (optional, empty=any):</label>		
+			<label>Request Hosts (optional, empty=any)<br>* wildcards alowed:</label>		
 			<div class="data">
 				<tml:input name="requestHosts" type="textarea" multiple="true"/>
 				<tml:include ref="system:convert-to-ext-field" o_fieldname="requestHosts" o_type="textarea" o_emptytext="any"/>			
 			</div>		
 			<div class="clear"></div>		
 
-			<label>Request Path:</label>		
+			<label>Request Path (optional, empty=any):</label>		
 			<div class="data">
 				<tml:input name="path" type="text" trim="true"/>	
-				<tml:include ref="system:convert-to-ext-field" o_fieldname="path" o_msgtarget="title" o_width="500"/>			
+				<tml:include ref="system:convert-to-ext-field" o_fieldname="path" o_allowblank="true" o_emptytext="optional regular expression" o_msgtarget="title" o_width="500"/>			
 			</div>		
 			<div class="clear"></div>		
 

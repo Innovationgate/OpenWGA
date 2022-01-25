@@ -70,7 +70,7 @@
 			<div style="width:30%;position:absolute;top:0;left:0;bottom:0;overflow:auto" id="module-tree"></div>
 			<div style="width:70%;position:absolute;border-left: solid #efefef 1px;top:0;bottom:0;left:30%;overflow:auto">
 				<div style="padding:10px">
-					<tml:portlet name="module-settings" ref="::settings"/>
+					<tml:portlet name="module-settings" ref="::settings" forcestate="true"/>
 				</div>
 			</div>
 		</div>

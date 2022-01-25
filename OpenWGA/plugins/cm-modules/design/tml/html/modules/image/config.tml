@@ -4,6 +4,7 @@
 	title:			'<tml:label key="image-poster"/>',
 	tml:			'modules:image:render',
 	settingstml: 	'modules:image:setting',
+	outlinetml:	 	'modules:image:outline',
 	icon:			'<tml:url db="plugin-wga-app-framework" type="file" doc="icons@base" file="picture.png"/>',
 	includes: {
 		jquery_plugins: ["lightbox"],

@@ -25,6 +25,7 @@
 {
 	id:				'cm_rtf',
 	title:			'<tml:label key="module.richtext-field"/>',
-	tml:			'plugin-cm-modules/modules:rtf:render',
+	tml:			'modules:rtf:render',
+	outlinetml:		'modules:rtf:outline',
 	icon:			'<tml:url db="@afw" type="file" doc="icons" file="pencil.png"/>'
 }

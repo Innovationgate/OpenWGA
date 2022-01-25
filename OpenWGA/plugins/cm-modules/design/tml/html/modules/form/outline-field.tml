@@ -1,0 +1,4 @@
+<tml:script>
+	_type = (tmlform && tmlform.field(WGA.scoped("fieldtype"))) || CMM.setting('fieldtype');
+</tml:script>
+<tml:include ref="system:outline" o_title="[/ {WGA.alias(_type, label('form.settings.field-type.options'))}]" o_style="background:#efefef"/>

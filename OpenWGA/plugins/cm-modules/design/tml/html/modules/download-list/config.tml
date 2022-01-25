@@ -16,6 +16,7 @@
 	icon:			'<tml:url db="@afw" type="file" doc="icons" file="attach.png"/>',
 	tml:			'modules:download-list:render-file',
 	settingstml: 	'modules:download-list:settings-file',
+	outlinetml: 	'modules:download-list:outline-file',
 	allowedparents: ["cm_download-list"],
 	includes: {
 		jquery_plugins: ["wga-drophandler"]

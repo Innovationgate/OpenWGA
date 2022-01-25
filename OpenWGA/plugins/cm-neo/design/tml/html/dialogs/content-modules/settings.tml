@@ -36,39 +36,43 @@
 <tml:input name="mod_id" type="hidden" store="false"/>
 <tml:input name="parent_mod_id" type="hidden" store="false"/>
 <tml:input name="ids_to_duplicate" type="hidden" store="false"/>
+<tml:input name="modules" type="hidden" store="false"/>
 
 <script>
-	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "content-module-selected", function(ev){
-		var form = document.forms["<tml:script expression="tmlform.formid"/>"];
-		var module = ev.params.module;
-		var config = ev.params.config;
-
-		if(config){
-			form.designdb.value = config.designdb;
-			form.settingstml.value = config.settingstml||"";
-			form.title.value=config.title;
-			form.module_id.value = config.id;
-		}
-		else if(module.level==1){
-			form.title.value="Bereich '" + module.title + "'";
-			form.settingstml.value = "root";
-		}
-		else {
-			form.title.value=module.context;
-			form.settingstml.value = "error";
-		}
-
-		if(module){
-			//form.mod_title.value=module.title;
-			form.mod_id.value=module.id;
-		}
-
-		WGA.ajax.callAction("<tml:action ref="refresh"/>");
+	require(["content-modules"], function(M){ 
+		WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "content-module-selected", function(ev){
+			var form = document.forms["<tml:script expression="tmlform.formid"/>"];
+			var module = ev.params.module;
+			var config = ev.params.config;
+	
+			if(config){
+				form.designdb.value = config.designdb;
+				form.settingstml.value = config.settingstml||"";
+				form.title.value=(config.category ? "[" +config.category + "] ": "") + config.title;
+				form.module_id.value = config.id;
+			}
+			else if(module.level==1){
+				form.title.value="Bereich '" + module.title + "'";
+				form.settingstml.value = "root";
+				var section = module.id.split(".")[1];
+				var mods = M.getModules();
+				form.modules.value = JSON.stringify(mods[section]);
+			}
+			else {
+				form.title.value=module.context;
+				form.settingstml.value = "error";
+			}
+	
+			if(module){
+				form.mod_id.value=module.id;
+			}
+	
+			WGA.ajax.callAction("<tml:action ref="refresh"/>");
+		})
+		
+		$("#<tml:script expression="tmlform.formid"/> input[type=text],input[type=number],input[type=password],textarea").addClass("form-control");
+		$("#<tml:script expression="tmlform.formid"/> textarea").autogrow()
 	})
-	
-	$("#<tml:script expression="tmlform.formid"/> input[type=text],input[type=number],input[type=password],textarea").addClass("form-control");
-	$("#<tml:script expression="tmlform.formid"/> textarea").autogrow()
-	
 </script>
 
 <tml:case condition="tmlform.title">
@@ -93,9 +97,23 @@
 		</tml:then>
 	
 		<tml:elseif condition="tmlform.settingstml=='root'">
-			<div class="alert alert-info">
-				Wählen Sie ein Inhaltsmodul im linken Modulbaum aus oder fügen Sie ein neues Inhaltsmodul ein.
-			</div> 
+			<tml:script>
+				_mods = JSON.parse(tmlform.modules)
+			</tml:script>
+			<tml:{div} html_class="outline" if="_mods.length">
+				<tml:include designdb="@cmm" ref="system:include-child-outlines" o-modules="_mods"/>
+				<script>
+					require(["jquery", "content-modules"], function($, M){
+						$("#dialog-content-modules .outline a").click(function(ev){
+							ev.preventDefault();
+							M.selectNode($(this).data("id"));
+						})
+					})
+				</script>
+			</tml:{div}>
+			<tml:{div} unless="_mods.length">
+				- keine Inhaltsmodule -
+			</tml:{div}>
 		</tml:elseif>
 		
 		<tml:else>

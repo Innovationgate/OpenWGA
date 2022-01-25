@@ -604,6 +604,7 @@ define(["jquery"], function($){
 								continue;
 							if((tagname=="a" && hasToolbarClass(toolbar.linkStyleList, cls))
 								|| (tagname=="img" && hasToolbarClass(toolbar.imageStyleList, cls))
+								|| (tagname=="ul" && hasToolbarClass(toolbar.listStyleList, cls))
 								|| (tagname=="table" && hasToolbarClass(toolbar.tableStyleList, cls))
 								|| ("p,h1,h2,h3,h4,h5,h6,pre".indexOf(tagname)>=0  && hasToolbarClass(toolbar.paragraphStyleList, cls))
 							)

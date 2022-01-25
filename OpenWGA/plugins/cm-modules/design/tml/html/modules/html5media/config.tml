@@ -30,6 +30,7 @@
 		icon:			'<tml:url type="file" doc="images" file="kaboodle.png"/>',
 		tml:			'modules:html5media:render-html5-video',
 		settingstml:	'modules:html5media:settings-html5-video',
+		outlinetml:		'modules:html5media:outline-video',
 		includes: {
 			jquery_plugins: ["wga-drophandler"],
 			css:	'modules:html5media:css'
@@ -42,6 +43,7 @@
 		icon:			'<tml:url type="file" doc="images" file="kmixdocked_mute.png"/>',
 		tml:			'modules:html5media:render-html5-audio',
 		settingstml:	'modules:html5media:settings-html5-audio',
+		outlinetml:		'modules:html5media:outline-audio',
 		includes: {
 			css:	'modules:html5media:css'
 		}

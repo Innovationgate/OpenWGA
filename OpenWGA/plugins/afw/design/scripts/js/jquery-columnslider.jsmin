@@ -19,7 +19,7 @@
 		var cols;
 		var col=0;
 		var columnWidth;
-		var margin = typeof(config.margin)=="undefined" ? 10 : config.margin;
+		var offset=config.offset || 0;
 
 		var supportsTransition = ("transition" in document.createElement("p").style)
 
@@ -27,9 +27,13 @@
 			cols = config.cols.large
 		else cols = config.cols || 1
 
-		// set margins
-		$wrapper.find("> .column").css("margin-right", margin+"px")
-
+		$("> .column", $wrapper).on("click", function(){
+			if(!$(this).hasClass("active")){
+				var index = $("> .column", $wrapper).index(this);
+				scrollToCol(index);
+			}
+		})
+		
 		// generate nav controls
 		if(!config.hide_nav){
 			$cols.append('<div class="nav"></div>')
@@ -119,8 +123,13 @@
 				$cols.find(".nav").hide()
 			else $cols.find(".nav").show()
 			
-			columnWidth = parseInt(width/cols - ((cols-1)*margin)/cols);	// width without right margin
-			$wrapper.find("> .column").outerWidth(columnWidth);
+			columnWidth = width/cols
+			
+			if(WGA.responsive && WGA.responsive.getMediaWidth && WGA.responsive.getMediaWidth()=="small")
+				columnWidth -= offset/cols;
+			else columnWidth -= 2*offset/cols;;
+			
+			$wrapper.find("> .column").outerWidth(columnWidth, true);
 			
 			scroll();
 		}
@@ -133,9 +142,21 @@
 				col=0;
 			if(col>cols_total-cols)
 				col = cols_total-cols
-				
-			var new_left = -col*(columnWidth+margin);
 
+			$cols.removeClass("first last")
+			if(col==0)
+				$cols.addClass("first");
+			if(col == cols_total-cols)
+				$cols.addClass("last")
+
+			var new_left = -col*columnWidth;
+			
+			var korrektur = WGA.responsive.getMediaWidth()=="small" ? offset/2 : offset;
+			if(new_left)
+				new_left += korrektur;			
+			if(col == cols_total-cols)
+				new_left += korrektur;
+			
 			if(new_left==0 && autoslide){
 				effect_fade(new_left);	// always fade to position 0 if autoslide.
 			}
@@ -144,7 +165,12 @@
 					effect_fade(new_left);
 				else effect_slide(new_left);
 			}
-						
+
+			$cols.find(".column").removeClass("active").each(function(i){
+				if(i>=col && i<col+cols)
+					$(this).addClass("active");
+			})
+
 			$cols.find(".control a").removeClass("active").each(function(i){
 				if(i>=col && i<col+cols)
 					$(this).addClass("active");

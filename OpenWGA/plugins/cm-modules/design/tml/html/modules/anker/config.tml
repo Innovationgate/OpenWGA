@@ -1,5 +1,6 @@
 {
 	id:				'cm_anker',
+	category:		"Verschiedenes",
 	title:			'Sprungmarke (Anker)',
 	tml:			'modules:anker:render',
 	settingstml: 	'modules:anker:settings',

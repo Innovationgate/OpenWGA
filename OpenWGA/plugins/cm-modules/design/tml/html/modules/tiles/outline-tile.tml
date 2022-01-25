@@ -1,0 +1,13 @@
+<tml:include ref="system:outline">
+	<tml:option name="style" scope="local">
+		flex: <tml:script format="0">
+			return (tmlform && tmlform.field(WGA.scoped("width"))) || CMM.setting('width');
+		</tml:script>;
+		display: flex;
+		flex-direction: column;
+		justify-content: <tml:script>
+			return (tmlform && tmlform.field(WGA.scoped("justify_content"))) || CMM.setting('justify_content');
+		</tml:script>;
+	</tml:option>
+	<tml:include ref="system:include-child-outlines"/>
+</tml:include>

@@ -104,6 +104,25 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 		}
 	});
 
+	$("#editor-panel-rtf [name=list-style]").multiselect({
+		nonSelectedText: "Kein Listenstil ausgewählt",
+		numberDisplayed: 2,
+		nSelectedText: "Stile ausgwewählt",
+		allSelectedText: "Alle Stile ausgewählt",
+		buttonClass: "btn btn-default btn-sm",
+		disableIfEmpty: true,
+		buttonWidth: '100%',
+		onChange: function(option, checked){
+			var el = editor.getNearestTagFromSelection("ul")
+			var cls = $(option).val()
+			if(el){
+				if(checked)
+					$(el).addClass(cls)
+				else $(el).removeClass(cls)
+			}
+		}
+	});
+
 	// attach click handler
 	$("#editor-panel-rtf").on("click", "[data-cmd]", function(ev){
 		ev.preventDefault();
@@ -387,6 +406,18 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 				$("#editor-panel-rtf [data-action=create-link]").show()
 			}
 
+			// List
+			$("#editor-panel-rtf [name=list-style]").multiselect('deselectAll', false)
+			var el = editor.getNearestTagFromSelection("ul")
+			if(el){
+				var classes = el.className.split(" ");
+				if(options && options.listStyleList && options.listStyleList.length){
+					$("#editor-panel-rtf .list-options").show()
+					$("#editor-panel-rtf [name=list-style]").multiselect('select', classes)
+				}
+			}
+			else $("#editor-panel-rtf .list-options").hide()
+			
 			// Image
 			var el = editor.getNearestTagFromSelection("img")
 			$("#editor-panel-rtf [name=image-style]").multiselect('deselectAll', false)
@@ -502,6 +533,19 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 					})
 				}
 				$("#editor-panel-rtf [name=image-style]").multiselect("dataprovider", opts)
+			}
+			if(options && options.listStyleList && options.listStyleList.length){
+				opts=[]
+				toolbar.listStyleList = options.listStyleList;
+				for(var i=0; i<options.listStyleList.length; i++){
+					var parts = options.listStyleList[i].split("|");
+					opts.push({
+						label: parts[0],
+						title: parts[0],
+						value: parts[1]
+					})
+				}
+				$("#editor-panel-rtf [name=list-style]").multiselect("dataprovider", opts)
 			}
 			if(options && options.tableStyleList && options.tableStyleList.length){
 				opts=[]

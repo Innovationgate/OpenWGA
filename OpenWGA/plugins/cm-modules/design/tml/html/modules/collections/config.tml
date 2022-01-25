@@ -29,6 +29,7 @@
 	icon:			'<tml:url db="@afw" type="file" doc="icons" file="application_view_list.png"/>',
 	tml:			'modules:collections:children',
 	settingstml:	'modules:collections:settings-children',
+	outlinetml:		'modules:collections:outline',
 	includes: {
 		jquery_plugins: ["columnslider", "swipehandler"],
 		css: 	'modules:collections:css'
@@ -41,6 +42,7 @@
 	icon:			'<tml:url db="@afw" type="file" doc="icons" file="database_table.png"/>',
 	tml:			'modules:collections:query',
 	settingstml:	'modules:collections:settings-query',
+	outlinetml:		'modules:collections:outline',
 	includes: {
 		jquery_plugins: ["columnslider", "swipehandler"],
 		css: 	'modules:collections:css'
