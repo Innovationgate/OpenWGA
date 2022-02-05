@@ -159,7 +159,7 @@ define([
 			edit_el_unencoded = $("#item_"+item+"_unencoded", Sitepanel.getDocument())
 			edit_el.hide();
 			
-			rtf_edit_el = $("<div>").html(edit_el_unencoded.html() || "<br>")
+			rtf_edit_el = $("<div>").html(edit_el_unencoded.html() || "<p><br></p>")
 			rtf_edit_el.insertBefore(edit_el);
 			
 			editor = RTFEditor.edit(rtf_edit_el)
