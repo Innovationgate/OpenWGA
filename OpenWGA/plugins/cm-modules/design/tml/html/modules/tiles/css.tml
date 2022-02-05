@@ -34,7 +34,7 @@
 				
 				"&.border": {
 					border: "solid silver 1px",
-					".module-cm_rtf": {
+					"> .module-cm_rtf": {
 						margin: 10
 					}
 				},
