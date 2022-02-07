@@ -1997,6 +1997,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
 				this.appendResult("\n\tdbkey:\"" + content.getDatabase().getDbReference() + "\"");
 	    		if(!content.isDummy()){
 	    			this.appendResult(",");
+	    			this.appendResult("\n\tstatus:\"" + content.getStatus() + "\",");
 	    			this.appendResult("\n\tstructkey:\"" + content.getStructKey() + "\",");
 	    			this.appendResult("\n\tcontentkey:\"" + content.getContentKey(true) + "\",");			
 	    			this.appendResult("\n\ttitle:\"" +  WGUtils.strReplace(WGUtils.strReplace(content.getTitle(), "\"", "\\\"", true), "script", "sc\"+\"ript", true) + "\",");

@@ -303,7 +303,7 @@ define(["cm", "jquery"], function(CM, $){
 		,getWindow: getWindow
 		
 		,getContentInfo: function(){
-			return getWindow().WGA.contentinfo
+			return getWindow().WGA && getWindow().WGA.contentinfo
 		}
 		
 		,scale: function(scale){

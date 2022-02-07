@@ -1,22 +1,19 @@
 define(["jquery"], function($){
 
 	var context,
+		pageRenderedListener,
 		contextChangeListener;
 	
 	WGA.event.addListener("appnav", "content-changed", function(ev){
-		
 		context = ev.params;
-
-		/*
-		$("#appnav [data-view='outline']")[ev.params.contentkey ? "show" : "hide"]();
-		$("#appnav [data-view='responsive']")[ev.params.contentkey ? "show" : "hide"]();
-		*/
-		
 		contextChangeListener && contextChangeListener(context);
-		
 		$("#appnav").show();
 	})
-	
+
+	WGA.event.addListener("appnav", "page-rendered", function(ev){
+		pageRenderedListener && pageRenderedListener(ev);
+	})
+
 	$(document).on("click.toolbar", "#appnav .toolbar [data-view]", function(ev){
 
 		ev.preventDefault();
@@ -42,6 +39,9 @@ define(["jquery"], function($){
 		},
 		setContextChangeListener: function(listener){
 			contextChangeListener = listener;
+		},
+		setPageRenderedListener: function(listener){
+			pageRenderedListener = listener;
 		},
 		selectView: function(view){
 			$("#appnav .toolbar [data-view]").removeClass("selected")
