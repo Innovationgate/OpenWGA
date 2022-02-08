@@ -2,8 +2,17 @@
 	<div class="splash">
 	
 		<img class="logo" src="<tml:url type="static" file="images/brand/logo_600.png"/>">
+
+		<tml:case if="$option_no_websites_available">
+			<div class="alert alert-danger" style="margin-top:30px">
+				<h4>Keine Websites verfügbar</h4>
+				Es stehen keine Websites zum Bearbeiten zur Verfügung.
+				<br>
+				Bitte wenden Sie sich an Ihren Administrator.
+			</div>
+		</tml:case>
 	
-		<form id="select-db-form" onsubmit="return selectDb(this)">
+		<tml:{form} html_id="select-db-form" html_onsubmit="return selectDb(this)" unless="$option_no_websites_available">
 			<h1>Website auswählen</h1>
 			<tml:case condition="option('msg')">
 				<div class="alert alert-warning">
@@ -17,7 +26,7 @@
 			<div class="form-group">
 				<button type="submit" class="btn btn-primary">Weiter ...</button>
 			</div>
-		</form>
+		</tml:{form}>
 	</div>
 </tml:include>
 

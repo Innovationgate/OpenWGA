@@ -11,18 +11,26 @@
 	var vhost_filter = Packages.de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
 	var vHost = vhost_filter.findMatchingHost(wgaconfig, request);
 
-	if(!portlet.dbkey && vHost){
-		// check if we have only one contentstore
+	if(!portlet.dbkey){
 		var allowedDbKeys = WGA.createList()
-		for(let uid in Iterator(vHost.getAllowedDatabases())){
-			if(uid=="$all")
-				break;
-			var dbkey = wgaconfig.getByUid(uid).getKey();
+		var dbkeys = WGA.Server.appKeys;		
+		for(let dbkey in Iterator(dbkeys)){
+			if(dbkey.indexOf("plugin-")==0)
+				continue;	// ignore plugins
+
 			var Database = AFW.database(dbkey);
-			if(Database.isValid() && Database.isAuthoringAllowed())
-				allowedDbKeys.add(dbkey);
-		}		
-		if(allowedDbKeys.size()==1){
+			if(!Database.isValid() || !Database.isAuthoringAllowed())
+				continue;
+			
+			if(vHost && !vhost_filter.isDBKeyAllowed(wgaconfig, vHost, dbkey))
+				continue;
+	
+			allowedDbKeys.add(dbkey);
+		}
+		if(allowedDbKeys.size()==0){
+			setOption("no_websites_available", true);
+		}
+		else if(allowedDbKeys.size()==1){
 			portlet.dbkey = allowedDbKeys.get(0);
 			setOption("dbkey_auto_selected", true);
 		}
