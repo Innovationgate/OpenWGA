@@ -12,7 +12,7 @@ Renderer.prototype.getData = function(AFW, $urlParam_dbkey, $urlParam_contentkey
 	var auth = WGA.app($urlParam_dbkey).domain().auth();
 
 	// zuletzt veröffentlicht
-	var docs = WGA.app($urlParam_dbkey).query("content.status='p' AND content.author = :me order by content.lastmodified DESC", {
+	var docs = WGA.app($urlParam_dbkey).query("content.status='p' AND content.author = :me order by content.published DESC", {
 		alllanguages: true,
 		max: 3,
 		p_me: me
