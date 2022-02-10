@@ -1,0 +1,31 @@
+function StructList(){}
+
+StructList.prototype.preparePosition = function(database, structlist, insertAfter){
+
+	var position = 0;
+	if(insertAfter=="end")
+		position = structlist.getByIndex(structlist.size()-1).getPosition()+100;
+	else if(insertAfter=="start")
+		position = structlist.getByIndex(0).getPosition()-100;
+	else{
+		var insert_after_struct = database.getStructEntryByKey(insertAfter)
+		position=insert_after_struct.position+1;
+		var next = insert_after_struct.getNextSibling();
+		if(next && position>=next.position)
+			WGA.Master.runFunction(function(structentry){
+				function incPosition(struct){
+					//console.log("incPosition", struct.title, struct.position, "+1")
+					var pos = struct.position+1;
+					var next = struct.getNextSibling();
+					if(next && pos>=next.position){
+						incPosition(next)
+					}
+					struct.setPosition(pos);
+					struct.save();
+				}
+				incPosition(structentry)
+			}, next)
+	}
+	return position;
+	
+}

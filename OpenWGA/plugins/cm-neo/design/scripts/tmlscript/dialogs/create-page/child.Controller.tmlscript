@@ -1,0 +1,60 @@
+function Controller() {}
+
+// Vererbung
+Controller.prototype = Object.create($$.StructList.prototype);
+
+Controller.prototype.createPage = function(AFW, App, $cx, $form) {
+
+	if($form.validate()){
+		var ct = $cx.db().getContentType($form.contenttype)
+
+		var position = 0;
+		var children = $cx.document.getChildEntries();
+		if(children.size())
+			position = this.preparePosition($cx.db(), children, $form.position)
+
+		var doc = $cx.document.createChildPage(ct, $form.title, $form.language)
+		var struct = doc.getStructEntry()
+		struct.setPosition(position)
+		struct.save();
+
+		if($form.template){
+			var sourcecontext=WGA.context("db:" + $cx.db().getDbReference() + "/docid:"+$form.template, false);
+			if(sourcecontext){
+				var sourcedoc = sourcecontext.content();
+				AFW.content(doc).copyRemoteData(sourcedoc, true /*include metas*/, false /*copy attachments*/, false /* copy modules */);
+			}
+		}
+		
+		// remove form-fields not wanted in store-in-content
+		$form.removefield("title")
+		$form.removefield("position")
+		$form.removefield("contenttype")
+		$form.removefield("language")
+		$form.removefield("template")
+
+		for(let [index, handler] in App.settingsSaveHandler){
+			try{
+				handler.call(WGA.context(doc), $form);
+			}
+			catch(e){
+				console.log(e);
+			}		
+		}
+		App.settingsSaveHandler=[];
+		
+		$form.storeincontent(doc)
+
+		return{
+			$portletEvents: {
+				"close-dialog": {
+					redirectto: WGA.context(doc).contenturl()
+				}
+			},
+			$vars: {
+				_dialogClosed: true
+			}
+		}
+		
+	}
+}

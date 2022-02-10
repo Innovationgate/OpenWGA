@@ -1,53 +1,3 @@
-<tml:action id="create-page">
-	if(tmlform.validate()){
-		var ct = db().getContentType(tmlform.contenttype)
-
-		var position = 0;
-		var children = document.getChildEntries();
-		if(children.size()){
-			if(tmlform.position=="end")
-				position = children.getByIndex(children.size()-1).getPosition()+100;
-			else position = children.getByIndex(0).getPosition()-100;
-		}		
-
-		var doc = document.createChildPage(ct, tmlform.title, tmlform.language)
-		var struct = doc.getStructEntry()
-		struct.setPosition(position)
-		struct.save();
-
-		if(tmlform.template){
-			var sourcecontext=context("db:" + db().getDbReference() + "/docid:"+tmlform.template, false);
-			if(sourcecontext){
-				var sourcedoc = sourcecontext.content();
-				AFW.content(doc).copyRemoteData(sourcedoc, true /*include metas*/, false /*copy attachments*/, false /* copy modules */);
-			}
-		}
-		
-		// remove form-fields als store-in-content
-		tmlform.removefield("title")
-		tmlform.removefield("position")
-		tmlform.removefield("contenttype")
-		tmlform.removefield("language")
-		tmlform.removefield("template")
-
-		for(let [index, handler] in App.settingsSaveHandler){
-			try{
-				handler.call(context(doc), tmlform);
-			}
-			catch(e){
-				console.log(e);
-			}		
-		}
-		App.settingsSaveHandler=[];
-		
-		tmlform.storeincontent(doc)
-				
-		portlet.fireevent("close-dialog", {
-			redirectto: context(doc).contenturl()
-		})
-	}
-</tml:action>
-
 <tml:script>
 	_opts = option("dialog_options")
 	setOption("current_lang", LANGUAGE);
@@ -55,7 +5,7 @@
 	App.settingsSaveHandler=[];
 </tml:script>
 
-<tml:form id="form-create-page" source="portlet" context="[$struct:{_opts.parent || document.getStructKey()}]">
+<tml:form id="form-create-page" source="portlet" context="[$struct:{_opts.parent || document.getStructKey()}]" unless="_dialogClosed">
 
 	<div class="header">
 		Neue Unterseite
@@ -64,8 +14,6 @@
 
 	<div class="content form-horizontal">
 
-		<tml:comment><tml:[form-messages] o_title="Seite kann nicht erstellt werden"/></tml:comment>
-		
 		<tml:[form-field] o_label="Erstellen unter" o_mode="view">
 			<tml:script encode="html">
 				var c = context("docid:"+document.getStructKey(), false)
@@ -75,7 +23,24 @@
 			</tml:script>			
 		</tml:[form-field]>
 		<tml:case condition="document.hasChildren()">
-			<tml:[form-field] o_label="Position" o_name="position" o_type="select" o_options="Am Anfang der Liste|start,Am Ende der Liste|end"/>
+			<tml:script>
+				_opts = ["Am Anfang der Liste|start", "Am Ende der Liste|end"]
+				var pages=[]
+				for(let doc in Iterator(document.getChildEntries())){
+					if(!doc.mayReadContent())
+						continue;
+					var title = doc.title;
+					var c = context("docid:"+doc.getStructKey(), false)
+					if(c)
+						title = c.TITLE;
+					pages.push("Nach '" + title + "'|" + doc.getStructKey().toString())
+				}
+				_optgroups = [{
+					label: "An definierter Position einfügen:",
+					options: pages
+				}]
+			</tml:script>
+			<tml:[form-field] o_label="Position" o_name="position" o_type="select" o-optionvalues="_opts" o-optgroups="_optgroups"/>
 		</tml:case>
 		<tml:[::form]/>
 		<tml:include ref="::required-settings" o_page="child"/>
@@ -84,7 +49,7 @@
 
 	<div class="footer">
 		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
-		<tml:button html_type="submit" cssclass="btn btn-primary" clickaction="create-page" if="_isValid">Erstellen</tml:button>
+		<tml:button html_type="submit" cssclass="btn btn-primary" clickaction="$mc.createPage" if="_isValid">Erstellen</tml:button>
 	</div>
 	
 </tml:form>	
