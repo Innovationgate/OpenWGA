@@ -608,7 +608,7 @@ this.attachment = function(filename){
 			return {
 				name: "others",
 				icon: this.mimeType=="application/zip" ? "tar.png"
-						: this.mimeType=="text/javascript" || this.mimeType=="text/css" ? "source.png"
+						: this.mimeType=="text/javascript" || this.mimeType=="application/json" || this.mimeType=="text/css" ? "source.png"
 						: this.mimeType=="text/html" ? "html.png"
 						: "binary.png",
 				pos: 999
