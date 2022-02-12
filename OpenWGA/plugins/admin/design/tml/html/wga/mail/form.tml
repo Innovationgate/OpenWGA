@@ -32,12 +32,14 @@
 	<tml:[system:fs-input] o_field="fromName" o_allowblank="true" o_emptytext="- none -"/>
 	<tml:[system:fs-input] o_field="fromAddress" o_allowblank="true" o_emptytext="- none -"/>
 
-	<tml:comment><tml:script>
-		var defs = DBM.getModuleDefinition("MailOptions", "de.innovationgate.wgpublisher.modules.mailoptions.MailOptionsCollector")
+	<tml:script>
+		var defs = DBM.getModuleDefinition("MailOptions", "de.innovationgate.wgpublisher.modules.mailoptions.MailOptionsModuleDefinition")
+		console.log("defs", defs);
+		console.log("options", defs.getOptionDefinitions());
 		setOption("module-definition", defs);
-	</tml:script></tml:comment>
+	</tml:script>
 	
-	<tml:[system:module-options:form] o_title="optional additional (JavaMail) Parameter">
+	<tml:[system:module-options:form] o_title="optional JavaMail Parameter">
 		<tml:option name="ns">/options</tml:option>
 	</tml:[system:module-options:form]>
 	
