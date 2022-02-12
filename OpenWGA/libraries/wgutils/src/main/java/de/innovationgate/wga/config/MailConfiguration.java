@@ -59,6 +59,9 @@ public class MailConfiguration extends ConfigBean {
 	@NormalizeEmptyValue
 	private String fromName;
 
+	@Attribute(required=false)
+	private String encryption;
+
 	@Element(required=false)
 	private boolean enableAdminNotifications = false;	
 	
@@ -143,5 +146,11 @@ public class MailConfiguration extends ConfigBean {
     public void setFromName(String fromName) {
         this.fromName = fromName;
     }
-
+    
+    public void setEncryption(String value){
+    	this.encryption=value;
+    }
+    public String getEncryption(){
+    	return this.encryption;
+    }
 }

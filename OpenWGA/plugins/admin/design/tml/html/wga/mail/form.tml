@@ -25,20 +25,21 @@
 <fieldset>	
 	
 	<tml:[system:fs-input] o_field="server" o_allowblank="true" o_emptytext="- none -"/>
+	<tml:[system:fs-input] o_field="encryption" o_type="select" o_options="none|,TLS - Port 587|tls,SSL - Port 465|ssl"/>
 	<tml:[system:fs-input] o_field="user" o_allowblank="true" o_emptytext="- none -"/>
 	<tml:[system:fs-input] o_field="password" o_type="password" o_allowblank="true" o_emptytext="- none -"/>
 	<tml:[system:fs-input] o_field="fromName" o_allowblank="true" o_emptytext="- none -"/>
 	<tml:[system:fs-input] o_field="fromAddress" o_allowblank="true" o_emptytext="- none -"/>
 
-	<tml:script>
+	<tml:comment><tml:script>
 		var defs = DBM.getModuleDefinition("MailOptions", "de.innovationgate.wgpublisher.modules.mailoptions.MailOptionsCollector")
 		setOption("module-definition", defs);
-	</tml:script>
+	</tml:script></tml:comment>
 	
 	<tml:[system:module-options:form] o_title="optional additional (JavaMail) Parameter">
 		<tml:option name="ns">/options</tml:option>
 	</tml:[system:module-options:form]>
-
+	
 </fieldset>
 
 <fieldset>
