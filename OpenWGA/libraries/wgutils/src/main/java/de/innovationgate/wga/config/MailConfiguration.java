@@ -60,7 +60,7 @@ public class MailConfiguration extends ConfigBean {
 	private String fromName;
 
 	@Attribute(required=false)
-	private String encryption;
+	private boolean useSSL = false;
 
 	@Element(required=false)
 	private boolean enableAdminNotifications = false;	
@@ -147,10 +147,10 @@ public class MailConfiguration extends ConfigBean {
         this.fromName = fromName;
     }
     
-    public void setEncryption(String value){
-    	this.encryption=value;
+    public void setUseSSL(boolean value){
+    	this.useSSL=value;
     }
-    public String getEncryption(){
-    	return this.encryption;
+    public boolean isUseSSL(){
+    	return this.useSSL;
     }
 }

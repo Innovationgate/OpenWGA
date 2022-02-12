@@ -79,16 +79,10 @@ public class WGAMailConfiguration {
 		_mailProperties.put("mail.smtp.connectiontimeout", "10000");
 		_mailProperties.put("mail.smtp.timeout", "10000");
 		
-		String encryption = _config.getEncryption();
-		if(encryption!=null){
-			if(encryption.equals("tls")){
-				_mailProperties.put("mail.smtp.port", "587");
-				_mailProperties.put("mail.smtp.starttls.enable", "true");
-			}
-			else if(encryption.equals("ssl")){
-				_mailProperties.put("mail.smtp.port", "465");
-				_mailProperties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-			}
+		if(_config.isUseSSL()){			
+			_mailProperties.put("mail.smtp.ssl.enable", "true");
+			_mailProperties.put("mail.smtp.ssl.protocols", "TLSv1.2");
+			_mailProperties.put("mail.smtp.starttls.enable", "true");
 		}
 		
 		if (_config.getUser() != null) {

@@ -25,7 +25,8 @@
 <fieldset>	
 	
 	<tml:[system:fs-input] o_field="server" o_allowblank="true" o_emptytext="- none -"/>
-	<tml:[system:fs-input] o_field="encryption" o_type="select" o_options="none|,TLS - Port 587|tls,SSL - Port 465|ssl"/>
+	<tml:comment><tml:[system:fs-input] o_field="encryption" o_type="select" o_options="none|,TLS - Port 587|tls,SSL - Port 465|ssl"/></tml:comment>
+	<tml:[system:fs-input] o_field="useSSL" o_type="boolean"/>
 	<tml:[system:fs-input] o_field="user" o_allowblank="true" o_emptytext="- none -"/>
 	<tml:[system:fs-input] o_field="password" o_type="password" o_allowblank="true" o_emptytext="- none -"/>
 	<tml:[system:fs-input] o_field="fromName" o_allowblank="true" o_emptytext="- none -"/>
