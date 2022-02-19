@@ -1,0 +1,9 @@
+<tml:include ref="system:include-child-modules">
+	<tml:option name="margins" expression="true" scope="local"/>
+</tml:include>
+
+<tml:case condition="STATUS==content().STATUS_DRAFT">
+	<script>
+		window.parent.CM && window.parent.CM.initItemEditors();
+	</script>
+</tml:case>
