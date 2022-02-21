@@ -41,5 +41,6 @@
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="tab.png"/>",
 	type:			'container',
 	tml:			'plugin-cm-modules/modules:tabs:render-tab-panel',
+	settingstml:	'plugin-cm-modules/modules:tabs:settings-panel',
 	allowedparents: ["cm_tabs"]
 }
