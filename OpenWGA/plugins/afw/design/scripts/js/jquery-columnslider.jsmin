@@ -265,6 +265,14 @@
 			else $wrapper.animate({left:new_left});
 		}
 
+	    WGA.event.addListener("columns-slider", "CMM-element-activated", function(e){
+	    	if(e.params.el){
+		    	if($.contains(e.params.el, $cols[0])){
+		    		setWidth();
+		    	}
+		    }
+	    })
+		
 	}
 
 	// jquery plugin interface:
