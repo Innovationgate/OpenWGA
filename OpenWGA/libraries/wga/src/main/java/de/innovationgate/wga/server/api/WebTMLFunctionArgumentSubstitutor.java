@@ -116,6 +116,11 @@ public class WebTMLFunctionArgumentSubstitutor implements FunctionArgumentSubsti
                 return _wga.tmlcontext().itemlist(argumentName.substring(10));
             }
         }
+        else if (argumentName.equals("$profile")) {
+            if (_wga.isTMLContextAvailable()) {
+                return  _wga.tmlcontext().getprofile();
+            }
+        }
         else if (argumentName.equals("$portlet")) {
             if (_wga.isTMLContextAvailable()) {
                 return  _wga.tmlcontext().getportlet();
