@@ -73,7 +73,7 @@
     </minimumJavaVersion>
     <pluginHomepage>main</pluginHomepage>
     <dependencies/>
-    <personalisationMode>4</personalisationMode>
+    <personalisationMode>1</personalisationMode>
     <usageAsDesignProvider>false</usageAsDesignProvider>
     <usageAsAuthSource>false</usageAsAuthSource>
     <usageAsContentStore>true</usageAsContentStore>

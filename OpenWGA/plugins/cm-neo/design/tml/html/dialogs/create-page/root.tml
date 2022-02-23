@@ -2,7 +2,7 @@
 
 	<tml:script>
 		setOption("current_lang", LANGUAGE);
-		setOption("current_pagetype", CONTENTTYPE);
+		setOption("default_pagetype", profile.last_used_contenttype || CONTENTTYPE);
 		var areas = WGA.createList();
 		var systemAreas = WGA.createList();
 		var allAreas = WGA.createList();

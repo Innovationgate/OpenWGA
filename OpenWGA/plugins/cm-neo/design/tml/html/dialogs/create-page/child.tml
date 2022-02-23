@@ -1,7 +1,7 @@
 <tml:script>
 	_opts = option("dialog_options")
 	setOption("current_lang", LANGUAGE);
-	setOption("current_pagetype", CONTENTTYPE);
+	setOption("default_pagetype", profile.last_used_contenttype || CONTENTTYPE);
 	App.settingsSaveHandler=[];
 </tml:script>
 

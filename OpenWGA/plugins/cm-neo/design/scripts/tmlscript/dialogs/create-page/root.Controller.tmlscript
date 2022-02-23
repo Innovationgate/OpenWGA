@@ -3,9 +3,10 @@ function Controller() {}
 // Vererbung
 Controller.prototype = Object.create($$.StructList.prototype);
 
-Controller.prototype.createPage = function(AFW, App, $cx, $form) {
+Controller.prototype.createPage = function(AFW, App, $cx, $form, $profile) {
 
 	if($form.validate()){
+		$profile.last_used_contenttype=$form.contenttype;
 		var ct = $cx.db().getContentType($form.contenttype)
 		var area = $cx.db().getArea($form.area)
 
