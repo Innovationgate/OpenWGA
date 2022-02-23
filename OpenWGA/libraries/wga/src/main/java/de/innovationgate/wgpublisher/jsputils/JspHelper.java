@@ -295,6 +295,14 @@ public class JspHelper {
         String structKeyStr = "null";
         String titleStr = "null";
        
+        String requestContentKey = requestPath.getContentKey();
+        if(requestContentKey!=null){
+        	// in case nothing else helps ...
+        	contentKeyStr = quote + requestContentKey + quote;
+        	structKeyStr = quote + requestContentKey.split("\\.")[0] + quote;
+        }
+        
+        
         // Try to retrieve content key to fill content specific information
         try {
             WGContent content = (WGContent) _pageContext.getRequest().getAttribute(WGACore.ATTRIB_MAINCONTEXT);
