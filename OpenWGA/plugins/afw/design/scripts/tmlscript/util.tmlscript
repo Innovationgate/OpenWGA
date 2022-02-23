@@ -610,7 +610,8 @@ this.csvWriter = function(config){
 		if(typeof(col)=="string"){
 			var parts = col.split("|");
 			var value = parts[1]||parts[0];
-			return value==value.toUpperCase() ? $cx.meta(value) : $cx.item(value); 
+			//return value==value.toUpperCase() ? $cx.meta(value) : $cx.item(value);
+			return $cx[value]; 
 		}
 		else return col.value.call($cx, $cx);
 	}
