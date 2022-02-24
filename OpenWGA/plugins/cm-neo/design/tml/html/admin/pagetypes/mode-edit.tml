@@ -10,7 +10,7 @@
 	_query_delete=true;
 	_may_delete = true;
 	try{
-		document.performRemoveCheck();
+		document.performRemoveCheck(true);
 	}
 	catch(e){
 		_may_delete = false;

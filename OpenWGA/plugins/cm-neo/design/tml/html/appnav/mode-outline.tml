@@ -13,6 +13,7 @@
 		WGA.portlet.registerObject("<tml:script expression="portlet.portletkey"/>", {
 			destroy: function(){
 				Outline.showHeadings(false);
+				Outline.removePageRenderedListener()
 			}
 		})
 	});

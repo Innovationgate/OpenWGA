@@ -1,10 +1,24 @@
 <div class="dashboard">
 
-	<tml:comment><fieldset>
-		<legend>Von mir zu Genehmigen</legend>
-	</fieldset></tml:comment>
-
 	<tml:[template] o_id="appnav-dashboard">
+	
+		{{#lastpublished.length}}
+			<fieldset>
+				<legend>Zuletzt veröffentlicht</legend>
+				{{#lastpublished}}
+					<div class="entry {{cssclass}}">
+						<a href="{{href}}">
+							{{{title}}}
+							<div class="info">
+								Version {{version}} / {{language}}
+								<br>
+								veröffentlicht <b>{{published}}</b> 
+							</div>
+						</a>
+					</div>
+				{{/lastpublished}}
+			</fieldset>
+		{{/lastpublished.length}}
 	
 		{{#toapprove.length}}
 			<fieldset>

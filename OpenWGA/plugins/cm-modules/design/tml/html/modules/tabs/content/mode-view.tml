@@ -1,0 +1,6 @@
+<script>
+	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "tab-activated", function(ev){
+		if(ev.params.id=="<tml:option name="ns"/>")
+			WGA.ajax.callAction("<tml:action ref="$refresh" portletmode="loaded"/>")
+	})
+</script>

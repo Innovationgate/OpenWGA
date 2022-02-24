@@ -24,8 +24,8 @@
 		if(pagetypes.size()==1)
 			tmlform.contenttype = pagetypes.get(0);
 		else if(!tmlform.submitted){
-			if($option_current_pagetype && pagetypes.contains($option_current_pagetype))
-				tmlform.contenttype=$option_current_pagetype
+			if($option_default_pagetype && pagetypes.contains($option_default_pagetype))
+				tmlform.contenttype=$option_default_pagetype
 			else if(pagetypes.size())
 				tmlform.contenttype = pagetypes.get(0);
 		}		

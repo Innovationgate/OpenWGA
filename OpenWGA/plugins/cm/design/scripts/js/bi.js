@@ -441,6 +441,9 @@ window.CM = {
 
 	pageLoaded: function(){
 		BI.sitepanel.monitorIframeOnLoad()
+	},
+	initItemEditors: function(){
+		BI.sitepanel.initItemEditors();
 	}
 
 }

@@ -75,13 +75,17 @@ public class WGAMailConfiguration {
 	private void init() {
 		// init mail props and authenticator
 		_mailProperties = new Properties();
-		_mailProperties.put("mail.transport.protocol", "smtp");
-		_mailProperties.put("mail.host", _config.getServer());
 		_mailProperties.put("mail.smtp.host", _config.getServer());
 		_mailProperties.put("mail.smtp.connectiontimeout", "10000");
 		_mailProperties.put("mail.smtp.timeout", "10000");
+		
+		if(_config.isUseSSL()){			
+			_mailProperties.put("mail.smtp.ssl.enable", "true");
+			_mailProperties.put("mail.smtp.ssl.protocols", "TLSv1.2");
+			_mailProperties.put("mail.smtp.starttls.enable", "true");
+		}
+		
 		if (_config.getUser() != null) {
-		    _mailProperties.put("mail.user", _config.getUser());
 			_mailProperties.put("mail.smtp.user", _config.getUser());
 			if (_config.getPassword() != null) {
 				_mailProperties.put("mail.smtp.auth", "true");

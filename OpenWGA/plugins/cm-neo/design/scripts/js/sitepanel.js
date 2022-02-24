@@ -48,6 +48,11 @@ define(["cm", "jquery"], function(CM, $){
 		$(".WGA-Item", doc).each(function(){
 			var item = $(this);
 	
+			// ensure editors are initialized only once
+			if(item.data("item-editor"))
+				return;
+			item.data("item-editor", true)
+			
 			var item_info_el=item.find(".WGA-Item-Info");
 			var item_label_el=item.find(".WGA-Item-Label");
 			var item_value_el=item.find(".WGA-Item-Value");
@@ -167,10 +172,12 @@ define(["cm", "jquery"], function(CM, $){
 					if(!$this.find(".WGA-Item-Value").html())
 						$this.find(".WGA-Item-Label").show();
 				});
+				editItemsVisible=true;
 			}
 			else {
 				$(".WGA-Item-Edit", doc).css("visibility", "hidden")
 				$(".WGA-Item", doc).removeClass("visible");
+				editItemsVisible=false;
 			}
 		}
 		catch(e)
@@ -303,7 +310,7 @@ define(["cm", "jquery"], function(CM, $){
 		,getWindow: getWindow
 		
 		,getContentInfo: function(){
-			return getWindow().WGA.contentinfo
+			return getWindow().WGA && getWindow().WGA.contentinfo
 		}
 		
 		,scale: function(scale){
@@ -315,7 +322,11 @@ define(["cm", "jquery"], function(CM, $){
 		,createStyle: createStyle
 		,removeStyle: removeStyle
 		,showItemEditors: showItemEditors
-		
+		,initItemEditors: initItemEditors
+		,isEditItemsVisible: function(){
+			return editItemsVisible;
+		}
+						
 		,reload: reload
 		,init: init
 	}

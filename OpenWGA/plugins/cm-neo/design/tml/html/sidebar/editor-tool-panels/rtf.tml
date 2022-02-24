@@ -13,7 +13,7 @@
 			<option value="h3">Überschrift 3
 			<option value="h4">Überschrift 4
 			<option value="h5">Überschrift 5
-			<option value="h6">Überschrift 6			
+			<option value="h6">Überschrift 6
 		</select> 
 	</div>
 	
@@ -25,10 +25,10 @@
 
 <fieldset>
 	<legend>Text</legend>
-	<div class="btn-group" style="display:block">
-		<a style="width:33.333%" href="#" data-cmd="Bold" class="btn btn-default btn-sm" title="Fett"><b>B</b></a>
-		<a style="width:33.333%" href="#" data-cmd="Italic" class="btn btn-default btn-sm" title="Kursiv""><i>I</i></a>
-		<a style="width:33.333%" href="#" data-cmd="Underline" class="btn btn-default btn-sm" title="Unterstrichen"><u>U</u></a>
+	<div class="btn-group" style="display:flex">
+		<a style="flex:1" href="#" data-cmd="Bold" class="btn btn-default btn-sm" title="Fett"><b>B</b></a>
+		<a style="flex:1" href="#" data-cmd="Italic" class="btn btn-default btn-sm" title="Kursiv""><i>I</i></a>
+		<a style="flex:1" href="#" data-cmd="Underline" class="btn btn-default btn-sm" title="Unterstrichen"><u>U</u></a>
 	</div>
 </fieldset>
 	
@@ -83,13 +83,13 @@
 	<legend>Objekte</legend>
 	<div role="tabpanel">
 		<ul class="nav nav-tabs">
-			<li class="active">
+			<li class="active InsertLink">
 				<a href="#rtf-tab-link" data-toggle="tab">Link</a>
 			</li>
-			<li>
+			<li class="InsertImg">
 				<a href="#rtf-tab-image" data-toggle="tab">Bild</a>
 			</li>
-			<li>
+			<li class="InsertTable">
 				<a href="#rtf-tab-table" data-toggle="tab">Tabelle</a>
 			</li>
 			<tml:comment><li>

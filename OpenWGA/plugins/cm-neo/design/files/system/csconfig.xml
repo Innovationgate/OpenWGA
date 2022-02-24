@@ -48,9 +48,9 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>9</minorVersion>
-        <maintenanceVersion>5</maintenanceVersion>
+        <maintenanceVersion>6</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>707</buildVersion>
+        <buildVersion>708</buildVersion>
       </version>
     </id>
     <title>OpenWGA Content Manager</title>
@@ -73,7 +73,7 @@
     </minimumJavaVersion>
     <pluginHomepage>main</pluginHomepage>
     <dependencies/>
-    <personalisationMode>4</personalisationMode>
+    <personalisationMode>1</personalisationMode>
     <usageAsDesignProvider>false</usageAsDesignProvider>
     <usageAsAuthSource>false</usageAsAuthSource>
     <usageAsContentStore>true</usageAsContentStore>

@@ -1,14 +1,18 @@
 // Public API
-require(["cm", "uploadmanager", "jquery-textarea-autogrow"], function(CM, UploadManager){
+require(["cm", "uploadmanager", "sitepanel", "jquery-textarea-autogrow"], function(CM, UploadManager, Sitepanel){
 	
 	window.CM = {
 
 		pageLoaded: function(info){
 			WGA.event.fireEvent("page-loaded", "cm-neo", info);
-		},
+		},		
+		openDialog: CM.openDialog,
+		initItemEditors: function(){
+			Sitepanel.initItemEditors();
+			if(Sitepanel.isEditItemsVisible())
+				Sitepanel.showItemEditors(true)
+		}
 		
-		openDialog: CM.openDialog
-
 	}
 	
 	window.BI = {		// some old modules check for this

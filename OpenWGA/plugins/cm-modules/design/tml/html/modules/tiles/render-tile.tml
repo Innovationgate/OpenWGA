@@ -35,11 +35,11 @@
 				_imagederivates = Math.max((responsive.small && responsive.small.maxPageWidth)||responsive.medium.width, _imagederivates);
 		}
 	} 
-	
+	_width = (100*Number(CMM.setting("width") || "1")/option("total")).toFixed(2) + "%";
 </tml:script>	
 
 <div class="tile <tml:option name="module_classes"/>" 
-	style="flex:<tml:script expression="CMM.setting('width') || 1"/>"
+	style="width:<tml:item name="_width"/>"
 >
 	<@{_wrap_tag} @{_wrap_attribs encode="none"} class="content <tml:option name="module_classes"/>"
 		style="<tml:script>

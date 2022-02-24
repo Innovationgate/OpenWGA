@@ -15,7 +15,7 @@ configurations {
 dependencies {
     server project(":server")
     
-    tomcatAdditionalJars 'com.sun.mail:javax.mail:1.4.7'
+    tomcatAdditionalJars 'com.sun.mail:javax.mail:1.6.2'
     tomcatAdditionalJars 'javax.activation:activation:1.1.1'
     tomcatAdditionalJars 'org.apache.geronimo.specs:geronimo-activation_1.1_spec:1.1'
     tomcatAdditionalJars 'org.apache.geronimo.specs:geronimo-jta_1.1_spec:1.1.1'

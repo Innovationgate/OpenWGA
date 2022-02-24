@@ -494,7 +494,27 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 			return editor;
 		},
 		setOptions: function(opts){
-			options = opts
+			options = opts;
+			if(options.hideoptions){
+				for(var i=0; i<options.hideoptions.length; i++){
+					var opt = options.hideoptions[i];
+					$("#editor-panel-rtf [data-cmd=" + opt + "]").hide();
+				}
+				// special handlings
+				if(options.hideoptions.indexOf("editHTML")>=0)
+					$("#editor-panel-rtf [data-action=edit-html]").hide();
+				if(options.hideoptions.indexOf("InsertTable")>=0)
+					$("#editor-panel-rtf .InsertTable").hide();
+				// headings
+				var headings = ["h1", "h2", "h3", "h3", "h4", "h6", "pre"]
+				for(var i=0; i<headings.length; i++){
+					var heading = headings[i];
+					if(options.hideoptions.indexOf(heading)>=0){
+						$("#editor-panel-rtf [name=para] + div input[value=" + heading + "]")
+							.parents("li").first().hide()
+					}
+				}
+			}
 			if(options && options.paragraphStyleList && options.paragraphStyleList.length){
 				var opts=[]
 				toolbar.paragraphStyleList = options.paragraphStyleList;

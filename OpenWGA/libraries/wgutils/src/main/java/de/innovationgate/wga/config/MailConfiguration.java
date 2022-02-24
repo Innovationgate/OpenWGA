@@ -59,6 +59,9 @@ public class MailConfiguration extends ConfigBean {
 	@NormalizeEmptyValue
 	private String fromName;
 
+	@Attribute(required=false)
+	private boolean useSSL = false;
+
 	@Element(required=false)
 	private boolean enableAdminNotifications = false;	
 	
@@ -143,5 +146,11 @@ public class MailConfiguration extends ConfigBean {
     public void setFromName(String fromName) {
         this.fromName = fromName;
     }
-
+    
+    public void setUseSSL(boolean value){
+    	this.useSSL=value;
+    }
+    public boolean isUseSSL(){
+    	return this.useSSL;
+    }
 }

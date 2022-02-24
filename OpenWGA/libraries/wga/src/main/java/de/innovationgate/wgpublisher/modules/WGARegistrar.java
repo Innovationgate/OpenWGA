@@ -55,7 +55,7 @@ import de.innovationgate.wgpublisher.modules.lang.BrowserLocaleLanguageBehaviour
 import de.innovationgate.wgpublisher.modules.lang.DynamicLanguageBehaviourModuleDefinition;
 import de.innovationgate.wgpublisher.modules.lang.OnlyDefaultLanguageBehaviourModuleDefinition;
 import de.innovationgate.wgpublisher.modules.lang.StaticLanguageBehaviourModuleDefinition;
-import de.innovationgate.wgpublisher.modules.mailoptions.MailOptionsCollector;
+import de.innovationgate.wgpublisher.modules.mailoptions.MailOptionsModuleDefinition;
 import de.innovationgate.wgpublisher.modules.poptions.BaseContentDatabasePublisherOptionsModuleDefinition;
 import de.innovationgate.wgpublisher.modules.poptions.BaseContentStorePublisherOptionsModuleDefinition;
 import de.innovationgate.wgpublisher.modules.poptions.ContentDatabasePublisherOptionsCollector;
@@ -107,9 +107,8 @@ public class WGARegistrar implements ModuleRegistrar {
         registry.addModuleDefinition(new VariousOptionsCollector());
         registry.addModuleDefinition(new BasicVariousOptionsModuleDefinition());
         
-        
         // Mail options
-        registry.addModuleDefinition(new MailOptionsCollector());
+        registry.addModuleDefinition(new MailOptionsModuleDefinition());
 
         // Design Sources
         registry.addModuleDefinition(new DBDesignSourceModuleDefinition());

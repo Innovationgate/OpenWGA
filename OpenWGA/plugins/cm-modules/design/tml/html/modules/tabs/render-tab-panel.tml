@@ -23,6 +23,13 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:include ref="system:include-child-modules">
-	<tml:option name="margins" expression="true" scope="local"/>
-</tml:include>
+<tml:if condition="CMM.setting('lazy_load_content_on_show')">
+	<tml:then>
+		<tml:portlet name="[pane-{$option_ns}]" ref="::content:portlet" portletmode="view"/>
+	</tml:then>
+	<tml:else>
+		<tml:include ref="system:include-child-modules">
+			<tml:option name="margins" expression="true" scope="local"/>
+		</tml:include>	
+	</tml:else>
+</tml:if>

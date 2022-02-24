@@ -2,15 +2,16 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 	
 	var outline_in_doc = false;
 
-	function onContextChange(context){
+	WGA.event.addListener("*", "CMS_save_item", function(){
+		setTimeout(updateOutline, 250)
+	})
+	
+	function onPageRendered(ev){
+		//console.log("outline page-rendered", ev.params.contentkey);
 		updateOutline()
 		if(outline_in_doc)
 			SitePanel.createStyle($("#heading-helper-css").text(), "heading-helper")		
 	}
-	
-	WGA.event.addListener("*", "CMS_save_item", function(){
-		setTimeout(updateOutline, 250)
-	})
 	
 	function init(){
 		$("#app-outline input").click(function(){
@@ -18,7 +19,7 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 		});
 		showHeadings(true);
 		updateOutline();
-		Appnav.setContextChangeListener(onContextChange)
+		Appnav.setPageRenderedListener(onPageRendered);
 		
 		$("#app-outline .struct").on("click", ".tag", function(){
 			var index = $(this).data("hx_id");
@@ -31,14 +32,14 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 	
 	function analyzeDocument(callback, validate){
 		
-		var context = Appnav.getContext();
-		if(!context)
+		var docinfo = SitePanel.getContentInfo();
+		if(!docinfo)
 			return;
 		
 		if(!validate)
 			validate = validateErrors;
 		
-		if(context.status=="w"){
+		if(docinfo.status=="w"){
 			// read page with URL param $clean to get clean HTML without item-editors
 			var win = SitePanel.getWindow();
 			var href;
@@ -140,6 +141,9 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 	return {
 		init: init,
 		showHeadings: showHeadings,
-		analyzeDocument: analyzeDocument
+		analyzeDocument: analyzeDocument,
+		removePageRenderedListener: function(){
+			Appnav.setPageRenderedListener(null);
+		}
 	}
 })

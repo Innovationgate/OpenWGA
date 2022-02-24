@@ -25,19 +25,21 @@
 
 package de.innovationgate.wgpublisher.modules.mailoptions;
 
-import java.util.Iterator;
 import java.util.Locale;
 
-import de.innovationgate.webgate.api.templates.ContentSourceSpecs;
+import de.innovationgate.utils.WGUtils;
+import de.innovationgate.wga.modules.LocalisationBundleLoader;
 import de.innovationgate.wga.modules.ModuleDefinition;
+import de.innovationgate.wga.modules.ModuleDependencyException;
 import de.innovationgate.wga.modules.ModuleType;
 import de.innovationgate.wga.modules.OptionDefinitionsMap;
-import de.innovationgate.wga.modules.OptionsCollector;
-import de.innovationgate.wga.modules.types.ContentDatabasePublisherOptionsModuleType;
-import de.innovationgate.wga.modules.types.ContentStorePublisherOptionsModuleType;
+import de.innovationgate.wga.modules.options.IntegerOptionType;
+import de.innovationgate.wga.modules.options.LocalizedOptionDefinition;
 import de.innovationgate.wga.modules.types.MailOptionsModuleType;
 
-public class MailOptionsCollector extends OptionsCollector  {
+public class MailOptionsModuleDefinition implements ModuleDefinition {
+
+    private LocalisationBundleLoader _bundleLoader = new LocalisationBundleLoader(WGUtils.getPackagePath(this.getClass()) + "/options", getClass().getClassLoader());
 
     public Class<? extends ModuleType> getModuleType() {
         return MailOptionsModuleType.class;
@@ -50,6 +52,31 @@ public class MailOptionsCollector extends OptionsCollector  {
     public String getTitle(Locale locale) {
         return "Mail options collector";
     }
+
+	@Override
+	public OptionDefinitionsMap getOptionDefinitions() {
+        OptionDefinitionsMap options = new OptionDefinitionsMap();
+        
+        LocalizedOptionDefinition port = new LocalizedOptionDefinition("mail.smpt.port", IntegerOptionType.INSTANCE, _bundleLoader);
+        port.setOptional(true);
+        options.addOption(port);
+                
+        return options;
+	}
+
+	@Override
+	public Class<? extends Object> getImplementationClass() {
+		return getClass();
+	}
+
+	@Override
+	public void testDependencies() throws ModuleDependencyException {
+	}
+
+	@Override
+	public Object getProperties() {
+		return null;
+	}
 
     
 
