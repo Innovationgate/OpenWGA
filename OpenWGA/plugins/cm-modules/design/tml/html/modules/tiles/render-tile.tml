@@ -48,10 +48,13 @@
 			];
 			var image = CMM.setting("image")
 			if(image){
-				var derivate = "usage=poster" + (_imagederivates ? ",width~"+WGA.format(_imagederivates, '0') :"")
+				var derivate = "usage=poster"
+				if(_imagederivates){
+					derivate = enhanceFileDerivateQuery("width~"+WGA.format(_imagederivates, '0'))
+				}
 				var url = WGA.urlBuilder(fileurl(image))
 					.setParameter("derivate", derivate)
-					.build()
+					.build();
 				styles.push("background-image:url('" + url + "')");
 				var imgSet = createImgSet(image, derivate);
 				if(imgSet)
