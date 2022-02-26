@@ -890,7 +890,11 @@ public class FileDerivateManager {
     
     }
 
-    public DerivateQuery parseDerivateQuery(String derivateQuery) throws WGInvalidDerivateQueryException {
+    
+    public static DerivateQuery parseDerivateQuery(String derivateQuery) throws WGInvalidDerivateQueryException {
+    	return parseDerivateQuery(derivateQuery, true);
+    }
+    public static DerivateQuery parseDerivateQuery(String derivateQuery, boolean add_usage) throws WGInvalidDerivateQueryException {
         DerivateQuery queryTerms = new DerivateQuery();
         for (String queryTermStr :WGUtils.deserializeCollection(derivateQuery, ",", true)) {
             DerivateQueryTerm queryTerm = new DerivateQueryTerm(queryTermStr);
@@ -904,7 +908,7 @@ public class FileDerivateManager {
         }
         
         // Defaulting "usage" if not present and also ne special derivate queried via ID (#00003667)
-        if (!queryTerms.containsKey(DerivateQuery.QUERYTERM_USAGE) && !queryTerms.containsKey(DerivateQuery.QUERYTERM_ID)) {
+        if (add_usage && !queryTerms.containsKey(DerivateQuery.QUERYTERM_USAGE) && !queryTerms.containsKey(DerivateQuery.QUERYTERM_ID)) {
             queryTerms.put("usage", new DerivateQueryTerm("usage=" + WGFileAnnotations.USAGE_POSTER));
         }
         
@@ -967,9 +971,9 @@ public class FileDerivateManager {
        
     }
 
-    public DerivateQuery mergeDerivateQueries(String fileDerivates, String existingDerivates) throws WGInvalidDerivateQueryException {
+    public static DerivateQuery mergeDerivateQueries(String fileDerivates, String existingDerivates) throws WGInvalidDerivateQueryException {
 
-        DerivateQuery derivateQuery = parseDerivateQuery(fileDerivates);
+        DerivateQuery derivateQuery = parseDerivateQuery(fileDerivates, false);
         DerivateQuery existingDerivateQuery = parseDerivateQuery(existingDerivates);
         
         if (derivateQuery.isClearPredefinedQuery()) {
