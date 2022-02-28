@@ -8,7 +8,8 @@ define(["cm", "jquery"], function(CM, $){
 			$("#loading").hide();
 			initItemEditors()
 			showItemEditors(true)
-			WGA.event.fireEvent("page-rendered", "sitepanel.js", getWindow().WGA.contentinfo)
+			if(getWindow().WGA)
+				WGA.event.fireEvent("page-rendered", "sitepanel.js", getWindow().WGA.contentinfo)
 		})
 	}
 	
