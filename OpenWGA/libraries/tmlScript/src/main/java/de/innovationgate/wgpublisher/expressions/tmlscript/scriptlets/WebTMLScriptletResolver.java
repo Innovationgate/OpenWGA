@@ -51,6 +51,7 @@ import de.innovationgate.wgpublisher.expressions.ExpressionEngine;
 import de.innovationgate.wgpublisher.expressions.ExpressionResult;
 import de.innovationgate.wgpublisher.expressions.tmlscript.RhinoExpressionEngine;
 import de.innovationgate.wgpublisher.expressions.tmlscript.RhinoExpressionEngineImpl;
+import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager;
 import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager.DerivateQuery;
 import de.innovationgate.wgpublisher.lang.LanguageBehaviourTools;
 import de.innovationgate.wgpublisher.lang.WebTMLLanguageChooser;
@@ -463,7 +464,10 @@ public class WebTMLScriptletResolver {
         	if (derivates == null)
         		derivates = (String) context.option(Base.OPTION_IMAGE_DERIVATES);
             if (derivates != null) {
-                DerivateQuery derivateQuery = context.getwgacore().getFileDerivateManager().parseDerivateQuery(derivates);
+                DerivateQuery derivateQuery = FileDerivateManager.parseDerivateQuery(derivates);
+                WGA wga = WGA.get(context);
+                if(wga.selectDerivate(context, fileName, derivateQuery.toString())==null)
+                	derivateQuery = context.enhanceFileDerivateQuery("usage=poster"); 
                 url = addDerivateQueryToURL(context, derivateQuery, url);
             }
         }
