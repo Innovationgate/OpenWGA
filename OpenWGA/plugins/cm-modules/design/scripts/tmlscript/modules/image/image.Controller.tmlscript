@@ -25,7 +25,6 @@ Controller.prototype.prepare = function($cx, CMM) {
 	
 	// filename
 	this.filename = setting('image');
-	console.log("this.filename", this.filename)
 
 	if(this.context && this.filename){
 		
