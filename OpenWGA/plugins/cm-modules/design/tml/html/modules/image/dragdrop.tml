@@ -45,7 +45,8 @@
 	map.put(WGA.scoped("image_mo"), "");
 	map.put(WGA.scoped("lightbox_image"), "");
 	map.put(WGA.scoped("dbkey"), dbkey);
-	map.put(WGA.scoped("sourcedoc"), container);
+	map.put(WGA.scoped("sourcedoc"), c.STRUCTKEY);
+	map.put(WGA.scoped("lang"), c.LANGUAGE);
 	map.put(WGA.scoped("source"), (dbkey||container) ? "container" : "");
 	map.put(WGA.scoped("setting_source"), "document");
 
