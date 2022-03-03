@@ -147,8 +147,17 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 		else struct = dest.createChildEntry(ct, source.getTitle())
 		
 		struct.setReaders(source.getReaders())
+		struct.setChildEditors(source.getChildEditors())
 		struct.setPageEditors(source.getPageEditors())
+
+		// workflow:
+		struct.setBranchWorkflow(source.getBranchWorkflow())
 		
+		// extension data
+		for(let name in Iterator(source.getExtensionDataNames())){
+			source.mayPushExtData(name) && struct.writeExtensionData(name, source.getExtensionData(name));
+		}
+
 		if(position){
 			if(dest instanceof Packages.de.innovationgate.webgate.api.WGArea){
 				var rootEntries = dest.getRootEntries();
