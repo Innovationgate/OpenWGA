@@ -489,7 +489,7 @@ BI.se.selectEntry=function(el, title){
 /**
  * Select tree entry based on structkey
  * called from outside the sitexplorer to select an entry
- * if structkey is not avaliable it reads the stuct path from server and opens all entries
+ * if structkey is not avaliable it reads the struct path from server and opens all entries
  * @param {String} key: the structkey to select
  */
 BI.se.selectEntryByKey=function(key){
@@ -518,8 +518,11 @@ BI.se.selectEntryByKey=function(key){
 		return getStructPathFromServer(key);	// load struct-path from server and open all entries in ajax callback
 	}
 	var el=Ext.get("struct:"+key);
-	if(!el)
-		return alert("structentry not found in tree");
+	if(!el){
+		alert("structentry not found in tree. Page will be reloaded.");
+		location.reload()
+		return;
+	}
 	BI.se.selectEntry(el, BI.title);
 	BI.se.updateStruct(key);
 	
