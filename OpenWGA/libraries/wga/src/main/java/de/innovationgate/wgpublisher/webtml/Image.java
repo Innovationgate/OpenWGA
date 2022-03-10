@@ -296,20 +296,6 @@ public class Image extends Base implements DynamicAttributes {
                     	if(!srcset.isEmpty())
                     		srcSetAttribute = "srcset=\"" + srcset + "\" ";
 
-                    	/*
-                        SrcSetCreator srcSetCreator = WGA.get(getTMLContext()).service(SrcSetCreator.class);
-                        WGFileMetaData fileMeta = content.getFileMetaData(file);
-                        String usage = WGFileAnnotations.USAGE_POSTER;
-                        if (derivateQuery != null && derivateQuery.containsKey(DerivateQuery.QUERYTERM_USAGE)) {
-                            usage = derivateQuery.get(DerivateQuery.QUERYTERM_USAGE).getValue();
-                        }
-                        Dimension originalSize = srcSetCreator.getMaxAvailableSize(fileMeta, usage);
-                        if (originalSize != null) {
-                        	String srcset = srcSetCreator.createSrcSet(fileurl, stringToBoolean(getAbsolute()), originalSize);
-                        	if(!srcset.isEmpty())
-                        		srcSetAttribute = "srcset=\"" + srcset + "\" ";
-                        }
-                        */
                     }
                 }
                 
