@@ -57,3 +57,19 @@
 	}
 	
 </tml:include>
+
+<tml:script>
+	_responsive = WGA.design(db()).getGlobal("RESPONSIVE")
+</tml:script>
+<tml:case condition="_responsive">
+	@media screen and (max-width: <tml:script format="0" expression="_responsive.medium.width-1"/>px) {
+		.module-cm_tiles >.tiles.clear >.tile {
+			width: 100% !important;
+		}
+	}
+	@media screen and (max-width: <tml:script format="0" expression="_responsive.large.width-1"/>px) {
+		.module-cm_tiles >.tiles.medium-clear >.tile {
+			width: 100% !important;
+		}
+	}	
+</tml:case>

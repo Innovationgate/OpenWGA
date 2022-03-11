@@ -1,0 +1,84 @@
+function Controller() {
+}
+
+Controller.prototype.prepare = function($cx, CMM) {
+
+	// helper
+	function setting(name){
+		var value = CMM.settings($cx).get(name)
+		if(value && value.size && value.size())
+			return value.get(0);
+		else return value;
+	}
+
+	// context
+	if(!setting("source")){
+		this.context = $cx;
+	}
+	else{
+		var ctx_expr = (setting("dbkey")!="this" ? "db:" + setting("dbkey") + "/" : "")
+			+ "docid:" + setting("sourcedoc") 
+			+ (setting("lang") ? "." + setting("lang") + ".0" : "")
+		 
+		this.context = $cx.context(ctx_expr, false);		
+	}
+	
+	// filename
+	this.filename = setting('image');
+
+	if(this.context && this.filename){
+		
+		this.download_url = this.context.fileurl(this.filename);
+		this.downloads = (setting('download') && this.download_url) || false;
+		
+		// Lightbox
+		var lightbox_filename = setting("lightbox_image") || this.filename;
+		this.lightbox_url = this.context.fileurl(lightbox_filename)
+		var option_imagederivates = $cx.option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES)
+		if(option_imagederivates){
+			var derivateQuery = WGA.Core.getFileDerivateManager().parseDerivateQuery(option_imagederivates)
+			var usage = derivateQuery.get("usage").toString();
+			if(!WGA.selectDerivate(this.context, this.filename, usage))
+				usage = "usage=poster"
+			this.lightbox_url = WGA.urlBuilder(this.lightbox_url).setParameter("derivate", usage);	
+		}
+	
+		// ALT / title
+		this.file_md = this.context.content().getFileMetaData(this.filename);
+		if(this.file_md){
+			this.img_alt = this.file_md.title || $cx.option('title');
+			this.img_title = setting("title");
+			if(this.img_title==null)
+				this.img_title = this.img_alt;	// backwards compatibilty
+		}
+
+		// Mouse-Over Image
+		this.url_mo = null;
+		var mo_filename = setting("image_mo")
+		if(mo_filename && this.context.content().hasFile(mo_filename)) {
+			this.url_mo = this.context.fileurl(mo_filename);
+		}
+	}	
+
+
+	// LINK
+	var onclick = setting("onclick");
+	if(onclick=="link"){
+		this.link_target = setting('link_target');
+		if(setting('link_type')=='int' && setting('wgakey'))
+			this.link_url = WGA.context("docid:"+setting('wgakey')).contenturl()
+		else if(setting('link_type')=='ext' && setting('url'))
+			this.link_url = setting('url');
+		else if(setting('url')){
+			// old style url
+			var target = WGA.context("docid:" + setting('url'), false)
+			if(target)
+				this.link_url = target.contenturl();
+			else this.link_url = setting('url');
+		}
+	}
+	else if(onclick=="open" && this.download_url){
+		this.link_url = this.download_url
+	}
+
+}

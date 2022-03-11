@@ -92,7 +92,7 @@
 								<tml:[util:link] o_linktitle="{TITLE}" o_encode="none">								
 									<tml:if condition="db().hasFeature(db().FEATURE_CONTENT_FILE_DERIVATES)">
 										<tml:then>
-											<img src="<tml:url type="file" file="{_filename}" derivate="usage=poster,width~320"/>" alt="<tml:script expression="headline||TITLE"/>">
+											<img src="<tml:url type="file" file="{_filename}" derivate="width~320"/>" alt="<tml:script expression="headline||TITLE"/>">
 										</tml:then>
 										<tml:else>
 											<img src="<tml:url type="file" file="{_filename}" u_maxwidth="320"/>" alt="<tml:script expression="headline||TITLE"/>">

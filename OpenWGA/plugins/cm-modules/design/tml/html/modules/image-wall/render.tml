@@ -25,9 +25,16 @@
 			filename: file
 		})
 	}
+	
+	_usage = "usage=poster";
+	var option_imagederivates = option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES)
+	if(option_imagederivates){
+		var derivateQuery = WGACore.getFileDerivateManager().parseDerivateQuery(option_imagederivates)
+		_usage = derivateQuery.get("usage") || "usage=poster";
+	}
 </tml:script>
 
-<div class="album clearfix" id="album-<tml:option name="ns"/>" data-count="<tml:item name="_count"/>">
+<div class="album clearfix" id="album-<tml:option name="ns"/>" data-count="<tml:item name="_count"/>" data-usage="<tml:item name="_usage"/>">
 	<tml:foreach item="_images" currentvalue="_image" id="img-loop">
 
 		<tml:script>
@@ -41,8 +48,8 @@
 			}
 
 			var url = context(_image.context).fileurl(file);
-			var url_lightbox = WGA.urlBuilder(url).setParameter("derivate", "usage=poster").build();
-			var url_tn = WGA.urlBuilder(url).setParameter("derivate", "usage=poster,width~320").build();
+			var url_lightbox = WGA.urlBuilder(url).setParameter("derivate", _usage).build();
+			var url_tn = WGA.urlBuilder(url).setParameter("derivate", _usage + ",width~320").build();
 			
 			var i = parseInt((taginfo('img-loop','iteration')-1)/_count)
 			if(!_image_rows[i])

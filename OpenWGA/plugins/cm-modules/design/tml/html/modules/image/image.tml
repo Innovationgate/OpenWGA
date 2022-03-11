@@ -1,189 +1,29 @@
-## LICENSE START ###############################################################
-## Copyright 2009, 2010 Innovation Gate GmbH. All Rights Reserved.
-## 
-## This file is part of the OpenWGA server platform.
-## 
-## OpenWGA is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-## 
-## In addition, a special exception is granted by the copyright holders
-## of OpenWGA called "OpenWGA plugin exception". You should have received
-## a copy of this exception along with OpenWGA in file COPYING.
-## If not, see <http://www.openwga.com/gpl-plugin-exception>.
-## 
-## OpenWGA is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-## 
-## You should have received a copy of the GNU General Public License
-## along with OpenWGA in file COPYING.
-## If not, see <http://www.gnu.org/licenses/>.
-## LICENSE END #################################################################
-
-<tml:script>
-	var no_image_url = WGA.design().fileURL("images", "no-image.jpg");
-	var filename = CMM.setting("image")
-
-	_url = no_image_url;
-	_url_lightbox = _url_mo = _download_url = null;
-	
-	var c;
-	if(!CMM.setting("source")){
-		c = CMM.settingSource()=="template" ? CMM.getTemplateContext() : this;
-	}
-	else {
-		c = context(
-			(CMM.setting("dbkey")!="this" ? "db:" + CMM.setting("dbkey") + "/" : "")
-			+ "docid:" + CMM.setting("sourcedoc") 
-			+ (CMM.setting("lang") ? "." + CMM.setting("lang") + ".0" : "")
-		, false);
-	}
-
-	if(filename && c && c.content().hasFile(filename)){
-		_url = c.fileurl(filename);
-		_file_md = c.content().getFileMetaData(filename);
-		_img_alt = _file_md.title || option('title');
-		_img_title = CMM.setting("title");
-		if(_img_title==null)
-			_img_title = _img_alt;	// backwards compatibilty
-		_download_url = c.fileurl(filename);
-		
-		var Attachment = AFW.content(c).attachment(filename)
-		if(!Attachment.isImage() && Attachment.waitingForDerivates()) {
-			_url = WGA.design().fileURL("images", "ajax-loader.gif");
-		}
-		else{			
-			// check for derivates:
-			var d = WGA.selectDerivate(c, filename, "usage=poster")
-			if(d){
-				var url = WGA.urlBuilder(_url).setParameter("derivate", "usage=poster")
-				if(isbrowserinterface()){
-					var cs = d.getSha512Checksum()
-					url.setParameter("cs", cs);
-				}
-				_url = url.build();
-			}
-			else if(Attachment.isImage())
-				_url = c.fileurl(filename);
-			else _url = no_image_url;
-		}
-	}
-
-	var filename = CMM.setting("image_mo")
-	if(filename && c && c.content().hasFile(filename)) {
-		_url_mo = c.fileurl(filename);
-		_mo_md = c.content().getFileMetaData(filename);
-		var mt = _mo_md.getMimeType();
-		if(mt && mt.indexOf("image")!=0){	// no image
-			var d = WGA.selectDerivate(c, filename, "usage=poster")
-			if(d)			
-				_url_mo = WGA.urlBuilder(_url_mo).setParameter("derivate", "usage=poster").build();
-			else _url_mo = no_image_url;
-		}
-	}
-
-	var filename = CMM.setting("lightbox_image")
-	if(filename && c && c.content().hasFile(filename))
-		_url_lightbox = c.fileurl(filename)
-	else _url_lightbox = _url;
-	
-	_srcset = _srcset_mo = null;
-	var option_imagederivates = option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES)
-	if(option_imagederivates){
-		if(_url != no_image_url)
-			_url = WGA.urlBuilder(_url).setParameter("derivate", option_imagederivates).build();
-		_url_mo = _url_mo && (WGA.urlBuilder(_url_mo).setParameter("derivate", option_imagederivates).build());
-		
-		if(WGA.app().getPublisherOption(WGA.Core.DBATTRIB_USE_NONFINAL_HT_FEATURES)){
-			var ssc = WGA.service(Packages.de.innovationgate.wgpublisher.webtml.utils.SrcSetCreator);
-			if(_file_md && ssc.getMaxAvailablePosterSize){
-				var fileOriginalSize = ssc.getMaxAvailablePosterSize(c.content(), _file_md);
-				if (fileOriginalSize != null) {
-					_srcset = ssc.createSrcSet(_url, fileOriginalSize);
-				}
-			}
-			if(_mo_md && ssc.getMaxAvailablePosterSize){
-				var moOriginalSize = ssc.getMaxAvailablePosterSize(c.content(), _mo_md);
-				if (moOriginalSize != null) {
-					_srcset_mo = _url_mo && ssc.createSrcSet(_url_mo, moOriginalSize);
-				}
-			}
-		}
-	}
-
-	_downloads = (CMM.setting('download') && _download_url) || false;
-	_link_target = CMM.setting('link_target');
-	
-</tml:script>
-
-<tml:range var="_img">
-	<img src="<tml:item name="_url"/>"
-		<tml:case condition="_img_title">
-			title="<tml:item name="_img_title"/>"
-		</tml:case>
-		alt="<tml:item name="_img_alt"/>"
-		<tml:case condition="_srcset">
-			srcset="<tml:item name="_srcset"/>"
-		</tml:case>
-		<tml:case condition="_url_mo">
-			onmouseover="this.src='<tml:item name="_url_mo"/>';<tml:case isfilled="_srcset">this.srcset='<tml:script expression="_srcset_mo||''"/>'</tml:case>"
-			onmouseout="this.src='<tml:item name="_url"/>';<tml:case isfilled="_srcset">this.srcset='<tml:item name="_srcset"/>'</tml:case>"
-		</tml:case>
-		data-image-url="<tml:item name="_url_lightbox"/>"
-		<tml:case condition="_downloads">
-			data-image-download="true"
-			data-image-download-url="<tml:item name="_download_url"/>"
-		</tml:case>
-	>
-</tml:range>
-
-<tml:if condition="(!CMM.setting('onclick') || CMM.setting('onclick')=='link')">
-	<tml:then>
-
-		<tml:if condition="CMM.setting('link_type')=='int' && CMM.setting('wgakey')">
-			<tml:then>
-				<a <tml:case if="_link_target">target="<tml:item name="_link_target"/>"</tml:case> href="<tml:url context="[docid:{CMM.setting('wgakey')}]"/>"><tml:item name="_img" encode="none"/></a>
-			</tml:then>
-			<tml:elseif condition="CMM.setting('link_type')=='ext' && CMM.setting('url')">
-				<a <tml:case if="_link_target">target="<tml:item name="_link_target"/>"</tml:case> href="<tml:[setting] o_name="url"/>"><tml:item name="_img" encode="none"/></a>
-			</tml:elseif>
-			<tml:elseif condition="CMM.setting('url')">
-				<tml:comment>old style url</tml:comment>
-				<tml:if context="[docid:{CMM.setting('url')}]" iscontextvalid="true">
-					<tml:then>
-						<a href="<tml:url/>"><tml:item name="_img" encode="none"/></a>
-					</tml:then>
-					<tml:else>
-						<a href="<tml:[setting] o_name="url"/>"><tml:item name="_img" encode="none"/></a>
-					</tml:else>
-				</tml:if>
-			</tml:elseif>
-			<tml:else>
-				<tml:item name="_img" encode="none"/>
-			</tml:else>
-		</tml:if>
-		
-	</tml:then>
-	<tml:elseif condition="CMM.setting('onclick')=='open'">
-		<a target="_blank" href="<tml:item name="_download_url"/>"><tml:item name="_img" encode="none"/></a>
-	</tml:elseif>
-	<tml:else>
-		<tml:item name="_img" encode="none"/>
-	</tml:else>
-</tml:if>
+<tml:{a} wrapif="$mc.link_url" html-href="$mc.link_url" html_target="{$mc.link_target || VOID}">
+	<tml:if context="{$mc.context}" iscontextvalid="true" condition="$mc.filename">
+		<tml:then>		
+			<tml:image file="{$mc.filename}"
+				html-alt="$mc.img_alt"
+				html-title="$mc.img_title"
+				html-data-image-url="$mc.lightbox_url"
+				html-data-image-download-url="$mc.download_url"
+				html-data-image-download="$mc.downloads"
+			/>
+		</tml:then>
+		<tml:else>
+			<tml:image doc="images" file="no-image.jpg"/>
+		</tml:else>
+	</tml:if>
+</tml:{a}>
 
 <tml:range var="_info" trim="true">
 	<tml:case condition="CMM.settingList('descriptions').contains('title')">
-		<div class="title"><tml:item name="_img_alt"/></div>
+		<div class="title"><tml:item name="$mc.img_alt"/></div>
 	</tml:case>
-	<tml:case condition="CMM.settingList('descriptions').contains('copyright') && _file_md && _file_md.getCopyright()">
-		<div class="copyright">&copy; <tml:script expression="_file_md && _file_md.getCopyright()"/></div>
+	<tml:case condition="CMM.settingList('descriptions').contains('copyright') && $mc.file_md && $mc.file_md.getCopyright()">
+		<div class="copyright">&copy; <tml:script expression="$mc.file_md.getCopyright()"/></div>
 	</tml:case>
 	<tml:case condition="CMM.settingList('descriptions').contains('description')">
-		<div class="description"><tml:script expression="_file_md && _file_md.getDescription()" encode="html"/></div>
+		<div class="description"><tml:script expression="$mc.file_md && $mc.file_md.getDescription()" encode="html"/></div>
 	</tml:case>
 	<tml:case condition="CMM.settingList('descriptions').contains('subtitle')">
 		<div class="subtitle"><tml:[setting] o_name="subtitle" encode="html"/></div>
@@ -199,6 +39,25 @@
 			})
 		})
 	</tml:[script]>
+</tml:case>
+
+<tml:case condition="$mc.url_mo">
+	<script>
+		require(["jquery"], function(){
+			var src = $("#module-<tml:option name="ns"/> img").prop("src"); 
+			var srcset = $("#module-<tml:option name="ns"/> img").prop("srcset");
+			$("#module-<tml:option name="ns"/> img").on({
+				mouseover: function(){
+					this.src = "<tml:item name="$mc.url_mo" encode="javascript"/>";
+					this.srcset="";
+				},
+				mouseout: function(){
+					this.src = src;
+					this.srcset = srcset;
+				}
+			})
+		})
+	</script>
 </tml:case>
 
 <tml:case condition="option('mode')=='edit'">

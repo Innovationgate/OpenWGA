@@ -43,11 +43,11 @@
 					<tml:if condition="_pages">
 						<tml:then>
 							<a class="preview-button" href="#" title="click to preview">
-								<tml:image file="{_filename}" derivate="usage=poster,width~100"/>
+								<tml:image file="{_filename}" derivate="width~100"/>
 							</a>
 						</tml:then>
 						<tml:else>
-							<tml:image file="{_filename}" derivate="usage=poster,width~100">
+							<tml:image file="{_filename}" derivate="width~100">
 								data-image-url="<tml:url type="file" file="{_filename}"/>"
 								data-image-title="<tml:script expression="_file_md.title || _filename"/>"
 							</tml:image>

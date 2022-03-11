@@ -12,7 +12,7 @@
 		})
 	}
 
-	function updateImageSrc(el){
+	function updateImageSrc(el, usage){
 		if(el.naturalWidth									// available in IE>9 and all modern browser
 				&& el.naturalWidth < $(el).data("width")	// do we have a better derivate? 
 				&& el.width > el.naturalWidth / (window.devicePixelRatio||1))		// do we need a better derivate?
@@ -24,7 +24,7 @@
 			}
 			var that=el
 			resizeTimer[base] = window.setTimeout(function(){
-				that.src=base + "?derivate=" + encodeURI("usage=poster,dpr=" + (window.devicePixelRatio||1) + ",width~" + that.width);
+				that.src=base + "?derivate=" + encodeURI(usage + ",dpr=" + (window.devicePixelRatio||1) + ",width~" + that.width);
 			}, 250);
 		}
 	}
@@ -33,6 +33,8 @@
 		var el = $(selector);
 		var count = el.data("count");
 		var el_width = el.width();
+		var usage = el.data("usage") || "usage=poster";
+		
 		el.find(".image-row").each(function(){
 			var s=0;
 			var w = el_width+10
@@ -49,7 +51,7 @@
 			var h = w/s;
 			$(this).find("img").each(function(){
 				$(this).height(h).width("auto");
-				updateImageSrc(this);
+				updateImageSrc(this, usage);
 			})
 			.css("opacity", 1)
 		})

@@ -47,17 +47,16 @@
 	<tml:case value="zoom">
 		<tml:case context="{$option_context}" iscontextvalid="true">
 			<label>Lightbox-Image:</label>
-				<div style="margin:10px">
-					<tml:include ref="util:select-image" o_fieldname="lightbox_image" o_empty-text="Original"/>
-				</div>
-				<div style="margin:10px">
-					<tml:input name="{scoped:download}" labeled="true" type="boolean" default="false" options="{label('image.settings.lightbox.show-download.options')}" mode="{option:mode}"/>
-				</div>
+			<div style="margin:10px">
+				<tml:include ref="util:select-image" o_fieldname="lightbox_image" o_empty-text="Original"/>
+			</div>
+			<div style="margin:10px">
+				<tml:input name="{scoped:download}" labeled="true" type="boolean" default="false" options="{label('image.settings.lightbox.show-download.options')}" mode="{option:mode}"/>
 			</div>
 		</tml:case>
 		<label><tml:label key="image.settings.lightbox-group"/>:</label>
 		<div style="margin:10px">
-			<tml:input name="{scoped:image_group}" cssclass="form-control" cssstyle="width:100%" default="default" mode="{option:mode}"/>
+			<tml:input name="{scoped:image_group}" cssclass="form-control" cssstyle="width:100%" html_placeholder="default" mode="{option:mode}"/>
 		</div>
 	</tml:case>
 </tml:select>	

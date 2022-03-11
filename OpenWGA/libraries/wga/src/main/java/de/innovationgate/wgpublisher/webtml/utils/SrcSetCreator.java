@@ -166,7 +166,7 @@ public class SrcSetCreator implements WGAAwareService {
             float heightTermValue = -1;
             String derivateQueryStr = fileUrl.getParameter(WGPDispatcher.URLPARAM_DERIVATE);
             if (derivateQueryStr != null) {
-                derivateQuery = _wga.getCore().getFileDerivateManager().parseDerivateQuery(derivateQueryStr);
+                derivateQuery = _wga.getCore().getFileDerivateManager().parseDerivateQuery(derivateQueryStr, false);
                 
                 DerivateQueryTerm widthTerm = derivateQuery.get(DerivateQuery.QUERYTERM_WIDTH);
                 if (widthTerm != null) {

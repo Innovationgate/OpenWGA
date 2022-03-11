@@ -4139,7 +4139,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      * @throws WGException
      */    
     public String createImgSet(String filename, String derivateQuery) throws WGException{
-    	return SrcSetCreator.createImgSet(this, filename, derivateQuery);
+    	return SrcSetCreator.createImgSet(this, filename, enhanceFileDerivateQuery(derivateQuery).toString());
     }
 
     /**
@@ -4149,7 +4149,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      * @throws WGException
      */    
     public String createSrcSet(String filename, String derivateQuery) throws WGException{
-    	return SrcSetCreator.createSrcSet(this, filename, derivateQuery);
+    	return SrcSetCreator.createSrcSet(this, filename, enhanceFileDerivateQuery(derivateQuery).toString());
     }
     
     /**
@@ -5614,5 +5614,16 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		return content().getFileNames();
 	}
 
+	public void setDefaultLabelContainer(String container){
+		setoption(Base.OPTION_DEFAULT_LABELCONTAINER + getDesignDBKey(), container, null);
+
+	}
+	public void setDefaultLabelFile(String file){
+		setoption(Base.OPTION_DEFAULT_LABELFILE + getDesignDBKey(), file, null);
+	}
+	
+	public void setDefaultLabelLanguage(String lang){
+		setoption(Base.OPTION_DEFAULT_LABELLANGUAGE, lang, null);
+	}
 
 } 
