@@ -177,8 +177,11 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 		function readAttachments(){
 			$.getJSON(url, context, function(result){
 				template.render(result, context)
-				if(context.may_update_content)
+				if(context.may_update_content){
 					$("#sidepannel-content-attachments .sidebar-toolbar [data-action='upload-file']").removeClass("disabled")
+					$("#sidepannel-content-attachments .drop-here").show();
+				}
+				else $("#sidepannel-content-attachments .drop-here").hide();
 				
 				if(initial_waitForDerivates==null){
 					initial_waitForDerivates=[]
