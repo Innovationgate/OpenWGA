@@ -395,7 +395,7 @@
 			args.push(arguments[i]);
 			
 		return this.each(function(){
-			$this = $(this);
+			var $this = $(this);
 			if(typeof(config)=="string"){
 				try{
 					var f = exports[config.toLowerCase()]
