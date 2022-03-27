@@ -15,7 +15,7 @@
 
 <tml:action id="login">
 
-	if(!callAction("cms:check-user-login", meta("database","dbkey")))
+	if(!callAction("cms:check-user-login", meta("database","dbkey"), request))
 		return;
 
 	if(login(tmlform.username, tmlform.password, tmlform.domain)){

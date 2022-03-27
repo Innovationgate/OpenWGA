@@ -24,8 +24,11 @@
 ## LICENSE END #################################################################
 <tml:action master="true">
 
-	var database = wgacore.contentdbs.get(tmlparam1);	
-	var accessLevel = database.reopenSession(tmlform.username, tmlform.password);
+	var dbkey = tmlparam1;
+	var request = tmlparam2;
+
+	var database = wgacore.contentdbs.get(dbkey);	
+	var accessLevel = database.reopenSession(tmlform.username, tmlform.password, null, request);
 
 	console.log("check accessLevel", tmlform.username, accessLevel)
 
