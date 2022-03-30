@@ -234,7 +234,7 @@ public class Image extends Base implements DynamicAttributes {
             		if(filenames!=null && filenames.size()>0)
             			file = filenames.get(0);
             		else {
-            			this.addWarning("<tml:image/>: No files found on content", false);
+            			//this.addWarning("<tml:image/>: No files found on content", false);
             			return;
             		}
             	}
