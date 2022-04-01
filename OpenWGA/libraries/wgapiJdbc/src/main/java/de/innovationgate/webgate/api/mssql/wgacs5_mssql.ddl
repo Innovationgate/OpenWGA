@@ -76,7 +76,7 @@ CREATE TABLE content(
 CREATE TABLE content_files_meta(
 		id                            		VARCHAR(32)		 NOT NULL,
 		content_id                    		VARCHAR(32)		 NOT NULL,
-		name                          		VARCHAR(100)		 NOT NULL,
+		name                          		VARCHAR(256)	 NOT NULL,
 		created                       		DATETIME2		 NULL ,
 		lastmodified                  		DATETIME2		 NULL ,
 		filesize                      		INT		 NULL ,
@@ -497,4 +497,4 @@ CREATE INDEX T38_CREATOR ON content_filederivates (creator);
 CREATE INDEX T38_PARENT_ID ON content_filederivates (parent_id);
 
 
-INSERT INTO extensiondata (id, name, datatype, numbervalue) VALUES ('staticid:ddlpatchlevel', 'ddlpatchlevel', 2, 5);
+INSERT INTO extensiondata (id, name, datatype, numbervalue) VALUES ('staticid:ddlpatchlevel', 'ddlpatchlevel', 2, 6);
