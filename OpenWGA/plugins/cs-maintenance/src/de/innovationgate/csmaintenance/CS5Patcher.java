@@ -183,7 +183,7 @@ public class CS5Patcher {
     public List<String> execute(List<String> dbKeys) throws WGAPIException, IOException {
         
         List<String> successfullyPatched = new ArrayList<String>();
-        _log.info("OpenWGA Content Store 5 Patcher starting");
+        _log.info("OpenWGA Content Store 6 Patcher starting");
         _log.info("Patch level to apply: " + CS5_PATCH_LEVEL);
         
         List<String> dbsToReconnect = new ArrayList<String>();
@@ -260,7 +260,7 @@ public class CS5Patcher {
             _log.info("Finished appying patches. No content stores were patched.");
         }
         
-        _log.info("OpenWGA Content Store 5 Patch Task finished successfully");
+        _log.info("OpenWGA Content Store 6 Patch Task finished successfully");
         return successfullyPatched;
     }
     
