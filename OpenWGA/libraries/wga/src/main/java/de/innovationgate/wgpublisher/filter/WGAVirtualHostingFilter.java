@@ -45,6 +45,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+
 import de.innovationgate.utils.URLBuilder;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGException;
@@ -67,6 +70,7 @@ import de.innovationgate.wgpublisher.url.WGAURLBuilder;
 public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProvider {
     
     public static final String REQUESTATTRIB_VIRTUAL_HOST = WGAVirtualHostingFilter.class.getName() + ":VirtualHost";
+    public static final Logger LOG = Logger.getLogger("wga.vhost");
     
     private class DefaultDBRequestWrapper extends HttpServletRequestWrapper {
 
@@ -124,6 +128,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 
     public void init(FilterConfig config) throws ServletException {
         _core = WGACore.retrieve(config.getServletContext());
+        LOG.setLevel(Level.INFO);
     }
 
     public void destroy() {
@@ -155,10 +160,12 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
         	Redirect redirect = findRedirect(vHost, request.getServerName(), uri);
             if(redirect!=null && !uri.equalsIgnoreCase(redirect.getPath())){
             	if(redirect.isForward()){
+            		LOG.debug("v-host " + vHost.getServername() + ": Forward '" + uri + "' to path: " + redirect.getPath());
             		httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, redirect.getPath());
             		forwardRequest=true;
             	}
             	else {
+            		LOG.debug("v-host " + vHost.getServername() + ": Redirect '" + uri + "' to path: " + redirect.getPath());
             		redirectRequired = true;
             		redirectUrlBuilder.setPath(redirect.getPath());
             		isPermanentRedirect = redirect.isPermanentRedirect();
@@ -167,12 +174,14 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
             
         	// set redirect host
         	if(vHost.isForceDefaultHost() && !request.getServerName().equalsIgnoreCase(vHost.getServername())){
+        		LOG.debug("v-host: Redirect '" + request.getServerName() + "' to default host: " + vHost.getServername());
     			redirectRequired = true;
     			redirectUrlBuilder.setHost(vHost.getServername());
     		}
         	
         	// set redirect protocol
             if(vHost.isForceSSL() && !request.isSecure()){
+            	LOG.debug("v-host " + vHost.getServername() + ": Redirect to use SSL");
             	redirectRequired = true;
             	redirectUrlBuilder.setProtocol("https");
             }
@@ -372,6 +381,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                 else {
                     for (String alias : vHost.getServerAliases()) {
                         if (Pattern.matches(convertToRegExp(alias), serverName)) {
+                        	LOG.debug("v-host: Requested host '" + serverName + "' matches host alias '" + alias + "' of v-host '" + vHost.getServername() + "'");
                             return vHost;
                         }
                     }
@@ -550,6 +560,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 	    		Pattern pattern = Pattern.compile(redirect.getPath(), Pattern.CASE_INSENSITIVE);
 	        	Matcher matcher= pattern.matcher(path);
 	            if(matcher.find()) {
+	            	LOG.debug("v-host " + vHost.getServername() + ": '" + path + "' matches VirtualHostRedirect-Path: " + redirectPath);
 	                String redirectURL = redirect.getRedirect();
 	                Integer count = matcher.groupCount();
 	                if(count > 0) {

@@ -60,6 +60,19 @@
 	DBM.wgaconfig.save();
 </tml:action>
 
+<tml:action id="debug">
+	_debug_dlg = true; 
+</tml:action>
+
+<tml:action id="toggle-debug-level">
+	var level = WGA.Logger("vhost").getLevel();
+	if(!level || level>level.DEBUG)
+		WGA.Logger("vhost").setLevel("debug");
+	else WGA.Logger("vhost").setLevel("info");
+	console.log("v-host Log-Level:", WGA.Logger("vhost").getLevel())
+	_debug_dlg = true; 
+</tml:action>
+
 <tml:script>
 
 	// look for default selection in var _uid
@@ -91,6 +104,15 @@
 							handler: function(){
 								WGA.ajax.callAction("<tml:action ref="newVhost"/>","<tml:script expression="portlet.portletkey"/>");
 							}
+						},
+						"->",
+						{
+							cls:'x-btn-text-icon',						
+							icon: '<tml:url type="file" db="@afw" doc="icons" file="monitor.png"/>',		                
+							text: "Debug",
+							handler: function(){
+								WGA.ajax.callAction("<tml:action ref="debug"/>");
+							}						
 						}
 					]
 				</tml:option>
@@ -100,6 +122,18 @@
 				</tml:option>
 				
 				<tml:option name="body">
+
+					<tml:case istrue="_debug_dlg">
+						<tml:include designdb="@ui" ref="message">
+							<tml:option name="title">Enable / Disable Debug-Logging</tml:option>
+							<tml:option name="body">
+								Current Log-Level is
+								<tml:script expression="WGA.Logger('vhost').getLevel() || 'not set'"/>
+								<br><br>
+								<tml:button clickaction="toggle-debug-level">Toggle Debug Log-Level</tml:button>
+							</tml:option>
+						</tml:include>
+					</tml:case>
 
 					<tml:script>
 						_hosts = DBM.wgaconfig.get().virtualHosts
@@ -121,7 +155,9 @@
 									var event=event||window.event;if(event.target.tagName!='BUTTON')WGA.ajax.callAction('<tml:action ref="selectVhost" param1="{_host.uid}" param2="{_host.servername}"/>', '<tml:script expression="portlet.portletkey"/>')
 								</tml:option>
 							</tml:include>									
-								<td><tml:script expression="_host.servername"/></td>
+								<td>
+									<tml:item name="_host.servername"/>
+								</td>
 								<td>
 									<tml:script>
 										if(_host.allowedDatabases.size()){
