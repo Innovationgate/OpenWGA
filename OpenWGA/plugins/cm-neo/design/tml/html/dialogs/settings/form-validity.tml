@@ -1,14 +1,29 @@
 <tml:script>
 	if(!tmlform.submitted){
 		tmlform.validfrom = VALIDFROM
-		tmlform.validfrom_time = WGA.format(VALIDFROM, "HH:mm") || "00:00"
+		if(VALIDFROM)
+			tmlform.validfrom_time = VALIDFROM
+		else{
+			var date = WGA.createCalendar();
+			date.set(date.HOUR_OF_DAY, "0");
+			date.set(date.MINUTE, 0);
+			tmlform.validfrom_time = date.time;
+		}
 		tmlform.validto = VALIDTO
-		tmlform.validto_time = WGA.format(VALIDTO, "HH:mm") || "23:59"
+		if(VALIDTO)
+			tmlform.validto_time = VALIDTO
+		else{
+			var date = WGA.createCalendar();
+			date.set(date.HOUR_OF_DAY, "23");
+			date.set(date.MINUTE, 59);
+			tmlform.validto_time = date.time;
+		}
 	}
+	_mode_validfrom = tmlform.mode()=='edit' && STATUS!=content().STATUS_RELEASE ? "edit":"view"
 </tml:script>
 
-<tml:[form-field] o_label="Sichtbar ab">
-	<tml:if condition="tmlform.mode()=='edit'">
+<tml:[form-field] o_label="Sichtbar ab" o-mode="_mode_validfrom">
+	<tml:if condition="_mode_validfrom=='edit'">
 		<tml:then>
 			<div class="clear-field-wrapper<tml:case condition="tmlform.validfrom"> col-sm-8</tml:case>">
 				<tml:input type="date" name="validfrom" meta="true" cssclass="form-control" html_placeholder="sofort" format="dd.MM.yyyy"/>
