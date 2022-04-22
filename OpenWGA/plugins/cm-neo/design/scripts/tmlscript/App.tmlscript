@@ -30,6 +30,9 @@ App.prototype.getCssClass = function(doc) {
 	if(doc.hiddenFrom.contains("nav"))
 		classes.push("hidden-in-nav")
 
+	if(doc.structEntry.readers.size())
+		classes.push("has-readers")
+
 	return classes.join(" ")
 }
 
