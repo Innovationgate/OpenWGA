@@ -20,6 +20,7 @@
 		contentkey: KEY,
 		dbkey: meta("db", "dbkey")
 	});
+	portlet.fireevent("struct-updated", App.getStructData(content()))	// readers may have changed
 	_dialog_closed=true;
 </tml:action>
 

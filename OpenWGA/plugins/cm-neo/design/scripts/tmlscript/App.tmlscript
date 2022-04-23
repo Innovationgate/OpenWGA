@@ -98,7 +98,7 @@ App.prototype.getStructData = function(doc, lang) {
 		}
 	}
 	else throw({
-		message: "App.getStructData() called with wrong arguments"
+		message: "App.getStructData() called with wrong arguments: " + doc
 	})
 }
 

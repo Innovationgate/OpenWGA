@@ -38,6 +38,7 @@
 			contentkey: KEY,
 			dbkey: meta("db", "dbkey")
 		});
+		portlet.fireevent("struct-updated", App.getStructData(portlet.context))	// readers may have changed
 		
 		_dialog_closed=true
 	}
@@ -45,6 +46,10 @@
 		tmlform.addmessage(e.message)
 	}
 </tml:action>
+
+<tml:script>
+	portlet.context = this;
+</tml:script>
 
 <tml:form id="form-page-settings" context="[$struct:{document.structKey}]" unless="_dialog_closed" mode="{WGA.app().isChiefEditor()?'edit':'view'}">
 
