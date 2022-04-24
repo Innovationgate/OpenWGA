@@ -103,7 +103,7 @@
 
 		<ul class="nav nav-tabs">
 			<li class="active"><a data-toggle="tab" href="#basic">Eigenschaften</a></li>
-			<li><a data-toggle="tab" href="#access">Wer darf was ...</a></li>
+			<li><a data-toggle="tab" id="tab-access-link" href="#access">Wer darf was ...</a></li>
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane active" id="basic">

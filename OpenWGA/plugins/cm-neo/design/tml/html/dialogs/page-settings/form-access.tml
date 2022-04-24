@@ -64,8 +64,10 @@
 
 <script>
 	require(["jquery"], function($){
-		$("#<tml:script expression="tmlform.formid"/> [name=custom_child_editors]").autogrow()
-		$("#<tml:script expression="tmlform.formid"/> [name=custom_page_editors]").autogrow()
-		$("#<tml:script expression="tmlform.formid"/> [name=custom_page_readers]").autogrow()
+		$("#tab-access-link").on('shown.bs.tab', function(e){
+			$("#<tml:script expression="tmlform.formid"/> [name=custom_child_editors]").autogrow()
+			$("#<tml:script expression="tmlform.formid"/> [name=custom_page_editors]").autogrow()
+			$("#<tml:script expression="tmlform.formid"/> [name=custom_page_readers]").autogrow()
+		})
 	})
 </script>
