@@ -133,11 +133,11 @@
 				</tml:case>
 				
 				<tml:script>
-					if(OVERRIDE_WORKFLOW==null)
-						tmlform.OVERRIDE_WORKFLOW="";
 					var workflows=WGA.createList();
-					var ct_workflow = db().getContentType(tmlform.contenttype).getWorkflow() || "kein Workflow"
-					workflows.add("aus Seitentyp: " + ct_workflow + "|");
+
+					var parent = document.getParentEntry()
+					workflows.add("geerbt (" + (parent && parent.getWorkflowName()||"kein Workflow") + ")|")
+					
 					workflows.addAll(db().getWorkflowEngine().getWorkflowDefinitions().keySet());
 					WGA.TMLPage.setVar("_workflows", workflows)
 				</tml:script>
