@@ -35,7 +35,7 @@
 
 <tml:[form-field] o_label="Unterseiten erstellen" o_name="child_editors" o_store="false"
 	o_type="select"
-	o_options="vererbt|,jeder|*,nur definierte Benutzer|custom,nur Chief-Editoren|%none"
+	o_options="geerbt|,jeder|*,nur definierte Benutzer|custom,nur Chief-Editoren|%none"
 	o_changeaction="$refresh"
 >
 	<div style="margin:5px 0;color:silver">
@@ -56,13 +56,13 @@
 	
 <tml:[form-field] o_label="Diese Seite bearbeiten" o_name="page_editors" o_store="false"
 	o_type="select"
-	o_options="vererbt|,jeder|*,nur definierte Benutzer|custom,nur Chief-Editoren|%none"
+	o_options="geerbt|,jeder|*,nur definierte Benutzer|custom,nur Chief-Editoren|%none"
 	o_changeaction="$refresh"
 >
 	<div style="margin:5px 0;color:silver">
 		<tml:case condition="!tmlform.page_editors">
 			<tml:script divider="<br>">
-				// page_editors: vererbt.
+				// page_editors: geerbt.
 				// in diesem Fall gelten die childEditors des Parents!
 				for(var struct = document.parentEntry; struct; struct = struct.parentEntry){
 					if(!struct.childEditors.isEmpty() && struct.childEditors.get(0))
@@ -79,7 +79,7 @@
 				
 <tml:[form-field] o_label="Diese Seite lesen" o_name="page_readers" o_store="false"
 	o_type="select"
-	o_options="vererbt|,nur definierte Benutzer|custom"
+	o_options="geerbt|,nur definierte Benutzer|custom"
 	o_changeaction="$refresh"
 >
 	<div style="margin:5px 0;color:silver">
