@@ -75,6 +75,11 @@ public class WGAMailConfiguration {
 	private void init() {
 		// init mail props and authenticator
 		_mailProperties = new Properties();
+		/*
+		 * mail.host is used by WGAMailService (Workflow Engine)!
+		 */
+		_mailProperties.put("mail.host", _config.getServer());
+		
 		_mailProperties.put("mail.smtp.host", _config.getServer());
 		_mailProperties.put("mail.smtp.connectiontimeout", "10000");
 		_mailProperties.put("mail.smtp.timeout", "10000");
