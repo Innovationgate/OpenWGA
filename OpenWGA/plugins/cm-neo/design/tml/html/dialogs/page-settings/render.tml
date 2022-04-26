@@ -151,7 +151,7 @@
 						tmlform.struct_childpagerestrictions = document.getChildPageRestrictions()
 				</tml:script>
 				<tml:[form-field] o_label="Erlaubte Unterseiten" o_name="struct_childpagerestrictions" o_type="select"
-					o_options="Beliebig|any,Keine|none,Nur Seiten folgender Seitentypen|fixDocTypes,Im Seitentyp festgelegt|unspecified"
+					o_options="Beliebig|any,Keine|none,Nur Seiten folgender Seitentypen|fixDocTypes,Default (im Seitentyp festgelegt)|unspecified"
 					o_changeaction="$refresh"
 					o_store="false"
 				/>
