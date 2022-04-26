@@ -41,15 +41,11 @@
 			There are upgrade patches available for this content store. Patches will modify the storage format of this content store to enable new features and provide optimizations. The following upgrade patches can be applied:
 			<ul>
 				<tml:foreach item="_patchesToApply" currentvalue="_patch">
-					<li>Patch level <tml:item name="_patch" xpath="level"/> introduced in OpenWGA version <tml:script expression="_patch.getWGAIntroductionVersion().getFeatureVersionString()"/>: <tml:item name="_patch" xpath="description"/> 
+					<li>Patch level <tml:item name="_patch" xpath="level"/> introduced in OpenWGA version <tml:script expression="_patch.getWGAIntroductionVersion().getMainVersionString()"/>: <tml:item name="_patch" xpath="description"/> 
 				</tml:foreach>
 			</ul>
 		</div>
 
-		<div style="color:red; margin-bottom: 10px; font-weight:bold">
-			IMPORTANT: CONSULT THE OPENWGA 6.3 UPGRADE GUIDE TO KNOW PREREQUISITES AND IMPLICATIONS OF CONTENT STORE UPGRADES! 
-		</div>
-		
 		<div style="margin-bottom: 10px;">
 			
 			<div style="margin-bottom: 10px;">

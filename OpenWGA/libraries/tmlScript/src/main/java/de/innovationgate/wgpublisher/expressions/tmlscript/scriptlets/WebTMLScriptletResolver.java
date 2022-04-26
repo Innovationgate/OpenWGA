@@ -432,6 +432,8 @@ public class WebTMLScriptletResolver {
         	}
         }
         
+        TMLContext targetContext=context;
+        
         if (containerName != null) {                
             // if container name is present we should check if this is a content key
             // if the content key contains a version other than 0 we should rewrite the version to 0
@@ -444,20 +446,25 @@ public class WebTMLScriptletResolver {
             if (contentKey != null && contentKey.isValid() && contentKey.getVersion() != 0) {
                 contentKey = new WGContentKey(contentKey.getStructKey(), contentKey.getLanguage(), 0);
                 containerName = contentKey.toString();
-            }                            
+            }
+            if(contentKey != null){
+                targetContext = targetContext.context("docid:" + contentKey, false);
+            	if(targetContext==null)
+            		return "";
+            }
         }
         
         String url = null;
         if (generateDataURL.booleanValue() && command.equalsIgnoreCase("imgurl")) {
         	if (derivates == null)
         		derivates = (String) context.option(Base.OPTION_IMAGE_DERIVATES);
-            return context.filedataurl(null, containerName, fileName, null, derivates);
+            return targetContext.filedataurl(null, containerName, fileName, null, derivates);
         }
         else if (command.equalsIgnoreCase("imgurl")) {
-        	url = context.fileImageURL(containerName, fileName);
+        	url = targetContext.fileImageURL(containerName, fileName);
         }
         else {        	
-        	url = context.fileurl(containerName, fileName);
+        	url = targetContext.fileurl(containerName, fileName);
         }
         
         if (command.equalsIgnoreCase("imgurl")) {
@@ -465,10 +472,10 @@ public class WebTMLScriptletResolver {
         		derivates = (String) context.option(Base.OPTION_IMAGE_DERIVATES);
             if (derivates != null) {
                 DerivateQuery derivateQuery = FileDerivateManager.parseDerivateQuery(derivates);
-                WGA wga = WGA.get(context);
-                if(wga.selectDerivate(context, fileName, derivateQuery.toString())==null)
-                	derivateQuery = context.enhanceFileDerivateQuery("usage=poster"); 
-                url = addDerivateQueryToURL(context, derivateQuery, url);
+                WGA wga = WGA.get(targetContext);
+                if(wga.selectDerivate(fileName, derivateQuery.toString())==null)
+                	derivateQuery = targetContext.enhanceFileDerivateQuery("usage=poster"); 
+                url = addDerivateQueryToURL(targetContext, derivateQuery, url);
             }
         }
         
@@ -558,12 +565,6 @@ public class WebTMLScriptletResolver {
     	
     	Integer level = (Integer) engineParams.get(RhinoExpressionEngine.SCRIPTLETOPTION_LEVEL);
     	
-        WGA wga = WGA.get(context);
-        boolean useNonfinalFeatures = (Boolean) wga.database(context.db()).getPublisherOption(WGACore.DBATTRIB_USE_NONFINAL_HT_FEATURES);
-        if (!useNonfinalFeatures) {
-            return "";
-        }
-        
         List<String> params = WGUtils.deserializeCollection(param, ",", true);
         String doc = params.size() >= 2 ? params.get(0) : null;
         String fileName = params.get(params.size() -1);
@@ -598,14 +599,20 @@ public class WebTMLScriptletResolver {
         if (md == null || md.getDisplayHeight() == -1 || md.getDisplayWidth() == -1) {
             return "";
         }
-        
+
+        WGA wga = WGA.get(targetContext);
+        boolean useNonfinalFeatures = (Boolean) wga.database(context.db()).getPublisherOption(WGACore.DBATTRIB_USE_NONFINAL_HT_FEATURES);
+        if (!useNonfinalFeatures) {
+            return "";
+        }
+
         SrcSetCreator scrSetCreator = wga.service(SrcSetCreator.class);
         String usage = WGFileAnnotations.USAGE_POSTER;
         if (derivateQuery != null && derivateQuery.containsKey(DerivateQuery.QUERYTERM_USAGE)) {
             usage = derivateQuery.get(DerivateQuery.QUERYTERM_USAGE).getValue();
         }
         
-        String srcSet = scrSetCreator.createSrcSet(imgURL, scrSetCreator.getMaxAvailableSize(targetContext.content(), md, usage));
+        String srcSet = scrSetCreator.createSrcSet(imgURL, scrSetCreator.getMaxAvailableSize(md, usage));
         if (!WGUtils.isEmpty(srcSet)) {
             return "srcset=\"" + srcSet + "\"";
         }

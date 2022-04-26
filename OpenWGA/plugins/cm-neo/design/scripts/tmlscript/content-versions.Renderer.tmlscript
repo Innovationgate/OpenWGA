@@ -82,6 +82,11 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 					langs[lang].content=version;
 					langs[lang].rating=rating;
 				}
+				else if(rating==langs[lang].rating){
+					// archived version: take the newest version
+					if(version.getVersion() > langs[lang].content.getVersion())
+						 langs[lang].content=version;
+				}
 			}
 			continue;
 		}

@@ -3101,6 +3101,10 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
         return reopenSession(username, credentials, null);
     }
     
+    public int reopenSession(String username, Object credentials, String filter) throws WGAPIException {
+    	return reopenSession(username, credentials, filter, null);
+    }
+    
     /**
      * Closes and reopens the session with the given user information
      * 
@@ -3110,13 +3114,13 @@ private AllDocumentsHierarchy _allDocumentsHierarchy = new AllDocumentsHierarchy
      * @return the access level of the new session
      * @throws WGAPIException
      */
-    public int reopenSession(String username, Object credentials, String filter) throws WGAPIException {
+    public int reopenSession(String username, Object credentials, String filter, HttpServletRequest request) throws WGAPIException {
 
         if (isSessionOpen()) {
             closeSession();
         }
 
-        int accessLevel = openSession(username, credentials, filter);
+        int accessLevel = openSession(username, credentials, filter, request);
         if (accessLevel > WGDatabase.ACCESSLEVEL_NOTLOGGEDIN) {
             // Do an "out of the order" cache maintenance now, to ensure the new session is on the most current state
             // as reopenSession() is often used to catch-up with changes done on another thread

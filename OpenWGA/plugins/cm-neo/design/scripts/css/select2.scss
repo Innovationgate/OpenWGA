@@ -1,3 +1,7 @@
-.select2-container--default .select2-selection--multiple{
+.select2-container--default .select2-selection{
 	border: 1px solid #ccc  !important;
+	min-height: 32px;
+	.select2-selection__arrow{
+		height: 30px !important;
+	} 
 }

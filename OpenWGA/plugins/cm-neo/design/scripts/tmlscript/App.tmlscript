@@ -30,6 +30,9 @@ App.prototype.getCssClass = function(doc) {
 	if(doc.hiddenFrom.contains("nav"))
 		classes.push("hidden-in-nav")
 
+	if(doc.structEntry.readers.size())
+		classes.push("has-readers")
+
 	return classes.join(" ")
 }
 
@@ -95,7 +98,7 @@ App.prototype.getStructData = function(doc, lang) {
 		}
 	}
 	else throw({
-		message: "App.getStructData() called with wrong arguments"
+		message: "App.getStructData() called with wrong arguments: " + doc
 	})
 }
 

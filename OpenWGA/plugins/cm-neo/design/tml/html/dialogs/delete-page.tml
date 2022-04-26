@@ -5,29 +5,29 @@
 	portlet.fireevent("page-deleted", {
 		id: struct.getStructKey() 
 	})
-
+	
 	var redirecturl = WGA.app().getHomepageURL() || "/"+WGA.app().dbKey;
 	var lang = $option_dialog_options.language || WGA.app().db().getDefaultLanguage();
 	
+	var redirectContent = null;
+	
 	var redirectStruct = struct.getPreviousSibling();
-	if(!redirectStruct)
-		redirectStruct = struct.getNextSibling();
-	if(!redirectStruct)
-		redirectStruct = struct.getParentEntry()
-		
 	if(redirectStruct){
-		var c = context("/docid:" + redirectStruct.getStructKey() + "<" + lang + ">", false);
-		if(c)
-			redirecturl = c.contenturl();
-		else {
-			redirecturl = WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
-					.setParameter({
-						dbkey: WGA.app().dbKey,
-						structkey: redirectStruct.getStructKey(),
-						lang: lang
-					}).build()			 			
-		}
+		redirectContent = context("docid:" + redirectStruct.getStructKey() + "<" + lang + ">", false);
 	}
+	if(!redirectContent){
+		redirectStruct = struct.getNextSibling();
+		redirectContent = redirectStruct && context("docid:" + redirectStruct.getStructKey() + "<" + lang + ">", false);
+	}
+	if(!redirectContent){
+		redirectStruct = struct.getParentEntry();
+		redirectContent = redirectStruct && context("docid:" + redirectStruct.getStructKey() + "<" + lang + ">", false);
+	}
+		
+	if(redirectContent)
+		redirecturl = redirectContent.contenturl();
+	/* else go to home page */
+	
 	portlet.fireevent("close-dialog", {
 		redirectto: redirecturl
 	})

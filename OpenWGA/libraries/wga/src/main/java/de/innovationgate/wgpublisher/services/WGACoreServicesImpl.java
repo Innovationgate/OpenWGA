@@ -31,8 +31,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -49,29 +47,22 @@ import org.apache.commons.vfs2.FileSelectInfo;
 import org.apache.commons.vfs2.FileSelector;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.VFS;
 import org.apache.commons.vfs2.impl.StandardFileSystemManager;
+import org.apache.log4j.Logger;
 
 import de.innovationgate.utils.WGUtils;
-import de.innovationgate.utils.cache.CacheException;
 import de.innovationgate.utils.io.ByteArrayDataSource;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGDatabaseCore;
 import de.innovationgate.webgate.api.WGDesignProvider;
-import de.innovationgate.webgate.api.WGVirtualDesignProvider;
 import de.innovationgate.webgate.api.servers.WGDatabaseServer;
 import de.innovationgate.wga.common.beans.DesignDefinition;
 import de.innovationgate.wga.common.beans.csconfig.v1.CSConfig;
 import de.innovationgate.wga.common.beans.csconfig.v1.PluginID;
 import de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption;
-import de.innovationgate.wga.config.DatabaseServer;
-import de.innovationgate.wga.config.DesignSource;
-import de.innovationgate.wga.config.Domain;
 import de.innovationgate.wga.config.WGAConfiguration;
 import de.innovationgate.wga.modules.ModuleDefinition;
-import de.innovationgate.wga.modules.ModuleDependencyException;
-import de.innovationgate.wga.modules.types.ContentStoreModuleType;
 import de.innovationgate.wgaservices.WGACoreServices;
 import de.innovationgate.wgaservices.WGAServiceException;
 import de.innovationgate.wgaservices.types.DatabaseInformation;
@@ -86,8 +77,6 @@ import de.innovationgate.wgpublisher.design.OverlayDesignProvider;
 import de.innovationgate.wgpublisher.design.OverlayStatus;
 import de.innovationgate.wgpublisher.design.WGADesign;
 import de.innovationgate.wgpublisher.design.WGADesignManager;
-import de.innovationgate.wgpublisher.design.WGADesignProvider;
-import de.innovationgate.wgpublisher.design.WGADesignRetrievalException;
 import de.innovationgate.wgpublisher.design.WGADesignSource;
 import de.innovationgate.wgpublisher.design.fs.FileSystemDesignManager;
 import de.innovationgate.wgpublisher.design.fs.FileSystemDesignProvider;
@@ -102,6 +91,8 @@ import de.innovationgate.wgpublisher.plugins.WorkspaceOperation;
 
 
 public class WGACoreServicesImpl extends WGAServicesImpl implements WGACoreServices {
+	
+	private static final Logger LOG = Logger.getLogger("wga.core-service");
 	
 	public WGACoreServicesImpl(WGACore core, WGAWebServicesContextProvider contextProvider) {
 		super(core, contextProvider);
@@ -329,6 +320,7 @@ public class WGACoreServicesImpl extends WGAServicesImpl implements WGACoreServi
 	}
 
 	public void updateFSDesignResource(RemoteSession session, String path, DataSource content, long lastModified) throws WGAServiceException {
+		
         if (!isAdminServiceEnabled()) {
             throw new WGAServiceException("Administrative services are disabled");
         }
@@ -336,6 +328,8 @@ public class WGACoreServicesImpl extends WGAServicesImpl implements WGACoreServi
 		if (!isAdminSession(session)) {
 			throw new WGAServiceException("You need an administrative login to access this service.");
 		}
+		
+		LOG.info("core-services: Update design resource: " + path);
 		
 		WGADesignSource source = _core.getDesignManager().getDesignSources().get(WGAConfiguration.UID_DESIGNSOURCE_FILESYSTEM);
 		if (source instanceof FileSystemDesignSource) {
@@ -361,7 +355,7 @@ public class WGACoreServicesImpl extends WGAServicesImpl implements WGACoreServi
 				clearDesignFileCache(fsSource, fsSource.getDir().getName().getRelativeName(resource.getName()));
 				
 			} catch (FileSystemException e) {
-//				throw new WGAServiceException("Updating FSDesignResource '" + path + "' failed.", e);
+				throw new WGAServiceException("Updating FSDesignResource '" + path + "' failed.", e);
 			} catch (IOException e) {
 				throw new WGAServiceException("Updating FSDesignResource '" + path + "' failed.", e);
 			}

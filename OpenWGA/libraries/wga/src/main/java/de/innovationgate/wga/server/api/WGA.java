@@ -3445,6 +3445,9 @@ public class WGA {
     			logger.setLevel(Level.ERROR);
     		return this;
     	}
+    	public Level getLevel(){
+    		return logger.getLevel();
+    	}
 
         public Logger getLogger(){
         	return logger;

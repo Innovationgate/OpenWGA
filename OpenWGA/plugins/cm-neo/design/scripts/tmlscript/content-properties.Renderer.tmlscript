@@ -12,7 +12,16 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 			pagereaders.push({
 				name: name
 			});
-			
+		
+		var readprotected = false;
+		// check hierarchy
+		for(let struct = c.content().structEntry; struct; struct = struct.getParentEntry()){
+			if(struct.readers.size()){
+				readprotected=true;
+				break;
+			}
+		}
+		
 		result = {
 			title: WGA.encode("html", c.TITLE),
 			pagetype: db($urlParam_dbkey).getContentType(c.CONTENTTYPE).getNameForLanguage("de"),
@@ -26,7 +35,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 			replacementReason: c.STATUS==c.content().STATUS_ARCHIVE && c.ersetzungsgrund && WGA.encode("html", c.ersetzungsgrund),
 
 			pagereaders: WGA.app($urlParam_dbkey).isManager() ? pagereaders : null,
-			readprotected: pagereaders.length>0,
+			readprotected: readprotected,
 
 			workflow: c.STATUS==c.content().STATUS_REVIEW && c.WORKFLOW 
 					&& c.content().getWorkflow().getWorkflowLevel()

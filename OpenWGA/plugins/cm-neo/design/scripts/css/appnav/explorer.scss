@@ -42,26 +42,20 @@
 			.symbol {
 				font-size: .9em
 			}
-			/*
-			&.w {
-				//color: brown;
-			}
-			&.a {
-				font-style: italic;
-				color: gray;
-			}
-			*/
-			&.not-visible {
-				color: silver;
+			&.not-visible .link-text {
+				//color: silver;
+				opacity: .4;
 			}
 			&.hidden-in-nav .link-text{
-				//font-style: italic;
 				&:before{
 					content: "("
 				}
 				&:after{
 					content: ")"
 				}
+			}
+			&.has-readers{
+				color: $blue;
 			}
 	
 		}

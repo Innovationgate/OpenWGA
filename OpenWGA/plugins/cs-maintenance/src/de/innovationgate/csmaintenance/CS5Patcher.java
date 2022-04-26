@@ -44,12 +44,11 @@ import de.innovationgate.csmaintenance.patchlevel.Level2;
 import de.innovationgate.csmaintenance.patchlevel.Level3;
 import de.innovationgate.csmaintenance.patchlevel.Level4;
 import de.innovationgate.csmaintenance.patchlevel.Level5;
+import de.innovationgate.csmaintenance.patchlevel.Level6;
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGDatabase;
-import de.innovationgate.webgate.api.jdbc.WGDatabaseImpl;
 import de.innovationgate.webgate.api.jdbc.WGDocumentImpl;
-import de.innovationgate.wga.common.beans.csconfig.v1.Version;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.plugins.WGAPlugin;
 
@@ -57,7 +56,7 @@ public class CS5Patcher {
     
     public static final String PLUGIN_ID = "de.innovationgate.csmaintenance";
     
-    public static final int CS5_PATCH_LEVEL = 5;
+    public static final int CS5_PATCH_LEVEL = 6;
     
     public static final String DBMETA_PATCH_LEVEL = WGDatabase.EXTDATA_PATCH_LEVEL;
     
@@ -86,6 +85,7 @@ public class CS5Patcher {
         _patches.put(3, new Level3(patchDB));
         _patches.put(4, new Level4(patchDB));
         _patches.put(5, new Level5(patchDB));
+        _patches.put(6, new Level6(patchDB));
         
     }
     
@@ -108,7 +108,6 @@ public class CS5Patcher {
         
                 _log.info("Applying patch " + patchIdx + " to db '" + db.getDbReference() + "' (" + db.getTypeName() + ")");
                 
-            
                 ((Session) db.getNativeObject()).doWork(new Work() {
                     
                     public void execute(Connection con) throws SQLException {
@@ -184,7 +183,7 @@ public class CS5Patcher {
     public List<String> execute(List<String> dbKeys) throws WGAPIException, IOException {
         
         List<String> successfullyPatched = new ArrayList<String>();
-        _log.info("OpenWGA Content Store 5 Patcher starting");
+        _log.info("OpenWGA Content Store 6 Patcher starting");
         _log.info("Patch level to apply: " + CS5_PATCH_LEVEL);
         
         List<String> dbsToReconnect = new ArrayList<String>();
@@ -261,7 +260,7 @@ public class CS5Patcher {
             _log.info("Finished appying patches. No content stores were patched.");
         }
         
-        _log.info("OpenWGA Content Store 5 Patch Task finished successfully");
+        _log.info("OpenWGA Content Store 6 Patch Task finished successfully");
         return successfullyPatched;
     }
     

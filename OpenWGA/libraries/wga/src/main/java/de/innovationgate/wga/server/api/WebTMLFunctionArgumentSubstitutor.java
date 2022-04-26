@@ -25,11 +25,13 @@
 
 package de.innovationgate.wga.server.api;
 
+import java.util.HashMap;
 import java.util.List;
 
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGException;
+import de.innovationgate.wga.server.api.tml.Context;
 import de.innovationgate.wga.server.api.tml.Form;
 import de.innovationgate.wga.server.api.tml.Portlet;
 import de.innovationgate.wgpublisher.api.Unlocker;
@@ -239,6 +241,22 @@ public class WebTMLFunctionArgumentSubstitutor implements FunctionArgumentSubsti
                 return null;
             }
             
+        }
+        else if(argumentName.startsWith("$has")) {
+            if (!_wga.isTMLContextAvailable() || !_wga.tmlcontext().iswebenvironment()) {
+                return null;
+            }
+        	String option = argumentName.substring(4);
+        	HashMap<String, Object> role_none = new HashMap<String, Object>();
+        	role_none.put("role", "none");
+        	switch (option) {
+				case "children":
+					return !_wga.nav().children(role_none).isEmpty();
+				case "siblings":
+					return !_wga.nav().siblings(role_none).exclude(_wga.tmlcontext()).isEmpty();
+				default:
+					return null;
+        	}        	
         }
         else if(argumentName.startsWith("$is_")) {
 
