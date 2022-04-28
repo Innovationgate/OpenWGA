@@ -104,7 +104,7 @@ Renderer.prototype.render = function(App, $urlParam_id, $urlParam_dbkey, $urlPar
 		}
 		else if(struct.title) {
 			AFW.structentry(struct).isVisible() && ret.push({
-				title: struct.title,
+				title: WGA.encode("html", struct.title),
 				href: WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
 					.setParameter({
 						dbkey: $urlParam_dbkey,
