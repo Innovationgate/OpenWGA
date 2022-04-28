@@ -102,36 +102,3 @@ Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options
 	$portlet.setmode("hidden");
 
 }.nonIsolated();	// must be isolated bc. getHomepageURL() needs request object
-
-Controller.prototype.isHomepage = function($cx){
-	return $cx.content() && WGA.app().getHomepage() && WGA.app().getHomepage().STRUCTKEY==$cx.STRUCTKEY
-}
-
-/*
-Controller.prototype.unames = function($cx) {
-	// recursivly check for unique names
-	function getNames(struct){
-		var msg = WGA.createList();
-		var uname = struct.getUniqueName() 
-		if(uname){
-			msg.add("Name '" + uname + "' in Seite '" + struct.getTitle() + "'");
-		}
-		var docs = struct.getAllReleasedContent().values().iterator();
-		while(docs.hasNext()){
-			var doc = docs.next();
-			uname = doc.getUniqueName();
-			if(uname){
-				msg.add("Name '" + uname + "' in Inhaltsversion " +doc.getTitle());
-			}
-		}
-		var children = struct.getChildEntries().iterator();
-		while(children.hasNext())
-			msg.addAll(getNames(children.next()))
-		return msg;
-	}
-
-	var struct = $cx.content() ? $cx.content().structEntry : $cx.document;
-	return getNames(struct) 
-
-}
-*/
