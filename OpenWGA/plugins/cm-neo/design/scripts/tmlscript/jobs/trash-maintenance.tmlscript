@@ -1,0 +1,44 @@
+if(WGA.Core.isRunSingleNodeFunctionalities()){
+	var log = jobContext.getLog();
+	log.info("CM-Neo Trash maintenance");
+	var dbs = WGA.Core.getContentdbs().values()
+	var cutoff = WGA.modifyDate(now(), "d", -3)
+	 
+	for(let db in Iterator(dbs)){
+	
+		if(!db.hasFeature(db.FEATURE_FULLCONTENTFEATURES))
+			continue;
+	
+        if (!db.isConnected() || !db.isReady()) {
+            continue;
+        }
+        
+        db.openSession();
+        try {        
+        	var trash = db.getArea("$trash")
+        	if(trash){
+        		var entries = trash.getRootEntries();
+        		if(entries.size()){
+            		log.info(db.getDbReference() + ": " + entries.size() + " entries in trash");
+            		for(let entry in Iterator(entries)){
+            			if(entry.isDeleted(true))
+            				continue;	// already deleted in backend
+            			try{
+            				if(entry.lastModified.before(cutoff)){
+		            			log.info(entry.title)
+	            				entry.remove();
+	            			}
+            			}
+            			catch(e){
+            				log.info(e.message);
+            			}
+            		}
+            	}
+            }                    
+		}
+        finally {
+            db.closeSession();
+        }
+		
+	}
+}

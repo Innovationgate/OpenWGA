@@ -41,6 +41,16 @@
 				console.log("Template area created", dbkey)
 			}, portlet.dbkey)
 		}
+		// create trash area if cs is version>=5
+		if(database.getContentStoreVersion()>=5 && database.getArea("$trash")==null){
+			WGA.Master.runFunction(function(dbkey){
+				var database = db(dbkey);
+				var area = database.createArea("$trash");
+				area.systemArea = true;
+				area.save();
+				console.log("Trash area created", dbkey)
+			}, portlet.dbkey)
+		}
 
 	</tml:script>
 

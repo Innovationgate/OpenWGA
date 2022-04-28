@@ -1,0 +1,137 @@
+function Controller() {
+}
+
+
+Controller.prototype.prepare = function($cx, AFW) {
+	var struct = $cx.content() ? $cx.content().structEntry : $cx.document;
+	var Struct = AFW.structentry(struct)
+	this.mayDelete = Struct.mayDeletePage(true);
+	if(!this.mayDelete){
+		this.reason = Struct.getReason();
+	}
+	// recursivly check for unique names
+	function getNames(struct){
+		var msg = WGA.createList();
+		var uname = struct.getUniqueName() 
+		if(uname){
+			msg.add("Name '" + uname + "' in Seite '" + struct.getTitle() + "'");
+		}
+		var docs = struct.getAllReleasedContent().values().iterator();
+		while(docs.hasNext()){
+			var doc = docs.next();
+			uname = doc.getUniqueName();
+			if(uname){
+				msg.add("Name '" + uname + "' in Inhaltsversion " +doc.getTitle());
+			}
+		}
+		var children = struct.getChildEntries().iterator();
+		while(children.hasNext())
+			msg.addAll(getNames(children.next()))
+		return msg;
+	}
+
+	this.unames = getNames(struct) 
+	
+}.nonIsolated()
+
+
+Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options, AFW){
+	var struct = $cx.content() ? $cx.content().structEntry : $cx.document;
+
+	var redirecturl =  WGA.app().getHomepageURL() || "/"+WGA.app().dbKey;
+	var lang = $option_dialog_options.language || WGA.app().db().getDefaultLanguage();
+	
+	var redirectContent = null;
+	
+	var redirectStruct = struct.getPreviousSibling();
+	if(redirectStruct){
+		redirectContent = $cx.context("docid:" + redirectStruct.getStructKey() + "<" + lang + ">", false);
+	}
+	if(!redirectContent){
+		redirectStruct = struct.getNextSibling();
+		redirectContent = redirectStruct && $cx.context("docid:" + redirectStruct.getStructKey() + "<" + lang + ">", false);
+	}
+	if(!redirectContent){
+		redirectStruct = struct.getParentEntry();
+		redirectContent = redirectStruct && $cx.context("docid:" + redirectStruct.getStructKey() + "<" + lang + ">", false);
+	}
+		
+	if(redirectContent)
+		redirecturl = redirectContent.contenturl();
+	/* else go to home page */
+	
+	$portlet.fireevent("close-dialog", {
+		redirectto: redirecturl
+	})
+
+	// check if we have a trash area and move struct to it
+	var trasharea = AFW.database().getTrashArea();
+	if(trasharea){
+		// move to trash area.
+		// must be a master action because user may have no right to "move pages".
+		WGA.Master.runFunction(function(struct, trasharea){
+			db().moveStructEntry(struct, trasharea);
+			//console.log("moveStructEntry", struct, struct.getLastModified());
+			// remove unique names:
+			function removeNames(struct){
+				var msg = WGA.createList();
+				var uname = struct.getUniqueName(); 
+				if(uname){
+					struct.setUniqueName(null);
+					struct.save();
+				}
+				var docs = struct.getAllReleasedContent().values().iterator();
+				while(docs.hasNext()){
+					var doc = docs.next();
+					doc.setUniqueName(null);
+					doc.saveQuiet();
+				}
+				var children = struct.getChildEntries().iterator();
+				while(children.hasNext())
+					removeNames(children.next())
+			}
+			removeNames(struct) 
+
+		}, struct, trasharea)
+	}
+	else struct.remove();
+
+	$portlet.fireevent("page-deleted", {
+		id: struct.getStructKey() 
+	})
+	$portlet.setmode("hidden");
+
+}.nonIsolated();	// must be isolated bc. getHomepageURL() needs request object
+
+Controller.prototype.isHomepage = function($cx){
+	return $cx.content() && WGA.app().getHomepage() && WGA.app().getHomepage().STRUCTKEY==$cx.STRUCTKEY
+}
+
+/*
+Controller.prototype.unames = function($cx) {
+	// recursivly check for unique names
+	function getNames(struct){
+		var msg = WGA.createList();
+		var uname = struct.getUniqueName() 
+		if(uname){
+			msg.add("Name '" + uname + "' in Seite '" + struct.getTitle() + "'");
+		}
+		var docs = struct.getAllReleasedContent().values().iterator();
+		while(docs.hasNext()){
+			var doc = docs.next();
+			uname = doc.getUniqueName();
+			if(uname){
+				msg.add("Name '" + uname + "' in Inhaltsversion " +doc.getTitle());
+			}
+		}
+		var children = struct.getChildEntries().iterator();
+		while(children.hasNext())
+			msg.addAll(getNames(children.next()))
+		return msg;
+	}
+
+	var struct = $cx.content() ? $cx.content().structEntry : $cx.document;
+	return getNames(struct) 
+
+}
+*/

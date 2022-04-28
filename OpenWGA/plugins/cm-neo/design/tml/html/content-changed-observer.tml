@@ -54,6 +54,7 @@
 	var Struct = AFW.structentry(struct);
 	var pagetype = struct.getContentType();
 	var area = struct.getArea().name;
+	var is_in_trash = (area=="$trash")
 	while(struct){
 		path.unshift(struct.getStructKey())
 		struct = struct.getParentEntry();
@@ -69,11 +70,11 @@
 	
 	event.setParameter("pagetype", pagetype.getNameForLanguage("de"));
 	
-	event.setParameter("may_create_content", Struct.mayCreateContent());
-	event.setParameter("may_create_child_page", Struct.mayCreatePage());
-	event.setParameter("may_delete_page", Struct.mayDeletePage());
+	event.setParameter("may_create_content", Struct.mayCreateContent() && !is_in_trash);
+	event.setParameter("may_create_child_page", Struct.mayCreatePage() && !is_in_trash);
+	event.setParameter("may_delete_page", Struct.mayDeletePage() && !is_in_trash);
 	
-	event.setParameter("page_visible", Struct.isVisible());
+	event.setParameter("page_visible", Struct.isVisible() && !is_in_trash);
 	event.setParameter("may_create_root_page", may_create_root_page);
 	
 	event.setParameter("has_released_contents", Struct.hasReleasedContents());
@@ -87,6 +88,7 @@
 			event.setParameter("status", c.STATUS)
 			event.setParameter("language", c.LANGUAGE)
 			event.setParameter("ismine", c.AUTHOR==c.meta("db", "username"))
+			
 			event.setParameter("may_update_content", App.mayUpdateContent(c));
 			event.setParameter("may_delete_version", Content.mayDeleteContent());
 			event.setParameter("may_archive_version", Content.mayArchiveContent());
@@ -97,8 +99,9 @@
 					|| (c.STATUS==c.content().STATUS_DRAFT && !Content.isMine())
 					|| (c.STATUS==c.content().STATUS_REVIEW && c.content().isPendingRelease())
 				) 
-				&& Content.mayEditContent()
+				&& Content.mayEditContent() && !is_in_trash
 			);
+			
 			event.setParameter("has_userdefined_settings", Content.getUserdefinedMetasTML()!=null)
 		}
 	}
