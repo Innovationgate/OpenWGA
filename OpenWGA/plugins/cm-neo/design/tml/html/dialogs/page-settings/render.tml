@@ -38,7 +38,7 @@
 			contentkey: KEY,
 			dbkey: meta("db", "dbkey")
 		});
-		portlet.fireevent("struct-updated", App.getStructData(portlet.context))	// readers may have changed
+		portlet.context.content() && portlet.fireevent("struct-updated", App.getStructData(portlet.context))	// readers may have changed
 		
 		_dialog_closed=true
 	}
