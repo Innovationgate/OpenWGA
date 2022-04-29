@@ -84,7 +84,7 @@ define(["cm", "sitepanel", "jquery", "bootstrap"], function(CM, Sitepanel, $){
 		
 		$("#toolbars [data-action-group='settings']")[ev.params.structkey && ev.params.page_visible ? "removeClass" : "addClass"]("disabled")
 		$("#toolbars [data-action-group='create']")[ev.params.dbkey ? "removeClass" : "addClass"]("disabled")
-		$("#toolbars [data-action-group='delete']")[ev.params.structkey && ev.params.page_visible ? "removeClass" : "addClass"]("disabled")
+		$("#toolbars [data-action-group='delete']")[ev.params.structkey && ev.params.page_visible && !ev.params.is_in_trash ? "removeClass" : "addClass"]("disabled")
 		$("#toolbars [data-action-group='clipboard']")[ev.params.structkey && ev.params.page_visible ? "removeClass" : "addClass"]("disabled")
 		
 		$("#toolbars [data-action='settings-user-defined']").parent()[ev.params.has_userdefined_settings ? "removeClass" : "addClass"]("disabled")

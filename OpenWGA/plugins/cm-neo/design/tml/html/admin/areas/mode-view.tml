@@ -11,7 +11,7 @@
 		_systemAreas = WGA.createList()
 		var areas = db($option_dbkey).getAreas().values();
 		for(let area in Iterator(areas))
-			if(area.name.indexOf("$")==0)
+			if(area.isSystemArea())
 				_systemAreas.add(area.name)
 			else _areas.add(area.name);
 	</tml:script>

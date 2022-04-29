@@ -16,7 +16,7 @@
 	var may_create_root_page = false;
 	if(dbkey){
 		for(let area in Iterator(db(dbkey).getAreas().values())){
-			if(area.name=="$trash")
+			if(area.name=="$trash-cm-neo")
 				continue;
 			if(area.name=="$templates" && !WGA.app(dbkey).isChiefEditor())
 				continue;
@@ -54,7 +54,7 @@
 	var Struct = AFW.structentry(struct);
 	var pagetype = struct.getContentType();
 	var area = struct.getArea().name;
-	var is_in_trash = (area=="$trash")
+	var is_in_trash = (area=="$trash-cm-neo")
 	while(struct){
 		path.unshift(struct.getStructKey())
 		struct = struct.getParentEntry();
@@ -92,8 +92,8 @@
 			
 			event.setParameter("may_update_content", App.mayUpdateContent(c));
 			event.setParameter("may_delete_version", Content.mayDeleteContent());
-			event.setParameter("may_archive_version", Content.mayArchiveContent() && !is_in_trash);
-			event.setParameter("may_approve_version", c.STATUS==c.content().STATUS_REVIEW && !c.content().isPendingRelease() && Content.mayApprove());
+			event.setParameter("may_archive_version", Content.mayArchiveContent());
+			event.setParameter("may_approve_version", !is_in_trash && c.STATUS==c.content().STATUS_REVIEW && !c.content().isPendingRelease() && Content.mayApprove());
 			event.setParameter("may_edit_content", 
 				(c.STATUS==c.content().STATUS_RELEASE 
 					|| c.STATUS==c.content().STATUS_ARCHIVE 

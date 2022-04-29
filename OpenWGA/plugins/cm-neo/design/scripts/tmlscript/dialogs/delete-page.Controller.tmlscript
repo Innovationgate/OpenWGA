@@ -35,7 +35,7 @@ Controller.prototype.prepare = function($cx, AFW) {
 }.nonIsolated()
 
 
-Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options, AFW){
+Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options){
 	var struct = $cx.content() ? $cx.content().structEntry : $cx.document;
 
 	var redirecturl =  WGA.app().getHomepageURL() || "/"+WGA.app().dbKey;
@@ -65,7 +65,7 @@ Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options
 	})
 
 	// check if we have a trash area and move struct to it
-	var trasharea = AFW.database().getTrashArea();
+	var trasharea = $cx.db().getArea("$trash-cm-neo")
 	if(trasharea){
 		// move to trash area.
 		// must be a master action because user may have no right to "move pages".
@@ -94,7 +94,7 @@ Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options
 
 		}, struct, trasharea)
 	}
-	else struct.remove();
+	//else struct.remove();
 
 	$portlet.fireevent("page-deleted", {
 		id: struct.getStructKey() 

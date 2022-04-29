@@ -117,14 +117,14 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 			el.html("");
 			var systemAreas=[];
 			for(var i=0; i<areas.length; i++){
-				if(areas[i].indexOf("$")==0)
+				if(areas[i].systemArea)
 					systemAreas.push(areas[i])
-				else el.append("<li><a href='#' data-name='" + areas[i] + "'>" + getAreaTitle(areas[i]) + "</a></li>"); 
+				else el.append("<li><a href='#' data-name='" + areas[i].name + "'>" + getAreaTitle(areas[i].name) + "</a></li>"); 
 			}
 			if(systemAreas.length){
 				el.append("<li class='divider'></li>")
 				for(var i=0; i<systemAreas.length; i++){
-					el.append("<li><a href='#' data-name='" + systemAreas[i] + "'>" + getAreaTitle(systemAreas[i]) + "</a></li>");
+					el.append("<li><a href='#' data-name='" + systemAreas[i].name + "'>" + getAreaTitle(systemAreas[i].name) + "</a></li>");
 				}
 			}
 			
@@ -191,7 +191,7 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 	function getAreaTitle(area){
 		if(area=="$templates")
 			return "Seitenvorlagen";
-		else if(area=="$trash")
+		else if(area=="$trash-cm-neo")
 			return "Papierkorb";
 		else return area;
 	}

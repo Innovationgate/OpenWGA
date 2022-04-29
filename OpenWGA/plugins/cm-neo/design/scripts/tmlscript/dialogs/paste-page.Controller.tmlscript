@@ -64,8 +64,7 @@ Controller.prototype.isAllowedPageType = function(AFW, $cx, $item__CM_clipboard_
 		var area = $field_area || $cx.AREA
 		dest = $cx.db().getArea(area)
 	}
-	else if(dest.getArea().name=="$trash"){
-		console.log("don't pase in trash")
+	else if(dest.getArea().name=="$trash-cm-neo"){
 		return false;	
 	}
 	

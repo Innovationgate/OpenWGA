@@ -15,7 +15,7 @@ if(WGA.Core.isRunSingleNodeFunctionalities()){
         
         db.openSession();
         try {        
-        	var trash = db.getArea("$trash")
+        	var trash = db.getArea("$trash-cm-neo")
         	if(trash){
         		var entries = trash.getRootEntries();
         		if(entries.size()){
