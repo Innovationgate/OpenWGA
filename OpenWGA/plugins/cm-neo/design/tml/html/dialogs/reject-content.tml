@@ -11,10 +11,10 @@
 	portlet.fireevent("close-dialog", {
 		redirectto: contenturl("html", null, true)
 	})
-	
+	portlet.setmode("closed")
 </tml:action>
 
-<tml:form id="form-approve-content">
+<tml:form id="form-approve-content" if="$pMode='view'">
 	<div class="header">
 		Inhaltsversion ablehnen
 		<a data-modal="hide">&times;</a>
