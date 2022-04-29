@@ -174,7 +174,7 @@ WGA.util = {
 			var reloadButton = document.createElement("button")
 			reloadButton.style.margin = "10px 0 0 0";
 			reloadButton.style.background = "white";
-			reloadButton.style.color: "black";
+			reloadButton.style.color = "black";
 			reloadButton.appendChild(document.createTextNode(WGA.util.label({
 				de: "Seite neu laden",
 				en: "Reload Page"
@@ -187,7 +187,7 @@ WGA.util = {
 			var cancelButton = document.createElement("button")
 			cancelButton.style.margin = "10px 0 0 10px";
 			cancelButton.style.background = "white";
-			cancelButton.style.color: "black";
+			cancelButton.style.color = "black";
 			cancelButton.appendChild(document.createTextNode(WGA.util.label({
 				de: "Schließen",
 				en: "Close"
