@@ -74,10 +74,11 @@
 	event.setParameter("may_create_child_page", Struct.mayCreatePage() && !is_in_trash);
 	event.setParameter("may_delete_page", Struct.mayDeletePage() && !is_in_trash);
 	
-	event.setParameter("page_visible", Struct.isVisible() && !is_in_trash);
+	event.setParameter("page_visible", Struct.isVisible());
 	event.setParameter("may_create_root_page", may_create_root_page);
 	
 	event.setParameter("has_released_contents", Struct.hasReleasedContents());
+	event.setParameter("is_in_trash", is_in_trash);
 	
 	if(Struct.isVisible() && contentkey){
 		event.setParameter("contentkey", contentkey)
@@ -91,7 +92,7 @@
 			
 			event.setParameter("may_update_content", App.mayUpdateContent(c));
 			event.setParameter("may_delete_version", Content.mayDeleteContent());
-			event.setParameter("may_archive_version", Content.mayArchiveContent());
+			event.setParameter("may_archive_version", Content.mayArchiveContent() && !is_in_trash);
 			event.setParameter("may_approve_version", c.STATUS==c.content().STATUS_REVIEW && !c.content().isPendingRelease() && Content.mayApprove());
 			event.setParameter("may_edit_content", 
 				(c.STATUS==c.content().STATUS_RELEASE 
