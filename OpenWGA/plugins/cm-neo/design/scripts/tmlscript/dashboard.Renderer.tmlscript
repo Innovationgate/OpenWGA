@@ -33,6 +33,8 @@ Renderer.prototype.getData = function(AFW, $urlParam_dbkey, $urlParam_contentkey
 		onlypublished: false,
 		alllanguages: true,
 		p_me: me
+	}).filter(function(doc){
+		return doc.AREA != "$trash"
 	})
 	for(let doc in Iterator(docs)){
 		drafts.push({
@@ -58,7 +60,9 @@ Renderer.prototype.getData = function(AFW, $urlParam_dbkey, $urlParam_contentkey
 			alllanguages: true,
 			p_item: initiator_item,
 			p_me: me
-		}).filter(function(doc) !doc.content().isPendingRelease())
+		}).filter(function(doc){
+			 return !doc.content().isPendingRelease() && doc.AREA != "$trash"
+		})
 		
 		for(let doc in Iterator(docs)){
 	
@@ -92,7 +96,7 @@ Renderer.prototype.getData = function(AFW, $urlParam_dbkey, $urlParam_contentkey
 			onlypublished: false,
 			alllanguages: true
 		}).filter(function(doc){
-			if(doc.content().isPendingRelease())
+			if(doc.content().isPendingRelease() || doc.AREA == "$trash")
 				return false;
 			var wf = doc.content().getWorkflow();
 			return wf && wf.isApprovableByUser(); 		
