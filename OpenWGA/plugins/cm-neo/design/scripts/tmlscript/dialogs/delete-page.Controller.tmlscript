@@ -2,13 +2,7 @@ function Controller() {
 }
 
 
-Controller.prototype.prepare = function($cx, AFW) {
-	var struct = $cx.content() ? $cx.content().structEntry : $cx.document;
-	var Struct = AFW.structentry(struct)
-	this.mayDelete = Struct.mayDeletePage(true);
-	if(!this.mayDelete){
-		this.reason = Struct.getReason();
-	}
+Controller.prototype.prepare = function($cx) {
 	// recursivly check for unique names
 	function getNames(struct){
 		var msg = WGA.createList();
@@ -30,10 +24,20 @@ Controller.prototype.prepare = function($cx, AFW) {
 		return msg;
 	}
 
-	this.unames = getNames(struct) 
+	var struct = $cx.content() ? $cx.content().structEntry : $cx.document;
+	this.unames = struct ? getNames(struct) : WGA.createList() 
 	
-}.nonIsolated()
+}
 
+Controller.prototype.mayDelete = function($cx, AFW) {
+	var struct = $cx.content() ? $cx.content().structEntry : $cx.document;
+	var Struct = AFW.structentry(struct)
+	var mayDelete = Struct.mayDeletePage(true);
+	if(!mayDelete){
+		this.reason = Struct.getReason();
+	}
+	return mayDelete;
+}.nonIsolated();		// Struct.getReason() needs this to read labels.
 
 Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options){
 	var struct = $cx.content() ? $cx.content().structEntry : $cx.document;
@@ -94,7 +98,7 @@ Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options
 
 		}, struct, trasharea)
 	}
-	//else struct.remove();
+	else struct.remove();
 
 	$portlet.fireevent("page-deleted", {
 		id: struct.getStructKey() 

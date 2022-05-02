@@ -37,7 +37,7 @@
 			
 			<div class="content">
 				Die Prüfung Ihrer Berechtigung zum Löschen der Seite "<tml:meta name="title"/>" ergab:
-				<div style="color:red"><tml:item name="$mc.reason"/></div>
+				<div style="color:red"><tml:item name="$mc.reason" encode="none"/></div>
 			</div>
 			
 			<div class="footer">

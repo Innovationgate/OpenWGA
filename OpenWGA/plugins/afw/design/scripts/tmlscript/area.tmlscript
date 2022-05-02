@@ -58,7 +58,7 @@ this.isTemplateArea=function(){
 	return area.name=="$templates"
 }
 this.isTrashArea=function(){
-	return area.name=="$trash"
+	return area.name.indexOf("$trash")==0
 }
 this.isSystemArea=function(){
 	return area.name.charAt(0)=="$";
