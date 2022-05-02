@@ -443,14 +443,12 @@ public class WebTMLScriptletResolver {
             } catch (Exception e) {
                 // container is no valid content key
             }   
-            if (contentKey != null && contentKey.isValid() && contentKey.getVersion() != 0) {
-                contentKey = new WGContentKey(contentKey.getStructKey(), contentKey.getLanguage(), 0);
-                containerName = contentKey.toString();
-            }
-            if(contentKey != null){
-                targetContext = targetContext.context("docid:" + contentKey, false);
-            	if(targetContext==null)
-            		return "";
+            if (contentKey != null && contentKey.isValid()){
+            	if(contentKey.getVersion() != 0) {
+	                contentKey = new WGContentKey(contentKey.getStructKey(), contentKey.getLanguage(), 0);
+	                containerName = contentKey.toString();
+	            }
+                targetContext = context.context("docid:" + contentKey);
             }
         }
         
