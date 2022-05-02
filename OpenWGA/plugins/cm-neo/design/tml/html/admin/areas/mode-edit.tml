@@ -16,7 +16,17 @@
 	document.remove();
 </tml:action>
 
-<tml:form id="form-edit-area" cssclass="form-horizontal" context="[db:{$option_dbkey}/$area:{portlet.areaname}]">
+<tml:script>
+	_may_edit=true;
+	try{
+		db($option_dbkey).getArea(portlet.areaname).performSaveCheck()
+	}
+	catch(e){
+		_may_edit = false;
+	}
+</tml:script>
+
+<tml:form id="form-edit-area" cssclass="form-horizontal" context="[db:{$option_dbkey}/$area:{portlet.areaname}]" mode="{_may_edit?'edit':'view'}">
 	<div class="header"><tml:item name="areaname" type="portlet"/> ...</div>
 	
 	<div class="content">
@@ -30,7 +40,7 @@
 	
 	<div class="footer">
 		<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="view">Abbrechen</tml:button>
-		<tml:button cssclass="btn btn-primary" clickaction="save" portletmode="view">Speichern</tml:button>
-		<tml:button cssclass="btn btn-danger pull-right" clickaction="$setvar" param1="_query_delete" param2="{true}">Löschen</tml:button>
+		<tml:button cssclass="btn btn-primary" clickaction="save" portletmode="view" if="_may_edit">Speichern</tml:button>
+		<tml:button cssclass="btn btn-danger pull-right" clickaction="$setvar" param1="_query_delete" param2="{true}" if="_may_edit">Löschen</tml:button>
 	</div>
 </tml:form>
