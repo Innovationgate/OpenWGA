@@ -922,5 +922,9 @@ public class WGArea extends WGSchemaDocument implements PageHierarchyNode {
         getCache().setRootEntryCountCache(rootEntryCountCache);
     }
 
+    public boolean isTrashArea() throws WGAPIException{
+    	return getName().startsWith("$trash");
+    }
+    
 }
 
