@@ -68,7 +68,7 @@ define(["cm", "sitepanel", "jquery", "bootstrap"], function(CM, Sitepanel, $){
 
 		$("#toolbars [data-action='settings-user-defined'] span").html("'"+ev.params.pagetype+"'")
 		$("#toolbars [data-action='create-draft']")[ev.params.may_edit_content ? "show" : "hide"]()
-		$("#toolbars [data-action='publish-page']")[ev.params.status=='w' && ev.params.ismine ? "show" : "hide"]()
+		$("#toolbars [data-action='publish-page']")[ev.params.may_publish_page ? "show" : "hide"]()
 		$("#toolbars [data-action='approve-content']")[ev.params.may_approve_version ? "show" : "hide"]()
 		$("#toolbars [data-action='reject-content']")[ev.params.may_approve_version ? "show" : "hide"]()
 			

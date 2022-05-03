@@ -93,6 +93,7 @@
 			event.setParameter("may_update_content", App.mayUpdateContent(c));
 			event.setParameter("may_delete_version", Content.mayDeleteContent());
 			event.setParameter("may_archive_version", Content.mayArchiveContent());
+			event.setParameter("may_publish_page", c.STATUS==c.content().STATUS_DRAFT && Content.isMine() && !is_in_trash);
 			event.setParameter("may_approve_version", !is_in_trash && c.STATUS==c.content().STATUS_REVIEW && !c.content().isPendingRelease() && Content.mayApprove());
 			event.setParameter("may_edit_content", 
 				(c.STATUS==c.content().STATUS_RELEASE 
