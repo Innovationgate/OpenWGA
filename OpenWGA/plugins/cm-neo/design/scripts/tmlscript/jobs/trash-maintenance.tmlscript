@@ -2,7 +2,7 @@ if(WGA.Core.isRunSingleNodeFunctionalities()){
 	var log = jobContext.getLog();
 	log.info("CM-Neo Trash maintenance");
 	var dbs = WGA.Core.getContentdbs().values()
-	var cutoff = WGA.modifyDate(now(), "d", -3)
+	var cutoff = WGA.modifyDate(now(), "d", -7)
 	 
 	for(let db in Iterator(dbs)){
 	
