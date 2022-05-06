@@ -1,0 +1,14 @@
+function Controller() {}
+
+Controller.prototype.prepare = function() {}
+
+Controller.prototype.docs = function($option_dbkey) {
+	return WGA.app($option_dbkey).db().getArea("$trash-cm-neo").getRootEntries()
+}
+
+Controller.prototype.clearTrash = function($option_dbkey){
+	console.log("Clear trash")
+	for(let doc in Iterator(this.docs($option_dbkey))){
+		console.log("remove", doc.title);
+	}
+}

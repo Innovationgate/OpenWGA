@@ -1,0 +1,51 @@
+<div id="trash">
+
+	<div class="header" style="padding:5px 10px">
+		Papierkorb
+	</div>
+	
+	<div class="content">
+		<div class="table">
+			<div class="row">
+				<div class="col">Titel</div>
+				<div class="col">Seitentyp</div>
+				<div class="col">Gelöscht</div>
+			</div>
+			<tml:foreach item="$mc.docs" currentvalue="_doc">
+				<div class="row">
+					<div class="col">
+						<a href="#" data-wgakey="<tml:item name="_doc.structKey"/>">
+							<tml:item name="_doc.title"/>
+						</a>
+					</div>
+					<div class="col"><tml:item name="_doc.contentType.name"/></div>
+					<div class="col">
+						<tml:script expression="AFW.Util.timeElapsed(_doc.lastModified)"/>
+						am
+						<tml:item name="_doc.lastModified" format="dd.MM.yyy HH:mm:ss"/>
+					</div>
+				</div>
+			</tml:foreach>
+		</div>
+	</div>
+	
+	<div class="footer">
+		<div class="right">
+			<tml:button clickaction="$mc.clearTrash" cssclass="btn btn-default">
+				Papierkorb leeren
+			</tml:button>
+		</div>
+	</div>
+	
+	<script>
+		require(["jquery"], function($){
+			$("#trash a[data-wgakey]").click(function(ev){
+				ev.preventDefault();
+				WGA.event.fireEvent("setMainPortletMode", "*", {
+					mode: "select-db",
+					contentkey: $(this).data("wgakey")
+				})
+			})
+		})
+	</script>
+</div>	
