@@ -857,8 +857,11 @@ public class ForEach extends Base implements IterationTag {
             
 			// Try to use the current object as a context, for changing the context inside the loop
 			TMLContext targetContext = retrieveTargetContext(status.currentObject);
-			if (targetContext instanceof TMLContext) {
-				this.setChildTagContext(getTMLContextForDocument(targetContext.content())); // Convert to "native" TMLContext for the current design context
+			if (targetContext !=null && targetContext instanceof TMLContext) {
+				WGContent c = targetContext.content();
+				if(c!=null)
+					this.setChildTagContext(getTMLContextForDocument(c)); // Convert to "native" TMLContext for the current design context
+				else this.setChildTagContext(targetContext);
 			}
 			
 			if (this.getCurrentvalue() != null) {
