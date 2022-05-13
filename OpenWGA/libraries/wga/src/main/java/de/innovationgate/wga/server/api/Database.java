@@ -82,6 +82,10 @@ public class Database {
      * Name of WebTML query attribute "onlypublished"
      */
     public static final String QUERYATT_ONLYPUBLISHED = "onlypublished";
+    
+    
+    public static final String QUERYATT_ONLYVISIBLE = "onlyvisible";
+    
     /**
      * Name of WebTML query attribute "options"
      */
@@ -314,11 +318,11 @@ public class Database {
 
         // Behaviour regarding unpublished documents
         if (ConversionUtils.getBoolean(options.get(QUERYATT_ONLYPUBLISHED), true) == true) {
-            parameters.put(WGDatabase.QUERYOPTION_ENHANCE, new Boolean(true));
             parameters.put(WGDatabase.QUERYOPTION_ONLYRELEASED, "");
+            parameters.put(WGDatabase.QUERYOPTION_ENHANCE, ConversionUtils.getBoolean(options.get(QUERYATT_ONLYVISIBLE), true));
         }
         else {
-            parameters.put(WGDatabase.QUERYOPTION_ENHANCE, new Boolean(false));
+            parameters.put(WGDatabase.QUERYOPTION_ENHANCE, false);
         }
 
         // Language behaviour
