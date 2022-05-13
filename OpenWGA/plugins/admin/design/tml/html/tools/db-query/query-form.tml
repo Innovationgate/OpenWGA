@@ -183,6 +183,13 @@
 							<tml:include ref="system:convert-to-ext-field" o_fieldname="onlypublished" o_type="boolean"/>			
 						</div>					
 						<div class="clear"></div>
+
+						<label>Only visible contents:</label>					
+						<div class="data">					
+							<tml:input type="boolean" name="onlyvisible" default="true"/>
+							<tml:include ref="system:convert-to-ext-field" o_fieldname="onlyvisible" o_type="boolean"/>			
+						</div>					
+						<div class="clear"></div>
 	
 						<label>Use query cache:</label>					
 						<div class="data">					
