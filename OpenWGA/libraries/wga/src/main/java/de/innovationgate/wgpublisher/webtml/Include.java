@@ -56,6 +56,7 @@ import de.innovationgate.webgate.api.WGTransientPortlet;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.design.DesignResourceReference;
+import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager.DerivateQuery;
 import de.innovationgate.wgpublisher.websockets.PageConnection;
 import de.innovationgate.wgpublisher.webtml.actions.TMLAction;
 import de.innovationgate.wgpublisher.webtml.portlet.TMLPortlet;
@@ -91,6 +92,7 @@ public class Include extends Base implements DynamicAttributes, PreferredOptionR
     private String portletmode;
     private String limit;
     private String forcestate;
+    private String imagederivates;
     
     public static class Status extends BaseTagStatus implements RootTagReceptor, DirectOutputCapableTag {
         String type;
@@ -824,6 +826,16 @@ public class Include extends Base implements DynamicAttributes, PreferredOptionR
          *  See #00005533
          */
         //status.dynamicOptions.clear();
+
+        // Set file derivate information
+        String fileDerivates = getImagederivates();
+        if (fileDerivates != null) {
+            DerivateQuery derivateQuery = getTMLContext().enhanceFileDerivateQuery(fileDerivates);
+            if (!derivateQuery.isNoDerivate()) {
+                status.setOption(Base.OPTION_IMAGE_DERIVATES, derivateQuery.toString(), TMLOption.SCOPE_GLOBAL);
+            }
+        }
+        
         
     }
 
@@ -898,6 +910,14 @@ public class Include extends Base implements DynamicAttributes, PreferredOptionR
 
     public void setForcestate(String forcestate) {
     	this.forcestate = forcestate;
+    }
+
+    public String getImagederivates() {
+        return getTagAttributeValue("imagederivates", imagederivates, null);
+    }
+
+    public void setImagederivates(String filederivates) {
+        this.imagederivates = filederivates;
     }
 
 
