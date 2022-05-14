@@ -19,8 +19,8 @@
       <uniqueName>de.innovationgate.wgaservices-rest</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>9</minorVersion>
-        <maintenanceVersion>9</maintenanceVersion>
+        <minorVersion>10</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
         <buildVersion>711</buildVersion>
       </version>
