@@ -10,5 +10,6 @@ Controller.prototype.clearTrash = function($option_dbkey){
 	console.log("Clear trash")
 	for(let doc in Iterator(this.docs($option_dbkey))){
 		console.log("remove", doc.title);
+		doc.remove();
 	}
 }
