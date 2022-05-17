@@ -15,11 +15,14 @@
 	".lookup": {	
 		position: "absolute",
 		top: 0,
+		width: "100%",
 		
+		/*
 		".lookup-wrapper": {
 			position: "relative",
 			display: "inline"
 		},
+		*/
 		
 		".lookup-input": {
 			position: "absolute",
