@@ -78,7 +78,7 @@
 					var c = context("docid:"+doc.getStructKey(), false)
 					if(c)
 						title = c.TITLE;
-					pages.push("Nach '" + title + "'|" + doc.getStructKey().toString())
+					pages.push("Nach '" + WGA.encode("html", title) + "'|" + doc.getStructKey().toString())
 				}
 				_optgroups=null;
 				if(pages.length>1)
