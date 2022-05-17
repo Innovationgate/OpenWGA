@@ -660,7 +660,10 @@ public class Input extends ActionBase implements DynamicAttributes {
             if (!onlySelectedValues) {
             	this.appendResult("<option ");
             	
-            	if (optionValue != null) {
+            	if(optionValue.equals("$disabled"))
+            		this.appendResult("disabled");
+            	
+            	if (optionValue != null && !optionValue.equals("$disabled")) {
             		this.appendResult(" value=\"").appendResult(displayOptionValue).appendResult("\"");
             	}
     		
@@ -792,10 +795,14 @@ public class Input extends ActionBase implements DynamicAttributes {
 		for(OptGroup optgroup: optgroups){
 			result.append("<optgroup label=\"" + optgroup.getLabel() + "\">");
 			for(InputOption option: optgroup.getOptions()){
-				result.append("<option value=\"" + option.getValue() + "\"");
-    			if (values.contains(option.getValue())) {
-    				result.append(" selected");
-    			}
+				if(option.getValue().equals("$disabled"))
+					result.append("<option disabled");
+				else{
+					result.append("<option value=\"" + option.getValue() + "\"");
+	    			if (values.contains(option.getValue())) {
+	    				result.append(" selected");
+	    			}
+				}
 				result.append(">" + option.getText() + "</option>");				
 			}
 			result.append("</optgroup>");
