@@ -69,11 +69,18 @@ public class Input extends ActionBase implements DynamicAttributes {
      * represents an HTML-Option (for example in an HTML-selectbox, an HTML-checkbox or an HTML-option
      */
     private class InputOption {
+
         private String _value;
         private String _text;
+        private boolean _disabled=false;
         
         public InputOption(String text, String value) {
-            _value = value;
+        	_value = value;
+        	int pos = value.indexOf("$disabled");        	
+        	if(pos>=0){
+        		_value = value.substring(0, pos);
+        		_disabled = true;
+        	}
             _text = text;
         }
 
@@ -85,8 +92,11 @@ public class Input extends ActionBase implements DynamicAttributes {
             return _value;
         }
         
+        public boolean isDisabled(){
+        	return _disabled;
+        }
+        
     }
-
 
 	private String type;
 	private String name;
@@ -120,9 +130,6 @@ public class Input extends ActionBase implements DynamicAttributes {
     // type of content relation to create instead of using an item
     private String relationtype;
 
-
-
-    
     public boolean isMultipleInput() {
         
         String type = this.getType();
@@ -660,10 +667,10 @@ public class Input extends ActionBase implements DynamicAttributes {
             if (!onlySelectedValues) {
             	this.appendResult("<option ");
             	
-            	if(optionValue.equals("$disabled"))
+            	if(option.isDisabled())
             		this.appendResult("disabled");
             	
-            	if (optionValue != null && !optionValue.equals("$disabled")) {
+            	if (optionValue != null) {
             		this.appendResult(" value=\"").appendResult(displayOptionValue).appendResult("\"");
             	}
     		
@@ -795,14 +802,12 @@ public class Input extends ActionBase implements DynamicAttributes {
 		for(OptGroup optgroup: optgroups){
 			result.append("<optgroup label=\"" + optgroup.getLabel() + "\">");
 			for(InputOption option: optgroup.getOptions()){
-				if(option.getValue().equals("$disabled"))
-					result.append("<option disabled");
-				else{
-					result.append("<option value=\"" + option.getValue() + "\"");
-	    			if (values.contains(option.getValue())) {
-	    				result.append(" selected");
-	    			}
-				}
+				result.append("<option value=\"" + option.getValue() + "\"");
+    			if (values.contains(option.getValue())) {
+    				result.append(" selected");
+    			}
+    			if(option.isDisabled())
+    				result.append(" disabled");
 				result.append(">" + option.getText() + "</option>");				
 			}
 			result.append("</optgroup>");
@@ -877,10 +882,8 @@ public class Input extends ActionBase implements DynamicAttributes {
 				this.appendResult("<label>");
 				
 			this.appendResult("<input").appendResult(dynHtml).appendResult(optionIdHtml).appendResult(" type=\"").appendResult(type).appendResult("\" name=\"").appendResult(name).appendResult("\" ");
-			this.appendResult(" value=\"").appendResult(WGUtils.encodeHTML(optionValue)).appendResult("\" ");
-            
-            createChangeActionJS(name, form, "onclick");
-		
+
+			// checked
 			if ( optionValue != null ) {
 				for( int i=0 ; i < values.size() ; i++){
 					if( String.valueOf( values.get(i) ).equalsIgnoreCase(optionValue) ){
@@ -888,7 +891,16 @@ public class Input extends ActionBase implements DynamicAttributes {
 					}
 				}				
 			}			
-			this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">");
+
+			String optionDisabled = disabled;
+			if(option.isDisabled())
+				optionDisabled = " disabled ";
+			
+			this.appendResult(" value=\"").appendResult(WGUtils.encodeHTML(optionValue)).appendResult("\" ");	            
+            if(optionDisabled.isEmpty())
+            	createChangeActionJS(name, form, "onclick");
+            
+			this.appendResult(cssClass).appendResult(cssStyle).appendResult(optionDisabled).appendResult(tagContent).appendResult(">");
 			
 			if (doLabelling) {
 			    this.appendResult("<label for=\"").appendResult(optionId).appendResult("\">").appendResult(optionText).appendResult("</label>");
