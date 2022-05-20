@@ -40,7 +40,7 @@
 	_languages = WGA.createList()
 	for(let lang in Iterator(db().getLanguages().values())){
 		if(lang.mayCreateContent()){
-			_languages.add(lang.title + "|" + lang.name)
+			_languages.add(lang.title + " (" + lang.name + ")|" + lang.name)
 			if($option_current_lang==lang.name && !tmlform.submitted)
 				tmlform.language=lang.name
 		}
