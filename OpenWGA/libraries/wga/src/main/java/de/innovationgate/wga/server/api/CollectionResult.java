@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 import de.innovationgate.utils.CountReportingIterator;
 import de.innovationgate.utils.IteratorWrapper;
@@ -424,7 +426,7 @@ public abstract class CollectionResult implements Iterable<Context> {
     }
  
     public interface Function {
-        public Object call(Context context) throws WGException;
+        public Object call(Object a) throws WGException;
     }
 
     /**
@@ -455,6 +457,38 @@ public abstract class CollectionResult implements Iterable<Context> {
     	return result;
     }
 
+    /**
+     * Creates a a sorted map keyed by the return value of a user defined function where its value is a list of TMLContext objects evaluating to the same key.
+     * @param function
+     * @return sorted Map 
+     * @throws WGException
+     */
+    public NavigableMap<Object, List<Context>> groupMap(Function function) throws WGException{
+    	return groupMap(function, false);
+    }
+    /**
+     * Creates a a sorted map keyed by the return value of a user defined function where its value is a list of TMLContext objects evaluating to the same key.
+     * @param function
+     * @param descending specified the sort order
+     * @return sorted Map 
+     * @throws WGException
+     */
+    public NavigableMap<Object, List<Context>> groupMap(Function function, boolean descending) throws WGException{
+    	TreeMap<Object, List<Context>> map = new TreeMap<Object, List<Context>>();
+    	SkippingIterator<Context> it = iterator();
+    	while(it.hasNext()){
+    		Context ctx = it.next();
+    		Object key = function.call(ctx);
+    		if(key==null)
+    			continue;
+    		if(!map.containsKey(key)){
+    			map.put(key, new ArrayList<Context>());
+    		}
+   			map.get(key).add(ctx);
+    	}
+    	return descending ? map.descendingMap() : map;
+    }
+    
     public boolean contains(Context ctx) throws WGAPIException{
     	SkippingIterator<Context> it = iterator();
     	while(it.hasNext()){
