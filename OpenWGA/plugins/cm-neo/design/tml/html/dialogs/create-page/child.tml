@@ -30,7 +30,7 @@
 					if(!doc.mayReadContent())
 						continue;
 					var title = doc.title;
-					var c = context("docid:"+doc.getStructKey(), false)
+					var c = context("docid:"+doc.getStructKey()+"<"+$option_current_lang+">", false)
 					if(c)
 						title = c.TITLE;
 					pages.push("Nach '" + WGA.encode("html", title) + "'|" + doc.getStructKey().toString())

@@ -65,6 +65,13 @@
 				<tml:input labeled="true" name="recursive" type="boolean" options="Unterseiten kopieren|true"/>
 			</tml:[form-field]>
 		</tml:case>
+
+		<script>
+			require(["jquery", "select2"], function($){
+				$("select").select2({width:"100%"})
+			})
+		</script>
+		
 	</div>
 	
 	<div class="footer">
