@@ -55,17 +55,19 @@
 						//console.log(key, settings.get(key));
 						var prop = key.split("_"+mod.id)[0]
 						var value = settings.get(key)
-						if(value instanceof java.util.List){
-							var values = []
-							for(let v in Iterator(value))
-								values.push(v);
-							if(values.length==1)
-								values=values[0];
-							value = values;
-						}
-						else value = value.toString();
-						if(value)
+						if(value){
+							if(value instanceof java.util.List){
+								var values = []
+								for(let v in Iterator(value))
+									values.push(v);
+								if(values.length==1)
+									values=values[0];
+								value = values;
+							}
+							else value = value.toString();
 							mod.settings[prop]=value;
+						}
+						else mod.settings[prop]=value;
 					}
 					var children=mod.children;
 					delete mod.children;
