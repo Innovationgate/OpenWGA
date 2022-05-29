@@ -36,6 +36,11 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.apache.log4j.Logger;
 
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.webp.WebpDirectory;
+
 import de.innovationgate.utils.SimpleImageInfo;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGFactory;
@@ -72,6 +77,23 @@ public class WGADefaultFileAnnotator implements WGFileAnnotator {
             }
         }
 
+        // try webP using ImageMetadataReader
+        if (mimeType == null || displayWidth == -1 || displayHeight == -1) {
+        	in = null;
+        	try {
+				in = originalFileData.getInputStream();
+				Metadata metadata = ImageMetadataReader.readMetadata(in);
+				Directory directory = metadata.getFirstDirectoryOfType(WebpDirectory.class);
+			    if(directory!=null && directory.containsTag(WebpDirectory.TAG_IMAGE_WIDTH) && directory.containsTag(WebpDirectory.TAG_IMAGE_HEIGHT)){
+			    	displayWidth = directory.getInt(WebpDirectory.TAG_IMAGE_WIDTH);
+			    	displayHeight = directory.getInt(WebpDirectory.TAG_IMAGE_HEIGHT);
+			    	mimeType = "image/webp";
+			    }				
+			} catch (Exception e) {
+				// Fail silently
+			}
+        }
+        
         // Image data: Second try with ImageIO
         if (mimeType == null || displayWidth == -1 || displayHeight == -1) {
             in = null;
