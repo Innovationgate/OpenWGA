@@ -125,39 +125,7 @@ public class SimpleImageInfo {
             height = readInt(is,2,false);
             mimeType = "image/bmp";
         } 
-        /*else { // Does not seem to work well: Wrong image sizes
-            int c4 = is.read();
-            if ((c1 == 'M' && c2 == 'M' && c3 == 0 && c4 == 42)
-                    || (c1 == 'I' && c2 == 'I' && c3 == 42 && c4 == 0)) { //TIFF
-                boolean bigEndian = c1 == 'M';
-                int ifd = 0;
-                int entries;
-                ifd = readInt(is,4,bigEndian);
-                is.skip(ifd - 8);
-                entries = readInt(is,2,bigEndian);
-                for (int i = 1; i <= entries; i++) {
-                    int tag = readInt(is,2,bigEndian);
-                    int fieldType = readInt(is,2,bigEndian);
-                    long count = readInt(is,4,bigEndian);
-                    int valOffset;
-                    if ((fieldType == 3 || fieldType == 8)) {
-                        valOffset = readInt(is,2,bigEndian);
-                        is.skip(2);
-                    } else {
-                        valOffset = readInt(is,4,bigEndian);
-                    }
-                    if (tag == 256) {
-                        width = valOffset;
-                    } else if (tag == 257) {
-                        height = valOffset;
-                    }
-                    if (width != -1 && height != -1) {
-                        mimeType = "image/tiff";
-                        break;
-                    }
-                }
-            }
-        }*/
+        
         if (mimeType == null) {
             throw new IOException("Unsupported image type");
         }
