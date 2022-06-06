@@ -7,6 +7,7 @@ public class Registrar implements ModuleRegistrar {
 
     public void registerModules(ModuleRegistry registry) {
         registry.addModuleDefinition(new SassConversionModuleDefinition());
+        registry.addModuleDefinition(new LessConversionModuleDefinition());
         registry.addModuleDefinition(new TMLScriptCoffeeScriptConversionModuleDefinition());
         registry.addModuleDefinition(new JSCoffeeScriptConversionModuleDefinition());
         registry.addModuleDefinition(new TMLScriptTypeScriptConversionModuleDefinition());
