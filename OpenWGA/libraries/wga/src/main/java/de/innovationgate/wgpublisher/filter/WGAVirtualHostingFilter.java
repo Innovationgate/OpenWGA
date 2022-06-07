@@ -166,6 +166,16 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
             	}
             	else {
             		LOG.debug("v-host " + vHost.getServername() + ": Redirect '" + uri + "' to path: " + redirect.getPath());
+            		String url = redirect.getPath();
+            		if(!url.startsWith("/")){
+            			// redirect to some external URL
+                		if(isPermanentRedirect){
+                    		httpResponse.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+                    		httpResponse.setHeader("Location", httpResponse.encodeRedirectURL(url));        			
+                		}
+                		else httpResponse.sendRedirect(httpResponse.encodeRedirectURL(url));
+                		return;            			
+            		}
             		redirectRequired = true;
             		redirectUrlBuilder.setPath(redirect.getPath());
             		isPermanentRedirect = redirect.isPermanentRedirect();
@@ -557,7 +567,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
     			String redirectPath = redirect.getPath();
     			if(redirectPath.isEmpty())
     				redirectPath = ".*";	// any path
-	    		Pattern pattern = Pattern.compile(redirect.getPath(), Pattern.CASE_INSENSITIVE);
+	    		Pattern pattern = Pattern.compile(redirectPath, Pattern.CASE_INSENSITIVE);
 	        	Matcher matcher= pattern.matcher(path);
 	            if(matcher.find()) {
 	            	LOG.debug("v-host " + vHost.getServername() + ": '" + path + "' matches VirtualHostRedirect-Path: " + redirectPath);
