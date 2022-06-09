@@ -55,10 +55,10 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 		
 		// default selection:
 		var node;
-		if(last_selected && $("#module-tree .node[data-id='" + last_selected + "']").length)
-			node = last_selected;
-		else if(section)
+		if(section)
 			node = "section."+section;
+		else if(last_selected && $("#module-tree .node[data-id='" + last_selected + "']").length)
+			node = last_selected;
 		else node = $("#module-tree .node").first().data("id");
 		
 		$("#module-tree").wga_tree("expandnode", node, function(node){
