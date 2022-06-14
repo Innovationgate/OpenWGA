@@ -61,7 +61,7 @@ Renderer.prototype.getData = function(AFW, $urlParam_dbkey, $urlParam_contentkey
 			p_item: initiator_item,
 			p_me: me
 		}).filter(function(doc){
-			 return !doc.content().isPendingRelease() && doc.AREA != "$trash-cm-neo"
+			 return !doc.content().isPendingRelease() && !doc.AREA.indexOf("$trash")==0 
 		})
 		
 		for(let doc in Iterator(docs)){
@@ -96,10 +96,10 @@ Renderer.prototype.getData = function(AFW, $urlParam_dbkey, $urlParam_contentkey
 			onlypublished: false,
 			alllanguages: true
 		}).filter(function(doc){
-			if(doc.content().isPendingRelease() || doc.AREA == "$trash-cm-neo")
+			if(doc.content().isPendingRelease() || doc.AREA.indexOf("$trash")==0)
 				return false;
 			var wf = doc.content().getWorkflow();
-			return wf && wf.isApprovableByUser(); 		
+			return wf && wf.getWorkflowRole() == wf.ROLE_APPROVER;
 		})
 		
 		for(let doc in Iterator(docs)){
