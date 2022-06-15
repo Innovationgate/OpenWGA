@@ -12,7 +12,6 @@ import java.util.Properties;
 import java.util.Map.Entry;
 
 import javax.json.JsonObject;
-import javax.json.JsonValue;
 
 import com.github.sommeri.less4j.Less4jException;
 import com.github.sommeri.less4j.LessCompiler;
@@ -143,6 +142,7 @@ public class LessPostProcessor implements PostProcessor{
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void prepare(WGA wga, PostProcessData data) throws WGException {
 		
@@ -165,9 +165,7 @@ public class LessPostProcessor implements PostProcessor{
             }
             if (wga.tmlscript().isNativeObject(result)) {
             	JsonObject values = (JsonObject) wga.tmlscript().importJsonData(result);
-            	for(Entry<String, JsonValue> value: values.entrySet()){
-            		vars.put("@"+value.getKey(), value.getValue().toString());
-            	}
+            	vars.putAll(values);
             }
             else vars.putAll((Map<String,Object>)result);
 		}
@@ -200,10 +198,15 @@ public class LessPostProcessor implements PostProcessor{
 
         	_wga.getLog().info("Less4j " + getVersion(compiler) + " postProcessing " + ref.toString());
         	
+        	// custom less variables
         	if (data.getCacheQualifier() != null) {
-                configuration.addExternalVariables((Map<String,String>) data.getCacheQualifier());
+        		Map<String,Object> values = (Map<String,Object>) data.getCacheQualifier();
+            	for(Entry<String, Object> value: values.entrySet()){
+            		configuration.addExternalVariable("@"+value.getKey(), value.getValue().toString());
+            	}
         	}
         	
+        	// custom less function wga_file_url(...)
         	configuration.addCustomFunction(new WGAFileURL(design));
         	
         	if(!WGACore.isDevelopmentModeEnabled() && data.isCompress())
