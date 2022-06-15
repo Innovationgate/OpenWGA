@@ -22,28 +22,33 @@
 ## along with OpenWGA in file COPYING.
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
-<tml:collection id="searchResult">	
-      <tml:query id="query" db="{tmlform.db}"
-      			 context="{isEmptyValue(tmlform.context) ? 'this' : 'db:'+tmlform.db+'/'+tmlform.context}"
-      		     includecurrent="true"
-      			 alllanguages="{tmlform.alllanguages}" 
-      			 onlypublished="{tmlform.onlypublished}"
-      			 role="{ tmlform.role }"
-      			 type="{ tmlform.type }"
-      			 options="{ tmlform.options }"
-      			 max="{ tmlform.max}"
-      			 cache="{ tmlform.cache}">
-      			 
-			<tml:script expression="tmlform.query" encode="none"/>
-      </tml:query> 		      
-</tml:collection>   
-			
-<tml:if condition="taginfo('query', 'error') != null">
+
+<tml:script>
+	try{
+		_result = WGA.app(tmlform.db).query(tmlform.query, {
+			 context: isEmptyValue(tmlform.context) ? 'this' : 'db:'+tmlform.db+'/'+tmlform.context,
+		     includecurrent: true,
+			 alllanguages: tmlform.alllanguages, 
+			 onlypublished: tmlform.onlypublished,
+			 onlyvisible: tmlform.onlyvisible,
+			 role: tmlform.role,
+			 type: tmlform.type,
+			 options: tmlform.options,
+			 max: tmlform.max,
+			 cache: tmlform.cache
+		})
+	}
+	catch(e){
+		_error = e.message;
+	}
+</tml:script>
+
+<tml:if condition="_error">
 	<tml:then>
 		<fieldset>
 			<legend>An error happened while executing the query:</legend>
 			<div style="color:red;padding:10px">
-				<tml:taginfo name="error" sourcetag="query"/>
+				<tml:item name="_error"/>
 			</div>
 	</tml:then>
 	<tml:else>
@@ -63,8 +68,8 @@
 			<div class="clear"></div>				
 		
 			<label>Result documents:</label>						
-			<div class="data">						
-				<tml:taginfo sourcetag="searchResult" name="count" format="#,##0"/>						
+			<div class="data">		
+				<tml:item name="_result.size"/>				
 			</div>						
 			<div class="clear"></div>
 
@@ -72,7 +77,7 @@
 				<tml:if condition="tmlform != null && (!isEmptyValue(tmlform.items) || tmlform.type=='sql')">
 					<tml:then>
 						
-						<tml:foreach id="searchFE" sourcetag="searchResult" page="{pagecontrol_searchFEPage}" pagesize="{tmlform.pagesize}" filllastpage="false" linear="{tmlform.linear}" onlypublished="false">
+						<tml:foreach id="searchFE" item="_result" page="{pagecontrol_searchFEPage}" pagesize="{tmlform.pagesize}" filllastpage="false" linear="{tmlform.linear}" onlypublished="false">
 						
 							<tml:case isfirstloop="true">
 								<tml:script>
@@ -143,7 +148,7 @@
 								<td>File</td>
 							</tml:case>
 						</tr>      
-						<tml:foreach id="searchFE" sourcetag="searchResult" page="{pagecontrol_searchFEPage}" pagesize="{tmlform.pagesize}" filllastpage="false">
+						<tml:foreach id="searchFE" item="_result" page="{pagecontrol_searchFEPage}" pagesize="{tmlform.pagesize}" filllastpage="false" onlypublished="false">
 						    <tml:include designdb="@ui" ref="tr">
 						    	<tml:option name="ajaxaction">
 							    	DBM.switchToObject('tools.db-explorer', '<tml:item name="db" type="tmlform"/>', '<tml:script expression="'db:'+tmlform.db+'/docid:'+KEY"/>');
@@ -183,22 +188,21 @@
 			<div id="result-info" style="display:none">
 				<label>Full query:</label>						
 				<div class="data">						
-					<tml:taginfo sourcetag="query" name="fullquery"/>						
+					<tml:item name="_result.fullQuery"/>						
 				</div>						
 				<div class="clear"></div>
 			
-				<tml:taginfo sourcetag="query" name="executiontime" var="executionTime"/>
-				<tml:case condition="executionTime != -1">
+				<tml:case condition="_result.executionTime != -1">
 					<label>Query execution time:</label>						
 					<div class="data">						
-						<tml:item name="executionTime" format="#,##0" /> Milliseconds						
+						<tml:item name="_result.executionTime" format="#,##0" /> Milliseconds						
 					</div>						
 					<div class="clear"></div>
 				</tml:case>
 			
 				<label>Used query cache:</label>						
 				<div class="data">						
-					<tml:taginfo sourcetag="query" name="cacheused"/>						
+					<tml:item name="_result.servedFromCache"/>
 				</div>						
 				<div class="clear"></div>
 			</div>

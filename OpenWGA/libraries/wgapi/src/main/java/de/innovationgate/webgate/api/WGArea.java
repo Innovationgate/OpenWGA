@@ -96,8 +96,7 @@ public class WGArea extends WGSchemaDocument implements PageHierarchyNode {
         METAINFO_READERS.setInputConverter(new MetaConverter() {
 
             public Object convert(WGDocument doc, MetaInfo metaInfo, Object value) throws WGAPIException {
-                List readers = (List) value;
-                    
+            	List<String> readers = (List) value;
                 // Test if the current user is contained in the list. If not, he is added to avoid self disclosure
                 if (!WGDatabase.anyoneAllowed(readers) && !doc.getDatabase().isMemberOfUserList(readers)) {
                     readers.add(doc.getDatabase().getSessionContext().getUser());
@@ -110,7 +109,9 @@ public class WGArea extends WGSchemaDocument implements PageHierarchyNode {
     
 	public static final String META_EDITORS = "EDITORS";
     public static final MetaInfo METAINFO_EDITORS = new MetaInfo(META_EDITORS, String.class, Collections.EMPTY_LIST);
-    static { METAINFO_EDITORS.setMultiple(true); };
+    static { 
+    	METAINFO_EDITORS.setMultiple(true);
+    };
     
     public static final String META_SYSTEM = "SYSTEM";
     public static final MetaInfo METAINFO_SYSTEM = new MetaInfo(META_SYSTEM, Boolean.class, Boolean.FALSE);
@@ -683,20 +684,16 @@ public class WGArea extends WGSchemaDocument implements PageHierarchyNode {
 
     public void performSaveCheck() throws ResourceIsLockedException, WGAPIException {
         super.performSaveCheck();
-        
-        List readers = (List) getEffectiveReaders();
-        if (!WGDatabase.anyoneAllowed(readers) && !this.db.isMemberOfUserList(readers)) {
-            throw new WGAuthorisationException("You are not authorized to modify this area", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_AREA);
-        }
-    
-        List editors = (List) getEffectiveEditors();
-        if (!WGDatabase.anyoneAllowed(editors) && !this.db.isMemberOfUserList(editors)) {
-            throw new WGAuthorisationException("You are not authorized to modify this area", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_AREA);
-        }
-        
+
         if (!getDatabase().isDoctypeModifiable(WGDocument.TYPE_AREA)) {
             throw new WGIllegalStateException("Updating areas via WGAPI is not permitted in this database", WGIllegalStateException.ERRORCODE_DOCTYPE_READONLY);
         }
+
+        List readers = (List) getEffectiveReaders();
+        if (!WGDatabase.anyoneAllowed(readers) && !this.db.isMemberOfUserList(readers)) {
+            throw new WGAuthorisationException("You are not authorized to modify read protecting area", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_AREA);
+        }
+        
     }
     
     /**
@@ -925,5 +922,9 @@ public class WGArea extends WGSchemaDocument implements PageHierarchyNode {
         getCache().setRootEntryCountCache(rootEntryCountCache);
     }
 
+    public boolean isTrashArea() throws WGAPIException{
+    	return getName().startsWith("$trash");
+    }
+    
 }
 

@@ -1,7 +1,7 @@
 function Controller() {}
 
 // Vererbung
-Controller.prototype = Object.create($$.StructList.prototype);
+Controller.prototype = Object.create($.dialogs.StructList.prototype);
 
 Controller.prototype.createPage = function(AFW, App, $cx, $form, $profile) {
 

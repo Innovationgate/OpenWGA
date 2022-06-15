@@ -404,7 +404,9 @@ this.timeElapsed = function(d){
 		if(houres<24)
 			return WGA.design(this).label("time.hours-ago", createlist([format(houres, "0")]));
 		else {
-			var days = houres/24
+			// more then 24 houres ago
+			var ms = WGA.dateOnly(createdate()).time - WGA.dateOnly(d).time;
+			var days = ms/(1000*60)/60/24 
 			if(days<2)
 				return WGA.design(this).label("time.one-day-ago");
 			return WGA.design(this).label("time.days-ago", createlist([format(days, "0")]));

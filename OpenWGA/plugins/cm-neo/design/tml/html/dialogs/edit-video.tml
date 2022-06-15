@@ -44,7 +44,8 @@
 	</tml:script>
 	
 	<div class="header">
-		Video Poster bearbeeiten
+		Video Poster bearbeiten
+		<a data-modal="hide">&times;</a>
 	</div>
 	
 	<div class="content" style="text-align:center">

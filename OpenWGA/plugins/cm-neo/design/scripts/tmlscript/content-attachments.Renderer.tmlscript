@@ -7,6 +7,8 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey)
 	var c = context("db:" + $urlParam_dbkey + "/docid:" + $urlParam_contentkey, false)
 	if(c){
 
+		result.title = WGA.encode("html", c.TITLE);
+
 		var attachments = WGA.createList()
 		attachments.addAll(c.content().getFileNames());
 		WGA.sortList(attachments, function(a,b){
@@ -36,9 +38,9 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey)
 			for(let filename in Iterator(filetypes.get(type))){
 				var Attachment = AFW.content(c).attachment(filename);
 				files.push({
-					filename: WGA.encode("JSON", filename),
+					filename: filename,
 					isPrimary: filename==primary,
-					filetitle: WGA.encode("JSON", c.content().getFileMetaData(filename).getTitle() || filename),
+					filetitle: c.content().getFileMetaData(filename).getTitle() || filename,
 					url: c.fileurl(filename),
 					filesize: WGA.format(Attachment.fileSize, "0"),
 					poster: Attachment.getPosterURL({checksum:true}),

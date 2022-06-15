@@ -27,23 +27,18 @@ package de.innovationgate.wgpublisher.files.derivates;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import de.innovationgate.utils.ImageScaler;
 import de.innovationgate.utils.MimeTypeSpecificImageScaler;
-import de.innovationgate.utils.TemporaryFile;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGException;
-import de.innovationgate.webgate.api.WGFactory;
 import de.innovationgate.webgate.api.WGFileAnnotations;
 import de.innovationgate.webgate.api.WGFileMetaData;
 import de.innovationgate.wga.server.api.WGA;
-import de.innovationgate.wgpublisher.WGAServerException;
 import de.innovationgate.wgpublisher.webtml.utils.ImageScalerFactory;
 
 public class ThumbnailDerivateCreator implements FileDerivateCreator {
@@ -55,7 +50,7 @@ public class ThumbnailDerivateCreator implements FileDerivateCreator {
         private int _height = -1;
         
         public ThumbnailSize(int widthParam, int heightParam) {
-            super("thumbnail" + String.valueOf(widthParam) + "x" + String.valueOf(heightParam), WGFileAnnotations.USAGE_POSTER);
+            super("poster-" + String.valueOf(widthParam) + "x" + String.valueOf(heightParam), WGFileAnnotations.USAGE_POSTER);
             _width = widthParam;
             _height = heightParam;
         }
@@ -68,8 +63,9 @@ public class ThumbnailDerivateCreator implements FileDerivateCreator {
             return _height;
         }
     }
-    //100, 320, 768 und 1024
-    public static final String DEFAULT_THUMBNAIL_SIZES = "2048x-1,1536x-1,1024x-1,768x-1,320x-1,100x-1";
+
+    //public static final String DEFAULT_THUMBNAIL_SIZES = "2048x-1,1536x-1,1024x-1,768x-1,320x-1,100x-1";
+    public static final String DEFAULT_THUMBNAIL_SIZES = "2048,1536,1024,768,320,100";
     
     public static final Set<String> SUPPORTED_MIMETYPES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(new String[] {"image/jpeg", "image/jpg", "image/png"})));
    
@@ -82,14 +78,18 @@ public class ThumbnailDerivateCreator implements FileDerivateCreator {
         
         Set<ThumbnailSize> thumbnailSizes = new HashSet<ThumbnailDerivateCreator.ThumbnailSize>();
         List<String> configuredSizes = (List<String>) wga.app(content.getDatabase()).getPublisherOption(DBATTRIB_THUMBNAIL_SIZES);
+        float ratio = (float)md.getDisplayWidth() / md.getDisplayHeight();
         for (String configuredSizeStr : configuredSizes) {
             try {
+                int width;
                 int xPos = configuredSizeStr.indexOf("x");
-                if (xPos == -1) {
-                    throw new IllegalArgumentException("Thumbnail size string must be of format <width>x<height>");
+                if (xPos > 0) {
+                	// old style config width x height
+                	width = Integer.parseInt(configuredSizeStr.substring(0, xPos));
                 }
-                int width = Integer.parseInt(configuredSizeStr.substring(0, xPos));
-                int height = Integer.parseInt(configuredSizeStr.substring(xPos + 1));
+                else width = Integer.parseInt(configuredSizeStr);
+                //int height = Integer.parseInt(configuredSizeStr.substring(xPos + 1));
+                int height = Math.round(width / ratio);
                 thumbnailSizes.add(new ThumbnailSize(width, height));
                 
             }

@@ -1,55 +1,6 @@
-<tml:action id="delete-page">
-
-	var struct = content() ? content().getStructEntry() : document;
-
-	portlet.fireevent("page-deleted", {
-		id: struct.getStructKey() 
-	})
-	
-	var redirecturl = WGA.app().getHomepageURL() || "/"+WGA.app().dbKey;
-	var lang = $option_dialog_options.language || WGA.app().db().getDefaultLanguage();
-	
-	var redirectContent = null;
-	
-	var redirectStruct = struct.getPreviousSibling();
-	if(redirectStruct){
-		redirectContent = context("docid:" + redirectStruct.getStructKey() + "<" + lang + ">", false);
-	}
-	if(!redirectContent){
-		redirectStruct = struct.getNextSibling();
-		redirectContent = redirectStruct && context("docid:" + redirectStruct.getStructKey() + "<" + lang + ">", false);
-	}
-	if(!redirectContent){
-		redirectStruct = struct.getParentEntry();
-		redirectContent = redirectStruct && context("docid:" + redirectStruct.getStructKey() + "<" + lang + ">", false);
-	}
-		
-	if(redirectContent)
-		redirecturl = redirectContent.contenturl();
-	/* else go to home page */
-	
-	portlet.fireevent("close-dialog", {
-		redirectto: redirecturl
-	})
-
-	struct.remove();
-	portlet.setmode("hidden");
-
-</tml:action>
-
 <tml:case portletmode="view">
 
-	<tml:script>
-		var struct = content() ? content().getStructEntry() : document;
-		var Struct = AFW.structentry(struct)
-		_mayDelete = Struct.mayDeletePage(true);
-		if(!_mayDelete){
-			_reason = Struct.getReason();
-		}
-		_isHomepage = WGA.app().getHomepage() && WGA.app().getHomepage().STRUCTKEY==struct.getStructKey()
-	</tml:script>
-	
-	<tml:if istrue="_mayDelete">
+	<tml:if istrue="$mc.mayDelete">
 		<tml:then>
 			<div class="header">
 				Seite löschen
@@ -57,18 +8,25 @@
 			</div>
 			
 			<div class="content">
-				<tml:case istrue="_isHomepage">
+				<tml:case if="$mc.isHomepage">
 					<div class="alert alert-danger">
 						<h4>Dies ist die Homepage der Website.</h4>
 						Die Website wird nicht mehr korrekt funktionieren, wenn Sie diese Seite löschen.
 					</div> 
+				</tml:case>
+				<tml:case if="$mc.unames.size">
+					<div class="alert alert-danger">
+						<h4>Eindeutige Namen gefunden:</h4>
+						<ul style="margin:10px 0"><tml:item name="$mc.unames" divider="</li><li>" wrap="li"/></ul>
+						<p>Die eindeutigen Namen werden entfernt. Die Website wird danach evtl. nicht mehr korrekt arbeiten.</p>
+					</div>
 				</tml:case>
 				Möchten Sie die Seite "<tml:meta name="title"/>" inklusiver aller Inhaltsversionen und Unterseiten wirklich löschen?
 			</div>
 			
 			<div class="footer">
 				<a class="btn btn-default" data-modal="hide">Abbrechen</a>
-				<tml:button cssclass="btn btn-primary" clickaction="delete-page">Löschen</tml:button>
+				<tml:button cssclass="btn btn-primary" clickaction="$mc.deletePage">Löschen</tml:button>
 			</div>
 		</tml:then>
 		<tml:else>
@@ -79,7 +37,7 @@
 			
 			<div class="content">
 				Die Prüfung Ihrer Berechtigung zum Löschen der Seite "<tml:meta name="title"/>" ergab:
-				<div style="color:red"><tml:item name="_reason"/></div>
+				<div style="color:red"><tml:item name="$mc.reason" encode="none"/></div>
 			</div>
 			
 			<div class="footer">

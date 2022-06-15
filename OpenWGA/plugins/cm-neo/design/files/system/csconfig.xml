@@ -41,16 +41,24 @@
     </de.innovationgate.wga.common.beans.csconfig.v1.MediaKey>
   </mediaKeys>
   <roles/>
-  <jobDefinitions/>
+  <jobDefinitions>
+    <de.innovationgate.wga.common.beans.csconfig.v1.JobDefinition>
+      <__name>trash-maintenance</__name>
+      <__description>Trash maintenance</__description>
+      <__resource>jobs:trash-maintenance</__resource>
+      <__type>1</__type>
+      <schedule>0 00 01 * * ?</schedule>
+    </de.innovationgate.wga.common.beans.csconfig.v1.JobDefinition>
+  </jobDefinitions>
   <pluginConfig class="de.innovationgate.wga.common.beans.csconfig.v5.PluginConfig">
     <id>
       <uniqueName>de.innovationgate.cm-neo</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>9</minorVersion>
-        <maintenanceVersion>8</maintenanceVersion>
+        <minorVersion>10</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>710</buildVersion>
+        <buildVersion>711</buildVersion>
       </version>
     </id>
     <title>OpenWGA Content Manager</title>

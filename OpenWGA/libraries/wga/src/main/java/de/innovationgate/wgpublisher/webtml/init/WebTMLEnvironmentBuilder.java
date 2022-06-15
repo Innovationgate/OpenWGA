@@ -118,8 +118,10 @@ public class WebTMLEnvironmentBuilder {
         if (data != null) {
             if (data.getFormInfoItem() != null) {
                 form = processTMLForm(context, _request, data, _ajaxInfo);
-                context.getEnvironment().setForm(form);
-                _request.setAttribute(WGACore.ATTRIB_POSTED_TMLFORM, form);
+                if(form!=null){
+	                context.getEnvironment().setForm(form);
+	                _request.setAttribute(WGACore.ATTRIB_POSTED_TMLFORM, form);
+                }
             }
             else {
                 WGA.get(context).tmlPage().setVar("multipartData", data.getFileItems());

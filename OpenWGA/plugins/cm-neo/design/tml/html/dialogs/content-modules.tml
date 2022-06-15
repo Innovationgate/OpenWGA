@@ -6,7 +6,7 @@
 			if(!tmlform.hasfield(setting))
 				tmlform.setField(setting, settings_map.get(setting))
 		}
-		_mayEdit = STATUS==content().STATUS_DRAFT && AUTHOR==meta("db", "username")
+		_mayEdit = STATUS==content().STATUS_DRAFT && AUTHOR==meta("db", "username") && !content().structEntry.area.isTrashArea()
 		/*
 		  #00005453
 		  Don't allow ChiefEditors to edit in this case

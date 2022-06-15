@@ -293,7 +293,7 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 			click: function(e){
 				var panel = $("#sidepannel-content-attachments");
 				var el = $(this);
-				if(e.metaKey){
+				if(e.metaKey || e.ctrlKey){
 					el.toggleClass("selected")
 				}
 				else{

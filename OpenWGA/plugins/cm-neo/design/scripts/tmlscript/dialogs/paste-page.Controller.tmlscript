@@ -1,11 +1,9 @@
 function Controller() {}
 
-Controller.prototype.prepare = function($cx) {
+// Vererbung
+Controller.prototype = Object.create($.dialogs.StructList.prototype);
 
-	/*
-	 * The following code needs wga 7.6 to work.
-	 * this bc. $cx is not correctly initialised in ajax portlet requests
-	 */ 
+Controller.prototype.prepare = function($cx) {
 
 	// Areas
 	var areas = WGA.createList()
@@ -64,6 +62,9 @@ Controller.prototype.isAllowedPageType = function(AFW, $cx, $item__CM_clipboard_
 		var area = $field_area || $cx.AREA
 		dest = $cx.db().getArea(area)
 	}
+	else if(dest.getArea().name=="$trash-cm-neo"){
+		return false;	
+	}
 	
 	if(!Contenttype.isAllowed(dest)){
 		return false;
@@ -71,14 +72,13 @@ Controller.prototype.isAllowedPageType = function(AFW, $cx, $item__CM_clipboard_
 	return true;
 }
 
-Controller.prototype.destinationHasChildren = function($cx, $form){
+Controller.prototype.destinationChildren = function($cx, $form){
 	if($form.root_or_child=="root"){
-		var dest = $cx.db().getArea($form.area)
-		return dest.getRootEntries().size() > 0;
+		return $cx.db().getArea($form.area).getRootEntries()
 	}
 	else{
 		var dest = $cx.document instanceof Packages.de.innovationgate.webgate.api.WGStructEntry ? $cx.document : $cx.content().structEntry;
-		return dest.hasChildren();
+		return dest.getChildEntries();
 	}
 } 
 
@@ -101,6 +101,19 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 
 	try{
 		var struct = copyStruct(source, dest, $form.recursive, $form.publish, $form.position)
+		if($form.position){
+			var children; 
+			if(dest instanceof Packages.de.innovationgate.webgate.api.WGArea)
+				children = dest.getRootEntries();
+			else children = dest.getChildEntries();
+			
+			if(children.size()>0){
+				var position = this.preparePosition(dest.getDatabase(), children, $form.position)
+				struct.setPosition(position);
+				struct.save();
+			}
+		}
+				
 		var url;
 		try{
 			url = $cx.context("docid:"+struct.structKey).contenturl()
@@ -125,7 +138,7 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 		logException(e);
 	}
 
-	function copyStruct(source, dest, recursive, publish, position){
+	function copyStruct(source, dest, recursive, publish){
 		//console.log("copy", source.title, "to", dest.title || dest.name, recursive, publish)
 
 		var Contenttype = AFW.contenttype(source.getContentType().name);
@@ -157,24 +170,6 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 		for(let name in Iterator(source.getExtensionDataNames())){
 			source.mayPushExtData(name) && struct.writeExtensionData(name, source.getExtensionData(name));
 		}
-
-		if(position){
-			if(dest instanceof Packages.de.innovationgate.webgate.api.WGArea){
-				var rootEntries = dest.getRootEntries();
-				if(rootEntries.size()){
-					if(position=="end")
-						struct.setPosition(rootEntries.getByIndex(rootEntries.size()-1).getPosition()+100);	// APPEND TO END
-					else struct.setPosition(rootEntries.getByIndex(0).getPosition()-100);	// APPEND TO START
-				}
-			}
-			else if(dest.hasChildren()){
-				var children = dest.getChildEntries();
-				if(position=="end")
-					struct.setPosition(children.getByIndex(children.size()-1).getPosition()+100);	// APPEND TO END
-				else struct.setPosition(children.getByIndex(0).getPosition()-100);	// APPEND TO START
-			}
-		}
-		else struct.setPosition(source.getPosition());	// default
 		
 		struct.save();
 		

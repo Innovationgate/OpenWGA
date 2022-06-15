@@ -1204,7 +1204,6 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
     	if(parent instanceof TMLContext){
     		parent = ((TMLContext)parent).content();    		
     	}
-        @SuppressWarnings("deprecation")
 		HDBModelParams params = new HDBModelParams(HDBModel.TYPE_CONTENT);
         params.setContentClass(contentClass);
         params.setRefDocument((WGContent)parent);

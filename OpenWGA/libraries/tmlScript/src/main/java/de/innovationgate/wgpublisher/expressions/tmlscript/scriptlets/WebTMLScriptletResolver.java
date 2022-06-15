@@ -443,14 +443,12 @@ public class WebTMLScriptletResolver {
             } catch (Exception e) {
                 // container is no valid content key
             }   
-            if (contentKey != null && contentKey.isValid() && contentKey.getVersion() != 0) {
-                contentKey = new WGContentKey(contentKey.getStructKey(), contentKey.getLanguage(), 0);
-                containerName = contentKey.toString();
-            }
-            if(contentKey != null){
-                targetContext = targetContext.context("docid:" + contentKey, false);
-            	if(targetContext==null)
-            		return "";
+            if (contentKey != null && contentKey.isValid()){
+            	if(contentKey.getVersion() != 0) {
+	                contentKey = new WGContentKey(contentKey.getStructKey(), contentKey.getLanguage(), 0);
+	                containerName = contentKey.toString();
+	            }
+                targetContext = context.context("docid:" + contentKey);
             }
         }
         
@@ -471,7 +469,7 @@ public class WebTMLScriptletResolver {
         	if (derivates == null)
         		derivates = (String) context.option(Base.OPTION_IMAGE_DERIVATES);
             if (derivates != null) {
-                DerivateQuery derivateQuery = FileDerivateManager.parseDerivateQuery(derivates);
+            	DerivateQuery derivateQuery = targetContext.enhanceFileDerivateQuery(derivates);
                 WGA wga = WGA.get(targetContext);
                 if(wga.selectDerivate(fileName, derivateQuery.toString())==null)
                 	derivateQuery = targetContext.enhanceFileDerivateQuery("usage=poster"); 
@@ -592,7 +590,7 @@ public class WebTMLScriptletResolver {
         	derivates = (String) context.option(Base.OPTION_IMAGE_DERIVATES);
         DerivateQuery derivateQuery = null;
         if (derivates != null) {
-            derivateQuery = context.getwgacore().getFileDerivateManager().parseDerivateQuery(derivates);
+            derivateQuery = targetContext.enhanceFileDerivateQuery(derivates);
             imgURL = addDerivateQueryToURL(context, derivateQuery, imgURL);
         }
         WGFileMetaData md = targetContext.content().getFileMetaData(fileName);

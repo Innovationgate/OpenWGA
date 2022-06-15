@@ -104,6 +104,9 @@ App.prototype.getStructData = function(doc, lang) {
 
 App.prototype.mayUpdateContent = function(ctx) {
 
+	if(ctx.AREA=="$trash-cm-neo")
+		return false;
+
 	if(WGA.app(ctx.meta("db", "dbkey")).isChiefEditor())
 		return true;
 

@@ -78,7 +78,7 @@
 					var c = context("docid:"+doc.getStructKey(), false)
 					if(c)
 						title = c.TITLE;
-					pages.push("Nach '" + title + "'|" + doc.getStructKey().toString())
+					pages.push("Nach '" + WGA.encode("html", title) + "'|" + doc.getStructKey().toString())
 				}
 				_optgroups=null;
 				if(pages.length>1)
@@ -107,12 +107,13 @@
 	</div>
 
 	<script>
-		require(["jquery", "siteexplorer"], function($, S){		
+		require(["jquery", "siteexplorer", "select2"], function($, S){		
 			$("#form-create-page button").click(function(ev){
 				ev.preventDefault();
 				S.forceReload();
 				WGA.ajax.callAction("<tml:action ref="$mc.createPage"/>");
 			})
+			$("select").select2({width:"100%"})
 		})
 	</script>	
 </tml:form>	

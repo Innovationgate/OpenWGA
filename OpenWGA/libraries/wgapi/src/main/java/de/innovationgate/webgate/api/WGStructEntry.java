@@ -751,6 +751,16 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
     }
 
     /**
+     * Sets the content type
+     * 
+     * @param contenttype name
+     * @throws WGAPIException 
+     */
+    public boolean setContentType(String name) throws WGAPIException {
+        return setMetaData(META_CONTENTTYPE, name);
+    }
+
+    /**
      * Returns the child entries of this struct entry
      * @throws WGAPIException 
      */

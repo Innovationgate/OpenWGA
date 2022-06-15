@@ -325,6 +325,8 @@ public class SrcSetCreator implements WGAAwareService {
     	SrcSetCreator ssc = wga.service(SrcSetCreator.class);
     	WGFileMetaData fileMeta = ctx.content().getFileMetaData(filename);
     	Dimension maxAvailableSize = ssc.getMaxAvailablePosterSize(fileMeta);
+    	if(maxAvailableSize==null)
+    		return "";
     	URLBuilder builder = wga.urlBuilder(ctx.fileurl(filename));
     	builder.setParameter(WGPDispatcher.URLPARAM_DERIVATE, derivateQuery);
         return ssc.createSrcSet(builder, false, maxAvailableSize, imgSet);

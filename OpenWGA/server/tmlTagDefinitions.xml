@@ -3552,6 +3552,15 @@
       <bodycontent>JSP</bodycontent>
       <attributes>
         <attribute>
+          <name>onlyvisible</name>
+          <required>false</required>
+          <values>
+            <string>true</string>
+            <string>false</string>
+          </values>
+          <valueHelpEnabled>false</valueHelpEnabled>
+        </attribute>
+        <attribute>
           <name>onlypublished</name>
           <required>false</required>
           <values>
@@ -4443,6 +4452,12 @@
       <description>Embedding a WebTML module</description>
       <bodycontent>JSP</bodycontent>
       <attributes>
+        <attribute>
+        	<name>imagederivates</name>
+        	<required>false</required>
+        	<values/>
+        	<valueHelpEnabled>false</valueHelpEnabled>
+        </attribute>
         <attribute>
           <name>forcestate</name>
           <required>false</required>

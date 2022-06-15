@@ -300,7 +300,7 @@ public class Root extends Base {
 	        		&& content.getDatabase().isMemberOfUserList(userNamesList)
 	        		&& !content.hasItem("remote_info")
 	        		&& request.getParameter(WGACore.URL_PARAM_CLEAN)==null
-	        		&& !(content.hasCompleteRelationships() && content.getStructEntry().getArea().getName().equals("$trash"))
+	        		&& !(content.hasCompleteRelationships() && content.getStructEntry().getArea().isTrashArea())
 	        		) {			        		
 	        			request.setAttribute(WGACore.ATTRIB_EDITDOCUMENT, content.getContentKey().toString());
 	        	}

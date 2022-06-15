@@ -1,0 +1,38 @@
+function Renderer() {
+}
+
+Renderer.prototype.render = function(AFW) {
+
+	var params = AFW.Util.deserializeJsObject(request.getParameter("so"))
+	var dbkey = params.dbkey;
+	var query = request.getParameter("query");
+	
+	var usersGroups = WGA.createList();
+	
+	if(!dbkey){
+		log.info("ldap-lookup without dbkey called");
+		// return empty list
+	}
+	else{
+		var authModule = db(dbkey).getAuthenticationModule();
+		var queryType = Packages.de.innovationgate.webgate.api.auth.AuthenticationModule.QUERY_USERS_AND_GROUPS;
+		if (authModule.isQueryable(queryType)) {
+			usersGroups = authModule.query(query, queryType);
+		}	
+	}
+
+	var ret = {
+		data: []
+	}
+	for(let entry in Iterator(usersGroups)){
+		ret.data.push({
+			fullname: entry.getFullQualifiedName(),
+			shortname: entry.getFullQualifiedName()
+		})
+	}
+
+	//console.log("ret", JSON.stringify(ret))
+	WGA.TMLPage.write(JSON.stringify(ret))
+
+	//WGA.TMLPage.renderDefault();
+}

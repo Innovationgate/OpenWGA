@@ -16,7 +16,7 @@
 	var may_create_root_page = false;
 	if(dbkey){
 		for(let area in Iterator(db(dbkey).getAreas().values())){
-			if(area.name=="$trash")
+			if(area.name=="$trash-cm-neo")
 				continue;
 			if(area.name=="$templates" && !WGA.app(dbkey).isChiefEditor())
 				continue;
@@ -54,6 +54,7 @@
 	var Struct = AFW.structentry(struct);
 	var pagetype = struct.getContentType();
 	var area = struct.getArea().name;
+	var is_in_trash = (area=="$trash-cm-neo")
 	while(struct){
 		path.unshift(struct.getStructKey())
 		struct = struct.getParentEntry();
@@ -69,14 +70,15 @@
 	
 	event.setParameter("pagetype", pagetype.getNameForLanguage("de"));
 	
-	event.setParameter("may_create_content", Struct.mayCreateContent());
-	event.setParameter("may_create_child_page", Struct.mayCreatePage());
-	event.setParameter("may_delete_page", Struct.mayDeletePage());
+	event.setParameter("may_create_content", Struct.mayCreateContent() && !is_in_trash);
+	event.setParameter("may_create_child_page", Struct.mayCreatePage() && !is_in_trash);
+	event.setParameter("may_delete_page", Struct.mayDeletePage() && !is_in_trash);
 	
 	event.setParameter("page_visible", Struct.isVisible());
 	event.setParameter("may_create_root_page", may_create_root_page);
 	
 	event.setParameter("has_released_contents", Struct.hasReleasedContents());
+	event.setParameter("is_in_trash", is_in_trash);
 	
 	if(Struct.isVisible() && contentkey){
 		event.setParameter("contentkey", contentkey)
@@ -87,18 +89,21 @@
 			event.setParameter("status", c.STATUS)
 			event.setParameter("language", c.LANGUAGE)
 			event.setParameter("ismine", c.AUTHOR==c.meta("db", "username"))
+			
 			event.setParameter("may_update_content", App.mayUpdateContent(c));
 			event.setParameter("may_delete_version", Content.mayDeleteContent());
 			event.setParameter("may_archive_version", Content.mayArchiveContent());
-			event.setParameter("may_approve_version", c.STATUS==c.content().STATUS_REVIEW && !c.content().isPendingRelease() && Content.mayApprove());
+			event.setParameter("may_publish_page", c.STATUS==c.content().STATUS_DRAFT && Content.isMine() && !is_in_trash);
+			event.setParameter("may_approve_version", !is_in_trash && c.STATUS==c.content().STATUS_REVIEW && !c.content().isPendingRelease() && Content.mayApprove());
 			event.setParameter("may_edit_content", 
 				(c.STATUS==c.content().STATUS_RELEASE 
 					|| c.STATUS==c.content().STATUS_ARCHIVE 
 					|| (c.STATUS==c.content().STATUS_DRAFT && !Content.isMine())
 					|| (c.STATUS==c.content().STATUS_REVIEW && c.content().isPendingRelease())
 				) 
-				&& Content.mayEditContent()
+				&& Content.mayEditContent() && !is_in_trash
 			);
+			
 			event.setParameter("has_userdefined_settings", Content.getUserdefinedMetasTML()!=null)
 		}
 	}

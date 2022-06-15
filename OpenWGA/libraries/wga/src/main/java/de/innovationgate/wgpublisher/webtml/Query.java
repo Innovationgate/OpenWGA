@@ -135,6 +135,8 @@ public class Query extends Base implements DynamicAttributes  {
     private String highlight;
 
     private String enhance;
+    
+    private String onlyvisible;
 
     private String max;
 
@@ -365,21 +367,11 @@ public class Query extends Base implements DynamicAttributes  {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
     public Map<String, Object> buildAttributes(WGDatabase db) throws WGAPIException, TMLException {
         
         Map<String,Object> params = new HashMap<String, Object>();
         params.put(Database.QUERYATT_ONLYPUBLISHED, this.getOnlypublished());
+        params.put(Database.QUERYATT_ONLYVISIBLE, this.getOnlyvisible());
         params.put(Database.QUERYATT_ALLLANGUAGES,this.getAlllanguages());
         params.put(Database.QUERYATT_INCLUDECURRENT, this.getIncludecurrent());
         params.put(Database.QUERYATT_ROLE, this.getRole());
@@ -489,6 +481,13 @@ public class Query extends Base implements DynamicAttributes  {
         this.max = max;
     }
 
+    public String getOnlyvisible(){
+    	return this.getTagAttributeValue("onlyvisible", onlyvisible, "true");
+    }
+    public void setOnlyvisible(String flag){
+    	this.onlyvisible=flag;
+    }
+    
     /**
      * Gets the enhance
      * 

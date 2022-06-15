@@ -497,16 +497,13 @@ public class ForEach extends Base implements IterationTag {
 		}
 		
 		// sorting of entries - We must prefetch all contents here to be able to sort them in WebTML
-		String sortOrder = this.getSortorder();
-		if (sortOrder != null && !sortOrder.equals("none")) {
+		if(getSortexpression()!=null || getSortcomparison()!=null || getSortmeta()!=null || getSortitem()!=null){
 		    List<Object> objects = objectIterator.extractCompleteList();
-			if (!status.forEachType.equals("content")) {
+			if (!status.forEachType.equals("content")) 
 				valueSort(objects);
-			}
-			else {
-				contentSort(objects);
-			}
+			else contentSort(objects);
 			
+			String sortOrder = this.getSortorder();	
 			if (sortOrder.startsWith("desc")) {
 				Collections.reverse(objects);
 			}
@@ -857,8 +854,11 @@ public class ForEach extends Base implements IterationTag {
             
 			// Try to use the current object as a context, for changing the context inside the loop
 			TMLContext targetContext = retrieveTargetContext(status.currentObject);
-			if (targetContext instanceof TMLContext) {
-				this.setChildTagContext(getTMLContextForDocument(targetContext.content())); // Convert to "native" TMLContext for the current design context
+			if (targetContext !=null && targetContext instanceof TMLContext) {
+				WGContent c = targetContext.content();
+				if(c!=null)
+					this.setChildTagContext(getTMLContextForDocument(c)); // Convert to "native" TMLContext for the current design context
+				else this.setChildTagContext(targetContext);
 			}
 			
 			if (this.getCurrentvalue() != null) {
@@ -1049,7 +1049,7 @@ public class ForEach extends Base implements IterationTag {
 	 * @return Returns a String
 	 */
 	public String getSortorder() {
-		return this.getTagAttributeValue("sortorder", sortOrder, null);
+		return this.getTagAttributeValue("sortorder", sortOrder, "ascending");
 	}
 	/**
 	 * Sets the sortOrder

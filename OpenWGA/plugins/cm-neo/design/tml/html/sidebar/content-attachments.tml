@@ -2,6 +2,14 @@
 
 	{{#context}}
 	<div class="panel panel-default">
+		{{#title}}
+		<div class="panel-heading">
+			<div class="title">{{{title}}}</div>
+			<a href="#" title="Seite neu laden" data-action="reload">
+				<i class="fas fa-sync"></i>
+			</a>			
+		</div>
+		{{/title}}
 		<div class="panel-body">
 
 			{{#filetypes}}

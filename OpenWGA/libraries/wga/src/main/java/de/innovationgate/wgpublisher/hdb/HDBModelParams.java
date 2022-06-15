@@ -34,7 +34,6 @@ import de.innovationgate.webgate.api.WGContentKey;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wga.server.api.tml.Form;
-import de.innovationgate.wgpublisher.webtml.form.TMLForm;
 import de.innovationgate.wgpublisher.webtml.utils.UniqueNamePartFormatter;
 
 /**
@@ -75,7 +74,6 @@ public class HDBModelParams {
 
 	/**
 	 * Constructor.
-	 * @deprecated Use methods {@link HDBModel#newCreateContentParams(String, WGContent)}, {@link HDBModel#newUpdateContentParams(WGContent)} or {@link HDBModel#newDeleteContentParams(WGContent)}
 	 * @param type Type of document to update. Use constants TYPE_... on {@link HDBModel}
 	 */
 	public HDBModelParams(String type) {
@@ -84,7 +82,6 @@ public class HDBModelParams {
 
     /**
      * Constructor.
-     * @deprecated Use methods {@link HDBModel#newCreateContentParams(String, WGContent)}, {@link HDBModel#newUpdateContentParams(WGContent)} or {@link HDBModel#newDeleteContentParams(WGContent)}
      * @param content Document on which the operation will be performed
      */
     public HDBModelParams(WGContent content) throws WGAPIException {

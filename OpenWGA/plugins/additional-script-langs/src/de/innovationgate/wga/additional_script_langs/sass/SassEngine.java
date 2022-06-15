@@ -104,7 +104,8 @@ public class SassEngine {
 	    catch(ScriptException e){
 	    	  StringReader reader = new StringReader(sw.toString());
 	    	  List<String> errors = IOUtils.readLines(reader);
-		      _wga.getLog().error("SASS ERROR: " + errors.get(0));
+	    	  if(errors.size()>0)
+	    		  _wga.getLog().error("SASS ERROR: " + errors.get(0));
 		      throw new Exception("SASS Exception");
 	    }
 	    catch (Exception e) {
