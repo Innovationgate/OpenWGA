@@ -98,6 +98,7 @@ import de.innovationgate.wgpublisher.expressions.tmlscript.scopes.RhinoScope;
 import de.innovationgate.wgpublisher.expressions.tmlscript.scopes.TMLScriptObjectParentScope;
 import de.innovationgate.wgpublisher.expressions.tmlscript.scopes.TMLScriptRootScope;
 import de.innovationgate.wgpublisher.expressions.tmlscript.wrapping.ContextWrapper;
+import de.innovationgate.wgpublisher.expressions.tmlscript.wrapping.ListWrapper;
 import de.innovationgate.wgpublisher.mail.SmtpMail;
 import de.innovationgate.wgpublisher.scheduler.JobContext;
 import de.innovationgate.wgpublisher.webtml.actions.TMLAction;
@@ -1037,7 +1038,7 @@ public class WGAGlobal extends ScriptableObject implements Wrapper {
         if (args.length == 1) {
         	@SuppressWarnings("unchecked")
         	Object arg = args[0];
-        	if(arg instanceof Collection){
+        	if(arg instanceof Collection || arg instanceof ListWrapper){
 				Collection<Object> objects = (Collection<Object>) Context.jsToJava(args[0], Collection.class);
 	        	return get(thisObj).getWga().createList(objects);
         	}
