@@ -315,6 +315,10 @@ public class WGA {
                 }
             }
             else if (o1 instanceof Comparable && o2 instanceof Comparable) {
+            	if(o1 instanceof Integer)
+            		o1 = ((Integer) o1).doubleValue();
+            	if(o2 instanceof Integer)
+            		o2 = ((Integer) o2).doubleValue();
                 return ((Comparable<Object>) o1).compareTo(o2);
             }
             else {
