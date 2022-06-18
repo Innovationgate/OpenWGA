@@ -29,7 +29,7 @@ import java.util.Comparator;
 import de.innovationgate.ext.org.mozilla.javascript.Context;
 import de.innovationgate.ext.org.mozilla.javascript.Function;
 
-public class JavascriptFunctionComparator implements Comparator {
+public class JavascriptFunctionComparator implements Comparator<Object> {
 
     private Function _function;
 
