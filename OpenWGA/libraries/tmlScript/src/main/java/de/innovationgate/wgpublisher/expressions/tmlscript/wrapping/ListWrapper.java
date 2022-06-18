@@ -10,7 +10,6 @@ import de.innovationgate.ext.org.mozilla.javascript.Function;
 import de.innovationgate.ext.org.mozilla.javascript.FunctionObject;
 import de.innovationgate.ext.org.mozilla.javascript.NativeJavaObject;
 import de.innovationgate.ext.org.mozilla.javascript.Scriptable;
-import de.innovationgate.ext.org.mozilla.javascript.ScriptableObject;
 import de.innovationgate.wgpublisher.expressions.tmlscript.JavascriptFunctionComparator;
 
 public class ListWrapper extends NativeJavaObject {
