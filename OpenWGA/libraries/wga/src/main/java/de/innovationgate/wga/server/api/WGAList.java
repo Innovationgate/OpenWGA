@@ -33,8 +33,16 @@ public class WGAList extends ArrayList<Object>{
 
 	public ArrayList<Object> sortList(){
 		Comparator<Object> compare = new Comparator<Object>() {
+			@SuppressWarnings("unchecked")
 			@Override
 			public int compare(Object o1, Object o2) {
+	            if (o1 instanceof Comparable && o2 instanceof Comparable) {
+	            	if(o1 instanceof Integer)
+	            		o1 = ((Integer) o1).doubleValue();
+	            	if(o2 instanceof Integer)
+	            		o2 = ((Integer) o2).doubleValue();
+	                return ((Comparable<Object>) o1).compareTo(o2);
+	            }
 				return o1.toString().compareTo(o2.toString());
 			}
 		};
