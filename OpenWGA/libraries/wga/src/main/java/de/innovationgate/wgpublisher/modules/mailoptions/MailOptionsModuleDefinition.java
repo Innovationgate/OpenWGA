@@ -57,7 +57,7 @@ public class MailOptionsModuleDefinition implements ModuleDefinition {
 	public OptionDefinitionsMap getOptionDefinitions() {
         OptionDefinitionsMap options = new OptionDefinitionsMap();
         
-        LocalizedOptionDefinition port = new LocalizedOptionDefinition("mail.smpt.port", IntegerOptionType.INSTANCE, _bundleLoader);
+        LocalizedOptionDefinition port = new LocalizedOptionDefinition("mail.smtp.port", IntegerOptionType.INSTANCE, _bundleLoader);
         port.setOptional(true);
         options.addOption(port);
                 
