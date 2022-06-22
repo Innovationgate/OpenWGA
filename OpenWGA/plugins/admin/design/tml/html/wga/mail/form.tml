@@ -34,8 +34,6 @@
 
 	<tml:script>
 		var defs = DBM.getModuleDefinition("MailOptions", "de.innovationgate.wgpublisher.modules.mailoptions.MailOptionsModuleDefinition")
-		console.log("defs", defs);
-		console.log("options", defs.getOptionDefinitions());
 		setOption("module-definition", defs);
 	</tml:script>
 	
