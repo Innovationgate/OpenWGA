@@ -3022,9 +3022,9 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
         
         List<WGFileDerivateMetaData> all_derivates = getCore().getFileDerivates(fileName);
         if (all_derivates == null) {
-            return Collections.emptyList();
+        	all_derivates = Collections.emptyList();
         }
-        else if(usage!=null){
+        if(usage!=null){
         	List<WGFileDerivateMetaData> derivates = new ArrayList<WGFileDerivateMetaData>();
         	for (WGFileDerivateMetaData md : all_derivates) {
         		if(usage.contains(md.getUsage()))
