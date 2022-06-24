@@ -553,6 +553,7 @@ public class ModuleRegistry {
             return obj;
         }
         catch (Throwable e) {
+        	_log.error("Exception instantiating module " + moduleClass, e);
             throw new ModuleInstantiationException("Exception instantiating module " + moduleClass, e);
         }
     }
