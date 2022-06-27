@@ -46,6 +46,7 @@ import de.innovationgate.wgpublisher.expressions.tmlscript.RhinoExpressionEngine
 import de.innovationgate.wgpublisher.webtml.actions.TMLAction;
 import de.innovationgate.wgpublisher.webtml.utils.ObjectStrategy;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
+import de.innovationgate.wgpublisher.webtml.utils.TMLException;
 
 /**
  * This object allows custom TMLScript expression and script execution
@@ -464,5 +465,25 @@ public class TMLScript {
         
     }
 
+    public Object resolveScriptlets(Object input) throws WGException{
+    	return resolveScriptlets(null, input);
+    }
+    
+    public Object resolveScriptlets(TMLContext cx, Object input) throws WGException{
 
+        if (cx == null) {
+            cx = (TMLContext) _wga.tmlcontext();
+        }
+
+    	RhinoExpressionEngine rhino = ExpressionEngineFactory.getTMLScriptEngine();
+        try {
+        	Map<String,Object> params = new HashMap<String,Object>();
+        	params.put(RhinoExpressionEngine.SCRIPTLETOPTION_LEVEL, RhinoExpressionEngine.LEVEL_SCRIPTLETS);
+            return rhino.resolveScriptlets(input, (TMLContext) _wga.tmlcontext(), params);
+        }
+        catch (Exception e) {
+            throw new TMLException("Exception parsing scriptlets", e, false);
+        } 
+    	
+    }
 }
