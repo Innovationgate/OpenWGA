@@ -1238,8 +1238,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         // create highlighter
         Highlighter highlighter = getwgacore().getLuceneManager().createHighlighter(itemname, query, formatter);
         
-        // retrieve itemtext
-        String text = itemTextValue(itemname, "none");        
+        // retrieve itemtext encoding scriptlets
+        String text = itemTextValue(itemname, "scriptlets");        
         if (text == null) {
             return Collections.EMPTY_LIST;
         }
