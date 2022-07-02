@@ -683,7 +683,8 @@ this.csvWriter = function(config){
  *		columns:				Array column definitions. Required.
  *		dateFormat:				Optional date format. If empty yyyy-MM-dd HH:mm:SS is used.
  *		numberFormat:			Optional number format. If empty # ist used.
- *		skiplines:				Number of lines to skip. Default = 0.
+ *		skipLines:				Number of lines to skip. Default = 0.
+ *		trimValues:				Trmm values (remove whitespaces before and after). Default = false 
  *		divider:				Column divider. Default is Semicolon
  *		process(data, line):		Function called for each line in input stream. Required.
  *		onerror(line, key, msg):	Optional function called on errors. Set to null to ignore erors
@@ -704,13 +705,48 @@ this.csvWriter = function(config){
  */
 this.csvReader = function(config){
 
-	var skiplines = config.skiplines || 0;
+	var skiplines = config.skiplines || config.skipLines || 0;
 	var divider = config.divider || ";";
 
 	if(typeof(config.onerror)=="undefined"){
 		config.onerror=function(line, key, msg){
 	 		console.error("line " + line, "[" + key + "]:", msg);
 	 	}
+	}
+	
+	function parseLine(line){
+		// based on https://mkyong.com/java/how-to-read-and-parse-csv-file-in-java/
+		var result = [];
+		var field = "";
+		var inQuote = false;
+		var inDoubleQuote=false;
+
+		for(let [index, c] in line.split("")){
+			if(c=='"'){
+				inQuote = !inQuote;
+				if(inDoubleQuote){
+					field += '"';
+					inDoubleQuote=false;
+				}
+				else inDoubleQuote=true;
+			}
+			else {
+				inDoubleQuote=false;
+                if (c == divider && !inQuote) {
+                	if(field!='"')
+                    	result.push(field)
+                    field="";
+                } else {
+                    field += c;                 
+                }
+			}
+		}
+		// last field
+		if(field=='"')
+			result.push("");
+		else result.push(field);
+		
+		return result;
 	}
 	
 	return {
@@ -731,7 +767,7 @@ this.csvReader = function(config){
 				reader.readLine()
 				
 			for(let i=1; line = reader.readLine(); i++){
-				var values = line.split(divider);
+				var values = parseLine(line);
 				var data = {};
 				
 				for(let [index, column] in config.columns){
@@ -761,10 +797,9 @@ this.csvReader = function(config){
 							config.onerror(i, column.key, "unable to find column");
 						continue;
 					}
-					value = value.trim();
-					if(value.charAt(0)=="\"")
-						value = value.substring(1, value.length-1);
-					
+					if(config.trimValues)
+						value = value.trim();
+						
 					try{
 						if(column.type=="date")
 							value = WGA.parseDate(value, config.dateFormat || "yyyy-MM-dd HH:mm:ss")
