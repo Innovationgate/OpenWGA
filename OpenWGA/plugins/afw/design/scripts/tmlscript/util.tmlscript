@@ -755,6 +755,10 @@ this.csvReader = function(config){
 	
 			var line;
 			var inputstream;
+			
+			if(typeof(stream_or_file)=="string")
+				stream_or_file = WGA.File(stream_or_file);
+			
 			if(stream_or_file instanceof Packages.java.io.File)
 				inputstream = new Packages.java.io.FileInputStream(stream_or_file);
 			else if(stream_or_file instanceof Packages.de.innovationgate.wga.server.api.WGAFile)
