@@ -570,8 +570,8 @@ this.getAppKeysBasedOnPlugin=function(plugin_name){
  *		dateFormat:		optional date format. If Empty yyyy-MM-dd HH:mm:SS is used.
  *		divider:		Column divider. Default is Semicolon
  *
- *	Item Definition (config.items):
- *		Each item is either a Sting or Object.
+ *	Columns Definition (config.columns):
+ *		Each column is either a Sting or Object.
  *		If String, the itemvalue or metavalue is written (meta if String is all uppercase)
  *		If Object it must have the format {label:<String>, value: <Function(TMLContext)>}
  *
