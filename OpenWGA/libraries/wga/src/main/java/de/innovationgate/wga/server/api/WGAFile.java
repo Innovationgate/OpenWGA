@@ -106,6 +106,10 @@ public class WGAFile {
 		_default_encoding = wga.getCore().getCharacterEncoding();
 	}
 
+	public String getName(){
+		return getFile().getName();
+	}
+	
 	public File getFile(){
 		return _file;
 	}
