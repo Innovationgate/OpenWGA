@@ -623,6 +623,10 @@ this.csvWriter = function(config){
 			
 		  	var out;
 		  	if(stream_or_file){
+		  		
+		  		if(stream_or_file instanceof Packages.de.innovationgate.wga.server.api.WGAFile)
+		  			stream_or_file = stream_or_file.file
+
 		  		if(stream_or_file instanceof java.io.OutputStream || stream_or_file instanceof java.io.Writer)
 		  			out = new java.io.PrintWriter(stream_or_file);
 		  		else {
