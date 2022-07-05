@@ -1483,6 +1483,8 @@ public class HDBModel implements ManagedDBAttribute, WGDesignChangeListener {
     @CodeCompletion
     public WGAbstractResultSet getRelationTargets(WGContent content, String contentClass, String relation, Map options) throws WGException, HDBModelException {
         
+    	content=getParentForContentClass(contentClass, content, false);
+    	
         Document refNode = getModelForContent(content);
         if (refNode == null) {
             throw new HDBModelException("Cannot find model for content " + content.getContentKey() + " of class " + content.getContentClass());
