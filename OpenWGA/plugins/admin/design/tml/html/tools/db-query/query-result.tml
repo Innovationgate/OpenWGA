@@ -25,7 +25,7 @@
 
 <tml:script>
 	try{
-		_result = WGA.app(tmlform.db).query(tmlform.query, {
+		_result = WGA.database(tmlform.db).query(tmlform.query, {
 			 context: isEmptyValue(tmlform.context) ? 'this' : 'db:'+tmlform.db+'/'+tmlform.context,
 		     includecurrent: true,
 			 alllanguages: tmlform.alllanguages, 
