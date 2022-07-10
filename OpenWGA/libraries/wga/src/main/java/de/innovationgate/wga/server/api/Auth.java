@@ -219,6 +219,20 @@ public class Auth {
         }
         
     }
+
+    /**
+     * Looks up user information by a distinguished user name
+     * @param dn The distinguished user name
+     * @return Information bean about the user
+     * @throws WGAServerException
+     * @throws WGQueryException
+     * @deprecated use lookupUserDN()
+     */
+    public UserGroupInfo lookupDN(String dn) throws WGException {
+    	// this name implies that all entries including groups are searched.
+    	// marked as deprecated.
+    	return lookupUserDN(dn);
+    }
     
     /**
      * Looks up user information by a distinguished user name
@@ -227,7 +241,7 @@ public class Auth {
      * @throws WGAServerException
      * @throws WGQueryException
      */
-    public UserGroupInfo lookupDN(String dn) throws WGException {
+    public UserGroupInfo lookupUserDN(String dn) throws WGException {
         
         if (_config == null) {
             throw new UnavailableResourceException("The generic Auth object cannot be used to perform this operation. Retrieve it via the Domain object to do so");
@@ -240,7 +254,30 @@ public class Auth {
         return (UserGroupInfo) mod.query(dn, AuthenticationModule.QUERY_USER_DN);
         
     }
-    
+
+    /**
+     * Looks up user or group information by any name
+     * @param dn The distinguished group name
+     * @return Information bean about the group
+     * @throws WGAServerException
+     * @throws WGQueryException
+     */
+    public UserGroupInfo lookupUserOrGroup(String name) throws WGException {
+        
+        if (_config == null) {
+            throw new UnavailableResourceException("The generic Auth object cannot be used to perform this operation. Retrieve it via the Domain object to do so");
+        }
+        
+        AuthenticationModule mod = _config.getAuthModule();
+        if (mod == null) {
+            throw new WGAServerException("No auth module configured for domain " + _domain);
+        }
+        if(mod.isQueryable(AuthenticationModule.QUERY_USER_OR_GROUP))
+        	return (UserGroupInfo) mod.query(name, AuthenticationModule.QUERY_USER_OR_GROUP);
+        return null;
+        
+    }
+
     /**
      * Fetches the common name if available
      * @param dn
@@ -251,10 +288,22 @@ public class Auth {
     	if(dn.equalsIgnoreCase(WGDatabase.ANONYMOUS_USER))
     		return dn;	// don't lookup anonymous user
     	String cn=null;
-    	UserGroupInfo info = lookupDN(dn);
+    	UserGroupInfo info = lookupUserDN(dn);
     	if(info != null && info instanceof LabeledNamesProvider)
     		cn = (String)((LabeledNamesProvider)info).getLabeledNames().get(AuthenticationModule.USERLABEL_COMMONNAME);
     	return cn != null ? cn : dn;
+    }
+    
+    public String queryDescription(String name) throws WGException{
+    	UserGroupInfo info = lookupUserOrGroup(name);
+        String description=null;
+    	if(info != null && info instanceof LabeledNamesProvider){
+    		Map labeledNames = ((LabeledNamesProvider)info).getLabeledNames();
+    		description = (String)labeledNames.get(AuthenticationModule.LABEL_DESCRIPTION);
+    		if(description==null)
+    			description = (String)labeledNames.get(AuthenticationModule.USERLABEL_COMMONNAME);
+    	}
+    	return description != null ? description : name;
     }
     
     /**

@@ -37,19 +37,21 @@ import de.innovationgate.webgate.api.WGQueryException;
 public interface AuthenticationModule {
     
     /**
-     * Query type that queries for users and groups
-     */
-    public static final String QUERY_USERS_AND_GROUPS = "queryUsersAndGroups";
-    
-    /**
      * Query type fetching a specific user and group for a given distinguished name
      */
     public static final String QUERY_USER_DN = "userDn";
+
+    /**
+     * Query type that queries for users and groups
+     */
+    public static final String QUERY_USERS_AND_GROUPS = "queryUsersAndGroups";
+    public static final String QUERY_USER_OR_GROUP = "queryUserOrGroup";
     
     /**
      * A predefined, yet optional labeled name denoting a display name for the user that is easy on the eye
      */
     public static final String USERLABEL_COMMONNAME = "commonname";
+    public static final String LABEL_DESCRIPTION = "description";
 
 	/**
 	 * Called when the Authentication module is created, providing additional information
