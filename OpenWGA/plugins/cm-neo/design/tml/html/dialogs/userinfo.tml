@@ -49,7 +49,15 @@
 		<tml:case condition="_Database.getUserGroups().size()">
 			<tml:[form-field] o_label="Gruppen" o_mode="view">
 				<div style="max-height: 200px;overflow:auto">
-					<tml:script expression="WGA.sortList(_Database.getUserGroups())" divider="<br>"/>
+					<tml:script divider="<br>">
+						return WGA.List(_Database.getUserGroups()).sortList()
+						/*
+						Dauert zu lange :-(
+						return WGA.List(_Database.getUserGroups()).map(function(name){
+							return WGA.app().domain().auth().queryDescription(name)
+						}).sortList()
+						*/
+					</tml:script> 
 				</div>
 			</tml:[form-field]>
 		</tml:case>

@@ -128,14 +128,14 @@
 				{{/pagename}}
 				
 				{{#readprotected}}
-					<div class="form-group" style="color:red">
-						<label>Lesbarkeit eingeschränkt</label>
+					<div class="form-group">
+						<label style="color:red">Lesbarkeit eingeschränkt</label>
 						{{#pagereaders.length}}
-							<p class="data">
+							<ul>
 							{{#pagereaders}}
-								{{name}}<br>
+								<li title="{{title}}">{{name}}</li>
 							{{/pagereaders}}
-							</p>
+							</ul>
 						{{/pagereaders.length}}
 					</div>
 				{{/readprotected}}
