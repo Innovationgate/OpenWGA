@@ -241,7 +241,13 @@
 	}
 }
 
-#dialog-page-settings_render, #dialog-settings_content, #dialog-settings_user-defined, #dialog-create-page_child, #dialog-create-page_root, #dialog-edit-html {
+#dialog-page-settings_render, 
+#dialog-settings_content, 
+#dialog-settings_user-defined, 
+#dialog-create-page_child, 
+#dialog-create-page_root, 
+#dialog-edit-html, 
+#dialog-userinfo {
 	width: 900px;
 	margin-left: -450px;
 }
@@ -337,18 +343,6 @@
 	}
 }
 
-#dialog-userinfo{
-	.row-wrapper {
-		margin: 5px 0;
-		label {
-			float: left;
-			width: 100px;
-		}
-		div {
-			margin-left: 110px;
-		}
-	}
-}
 
 #dialog-edit-rtf-link, #dialog-edit-rtf-image {
 	width: 800px;
