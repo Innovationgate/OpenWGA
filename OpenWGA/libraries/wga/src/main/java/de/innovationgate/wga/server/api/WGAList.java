@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 
 public class WGAList extends ArrayList<Object>{
 
@@ -21,7 +20,7 @@ public class WGAList extends ArrayList<Object>{
 		super();
 	}
 
-	public ArrayList<Object> map(JSFunction f){
+	public WGAList map(JSFunction f){
 		if(f==null)
 			return this;
 		ArrayList<Object> newList = new ArrayList<Object>();
@@ -31,7 +30,7 @@ public class WGAList extends ArrayList<Object>{
 		return new WGAList(newList);
 	}
 
-	public ArrayList<Object> sortList(){
+	public WGAList sortList(){
 		Comparator<Object> compare = new Comparator<Object>() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -50,7 +49,7 @@ public class WGAList extends ArrayList<Object>{
 		return this;
 	}
 
-	public ArrayList<Object> sortList(final JSFunction f){
+	public WGAList sortList(final JSFunction f){
 		Comparator<Object> compare = new Comparator<Object>() {
 			@Override
 			public int compare(Object o1, Object o2) {
@@ -65,7 +64,7 @@ public class WGAList extends ArrayList<Object>{
 		return this;
 	}
 	
-	public ArrayList<Object> trim(){
+	public WGAList trim(){
 		ArrayList<Object> result = new ArrayList<Object>();
 		for(Object o: this){
 			if(o==null)
@@ -77,7 +76,7 @@ public class WGAList extends ArrayList<Object>{
 		return new WGAList(result);
 	}
 	
-    public ArrayList<Object> deleteDoublets() {
+    public WGAList deleteDoublets() {
         WGAList list = new WGAList();
         for(Object o: this){
         	if(!list.contains(o))
@@ -86,7 +85,7 @@ public class WGAList extends ArrayList<Object>{
         return list;
     }
 
-	public ArrayList<Object> reverse(){
+	public WGAList reverse(){
 		Collections.reverse(this);
 		return this;
 	}
