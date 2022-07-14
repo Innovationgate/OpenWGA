@@ -78,10 +78,12 @@ public class WGAList extends ArrayList<Object>{
 	}
 	
     public ArrayList<Object> deleteDoublets() {
-        HashSet<Object> set = new HashSet<Object>(this);
-        ArrayList<Object> list = new ArrayList<Object>();
-        list.addAll(set);
-        return new WGAList(list);
+        WGAList list = new WGAList();
+        for(Object o: this){
+        	if(!list.contains(o))
+        		list.add(o);
+        }
+        return list;
     }
 
 	public ArrayList<Object> reverse(){
