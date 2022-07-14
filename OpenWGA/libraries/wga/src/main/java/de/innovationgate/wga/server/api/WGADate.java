@@ -22,7 +22,6 @@ public class WGADate extends Date{
 	}
 	
 	public WGADate(WGA wga, String date, String format, String language) throws ParseException, WGException{
-		//this(wga, wga.getDateFormat(format, wga.getCore().languageCodeToLocale(language)).parse(date));
 		this(wga, wga.parseDate(date, format, language));
 	}
 	public WGADate(WGA wga, String date, String format) throws ParseException, WGException{
