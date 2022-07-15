@@ -6,7 +6,7 @@ define(["jquery", "cm", "select2"], function($, CM){
 		
 		$("#form-settings [name=keywords]").select2({
 			tags: true,
-			tokenSeparators: [",", " "],
+			tokenSeparators: [","],
 			minimumInputLength: 1,
 			placeholder: "- keine -",
 			language: "de",
