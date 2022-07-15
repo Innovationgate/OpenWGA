@@ -5,6 +5,7 @@ import java.util.Date;
 
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGException;
+import de.innovationgate.wgpublisher.WGAServerException;
 
 public class WGADate extends Date{
 
@@ -61,5 +62,13 @@ public class WGADate extends Date{
 			return  diff / 1000;
 		return diff;
 	}
-	
+
+    public boolean isDateInFuture() throws WGException {
+        return getTime() > System.currentTimeMillis();
+    }
+    
+    public boolean isDateInPast() throws WGException {
+        return getTime() < System.currentTimeMillis();
+    }
+
 }
