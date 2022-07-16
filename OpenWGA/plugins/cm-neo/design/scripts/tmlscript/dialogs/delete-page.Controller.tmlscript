@@ -74,6 +74,7 @@ Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options
 		// move to trash area.
 		// must be a master action because user may have no right to "move pages".
 		WGA.Master.runFunction(function(struct, trasharea){
+			db().getSessionContext().setEventsEnabled(false);	// disably any content event
 			db().moveStructEntry(struct, trasharea);
 			//console.log("moveStructEntry", struct, struct.getLastModified());
 			// remove unique names:
@@ -95,7 +96,7 @@ Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options
 					removeNames(children.next())
 			}
 			removeNames(struct) 
-
+			db().getSessionContext().setEventsEnabled(true);
 		}, struct, trasharea)
 	}
 	else struct.remove();
