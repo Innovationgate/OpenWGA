@@ -2506,6 +2506,14 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
      * @return The created content, already saved, but still in draft state
      * @throws WGAPIException
      */
+    public WGContent createChildPage(String contentType, String title) throws WGAPIException {
+    	WGContentType ct = getDatabase().getContentType(contentType);
+    	if(ct==null){
+    		throw new WGAPIException("content type '" + contentType + "' does not exist");
+    	}
+    	return createChildPage(ct, title);
+    }
+    
     public WGContent createChildPage(WGContentType contentType, String title) throws WGAPIException {
 
         WGTransaction trans = getDatabase().startTransaction();
