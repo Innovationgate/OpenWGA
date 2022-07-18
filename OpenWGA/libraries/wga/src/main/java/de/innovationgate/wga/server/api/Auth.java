@@ -272,8 +272,20 @@ public class Auth {
         if (mod == null) {
             throw new WGAServerException("No auth module configured for domain " + _domain);
         }
-        if(mod.isQueryable(AuthenticationModule.QUERY_USER_OR_GROUP))
-        	return (UserGroupInfo) mod.query(name, AuthenticationModule.QUERY_USER_OR_GROUP);
+        if(mod.isQueryable(AuthenticationModule.QUERY_USER_OR_GROUP)){
+        	try{
+        		Object result = mod.query(name, AuthenticationModule.QUERY_USER_OR_GROUP);
+        		if(result instanceof List){
+        			if(((List)result).size()==0)
+						return null;
+        			result = ((List)result).get(0);
+        		}
+        		return (UserGroupInfo) result;
+        	}
+	        catch(Exception e){
+	        	_wga.getCore().getLog().warn("lookupUserOrGroup: " + e.getMessage());
+	        };
+        }
         return null;
         
     }
