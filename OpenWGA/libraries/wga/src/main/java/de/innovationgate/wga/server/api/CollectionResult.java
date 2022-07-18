@@ -452,7 +452,9 @@ public abstract class CollectionResult implements Iterable<Context> {
     	ArrayList<Object> result = new ArrayList<Object>();
     	SkippingIterator<Context> it = iterator();
     	while(it.hasNext()){
-    		result.add(function.call(it.next()));
+    		Object value = function.call(it.next());
+    		if(value!=null)
+    			result.add(value);
     	}
     	return result;
     }
