@@ -830,3 +830,15 @@ this.csvReader = function(config){
 	}
 	
 }
+
+this.context = function(exp){
+	var ctx = context(exp, false);
+	return{
+		meta: function(name, defaultvalue){
+			return ctx!=null ? ctx.meta(name) : defaultvalue || "";
+		},
+		item: function(name, defaultvalue){
+			return ctx!=null ? ctx.item(name) : defaultvalue || "";
+		}
+	}
+}
