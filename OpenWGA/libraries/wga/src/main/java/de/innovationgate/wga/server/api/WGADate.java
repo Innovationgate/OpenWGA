@@ -71,4 +71,11 @@ public class WGADate extends Date{
         return getTime() < System.currentTimeMillis();
     }
 
+    public String format(String formatString) throws WGException{
+    	return _wga.format(this, formatString);
+    }
+    public String format(String formatString, String language) throws WGException{
+    	return _wga.format(this, formatString, language);
+    }
+    
 }
