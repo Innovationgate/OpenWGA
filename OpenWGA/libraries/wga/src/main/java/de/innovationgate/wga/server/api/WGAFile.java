@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -105,6 +106,10 @@ public class WGAFile {
 		_file = file;
 		_default_encoding = wga.getCore().getCharacterEncoding();
 	}
+	
+	public WGAFile(WGA wga, WGAFile folder, String filename){
+		this(wga, new File(folder.getFile(), filename));
+	}
 
 	public String getName(){
 		return getFile().getName();
@@ -123,6 +128,23 @@ public class WGAFile {
 		return _file.exists();
 	}
 	
+	public boolean mkdir(){
+		if(_file==null)
+			return false;
+		return _file.mkdir();
+	}
+
+	public void rmdir() throws IOException{
+		if(_file==null)
+			return;
+		FileUtils.deleteDirectory(_file);
+	}
+
+	public void cleanDirectory() throws IOException{
+		if(_file!=null)
+			FileUtils.cleanDirectory(_file);
+	}
+
 	public InputStream getInputStream() throws FileNotFoundException{
 		if(_file==null)
 			return null;
@@ -255,5 +277,5 @@ public class WGAFile {
 	public List<WGAFile> listFiles(){
 		return listFiles(null);
 	}
-
+	
 }
