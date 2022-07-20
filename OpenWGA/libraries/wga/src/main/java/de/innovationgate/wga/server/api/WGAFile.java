@@ -275,10 +275,19 @@ public class WGAFile {
 		}
 		return list;
 	}
+
+	/**
+	 * Returns directory list as WGAFile objects
+	 * @return
+	 */
 	public List<WGAFile> listFiles(){
 		return listFiles(null);
 	}
 	
+	/**
+	 * Returns directory list as WGAFile objects including subdirectories
+	 * @return
+	 */
 	public List<WGAFile> list(){
 		ArrayList<WGAFile> list = new ArrayList<WGAFile>();
 		if(_file!=null){
