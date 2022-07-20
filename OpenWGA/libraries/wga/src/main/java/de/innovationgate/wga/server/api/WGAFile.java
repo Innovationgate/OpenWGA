@@ -128,21 +128,22 @@ public class WGAFile {
 		return _file.exists();
 	}
 	
-	public boolean mkdir(){
-		if(_file==null)
-			return false;
-		return _file.mkdir();
+	public WGAFile createDir(){
+		if(_file!=null && !_file.exists())
+			_file.mkdir();
+		return this;
 	}
 
-	public void rmdir() throws IOException{
-		if(_file==null)
-			return;
-		FileUtils.deleteDirectory(_file);
+	public WGAFile deleteDir() throws IOException{
+		if(_file!=null && _file.exists())
+			FileUtils.deleteDirectory(_file);
+		return this;
 	}
 
-	public void cleanDirectory() throws IOException{
+	public WGAFile cleanDir() throws IOException{
 		if(_file!=null)
 			FileUtils.cleanDirectory(_file);
+		return this;
 	}
 
 	public InputStream getInputStream() throws FileNotFoundException{
@@ -276,6 +277,16 @@ public class WGAFile {
 	}
 	public List<WGAFile> listFiles(){
 		return listFiles(null);
+	}
+	
+	public List<WGAFile> list(){
+		ArrayList<WGAFile> list = new ArrayList<WGAFile>();
+		if(_file!=null){
+			for(String filename: _file.list()){
+				list.add(new WGAFile(_wga, this, filename));
+			}
+		}
+		return list;
 	}
 	
 }
