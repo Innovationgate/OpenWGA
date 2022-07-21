@@ -133,7 +133,13 @@ define(["jquery"], function($){
 			return this.getSelection().toString();
 		},
 		queryCommandState: function(state){
-			return this.doc.queryCommandState(state)
+			if(state=="sup"){
+				return this.getNearestTagFromSelection("sup")
+			}
+			else if(state=="sub"){
+				return this.getNearestTagFromSelection("sub")
+			}
+			else return this.doc.queryCommandState(state)
 		},
 		setDefaultParagraphSeparator: function(el){
 			this.doc.execCommand("defaultParagraphSeparator", false, el);
@@ -259,7 +265,26 @@ define(["jquery"], function($){
 	}
 	
 	editor.prototype.execCmd = function(cmd, param){
-		this.doc.execCommand(cmd, false, param);
+		
+		if(cmd=="sup"){
+			var node = this.getNearestTagFromSelection("sup");
+			if(node)
+				this.removeNode(node);
+			else{
+				var txt = this.getSelection()
+				this.insertHTML("<sup>"+txt+"</sup>")
+			}
+		}		
+		else if(cmd=="sub"){
+			var node = this.getNearestTagFromSelection("sub");
+			if(node)
+				this.removeNode(node);
+			else{
+				var txt = this.getSelection()
+				this.insertHTML("<sub>"+txt+"</sub>")
+			}
+		}		
+		else this.doc.execCommand(cmd, false, param);
 		
 		if(cmd.toLowerCase()=="insertorderedlist" || cmd.toLowerCase()=="insertunorderedlist"){
 			// Safari/Chrome bug: remove <span> element created by the browser.
