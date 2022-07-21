@@ -29,6 +29,9 @@
 		<a style="flex:1" href="#" data-cmd="Bold" class="btn btn-default btn-sm" title="Fett"><b>B</b></a>
 		<a style="flex:1" href="#" data-cmd="Italic" class="btn btn-default btn-sm" title="Kursiv""><i>I</i></a>
 		<a style="flex:1" href="#" data-cmd="Underline" class="btn btn-default btn-sm" title="Unterstrichen"><u>U</u></a>
+		<div style="width:10px"></div>
+		<a style="flex:1" href="#" data-cmd="sup" class="btn btn-default btn-sm" title="Hochgestellt"><i class="fas fa-superscript"></i></a>
+		<a style="flex:1" href="#" data-cmd="sub" class="btn btn-default btn-sm" title="Tiefgestellt"><i class="fas fa-subscript"></i></a>
 	</div>
 </fieldset>
 	
