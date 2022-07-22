@@ -24,20 +24,13 @@
  ******************************************************************************/
 package de.innovationgate.wgpublisher.webtml;
 import java.io.UnsupportedEncodingException;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.PropertyResourceBundle;
-import java.util.ResourceBundle;
 
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.tagext.DynamicAttributes;
 
 import org.apache.commons.jxpath.JXPathContext;
@@ -58,7 +51,6 @@ import de.innovationgate.wgpublisher.expressions.tmlscript.RhinoExpressionEngine
 import de.innovationgate.wgpublisher.webtml.form.TMLFormInfo;
 import de.innovationgate.wgpublisher.webtml.form.TMLForm;
 import de.innovationgate.wgpublisher.webtml.portlet.TMLPortlet;
-import de.innovationgate.wgpublisher.webtml.utils.RootTagReceptor;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 import de.innovationgate.wgpublisher.webtml.utils.TMLException;
 import de.innovationgate.wgpublisher.webtml.utils.TMLUserProfile;

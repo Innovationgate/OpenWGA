@@ -375,6 +375,7 @@ import de.innovationgate.wgpublisher.webtml.utils.JSONEncodingFormatter;
 import de.innovationgate.wgpublisher.webtml.utils.JavaScriptEncodingFormatter;
 import de.innovationgate.wgpublisher.webtml.utils.NoneEncodingFormatter;
 import de.innovationgate.wgpublisher.webtml.utils.PlainTextFormatter;
+import de.innovationgate.wgpublisher.webtml.utils.ScriptletEncodingFormatter;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContextAwareFormatter;
 import de.innovationgate.wgpublisher.webtml.utils.TMLException;
@@ -960,10 +961,11 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
     
     public static final String ENCODER_PLAINTEXT = "plaintext";
 
-    private static final String ENCODER_XML = "xml";
+    public static final String ENCODER_XML = "xml";
 
     public static final String ENCODER_HTML = "html";
     
+    public static final String ENCODER_SCRIPTLETS = "scriptlets";
 
     
     public static final String ENCODER_URL = "url";
@@ -5726,10 +5728,6 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         return tmlHeader;
     }
 
-
-
-
-
     public ObjectFormatter getEncodingFormatter(String encode, TMLContext context) throws FormattingException {
 
         encode = encode.toLowerCase();
@@ -5748,6 +5746,9 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         ObjectFormatter formatter = null;
         if (encode.equalsIgnoreCase(ENCODER_NONE)) {
             formatter = NoneEncodingFormatter.INSTANCE;
+        }
+        else if (encode.equalsIgnoreCase(ENCODER_SCRIPTLETS)) {
+            formatter = new ScriptletEncodingFormatter(context);
         }
         else if (encode.equalsIgnoreCase(ENCODER_HTML) || encode.equalsIgnoreCase(ENCODER_XML)) {
             formatter = new HTMLXMLEncodingFormatter(encode, (context != null ? context.getDesignContext().getVersionCompliance() : WGAVersion.toCsConfigVersion()));

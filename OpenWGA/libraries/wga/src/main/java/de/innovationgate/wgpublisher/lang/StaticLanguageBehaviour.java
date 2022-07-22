@@ -82,7 +82,7 @@ public class StaticLanguageBehaviour implements LanguageBehaviour, PriorizingLan
     }
 
     public List<WGLanguage> webtmlQueryLanguages(WGDatabase db, TMLContext context) throws WGAPIException {
-        Set<WGLanguage> langs = new LinkedHashSet<WGLanguage>();
+    	ArrayList<WGLanguage> langs = new ArrayList<WGLanguage>();
         
         if (!LanguageBehaviourTools.isMultiLanguageContext(context)) {
             if (context.iswebenvironment()) {
@@ -98,9 +98,10 @@ public class StaticLanguageBehaviour implements LanguageBehaviour, PriorizingLan
             if (lang != null && !lang.isDummy()) {
                 langs.add(lang);
             }
+            else langs.add(db.getLanguage(db.getDefaultLanguage()));
         }
         
-        return new ArrayList(langs);
+        return langs;
     }
 
     public WGContent webtmlSelectContentForPage(WGStructEntry page, TMLContext context, boolean isBI) throws WGAPIException {

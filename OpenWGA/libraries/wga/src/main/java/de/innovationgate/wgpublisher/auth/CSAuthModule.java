@@ -459,7 +459,7 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
                         userGroupInfo = buildUserInfo(login);
                     }
                     else if (isGroupDefinition(result.content())) {
-                        userGroupInfo = buildGroupInfo((String) result.item(_groupnameItem));
+                        userGroupInfo = buildGroupInfo((String) result.item(_groupnameItem), (String)result.item(_groupdescriptionItem));
                     }
                     if (userGroupInfo != null) {
                         results.add(userGroupInfo);
@@ -519,6 +519,7 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
 
     public static final String DEFAULTITEM_USERNAME = "UserName";
     public static final String DEFAULTITEM_GROUPNAME = "GroupName";
+    public static final String DEFAULTITEM_GROUPDESCRIPTION = "description";
     public static final String DEFAULTITEM_MEMBERS = "Members";
     public static final String DEFAULTITEM_ENABLED = "Enabled";
     
@@ -552,7 +553,9 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
     private String _membersItem = DEFAULTITEM_MEMBERS;
 
     private String _groupnameItem = DEFAULTITEM_GROUPNAME;
-    
+
+    private String _groupdescriptionItem = DEFAULTITEM_GROUPDESCRIPTION;
+
     private String _collectCondition = null;
     
     private boolean _internalConfiguration = false;
@@ -1030,6 +1033,9 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
         if(queryType.equals(QUERY_USERS_AND_GROUPS)) {
         	return true;
         }
+        else if(queryType.equals(QUERY_USER_OR_GROUP)) {
+        	return true;
+        }
         else if (queryType.equals(QUERY_USER_DN)) {
             return true;
         }
@@ -1046,6 +1052,9 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
         try {
             if(queryType.equals(QUERY_USERS_AND_GROUPS)) {
             	return findUsersAndGroups((String) query);
+            }
+            else if (queryType.equals(QUERY_USER_OR_GROUP)) {
+                return fetchUserOrGroup((String) query);
             }
             else if (queryType.equals(QUERY_USER_DN)) {
                 return fetchUserByDN((String) query);
@@ -1069,6 +1078,17 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
         
     }
 
+    private CSUserGroupInfo fetchUserOrGroup(String name) throws WGException, CacheException {
+    	CSUserGroupInfo info = fetchUserByDN(name);
+    	if(info!=null)
+    		return info;
+    	Group group = _groupInformation.get(name);
+    	if(group!=null)
+    		return buildGroupInfo(group);
+    	return null;
+    	
+    }
+
     /**
      * retrieves all users and groups with the given prefix in nameAttributes
      * @param prefix to search for
@@ -1089,7 +1109,7 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
         LazyLoginSearcher searcher = new LazyLoginSearcher(prefix);
         return _lazyLoadingPool.submit(searcher).get();
     }
-
+    
     private List<CSUserGroupInfo> findPreloadUsersAndGroups(String prefix) {
         List<CSUserGroupInfo> results = new ArrayList<CSUserGroupInfo>();
         Set<String> foundUsers = new HashSet<String>();
@@ -1110,19 +1130,26 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
 		while (it.hasNext()) {
 		    current = (String) it.next();
 		    if(current.indexOf(prefix)!=-1){
-		        results.add(buildGroupInfo(current));
+		        results.add(buildGroupInfo(_groupInformation.get(current)));
 		    }
 		}
 		return results;
     }
 
-    private CSUserGroupInfo buildGroupInfo(String groupName) {
+    
+    private CSUserGroupInfo buildGroupInfo(String groupName, String description) {
         
         CSUserGroupInfo newUserEntry = new CSUserGroupInfo();
         newUserEntry.setIsUser(false);
         newUserEntry.setIsGroup(true);
         newUserEntry.setFullQualifiedName(groupName);
+        newUserEntry.getLabeledNames().put(LABEL_DESCRIPTION, description);
         return newUserEntry;
+    }
+    
+
+    private CSUserGroupInfo buildGroupInfo(Group group) {
+        return buildGroupInfo(group.getName(), group.getDescription());
     }
 
     /**
@@ -1411,7 +1438,7 @@ public class CSAuthModule implements CoreAwareAuthModule, CertAuthCapableAuthMod
     private void fetchDefaultGroupsFromDocument(Map<String,GroupMembership> groupMemberships, WGContent content, Map<String,Group> groupInformation) throws WGAPIException {
         
         String groupname = content.getItemText(_groupnameItem);
-        groupInformation.put(groupname.toLowerCase(), new Group(groupname, content.getDocumentKey()));
+        groupInformation.put(groupname.toLowerCase(), new Group(groupname, content.getDocumentKey(), content.getItemText(_groupdescriptionItem)));
         
         // Members item
         @SuppressWarnings("unchecked")

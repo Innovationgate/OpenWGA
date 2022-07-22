@@ -570,8 +570,8 @@ this.getAppKeysBasedOnPlugin=function(plugin_name){
  *		dateFormat:		optional date format. If Empty yyyy-MM-dd HH:mm:SS is used.
  *		divider:		Column divider. Default is Semicolon
  *
- *	Item Definition (config.items):
- *		Each item is either a Sting or Object.
+ *	Columns Definition (config.columns):
+ *		Each column is either a Sting or Object.
  *		If String, the itemvalue or metavalue is written (meta if String is all uppercase)
  *		If Object it must have the format {label:<String>, value: <Function(TMLContext)>}
  *
@@ -594,7 +594,7 @@ this.csvWriter = function(config){
 		if(value instanceof Packages.java.util.Date)
 			line += WGA.format(value, config.dateFormat || "yyyy-MM-dd HH:mm:ss")
 		else if(typeof(value)=="string")
-			line += '"' + (value||"").replace(/\"/g, "'").replace(/[\r]/g, "") + '"';
+			line += '"' + (value||"").replace(/\"/g, "\"\"").replace(/[\r]/g, "") + '"';
 		else line += (value==null ? "" : value)
 	}
 
@@ -623,6 +623,10 @@ this.csvWriter = function(config){
 			
 		  	var out;
 		  	if(stream_or_file){
+		  		
+		  		if(stream_or_file instanceof Packages.de.innovationgate.wga.server.api.WGAFile)
+		  			stream_or_file = stream_or_file.file
+
 		  		if(stream_or_file instanceof java.io.OutputStream || stream_or_file instanceof java.io.Writer)
 		  			out = new java.io.PrintWriter(stream_or_file);
 		  		else {
@@ -683,7 +687,8 @@ this.csvWriter = function(config){
  *		columns:				Array column definitions. Required.
  *		dateFormat:				Optional date format. If empty yyyy-MM-dd HH:mm:SS is used.
  *		numberFormat:			Optional number format. If empty # ist used.
- *		skiplines:				Number of lines to skip. Default = 0.
+ *		skipLines:				Number of lines to skip. Default = 0.
+ *		trimValues:				Trmm values (remove whitespaces before and after). Default = false 
  *		divider:				Column divider. Default is Semicolon
  *		process(data, line):		Function called for each line in input stream. Required.
  *		onerror(line, key, msg):	Optional function called on errors. Set to null to ignore erors
@@ -704,7 +709,7 @@ this.csvWriter = function(config){
  */
 this.csvReader = function(config){
 
-	var skiplines = config.skiplines || 0;
+	var skiplines = config.skiplines || config.skipLines || 0;
 	var divider = config.divider || ";";
 
 	if(typeof(config.onerror)=="undefined"){
@@ -713,12 +718,51 @@ this.csvReader = function(config){
 	 	}
 	}
 	
+	function parseLine(line){
+		// based on https://mkyong.com/java/how-to-read-and-parse-csv-file-in-java/
+		var result = [];
+		var field = "";
+		var inQuote = false;
+		var inDoubleQuote=false;
+
+		for(let [index, c] in line.split("")){
+			if(c=='"'){
+				inQuote = !inQuote;
+				if(inDoubleQuote){
+					field += '"';
+					inDoubleQuote=false;
+				}
+				else inDoubleQuote=true;
+			}
+			else {
+				inDoubleQuote=false;
+                if (c == divider && !inQuote) {
+                	if(field!='"')
+                    	result.push(field)
+                    field="";
+                } else {
+                    field += c;                 
+                }
+			}
+		}
+		// last field
+		if(field=='"')
+			result.push("");
+		else result.push(field);
+		
+		return result;
+	}
+	
 	return {
 
 		read: function(stream_or_file, encoding){
 	
 			var line;
 			var inputstream;
+			
+			if(typeof(stream_or_file)=="string")
+				stream_or_file = WGA.File(stream_or_file);
+			
 			if(stream_or_file instanceof Packages.java.io.File)
 				inputstream = new Packages.java.io.FileInputStream(stream_or_file);
 			else if(stream_or_file instanceof Packages.de.innovationgate.wga.server.api.WGAFile)
@@ -731,7 +775,7 @@ this.csvReader = function(config){
 				reader.readLine()
 				
 			for(let i=1; line = reader.readLine(); i++){
-				var values = line.split(divider);
+				var values = parseLine(line);
 				var data = {};
 				
 				for(let [index, column] in config.columns){
@@ -761,10 +805,9 @@ this.csvReader = function(config){
 							config.onerror(i, column.key, "unable to find column");
 						continue;
 					}
-					value = value.trim();
-					if(value.charAt(0)=="\"")
-						value = value.substring(1, value.length-1);
-					
+					if(config.trimValues)
+						value = value.trim();
+						
 					try{
 						if(column.type=="date")
 							value = WGA.parseDate(value, config.dateFormat || "yyyy-MM-dd HH:mm:ss")
@@ -786,4 +829,16 @@ this.csvReader = function(config){
 		}
 	}
 	
+}
+
+this.context = function(exp){
+	var ctx = context(exp, false);
+	return{
+		meta: function(name, defaultvalue){
+			return ctx!=null ? ctx.meta(name) : defaultvalue || "";
+		},
+		item: function(name, defaultvalue){
+			return ctx!=null ? ctx.item(name) : defaultvalue || "";
+		}
+	}
 }

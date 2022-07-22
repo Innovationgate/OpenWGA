@@ -315,6 +315,10 @@ public class WGA {
                 }
             }
             else if (o1 instanceof Comparable && o2 instanceof Comparable) {
+            	if(o1 instanceof Integer)
+            		o1 = ((Integer) o1).doubleValue();
+            	if(o2 instanceof Integer)
+            		o2 = ((Integer) o2).doubleValue();
                 return ((Comparable<Object>) o1).compareTo(o2);
             }
             else {
@@ -3405,23 +3409,51 @@ public class WGA {
     protected WGAContext getContext() {
         return _context;
     }
+    
+    // WGA.Date
+    public WGADate Date(){
+    	return new WGADate(this);
+    }
+    public WGADate Date(Date d){
+    	return new WGADate(this, d);
+    }
+    public WGADate Date(String date, String format, String language) throws ParseException, WGException{
+    	return new WGADate(this, date, format, language);
+    }
+    public WGADate Date(String date, String format) throws ParseException, WGException{
+    	return new WGADate(this, date, format);
+    }
 
-
+    // WGA.List
+    public WGAList List(Collection<Object> list){
+    	return new WGAList(list);
+    }
+    public WGAList List(){
+    	return new WGAList();
+    }
+    
+    // WGA.File
     public WGAFile File(String filename){
     	return new WGAFile(this, filename);
     }
     public WGAFile File(File file){
     	return new WGAFile(this, file);
     }
+    public WGAFile File(WGAFile file, String filename){
+    	return new WGAFile(this, file, filename);
+    }
  
+    // WGA.HttpClient
     public WGAHttpClient HttpClient(String url) throws WGException{
     	return new WGAHttpClient(this, url);
     }
  
+    // WGA.TempFile
     public WGATempFile TempFile(String filename) throws IOException{
     	return new WGATempFile(this, filename);
     }
      
+    // WGA.Logger
     public WGALogger Logger(String name){
     	return new WGALogger("wga."+name);
     }

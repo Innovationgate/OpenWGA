@@ -10,9 +10,12 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 		var pagereaders = [];
 		for(let name in Iterator(c.content().structEntry.readers))
 			pagereaders.push({
-				name: name
+				name: WGA.app($urlParam_dbkey).domain().auth().queryDescription(name),
+				title: name
 			});
-		
+		pagereaders.sort(function(a,b){
+			return a.name<b.name ? -1 : a.name==b.name ? 0 : 1; 
+		})
 		var readprotected = false;
 		// check hierarchy
 		for(let struct = c.content().structEntry; struct; struct = struct.getParentEntry()){
@@ -34,8 +37,8 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 
 			replacementReason: c.STATUS==c.content().STATUS_ARCHIVE && c.ersetzungsgrund && WGA.encode("html", c.ersetzungsgrund),
 
-			pagereaders: WGA.app($urlParam_dbkey).isManager() ? pagereaders : null,
 			readprotected: readprotected,
+			pagereaders: WGA.app($urlParam_dbkey).isManager() ? pagereaders : null,
 
 			workflow: c.STATUS==c.content().STATUS_REVIEW && c.WORKFLOW 
 					&& c.content().getWorkflow().getWorkflowLevel()

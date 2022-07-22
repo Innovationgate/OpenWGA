@@ -51,7 +51,6 @@ import de.innovationgate.wgpublisher.expressions.ExpressionEngine;
 import de.innovationgate.wgpublisher.expressions.ExpressionResult;
 import de.innovationgate.wgpublisher.expressions.tmlscript.RhinoExpressionEngine;
 import de.innovationgate.wgpublisher.expressions.tmlscript.RhinoExpressionEngineImpl;
-import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager;
 import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager.DerivateQuery;
 import de.innovationgate.wgpublisher.lang.LanguageBehaviourTools;
 import de.innovationgate.wgpublisher.lang.WebTMLLanguageChooser;
@@ -448,7 +447,11 @@ public class WebTMLScriptletResolver {
 	                contentKey = new WGContentKey(contentKey.getStructKey(), contentKey.getLanguage(), 0);
 	                containerName = contentKey.toString();
 	            }
-                targetContext = context.context("docid:" + contentKey);
+                targetContext = context.context("docid:" + contentKey, false);
+                if(targetContext==null){
+                	context.addwarning("macroFileURL " + fileName + ": target container not valid: " + contentKey);
+                	return "";
+                }
             }
         }
         

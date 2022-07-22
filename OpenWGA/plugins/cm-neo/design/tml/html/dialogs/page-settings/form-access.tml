@@ -43,13 +43,39 @@
 			<tml:script divider="<br>">
 				for(var struct = document.parentEntry; struct; struct = struct.parentEntry){
 					if(!struct.childEditors.isEmpty() && struct.childEditors.get(0))
-						return WGA.aliases(struct.childEditors, "jeder|*,nur Chief-Editoren|%none");
+						//return WGA.aliases(struct.childEditors, "jeder|*,nur Chief-Editoren|%none");
+						return WGA.List(struct.childEditors).map(function(name){
+							if(name=="*")
+								return "jeder";
+							if(name=="%none")
+								return "nur Chief-Editoren"
+							return WGA.app().domain().auth().queryDescription(name);
+						});
 				}
 				return ["jeder"]
 			</tml:script>
 		</tml:case>
 		<tml:case condition="tmlform.child_editors=='custom'">
-			<tml:input cssclass="form-control" name="custom_child_editors" store="false" type="textarea" multiple="true"/>
+			<tml:if condition="tmlform.mode()=='view'">
+				<tml:then>
+					<tml:script>
+						_names = tmlform.fieldlist("custom_child_editors")
+					</tml:script>
+					<tml:foreach item="_names" currentvalue="_name">
+						<tml:script>
+							if(_name=="*")
+								return "jeder";
+							if(_name=="%none")
+								return "nur Chief-Editoren"
+							return WGA.app().domain().auth().queryDescription(_name);							
+						</tml:script>
+						<tml:between><br></tml:between>
+					</tml:foreach>
+				</tml:then>
+				<tml:else>
+					<tml:input cssclass="form-control" name="custom_child_editors" store="false" type="textarea" multiple="true"/>
+				</tml:else>
+			</tml:if>
 		</tml:case>
 	</div>
 </tml:[form-field]>
@@ -66,13 +92,39 @@
 				// in diesem Fall gelten die childEditors des Parents!
 				for(var struct = document.parentEntry; struct; struct = struct.parentEntry){
 					if(!struct.childEditors.isEmpty() && struct.childEditors.get(0))
-						return WGA.aliases(struct.childEditors, "jeder|*,nur Chief-Editoren|%none");
+						return WGA.List(struct.childEditors).map(function(name){
+							if(name=="*")
+								return "jeder";
+							if(name=="%none")
+								return "nur Chief-Editoren"
+							return WGA.app().domain().auth().queryDescription(name);
+						});
+						//return WGA.aliases(struct.childEditors, "jeder|*,nur Chief-Editoren|%none");
 				}
 				return ["jeder"]
 			</tml:script>
 		</tml:case>
 		<tml:case condition="tmlform.page_editors=='custom'">
-			<tml:input cssclass="form-control" name="custom_page_editors" store="false" type="textarea" multiple="true"/>
+			<tml:if condition="tmlform.mode()=='view'">
+				<tml:then>
+					<tml:script>
+						_names = tmlform.fieldlist("custom_page_editors")
+					</tml:script>
+					<tml:foreach item="_names" currentvalue="_name">
+						<tml:script>
+							if(_name=="*")
+								return "jeder";
+							if(_name=="%none")
+								return "nur Chief-Editoren"
+							return WGA.app().domain().auth().queryDescription(_name);							
+						</tml:script>
+						<tml:between><br></tml:between>
+					</tml:foreach>
+				</tml:then>
+				<tml:else>
+					<tml:input cssclass="form-control" name="custom_page_editors" store="false" type="textarea" multiple="true"/>
+				</tml:else>
+			</tml:if>
 		</tml:case>
 	</div>
 </tml:[form-field]>
@@ -87,14 +139,29 @@
 			<tml:script divider="<br>">
 				for(var struct = document.parentEntry; struct; struct = struct.parentEntry){
 					if(!struct.readers.isEmpty() && struct.readers.get(0)){
-						return struct.readers;
+						return WGA.List(struct.readers).map(function(name){
+							return WGA.app().domain().auth().queryDescription(name)
+						});
 					}
 				}
 				return ["jeder"]
 			</tml:script>
 		</tml:case>
 		<tml:case condition="tmlform.page_readers=='custom'">
-			<tml:input cssclass="form-control" name="custom_page_readers" store="false" type="textarea" multiple="true"/>
+			<tml:if condition="tmlform.mode()=='view'">
+				<tml:then>
+					<tml:script>
+						_names = tmlform.fieldlist("custom_page_readers")
+					</tml:script>
+					<tml:foreach item="_names" currentvalue="_name">
+						<tml:script expression="WGA.app().domain().auth().queryDescription(_name)"/>
+						<tml:between><br></tml:between>
+					</tml:foreach>
+				</tml:then>
+				<tml:else>
+					<tml:input cssclass="form-control" name="custom_page_readers" store="false" type="textarea" multiple="true"/>
+				</tml:else>
+			</tml:if>
 		</tml:case>
 	</div>
 </tml:[form-field]>

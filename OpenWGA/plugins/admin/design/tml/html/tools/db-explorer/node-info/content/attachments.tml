@@ -87,7 +87,9 @@
 											<tml:script expression="_derivate.name"/></a>:
 									</label>
 									<div class="data">
-										<tml:script expression="_derivate.displayWidth + ' x ' + _derivate.displayHeight"/> Pixel,
+										<tml:case condition="_derivate.displayWidth>0 || _derivate.displayHeight>0">
+											<tml:script expression="_derivate.displayWidth + ' x ' + _derivate.displayHeight"/> Pixel,
+										</tml:case>
 										<tml:script expression="_derivate.size/1000" format="0"/> KB
 										<br>
 										ID=<tml:script expression="_derivate.id"/>

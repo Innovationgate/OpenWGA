@@ -65,6 +65,7 @@ import de.innovationgate.webgate.api.WGFactory;
 import de.innovationgate.webgate.api.mail.WGMail;
 import de.innovationgate.webgate.api.mail.WGMailException;
 import de.innovationgate.wga.common.CodeCompletion;
+import de.innovationgate.wga.server.api.WGAFile;
 import de.innovationgate.wgpublisher.webtml.utils.TMLException;
 
 public abstract class MailBase implements WGMail {
@@ -507,6 +508,13 @@ public abstract class MailBase implements WGMail {
         this._attachmentURLs.put(url, altFilename);
     }
 
+    /**
+     * adds the given inputstream as attachment to the mail
+     * @param in InputStream
+     * @param filename filename to use for the attachment
+     * @throws TMLException 
+     * @throws FileNotFoundException 
+     */
     @CodeCompletion
     public void addAttachment(InputStream in, String filename) throws WGMailException {
         
@@ -524,15 +532,25 @@ public abstract class MailBase implements WGMail {
     }
 
     /**
-     * adds the given inputstream as attachment to the mail
-     * @param in InputStream
-     * @param filename filename to use for the attachment
+     * adds the given File as attachment to the mail
+     * @param file File
      * @throws TMLException 
      * @throws FileNotFoundException 
      */
     @CodeCompletion
     public void addAttachment(File file) throws WGMailException, FileNotFoundException {
         addAttachment(new FileInputStream(file), file.getName());
+    }
+
+    /**
+     * adds the given WGAFile as attachment to the mail
+     * @param file WGAFile
+     * @throws TMLException 
+     * @throws FileNotFoundException 
+     */
+    @CodeCompletion
+    public void addAttachment(WGAFile file) throws WGMailException, FileNotFoundException {
+        addAttachment(file.getInputStream(), file.getName());
     }
 
     @CodeCompletion

@@ -27,6 +27,42 @@
 					</tml:else>
 				</tml:if>
 			</tml:then>
+			<tml:elseif condition="STATUS==content().STATUS_RELEASE">
+				<iframe src="<tml:url/>"></iframe>
+				<div class="modal-popup" id="released">
+					<div class="header">
+						Seite ist bereits veröffentlicht
+						<a href="#" class="close">&times;</a>
+					</div>
+					<div class="content">
+						Diese Seite wurde bereits freigegeben:
+						<br>
+						<tml:case condition="wfreleasedate">
+							<br>am <tml:item name="wfreleasedate" format="mediumDateTime"/> Uhr
+						</tml:case>
+						<tml:case condition="wflevelhatgenehmigt && wflevelhatgenehmigt.size()">
+							<br>von <tml:script>
+								return WGA.app().domain().auth().fetchCommonName(wflevelhatgenehmigt.get(0))
+							</tml:script>
+						</tml:case>
+					</div>
+					<div class="footer">
+						<a href="#" data-modal="hide" class="btn btn-default">Schließen</a>
+					</div>
+				</div>
+				<script>
+					require(["jquery", "jquery-modal"], function($){
+						$("#released").wga_modal("show");
+					})
+				</script>
+			</tml:elseif>
+			<tml:elseif condition="STATUS==content().STATUS_DRAFT">
+				<div class="loading">
+					Die Genehmigung wurde abgeleht.
+					<br>
+					Die Seite befindet sich im Status <tml:label key="[status.{STATUS}]"/>.
+				</div>
+			</tml:elseif>
 			<tml:else>
 				<div class="loading">
 					<tml:item name="_msg" wrap="h1"/>

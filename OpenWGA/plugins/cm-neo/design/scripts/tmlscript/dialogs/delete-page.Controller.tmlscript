@@ -31,6 +31,10 @@ Controller.prototype.prepare = function($cx) {
 
 Controller.prototype.mayDelete = function($cx, AFW) {
 	var struct = $cx.content() ? $cx.content().structEntry : $cx.document;
+	if(struct==null){
+		//console.log("mayDelete with null struct")
+		return false;
+	}
 	var Struct = AFW.structentry(struct)
 	var mayDelete = Struct.mayDeletePage(true);
 	if(!mayDelete){
@@ -74,6 +78,7 @@ Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options
 		// move to trash area.
 		// must be a master action because user may have no right to "move pages".
 		WGA.Master.runFunction(function(struct, trasharea){
+			db().getSessionContext().setEventsEnabled(false);	// disable content events
 			db().moveStructEntry(struct, trasharea);
 			//console.log("moveStructEntry", struct, struct.getLastModified());
 			// remove unique names:
@@ -95,7 +100,7 @@ Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options
 					removeNames(children.next())
 			}
 			removeNames(struct) 
-
+			db().getSessionContext().setEventsEnabled(true);
 		}, struct, trasharea)
 	}
 	else struct.remove();

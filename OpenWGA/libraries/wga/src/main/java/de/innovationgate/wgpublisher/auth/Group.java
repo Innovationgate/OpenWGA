@@ -29,6 +29,7 @@ public class Group {
     
     private String _name;
     private String _documentKey;
+    private String _description;
     
     protected String getName() {
         return _name;
@@ -37,15 +38,25 @@ public class Group {
     protected String getDocumentKey() {
         return _documentKey;
     }
-    
-    public Group(String name, String documentKey) {
+
+    protected String getDescription() {
+        return _description;
+    }
+
+    public Group(String name, String documentKey, String description) {
         //super();
+        _name = name;
+        _documentKey = documentKey;
+        _description = description;
+        
+    }
+
+    public Group(String name, String documentKey) {
         _name = name;
         _documentKey = documentKey;
     }
 
 	public Group(String name) {
-        //super();
         _name = name;
 	}
 

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -105,7 +106,15 @@ public class WGAFile {
 		_file = file;
 		_default_encoding = wga.getCore().getCharacterEncoding();
 	}
+	
+	public WGAFile(WGA wga, WGAFile folder, String filename){
+		this(wga, new File(folder.getFile(), filename));
+	}
 
+	public String getName(){
+		return getFile().getName();
+	}
+	
 	public File getFile(){
 		return _file;
 	}
@@ -119,6 +128,24 @@ public class WGAFile {
 		return _file.exists();
 	}
 	
+	public WGAFile createDir(){
+		if(_file!=null && !_file.exists())
+			_file.mkdir();
+		return this;
+	}
+
+	public WGAFile deleteDir() throws IOException{
+		if(_file!=null && _file.exists())
+			FileUtils.deleteDirectory(_file);
+		return this;
+	}
+
+	public WGAFile cleanDir() throws IOException{
+		if(_file!=null)
+			FileUtils.cleanDirectory(_file);
+		return this;
+	}
+
 	public InputStream getInputStream() throws FileNotFoundException{
 		if(_file==null)
 			return null;
@@ -248,8 +275,27 @@ public class WGAFile {
 		}
 		return list;
 	}
+
+	/**
+	 * Returns directory list as WGAFile objects
+	 * @return
+	 */
 	public List<WGAFile> listFiles(){
 		return listFiles(null);
 	}
-
+	
+	/**
+	 * Returns directory list as WGAFile objects including subdirectories
+	 * @return
+	 */
+	public List<WGAFile> list(){
+		ArrayList<WGAFile> list = new ArrayList<WGAFile>();
+		if(_file!=null){
+			for(String filename: _file.list()){
+				list.add(new WGAFile(_wga, this, filename));
+			}
+		}
+		return list;
+	}
+	
 }
