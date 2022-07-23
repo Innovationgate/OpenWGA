@@ -1,1 +1,1 @@
-ALTER TABLE content_files_meta MODIFY name VARCHAR(256);
+ALTER TABLE content_files_meta ALTER COLUMN name VARCHAR(256);
