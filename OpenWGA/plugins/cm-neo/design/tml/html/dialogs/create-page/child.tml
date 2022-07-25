@@ -49,7 +49,7 @@
 
 		<script>
 			require(["jquery", "select2"], function($){
-				$("select").select2({width:"100%"})
+				$("#form-create-page select").select2({width:"100%"})
 			})
 		</script>
 		 
