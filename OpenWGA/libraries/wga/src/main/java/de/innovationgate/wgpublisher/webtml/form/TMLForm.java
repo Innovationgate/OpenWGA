@@ -572,7 +572,7 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
         try {
             serFormInfo = core.getSymmetricEncryptionEngine().decryptBase64Web(formInfoStr);
             String unzipped = WGUtils.unzipString(serFormInfo);
-            formInfo = (TMLFormInfo) new XStream(new Dom4JDriver()).fromXML(unzipped);
+            formInfo = (TMLFormInfo) XStreamUtils.createXStream(new Dom4JDriver()).fromXML(unzipped);
             return formInfo;
         }
         catch (Exception e) {

@@ -74,7 +74,7 @@ public class DesignDefinition {
     
     private static XStream createXStreamForFile(String name) {
         
-        XStream xStream = new XStream(new DomDriver());
+        XStream xStream = XStreamUtils.createXStream();
         
         // The last registered alias wins when resolving from class to name
         // We register both aliases, but the one that should be used for writing as the last

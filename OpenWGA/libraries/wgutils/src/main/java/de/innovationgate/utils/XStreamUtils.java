@@ -36,6 +36,7 @@ import org.apache.commons.vfs2.FileObject;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.Dom4JDriver;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 
 /**
@@ -78,7 +79,7 @@ public abstract class XStreamUtils {
      * @throws IOException
      */
     public static void writeUtf8ToOutputStream(Object obj, XStream xstream, OutputStream out) throws IOException {
-    	xstream.addPermission(AnyTypePermission.ANY);
+    	//xstream.addPermission(AnyTypePermission.ANY);
         BufferedOutputStream bufOut = new BufferedOutputStream(out);
         OutputStreamWriter writer;
         try {
@@ -112,7 +113,7 @@ public abstract class XStreamUtils {
      * @throws IOException
      */    
     public static Object loadUtf8FromInputStream(XStream xstream, InputStream in, boolean forceClose) throws IOException {
-    	xstream.addPermission(AnyTypePermission.ANY);
+    	//xstream.addPermission(AnyTypePermission.ANY);
         BufferedInputStream bufIn = new BufferedInputStream(in);
         try {
             InputStreamReader reader = new InputStreamReader(bufIn, "UTF-8");
@@ -161,7 +162,7 @@ public abstract class XStreamUtils {
     public static Object clone(Object obj) {
         
         try {
-        	XSTREAM_CLONING.addPermission(AnyTypePermission.ANY);
+        	//XSTREAM_CLONING.addPermission(AnyTypePermission.ANY);
             String xml = XSTREAM_CLONING.toXML(obj);
             return XSTREAM_CLONING.fromXML(xml);
         }
@@ -172,9 +173,17 @@ public abstract class XStreamUtils {
     }
     
     public static XStream createXStream(){
-    	XStream xstream = new XStream(new Dom4JDriver());
-    	xstream.addPermission(AnyTypePermission.ANY);
+    	XStream xstream = new XStream(new DomDriver());
+    	//xstream.addPermission(AnyTypePermission.ANY);
+    	xstream.allowTypesByWildcard(new String[] {"de.innovationgate.**", "org.dom4j.**"});
     	return xstream;
     }
+
+	public static XStream createXStream(Dom4JDriver driver) {
+    	XStream xstream = new XStream(driver);
+    	//xstream.addPermission(AnyTypePermission.ANY);
+    	xstream.allowTypesByWildcard(new String[] {"de.innovationgate.**", "org.dom4j.**"});
+    	return xstream;
+	}
     
 }
