@@ -46,8 +46,6 @@ import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGFileMetaData;
 import de.innovationgate.webgate.api.WGUnavailableException;
 import de.innovationgate.webgate.api.WGUnresolveableVirtualLinkException;
-import de.innovationgate.wga.config.VirtualHost;
-import de.innovationgate.wga.config.WGAConfiguration;
 import de.innovationgate.wga.server.api.App;
 import de.innovationgate.wga.server.api.Database;
 import de.innovationgate.wga.server.api.UnavailableResourceException;
@@ -56,7 +54,6 @@ import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGPDispatcher;
 import de.innovationgate.wgpublisher.design.DesignResourceReference;
 import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager.DerivateQuery;
-import de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
 import de.innovationgate.wgpublisher.webtml.actions.TMLAction;
 import de.innovationgate.wgpublisher.webtml.form.TMLForm;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
@@ -820,7 +817,11 @@ public class URL extends ActionBase implements DynamicAttributes {
         Status status = getStatus();
         for (DynamicAttribute att : status.dynamicOptions.values()) {
             
-            Object value = att.getDynamicValue(getTMLContext());
+        	// parameter evaluation should be done based on the parent context if available
+        	TMLContext ctx = getParentTagContext();
+        	if(ctx==null)
+        		ctx = getTMLContext();
+            Object value = att.getDynamicValue(ctx);
             if (value != null) {
                 if (att.getPrefix().equals("v")) {
                     status.varparams.put(att.getBaseName(), value);
