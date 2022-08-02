@@ -336,9 +336,16 @@ public class WGPRequestPath {
         }
 		else if (elementsSize >= 3 && elem1.equals("file")) {
 			this.pathType = TYPE_FILE;
-			int fileNameIndex = determineFileNameIndex(this.pathElements, 2);
-			this.containerKey = this.database.toLowerCaseMeta(WGUtils.serializeCollection(this.pathElements.subList(2, fileNameIndex), ":"));			
-			this.fileName = WGUtils.serializeCollection(this.pathElements.subList(fileNameIndex, elementsSize), "/");			
+			if(elementsSize==3){
+				// container key only
+				this.containerKey = this.database.toLowerCaseMeta(this.pathElements.get(2));			
+				this.fileName = "";
+			}
+			else{
+				int fileNameIndex = determineFileNameIndex(this.pathElements, 2);
+				this.containerKey = this.database.toLowerCaseMeta(WGUtils.serializeCollection(this.pathElements.subList(2, fileNameIndex), ":"));			
+				this.fileName = WGUtils.serializeCollection(this.pathElements.subList(fileNameIndex, elementsSize), "/");
+			}
 			return;
 		}
 
@@ -737,6 +744,10 @@ public class WGPRequestPath {
 	 */
 	public String getFileName() {
 		return fileName;
+	}
+
+	public void setFileName(String name) {
+		fileName = name;
 	}
 
 	/**

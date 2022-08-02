@@ -2033,11 +2033,18 @@ public class WGPDispatcher extends HttpServlet {
         }
 
         String fileName = path.getFileName();
-        if (fileName == null || fileName.equals("")) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "No file name in file URL: " + path.getCompleteURL());
-            return;
+        if (fileName == null || fileName.isEmpty()) {
+        	path.setFileName("index.html");
         }
-
+        
+        if(!fileContainer.hasFile(fileName)){
+        	// check, if fileName is a directory and therefore it is part of the container name and should address file 'index.html'
+        	WGDocument fileContainer2 = database.getFileContainer(containerKeyLastElement.isEmpty() ? fileName : containerKeyLastElement+":"+fileName);
+        	if(fileContainer2!=null){
+        		fileContainer = fileContainer2;
+        		path.setFileName("index.html");
+        	}
+        }
         
         String headerModuleName = "wga:header:files";
     	WGCSSJSModule headerModule = database.getScriptModule(headerModuleName, WGCSSJSModule.CODETYPE_TMLSCRIPT);	    	
