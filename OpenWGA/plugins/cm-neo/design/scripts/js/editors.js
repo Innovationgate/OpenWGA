@@ -428,6 +428,12 @@ define([
 			edit_el = item_el.find("input,textarea")
 					.val(unencoded_val || value_el.text())
 					.focus();
+			if(this.data_type!="textarea"){
+				edit_el.on("keypress", function(ev){
+					if(ev.key=="Enter")
+						WGA.event.fireEvent('CMS_save_item', "*", {close_editor: true})
+				})
+			}
 			return this;
 		}
 		function close(){
