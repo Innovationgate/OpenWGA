@@ -119,7 +119,7 @@ fi
 if [ ! -z "$CLASSPATH" ] ; then
   CLASSPATH="$CLASSPATH":
 fi
-CLASSPATH="$CLASSPATH""$CATALINA_HOME"/bin/bootstrap.jar:"$CATALINA_HOME"/bin/tomcat-juli.jar:"$CATALINA_HOME"/lib/servlet-api.jar:"$CATALINA_HOME"/lib/tomcat-coyote.jar
+CLASSPATH="$CLASSPATH""$CATALINA_HOME"/bin/bootstrap.jar:"$CATALINA_HOME"/bin/tomcat-juli.jar:"$CATALINA_HOME"/lib/servlet-api.jar:"$CATALINA_HOME"/lib/tomcat-util.jar
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
