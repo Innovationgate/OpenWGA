@@ -57,10 +57,10 @@ ospackage {
     configurationFile('/etc/openwga/tomcat/conf/tomcat-users.xml')
     configurationFile('/etc/openwga/tomcat/conf/web.xml')
     
+    preInstall file('debianScripts/preinst')
     postInstall file('debianScripts/postinst')
     preUninstall file('debianScripts/prerm')
     postUninstall file('debianScripts/postrm')
-
     
     from('dist/all/openwga/src/etc') {
         into '/etc'
