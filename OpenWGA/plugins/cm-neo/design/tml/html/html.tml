@@ -29,7 +29,7 @@
 		</script>
 		
 		<link rel="stylesheet" href="<tml:url type="css" name="styles" u_v="{WGA.server().getVersion().toProjectVersion()}"/>">
-		<link rel="icon" href="/static/images/brand/icon_32.png"/>	
+		<link rel="icon" href="<tml:url type="static" file="images/brand/icon_32.png"/>"/>	
 		
 	</head>
 	
