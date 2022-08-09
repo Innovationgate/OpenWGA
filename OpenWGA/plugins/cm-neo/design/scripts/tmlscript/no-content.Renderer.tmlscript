@@ -1,0 +1,7 @@
+function Renderer() {
+}
+
+Renderer.prototype.render = function() {
+	WGA.response.setStatus(404);
+	WGA.TMLPage.renderDefault();
+}
