@@ -94,6 +94,10 @@ public class ResourceRef {
 				
 	}
 	
+	public ResourceRef resolve(String path) throws WGException{
+		return new ResourceRef(this, path);
+	}
+	
 	/*
 	 * Returns the code "as is" - WITHOUT recursively calling postProcessors
 	 */

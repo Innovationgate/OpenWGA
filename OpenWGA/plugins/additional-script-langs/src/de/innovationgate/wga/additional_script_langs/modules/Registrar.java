@@ -13,6 +13,7 @@ public class Registrar implements ModuleRegistrar {
         registry.addModuleDefinition(new TMLScriptTypeScriptConversionModuleDefinition());
         registry.addModuleDefinition(new JSTypeScriptConversionModuleDefinition());
         registry.addModuleDefinition(new JSMinConversionModuleDefinition());
+        registry.addModuleDefinition(new WcssConversionModuleDefinition());
     }
 
 }

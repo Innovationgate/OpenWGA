@@ -1287,7 +1287,9 @@ public class Design {
         }
         
         DesignResourceReference refObj = resolveReference(ref);
-        WGDatabase designdb= _wga.db(refObj.getDesignApp());
+        WGDatabase designdb = _wga.db(refObj.getDesignApp());
+        if(designdb==null)
+        	return null;
         return new Design(_wga, _designContext.createContextDelegate(designdb, refObj.toString()));
     }
     
