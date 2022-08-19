@@ -18,33 +18,35 @@ import de.innovationgate.wgpublisher.design.conversion.PostProcessResult;
 public class WcssCompiler {
 
 	public static final Logger LOG = Logger.getLogger("wga.wcss");
-	
-	ResourceRef _ref;
-	PostProcessResult _result;
+
+	// map of custom wcss functions
+	final private static HashMap<String, WcssFunction> customFunctions = new HashMap<String, WcssFunction>();
 
 	public interface WcssFunction{
 		public String execute(ResourceRef ref, ArrayList<String> params) throws WGException;
 	}
 
-	// map of custom wcss functions
-	final private static HashMap<String, WcssFunction> customFunctions = new HashMap<String, WcssFunction>();
+
+	ResourceRef _ref;
+	PostProcessResult _result;	
+
+	WcssCompiler(ResourceRef ref, PostProcessResult result){
+		_ref=ref;
+		_result=result;
+	}
 
 	// register a custom function
 	public static void registerCustomFunction(String name, WcssFunction func){
 		customFunctions.put(name, func);
 	}
 	
-	WcssCompiler(ResourceRef ref, PostProcessResult result){
-		_ref=ref;
-		_result=result;
-	}
-	
 	public String compile() throws WGException, IOException{
-		return compile("");
+		CssBlock b = new CssBlock(""); 
+		compile(b);
+		return b.getCode("");
 	}
 	
-	public String compile(String root_name) throws WGException, IOException{
-		
+	public void compile(CssBlock parent) throws WGException, IOException{
 		StreamTokenizer st = new StreamTokenizer(new StringReader(_ref.getCode()));
 
 		st.resetSyntax();
@@ -54,7 +56,6 @@ public class WcssCompiler {
 		
 		st.whitespaceChars('\n', '\n');		// needed to get correct line numbers
 		
-		st.quoteChar('"');
 		st.slashSlashComments(true);
 		st.slashStarComments(true);
 		st.eolIsSignificant(true);
@@ -62,255 +63,351 @@ public class WcssCompiler {
 		st.ordinaryChar('{');
 		st.ordinaryChar('}');
 		st.ordinaryChar(';');
-		st.ordinaryChar(':');
-		st.ordinaryChar('&');
-		st.ordinaryChar('/');
-		//st.ordinaryChar('@');
-        
-		StringBuffer code = new StringBuffer();
-
-		StringBuffer prop = new StringBuffer();
-		int token;
-		while((token = st.nextToken()) != StreamTokenizer.TT_EOF){
-			if(token==StreamTokenizer.TT_EOL)
-				continue;
-			else if(token==StreamTokenizer.TT_WORD)
-				prop.append(st.sval);
-			else if((char)token == ':'){
-				if(prop.toString().trim().isEmpty())
-					prop.append(":");		// sample: :root{...}
-				else{
-					code.append(parseValue("", prop.toString().trim(), st));
-					prop = new StringBuffer();
-				}
-			}
-			else if((char)token == '{'){
-				String cssClassName = (root_name  + " " + prop.toString()).trim();
-				code.append(parseCssClass(cssClassName, st));
-				prop = new StringBuffer();
-			}
-			else if((char)token == '@'){
-				code.append(parseCmd(root_name, st));
-				//prop = new StringBuffer();
-			}
-			else{
-				LOG.error("syntax error: " + st.toString());
-			}
-		}
+		st.ordinaryChar('/');		// needed for comments
+		        
+		CssBlock rootCssBlock = new CssBlock("", parent);
+		rootCssBlock.parse(st);
 		
-        _result.addIntegratedResource(_ref.getDesignDocument());
-		return code.toString();
-	}
-
-	private String parseCmd(String name, StreamTokenizer st) throws IOException, WGException {
-		int token;
-		StringBuffer cmd = new StringBuffer();
-		String params = "";
+		_result.addIntegratedResource(_ref.getDesignDocument());
 		
-		while((token = st.nextToken()) != StreamTokenizer.TT_EOF){
-			if(token==StreamTokenizer.TT_WORD){
-				cmd.append(st.sval.trim());
-			}
-			else if((char)token == ':')
-				cmd.append(':');
-			else if((char)token == '"')
-				params = st.sval.trim();
-			else if((char)token == ';'){
-				if(cmd.toString().trim().equalsIgnoreCase("import")){
-					ResourceRef ref = _ref.resolve(params); 
-					if(ref.getDesignDocument()!=null){
-						WcssCompiler compiler = new WcssCompiler(ref, _result);
-						return compiler.compile(name);
-					}
-					else LOG.error("@import: ResourceRef not found: " + ref);
-				}
-				else LOG.error("unknown command @" + cmd);
-				
-				break;
-			}
-			else if((char)token == '{')
-				return parseCssClass("@"+cmd.toString(), st);
-		}
-					
-		return "";
-	}
-
-	private String parseCssClass(String name, StreamTokenizer st) throws IOException, WGException {
-
-		StringBuffer result = new StringBuffer();
-		result.append(name);
-		result.append("{\n");
-		
-		StringBuffer subclasses = new StringBuffer();
-		String classDivider = " ";
-		StringBuffer prop = new StringBuffer();
-		int token;
-		while((token = st.nextToken()) != StreamTokenizer.TT_EOF){
-			if(token==StreamTokenizer.TT_EOL){
-				/*
-				if(!prop.toString().trim().isEmpty()){
-					LOG.error("syntax error parseCssClass " + prop.toString().trim() + ": " + st.toString());
-					prop = new StringBuffer();
-				}
-				*/
-				continue;
-			}
-			else if((char)token == '@'){
-				subclasses.append(parseCmd(name, st));
-			}
-			else if(token==StreamTokenizer.TT_WORD)
-				prop.append(st.sval);
-			else if((char)token == '&'){
-				classDivider="";
-			}
-			else if((char)token == ':'){
-				if(prop.toString().trim().isEmpty() || prop.toString().trim().equals(":"))
-					prop.append(":");	// usecase: &:hover{...}
-				else{
-					if(prop.toString().trim().startsWith("@"))
-						subclasses.append(parseValue(name, prop.toString().trim(), st));		// returns "prop:value;"
-					else result.append(parseValue(name, "\t"+prop.toString().trim(), st));		// returns "prop:value;"
-					prop = new StringBuffer();
-				}
-			}
-			else if((char)token == '{'){
-				subclasses.append(parseCssClass(name + classDivider + prop.toString().trim(), st));
-				prop = new StringBuffer();
-				classDivider= " ";
-			}
-			else if((char)token == '}')
-				break;
-			else {
-				LOG.error("syntax error parseCssClass: " + st.toString());
-			}
-		}
-		if(token == StreamTokenizer.TT_EOF)
-			LOG.error("syntax error parseCssClass: missing }. " + st.toString());
-		
-		result.append("}\n");
-		result.append(subclasses);
-		return result.toString();
-	}
-
-	private String parseValue(String cssClass, String name, StreamTokenizer st) throws IOException, WGException {
-		
-		StringBuffer result = new StringBuffer();
-		StringBuffer value = new StringBuffer();
-		int token;
-		while((token = st.nextToken()) != StreamTokenizer.TT_EOF){
-			if(token==StreamTokenizer.TT_WORD)
-				value.append(st.sval);
-			else if((char)token == '/'){
-				value.append("/");		// usecase: background-image: url(/path/to/file)
-			}
-			else if((char)token == '"'){
-				value.append("\"" + st.sval + "\"");	// usecase: :after{content: "text"};
-			}
-			else if((char)token == '{'){
-				// multiple properties
-				result.append(parseProps(cssClass, name, st));	// list of props: background{image:...;position:...}
-				break;
-			}
-			else if(token == StreamTokenizer.TT_EOL){
-				result.append(name + ": " + value.toString().trim() + ";\n");
-				LOG.warn(st.toString() + " - semicolon expected after token '" + name.trim() + ":" + value.toString().trim() + "'");
-				break;
-			}
-			else if((char)token == ';'){
-				// finished property definition
-				String theValue = value.toString().trim();
-				
-				// parse for custom functions
-				theValue = replaceCustomFunctions(theValue);
-
-				if(name.startsWith("@")){
-					LOG.info("execute command "+name + "(" + theValue + ")");
-					if(name.equalsIgnoreCase("@import")){
-						ResourceRef ref = _ref.resolve(theValue); 
-						if(ref.getDesignDocument()!=null){
-							WcssCompiler compiler = new WcssCompiler(ref, _result);
-							result.append(compiler.compile(cssClass));
-						}
-						else LOG.error("@import: ResourceRef not found: " + ref);
-					}
-				}				
-				else result.append(name + ": " + theValue + ";\n");
-				
-				break;
-			}
-			else {
-				LOG.error("syntax error parseValue: " + st.toString());
-			}
-		}
-		return result.toString();
 	}
 	
-	/*
-	 * search for pattern function_name(param1, param2, ...) and replace it with result of custom function
-	 */
-	private String replaceCustomFunctions(String theValue) throws WGException {
-		for(Map.Entry<String,WcssFunction> customFunction : customFunctions.entrySet()){
-			String search_pattern = customFunction.getKey() + "\\s*\\(([^\\)]*)\\)";	// search for name(params)
-			Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
-        	Matcher matcher = pattern.matcher(theValue);
+	//--------------------
+
+	private class CssBlock{
+		
+		private ArrayList<CssBlock> _subClases = new ArrayList<CssBlock>();
+		private HashMap<String,String> _props = new HashMap<String,String>();
+		private HashMap<String,String> _vars = new HashMap<String,String>();
+		private CssBlock _parentBlock = null;
+		private String _name;
+		private boolean _variant=false;
+		private String _sourceInfo;
+		
+		CssBlock(String name){
+			this(name, null, false);
+		}
+
+		CssBlock(String name, CssBlock parent){
+			this(name, parent, false);
+		}
+		
+		CssBlock(String name, CssBlock parent, boolean variant){
+			_name = name;
+			_parentBlock = parent;
+			_variant = variant;
+			if(parent!=null)
+				parent.addSubClass(this);
+		}
+		
+		protected void addSubClass(CssBlock subclass){
+			_subClases.add(subclass);
+		}
+		
+		public void parse(StreamTokenizer st) throws IOException{
+			_sourceInfo = _ref.toString() + " line " + st.lineno();
+			int token;
+			StringBuffer prop = new StringBuffer();
+			while((token = st.nextToken()) != StreamTokenizer.TT_EOF){
+				if(token==StreamTokenizer.TT_WORD)
+					prop.append(st.sval);
+				else if((char)token == '/'){
+					prop.append("/");
+				}
+				else if((char)token == ';'){					
+					String propName = prop.toString().trim();
+					prop = new StringBuffer();
+					if(propName.startsWith("@")){
+						CssDirectiveBlock b = new CssDirectiveBlock(propName, this);
+						b.parse(st);
+					}
+					else{
+						// search for property name:value
+						int index = propName.indexOf(':');
+						if(index>0){
+							String propPart = propName.substring(0, index);
+							String valuePart = propName.substring(index+1);
+							if(propPart.startsWith("$")){
+								_vars.put(propPart, valuePart.trim().replaceAll("\\s+", " "));
+							}
+							else _props.put(propPart, valuePart.trim().replaceAll("\\s+", " "));
+						}
+						else LOG.warn("line " + st.lineno() + " ignored: " + propName);
+					}					
+				}
+				else if((char)token == '{'){
+					String className = prop.toString().trim().replaceAll("\\s+", " ");
+					prop = new StringBuffer();
+					boolean isVariant=false;
+					if(className.startsWith("&")){
+						isVariant=true;
+						className = className.substring(1);
+					}
+					
+					if(className.startsWith("@media")){
+						CssBlock parent = new CssMetaBlock(className, this);	// no parent
+						CssBlock b = new CssBlock(getPath(), parent, isVariant);
+						b.parse(st);
+					}
+					else if(className.endsWith(":")){
+						className = className.substring(0, className.length()-1);
+						CssBlock b = new CssPropertiesBlock(className, this);
+						b.parse(st);
+					}
+					else {
+						CssBlock b = new CssBlock(className, this, isVariant);
+						b.parse(st);
+					}
+				}
+				else if((char)token == '}')
+					break;
+			}
+			
+		}
+		
+		public String getCode(String prefix) throws WGException, IOException{
+			StringBuffer result = new StringBuffer();
+
+			if(!_props.isEmpty())
+				result.append("\n" + prefix + "/* " + getSourceInfo() + " */\n");
+
+			String path = getPath();
+			if(!path.isEmpty() && !_props.isEmpty()){
+				result.append(prefix);
+				result.append(getPath() + "{\n");
+			}
+			for(Map.Entry<String,String> entry: _props.entrySet()){
+				if(!path.isEmpty()){
+					result.append(prefix);
+					result.append("\t");
+				}
+				result.append(entry.getKey());
+				result.append(": ");
+				result.append(replaceCustomFunctions(replaceVars(entry.getValue())));
+				result.append(";\n");
+			}
+			if(!path.isEmpty() && !_props.isEmpty()){
+				result.append(prefix);
+				result.append("}\n");
+			}
+			for(CssBlock b: _subClases)
+				result.append(b.getCode(prefix));
+
+			return result.toString();
+		}
+
+		protected String replaceVars(String theValue) throws WGException {
+			String search_pattern = "\\$\\S+";
+			Pattern pattern = Pattern.compile(search_pattern);
+			Matcher matcher = pattern.matcher(theValue);
         	StringBuffer sb = new StringBuffer();
         	while(matcher.find()){
-	            if(matcher.groupCount()>0) {
-	            	ArrayList<String> params = parseCommasAndQuotes(matcher.group(1));
-	            	String replacement = customFunction.getValue().execute(_ref, params);
-	            	matcher.appendReplacement(sb, replacement);
-	            }
+            	String replacement = matcher.group(0);
+            	String var = searchVar(replacement);
+            	if(var!=null)
+	            	replacement = var;
+            	else {
+            		LOG.error("variable not found: " + replacement);
+            		replacement = "/* not defined: " + Matcher.quoteReplacement(replacement) + " */";
+            	}
+	            matcher.appendReplacement(sb, replacement);
         	}
         	matcher.appendTail(sb);
-        	theValue = sb.toString();
+        	return sb.toString();
 		}
-		return theValue;
-	}
-
-	private String parseProps(String cssClass, String name, StreamTokenizer st) throws IOException, WGException {
-		StringBuffer result = new StringBuffer();
-		StringBuffer prop = new StringBuffer();
-		int token;
-		while((token = st.nextToken()) != StreamTokenizer.TT_EOF){
-			if(token==StreamTokenizer.TT_EOL)
-				continue;
-			else if(token==StreamTokenizer.TT_WORD)
-				prop.append(st.sval + " ");
-			else if((char)token == ':'){
-				result.append(name + "-" + parseValue(cssClass, prop.toString().trim(), st));
-				prop = new StringBuffer();
+		
+		private String searchVar(String var){			
+			for(CssBlock block = this; block!=null; block = block.getParentBlock()){
+				String value = block.getVars().get(var);
+				if(value!=null)
+					return value;
 			}
-			else if((char)token == '}')
-				break;
-			else {
-				LOG.error("syntax error parseProps: " + st.toString());
-				break;				
+			return null;
+		}
+		
+		/*
+		 * search for pattern function_name(param1, param2, ...) and replace it with result of custom function
+		 */
+		protected String replaceCustomFunctions(String theValue) throws WGException {
+			for(Map.Entry<String,WcssFunction> customFunction : customFunctions.entrySet()){
+				String search_pattern = customFunction.getKey() + "\\s*\\(([^\\)]*)\\)";	// search for name(params)
+				Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
+	        	Matcher matcher = pattern.matcher(theValue);
+	        	StringBuffer sb = new StringBuffer();
+	        	while(matcher.find()){
+		            if(matcher.groupCount()>0) {
+		            	ArrayList<String> params = parseCommasAndQuotes(matcher.group(1));
+		            	String replacement = customFunction.getValue().execute(_ref, params);
+		            	matcher.appendReplacement(sb, replacement);
+		            }
+	        	}
+	        	matcher.appendTail(sb);
+	        	theValue = sb.toString();
 			}
+			return theValue;
 		}
-		return result.toString();
-	}
 
-	/*
-	 *  Helper method to prepare parameter
-	 *  input is a comma separated string but elements may be quoted and quoted values may also contain commas
-	 *  Sample: "cont,ainer", image.jpg 
-	 *  Result should be: param-1 [cont,ainer], param-2 [image.jpg]
-	 */
-	private ArrayList<String> parseCommasAndQuotes(String input){
-		ArrayList<String> result = new ArrayList<String>();
-		int start = 0;
-		boolean inQuotes = false;
-		for (int current = 0; current < input.length(); current++) {
-		    if (input.charAt(current) == '\"') inQuotes = !inQuotes; // toggle state
-		    else if (input.charAt(current) == ',' && !inQuotes) {
-		        result.add(input.substring(start, current).replace("\"", "").trim());
-		        start = current + 1;
-		    }
+		/*
+		 *  Helper method to prepare parameter
+		 *  input is a comma separated string but elements may be quoted and quoted values may also contain commas
+		 *  Sample: "cont,ainer", image.jpg 
+		 *  Result should be: param-1 [cont,ainer], param-2 [image.jpg]
+		 */
+		protected ArrayList<String> parseCommasAndQuotes(String input){
+			ArrayList<String> result = new ArrayList<String>();
+			int start = 0;
+			boolean inQuotes = false;
+			for (int current = 0; current < input.length(); current++) {
+			    if (input.charAt(current) == '\"') inQuotes = !inQuotes; // toggle state
+			    else if (input.charAt(current) == ',' && !inQuotes) {
+			        result.add(input.substring(start, current).replace("\"", "").trim());
+			        start = current + 1;
+			    }
+			}
+			result.add(input.substring(start).replace("\"",  "").trim());
+			return result;
 		}
-		result.add(input.substring(start).replace("\"",  "").trim());
-		return result;
+
+		
+		public String getName(){
+			return _name;
+		}
+		public boolean isVariant(){
+			return _variant;
+		}
+		public CssBlock getParentBlock(){
+			return _parentBlock;
+		}
+		public ArrayList<CssBlock> getSubBlocks(){
+			return _subClases;
+		}
+		public String getSourceInfo(){
+			return _sourceInfo;
+		}
+		public void setSourceInfo(String info){
+			_sourceInfo=info;
+		}
+		public HashMap<String,String> getProperties(){
+			return _props;
+		}
+		public HashMap<String,String> getVars(){
+			return _vars;
+		}
+		
+		public String getPath(){						
+			String path = _name;
+			boolean compact = _variant; 
+			for(CssBlock block = _parentBlock; block!=null && !(block instanceof CssMetaBlock); block = block.getParentBlock()){
+				path = block.getName() + (compact?"":" ") + path;
+				compact=block.isVariant();
+			}
+			return trim(path);
+		}
+
+		/*
+		 * Utility to remove multiple whitespaces from text
+		 */
+		private String trim(String text){
+			return text.trim().replaceAll("\\s+", " ");
+		}
+
 	}
+	
+	
+	public class CssPropertiesBlock extends CssBlock{
+
+		CssPropertiesBlock(String name) {
+			super(name);
+		}
+		CssPropertiesBlock(String name, CssBlock parent) {
+			super(name, parent);
+		}
+		
+		public String getCode(String prefix) throws WGException, IOException{
+			StringBuffer result = new StringBuffer();
+
+			String path = getParentBlock().getPath();
+			if(!getProperties().isEmpty()){
+				result.append("\n" + prefix + "/* " + getSourceInfo() + " */\n");
+				result.append(prefix);
+				result.append(path + "{\n");
+			}
+
+			for(Map.Entry<String,String> entry: getProperties().entrySet()){
+				result.append(prefix);
+				result.append("\t");
+				result.append(getName() + "-" + entry.getKey());
+				result.append(": ");
+				result.append(replaceCustomFunctions(entry.getValue()));
+				result.append(";\n");
+			}
+						
+			if(!getProperties().isEmpty()){
+				result.append(prefix);
+				result.append("}\n");
+			}
+			
+			return result.toString();
+		}
+	}
+	
+	public class CssDirectiveBlock extends CssBlock{
+
+		CssDirectiveBlock(String name) {
+			super(name);
+		}
+		CssDirectiveBlock(String name, CssBlock parent) {
+			super(name, parent);
+		}
+
+		public void parse(StreamTokenizer st) throws IOException{
+			setSourceInfo(_ref.toString() + " line " + st.lineno());
+
+			String parts[] = getName().split("\\s+");
+			if(parts[0].equalsIgnoreCase("@import") && parts.length>1){	
+				ArrayList<String> params = parseCommasAndQuotes(parts[1]);
+				try {
+					ResourceRef ref = _ref.resolve(params.get(0));
+					if(ref.getDesignDocument()!=null){
+						WcssCompiler compiler = new WcssCompiler(ref, _result);
+						compiler.compile(getParentBlock());
+					}
+					else LOG.error("@import: ResourceRef not found: " + ref);
+				} catch (WGException e) {
+					e.printStackTrace();
+				} 
+			}
+			else LOG.error("unknown directive " + getName());
+		}
+		
+		public String getCode(String prefix) throws WGException, IOException{
+			// nothing to do here
+			StringBuffer result = new StringBuffer();
+			result.append("\n" + prefix + "/* Execute " + getName() + " in " + getSourceInfo() + " */\n");
+			return result.toString();
+		}
+	}
+	
+	public class CssMetaBlock extends CssBlock{
+
+		CssMetaBlock(String name) {
+			super(name);
+		}
+		
+		CssMetaBlock(String name, CssBlock parent) {
+			super(name, parent);
+		}
+		
+		public String getCode(String prefix) throws WGException, IOException{
+			StringBuffer result = new StringBuffer();
+			result.append(getName() + "{\n");
+			for(CssBlock b: getSubBlocks()){
+				result.append(b.getCode("\t"));
+			}
+			result.append("}\n");
+			return result.toString();
+		}		
+	}
+	
 
 }
-
-
