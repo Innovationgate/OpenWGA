@@ -41,7 +41,7 @@ public class WcssCompiler {
 	}
 	
 	public String compile() throws WGException, IOException{
-		CssBlock b = new CssBlock(""); 
+		CssBlock b = new CssBlock(); 
 		compile(b);
 		return b.getCode("");
 	}
@@ -77,29 +77,50 @@ public class WcssCompiler {
 	private class CssBlock{
 		
 		private ArrayList<CssBlock> _subClases = new ArrayList<CssBlock>();
+		private HashMap<String,CssMixinBlock> _mixins = new HashMap<String,CssMixinBlock>();		
 		private HashMap<String,String> _props = new HashMap<String,String>();
 		private HashMap<String,String> _vars = new HashMap<String,String>();
 		private CssBlock _parentBlock = null;
 		private String _name;
-		private boolean _variant=false;
 		private String _sourceInfo;
 		
-		CssBlock(String name){
-			this(name, null, false);
-		}
-
-		CssBlock(String name, CssBlock parent){
-			this(name, parent, false);
-		}
+		CssBlock(){}
 		
-		CssBlock(String name, CssBlock parent, boolean variant){
+		CssBlock(String name, CssBlock parent){
 			_name = name;
 			_parentBlock = parent;
-			_variant = variant;
 			if(parent!=null)
 				parent.addSubClass(this);
 		}
 		
+		public String getName(){
+			return _name !=null ? _name : "";
+		}
+		public void setName(String name){
+			_name=name;
+		}
+		public CssBlock getParentBlock(){
+			return _parentBlock;
+		}
+		public ArrayList<CssBlock> getSubBlocks(){
+			return _subClases;
+		}
+		public String getSourceInfo(){
+			return _sourceInfo;
+		}
+		public void setSourceInfo(String info){
+			_sourceInfo=info;
+		}
+		public HashMap<String,String> getProperties(){
+			return _props;
+		}
+		public HashMap<String,String> getVars(){
+			return _vars;
+		}
+		protected HashMap<String,CssMixinBlock> getMixins(){
+			return _mixins;
+		}
+						
 		protected void addSubClass(CssBlock subclass){
 			_subClases.add(subclass);
 		}
@@ -128,26 +149,29 @@ public class WcssCompiler {
 							String propPart = propName.substring(0, index);
 							String valuePart = propName.substring(index+1);
 							if(propPart.startsWith("$")){
-								_vars.put(propPart, valuePart.trim().replaceAll("\\s+", " "));
+								_vars.put(propPart, trim(valuePart));
 							}
-							else _props.put(propPart, valuePart.trim().replaceAll("\\s+", " "));
+							else _props.put(propPart, trim(valuePart));
 						}
 						else LOG.warn("line " + st.lineno() + " ignored: " + propName);
 					}					
 				}
 				else if((char)token == '{'){
-					String className = prop.toString().trim().replaceAll("\\s+", " ");
+					String className = trim(prop.toString());
 					prop = new StringBuffer();
-					boolean isVariant=false;
-					if(className.startsWith("&")){
-						isVariant=true;
-						className = className.substring(1);
-					}
-					
 					if(className.startsWith("@media")){
+						// special handling for @media
 						CssBlock parent = new CssMetaBlock(className, this);	// no parent
-						CssBlock b = new CssBlock(getPath(), parent, isVariant);
+						CssBlock b = new CssBlock(getPath(), parent);
 						b.parse(st);
+					}
+					else if(className.startsWith("@mixin")){
+						CssMixinBlock b = new CssMixinBlock(className);
+						if(b.isValid()){
+							_mixins.put(b.getName(), b);
+						}
+						else LOG.error(st.toString() + ": invalid @mixin definition: " + className);
+						b.parse(st);	// parse in any case
 					}
 					else if(className.endsWith(":")){
 						className = className.substring(0, className.length()-1);
@@ -155,7 +179,7 @@ public class WcssCompiler {
 						b.parse(st);
 					}
 					else {
-						CssBlock b = new CssBlock(className, this, isVariant);
+						CssBlock b = new CssBlock(className, this);
 						b.parse(st);
 					}
 				}
@@ -168,7 +192,7 @@ public class WcssCompiler {
 		public String getCode(String prefix) throws WGException, IOException{
 			StringBuffer result = new StringBuffer();
 
-			if(!_props.isEmpty())
+			if(!_props.isEmpty() && getSourceInfo()!=null && !getSourceInfo().isEmpty())
 				result.append("\n" + prefix + "/* " + getSourceInfo() + " */\n");
 
 			String path = getPath();
@@ -197,7 +221,7 @@ public class WcssCompiler {
 		}
 
 		protected String replaceVars(String theValue) throws WGException {
-			String search_pattern = "\\$\\S+";
+			String search_pattern = "\\$[\\w-]+";		// alphanumeric (incl. underscore) plus minus
 			Pattern pattern = Pattern.compile(search_pattern);
 			Matcher matcher = pattern.matcher(theValue);
         	StringBuffer sb = new StringBuffer();
@@ -268,40 +292,37 @@ public class WcssCompiler {
 			return result;
 		}
 
-		
-		public String getName(){
-			return _name;
-		}
-		public boolean isVariant(){
-			return _variant;
-		}
-		public CssBlock getParentBlock(){
-			return _parentBlock;
-		}
-		public ArrayList<CssBlock> getSubBlocks(){
-			return _subClases;
-		}
-		public String getSourceInfo(){
-			return _sourceInfo;
-		}
-		public void setSourceInfo(String info){
-			_sourceInfo=info;
-		}
-		public HashMap<String,String> getProperties(){
-			return _props;
-		}
-		public HashMap<String,String> getVars(){
-			return _vars;
-		}
-		
-		public String getPath(){						
-			String path = _name;
-			boolean compact = _variant; 
-			for(CssBlock block = _parentBlock; block!=null && !(block instanceof CssMetaBlock); block = block.getParentBlock()){
-				path = block.getName() + (compact?"":" ") + path;
-				compact=block.isVariant();
+		protected CssBlock cloneCssBlock(CssBlock parent){
+			String name = getName();
+			if(this instanceof CssMixinBlock)
+				name="";
+			CssBlock clone = new CssBlock(name, parent);
+			
+			// copy properties
+			HashMap<String, String> props = clone.getProperties();
+			for(Map.Entry<String,String> entry: getProperties().entrySet()){
+				props.put(entry.getKey(), entry.getValue());
 			}
-			return trim(path);
+
+			// clone sub classes
+			for(CssBlock sub: getSubBlocks()){
+				sub.cloneCssBlock(clone);
+			}
+			
+			return clone;
+		}
+
+		public String getPath(){
+
+			String names[] = getName().trim().split("\\s*,\\s*");
+			String parentPath = trim(_parentBlock!=null ? _parentBlock.getPath() : "");
+			for(int i=0; i<names.length; i++){
+				String name = names[i];
+				if(name.startsWith("&"))
+					names[i] = trim(parentPath + name.substring(1));
+				else names[i] = trim(parentPath + " " + name);
+			}
+			return String.join(", ", names);
 		}
 
 		/*
@@ -310,15 +331,26 @@ public class WcssCompiler {
 		private String trim(String text){
 			return text.trim().replaceAll("\\s+", " ");
 		}
+		
+		protected CssMixinBlock findMixin(String name){
+			for(CssBlock block = this; block!=null; block = block.getParentBlock()){
+				CssMixinBlock mixin = block.getMixins().get(name);
+				if(mixin!=null)
+					return mixin;
+			}
+			return null;
+		}
 
 	}
 	
 	
 	public class CssPropertiesBlock extends CssBlock{
 
+		/*
 		CssPropertiesBlock(String name) {
 			super(name);
 		}
+		*/
 		CssPropertiesBlock(String name, CssBlock parent) {
 			super(name, parent);
 		}
@@ -353,9 +385,11 @@ public class WcssCompiler {
 	
 	public class CssDirectiveBlock extends CssBlock{
 
+		/*
 		CssDirectiveBlock(String name) {
 			super(name);
 		}
+		*/
 		CssDirectiveBlock(String name, CssBlock parent) {
 			super(name, parent);
 		}
@@ -377,6 +411,12 @@ public class WcssCompiler {
 					e.printStackTrace();
 				} 
 			}
+			else if(parts[0].equalsIgnoreCase("@include") && parts.length>1){
+				CssMixinBlock mixin = findMixin(parts[1].trim());
+				if(mixin!=null)
+					mixin.cloneCssBlock(getParentBlock());
+				else LOG.error("@mixin not found " + parts[1]);
+			}
 			else LOG.error("unknown directive " + getName());
 		}
 		
@@ -390,12 +430,18 @@ public class WcssCompiler {
 	
 	public class CssMetaBlock extends CssBlock{
 
+		/*
 		CssMetaBlock(String name) {
 			super(name);
 		}
+		*/
 		
 		CssMetaBlock(String name, CssBlock parent) {
 			super(name, parent);
+		}
+		
+		public String getPath(){
+			return "";
 		}
 		
 		public String getCode(String prefix) throws WGException, IOException{
@@ -409,5 +455,36 @@ public class WcssCompiler {
 		}		
 	}
 	
+	public class CssMixinBlock extends CssBlock{
 
+		ArrayList<String> _params;
+		boolean _valid=false;
+
+		CssMixinBlock(String name) {
+			String search_pattern = "@mixin\\s+(\\S+)\\s*\\(([^\\)]*)\\)";	// search for name(params)
+			Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
+        	Matcher matcher = pattern.matcher(name);
+        	while(matcher.find()){
+        		if(matcher.groupCount()==2){
+        			setName(matcher.group(1));
+        			_params = parseCommasAndQuotes(matcher.group(2));
+        			_valid=true;
+        		}
+        	}
+        	if(_valid)
+        		LOG.info("@mixin " + getName() + ", params=" + _params);
+		}
+		
+		public boolean isValid(){
+			return _valid;
+		}
+		
+		/*
+		public String getCode(String prefix) throws WGException, IOException{
+			// nothing to do here
+			return "";
+		}
+		*/
+		
+	}
 }
