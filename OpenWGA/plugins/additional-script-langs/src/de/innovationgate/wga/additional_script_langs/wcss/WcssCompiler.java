@@ -11,10 +11,6 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
-import de.innovationgate.webgate.api.WGException;
-import de.innovationgate.wga.additional_script_langs.ResourceRef;
-import de.innovationgate.wgpublisher.design.conversion.PostProcessResult;
-
 public class WcssCompiler {
 
 	public static final Logger LOG = Logger.getLogger("wga.wcss");
@@ -22,17 +18,20 @@ public class WcssCompiler {
 	// map of custom wcss functions
 	final private static HashMap<String, WcssFunction> customFunctions = new HashMap<String, WcssFunction>();
 
-	public interface WcssFunction{
-		public String execute(ResourceRef ref, ArrayList<String> params) throws WGException;
+	public interface WcssResource{
+		public String getCode();
+		public WcssResource resolve(String path);
+		public void addIntegratedResource();
 	}
 
+	public interface WcssFunction{
+		public String execute(WcssResource ref, ArrayList<String> params);
+	}
+	
+	WcssResource _resource;
 
-	ResourceRef _ref;
-	PostProcessResult _result;	
-
-	WcssCompiler(ResourceRef ref, PostProcessResult result){
-		_ref=ref;
-		_result=result;
+	WcssCompiler(WcssResource resource){
+		_resource = resource;
 	}
 
 	// register a custom function
@@ -40,14 +39,14 @@ public class WcssCompiler {
 		customFunctions.put(name, func);
 	}
 	
-	public String compile() throws WGException, IOException{
+	public String compile() throws IOException{
 		CssBlock b = new CssBlock(); 
 		compile(b);
 		return b.getCode("");
 	}
 	
-	public void compile(CssBlock parent) throws WGException, IOException{
-		StreamTokenizer st = new StreamTokenizer(new StringReader(_ref.getCode()));
+	private void compile(CssBlock parent) throws IOException{
+		StreamTokenizer st = new StreamTokenizer(new StringReader(_resource.getCode()));
 
 		st.resetSyntax();
 		
@@ -68,7 +67,7 @@ public class WcssCompiler {
 		CssBlock rootCssBlock = new CssBlock("", parent);
 		rootCssBlock.parse(st);
 		
-		_result.addIntegratedResource(_ref.getDesignDocument());
+		_resource.addIntegratedResource();
 		
 	}
 	
@@ -126,7 +125,7 @@ public class WcssCompiler {
 		}
 		
 		public void parse(StreamTokenizer st) throws IOException{
-			_sourceInfo = _ref.toString() + " line " + st.lineno();
+			_sourceInfo = _resource.toString() + " line " + st.lineno();
 			int token;
 			StringBuffer prop = new StringBuffer();
 			while((token = st.nextToken()) != StreamTokenizer.TT_EOF){
@@ -189,7 +188,7 @@ public class WcssCompiler {
 			
 		}
 		
-		public String getCode(String prefix) throws WGException, IOException{
+		public String getCode(String prefix) throws IOException{
 			StringBuffer result = new StringBuffer();
 
 			if(!_props.isEmpty() && getSourceInfo()!=null && !getSourceInfo().isEmpty())
@@ -220,7 +219,7 @@ public class WcssCompiler {
 			return result.toString();
 		}
 
-		protected String replaceVars(String theValue) throws WGException {
+		protected String replaceVars(String theValue) {
 			String search_pattern = "\\$[\\w-]+";		// alphanumeric (incl. underscore) plus minus
 			Pattern pattern = Pattern.compile(search_pattern);
 			Matcher matcher = pattern.matcher(theValue);
@@ -252,7 +251,7 @@ public class WcssCompiler {
 		/*
 		 * search for pattern function_name(param1, param2, ...) and replace it with result of custom function
 		 */
-		protected String replaceCustomFunctions(String theValue) throws WGException {
+		protected String replaceCustomFunctions(String theValue) {
 			for(Map.Entry<String,WcssFunction> customFunction : customFunctions.entrySet()){
 				String search_pattern = customFunction.getKey() + "\\s*\\(([^\\)]*)\\)";	// search for name(params)
 				Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
@@ -261,7 +260,7 @@ public class WcssCompiler {
 	        	while(matcher.find()){
 		            if(matcher.groupCount()>0) {
 		            	ArrayList<String> params = parseCommasAndQuotes(matcher.group(1));
-		            	String replacement = customFunction.getValue().execute(_ref, params);
+		            	String replacement = customFunction.getValue().execute(_resource, params);
 		            	matcher.appendReplacement(sb, replacement);
 		            }
 	        	}
@@ -343,19 +342,13 @@ public class WcssCompiler {
 
 	}
 	
-	
-	public class CssPropertiesBlock extends CssBlock{
+	private class CssPropertiesBlock extends CssBlock{
 
-		/*
-		CssPropertiesBlock(String name) {
-			super(name);
-		}
-		*/
 		CssPropertiesBlock(String name, CssBlock parent) {
 			super(name, parent);
 		}
 		
-		public String getCode(String prefix) throws WGException, IOException{
+		public String getCode(String prefix) throws IOException{
 			StringBuffer result = new StringBuffer();
 
 			String path = getParentBlock().getPath();
@@ -383,33 +376,24 @@ public class WcssCompiler {
 		}
 	}
 	
-	public class CssDirectiveBlock extends CssBlock{
+	private class CssDirectiveBlock extends CssBlock{
 
-		/*
-		CssDirectiveBlock(String name) {
-			super(name);
-		}
-		*/
 		CssDirectiveBlock(String name, CssBlock parent) {
 			super(name, parent);
 		}
 
 		public void parse(StreamTokenizer st) throws IOException{
-			setSourceInfo(_ref.toString() + " line " + st.lineno());
+			setSourceInfo(_resource.toString() + " line " + st.lineno());
 
 			String parts[] = getName().split("\\s+");
 			if(parts[0].equalsIgnoreCase("@import") && parts.length>1){	
 				ArrayList<String> params = parseCommasAndQuotes(parts[1]);
-				try {
-					ResourceRef ref = _ref.resolve(params.get(0));
-					if(ref.getDesignDocument()!=null){
-						WcssCompiler compiler = new WcssCompiler(ref, _result);
-						compiler.compile(getParentBlock());
-					}
-					else LOG.error("@import: ResourceRef not found: " + ref);
-				} catch (WGException e) {
-					e.printStackTrace();
-				} 
+				WcssResource ref = _resource.resolve(params.get(0));
+				if(ref!=null){
+					WcssCompiler compiler = new WcssCompiler(ref);
+					compiler.compile(getParentBlock());
+				}
+				else LOG.error("@import: ResourceRef not found: " + ref);
 			}
 			else if(parts[0].equalsIgnoreCase("@include") && parts.length>1){
 				CssMixinBlock mixin = findMixin(parts[1].trim());
@@ -420,7 +404,7 @@ public class WcssCompiler {
 			else LOG.error("unknown directive " + getName());
 		}
 		
-		public String getCode(String prefix) throws WGException, IOException{
+		public String getCode(String prefix) throws IOException{
 			// nothing to do here
 			StringBuffer result = new StringBuffer();
 			result.append("\n" + prefix + "/* Execute " + getName() + " in " + getSourceInfo() + " */\n");
@@ -428,14 +412,8 @@ public class WcssCompiler {
 		}
 	}
 	
-	public class CssMetaBlock extends CssBlock{
+	private class CssMetaBlock extends CssBlock{
 
-		/*
-		CssMetaBlock(String name) {
-			super(name);
-		}
-		*/
-		
 		CssMetaBlock(String name, CssBlock parent) {
 			super(name, parent);
 		}
@@ -444,7 +422,7 @@ public class WcssCompiler {
 			return "";
 		}
 		
-		public String getCode(String prefix) throws WGException, IOException{
+		public String getCode(String prefix) throws IOException{
 			StringBuffer result = new StringBuffer();
 			result.append(getName() + "{\n");
 			for(CssBlock b: getSubBlocks()){
@@ -455,7 +433,7 @@ public class WcssCompiler {
 		}		
 	}
 	
-	public class CssMixinBlock extends CssBlock{
+	private class CssMixinBlock extends CssBlock{
 
 		ArrayList<String> _params;
 		boolean _valid=false;
@@ -478,13 +456,6 @@ public class WcssCompiler {
 		public boolean isValid(){
 			return _valid;
 		}
-		
-		/*
-		public String getCode(String prefix) throws WGException, IOException{
-			// nothing to do here
-			return "";
-		}
-		*/
 		
 	}
 }
