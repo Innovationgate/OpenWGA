@@ -440,7 +440,7 @@ public class WcssCompiler {
 		boolean _valid=false;
 
 		CssMixinBlock(String name) {
-			String search_pattern = "@mixin\\s+(\\S+)\\s*\\(([^\\)]*)\\)";	// search for name(params)
+			String search_pattern = "@mixin\\s+(\\S+)\\s*\\(([^\\)]*)\\)";	// search for @mixin name(params)
 			Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
         	Matcher matcher = pattern.matcher(name);
         	while(matcher.find()){
