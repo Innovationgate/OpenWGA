@@ -15,9 +15,6 @@ public class WcssCompiler {
 
 	public static final Logger LOG = Logger.getLogger("wga.wcss");
 
-	// map of custom wcss functions
-	final private static HashMap<String, WcssFunction> customFunctions = new HashMap<String, WcssFunction>();
-
 	public interface WcssResource{
 		public String getCode();
 		public WcssResource resolve(String path);
@@ -25,9 +22,12 @@ public class WcssCompiler {
 	}
 
 	public interface WcssFunction{
-		public String execute(WcssResource ref, ArrayList<String> params);
+		public String execute(WcssResource resource, ArrayList<String> params);
 	}
-	
+
+	// map of custom wcss functions
+	final private static HashMap<String, WcssFunction> customFunctions = new HashMap<String, WcssFunction>();
+
 	WcssResource _resource;
 
 	WcssCompiler(WcssResource resource){
@@ -57,14 +57,14 @@ public class WcssCompiler {
 		
 		st.slashSlashComments(true);
 		st.slashStarComments(true);
-		st.eolIsSignificant(true);
+		//st.eolIsSignificant(true);
 		
 		st.ordinaryChar('{');
 		st.ordinaryChar('}');
 		st.ordinaryChar(';');
 		st.ordinaryChar('/');		// needed for comments
 		        
-		CssBlock rootCssBlock = new CssBlock("", parent);
+		CssBlock rootCssBlock = new CssBlock(parent);
 		rootCssBlock.parse(st);
 		
 		_resource.addIntegratedResource();
@@ -80,10 +80,14 @@ public class WcssCompiler {
 		private HashMap<String,String> _props = new HashMap<String,String>();
 		private HashMap<String,String> _vars = new HashMap<String,String>();
 		private CssBlock _parentBlock = null;
-		private String _name;
+		private String _name="";
 		private String _sourceInfo;
 		
 		CssBlock(){}
+		
+		CssBlock(CssBlock parent){
+			this("", parent);
+		}
 		
 		CssBlock(String name, CssBlock parent){
 			_name = name;
@@ -125,7 +129,7 @@ public class WcssCompiler {
 		}
 		
 		public void parse(StreamTokenizer st) throws IOException{
-			_sourceInfo = _resource.toString() + " line " + st.lineno();
+			_sourceInfo = _resource + " line " + st.lineno();
 			int token;
 			StringBuffer prop = new StringBuffer();
 			while((token = st.nextToken()) != StreamTokenizer.TT_EOF){
@@ -197,7 +201,7 @@ public class WcssCompiler {
 			String path = getPath();
 			if(!path.isEmpty() && !_props.isEmpty()){
 				result.append(prefix);
-				result.append(getPath() + "{\n");
+				result.append(path + "{\n");
 			}
 			for(Map.Entry<String,String> entry: _props.entrySet()){
 				if(!path.isEmpty()){
@@ -287,7 +291,7 @@ public class WcssCompiler {
 			        start = current + 1;
 			    }
 			}
-			result.add(input.substring(start).replace("\"",  "").trim());
+			result.add(input.substring(start).replace("\"", "").trim());
 			return result;
 		}
 
@@ -351,11 +355,10 @@ public class WcssCompiler {
 		public String getCode(String prefix) throws IOException{
 			StringBuffer result = new StringBuffer();
 
-			String path = getParentBlock().getPath();
 			if(!getProperties().isEmpty()){
 				result.append("\n" + prefix + "/* " + getSourceInfo() + " */\n");
 				result.append(prefix);
-				result.append(path + "{\n");
+				result.append(getParentBlock().getPath() + "{\n");
 			}
 
 			for(Map.Entry<String,String> entry: getProperties().entrySet()){
@@ -406,9 +409,7 @@ public class WcssCompiler {
 		
 		public String getCode(String prefix) throws IOException{
 			// nothing to do here
-			StringBuffer result = new StringBuffer();
-			result.append("\n" + prefix + "/* Execute " + getName() + " in " + getSourceInfo() + " */\n");
-			return result.toString();
+			return "\n" + prefix + "/* Execute " + getName() + " in " + getSourceInfo() + " */";
 		}
 	}
 	
