@@ -450,8 +450,10 @@ public class WcssCompiler {
         			_valid=true;
         		}
         	}
+        	/*
         	if(_valid)
         		LOG.info("@mixin " + getName() + ", params=" + _params);
+        	*/
 		}
 		
 		public boolean isValid(){
