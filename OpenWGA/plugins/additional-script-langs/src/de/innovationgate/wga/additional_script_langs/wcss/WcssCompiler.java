@@ -409,7 +409,7 @@ public class WcssCompiler {
 		
 		public String getCode(String prefix) throws IOException{
 			// nothing to do here
-			return "\n" + prefix + "/* Execute " + getName() + " in " + getSourceInfo() + " */";
+			return "\n" + prefix + "/* Execute " + getName() + " in " + getSourceInfo() + " */\n";
 		}
 	}
 	
