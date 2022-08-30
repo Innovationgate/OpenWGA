@@ -282,6 +282,8 @@ public class WcssCompiler {
 		 */
 		protected ArrayList<String> parseCommasAndQuotes(String input){
 			ArrayList<String> result = new ArrayList<String>();
+			if(input==null)
+				return result;
 			int start = 0;
 			boolean inQuotes = false;
 			for (int current = 0; current < input.length(); current++) {
@@ -295,21 +297,25 @@ public class WcssCompiler {
 			return result;
 		}
 
-		protected CssBlock cloneCssBlock(CssBlock parent){
-			String name = getName();
-			if(this instanceof CssMixinBlock)
-				name="";
+		protected CssBlock cloneCssBlock(String name, CssBlock parent){
+
 			CssBlock clone = new CssBlock(name, parent);
 			
 			// copy properties
 			HashMap<String, String> props = clone.getProperties();
-			for(Map.Entry<String,String> entry: getProperties().entrySet()){
+			for(Map.Entry<String,String> entry: this.getProperties().entrySet()){
 				props.put(entry.getKey(), entry.getValue());
 			}
 
+			// copy vars
+			HashMap<String, String> vars = clone.getVars();
+			for(Map.Entry<String,String> entry: this.getVars().entrySet()){
+				vars.put(entry.getKey(), entry.getValue());
+			}
+
 			// clone sub classes
-			for(CssBlock sub: getSubBlocks()){
-				sub.cloneCssBlock(clone);
+			for(CssBlock sub: this.getSubBlocks()){
+				sub.cloneCssBlock(sub.getName(), clone);
 			}
 			
 			return clone;
@@ -388,9 +394,22 @@ public class WcssCompiler {
 		public void parse(StreamTokenizer st) throws IOException{
 			setSourceInfo(_resource.toString() + " line " + st.lineno());
 
-			String parts[] = getName().split("\\s+");
-			if(parts[0].equalsIgnoreCase("@import") && parts.length>1){	
-				ArrayList<String> params = parseCommasAndQuotes(parts[1]);
+			String directive="";
+			String params_string="";
+			// parse for "@directive something"
+			String search_pattern = "@(\\S+)\\s*(.*)";
+			Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
+        	Matcher matcher = pattern.matcher(getName());
+        	if(matcher.find()){
+        		if(matcher.groupCount()>1){
+        			directive = matcher.group(1);
+        			params_string = matcher.group(2);
+        		}
+        	}
+        	//LOG.info("@directive: " + directive  + ", params: " + params_string);
+			
+			if(directive.equalsIgnoreCase("import") && params_string.length()>1){	
+				ArrayList<String> params = parseCommasAndQuotes(params_string);
 				WcssResource ref = _resource.resolve(params.get(0));
 				if(ref!=null){
 					WcssCompiler compiler = new WcssCompiler(ref);
@@ -398,11 +417,33 @@ public class WcssCompiler {
 				}
 				else LOG.error("@import: ResourceRef not found: " + ref);
 			}
-			else if(parts[0].equalsIgnoreCase("@include") && parts.length>1){
-				CssMixinBlock mixin = findMixin(parts[1].trim());
+			else if(directive.equalsIgnoreCase("include") && params_string.length()>1){
+				
+				String mixin_name="";
+				String rest = "";
+				ArrayList<String> params = new ArrayList<String>();
+				search_pattern = "([\\w-]+)\\s*(.*)";	// search for name
+				pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
+	        	matcher = pattern.matcher(params_string);
+	        	if(matcher.find()){
+	        		if(matcher.groupCount()>1){
+	        			mixin_name=matcher.group(1);
+        				rest = matcher.group(2);
+	        		}
+	        	}
+	        	if(rest.length()>0){
+	        		search_pattern = "\\(([^\\)]*)\\)";	// search for (params)
+					pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
+		        	matcher = pattern.matcher(rest);
+		        	if(matcher.find())
+	        			params = parseCommasAndQuotes(matcher.group(1));
+	        	}
+	        	//LOG.info("@include mixin '" + mixin_name + "', params=" + params);
+								
+				CssMixinBlock mixin = findMixin(mixin_name);
 				if(mixin!=null)
-					mixin.cloneCssBlock(getParentBlock());
-				else LOG.error("@mixin not found " + parts[1]);
+					mixin.cloneCssBlock(getParentBlock(), params);
+				else LOG.error("@mixin not found " + mixin_name);
 			}
 			else LOG.error("unknown directive " + getName());
 		}
@@ -443,22 +484,50 @@ public class WcssCompiler {
 			String search_pattern = "@mixin\\s+(\\S+)\\s*\\(([^\\)]*)\\)";	// search for @mixin name(params)
 			Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
         	Matcher matcher = pattern.matcher(name);
-        	while(matcher.find()){
+        	if(matcher.find()){
         		if(matcher.groupCount()==2){
         			setName(matcher.group(1));
         			_params = parseCommasAndQuotes(matcher.group(2));
         			_valid=true;
+        			for(int i=0; i<_params.size(); i++){
+        				String parts[] = _params.get(i).split("\\s*:\\s*");
+        				if(parts.length>1){
+        					getVars().put(parts[0], parts[1]);
+        					_params.set(i, parts[0]);
+        				}
+        			}
         		}
         	}
         	/*
         	if(_valid)
-        		LOG.info("@mixin " + getName() + ", params=" + _params);
+        		LOG.info("@mixin " + getName() + ", params=" + _params + ", vars=" + getVars());
         	*/
 		}
 		
 		public boolean isValid(){
 			return _valid;
 		}
-		
+
+		public CssBlock cloneCssBlock(CssBlock parent, ArrayList<String> params){
+			
+			CssBlock clone = super.cloneCssBlock("", parent);
+			
+			// params
+			if(params!=null){
+				for(int i=0; i<params.size(); i++){
+					String parts[] = params.get(i).split("\\s*:\\s*");
+					if(parts.length>1){
+						clone.getVars().put(parts[0], parts[1]);
+					}
+					else{
+						String p = _params.get(i);
+						clone.getVars().put(p, parts[0]);
+					}
+				}
+			}
+			
+			return clone;
+		}
+
 	}
 }
