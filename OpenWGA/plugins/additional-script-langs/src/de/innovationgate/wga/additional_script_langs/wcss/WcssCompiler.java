@@ -68,7 +68,8 @@ public class WcssCompiler {
 		rootCssBlock.parse(st);
 		
 		_resource.addIntegratedResource();
-		
+		//LOG.info("dump\n" + rootCssBlock.dump(""));
+
 	}
 	
 	//--------------------
@@ -94,6 +95,14 @@ public class WcssCompiler {
 			_parentBlock = parent;
 			if(parent!=null)
 				parent.addSubClass(this);
+		}
+		
+		public String dump(String prefix){
+			StringBuffer s = new StringBuffer();
+			s.append("\n" + prefix + "'" + _name + "' (" + getClass().getName() + ")");
+			for(CssBlock b : getSubBlocks())
+				s.append(b.dump(prefix + "\t"));
+			return s.toString();
 		}
 		
 		public String getName(){
@@ -166,6 +175,10 @@ public class WcssCompiler {
 						// special handling for @media
 						CssBlock parent = new CssMetaBlock(className, this);	// no parent
 						CssBlock b = new CssBlock(getPath(), parent);
+						b.parse(st);
+					}
+					else if(className.startsWith("@include")){
+						CssIncludeBlock b = new CssIncludeBlock(className, this);
 						b.parse(st);
 					}
 					else if(className.startsWith("@mixin")){
@@ -297,7 +310,7 @@ public class WcssCompiler {
 			return result;
 		}
 
-		protected CssBlock cloneCssBlock(String name, CssBlock parent){
+		protected CssBlock cloneCssBlock(String name, CssBlock parent, CssBlock contentBlock){
 
 			CssBlock clone = new CssBlock(name, parent);
 			
@@ -315,7 +328,7 @@ public class WcssCompiler {
 
 			// clone sub classes
 			for(CssBlock sub: this.getSubBlocks()){
-				sub.cloneCssBlock(sub.getName(), clone);
+				sub.cloneCssBlock(sub.getName(), clone, contentBlock);
 			}
 			
 			return clone;
@@ -323,15 +336,22 @@ public class WcssCompiler {
 
 		public String getPath(){
 
-			String names[] = getName().trim().split("\\s*,\\s*");
-			String parentPath = trim(_parentBlock!=null ? _parentBlock.getPath() : "");
-			for(int i=0; i<names.length; i++){
-				String name = names[i];
-				if(name.startsWith("&"))
-					names[i] = trim(parentPath + name.substring(1));
-				else names[i] = trim(parentPath + " " + name);
+			String parentPath = (_parentBlock!=null ? _parentBlock.getPath() : "");
+			String path_parts[] = parentPath.split("\\s*,\\s*");
+			String name_parts[] = getName().trim().split("\\s*,\\s*");
+			
+			ArrayList<String> result = new ArrayList<String>();
+			for(int i=0; i<name_parts.length; i++){
+				for(int j=0; j<path_parts.length; j++){
+					String name = name_parts[i];
+					String path = path_parts[j];
+					if(name.startsWith("&"))
+						result.add(trim(path + name.substring(1)));
+					else result.add(trim(path + " " + name));
+				}
 			}
-			return String.join(", ", names);
+			String[] r = new String[result.size()];
+			return String.join(", ", result.toArray(r));
 		}
 
 		/*
@@ -406,7 +426,6 @@ public class WcssCompiler {
         			params_string = matcher.group(2);
         		}
         	}
-        	//LOG.info("@directive: " + directive  + ", params: " + params_string);
 			
 			if(directive.equalsIgnoreCase("import") && params_string.length()>1){	
 				ArrayList<String> params = parseCommasAndQuotes(params_string);
@@ -416,6 +435,9 @@ public class WcssCompiler {
 					compiler.compile(getParentBlock());
 				}
 				else LOG.error("@import: ResourceRef not found: " + ref);
+			}
+			else if(directive.equalsIgnoreCase("content")){
+				new CssContentBlock(getParentBlock());
 			}
 			else if(directive.equalsIgnoreCase("include") && params_string.length()>1){
 				
@@ -438,11 +460,10 @@ public class WcssCompiler {
 		        	if(matcher.find())
 	        			params = parseCommasAndQuotes(matcher.group(1));
 	        	}
-	        	//LOG.info("@include mixin '" + mixin_name + "', params=" + params);
 								
 				CssMixinBlock mixin = findMixin(mixin_name);
 				if(mixin!=null)
-					mixin.cloneCssBlock(getParentBlock(), params);
+					mixin.cloneCssBlock(getParentBlock(), params, null);
 				else LOG.error("@mixin not found " + mixin_name);
 			}
 			else LOG.error("unknown directive " + getName());
@@ -475,6 +496,50 @@ public class WcssCompiler {
 		}		
 	}
 	
+	private class CssIncludeBlock extends CssBlock{
+
+		String mixin_name;
+		ArrayList<String> params = new ArrayList<String>();
+		CssBlock _parent;
+		
+		CssIncludeBlock(String name, CssBlock parent) {
+			
+			_parent = parent;
+
+			String rest="";
+			String search_pattern = "@include\\s+([\\w-]+)\\s*(.*)";
+			Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
+        	Matcher matcher = pattern.matcher(name);
+        	if(matcher.find()){
+        		if(matcher.groupCount()>1){
+        			mixin_name = matcher.group(1);
+        			rest = matcher.group(2);
+        		}
+        	}
+        	if(rest.length()>0){
+        		search_pattern = "\\(([^\\)]*)\\)";	// search for (params)
+				pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
+	        	matcher = pattern.matcher(rest);
+	        	if(matcher.find())
+        			params = parseCommasAndQuotes(matcher.group(1));
+        	}
+		}
+
+		public String getName(){
+			return "";
+		}
+		
+		public void parse(StreamTokenizer st) throws IOException{
+			super.parse(st);
+        	CssMixinBlock mixin = _parent.findMixin(mixin_name);
+			if(mixin!=null){
+				mixin.cloneCssBlock(_parent, params, this);
+			}
+			else LOG.error("mixin not found: " + mixin_name);
+		}
+		
+	}
+	
 	private class CssMixinBlock extends CssBlock{
 
 		ArrayList<String> _params;
@@ -498,19 +563,15 @@ public class WcssCompiler {
         			}
         		}
         	}
-        	/*
-        	if(_valid)
-        		LOG.info("@mixin " + getName() + ", params=" + _params + ", vars=" + getVars());
-        	*/
 		}
 		
 		public boolean isValid(){
 			return _valid;
 		}
 
-		public CssBlock cloneCssBlock(CssBlock parent, ArrayList<String> params){
+		public CssBlock cloneCssBlock(CssBlock parent, ArrayList<String> params, CssBlock contentBlock){
 			
-			CssBlock clone = super.cloneCssBlock("", parent);
+			CssBlock clone = super.cloneCssBlock("", parent, contentBlock);
 			
 			// params
 			if(params!=null){
@@ -530,4 +591,17 @@ public class WcssCompiler {
 		}
 
 	}
+	
+	private class CssContentBlock extends CssBlock{
+
+		CssContentBlock(CssBlock parent) {
+			super(parent);
+		}
+
+		protected CssBlock cloneCssBlock(String name, CssBlock parent, CssBlock contentBlock){
+			return contentBlock.cloneCssBlock(name, parent, null);
+		}
+		
+	}
+	
 }
