@@ -39,10 +39,15 @@ public class WcssCompiler {
 		customFunctions.put(name, func);
 	}
 	
+	private boolean _compress=false;
+	public void setCompressing(boolean value){
+		_compress=value;
+	}
+	
 	public String compile() throws IOException{
 		CssBlock b = new CssBlock(); 
 		compile(b);
-		return b.getCode("");
+		return b.getCode();
 	}
 	
 	private void compile(CssBlock parent) throws IOException{
@@ -76,7 +81,7 @@ public class WcssCompiler {
 
 	private class CssBlock{
 		
-		private ArrayList<CssBlock> _subClases = new ArrayList<CssBlock>();
+		private ArrayList<CssBlock> _subBlocks = new ArrayList<CssBlock>();
 		private HashMap<String,CssMixinBlock> _mixins = new HashMap<String,CssMixinBlock>();		
 		private HashMap<String,String> _props = new HashMap<String,String>();
 		private HashMap<String,String> _vars = new HashMap<String,String>();
@@ -94,7 +99,7 @@ public class WcssCompiler {
 			_name = name;
 			_parentBlock = parent;
 			if(parent!=null)
-				parent.addSubClass(this);
+				parent.addSubBlock(this);
 		}
 		
 		public String dump(String prefix){
@@ -115,10 +120,10 @@ public class WcssCompiler {
 			return _parentBlock;
 		}
 		public ArrayList<CssBlock> getSubBlocks(){
-			return _subClases;
+			return _subBlocks;
 		}
 		public String getSourceInfo(){
-			return _sourceInfo;
+			return _compress ? null : _sourceInfo;
 		}
 		public void setSourceInfo(String info){
 			_sourceInfo=info;
@@ -133,8 +138,8 @@ public class WcssCompiler {
 			return _mixins;
 		}
 						
-		protected void addSubClass(CssBlock subclass){
-			_subClases.add(subclass);
+		protected void addSubBlock(CssBlock subblock){
+			_subBlocks.add(subblock);
 		}
 		
 		public void parse(StreamTokenizer st) throws IOException{
@@ -173,7 +178,7 @@ public class WcssCompiler {
 					prop = new StringBuffer();
 					if(className.startsWith("@media")){
 						// special handling for @media
-						CssBlock parent = new CssMetaBlock(className, this);	// no parent
+						CssBlock parent = new CssMediaBlock(className, this);	// no parent
 						CssBlock b = new CssBlock(getPath(), parent);
 						b.parse(st);
 					}
@@ -205,8 +210,14 @@ public class WcssCompiler {
 			
 		}
 		
+		public String getCode() throws IOException{
+			return getCode("");
+		}
 		public String getCode(String prefix) throws IOException{
 			StringBuffer result = new StringBuffer();
+
+			if(_compress)
+				prefix="";
 
 			if(!_props.isEmpty() && getSourceInfo()!=null && !getSourceInfo().isEmpty())
 				result.append("\n" + prefix + "/* " + getSourceInfo() + " */\n");
@@ -214,23 +225,29 @@ public class WcssCompiler {
 			String path = getPath();
 			if(!path.isEmpty() && !_props.isEmpty()){
 				result.append(prefix);
-				result.append(path + "{\n");
+				result.append(path + "{");
+				if(!_compress)
+					result.append("\n");
 			}
 			for(Map.Entry<String,String> entry: _props.entrySet()){
-				if(!path.isEmpty()){
+				if(!path.isEmpty() && !_compress){
 					result.append(prefix);
 					result.append("\t");
 				}
 				result.append(entry.getKey());
 				result.append(": ");
 				result.append(replaceCustomFunctions(replaceVars(entry.getValue())));
-				result.append(";\n");
+				result.append(";");
+				if(!_compress)
+					result.append("\n");
 			}
 			if(!path.isEmpty() && !_props.isEmpty()){
 				result.append(prefix);
-				result.append("}\n");
+				result.append("}");
+				if(!_compress)
+					result.append("\n");
 			}
-			for(CssBlock b: _subClases)
+			for(CssBlock b: _subBlocks)
 				result.append(b.getCode(prefix));
 
 			return result.toString();
@@ -381,24 +398,35 @@ public class WcssCompiler {
 		public String getCode(String prefix) throws IOException{
 			StringBuffer result = new StringBuffer();
 
+			if(_compress)
+				prefix="";
+			
 			if(!getProperties().isEmpty()){
-				result.append("\n" + prefix + "/* " + getSourceInfo() + " */\n");
+				if(getSourceInfo()!=null)
+					result.append("\n" + prefix + "/* " + getSourceInfo() + " */\n");
 				result.append(prefix);
-				result.append(getParentBlock().getPath() + "{\n");
+				result.append(getParentBlock().getPath() + "{");
+				if(!_compress)
+					result.append("\n");
 			}
 
 			for(Map.Entry<String,String> entry: getProperties().entrySet()){
 				result.append(prefix);
-				result.append("\t");
+				if(!_compress)
+					result.append("\t");
 				result.append(getName() + "-" + entry.getKey());
 				result.append(": ");
 				result.append(replaceCustomFunctions(entry.getValue()));
-				result.append(";\n");
+				result.append(";");
+				if(!_compress)
+					result.append("\n");
 			}
 						
 			if(!getProperties().isEmpty()){
 				result.append(prefix);
-				result.append("}\n");
+				result.append("}");
+				if(!_compress)
+					result.append("\n");
 			}
 			
 			return result.toString();
@@ -430,7 +458,7 @@ public class WcssCompiler {
 			if(directive.equalsIgnoreCase("import") && params_string.length()>1){	
 				ArrayList<String> params = parseCommasAndQuotes(params_string);
 				WcssResource ref = _resource.resolve(params.get(0));
-				if(ref!=null){
+				if(ref!=null && ref.getCode()!=null){
 					WcssCompiler compiler = new WcssCompiler(ref);
 					compiler.compile(getParentBlock());
 				}
@@ -471,13 +499,15 @@ public class WcssCompiler {
 		
 		public String getCode(String prefix) throws IOException{
 			// nothing to do here
-			return "\n" + prefix + "/* Execute " + getName() + " in " + getSourceInfo() + " */\n";
+			if(getSourceInfo()!=null)
+				return "\n" + prefix + "/* Execute " + getName() + " in " + getSourceInfo() + " */\n";
+			else return "";
 		}
 	}
 	
-	private class CssMetaBlock extends CssBlock{
+	private class CssMediaBlock extends CssBlock{
 
-		CssMetaBlock(String name, CssBlock parent) {
+		CssMediaBlock(String name, CssBlock parent) {
 			super(name, parent);
 		}
 		
@@ -487,11 +517,15 @@ public class WcssCompiler {
 		
 		public String getCode(String prefix) throws IOException{
 			StringBuffer result = new StringBuffer();
-			result.append(getName() + "{\n");
+			result.append(getName() + "{");
+			if(!_compress)
+				result.append("\n");
 			for(CssBlock b: getSubBlocks()){
 				result.append(b.getCode("\t"));
 			}
-			result.append("}\n");
+			result.append("}");
+			if(!_compress)
+				result.append("\n");
 			return result.toString();
 		}		
 	}

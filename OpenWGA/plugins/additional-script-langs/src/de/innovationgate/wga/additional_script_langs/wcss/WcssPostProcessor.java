@@ -10,6 +10,7 @@ import de.innovationgate.wga.additional_script_langs.wcss.WcssCompiler.WcssFunct
 import de.innovationgate.wga.additional_script_langs.wcss.WcssCompiler.WcssResource;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.WGA;
+import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessData;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessResult;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessor;
@@ -35,9 +36,13 @@ public class WcssPostProcessor implements PostProcessor{
         ResourceRef ref = new ResourceRef(design, ResourceRef.TYPE_CSS);
 
         WcssCompiler.registerCustomFunction("wga_file_url", new WGAFileURL());
+        WcssCompiler.registerCustomFunction("fileurl", new WGAFileURL());
         
         WGAResource res = new WGAResource(result, ref);
 		WcssCompiler compiler = new WcssCompiler(res);
+    	if(!WGACore.isDevelopmentModeEnabled() && data.isCompress())
+    		compiler.setCompressing(true);
+
 		try {
 			result.setCode(compiler.compile());
 		} catch (IOException e) {
