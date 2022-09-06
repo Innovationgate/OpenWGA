@@ -1,10 +1,16 @@
 package de.innovationgate.wga.additional_script_langs.wcss;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.innovationgate.webgate.api.WGDesignDocument;
+import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
+import de.innovationgate.webgate.api.WGScriptModule;
 import de.innovationgate.wga.additional_script_langs.ResourceRef;
 import de.innovationgate.wga.additional_script_langs.wcss.WcssCompiler.WcssFunction;
 import de.innovationgate.wga.additional_script_langs.wcss.WcssCompiler.WcssResource;
@@ -19,10 +25,40 @@ public class WcssPostProcessor implements PostProcessor{
 
 	WGA _wga;
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void prepare(WGA wga, PostProcessData data) throws WGException {
+			
+    	ArrayList<Design> cssVariables = wga.design(data.getDocument().getDatabase().getDbReference())
+    			.resolveSystemResources("css-variables", WGDocument.TYPE_CSSJS, WGScriptModule.CODETYPE_TMLSCRIPT, false);
+    	if(cssVariables.size()==0)
+    		return;
+
+    	Collections.reverse(cssVariables);		// execute @base design first followed by overlay design
+    	
+        Map<String,Object> extraObjects = new HashMap<String, Object>();
+        extraObjects.put("cssDocument", data.getDocument());
+
+        Map<String,Object> vars = new HashMap<String, Object>();
+    	for (Design design : cssVariables) {
+            Object result = wga.tmlscript().runScript(design, wga.createTMLContext(data.getDocument().getDatabase(), design), design.getScriptModule(WGScriptModule.CODETYPE_TMLSCRIPT).getCode(), extraObjects);
+            if (!(result instanceof Map<?,?>)) {
+            	wga.getLog().error("The return type of TMLScript module '" + design + "' used to set CSS variables is no lookup table or JS object and will be ignored.");
+            	continue;
+            }
+            vars.putAll((Map<String,Object>)result);
+		}
+    	
+    	if(wga.getRequest()!=null){
+    		String host = wga.getRequest().getServerName().replace(".", "_");
+    		vars.put("requested_host", host);
+    	}
+    	
+        data.setCacheQualifier((Serializable)vars);
+			
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public PostProcessResult postProcess(WGA wga, PostProcessData data, String code) throws WGException {
 		
@@ -37,9 +73,20 @@ public class WcssPostProcessor implements PostProcessor{
 
         WcssCompiler.registerCustomFunction("wga_file_url", new WGAFileURL());
         WcssCompiler.registerCustomFunction("fileurl", new WGAFileURL());
-        
+        WcssCompiler.registerCustomFunction("concat", new Concat());
+
+        if (data.getCacheQualifier() != null) {
+        	Map<Object,Object> variables = (Map<Object,Object>) data.getCacheQualifier();
+        	HashMap<String,String> vars = new HashMap<String,String>();
+        	for(Map.Entry<Object, Object> entry: variables.entrySet()){
+        		vars.put("$"+entry.getKey().toString(), entry.getValue().toString());
+        	}
+			WcssCompiler.registerVars(vars);
+		}
+		        
         WGAResource res = new WGAResource(result, ref);
 		WcssCompiler compiler = new WcssCompiler(res);
+		
     	if(!WGACore.isDevelopmentModeEnabled() && data.isCompress())
     		compiler.setCompressing(true);
 
@@ -98,7 +145,23 @@ public class WcssPostProcessor implements PostProcessor{
 		}
 		
 	}
-	
+
+	/*
+	 * custom WcssFunction used as concat()
+	 */
+	private class Concat implements WcssFunction{
+
+		@Override
+		public String execute(WcssResource resource, ArrayList<String> params) {
+			StringBuffer s = new StringBuffer();
+			for(String el: params){
+				s.append(el);
+			}
+			return s.toString();
+		}
+		
+	}
+
 	/*
 	 * custom WcssFunction used as wga_file_url()
 	 */

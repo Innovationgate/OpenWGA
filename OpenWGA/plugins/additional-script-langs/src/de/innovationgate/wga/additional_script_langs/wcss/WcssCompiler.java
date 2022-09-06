@@ -28,6 +28,9 @@ public class WcssCompiler {
 	// map of custom wcss functions
 	final private static HashMap<String, WcssFunction> customFunctions = new HashMap<String, WcssFunction>();
 
+	// map of custom vars
+	final private static HashMap<String, String> customVars = new HashMap<String, String>();
+
 	WcssResource _resource;
 
 	WcssCompiler(WcssResource resource){
@@ -38,7 +41,12 @@ public class WcssCompiler {
 	public static void registerCustomFunction(String name, WcssFunction func){
 		customFunctions.put(name, func);
 	}
-	
+
+	// register vars
+	public static void registerVars(Map<String, String> vars){
+		customVars.putAll(vars);
+	}
+
 	private boolean _compress=false;
 	public void setCompressing(boolean value){
 		_compress=value;
@@ -46,6 +54,7 @@ public class WcssCompiler {
 	
 	public String compile() throws IOException{
 		CssBlock b = new CssBlock(); 
+		b.getVars().putAll(customVars);
 		compile(b);
 		return b.getCode();
 	}
@@ -62,7 +71,6 @@ public class WcssCompiler {
 		
 		st.slashSlashComments(true);
 		st.slashStarComments(true);
-		//st.eolIsSignificant(true);
 		
 		st.ordinaryChar('{');
 		st.ordinaryChar('}');
@@ -73,7 +81,6 @@ public class WcssCompiler {
 		rootCssBlock.parse(st);
 		
 		_resource.addIntegratedResource();
-		//LOG.info("dump\n" + rootCssBlock.dump(""));
 
 	}
 	
@@ -102,6 +109,7 @@ public class WcssCompiler {
 				parent.addSubBlock(this);
 		}
 		
+		@SuppressWarnings("unused")
 		public String dump(String prefix){
 			StringBuffer s = new StringBuffer();
 			s.append("\n" + prefix + "'" + _name + "' (" + getClass().getName() + ")");
@@ -234,7 +242,7 @@ public class WcssCompiler {
 					result.append(prefix);
 					result.append("\t");
 				}
-				result.append(entry.getKey());
+				result.append(replaceCustomFunctions(replaceVars(entry.getKey())));
 				result.append(": ");
 				result.append(replaceCustomFunctions(replaceVars(entry.getValue())));
 				result.append(";");
@@ -265,7 +273,8 @@ public class WcssCompiler {
 	            	replacement = var;
             	else {
             		LOG.error("variable not found: " + replacement);
-            		replacement = "/* not defined: " + Matcher.quoteReplacement(replacement) + " */";
+            		//replacement = "/* not defined: " + Matcher.quoteReplacement(replacement) + " */";
+            		replacement = Matcher.quoteReplacement(replacement);
             	}
 	            matcher.appendReplacement(sb, replacement);
         	}
@@ -295,7 +304,7 @@ public class WcssCompiler {
 		            if(matcher.groupCount()>0) {
 		            	ArrayList<String> params = parseCommasAndQuotes(matcher.group(1));
 		            	String replacement = customFunction.getValue().execute(_resource, params);
-		            	matcher.appendReplacement(sb, replacement);
+		            	matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
 		            }
 	        	}
 	        	matcher.appendTail(sb);
@@ -468,7 +477,6 @@ public class WcssCompiler {
 				new CssContentBlock(getParentBlock());
 			}
 			else if(directive.equalsIgnoreCase("include") && params_string.length()>1){
-				
 				String mixin_name="";
 				String rest = "";
 				ArrayList<String> params = new ArrayList<String>();
