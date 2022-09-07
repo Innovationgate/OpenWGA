@@ -73,7 +73,6 @@ public class WcssPostProcessor implements PostProcessor{
 
         WcssCompiler.registerCustomFunction("wga_file_url", new WGAFileURL());
         WcssCompiler.registerCustomFunction("fileurl", new WGAFileURL());
-        WcssCompiler.registerCustomFunction("concat", new Concat());
 
         if (data.getCacheQualifier() != null) {
         	Map<Object,Object> variables = (Map<Object,Object>) data.getCacheQualifier();
@@ -145,25 +144,9 @@ public class WcssPostProcessor implements PostProcessor{
 		}
 		
 	}
-
+	
 	/*
-	 * custom WcssFunction used as concat()
-	 */
-	private class Concat implements WcssFunction{
-
-		@Override
-		public String execute(WcssResource resource, ArrayList<String> params) {
-			StringBuffer s = new StringBuffer();
-			for(String el: params){
-				s.append(el);
-			}
-			return s.toString();
-		}
-		
-	}
-
-	/*
-	 * custom WcssFunction used as wga_file_url()
+	 * custom WcssFunction used as fileurl() or wga_file_url()
 	 */
 	private class WGAFileURL implements WcssFunction{
 

@@ -25,6 +25,22 @@ public class WcssCompiler {
 		public String execute(WcssResource resource, ArrayList<String> params);
 	}
 
+	/*
+	 * custom WcssFunction used as concat()
+	 */
+	private class ConcatFunction implements WcssFunction{
+
+		@Override
+		public String execute(WcssResource resource, ArrayList<String> params) {
+			StringBuffer s = new StringBuffer();
+			for(String el: params){
+				s.append(el);
+			}
+			return s.toString();
+		}
+		
+	}
+
 	// map of custom wcss functions
 	final private static HashMap<String, WcssFunction> customFunctions = new HashMap<String, WcssFunction>();
 
@@ -35,6 +51,7 @@ public class WcssCompiler {
 
 	WcssCompiler(WcssResource resource){
 		_resource = resource;
+		registerCustomFunction("concat", new ConcatFunction());
 	}
 
 	// register a custom function
