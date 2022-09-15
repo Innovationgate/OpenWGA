@@ -29,6 +29,7 @@ import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.ref.WeakReference;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -74,7 +75,6 @@ public class WGACoreTimer {
                 return;
             }
             
-            int count = 0;
             for (WeakReference<PageConnection> connRef : _core.getPageConnectionManager().getActiveConnections().values()) {
                 
                 PageConnection conn = connRef.get();
@@ -98,22 +98,16 @@ public class WGACoreTimer {
                 
                 WGAHttpSession wgaSession = (WGAHttpSession) session;
                 wgaSession.access();
-                count++;
                 
             }
-            
-            /*
-            if (count > 0) {
-                _core.getLog().info("Updated " + WGUtils.DECIMALFORMAT_STANDARD.format(count) + " sessions with active WebSocket connections to be kept alive");
-            }
-            */
-            
+                        
         }
         
     }
     
     public class ProblemDeterminationTask extends TimerTask {
 
+    	HashMap<String, Boolean> alreadyAdded = new HashMap<String, Boolean>(); 
     
         @Override
         public void run() {
@@ -142,19 +136,31 @@ public class WGACoreTimer {
                 // Test Lucene
                 LuceneManager luceneManager =_core.getLuceneManager();
                 if (luceneManager == null) {
-                    _core.getProblemRegistry().addProblem(Problem.create(occ, "luceneProblem.managerDead", ProblemSeverity.HIGH));
+                	Problem p = Problem.create(occ, "luceneProblem.managerDead", ProblemSeverity.HIGH);
+            		p.setDoNotModifiy(alreadyAdded.get("luceneProblem.managerDead")!=null);
+            		alreadyAdded.put("luceneProblem.managerDead", true);
+            		_core.getProblemRegistry().addProblem(p);
                 }
-                else if (luceneManager.getIndexer() == null) {
-                    _core.getProblemRegistry().addProblem(Problem.create(occ, "luceneProblem.indexerDead", ProblemSeverity.HIGH));
-                }
-                else {
-                    long timeSinceLastRun = System.currentTimeMillis() -  luceneManager.getIndexer().getLastFullIndexingRun();
-                    if (timeSinceLastRun > (1000 * 60 * 60)) {
-                        _core.getProblemRegistry().addProblem(Problem.create(occ, "luceneProblem.indexerNotRunning", ProblemSeverity.HIGH, Problem.var("time", timeSinceLastRun / 1000 / 60)));
-                    }
-                }
-                
-                if (luceneManager != null) {
+                else{
+                	alreadyAdded.remove("luceneProblem.managerDead");
+	                if (luceneManager.getIndexer() == null) {
+	                	Problem p = Problem.create(occ, "luceneProblem.indexerDead", ProblemSeverity.HIGH);
+	                	p.setDoNotModifiy(alreadyAdded.get("luceneProblem.indexerDead")!=null);
+	                	alreadyAdded.put("luceneProblem.indexerDead", true);
+                		_core.getProblemRegistry().addProblem(p);
+	                }
+	                else {
+	                	alreadyAdded.remove("luceneProblem.indexerDead");
+	                    long timeSinceLastRun = System.currentTimeMillis() -  luceneManager.getIndexer().getLastFullIndexingRun();
+	                    if (timeSinceLastRun > (1000 * 60 * 60)) {
+	                    	Problem p = Problem.create(occ, "luceneProblem.indexerNotRunning", ProblemSeverity.HIGH, Problem.var("time", timeSinceLastRun / 1000 / 60));
+		                	p.setDoNotModifiy(alreadyAdded.get("luceneProblem.indexerNotRunning")!=null);
+		                	alreadyAdded.put("luceneProblem.indexerNotRunning", true);
+		                	_core.getProblemRegistry().addProblem(p);
+	                    }
+	                    else alreadyAdded.remove("luceneProblem.indexerNotRunning");
+	                }
+	                
 	                File luceneIndexFolder = luceneManager.getIndexDirectory();
 	                long indexSize=0;
 	                for (File file : luceneIndexFolder.listFiles()) {
@@ -183,14 +189,22 @@ public class WGACoreTimer {
                 File dataFolder = _core.getWgaDataDir();
                 long dataFreeSpace = dataFolder.getFreeSpace();
                 if (dataFreeSpace < (long) 1024 * 1024 * 100) {
-                    _core.getProblemRegistry().addProblem(Problem.create(occ, "systemProblem.lowDataSpace100", ProblemSeverity.HIGH, Problem.var("freespace", WGUtils.DECIMALFORMAT_STANDARD.format(dataFreeSpace / 1024 / 1024)).var("dir", dataFolder.getAbsolutePath())));
+                	Problem p = Problem.create(occ, "systemProblem.lowDataSpace100", ProblemSeverity.HIGH, Problem.var("freespace", WGUtils.DECIMALFORMAT_STANDARD.format(dataFreeSpace / 1024 / 1024)).var("dir", dataFolder.getAbsolutePath()));
+                	p.setDoNotModifiy(alreadyAdded.get("systemProblem.lowDataSpace100")!=null);
+                	alreadyAdded.put("systemProblem.lowDataSpace100", true);
+                	_core.getProblemRegistry().addProblem(p);
                 }
+                else alreadyAdded.remove("systemProblem.lowDataSpace100");
                 
                 File tempFolder = WGFactory.getTempDir();
                 long tempFreeSpace = tempFolder.getFreeSpace();
                 if (tempFreeSpace < (long) 1024 * 1024 * 100) {
-                    _core.getProblemRegistry().addProblem(Problem.create(occ, "systemProblem.lowTempSpace100", ProblemSeverity.HIGH, Problem.var("freespace", WGUtils.DECIMALFORMAT_STANDARD.format(tempFreeSpace / 1024 / 1024)).var("dir", tempFolder.getAbsolutePath())));
+                	Problem p = Problem.create(occ, "systemProblem.lowTempSpace100", ProblemSeverity.HIGH, Problem.var("freespace", WGUtils.DECIMALFORMAT_STANDARD.format(tempFreeSpace / 1024 / 1024)).var("dir", tempFolder.getAbsolutePath()));
+                	p.setDoNotModifiy(alreadyAdded.get("systemProblem.lowTempSpace100")!=null);
+                	alreadyAdded.put("systemProblem.lowTempSpace100", true);
+                	_core.getProblemRegistry().addProblem(p);
                 }
+                else alreadyAdded.remove("systemProblem.lowTempSpace100");
                 
                 // Test cluster
                 if (_core.getWgaConfiguration().getClusterConfiguration().isEnabled()) {
@@ -203,9 +217,13 @@ public class WGACoreTimer {
                    if (logger.getLastLogged() < System.currentTimeMillis() - (1000 * 60)) {
                        if (logger.getLastLogged() < System.currentTimeMillis() - (1000 * 60 * 5)) {
                            logger.getQueue().clear();
-                           _core.getProblemRegistry().addProblem(Problem.create(occ, "loggerProblem.noLogging5Minutes", ProblemSeverity.HIGH, Problem.var("lastlogged", WGUtils.TIMEFORMAT_STANDARD.format(new Date(logger.getLastLogged())))));
+                           Problem p = Problem.create(occ, "loggerProblem.noLogging5Minutes", ProblemSeverity.HIGH, Problem.var("lastlogged", WGUtils.TIMEFORMAT_STANDARD.format(new Date(logger.getLastLogged()))));
+                           p.setDoNotModifiy(alreadyAdded.get("loggerProblem.noLogging5Minutes")!=null);
+                           alreadyAdded.put("loggerProblem.noLogging5Minutes", true);
+                           _core.getProblemRegistry().addProblem(p);
                        }
                        else {
+                    	   alreadyAdded.remove("loggerProblem.noLogging5Minutes");
                            _core.getProblemRegistry().addProblem(Problem.create(occ, "loggerProblem.noLogging1Minute", ProblemSeverity.LOW, Problem.var("lastlogged", WGUtils.TIMEFORMAT_STANDARD.format(new Date(logger.getLastLogged())))));
                        }
                    }
