@@ -85,9 +85,9 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>10</minorVersion>
-        <maintenanceVersion>1</maintenanceVersion>
+        <maintenanceVersion>2</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>712</buildVersion>
+        <buildVersion>713</buildVersion>
       </version>
     </id>
     <title>OpenWGA Application Framework</title>

@@ -7,10 +7,12 @@ App.prototype.getIconURL = function(doc) {
 	var AFW = WGA.design("plugin-wga-app-framework").getGlobal("AFW")
 	doc = AFW.structentry(doc.getStructEntry()).getBestContent(doc.language.name)
 	
-	var icon = "page_white";
+	var icon = "page_white.png";
 	if(doc.mayEditContent())
-		icon = "page_white_text";
-	return doc.getMetaData("VIRTUALLINK") ? "/plugin-wga-app-framework/file/icons/page_white_link.png" : "/plugin-wga-app-framework/file/icons/" + icon + ".png"
+		icon = "page_white_text.png";
+	if(doc.getMetaData("VIRTUALLINK"))
+		icon = "page_white_link.png"
+	return WGA.design("plugin-wga-app-framework").resolve("icons").fileURL(icon)
 }
 
 App.prototype.getCssClass = function(doc) {
@@ -21,7 +23,6 @@ App.prototype.getCssClass = function(doc) {
 	}
 	var AFW = WGA.design("plugin-wga-app-framework").getGlobal("AFW")
 	doc = AFW.structentry(doc.getStructEntry()).getBestContent(doc.language.name)
-	//doc=WGA.context("db:"+ doc.database.dbReference + "/docid:"+doc.structKey+"<"+doc.language.name+">").content()
 
 	var published = doc.structEntry && doc.structEntry.getReleasedContent(doc.language.name)
 	if(!published || !published.isVisibleNow())
@@ -43,7 +44,6 @@ App.prototype.getSymbolIcon = function(doc) {
 	
 	var AFW = WGA.design("plugin-wga-app-framework").getGlobal("AFW")
 	doc = AFW.structentry(doc.getStructEntry()).getBestContent(doc.language.name)
-	//doc=WGA.context("db:"+ doc.database.dbReference + "/docid:"+doc.structKey+"<"+doc.language.name+">").content()
 	
 	var icons = {
 		draft: "fas fa-pencil-alt",
@@ -93,7 +93,7 @@ App.prototype.getStructData = function(doc, lang) {
 			title: doc.title,
 			symbolclass: "",
 			cssclass: "not-visible",
-			iconurl: "/plugin-wga-app-framework/file/icons/page_white_error.png",
+			iconurl: WGA.design("plugin-wga-app-framework").resolve("icons").fileURL("page_white_error.png"), 
 			href: href
 		}
 	}

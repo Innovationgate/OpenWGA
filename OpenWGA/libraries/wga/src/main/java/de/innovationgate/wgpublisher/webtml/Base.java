@@ -712,7 +712,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
         }
     }
 
-    private TMLContext getParentTagContext() throws WGAPIException {
+    protected TMLContext getParentTagContext() throws WGAPIException {
         BaseTagStatus parent = this.getParentTag();
         if (parent != null) {
             return parent.childTMLContext;

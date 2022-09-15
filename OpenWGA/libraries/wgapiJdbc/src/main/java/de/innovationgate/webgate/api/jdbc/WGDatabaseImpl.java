@@ -100,6 +100,7 @@ import com.thoughtworks.xstream.io.xml.Dom4JDriver;
 
 import de.innovationgate.monitoring.JmxManager;
 import de.innovationgate.utils.WGUtils;
+import de.innovationgate.utils.XStreamUtils;
 import de.innovationgate.webgate.api.WGACLCore;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGArea;
@@ -2104,7 +2105,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                     patchLevel = numberValue.intValue();
                 }
                 else if (type == WGDocumentImpl.ITEMTYPE_SERIALIZED_XSTREAM) {
-                    XStream xstream = new XStream(new Dom4JDriver());
+                    XStream xstream = XStreamUtils.createXStream(new Dom4JDriver());
                     patchLevel = ((Number) xstream.fromXML(textValue)).intValue();
                 }
             }

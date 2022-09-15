@@ -282,7 +282,7 @@ public class ProblemRegistry {
                 problems.add(problem);
             }
 
-            if(problem.getSeverity().equals(ProblemSeverity.HIGH)){
+            if(problem.getSeverity().equals(ProblemSeverity.HIGH) && !problem.isDoNotModify()){
             	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_PROBLEM);
             	mail.setSubject(problem.getTitle(Locale.getDefault()));
             	mail.append(problem.getMessage(Locale.getDefault()));

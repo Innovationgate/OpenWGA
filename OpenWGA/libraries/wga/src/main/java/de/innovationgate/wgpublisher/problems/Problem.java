@@ -137,6 +137,7 @@ public class Problem extends WGAServerException implements ProblemQueueEvent {
     private ProblemSeverity _severity;
     private Throwable _throwable;
     private Date _occuranceTime;
+    private boolean _doNotModify = false;
 
     private ProblemPath _path;
     private List<MessageVariableProvider> _variableProviders;
@@ -149,6 +150,13 @@ public class Problem extends WGAServerException implements ProblemQueueEvent {
         _throwable = throwable;
         _occuranceTime = new Date();
         _variableProviders = providers;
+    }
+    
+    public void setDoNotModifiy(boolean value){
+    	_doNotModify = value;
+    }
+    public boolean isDoNotModify(){
+    	return _doNotModify;
     }
     
     @Override

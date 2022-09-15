@@ -68,7 +68,7 @@
 
 		<script>
 			require(["jquery", "select2"], function($){
-				$("select").select2({width:"100%"})
+				$("#form-copy-pages select").select2({width:"100%"})
 			})
 		</script>
 		

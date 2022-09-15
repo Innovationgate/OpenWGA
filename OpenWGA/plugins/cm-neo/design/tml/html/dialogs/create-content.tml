@@ -32,7 +32,7 @@
 	
 			// get languages:		
 			var langs = db().getLanguages().values().iterator();;
-			var opts = WGA.createList();
+			var opts = WGA.List();
 			while(langs.hasNext()){
 				var lang=langs.next();
 				var langname=lang.getName().toLowerCase();
@@ -46,7 +46,7 @@
 		
 				opts.add(lang.getTitle() + "|" + lang.getName());
 			}
-			WGA.TMLPage.setVar("_languages", opts)
+			WGA.TMLPage.setVar("_languages", opts.sortList())
 			if(_languages.size()==1)
 				tmlform.language = _languages.get(0).split("|")[1];
 			

@@ -429,7 +429,7 @@
 				var mayDrop;
 				var expand_timer=null;
 				var drag_img = document.createElement("img")
-				drag_img.src="/plugin-wga-app-framework/file/images/wordprocessing.png"
+				drag_img.src=WGA.contextpath+"/plugin-wga-app-framework/file/images/wordprocessing.png"
 				
 				function dragEnd(el){
 					drag_el.removeClass("dragging");

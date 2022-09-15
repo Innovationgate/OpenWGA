@@ -24,6 +24,7 @@ import javax.activation.DataHandler;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 
 import de.innovationgate.wgaservices.ActionCaller;
 import de.innovationgate.wgaservices.ClientFactory;
@@ -89,7 +90,7 @@ public class PluginStore {
                 params.add(environment.getJavaVersion().toMainVersionString());
                 ActionCaller actionCaller = createActionCaller();
                 String result = (String) actionCaller.callAction("getPlugins", params);            
-                XStream xstream = new XStream(new DomDriver());
+                XStream xstream = createXStream();
                 @SuppressWarnings("unchecked")
                 Map<String,Object> pluginsRaw = (Map<String,Object>) xstream.fromXML(result);
                 if (pluginsRaw.containsKey("msg")) {
@@ -134,7 +135,7 @@ public class PluginStore {
             ArrayList<String> params = new ArrayList<String>();
             List<String> filenames = new ArrayList<String>();
             filenames.add(plugin.getFilename());
-            XStream xstream = new XStream(new DomDriver());
+            XStream xstream = createXStream();
             params.add(xstream.toXML(filenames));
             ActionCaller actionCaller = createActionCaller();
             Form result = (Form) actionCaller.callAction("getPluginFiles", params);
@@ -199,7 +200,7 @@ public class PluginStore {
             params.add(environment.getJavaVersion().toMainVersionString());
             ActionCaller actionCaller = createActionCaller();
             String result = (String) actionCaller.callAction("getPluginDependencies", params);            
-            XStream xstream = new XStream(new DomDriver());
+            XStream xstream = createXStream();
             @SuppressWarnings("unchecked")
             Map<String,Object> pluginsRaw = (Map<String,Object>) xstream.fromXML(result);
             if (pluginsRaw.containsKey("msg")) {
@@ -229,7 +230,7 @@ public class PluginStore {
             ArrayList<String> params = new ArrayList<String>();
             ActionCaller actionCaller = createActionCaller();
             String result = (String) actionCaller.callAction("getStoreMetadata", params);            
-            XStream xstream = new XStream(new DomDriver());
+            XStream xstream = createXStream();
             @SuppressWarnings("unchecked")
             Map<String,Object> rawResult = (Map<String,Object>) xstream.fromXML(result);
             if (rawResult.containsKey("msg")) {
@@ -267,5 +268,13 @@ public class PluginStore {
     private String createCacheKey(Environment environment) {
         return environment.getWgaVersion().toMainVersionString() + "/" + environment.getJavaVersion().toMainVersionString();
     }
+
+    private static XStream createXStream(){
+    	DomDriver driver = new DomDriver();
+    	XStream xstream = new XStream(driver);
+    	xstream.addPermission(AnyTypePermission.ANY);
+    	return xstream;
+    }
+    
     
 }

@@ -35,6 +35,7 @@ import com.thoughtworks.xstream.io.xml.Dom4JDriver;
 
 import de.innovationgate.utils.Base64;
 import de.innovationgate.utils.DESEncrypter;
+import de.innovationgate.utils.XStreamUtils;
 import de.innovationgate.utils.DESEncrypter.PersistentKeyException;
 import de.innovationgate.utils.security.IncorrectPassphraseException;
 import de.innovationgate.utils.security.RSAKeyPair;
@@ -218,7 +219,7 @@ public class RSAEncrypter {
 
             byte[] decryptedData = decrypt(data);            
             String serialized = new String(decryptedData, "UTF-8");   
-            return new XStream(new Dom4JDriver()).fromXML(serialized);
+            return XStreamUtils.createXStream(new Dom4JDriver()).fromXML(serialized);
         }
         return value;
     }
@@ -232,7 +233,7 @@ public class RSAEncrypter {
      */
     public String encryptItemValue(Object value) throws IOException, GeneralSecurityException {
         if (value != null) {
-            XStream xstream = new XStream(new Dom4JDriver());
+            XStream xstream = XStreamUtils.createXStream(new Dom4JDriver());
             String serialized = xstream.toXML(value);            
             RSAEncryptedData rsaEncryptedData = encrypt(serialized.getBytes("UTF-8"));
             return rsaEncryptedData.serialize();

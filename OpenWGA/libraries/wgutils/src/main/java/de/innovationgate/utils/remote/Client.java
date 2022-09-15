@@ -21,6 +21,7 @@ import java.net.Socket;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.Dom4JDriver;
 
+import de.innovationgate.utils.XStreamUtils;
 import de.innovationgate.utils.remote.commands.Command;
 import de.innovationgate.utils.remote.commands.CommandException;
 import de.innovationgate.utils.remote.commands.Connect;
@@ -48,7 +49,7 @@ public class Client {
     public Client(String host, int port) {
         _host = host;
         _port = port;
-        _xstream = new XStream(new Dom4JDriver());        
+        _xstream = XStreamUtils.createXStream();        
     }
     
     /**
@@ -60,7 +61,7 @@ public class Client {
     public Client(String host, int port, ClassLoader classLoader) {
         _host = host;
         _port = port;
-        _xstream = new XStream(new Dom4JDriver());
+        _xstream = XStreamUtils.createXStream();
         if (classLoader != null) {
         	_xstream.setClassLoader(classLoader);
         }

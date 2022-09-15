@@ -40,7 +40,7 @@ import de.innovationgate.wga.model.WGADesignConfigurationModel;
 
 public class CSConfig {
     
-    protected static final XStream XSTREAM = new XStream(new DomDriver());
+    protected static final XStream XSTREAM = XStreamUtils.createXStream();
     
     public static Class<? extends CSConfig> getCSConfigClassForCompliance(String versionCompliance) {
         

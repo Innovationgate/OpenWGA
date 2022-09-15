@@ -177,7 +177,7 @@ public class WGAPluginSet {
     
     }
 
-    private static final XStream XSTREAM = new XStream(new Dom4JDriver());
+    private static final XStream XSTREAM = XStreamUtils.createXStream(new Dom4JDriver());
     static {
         XSTREAM.alias("WGAPluginSet", WGAPluginSet.class);
         XSTREAM.alias("WGAPlugin", WGAPlugin.class);

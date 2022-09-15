@@ -16,24 +16,21 @@
 ================================================================================
 
             ===================================================
-            Running The Apache Tomcat 7.0 Servlet/JSP Container
+            Running The Apache Tomcat 9.0 Servlet/JSP Container
             ===================================================
 
-Apache Tomcat 7.0 requires a Java Standard Edition Runtime
-Environment (JRE) version 6 or later.
+Apache Tomcat 9.0 requires a Java Standard Edition Runtime
+Environment (JRE) version 8 or later.
 
 =============================
-Running With JRE 6 Or Later
+Running With JRE 8 Or Later
 =============================
 
 (1) Download and Install a Java SE Runtime Environment (JRE)
 
 (1.1) Download a Java SE Runtime Environment (JRE),
-      release version 6 or later, from
+      release version 8 or later, from
       http://www.oracle.com/technetwork/java/javase/downloads/index.html
-
-      NOTE:  Java WebSocket API (JSR-356) is supported only when running
-      with Java 7 or later.
 
 (1.2) Install the JRE according to the instructions included with the
       release.
@@ -41,18 +38,6 @@ Running With JRE 6 Or Later
       You may also use a full Java Development Kit (JDK) rather than just
       a JRE.
 
-(1.3) When running on Java 6, the Common Annotations 1.0 implementation
-      provided by the JRE will be used. To use the Common Annotations 1.1
-      provided by Tomcat, use the Endorsed Standards Override mechanism
-      of the JVM. The default configuration defines JARs located in
-      "$CATALINA_HOME/endorsed" as endorsed.
-
-      NOTE:  Java 6 includes a subset of Common Annotations 1.0 classes.
-
-      The only known difference between versions 1.0 and 1.1 of those
-      classes is introduction of "lookup" element on Resource annotation.
-
-      Majority of web applications will not notice the difference.
 
 (2) Download and Install Apache Tomcat
 
@@ -147,8 +132,8 @@ belong to CATALINA_OPTS.
 
 Another frequently used variable is CATALINA_PID (on *nix only). It
 specifies the location of the file where process id of the forked Tomcat
-java process will be written. This setting is optional. It will enable the
-following features:
+java process will be written. This setting is optional. It will activate
+the following features:
 
  *  better protection against duplicate start attempts and
  *  allows forceful termination of Tomcat process when it does not react to
@@ -172,13 +157,13 @@ create the following script file:
 
 On Windows, %CATALINA_BASE%\bin\setenv.bat:
 
-  set "JRE_HOME=%ProgramFiles%\Java\jre6"
+  set "JRE_HOME=%ProgramFiles%\Java\jre8"
   exit /b 0
 
 On *nix, $CATALINA_BASE/bin/setenv.sh:
 
   JRE_HOME=/usr/java/latest
-  CATALINA_PID="$CATALINA_BASE/tomcat.pid"
+  CATALINA_PID="/run/tomcat.pid"
 
 
 The CATALINA_HOME and CATALINA_BASE variables cannot be configured in the
@@ -290,8 +275,7 @@ In CATALINA_HOME:
  * endorsed - Libraries that override standard "Endorsed Standards"
               libraries provided by JRE. See Classloading documentation
               in the User Guide for details.
-              No longer supported with Java 9.
-
+              This is only supported for Java <= 8.
               By default this "endorsed" directory is absent.
 
 In the default configuration the JAR libraries and classes both in
@@ -313,8 +297,8 @@ CATALINA_BASE can be referenced in the XML configuration files processed
 by Tomcat as ${catalina.home} and ${catalina.base} respectively.
 
 For example, the standard manager web application can be kept in
-CATALINA_HOME/webapps/manager and loaded into CATALINA_BASE by using
-the following trick:
+CATALINA_HOME/webapps/manager and loaded into CATALINA_BASE by copying
+its deployment descriptor into the desired virtual host:
 
  * Copy the CATALINA_HOME/webapps/manager/META-INF/context.xml
    file as CATALINA_BASE/conf/Catalina/localhost/manager.xml
@@ -328,6 +312,7 @@ The file will look like the following:
     antiResourceLocking="false" privileged="true" >
     <Valve className="org.apache.catalina.valves.RemoteAddrValve"
          allow="127\.0\.0\.1" />
+    <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
   </Context>
 
 See Deployer chapter in User Guide and Context and Host chapters in the
@@ -409,14 +394,14 @@ For further reading:
 
     * Documentation for APR/Native library in the Tomcat User's Guide
 
-      https://tomcat.apache.org/tomcat-7.0-doc/apr.html
+      https://tomcat.apache.org/tomcat-9.0-doc/apr.html
 
     * Documentation for the HTTP and AJP protocol connectors in the Tomcat
       Configuration Reference
 
-      https://tomcat.apache.org/tomcat-7.0-doc/config/http.html
+      https://tomcat.apache.org/tomcat-9.0-doc/config/http.html
 
-      https://tomcat.apache.org/tomcat-7.0-doc/config/ajp.html
+      https://tomcat.apache.org/tomcat-9.0-doc/config/ajp.html
 
  - Apache Tomcat Native project home
 
@@ -436,9 +421,9 @@ For further reading:
 
       https://httpd.apache.org/
 
-To disable Apache Tomcat Native library:
+To deactivate Apache Tomcat Native library:
 
- - To disable Apache Tomcat Native library when it is installed, or
+ - To deactivate Apache Tomcat Native library when it is installed, or
  - To remove the warning that is logged during Tomcat startup when the
    library is not installed:
 
@@ -471,22 +456,22 @@ For further reading:
 
     * Installing Apache Tomcat
 
-      https://tomcat.apache.org/tomcat-7.0-doc/setup.html
+      https://tomcat.apache.org/tomcat-9.0-doc/setup.html
 
-    * Windows service HOW-TO
+    * Windows Service How-To
 
-      https://tomcat.apache.org/tomcat-7.0-doc/windows-service-howto.html
+      https://tomcat.apache.org/tomcat-9.0-doc/windows-service-howto.html
 
 The binary files of Apache Commons Daemon in Apache Tomcat distributions
 for Windows are named:
 
-  - "tomcat7.exe"
-  - "tomcat7w.exe"
+  - "tomcat9.exe"
+  - "tomcat9w.exe"
 
 These files are renamed copies of "prunsrv.exe" and "prunmgr.exe" from
 Apache Commons Daemon distribution. The file names have a meaning: they are
 used as the service name to register the service in Windows, as well as the
 key name to store distinct configuration for this installation of
-"procrun". If you would like to install several instances of Tomcat 7.0
+"procrun". If you would like to install several instances of Tomcat 9.0
 in parallel, you have to further rename those files, using the same naming
 scheme.

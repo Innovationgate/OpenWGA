@@ -63,6 +63,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.Dom4JDriver;
 
 import de.innovationgate.utils.SkippingIterator;
+import de.innovationgate.utils.XStreamUtils;
 import de.innovationgate.webgate.api.BinaryFieldData;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGBackendException;
@@ -138,7 +139,7 @@ public class WGDocumentImpl implements WGDocumentCore {
         }
     }
 
-    public static final XStream XSTREAM_SERIALIZER = new XStream(new Dom4JDriver());
+    public static final XStream XSTREAM_SERIALIZER = XStreamUtils.createXStream(new Dom4JDriver());
     
     public static final int ATTACHMENT_FILEPART_SIZE = 1024*64-1;
 

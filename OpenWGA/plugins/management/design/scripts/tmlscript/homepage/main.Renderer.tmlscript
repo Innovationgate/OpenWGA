@@ -1,0 +1,11 @@
+function Renderer() {
+}
+
+Renderer.prototype.render = function() {
+
+	if(!wgacore.getWgaConfiguration().isStartPageEnabled()){
+		WGA.response.setStatus(404);
+	}
+
+	WGA.TMLPage.renderDefault();
+}

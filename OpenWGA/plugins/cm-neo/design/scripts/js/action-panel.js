@@ -146,8 +146,9 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 						WGA.event.fireEvent('CMS_item_saved')						
 					}
 				},
-				error: function(xhr, status){
-					console.log("unable to save item: ", status, xhr);
+				error: function(xhr, statusText){
+					console.log("unable to save item: ", statusText, xhr.status,  xhr);
+					alert("Feld konnte nicht gespeichert werden.\nStatus-Text: " + statusText+"\nPOST " + url + "\nHTTP Status Code: " + xhr.status);
 				}
 			})
 		}

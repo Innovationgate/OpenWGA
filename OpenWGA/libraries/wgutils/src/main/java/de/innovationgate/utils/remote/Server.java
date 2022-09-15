@@ -29,6 +29,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.Dom4JDriver;
 
 import de.innovationgate.utils.ThreadPool;
+import de.innovationgate.utils.XStreamUtils;
 import de.innovationgate.utils.remote.commands.Command;
 import de.innovationgate.utils.remote.commands.CommandException;
 import de.innovationgate.utils.remote.commands.Connect;
@@ -100,7 +101,7 @@ public class Server implements Runnable {
             
             public ClientWorker(Socket client) {
                 _client = client;
-                _xstream = new XStream(new Dom4JDriver()); 
+                _xstream = _xstream = XStreamUtils.createXStream(new Dom4JDriver()); 
                 _failures = 0;
             }
 

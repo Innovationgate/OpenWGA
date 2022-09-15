@@ -3286,7 +3286,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         libraryClassLoadingChain = new DynamicClassLoadingChain(baseLibraryLoader);
         WGFactory.setImplementationLoader(libraryClassLoadingChain);
         updateLibraryLoader();
-        _libraryXStream = new XStream(new Dom4JDriver());
+        _libraryXStream = XStreamUtils.createXStream(new Dom4JDriver());
         _libraryXStream.setClassLoader(libraryClassLoadingChain);
         
     }
@@ -4564,7 +4564,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         format.setSuppressDeclaration(true);
         driver.setOutputFormat(format);
         
-        _defaultSerializer = new XStream(driver);
+        _defaultSerializer = XStreamUtils.createXStream(driver);
         _defaultSerializer.setClassLoader(getLibraryLoader());
         _defaultSerializer.alias("tmloption", TMLOption.class);
         _defaultSerializer.alias("version", Version.class);

@@ -11,7 +11,8 @@ var GETALLPLUGINS = "getPlugins";
 var GETPLUGINDEPENDENCIES = "getPluginDependencies";
 var GETPLUGIN = "GetPluginFiles";
 
-var XSTREAM = new Packages.com.thoughtworks.xstream.XStream(new Packages.com.thoughtworks.xstream.io.xml.Dom4JDriver());
+var XSTREAM = Packages.de.innovationgate.utils.XStreamUtils.createXStream(new Packages.com.thoughtworks.xstream.io.xml.Dom4JDriver())
+
 var properties = null;
 
 var serviceClientFactory = Packages.de.innovationgate.wgaservices.ClientFactory.findService(WGA.Core.getLibraryLoader());

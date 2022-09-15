@@ -27,7 +27,7 @@ dependencies {
     compile 'net.sf.json-lib:json-lib:2.4:jdk15'
     compile 'quartz:quartz:1.4.5'
     compile fileTree(dir: '../../customLibs/simpleXml', include: ['*.jar'])
-    compile 'com.thoughtworks.xstream:xstream:1.4.7'
+    compile 'com.thoughtworks.xstream:xstream:1.4.19'
     
     // used for CMYK JPEG images
     compile 'com.twelvemonkeys.imageio:imageio-jpeg:3.8.1'

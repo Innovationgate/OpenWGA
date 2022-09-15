@@ -58,6 +58,7 @@ import com.thoughtworks.xstream.io.xml.Dom4JDriver;
 
 import de.innovationgate.utils.DESEncrypter;
 import de.innovationgate.utils.WGUtils;
+import de.innovationgate.utils.XStreamUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGCSSJSModule;
 import de.innovationgate.webgate.api.WGDatabase;
@@ -102,7 +103,7 @@ public abstract class FileSystemDesignManager implements WGDatabaseConnectListen
 
     public static Map<Integer, DesignInformation> _designTypes = new HashMap<Integer, DesignInformation>();
 
-    protected static XStream _xstream = new XStream(new Dom4JDriver());
+    protected static XStream _xstream = XStreamUtils.createXStream(new Dom4JDriver());
 
     private Pattern _validDesignName = Constants.PATTERN_FILENAMES;
 
