@@ -154,19 +154,20 @@ public class WGACoreTimer {
                     }
                 }
                 
-                
-                File luceneIndexFolder = luceneManager.getIndexDirectory();
-                long indexSize=0;
-                for (File file : luceneIndexFolder.listFiles()) {
-                    indexSize+=file.length();
-                }
-                long luceneFreeSpace = luceneIndexFolder.getFreeSpace();
-                if (luceneFreeSpace < indexSize * 2) {
-                    Problem.Vars vars = Problem
-                        .var("indexsize", WGUtils.DECIMALFORMAT_STANDARD.format(indexSize / 1024 / 1024))
-                        .var("freespace", WGUtils.DECIMALFORMAT_STANDARD.format(luceneFreeSpace / 1024 / 1024))
-                        .var("dir", luceneIndexFolder.getAbsolutePath());
-                    _core.getProblemRegistry().addProblem(Problem.create(occ, "luceneProblem.lowSpace", ProblemSeverity.LOW, vars));
+                if (luceneManager != null) {
+	                File luceneIndexFolder = luceneManager.getIndexDirectory();
+	                long indexSize=0;
+	                for (File file : luceneIndexFolder.listFiles()) {
+	                    indexSize+=file.length();
+	                }
+	                long luceneFreeSpace = luceneIndexFolder.getFreeSpace();
+	                if (luceneFreeSpace < indexSize * 2) {
+	                    Problem.Vars vars = Problem
+	                        .var("indexsize", WGUtils.DECIMALFORMAT_STANDARD.format(indexSize / 1024 / 1024))
+	                        .var("freespace", WGUtils.DECIMALFORMAT_STANDARD.format(luceneFreeSpace / 1024 / 1024))
+	                        .var("dir", luceneIndexFolder.getAbsolutePath());
+	                    _core.getProblemRegistry().addProblem(Problem.create(occ, "luceneProblem.lowSpace", ProblemSeverity.LOW, vars));
+	                }
                 }
                 
                 // Test db connection pools
