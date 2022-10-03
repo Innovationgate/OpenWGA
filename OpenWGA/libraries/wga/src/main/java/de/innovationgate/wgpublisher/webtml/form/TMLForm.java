@@ -65,7 +65,6 @@ import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.log4j.Logger;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.Dom4JDriver;
 
 import de.innovationgate.utils.Base64;
@@ -84,6 +83,7 @@ import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGFactory;
+import de.innovationgate.webgate.api.WGFileMetaData;
 import de.innovationgate.webgate.api.WGIllegalArgumentException;
 import de.innovationgate.webgate.api.WGIllegalStateException;
 import de.innovationgate.webgate.api.WGRelationData;
@@ -110,6 +110,7 @@ import de.innovationgate.wgpublisher.expressions.tmlscript.RhinoExpressionEngine
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptException;
 import de.innovationgate.wgpublisher.hdb.HDBModel;
 import de.innovationgate.wgpublisher.services.ServicesFileItem;
+import de.innovationgate.wgpublisher.webtml.form.TMLFormProcessContext.FileMetaData;
 import de.innovationgate.wgpublisher.webtml.form.TMLFormProcessContext.PCFile;
 import de.innovationgate.wgpublisher.webtml.portlet.TMLPortlet;
 import de.innovationgate.wgpublisher.webtml.utils.CSVWriter;
@@ -1766,7 +1767,37 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
         
     }
 
+    public FileMetaData getFileMetaData(String filename){
+        PCFile file = getProcessContext().getFiles().get(filename.toLowerCase());
+        if (file == null) {
+            return null;
+        }
+    	return file.getFileMetaData();
+    }
 	
+    public void renameFile(String filename, String new_filename){
+        PCFile file = getProcessContext().getFiles().remove(filename.toLowerCase());
+        if (file == null) {
+            return;
+        }
+        file.setName(new_filename);
+        getProcessContext().getFiles().put(new_filename, file);
+    }
+    
+    public void setPrimaryFileName(String filename) throws WGAPIException{
+    	for(PCFile file : getProcessContext().getFiles().values()){
+   			file.setPrimary(file.getName().equals(filename));
+    	}
+    }
+    
+    public String getPrimaryFileName() throws WGAPIException{
+    	for(PCFile file : getProcessContext().getFiles().values()){
+    		if(file.isPrimary())
+   				return file.getName();
+    	}
+    	return null;
+    }
+    
 	public boolean attach( TMLUserProfile obj ) throws IOException, WGAPIException {
 		return this.attach( obj.getprofile() );
 	}
@@ -1800,25 +1831,39 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
     public boolean pushFiles(WGDocument doc) throws WGAPIException, IOException {
         
         boolean anythingPushed = false;
-        Iterator<PCFile> fileIter = getProcessContext().getFiles().values().iterator();
+        String primaryFile = doc.getPrimaryFileName();
+        
         for ( PCFile file : getprocesscontext().getFiles().values()) {
-        	
+
         	// Look if file already attached. Skip if file is identical or cannot be determined bc. too low CS version
         	if (doc.hasFile(file.getName())) {
-        	    if (doc.getDatabase().getContentStoreVersion() < WGDatabase.CSVERSION_WGA4_1 || file.getMd5Checksum().equals(doc.getFileMetaData(file.getName()).getMd5Checksum())) {
-        	        continue;
+        	    if (doc.getDatabase().getContentStoreVersion() >= WGDatabase.CSVERSION_WGA4_1 && !file.getMd5Checksum().equals(doc.getFileMetaData(file.getName()).getMd5Checksum())) {        	    
+	        	    doc.removeFile(file.getName());
+	        	    doc.attachFile(file.getData(), file.getName());
         	    }
-        	    
-        	    doc.removeFile(file.getName());
         	}
+        	else doc.attachFile(file.getData(), file.getName());
+
+            WGFileMetaData data = doc.getFileMetaData(file.getName());
+            FileMetaData formFileMetaData = file.getFileMetaData();
+            data.setTitle(formFileMetaData.getTitle());
+            data.setDescription(formFileMetaData.getDescription());
+            data.setCopyright(formFileMetaData.getCopyright());        	
         	
-        	doc.attachFile(file.getData(), file.getName());
+            if(file.isPrimary())
+            	doc.setPrimaryFileName(file.getName());
+            else if(primaryFile!=null && file.getName().equals(primaryFile))
+            	doc.setPrimaryFileName(null);
+            
         	anythingPushed = true;
         }
-        
+                
         return anythingPushed;
     }
-    
+
+    /*
+     * remove all files not in this form
+     */
     public boolean retainFiles(WGDocument doc) throws WGAPIException {
         
         boolean anythingRetained = false;
@@ -1830,6 +1875,7 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
                 anythingRetained = true;
             }
         }
+        doc.setPrimaryFileName(this.getPrimaryFileName());
         return anythingRetained;
         
     }
@@ -1868,12 +1914,6 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
         attachscaledimage(doc, scaler, null);
     }
     
-    
-    
-
-    
-
-	
 	public void attachimage( WGDocument doc, String altFileName, String fit2size, String compression, String width, String height ) {
 		
 		if( width == null || width.equals("") ){

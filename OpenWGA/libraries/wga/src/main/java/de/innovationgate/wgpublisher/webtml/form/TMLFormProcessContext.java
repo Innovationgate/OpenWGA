@@ -43,6 +43,7 @@ import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGFactory;
+import de.innovationgate.webgate.api.WGFileMetaData;
 import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.webtml.utils.ProcessContext;
@@ -55,6 +56,31 @@ import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 @CodeCompletion(methodMode=CodeCompletion.MODE_INCLUDE, beanMode=CodeCompletion.BEAN_MODE_ALL)
 public class TMLFormProcessContext extends ProcessContext implements Map<String,Object> {
     
+	public class FileMetaData{
+		private String _title;
+		private String _description;
+		private String _copyright;
+		
+		public String getTitle(){
+			return _title;
+		}
+		public void setTitle(String t){
+			_title = t;
+		}
+		public String getDescription(){
+			return _description;			
+		}
+		public void setDescription(String value){
+			_description = value;
+		}
+		public String getCopyright(){
+			return _copyright;			
+		}
+		public void setCopyright(String value){
+			_copyright = value;
+		}
+	}
+	
     /**
      * A file attached to a process context
      */
@@ -65,12 +91,18 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
         public InputStream getData() throws IOException;
         
         public String getName() throws WGAPIException;
+        public void setName(String name);
+        
+        public void setPrimary(boolean value);
+        public boolean isPrimary();
         
         public File getDiskFile() throws WGAPIException, IOException;
         
         public long getSize() throws IOException;
         
         public long lastModified() throws WGAPIException;
+        
+        public FileMetaData getFileMetaData();
         
         public void openSession(HttpServletRequest req, WGACore core) throws WGException;
         
@@ -84,11 +116,18 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
         private String _name;
         private File _file;
         private String _md5Checksum;
+        private FileMetaData _metaData;
+        private boolean _primary;
 
         public DiskPCFile(File file, String name, String md5sum) {
             _file = file;
             _name = name;
             _md5Checksum = md5sum;
+            _metaData = new FileMetaData();
+        }
+
+        public FileMetaData getFileMetaData(){
+        	return _metaData;
         }
 
         public String getMd5Checksum() {
@@ -102,7 +141,10 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
         public String getName() {
             return _name;
         }
-
+        public void setName(String name){
+        	_name = name;
+        }
+        
         public File getDiskFile() {
             return _file;
         }
@@ -119,6 +161,16 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
         @Override
         public void openSession(HttpServletRequest req, WGACore core) throws WGAPIException {
         }
+
+		@Override
+		public void setPrimary(boolean value) {
+			_primary = value;
+		}
+
+		@Override
+		public boolean isPrimary() {
+			return _primary;
+		}
         
     }
     
@@ -129,34 +181,60 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
         
         private WGDocument _doc;
         private String _fileName;
+        private String _orgFileName;
+        private FileMetaData _metaData;
+        private String _md5Checksum;
+        private long _lastModified;
+        private long _size;
+        private boolean _primary;
         
         private TemporaryFile _diskFile = null;
 
-        public DocumentPCFile(WGDocument doc, String fileName) {
+        public DocumentPCFile(WGDocument doc, String fileName) throws WGAPIException {
             _doc = doc;
-            _fileName = fileName;
+            _fileName = _orgFileName = fileName;
+            _metaData = new FileMetaData();
+            
+			try {
+	            _md5Checksum = doc.getFileMetaData(_fileName).getMd5Checksum();
+	            _lastModified = doc.getFileMetaData(_fileName).getLastmodified().getTime();
+	            _size = doc.getFileMetaData(_fileName).getSize();
+	            _primary = doc.getPrimaryFileName() != null && doc.getPrimaryFileName().equals(fileName);
+	            
+	            WGFileMetaData data = _doc.getFileMetaData(_fileName);
+	            _metaData.setTitle(data.getTitle());
+	            _metaData.setDescription(data.getDescription());
+	            _metaData.setCopyright(data.getCopyright());
+			} catch (WGAPIException e) {
+				throw new WGAPIException("unable to init DocumentPCFile " + fileName);
+			}
         }
     
         @Override
         public String getMd5Checksum() throws WGAPIException {
-            return _doc.getFileMetaData(_fileName).getMd5Checksum();
+            return _md5Checksum;
         }
     
         @Override
         public InputStream getData() throws IOException {
             try {
-                return _doc.getFileData(_fileName);
+                return _doc.getFileData(_orgFileName);
             }
             catch (WGAPIException e) {
                 throw new IOException("Exception retrieving document file data", e);
-            }        
+            } 
         }
     
         @Override
         public String getName() {
             return _fileName;
         }
-    
+        
+        @Override
+        public void setName(String name){
+        	_fileName = name;
+        }
+
         @Override
         public synchronized File getDiskFile() throws WGAPIException, IOException {
 
@@ -178,17 +256,12 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
     
         @Override
         public long getSize() throws IOException {
-            try {
-                return _doc.getFileMetaData(_fileName).getSize();
-            }
-            catch (WGAPIException e) {
-                throw new IOException("Exception retrieving WebTML form file size", e);
-            }
+        	return _size;
         }
 
         @Override
         public long lastModified() throws WGAPIException {
-            return _doc.getFileMetaData(_fileName).getLastmodified().getTime();
+            return _lastModified;
         }
         
         @Override
@@ -199,6 +272,21 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
         public WGDocument getDoc() {
             return _doc;
         }
+
+		@Override
+		public FileMetaData getFileMetaData() {
+			return _metaData;
+		}
+
+		@Override
+		public void setPrimary(boolean value) {
+			_primary = value;
+		}
+
+		@Override
+		public boolean isPrimary() {
+			return _primary;
+		}
     
     }
 
@@ -258,7 +346,7 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
         
     }
     
-    protected void addDocumentFile(WGDocument doc, String fileName) {
+    protected void addDocumentFile(WGDocument doc, String fileName) throws WGAPIException {
         _files.put(fileName.toLowerCase(), new DocumentPCFile(doc, fileName));
     }
 
@@ -288,6 +376,5 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
         super.reset();
         _files.clear();
     }
-    
 
 }

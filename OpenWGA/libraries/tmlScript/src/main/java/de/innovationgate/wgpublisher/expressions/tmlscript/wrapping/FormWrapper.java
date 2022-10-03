@@ -60,6 +60,10 @@ public class FormWrapper extends NativeJavaObject {
 		if (this.has(argLC, arg1)) {
 			return RhinoWrapFactory.notFoundToNull(super.get(argLC, arg1));
 		}
+        else if (super.has(arg0, arg1)) {
+        	// preferred: exact case
+            return RhinoWrapFactory.notFoundToNull(super.get(arg0, arg1));
+        }            
 		else {
 			return Context.javaToJS(this.form.field(arg0), arg1);
 		}
