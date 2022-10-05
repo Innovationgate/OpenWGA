@@ -255,6 +255,13 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     private String trim = null;
 	private String _wrap = null;
 
+	// original context before setTMLContext(9 is called to change the context
+	private TMLContext originalContext;
+	public TMLContext getOriginalContext(){
+		if(originalContext!=null)
+			return originalContext;
+		return getTMLContext();
+	}
     
     // Tags environment
     
@@ -1387,6 +1394,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
      */
     public void setTMLContext(TMLContext tagContext) {
         BaseTagStatus status = getStatus();
+    	originalContext = status.tmlContext; 
         status.tmlContext = tagContext;
         if (status.debugNode != null) {
             try {

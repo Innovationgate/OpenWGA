@@ -817,10 +817,10 @@ public class URL extends ActionBase implements DynamicAttributes {
         Status status = getStatus();
         for (DynamicAttribute att : status.dynamicOptions.values()) {
             
-        	// parameter evaluation should be done based on the parent context if available
-        	TMLContext ctx = getParentTagContext();
-        	if(ctx==null)
-        		ctx = getTMLContext();
+        	// parameter evaluation should be done based on the original context (before eval. context attribite) if available
+        	// see also #00005991
+        	TMLContext ctx = getOriginalContext();
+        	
             Object value = att.getDynamicValue(ctx);
             if (value != null) {
                 if (att.getPrefix().equals("v")) {
