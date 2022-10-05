@@ -835,7 +835,12 @@ public class TMLAction implements Serializable {
                 throw new TMLException("Cannot store form because there is no form", false);
             }
             
-            return (tmlForm.store());
+            boolean validate=true;
+            if(params!=null && params.size()>0 && params.get(0)!=null){
+            	validate = WGUtils.stringToBoolean((String)params.get(0));
+            }
+            
+            return (tmlForm.store(validate));
 
         }
         catch (WGCancelledException e) {
