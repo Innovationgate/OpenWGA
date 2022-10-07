@@ -7,8 +7,8 @@ Controller.prototype.settingsTML = function(AFW, $cx, $option_dialog_options) {
 	var database = $cx.meta('db', 'dbkey');
 
 	var tmls = WGA.createList([
-		"wga:content-manager:dialogs:"+$option_dialog_options.param,
-		"overlay:wga:content-manager:dialogs:"+$option_dialog_options.param
+		"overlay:wga:content-manager:dialogs:"+$option_dialog_options.param,
+		"wga:content-manager:dialogs:"+$option_dialog_options.param
 	])
 
 	return AFW.database(database).checkforTML(tmls)
