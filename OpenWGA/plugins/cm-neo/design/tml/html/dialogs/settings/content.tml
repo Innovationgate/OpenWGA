@@ -109,7 +109,7 @@
 						
 				<tml:if condition="tmlform.mode()=='edit'">
 					<tml:then>
-						<tml:[form-field] o_label="Inhalt verstecken in" o_type="checkbox" o_name="ishiddenfrom" o_meta="true"
+						<tml:[form-field] o_label="Inhalt verstecken in" o_type="checkbox" o_name="ishiddenfrom" o_meta="true" o_labeled="true"
 							o_options="Navigation|nav,Suche|search,Sitemap|sitemap"
 						/>
 					</tml:then>

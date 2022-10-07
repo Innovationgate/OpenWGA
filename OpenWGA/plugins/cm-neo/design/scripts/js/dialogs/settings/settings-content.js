@@ -9,7 +9,12 @@ define(["jquery", "cm", "select2"], function($, CM){
 			tokenSeparators: [","],
 			minimumInputLength: 1,
 			placeholder: "- keine -",
-			language: "de",
+			language: {
+				inputTooShort: function(e) {
+					var t=e.minimum-e.input.length;
+					return"Bitte "+t+" Zeichen mehr eingeben"
+				}				
+			},
 			width: "100%",
 			ajax: {
 				delay: 250,
@@ -23,10 +28,7 @@ define(["jquery", "cm", "select2"], function($, CM){
 		                context: $("#form-settings").data("context"),
 		                dbkey: $("#form-settings").data("dbkey")	// used for resource-access-filter
 		            };
-		        }/*,
-		        results: function (data, page) {
-		            return { results: data.results};
-		        }*/
+		        }
 		    }			
 		})
 		
