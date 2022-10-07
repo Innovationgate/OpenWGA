@@ -1,0 +1,18 @@
+<tml:item name="$mc.settingsTML" var="_tml"/>
+
+<tml:include ref="{_tml}" designdb="{meta('db', 'dbkey')}" if="_tml"/>
+
+<tml:range unless="_tml">
+	<div class="header">
+		Custom Dialog
+	</div>
+	<div class="content">
+		<p style="color:red">
+			Das angegebene TML-Modul wurde nicht gefunden:
+			<br><tml:item name="$option_dialog_options.param"/>
+		</p>
+	</div>
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+	</div>
+</tml:range>

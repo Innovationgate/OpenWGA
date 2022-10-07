@@ -46,7 +46,7 @@
 	    		wrap_class="{_wrap_class}"
 	    	>
 	    		placeholder="<tml:option name="placeholder"/>"
-	    		<tml:case hasoptions="focus">data-focus="true"</tml:case>
+	    		<tml:case hasoptions="focus">data-focus="<tml:option name="focus"/>"</tml:case>
 	    	</tml:input>
 	    	
 	    	<tml:case condition="tmlform.hasmessage(_field)">

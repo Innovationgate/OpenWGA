@@ -162,6 +162,18 @@
 			{{#custom}}
 				<fieldset>
 					<legend>{{legend}}</legend>
+					{{#dialogs.length}}
+						<ul class="dialog-links">
+						{{#dialogs}}
+							<li>
+								<a href="#" data-dialog="custom" data-param="{{tml}}">
+									<i class="fa fa-arrow-right"></i>
+									{{label}}
+								</a>
+							</li>
+						{{/dialogs}}
+						</ul>
+					{{/dialogs.length}}
 					{{#fields}}
 						<div class="form-group" {{#important}}style="color:red"{{/important}}>
 							<label>{{label}}</label>
@@ -181,7 +193,9 @@
 	require(["jquery", "cm"], function($,CM){
 		$(document).on("click", "#sidepannel-content-properties [data-dialog]", function(ev){
 			ev.preventDefault();
-			CM.openDialog($(this).data("dialog"));
+			CM.openDialog($(this).data("dialog"), {
+				param: $(this).data("param")
+			});
 		})
 	})
 </script>
