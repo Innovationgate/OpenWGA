@@ -70,9 +70,10 @@
 						_container = parts[0];
 						if(parts.length>1)
 							_lang = parts[1];
+						tmlform.dbkey = _dbkey;
 					}
 
-					var database = db()
+					var database = db();
 					if(tmlform.dbkey && tmlform.dbkey!="this")
 						database = db(tmlform.dbkey)
 					WGA.TMLPage.setVar("_langs", database.getLanguages().keySet());
