@@ -60,25 +60,41 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
 		private String _title;
 		private String _description;
 		private String _copyright;
+		private PCFile _file;
+		
+		public FileMetaData(PCFile file){
+			_file = file;
+		}
+		
+		public long getSize() throws IOException{
+			return _file.getSize();
+		}
+		public String getMimeType() throws WGAPIException{
+			return _file.getMimeType();
+		}
 		
 		public String getTitle(){
 			return _title;
 		}
-		public void setTitle(String t){
+		public FileMetaData setTitle(String t){
 			_title = t;
+			return this;
 		}
 		public String getDescription(){
 			return _description;			
 		}
-		public void setDescription(String value){
+		public FileMetaData setDescription(String value){
 			_description = value;
+			return this;
 		}
 		public String getCopyright(){
 			return _copyright;			
 		}
-		public void setCopyright(String value){
+		public FileMetaData setCopyright(String value){
 			_copyright = value;
+			return this;
 		}
+		
 	}
 	
     /**
@@ -105,7 +121,8 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
         public FileMetaData getFileMetaData();
         
         public void openSession(HttpServletRequest req, WGACore core) throws WGException;
-        
+
+        public String getMimeType() throws WGAPIException;
     }
     
     /**
@@ -117,15 +134,19 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
         private File _file;
         private String _md5Checksum;
         private FileMetaData _metaData;
-        private boolean _primary;
+        private boolean _primary;        
 
         public DiskPCFile(File file, String name, String md5sum) {
             _file = file;
             _name = name;
             _md5Checksum = md5sum;
-            _metaData = new FileMetaData();
+            _metaData = new FileMetaData(this);
         }
 
+        public String getMimeType(){
+        	return WGFactory.getMimetypeDeterminationService().determineByFilename(_name);
+        }
+        
         public FileMetaData getFileMetaData(){
         	return _metaData;
         }
@@ -187,21 +208,25 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
         private long _lastModified;
         private long _size;
         private boolean _primary;
+        private String _mimeType;
         
         private TemporaryFile _diskFile = null;
 
         public DocumentPCFile(WGDocument doc, String fileName) throws WGAPIException {
             _doc = doc;
             _fileName = _orgFileName = fileName;
-            _metaData = new FileMetaData();
+            _metaData = new FileMetaData(this);
             
 			try {
-	            _md5Checksum = doc.getFileMetaData(_fileName).getMd5Checksum();
-	            _lastModified = doc.getFileMetaData(_fileName).getLastmodified().getTime();
-	            _size = doc.getFileMetaData(_fileName).getSize();
 	            _primary = doc.getPrimaryFileName() != null && doc.getPrimaryFileName().equals(fileName);
 	            
 	            WGFileMetaData data = _doc.getFileMetaData(_fileName);
+	            
+	            _md5Checksum = data.getMd5Checksum();
+	            _lastModified = data.getLastmodified().getTime();
+	            _size = data.getSize();
+	            _mimeType = data.getMimeType();	            
+	            
 	            _metaData.setTitle(data.getTitle());
 	            _metaData.setDescription(data.getDescription());
 	            _metaData.setCopyright(data.getCopyright());
@@ -210,6 +235,11 @@ public class TMLFormProcessContext extends ProcessContext implements Map<String,
 			}
         }
     
+        @Override
+        public String getMimeType() throws WGAPIException{
+        	return _mimeType;
+        }
+        
         @Override
         public String getMd5Checksum() throws WGAPIException {
             return _md5Checksum;

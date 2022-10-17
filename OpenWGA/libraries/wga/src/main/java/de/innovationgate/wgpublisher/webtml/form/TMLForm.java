@@ -1738,6 +1738,20 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
 		}
 	}
 
+	public String getMimeType(String filename) throws WGAPIException{
+		PCFile pcFile = getProcessContext().getFiles().get(filename.toLowerCase());
+		if (pcFile != null) {
+		    return pcFile.getMimeType();
+		}
+		else {
+		    return null;
+		}		
+	}
+	
+	public PCFile getPCFile(String filename){
+		return getProcessContext().getFiles().get(filename.toLowerCase());
+	}
+	
 	public long getfilesize(String name) throws IOException {
 		PCFile pcFile = getProcessContext().getFiles().get(name.toLowerCase());
 		if (pcFile != null) {
