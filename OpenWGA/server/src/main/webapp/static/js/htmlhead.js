@@ -189,7 +189,7 @@ WGA.util = {
 			cancelButton.style.background = "white";
 			cancelButton.style.color = "black";
 			cancelButton.appendChild(document.createTextNode(WGA.util.label({
-				de: "Schließen",
+				de: "Schliessen",
 				en: "Close"
 			}, "en")));
 			cancelButton.onclick=function(){
