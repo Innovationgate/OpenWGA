@@ -37,14 +37,14 @@
 				</tml:foreach>
 
 				<select name="module">
-					<tml:foreach item="$pc.rootModules" a-modules="_mods" currentvalue="_mod" sortorder="ascending">
+					<tml:foreach item="$pc.rootModules" a-modules="_mods" currentvalue="_mod" sortexpression="_mod.title" sortorder="ascending">
 						<option title="<tml:item name="_mod.value"/>" value="<tml:item name="_mod.value"/>" <tml:case condition="portlet.module==_mod.value">selected</tml:case>>
 							<tml:item name="_mod.title"/>
 						</option>
 					</tml:foreach>
-					<tml:foreach item="$pc.catModules" a-modules="_mods" currentvalue="_entryset" sortorder="ascending">
+					<tml:foreach item="$pc.catModules" a-modules="_mods" currentvalue="_entryset" sortexpression="_entryset.key" sortorder="ascending">
 						<optgroup label="<tml:item name="_entryset.key"/>">
-							<tml:foreach item="_entryset.value" currentvalue="_mod" sortorder="ascending">
+							<tml:foreach item="_entryset.value" currentvalue="_mod" sortexpression="_mod.title" sortorder="ascending">
 								<option title="<tml:item name="_mod.value"/>" value="<tml:item name="_mod.value"/>" <tml:case condition="portlet.module==_mod.value">selected</tml:case>>
 									<tml:item name="_mod.title"/>
 								</option>
