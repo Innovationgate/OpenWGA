@@ -623,9 +623,10 @@ public class URL extends ActionBase implements DynamicAttributes {
         String portletMode = this.getPortletmode();
         String portletContext = this.getPortletcontext();
         
-        // On a change of portletmode/context we need an action tag. Default the action to $refresh
+        // On a change of portletmode/context we need an action. Default the action to $refresh if no inline action
         if (portletMode != null || portletContext != null) {
-            if (actionName == null) {
+            if (actionName == null && this.getResultString().isEmpty()) {
+            	//no action name and no inline action: use $refresh. 
                 actionName = "$refresh";
             }
             if (type == null) {
