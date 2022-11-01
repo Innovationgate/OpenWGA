@@ -45,9 +45,9 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>10</minorVersion>
-        <maintenanceVersion>2</maintenanceVersion>
+        <maintenanceVersion>3</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>713</buildVersion>
+        <buildVersion>714</buildVersion>
       </version>
     </id>
     <title>OpenWGA Admin Client</title>

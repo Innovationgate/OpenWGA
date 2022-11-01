@@ -17,11 +17,14 @@
 	var onclose;
 	var triggerEl;
 		
-	function maskBody(){
+	function maskBody(modal){
 		if(!bodyMask){
 			$("body").append('<div class="body-mask" id="modal-body-mask"></div>')
-			bodyMask = $("#modal-body-mask").on("click.hide-modal", function(){hideModal()})
+			bodyMask = $("#modal-body-mask")
 		}
+		if(modal)
+			bodyMask.off("click.hide-modal");			
+		else bodyMask.one("click.hide-modal", function(){hideModal()})
 		bodyMask.fadeIn({duration: 200})
 	}
 	
@@ -49,7 +52,7 @@
 		});
 	}
 	
-	function showModal(id, callback){
+	function showModal(id, callback, modal){
 		var el = $(id);
 		if(!el.length){
 			if(callback)
@@ -59,7 +62,7 @@
 		if(!el.hasClass("modal-popup"))
 			el.addClass("modal-popup");
 		currentModal=el;
-		maskBody();
+		maskBody(modal);
 		if(callback)
 			onload=callback;
 		var fn = $.wga_modal.effect == "slide" ? "slideDown" : "fadeIn"
@@ -118,7 +121,7 @@
 							marginLeft: -config.width/2 
 						})
 					}
-					showModal(target);
+					showModal(target, null, config.modal);
 				})
 			}
 		})
@@ -135,6 +138,11 @@
 		e.preventDefault();
 		triggerEl=this;
 		showModal($(this).data("target") || this.hash);
+	}) 
+	$(document).on('click.wga_modal_show', "[data-modal='show-modal']", function(e){
+		e.preventDefault();
+		triggerEl=this;
+		showModal($(this).data("target") || this.hash, null, true);
 	}) 
 
 	// Globals

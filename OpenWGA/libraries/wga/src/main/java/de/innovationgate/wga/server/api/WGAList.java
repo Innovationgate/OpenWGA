@@ -20,6 +20,18 @@ public class WGAList extends ArrayList<Object>{
 		super();
 	}
 
+	public String join(String divider){
+		StringBuffer s = new StringBuffer();
+		boolean firstLoop = true;
+		for(Object o: this){
+			if(!firstLoop)
+				s.append(divider);
+			s.append(o.toString());
+			firstLoop = false;
+		}
+		return s.toString();
+	}
+	
 	public WGAList map(JSFunction f){
 		if(f==null)
 			return this;

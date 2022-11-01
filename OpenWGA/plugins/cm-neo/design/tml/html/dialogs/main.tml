@@ -28,7 +28,7 @@
 						changeMonth: true,
 						changeYear: true
 					})
-					$("[data-focus]", this).first().focus();
+					$("[data-focus=true]", this).first().focus();
 					<tml:case condition="_js">
 						require(["dialogs/<tml:item name="_id"/>"], function(Module){
 							Module()
@@ -40,7 +40,7 @@
 </tml:case>
 
 <script>
-	require(["jquery", "sitepanel", "jquery-modal"], function($, Sitepanel, Modal){
+	require(["jquery", "sitepanel", "siteexplorer", "jquery-modal"], function($, Sitepanel, Siteexplorer, Modal){
 		WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "open-dialog", function(ev){
 			WGA.ajax.action({
 				action: "<tml:action>
@@ -64,7 +64,10 @@
 			if(ev.params.redirectto){
 				Sitepanel.load(ev.params.redirectto);
 			}
-			//WGA.ajax.callAction("<tml:action ref="$refresh" portletmode="view"/>");
+			if(ev.params.forcereload){
+				Siteexplorer.reload();
+				Sitepanel.reload();
+			}
 		});
 	})
 </script>

@@ -24,6 +24,7 @@
 		_wrap_class="radio"
 		_wrap="label"
 	}
+	
 </tml:script>
 
 <div class="form-group<tml:case condition="_field && tmlform.hasmessage(_field)"> error</tml:case>">
@@ -61,6 +62,7 @@
 				<tml:case hasoptions="placeholder">
 					placeholder="<tml:option name="placeholder"/>"
 				</tml:case>
+				<tml:case hasoptions="focus">data-focus="<tml:option name="focus"/>"</tml:case>
 				<tml:option name="attributes"/>
 			</tml:input>
 			<tml:case condition="tmlform.hasmessage(_field)">

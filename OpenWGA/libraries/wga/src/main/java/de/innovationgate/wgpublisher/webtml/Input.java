@@ -1134,6 +1134,11 @@ public class Input extends ActionBase implements DynamicAttributes {
                 this.appendResult(" checked=\"true\"");
             }
             
+            if (options.size() == 1 && options.get(0).isDisabled()) {
+            	this.appendResult(" disabled ");
+            	disabled="";	// do not disable twice
+            }
+            
             this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">");
 
             if (options.size() == 1) {

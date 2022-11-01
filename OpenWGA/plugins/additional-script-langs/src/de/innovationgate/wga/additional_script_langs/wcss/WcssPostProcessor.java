@@ -107,6 +107,11 @@ public class WcssPostProcessor implements PostProcessor{
 		WGAResource(PostProcessResult result, ResourceRef ref){
 			_result = result;
 			_ref = ref;
+			try {
+				if(_ref.getCode()==null)
+					_ref.setResourceName("_"+_ref.getResourceName());
+			} 
+			catch (WGException | IOException e) {}
 		}
 		
 		public ResourceRef getResourceRef(){
@@ -121,7 +126,8 @@ public class WcssPostProcessor implements PostProcessor{
 		public String getCode() {
 			try {
 				return _ref.getCode();
-			} catch (WGException | IOException e) {
+			} 
+			catch (WGException | IOException e) {
 				return "";
 			}
 		}

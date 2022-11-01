@@ -246,11 +246,17 @@
 #dialog-settings_user-defined, 
 #dialog-create-page_child, 
 #dialog-create-page_root, 
-#dialog-edit-html, 
+#dialog-edit-html,
 #dialog-userinfo {
 	width: 900px;
 	margin-left: -450px;
 }
+
+#dialog-custom {
+	width: 800px;
+	margin-left: -400px;
+}
+
 
 #dialog-settings_content {
 	.content{

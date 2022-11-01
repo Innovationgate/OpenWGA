@@ -53,13 +53,9 @@ import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGHierarchicalDatabase;
-import de.innovationgate.webgate.api.WGIllegalArgumentException;
 import de.innovationgate.webgate.api.WGIllegalStateException;
 import de.innovationgate.webgate.api.WGScriptModule;
 import de.innovationgate.wga.common.DesignDirectory;
-import de.innovationgate.wga.server.api.Design;
-import de.innovationgate.wga.server.api.ObjectScope;
-import de.innovationgate.wga.server.api.TMLScript;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.LoginException;
 import de.innovationgate.wgpublisher.WGACore;
@@ -67,8 +63,6 @@ import de.innovationgate.wgpublisher.design.DesignResourceReference;
 import de.innovationgate.wgpublisher.expressions.tmlscript.RhinoExpressionEngine;
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptException;
 import de.innovationgate.wgpublisher.hdb.HDBModel;
-import de.innovationgate.wgpublisher.so.ScopeObjectRegistry;
-import de.innovationgate.wgpublisher.so.ScopeObjectRegistry.ScopeObject;
 import de.innovationgate.wgpublisher.webtml.Base;
 import de.innovationgate.wgpublisher.webtml.form.FieldReg;
 import de.innovationgate.wgpublisher.webtml.form.TMLForm;
@@ -202,7 +196,7 @@ public class TMLAction implements Serializable {
 
         action = new DefaultAction(DEFAULTACTION_STORE, FLAG_DEBOUNCED) {
             public Object call(TMLAction action, TMLContext context, TMLActionLink link, Map<String, Object> objects) throws WGException, IOException, WGIllegalStateException {
-                return TMLAction.defaultActionStore(context, link.getUnnamedParams());
+                return TMLAction.defaultActionStore(context, action.getQualifier());
             }
         };
         _defaultActions.put(action.getName(), action);
@@ -818,7 +812,7 @@ public class TMLAction implements Serializable {
      * @throws WGAPIException
      * @throws WGIllegalStateException
      */
-    public static Boolean defaultActionStore(TMLContext context, List<Object> params) throws WGException, IOException, WGIllegalStateException {
+    public static Boolean defaultActionStore(TMLContext context, String qualifier) throws WGException, IOException, WGIllegalStateException {
 
         try {
             
@@ -835,7 +829,11 @@ public class TMLAction implements Serializable {
                 throw new TMLException("Cannot store form because there is no form", false);
             }
             
-            return (tmlForm.store());
+            boolean validate=true;
+            if(qualifier!=null && qualifier.equalsIgnoreCase("no-validation"))
+            	validate = false;
+            
+            return tmlForm.store(validate);
 
         }
         catch (WGCancelledException e) {

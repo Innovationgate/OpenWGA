@@ -281,13 +281,17 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 		}
 	})
 	$("#rtf-tab-image [name=height]").on({
-		keyup: function(){
+		keyup: function(ev){
 			if(!selectedImg)
 				return;
 			var img = $(selectedImg);
 			var w_el = $("#rtf-tab-image [name=width]")
 			var h_el = $(this);
 			var value = h_el.val();
+			if(ev.keyCode==40)
+				value--;
+			else if(ev.keyCode==38)
+				value++;
 			
 			img.removeAttr("height");
 			img.removeAttr("width");
