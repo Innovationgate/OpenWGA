@@ -23,6 +23,7 @@ case "$1" in
     ;;
 
     failed-upgrade)
+    exit 1
     ;;
 
     *)
