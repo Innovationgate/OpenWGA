@@ -19,7 +19,13 @@ Controller.prototype.pagetypes = function($option_dbkey) {
 	var values = WGA.createList()
 	var pagetypes = WGA.db($option_dbkey).getContentTypes();
 	for(let pagetype in Iterator(pagetypes))
-		values.add(pagetype.name);
+		values.add({
+			name: pagetype.name,
+			editors: pagetype.editors,
+			aliases: pagetype.nameAliases,
+			innerlayout: pagetype.innerLayoutName,
+			workflow: pagetype.workflow
+		});
 	return values
 	
 }

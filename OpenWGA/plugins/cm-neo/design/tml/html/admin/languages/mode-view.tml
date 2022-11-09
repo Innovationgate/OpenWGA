@@ -12,19 +12,35 @@
 		for(let lang in Iterator(langs))
 			_langs.add({
 				name: lang.name,
-				title: lang.title
+				title: lang.title,
+				editors: lang.editors
 			});
 	</tml:script>
-	<ul>
+	
+	<div class="table">
+		<div class="row">
+			<div class="col">Titel</div>
+			<div class="col">Name</div>
+			<div class="col">Editoren</div>
+		</div>
 		<tml:foreach item="_langs" currentvalue="_lang">
-			<li>
-				<a href="<tml:url action="edit" param1="{_lang.name}" portletmode="edit"/>"><tml:item name="_lang.title"/></a>
-				<tml:case condition="_lang.name==_defaultLang">
-					(Default)
-				</tml:case>
-			</li>			
+			<div class="row">
+				<div class="col">
+					<a href="<tml:url action="edit" param1="{_lang.name}" portletmode="edit"/>"><tml:item name="_lang.title"/></a>
+					<tml:case condition="_lang.name==_defaultLang">
+						(Default)
+					</tml:case>
+				</div>
+				<div class="col">
+					<tml:item name="_lang.name"/>
+				</div>
+				<div class="col">
+					<tml:item name="_lang.editors" divider=", "/>
+				</div>
+			</div>
 		</tml:foreach>
-	</ul>
+	</div>
+	
 </div>
 
 <div class="footer">

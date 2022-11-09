@@ -1,13 +1,30 @@
 <div class="header"><tml:label key="admin.workflows"/></div>
 
 <div class="content">
-	<ul>
+
+	<div class="table">
+		<div class="row">
+			<div class="col">Name</div>
+			<div class="col">Admin-Genehmiger</div>
+			<div class="col">Genehmigungs-Ebenen</div>
+		</div>
 		<tml:foreach item="$pc.workflows" currentvalue="_wf">
-			<li>
-				<a href="<tml:url action="$pc.setWorkflow" a-name="_wf.name" portletmode="edit"/>"><tml:item name="_wf.name"/></a>
-			</li>			
+			<div class="row">
+				<div class="col">
+					<a href="<tml:url action="$pc.setWorkflow" a-name="_wf.name" portletmode="edit"/>"><tml:item name="_wf.name"/></a>
+				</div>
+				<div class="col">@{_wf.adminReviewers}</div>
+				<div class="col">
+					<tml:script divider="<br>">
+						return WGA.List(_wf.levels).map(function(el){
+							return el.name
+						})
+					</tml:script>
+				</div>
+			</div>
 		</tml:foreach>
-	</ul>
+	</div>
+	
 </div>
 
 <div class="footer">
