@@ -11,7 +11,7 @@
 		<tr>
 			<td><tml:item name="_itemname"/></td>
 			<td nowrap><tml:item name="$mc.type" a-itemname="_itemname"/></td>
-			<td><tml:item name="$mc.value" a-itemname="_itemname" encode="html"/></td>
+			<td style="overflow-wrap:anywhere"><tml:item name="$mc.value" a-itemname="_itemname" encode="html"/></td>
 		</tr>
 	</tml:foreach>
 	</tbody>
