@@ -10,12 +10,7 @@ form{
 
 	select.form-control{
 		
-		@if($isGecko){
-			padding: 2px;
-		}
-		@else{
-			padding: 6px;
-		}
+		padding: 6px;
 		
 		-moz-appearance:none;
 		-webkit-appearance:none;
