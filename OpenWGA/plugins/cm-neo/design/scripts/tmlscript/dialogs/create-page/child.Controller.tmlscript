@@ -16,8 +16,11 @@ Controller.prototype.createPage = function(AFW, App, $cx, $form, $profile) {
 
 		var doc = $cx.document.createChildPage(ct, $form.title, $form.language)
 		var struct = doc.getStructEntry()
-		struct.setPosition(position)
-		struct.save();
+		if(struct.parentEntry==$cx.document){
+			// only reposition if we have the expected parent
+			struct.setPosition(position)
+			struct.save();
+		}
 
 		if($form.template){
 			var sourcecontext=WGA.context("db:" + $cx.db().getDbReference() + "/docid:"+$form.template, false);
