@@ -549,9 +549,10 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
     					.replaceAll("ü", "ue")
     					.replaceAll("ß", "ss");
     		}
-    		return title.replaceAll("[^äöüßa-z0-9_()\\[\\]]+", "-");
+    		return title.replaceAll("[^äöüßa-z0-9_()\\[\\]]+", "-")
+    				.replaceAll("^-", "")	// remove trailing minus
+    				.replaceAll("-$", "");	// remove ending minus
     	}
-    	
 
         StringBuffer name = new StringBuffer();
         for (int i = 0; i < title.length(); i++) {
@@ -1002,9 +1003,10 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
                 	path.add(title);
                 	break;
                 }
-                
-            }
-            path.add(title);
+                path.add(title);
+            }            
+            else if(!content.isHiddenFrom().contains("nav") || !_includeKeys)
+            	path.add(title);
             
             if (content.getStructEntry().isRoot()) {
                 break;
