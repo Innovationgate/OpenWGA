@@ -133,6 +133,8 @@ public class TMLAction implements Serializable {
     
     public static final String DEFAULTACTION_CALLMCMETHOD = "mc";
     
+    public static final String DEFAULTACTION_SETPORTLETITEM = "setportletitem";
+    
     public static final int FLAG_DEBOUNCED = 1;
 
     public abstract static class DefaultAction {
@@ -284,6 +286,13 @@ public class TMLAction implements Serializable {
         action = new DefaultAction(DEFAULTACTION_CALLMCMETHOD, FLAG_DEBOUNCED) {
             public Object call(TMLAction action, TMLContext context, TMLActionLink link, Map<String, Object> objects) throws TMLException ,TMLScriptException ,WGException ,IOException {
                 return TMLAction.defaultActionCallMCMethod(action, context , link.getDefinitionModule(), link.getNamedParams(), link.getUnnamedParams(), objects);
+            };
+        };
+        _defaultActions.put(action.getName(), action);
+
+        action = new DefaultAction(DEFAULTACTION_SETPORTLETITEM, FLAG_DEBOUNCED) {
+            public Object call(TMLAction action, TMLContext context, TMLActionLink link, Map<String, Object> objects) throws TMLException ,TMLScriptException ,WGException ,IOException {
+                return TMLAction.defaultActionSetPortetItem(context, link.getUnnamedParams());
             };
         };
         _defaultActions.put(action.getName(), action);
@@ -523,6 +532,16 @@ public class TMLAction implements Serializable {
         
     }
 
+    public static Object defaultActionSetPortetItem(TMLContext context, List<Object> params) throws TMLException, WGAPIException {
+        if (params.size() >= 2 && !WGUtils.isEmpty(params.get(0)) && !WGUtils.isEmpty(params.get(1))) { 
+            if (context.getportlet() == null) {
+                throw new TMLException("Default action $" + DEFAULTACTION_SETPORTLETITEM + " can only be called inside a WebTML portlet", false);
+            }
+            return context.getportlet().setitem(String.valueOf(params.get(0)), params.get(1));    
+        }
+        else return false;
+    }
+    
     public static Object defaultActionSetPortetSessionVar(TMLContext context, List<Object> params) throws TMLException, WGAPIException {
 
         if (params.size() >= 2 && !WGUtils.isEmpty(params.get(0)) && !WGUtils.isEmpty(params.get(1))) { 
