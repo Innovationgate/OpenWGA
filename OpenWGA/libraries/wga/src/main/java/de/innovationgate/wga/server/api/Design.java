@@ -1931,6 +1931,9 @@ public class Design {
     }
     
 
+    public Object executeTMLScript() throws WGException{
+   		return WGA.get().tmlscript().runScript(getTMLScriptCode());
+    }
     
 
 }
