@@ -105,7 +105,7 @@
 					</tml:case>
 					<tml:case condition="tmlform.filter!='status'">
 						<div class="col">
-							<tml:label key="[content-properties.status.{STATUS}]"/>
+							<tml:label key="[content-properties.status.{content().isPendingRelease()?'pending':STATUS}]"/>
 						</div>
 					</tml:case>
 					<tml:case condition="tmlform.filter!='language'">
