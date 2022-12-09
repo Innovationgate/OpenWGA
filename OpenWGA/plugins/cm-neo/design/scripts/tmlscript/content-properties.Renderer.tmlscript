@@ -80,16 +80,22 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 			}
 		}
 		var script = WGA.design($urlParam_dbkey).resolveSystemScriptModule("content-manager:content-info", "tmlscript")
-		if(script){
-			var mod = script.getTMLScriptModule()
+		if (script){
 			try{
-				result.custom = mod && WGA.tmlscript().runScript(c, mod.getCode())
+				var ret = script.executeTMLScript(c);
+				if(ret instanceof Packages.java.util.ArrayList){
+					// convert to native array
+					var r=[];
+					for(let v in Iterator(ret))
+						r.push(v);
+					result.custom = r;
+				}
+				else result.custom = ret;
 			}
 			catch(e){
 				logException(e);
 			}
 		}
-		
 	}
 	else if($urlParam_structkey && AFW.structentry($urlParam_structkey, $urlParam_dbkey).isVisible()){
 		var c = context("db:" + $urlParam_dbkey + "/$struct:" + $urlParam_structkey, false)
