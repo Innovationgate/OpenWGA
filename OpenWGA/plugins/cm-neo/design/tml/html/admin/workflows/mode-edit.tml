@@ -10,16 +10,31 @@
 
 		<fieldset>
 			<legend>Workflow-Level</legend>
-			<ol>
+			
+			<div class="table">
+				<div class="row">
+					<div class="col">Pos</div>
+					<div class="col">Name</div>
+					<div class="col">Genehmiger</div>
+					<div class="col"># Genehmigungen</div>
+				</div>
 				<tml:foreach item="$pc.workflowlevels" currentvalue="_wflevel" id="workflowlevels-loop">
-					<li><a href="<tml:url action="$pc.setWorkflowLevel" a-index="index" portletmode="edit-level"/>">
-						<tml:item name="_wflevel.name"/>
-						<tml:case condition="_wflevel.description">
-							- <tml:item name="_wflevel.description"/>
-						</tml:case>
-					</a></li>
+					<div class="row">
+						<div class="col">@{_wflevel.position}</div>
+						<div class="col">
+							<a href="<tml:url action="$pc.setWorkflowLevel" a-index="index" portletmode="edit-level"/>">
+								<tml:item name="_wflevel.name"/>
+							</a>
+							<tml:case condition="_wflevel.description">
+								<br><tml:item name="_wflevel.description"/>
+							</tml:case>
+						</div>
+						<div class="col">@{_wflevel.reviewers divider="<br>"}</div>
+						<div class="col">@{_wflevel.reviewerCount}</div>
+					</div>
 				</tml:foreach>
-			</ol>
+			</div>
+			
 		</fieldset>
 		
 	</div>

@@ -12,22 +12,48 @@
 		var areas = db($option_dbkey).getAreas().values();
 		for(let area in Iterator(areas))
 			if(area.isSystemArea())
-				_systemAreas.add(area.name)
-			else _areas.add(area.name);
+				_systemAreas.add(area)
+			else _areas.add(area);
 	</tml:script>
-	<tml:foreach item="_areas" currentvalue="_area" wrap="ul">
-		<li>
-			<a href="<tml:url action="edit" param1="{_area}"/>"><tml:item name="_area"/></a>
-		</li>			
-	</tml:foreach>
-	<tml:{fieldset} if="_systemAreas.size">
-		<legend>Systembereiche</legend>
-		<tml:foreach item="_systemAreas" currentvalue="_area" wrap="ul">
-			<li>
-				<a href="<tml:url action="edit" param1="{_area}"/>"><tml:label key="[system-area.{_area}]" param1="{_area}"/></a>
-			</li>			
+	
+	<div class="table">
+		<div class="row">
+			<div class="col">Name</div>
+			<div class="col">Sichtbar für</div>
+			<div class="col">Leser</div>
+			<div class="col">Editoren</div>
+		</div>
+		<tml:foreach item="_areas" currentvalue="_area">
+			<div class="row">
+				<div class="col">
+					<a href="<tml:url action="edit" param1="{_area.name}"/>"><tml:item name="_area.name"/></a>
+				</div>
+				<div class="col">
+					<tml:script expression="_area.getExtensionData('CM_area_visible')"/>
+				</div>
+				<div class="col">@{_area.readers divider="<br>"}</div>
+				<div class="col">@{_area.editors divider="<br>"}</div>
+			</div>
 		</tml:foreach>
-	</tml:{fieldset}>		
+		<div class="row" style="font-size:1.5em;color:gray">
+			<div class="col">
+				Systembereiche
+			</div>
+		</div>
+		<tml:foreach item="_systemAreas" currentvalue="_area">
+			<div class="row">
+				<div class="col">
+					<a href="<tml:url action="edit" param1="{_area.name}"/>"><tml:label key="[system-area.{_area.name}]" param1="{_area.name}"/></a>
+				</div>
+				<div class="col">
+					<tml:script expression="_area.getExtensionData('CM_area_visible')"/>
+				</div>
+				<div class="col">@{_area.readers divider="<br>"}</div>
+				<div class="col">@{_area.editors divider="<br>"}</div>
+			</div>
+		</tml:foreach>
+	</div>
+
 </div>
 
 <div class="footer">

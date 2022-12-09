@@ -551,26 +551,41 @@ public class WebTMLEnvironmentBuilder {
                 }
             }
         }
-        
+
+        // portlet mode
+        if (tmlscript.hasProperty(actionResult, "$portletMode")) {
+            if (portlet == null) {
+                wga.getLog().error("Cannot set $portletMode as the WebTML action '" + action.getDescription() + "' does not run in a portlets scope");
+            }
+            else{
+            	Object portletMode = tmlscript.callMethod(actionResult, "$portletMode");
+            	portlet.setmode(portletMode.toString());
+            }
+        }
+
         // Fire portlet events
         if (tmlscript.hasProperty(actionResult, "$portletEvents")) {
-            Object portletEvents = tmlscript.callMethod(actionResult, "$portletEvents");
-            try {
-                @SuppressWarnings("unchecked")
-                Map<String,Map<String,Object>> events = tmlscript.descriptify(portletEvents, Map.class);
-                for (Map.Entry<String,Map<String,Object>> event : events.entrySet()) {
-                    
-                    PortletEvent ev = wga.tmlcontext().createevent(event.getKey());
-                    for (Map.Entry<String,Object> param : event.getValue().entrySet()) {
-                        ev.addParameter(param.getKey(), param.getValue());
-                    }
-                    portlet.fireevent(ev);
-                }
+            if (portlet == null) {
+                wga.getLog().error("Cannot fire $portletEvents as the WebTML action '" + action.getDescription() + "' does not run in a portlets scope");
             }
-            catch (Exception e) {
-                wga.getLog().error("Exception descriptifying $vars of WebTML action '" + action.getDescription() + "' as Lookup table", e);
+            else{
+	            Object portletEvents = tmlscript.callMethod(actionResult, "$portletEvents");
+	            try {
+	                @SuppressWarnings("unchecked")
+	                Map<String,Map<String,Object>> events = tmlscript.descriptify(portletEvents, Map.class);
+	                for (Map.Entry<String,Map<String,Object>> event : events.entrySet()) {
+	                    
+	                    PortletEvent ev = wga.tmlcontext().createevent(event.getKey());
+	                    for (Map.Entry<String,Object> param : event.getValue().entrySet()) {
+	                        ev.addParameter(param.getKey(), param.getValue());
+	                    }
+	                    portlet.fireevent(ev);
+	                }
+	            }
+	            catch (Exception e) {
+	                wga.getLog().error("Exception descriptifying $portletEvents of WebTML action '" + action.getDescription() + "' as Lookup table", e);
+	            }
             }
-            
         }
         
         // Fire app events

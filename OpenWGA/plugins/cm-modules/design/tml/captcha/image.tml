@@ -23,7 +23,8 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:script>    
+<tml:script>
+	WGA.accessLogging().setLoggingEnabled(false);
     var service = db().getAttribute("captchaService");    
     service.renderCaptcha(this);    
 </tml:script>

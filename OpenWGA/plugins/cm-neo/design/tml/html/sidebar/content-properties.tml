@@ -161,7 +161,13 @@
 
 			{{#custom}}
 				<fieldset>
-					<legend>{{legend}}</legend>
+					<legend>{{{legend}}}</legend>
+					{{#fields}}
+						<div class="form-group" {{#important}}style="color:red"{{/important}}>
+							<label>{{{label}}}</label>
+							<p class="data">{{{value}}}</p>
+						</div>
+					{{/fields}}
 					{{#dialogs.length}}
 						<ul class="dialog-links">
 						{{#dialogs}}
@@ -174,12 +180,6 @@
 						{{/dialogs}}
 						</ul>
 					{{/dialogs.length}}
-					{{#fields}}
-						<div class="form-group" {{#important}}style="color:red"{{/important}}>
-							<label>{{label}}</label>
-							<p class="data">{{{value}}}</p>
-						</div>
-					{{/fields}}
 				</fieldset>
 			{{/custom}}
 			

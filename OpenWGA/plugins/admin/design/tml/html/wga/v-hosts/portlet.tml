@@ -167,7 +167,11 @@
 												var dbs = _host.allowedDatabases.iterator();
 												var ret=[];
 												while(dbs.hasNext()){
-													ret.push(DBM.wgaconfig.getByUid(dbs.next()).key)
+													var uid = dbs.next();
+													var database = DBM.wgaconfig.getByUid(uid)
+													if(!database)
+														console.error("wgaconfig V-host: allowed database not found", _host.servername, uid)
+													else ret.push(database.key)
 												} 
 												return ret.join(", ");
 											}

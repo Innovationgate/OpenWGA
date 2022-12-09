@@ -5,13 +5,28 @@
 <div class="header"><tml:label key="admin.pagetypes"/></div>
 
 <div class="content">
-	<ul>
+
+	<div class="table">
+		<div class="row">
+			<div class="col">Name</div>
+			<div class="col">Aliase</div>
+			<div class="col">Inner-Layout</div>
+			<div class="col">Editoren</div>
+			<div class="col">Workflow</div>
+		</div>
 		<tml:foreach item="$pc.pagetypes" currentvalue="_pagetype">
-			<li>
-				<a href="<tml:url action="edit" param1="{_pagetype}" portletmode="edit"/>"><tml:item name="_pagetype"/></a>
-			</li>			
+			<div class="row">
+				<div class="col">
+					<a href="<tml:url action="edit" param1="{_pagetype.name}" portletmode="edit"/>"><tml:item name="_pagetype.name"/></a>
+				</div>
+				<div class="col">@{_pagetype.aliases divider="<br>"}</div>
+				<div class="col">@{_pagetype.innerlayout}</div>
+				<div class="col">@{_pagetype.editors divider="<br>"}</div>
+				<div class="col">@{_pagetype.workflow}</div>
+			</div>
 		</tml:foreach>
-	</ul>
+	</div>
+
 </div>
 
 <div class="footer">
