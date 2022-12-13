@@ -510,7 +510,7 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 				if(options.hideoptions.indexOf("InsertTable")>=0)
 					$("#editor-panel-rtf .InsertTable").hide();
 				// headings
-				var headings = ["h1", "h2", "h3", "h3", "h4", "h6", "pre"]
+				var headings = ["h1", "h2", "h3", "h4", "h5", "h6", "pre"]
 				for(var i=0; i<headings.length; i++){
 					var heading = headings[i];
 					if(options.hideoptions.indexOf(heading)>=0){
