@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class WGAList extends ArrayList<Object>{
+public class WGAList<T> extends ArrayList<Object>{
 
 	private static final long serialVersionUID = 1L;
 
@@ -13,7 +13,7 @@ public class WGAList extends ArrayList<Object>{
         public Object call(Object a, Object b);
     }
 		
-	public WGAList(Collection<Object> list){
+	public WGAList(Collection<?> list){
 		super(list);
 	}
 	public WGAList(){
@@ -32,17 +32,28 @@ public class WGAList extends ArrayList<Object>{
 		return s.toString();
 	}
 	
-	public WGAList map(JSFunction f){
+	public WGAList<T> map(JSFunction f){
 		if(f==null)
 			return this;
-		ArrayList<Object> newList = new ArrayList<Object>();
+		WGAList<T> newList = new WGAList<T>();
 		for(Object o: this){
 			newList.add(f.call(o, null));
 		}
-		return new WGAList(newList);
+		return newList.trim();
 	}
 
-	public WGAList sortList(){
+	public WGAList<T> filter(JSFunction f){
+		if(f==null)
+			return this;
+		WGAList<T> newList = new WGAList<T>();
+		for(Object o: this){
+			if((boolean)f.call(o, null))
+				newList.add(o);
+		}
+		return newList;
+	}
+
+	public WGAList<T> sortList(){
 		Comparator<Object> compare = new Comparator<Object>() {
 			@SuppressWarnings("unchecked")
 			@Override
@@ -61,7 +72,7 @@ public class WGAList extends ArrayList<Object>{
 		return this;
 	}
 
-	public WGAList sortList(final JSFunction f){
+	public WGAList<T> sortList(final JSFunction f){
 		Comparator<Object> compare = new Comparator<Object>() {
 			@Override
 			public int compare(Object o1, Object o2) {
@@ -76,8 +87,8 @@ public class WGAList extends ArrayList<Object>{
 		return this;
 	}
 	
-	public WGAList trim(){
-		ArrayList<Object> result = new ArrayList<Object>();
+	public WGAList<T> trim(){
+		WGAList<T> result = new WGAList<T>();
 		for(Object o: this){
 			if(o==null)
 				continue;
@@ -85,11 +96,11 @@ public class WGAList extends ArrayList<Object>{
 				continue;
 			result.add(o);
 		}
-		return new WGAList(result);
+		return result;
 	}
 	
-    public WGAList deleteDoublets() {
-        WGAList list = new WGAList();
+    public WGAList<T> deleteDoublets() {
+        WGAList<T> list = new WGAList<T>();
         for(Object o: this){
         	if(!list.contains(o))
         		list.add(o);
@@ -97,7 +108,7 @@ public class WGAList extends ArrayList<Object>{
         return list;
     }
 
-	public WGAList reverse(){
+	public WGAList<T> reverse(){
 		Collections.reverse(this);
 		return this;
 	}
