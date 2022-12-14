@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 
-public class WGAList<T> extends ArrayList<Object>{
+public class WGAList<T> extends ArrayList<T>{
 
 	private static final long serialVersionUID = 1L;
 
@@ -13,7 +13,7 @@ public class WGAList<T> extends ArrayList<Object>{
         public Object call(Object a, Object b);
     }
 		
-	public WGAList(Collection<?> list){
+	public WGAList(Collection<T> list){
 		super(list);
 	}
 	public WGAList(){
@@ -23,7 +23,7 @@ public class WGAList<T> extends ArrayList<Object>{
 	public String join(String divider){
 		StringBuffer s = new StringBuffer();
 		boolean firstLoop = true;
-		for(Object o: this){
+		for(T o: this){
 			if(!firstLoop)
 				s.append(divider);
 			s.append(o.toString());
@@ -32,10 +32,10 @@ public class WGAList<T> extends ArrayList<Object>{
 		return s.toString();
 	}
 	
-	public WGAList<T> map(JSFunction f){
+	public WGAList<Object> map(JSFunction f){
 		if(f==null)
-			return this;
-		WGAList<T> newList = new WGAList<T>();
+			return (WGAList<Object>)this;
+		WGAList<Object> newList = new WGAList<Object>();
 		for(Object o: this){
 			newList.add(f.call(o, null));
 		}
@@ -46,7 +46,7 @@ public class WGAList<T> extends ArrayList<Object>{
 		if(f==null)
 			return this;
 		WGAList<T> newList = new WGAList<T>();
-		for(Object o: this){
+		for(T o: this){
 			if((boolean)f.call(o, null))
 				newList.add(o);
 		}
@@ -89,7 +89,7 @@ public class WGAList<T> extends ArrayList<Object>{
 	
 	public WGAList<T> trim(){
 		WGAList<T> result = new WGAList<T>();
-		for(Object o: this){
+		for(T o: this){
 			if(o==null)
 				continue;
 			if(o instanceof String && ((String) o).trim().isEmpty())
@@ -101,7 +101,7 @@ public class WGAList<T> extends ArrayList<Object>{
 	
     public WGAList<T> deleteDoublets() {
         WGAList<T> list = new WGAList<T>();
-        for(Object o: this){
+        for(T o: this){
         	if(!list.contains(o))
         		list.add(o);
         }
@@ -112,5 +112,5 @@ public class WGAList<T> extends ArrayList<Object>{
 		Collections.reverse(this);
 		return this;
 	}
-
+	
 }
