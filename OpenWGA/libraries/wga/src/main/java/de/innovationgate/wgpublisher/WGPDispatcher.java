@@ -425,7 +425,7 @@ public class WGPDispatcher extends HttpServlet {
 
     }
 
-    public class TemporaryDownload implements HttpSessionBindingListener {
+    public static class TemporaryDownload implements HttpSessionBindingListener {
 
         private String _name;
 

@@ -3449,7 +3449,7 @@ public class WGA {
     }
  
     // WGA.TempFile
-    public WGATempFile TempFile(String filename) throws IOException{
+    public WGATempFile TempFile(String filename) throws IOException, WGException{
     	return new WGATempFile(this, filename);
     }
      
