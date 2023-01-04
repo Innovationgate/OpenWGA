@@ -27,36 +27,36 @@
 AFW.RTFToolbar.txt={
 	tooltips:{
 		save:				"Speichern",
-		paste:				"Text ohne Formatierung aus der Zwischenablage einfügen",
+		paste:				"Text ohne Formatierung aus der Zwischenablage einfÃ¼gen",
 		bold: 				"Fett",
 		italic:				"Kursiv",
 		underline:			"Unterstrichen",
 		forecolor:			"Textfarbe",
 		removeformat:		"Alle Formatierungen entfernen",
-		indent:				"Text einrücken",
-		outdent:			"Text ausrücken",
+		indent:				"Text einrÃ¼cken",
+		outdent:			"Text ausrÃ¼cken",
 		justifyleft:		"Text links ausrichten",
 		justifycenter:		"Text zentrieren",
 		justifyright:		"Text rechts ausrichten",
 		insertunorderedlist:"Bulletliste",
 		insertorderedlist:	"Nummerierte Liste",
-		inserttable:		"Tabelle einfügen",
+		inserttable:		"Tabelle einfÃ¼gen",
 		tableproperties:	"Tabelleneigenschaften bearbeiten",
-		inserttablerow:		"Zeile in Tabelle einfügen",
-		deletetablerow:		"Tabellenzeile löschen",
-		inserttablecol:		"Spalte in Tabelle einfügen",
-		deletetablecol:		"Spalte löschen",
-		mergetablecells:	"Spalten rechts zusammenführen",
+		inserttablerow:		"Zeile in Tabelle einfÃ¼gen",
+		deletetablerow:		"Tabellenzeile lÃ¶schen",
+		inserttablecol:		"Spalte in Tabelle einfÃ¼gen",
+		deletetablecol:		"Spalte lÃ¶schen",
+		mergetablecells:	"Spalten rechts zusammenfÃ¼hren",
 		splittablecell:		"Spalten rechts spliten",
-		insertlink:			"Link in Dialog auswählen",
+		insertlink:			"Link in Dialog auswÃ¤hlen",
 		unlink:				"Link entfernen",
-		insertsimplelink:	"Link einfügen oder bearbeiten",
-		insertimg:			"Grafik aus Bibliothek einfügen",
-		insertsimpleimg:	"Grafik einfügen"
+		insertsimplelink:	"Link einfÃ¼gen oder bearbeiten",
+		insertimg:			"Grafik aus Bibliothek einfÃ¼gen",
+		insertsimpleimg:	"Grafik einfÃ¼gen"
 	},
 
 	linkDialog:{
-		title:				"Link einfügen",
+		title:				"Link einfÃ¼gen",
 		linktitle:			"Titel",
 		url:				"Adresse:",
 		target:				"Zielfenster:",
@@ -65,7 +65,7 @@ AFW.RTFToolbar.txt={
 	},
 
 	imgDialog:{
-		title:				"Grafik einfügen",
+		title:				"Grafik einfÃ¼gen",
 		url:				"Adresse:",
 		alt:				"Titel:",
 		border:				"Rahmen:",
@@ -74,12 +74,12 @@ AFW.RTFToolbar.txt={
 	},
 	
 	fileDialog:{
-		title:				"Anhänge verwalten",
-		files:				"Dataianhänge"
+		title:				"AnhÃ¤nge verwalten",
+		files:				"DataianhÃ¤nge"
 	},
 	
 	tableDialog:{
-		title:				"Tabelle einfügen",
+		title:				"Tabelle einfÃ¼gen",
 		width:				"Breite:",
 		align:				"Ausrichtung:",
 		alignValues:		["keine|", "links|left", "zentriert|center", "rechts|right"],
@@ -88,16 +88,16 @@ AFW.RTFToolbar.txt={
 	},
 
 	tablePropDialog:{
-		title:				"Tabellenattribute ändern",
-		change:				"ändere",
+		title:				"Tabellenattribute Ã¤ndern",
+		change:				"Ã„ndern",
 		to:					"in",
 		applyto:			"anwenden auf",
 		preview:			"Vorschau",
 		none:				["kein Stil|"],
 		tableStyleList:		["Tablenstil", "Zeilenstil", "Zellenstil"],
-		applyToTableList:	["ausgewählte Table|table"],
-		applyToTrList:		["ausgewählte Zeile|selected", "alle Zeilen der Tabelle|all"],
-		applyToTdList:		["ausgewählte Zelle|selected", "alle Zeilen der Tabelle|row", "alle Zellen der Tabelle|all"]
+		applyToTableList:	["ausgewÃ¤hlte Table|table"],
+		applyToTrList:		["ausgewÃ¤hlte Zeile|selected", "alle Zeilen der Tabelle|all"],
+		applyToTdList:		["ausgewÃ¤hlte Zelle|selected", "alle Zeilen der Tabelle|row", "alle Zellen der Tabelle|all"]
 	},
 	
 	viewmodes_html:			["WYSIWYG|wysiwyg", "HTML|html", "Vorschau|preview"],

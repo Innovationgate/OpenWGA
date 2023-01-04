@@ -24,9 +24,9 @@
  ******************************************************************************/
 $L={
 	cancel: "Abbrechen",
-	close: "Schlieﬂen",
+	close: "Schlie√üen",
 	save: "Speichern",
 	please_wait: "Bitte warten",
 	filename: "Dateiname",
-	filesize: "Grˆﬂe"
+	filesize: "Gr√∂√üe"
 }
