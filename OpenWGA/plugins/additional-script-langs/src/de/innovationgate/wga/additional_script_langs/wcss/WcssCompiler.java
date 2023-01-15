@@ -15,35 +15,21 @@ public class WcssCompiler {
 
 	public static final Logger LOG = Logger.getLogger("wga.wcss");
 
-	public interface WcssResource{
-		public String getCode();
-		public WcssResource resolve(String path);
-		public void addIntegratedResource();
-	}
-
-	public interface WcssFunction{
-		public String execute(WcssResource resource, ArrayList<String> params);
-	}
-
-	/*
-	 * custom WcssFunction used as concat()
-	 */
-	private class ConcatFunction implements WcssFunction{
-
-		@Override
-		public String execute(WcssResource resource, ArrayList<String> params) {
-			StringBuffer s = new StringBuffer();
-			for(String el: params){
-				s.append(el);
-			}
-			return s.toString();
-		}
-		
-	}
-
 	// map of custom wcss functions
 	final private static HashMap<String, WcssFunction> customFunctions = new HashMap<String, WcssFunction>();
-
+	static{
+		customFunctions.put("concat", new WcssFunction(){
+			@Override
+			public String execute(WcssResource resource, ArrayList<String> params) {
+				StringBuffer s = new StringBuffer();
+				for(String el: params){
+					s.append(el);
+				}
+				return s.toString();
+			}			
+		});
+	}
+	
 	// map of custom vars
 	final private static HashMap<String, String> customVars = new HashMap<String, String>();
 
@@ -51,7 +37,6 @@ public class WcssCompiler {
 
 	WcssCompiler(WcssResource resource){
 		_resource = resource;
-		registerCustomFunction("concat", new ConcatFunction());
 	}
 
 	// register a custom function
@@ -440,9 +425,9 @@ public class WcssCompiler {
 				result.append(prefix);
 				if(!_compress)
 					result.append("\t");
-				result.append(getName() + "-" + entry.getKey());
+				result.append(replaceCustomFunctions(replaceVars(getName() + "-" + entry.getKey())));
 				result.append(": ");
-				result.append(replaceCustomFunctions(entry.getValue()));
+				result.append(replaceCustomFunctions(replaceVars(entry.getValue())));
 				result.append(";");
 				if(!_compress)
 					result.append("\n");
@@ -461,6 +446,8 @@ public class WcssCompiler {
 	
 	private class CssDirectiveBlock extends CssBlock{
 
+		private String _csscode = "";
+		
 		CssDirectiveBlock(String name, CssBlock parent) {
 			super(name, parent);
 		}
@@ -489,6 +476,13 @@ public class WcssCompiler {
 					compiler.compile(getParentBlock());
 				}
 				else LOG.error("@import: ResourceRef not found: " + ref);
+			}
+			else if(directive.equalsIgnoreCase("importcss") && params_string.length()>1){	
+				ArrayList<String> params = parseCommasAndQuotes(params_string);
+				WcssResource ref = _resource.resolve(params.get(0));
+				if(ref!=null && ref.getCode()!=null){
+					_csscode = ref.getCSSCode();
+				}
 			}
 			else if(directive.equalsIgnoreCase("content")){
 				new CssContentBlock(getParentBlock());
@@ -523,10 +517,10 @@ public class WcssCompiler {
 		}
 		
 		public String getCode(String prefix) throws IOException{
-			// nothing to do here
+			String info="";
 			if(getSourceInfo()!=null)
-				return "\n" + prefix + "/* Execute " + getName() + " in " + getSourceInfo() + " */\n";
-			else return "";
+				info = "\n" + prefix + "/* Execute " + getName() + " in " + getSourceInfo() + " */\n";
+			return info + _csscode;
 		}
 	}
 	
