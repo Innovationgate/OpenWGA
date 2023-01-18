@@ -549,9 +549,10 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
     					.replaceAll("ü", "ue")
     					.replaceAll("ß", "ss");
     		}
-    		return title.replaceAll("[^äöüßa-z0-9_()\\[\\]]+", "-")
+    		title = title.replaceAll("[^äöüßa-z0-9_()\\[\\]]+", "-")
     				.replaceAll("^-", "")	// remove trailing minus
     				.replaceAll("-$", "");	// remove ending minus
+    		return title.isEmpty() ? "-" : title;	// avoid empty titles
     	}
 
         StringBuffer name = new StringBuffer();
