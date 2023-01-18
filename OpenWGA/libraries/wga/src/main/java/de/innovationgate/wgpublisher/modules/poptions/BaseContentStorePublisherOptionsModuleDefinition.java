@@ -47,9 +47,6 @@ import de.innovationgate.wga.modules.options.PredefinedValuesOptionType;
 import de.innovationgate.wga.modules.options.ServerFilePathOptionType;
 import de.innovationgate.wga.modules.options.StringOptionType;
 import de.innovationgate.wga.modules.options.TextEncodingOptionType;
-import de.innovationgate.wga.modules.types.ContentDatabasePublisherOptionsModuleType;
-import de.innovationgate.wga.modules.types.FileAnnotatorModuleType;
-import de.innovationgate.wga.modules.types.FileDerivateCreatorModuleType;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.expressions.ExpressionEngineFactory;
 import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager;
@@ -278,6 +275,11 @@ public class BaseContentStorePublisherOptionsModuleDefinition implements ModuleD
         enhencedFormat.addDependentOption(WGACore.DBATTRIB_TITLEPATHURL, Boolean.TRUE.toString());
         enhencedFormat.addDependentOption(WGACore.DBATTRIB_TITLEPATHURL_INCLUDEKEYS, Boolean.FALSE.toString());
         options.addOption(enhencedFormat);
+
+        LocalizedOptionDefinition useDefaultLanguageTitles = new LocalizedOptionDefinition(WGACore.DBATTRIB_TITLEPATHURL_USEDEFAULTLANGUAGETITLES, CommaSeparatedListOptionType.INSTANCE, _bundleLoader);
+        useDefaultLanguageTitles.setOptional(true);
+        useDefaultLanguageTitles.addDependentOption(WGACore.DBATTRIB_TITLEPATHURL, Boolean.TRUE.toString());
+        options.addOption(useDefaultLanguageTitles);
 
         LocalizedOptionDefinition tpuUseStruckkeys = new LocalizedOptionDefinition(WGACore.DBATTRIB_TITLEPATHURL_USESTRUCTKEYS, BooleanOptionType.INSTANCE, _bundleLoader);
         tpuUseStruckkeys.setOptional(true);

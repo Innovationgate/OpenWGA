@@ -428,6 +428,7 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
     private boolean _includeKeys;
     private boolean _useStructKeysInPath;
     private boolean _enhancedFormat;
+    private List<String> _useDefaultLanguageTitles;
     
     public PathTitle parseURLPathTitle(String title) throws UnsupportedEncodingException {
         return new URLPathTitle(title);
@@ -437,17 +438,21 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
         return new SharePathTitle(title);
     }
 
-    public TitlePathManager(WGDatabase db, WGACore core, boolean generateTitlePathURLs) throws WGAPIException, UnsupportedEncodingException {
+    @SuppressWarnings("unchecked")
+	public TitlePathManager(WGDatabase db, WGACore core, boolean generateTitlePathURLs) throws WGAPIException, UnsupportedEncodingException {
         _core = core;
         _shortcutArea = (String) db.getAttribute(WGACore.DBATTRIB_TITLEPATHURL_SHORTCUTAREA);
         _allowAllCharacters = db.getBooleanAttribute(WGACore.DBATTRIB_SHARE_ALLOWALLCHARS, true);
         _allowMixedLang = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_MIXEDLANGUAGES, false);
         _generateTitlePathURLs = generateTitlePathURLs;
-        _contentIndexing = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_CONTENTINDEXING, false);
+        _contentIndexing = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_CONTENTINDEXING, false);        
         _includeKeys = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_INCLUDEKEYS, false);
         _useStructKeysInPath = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_USESTRUCTKEYS, false);
         _allowUmlaute = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_ALLOW_UMLAUTE, false);
         _enhancedFormat = db.getBooleanAttribute(WGACore.DBATTRIB_TITLEPATHURL_ENHENCED_FORMAT, false);
+        
+        _useDefaultLanguageTitles = (List<String>) core.readPublisherOptionOrDefault(db, WGACore.DBATTRIB_TITLEPATHURL_USEDEFAULTLANGUAGETITLES);
+        
         _db = db;
         
         if(_shortcutArea!=null && db.getArea(_shortcutArea)==null){
@@ -730,6 +735,14 @@ public class TitlePathManager implements ManagedDBAttribute, WGDatabaseEventList
 
     public PathTitle createPathTitle(WGContent content) throws WGAPIException {
 
+    	String lang = content.getLanguage().getName();
+    	if(_includeKeys && _useDefaultLanguageTitles!=null && _useDefaultLanguageTitles.contains(lang)){
+    		lang = content.getDatabase().getDefaultLanguage();
+    		WGContent default_lang_content = content.getStructEntry().getReleasedContent(lang);
+    		if(default_lang_content!=null)
+    			content = default_lang_content;
+    	}    	
+    	
         String title = content.getTitle();
         String normalizedTitle = normalizeURLTitle(title);
         int index = -1;
