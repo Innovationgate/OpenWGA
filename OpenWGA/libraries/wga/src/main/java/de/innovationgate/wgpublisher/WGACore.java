@@ -3968,6 +3968,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
     public static final String DBATTRIB_TITLEPATHURL_INCLUDEKEYS = "TitlePathURL.IncludeKeys";    
     public static final String DBATTRIB_TITLEPATHURL_USESTRUCTKEYS = "TitlePathURL.UseStructkeysAsKey";
     public static final String DBATTRIB_TITLEPATHURL_ENHENCED_FORMAT = "TitlePathURL.EnhancedFormat";
+    public static final String DBATTRIB_TITLEPATHURL_USEDEFAULTLANGUAGETITLES = "TitlePathURL.UseDefaultLanguageTitles";
     
     public static final String DBATTRIB_TITLEPATHURL_ALLOW_UMLAUTE = "TitlePathURL.AllowUmlaute";
 
@@ -8560,12 +8561,15 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
     
     public Object readPublisherOptionOrDefault(WGDatabase db, String name) {
 
-       if (_publisherOptionsReader != null) {
-           return _publisherOptionsReader.readPublisherOptionOrDefault(db, name);
-       }
-       else {
-           return db.getAttribute(name);
-       }
+    	if (_publisherOptionsReader != null) {
+    		Object result = _publisherOptionsReader.readPublisherOptionOrDefault(db, name);
+    		if(result==null)
+    			result = getWgaConfiguration().getGlobalPublisherOptions().get(name);
+    		return result;
+    	}
+    	else {
+    		return db.getAttribute(name);
+    	}
         
     }
     
