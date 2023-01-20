@@ -1,38 +1,40 @@
 <tml:action id="publish">
 
-	try{
-		var validfrom = tmlform.validfrom && WGA.createCalendar(WGA.dateOnly(tmlform.validfrom))
-		if(validfrom && tmlform.validfrom_time){
-			var time = WGA.createCalendar(tmlform.validfrom_time)
-			validfrom.set(validfrom.HOUR_OF_DAY, time.get(validfrom.HOUR_OF_DAY));
-			validfrom.set(validfrom.MINUTE, time.get(validfrom.MINUTE));
+	if(tmlform.validate()){
+		try{
+			var validfrom = tmlform.validfrom && WGA.createCalendar(WGA.dateOnly(tmlform.validfrom))
+			if(validfrom && tmlform.validfrom_time){
+				var time = WGA.createCalendar(tmlform.validfrom_time)
+				validfrom.set(validfrom.HOUR_OF_DAY, time.get(validfrom.HOUR_OF_DAY));
+				validfrom.set(validfrom.MINUTE, time.get(validfrom.MINUTE));
+			}
+			//console.log("validfrom", validfrom && validfrom.time);
+		
+			var validto = tmlform.validto && WGA.createCalendar(WGA.dateOnly(tmlform.validto))
+			if(validto && tmlform.validto_time){
+				var time = WGA.createCalendar(tmlform.validto_time)
+				validto.set(validto.HOUR_OF_DAY, time.get(validto.HOUR_OF_DAY));
+				validto.set(validto.MINUTE, time.get(validto.MINUTE));
+			}
+			//console.log("validto", validto && validto.time);
+			
+			content().setValidity(validfrom && validfrom.time, validto && validto.time);
+			content().publish(tmlform.comment, tmlform.reasonForReplacement)
+			
+			if(tmlform.mail_to_authors)
+				$mc.sendTranslationRequestMails(this, tmlform.fieldList("mail_to_authors"), tmlform.reasonForReplacement);
+			
+			portlet.fireevent("close-dialog", {
+				redirectto: contenturl("html", null, true)
+			})
+		
+			portlet.fireevent("struct-updated", App.getStructData(content()))
+			
+			_dialog_closed=true;
 		}
-		//console.log("validfrom", validfrom && validfrom.time);
-	
-		var validto = tmlform.validto && WGA.createCalendar(WGA.dateOnly(tmlform.validto))
-		if(validto && tmlform.validto_time){
-			var time = WGA.createCalendar(tmlform.validto_time)
-			validto.set(validto.HOUR_OF_DAY, time.get(validto.HOUR_OF_DAY));
-			validto.set(validto.MINUTE, time.get(validto.MINUTE));
+		catch(e){
+			tmlform.addmessage(e.message)
 		}
-		//console.log("validto", validto && validto.time);
-		
-		content().setValidity(validfrom && validfrom.time, validto && validto.time);
-		content().publish(tmlform.comment, tmlform.reasonForReplacement)
-		
-		if(tmlform.mail_to_authors)
-			$mc.sendTranslationRequestMails(this, tmlform.fieldList("mail_to_authors"), tmlform.reasonForReplacement);
-		
-		portlet.fireevent("close-dialog", {
-			redirectto: contenturl("html", null, true)
-		})
-	
-		portlet.fireevent("struct-updated", App.getStructData(content()))
-		
-		_dialog_closed=true;
-	}
-	catch(e){
-		tmlform.addmessage(e.message)
 	}
 	
 </tml:action>
@@ -44,14 +46,16 @@
 	</div>
 	
 	<div class="content form-horizontal">
-	
+		
 		<tml:script>
+			_validation_errors = false;
 			var script = WGA.design(db()).resolveSystemScriptModule("content-manager:validate", "tmlscript")
 			if(script){
 				var mod = script.getTMLScriptModule()
 				try{
 					var msg = mod && WGA.tmlscript().runScript(this, mod.getCode())
-					if(msg){
+					if(msg && msg.size()){
+						_validation_errors = true;
 						for(let message in Iterator(msg))
 							tmlform.addmessage(message)
 					}
@@ -61,86 +65,99 @@
 					tmlform.addmessage("Es ist ein Fehler beim Ausführen des Validierungs-Scripts aufgetreten:<br><br>"+e.message)
 				}
 			}
+			console.log("_validation_errors", _validation_errors)
 		</tml:script>
-		<tml:if condition="tmlform.hasmessages()">
-			<tml:then>
-				<tml:[form-messages] o_title="Die Seite kann nicht veröffentlicht werden"/>
-			</tml:then>
-			<tml:else>
-
-				<div style="color:red;margin-bottom:20px;display:none;align-items:center" id="empty_h">
-					<i style="font-size:2em;margin-right:15px" class="fas fa-exclamation-triangle"></i>
-					<div style="flex:1">
-						Die Dokumentstruktur enthält Fehler.
-						<br>Bitte prüfen Sie die Seite mit Hilfe der <a style="text-decoration:underline;color:inherit" href="#"><i class="fa fa-arrow-right"></i> Outline-Ansicht</a>.
-					</div>
+		<tml:[form-messages] o_title="Die Seite kann nicht veröffentlicht werden"/>
+		
+		<tml:case unless="_validation_errors">
+		
+			<div style="color:red;margin-bottom:20px;display:none;align-items:center" id="empty_h">
+				<i style="font-size:2em;margin-right:15px" class="fas fa-exclamation-triangle"></i>
+				<div style="flex:1">
+					Die Dokumentstruktur enthält Fehler.
+					<br>Bitte prüfen Sie die Seite mit Hilfe der <a style="text-decoration:underline;color:inherit" href="#"><i class="fa fa-arrow-right"></i> Outline-Ansicht</a>.
 				</div>
-				<script>
-					require(["jquery", "outline"], function($, Outline){
-						Outline.analyzeDocument(function(errors){
-							if(errors)
-								$("#empty_h").css("display", "flex");
-						})
-						$("#empty_h a").click(function(ev){
-							ev.preventDefault();
-							WGA.event.fireEvent("appnav-view-change", "publish-page-dialog", {
-								view: "outline"
-							})
-							WGA.event.fireEvent("close-dialog", "publish-page-dialog", {});
-						})
+			</div>
+			<script>
+				require(["jquery", "outline"], function($, Outline){
+					Outline.analyzeDocument(function(errors){
+						if(errors)
+							$("#empty_h").css("display", "flex");
 					})
-				</script>
+					$("#empty_h a").click(function(ev){
+						ev.preventDefault();
+						WGA.event.fireEvent("appnav-view-change", "publish-page-dialog", {
+							view: "outline"
+						})
+						WGA.event.fireEvent("close-dialog", "publish-page-dialog", {});
+					})
+				})
+			</script>
 
-				<tml:[form-field] o_label="Sichtbar ab">
-					<div class="clear-field-wrapper<tml:case condition="VALIDFROM"> col-sm-8</tml:case>">
-						<tml:input type="date" name="validfrom" meta="true" cssclass="date form-control" html_placeholder="sofort" format="dd.MM.yyyy"/>
-						<a class="clear-field" style="display:none">&times;</a>
-					</div>
-					<tml:script>
-						if(!tmlform.validfrom_time)
-							tmlform.validfrom_time = WGA.format(VALIDFROM, "HH:mm") || "00:00"
-					</tml:script>
-					<div class="input-group col-sm-4" <tml:case condition="!VALIDFROM">style="display:none"</tml:case>>			
-						<tml:input type="date" name="validfrom_time" cssclass="form-control" store="false" format="HH:mm"/>
-						<div class="input-group-addon">Uhr</div>
-					</div>
-				</tml:[form-field]>
-				
-				<tml:[form-field] o_label="Sichtbar bis">
-					<div class="clear-field-wrapper<tml:case condition="VALIDTO"> col-sm-8</tml:case>">
-						<tml:input type="date" name="validto" meta="true" cssclass="date form-control" html_placeholder="unbegrenzt" format="dd.MM.yyyy"/>
-						<a class="clear-field" style="display:none">&times;</a>
-					</div>
-					<tml:script>
-						if(!tmlform.validto_time)
-							tmlform.validto_time = WGA.format(VALIDTO, "HH:mm") || "23:59"
-					</tml:script>
-					<div class="input-group col-sm-4" <tml:case condition="!VALIDTO">style="display:none"</tml:case>>			
-						<tml:input type="date" name="validto_time" cssclass="form-control" store="false" format="HH:mm"/>
-						<div class="input-group-addon">Uhr</div>
-					</div>
-				</tml:[form-field]>
-				
-				<tml:case condition="VERSION!=1">
-					<tml:[form-field] o_label="Grund der Ersetzung" o_type="textarea" o_field="reasonForReplacement" o_placeholder="Warum wurde der Inhalt ersetzt?"/>					
-					<tml:comment>
-						check if other autors (of other lanuages) should be notified
-					</tml:comment>
-					<tml:case if="$mc.isDefaultLang & $mc.translationAutors.size & $mc.translationRequestSubject">
-						<tml:[form-field] o-optionvalues="$mc.translationAutors" o_label="Benachrichtigen" o_name="mail_to_authors" o_type="checkbox" o_labeled="true" o_divider="<br>"/>
-					</tml:case>
+			<tml:[form-field] o_label="Sichtbar ab">
+				<div class="clear-field-wrapper<tml:case condition="tmlform.validfrom"> col-sm-8</tml:case>">
+					<tml:input type="date" name="validfrom" meta="true" cssclass="date form-control" html_placeholder="sofort" format="dd.MM.yyyy"/>
+					<a class="clear-field" style="display:none">&times;</a>
+				</div>
+				<tml:script>
+					if(!tmlform.validfrom_time)
+						tmlform.validfrom_time = WGA.format(VALIDFROM, "HH:mm") || "00:00"
+				</tml:script>
+				<div class="input-group col-sm-4" <tml:case condition="!tmlform.validfrom">style="display:none"</tml:case>>			
+					<tml:input type="date" name="validfrom_time" cssclass="form-control" store="false" format="HH:mm"/>
+					<div class="input-group-addon">Uhr</div>
+				</div>
+			</tml:[form-field]>
+			
+			<tml:[form-field] o_label="Sichtbar bis">
+				<div class="clear-field-wrapper<tml:case condition="tmlform.validto"> col-sm-8</tml:case>">
+					<tml:input type="date" name="validto" meta="true" cssclass="date form-control" html_placeholder="unbegrenzt" format="dd.MM.yyyy"/>
+					<a class="clear-field" style="display:none">&times;</a>
+				</div>
+				<tml:script>
+					if(!tmlform.validto_time)
+						tmlform.validto_time = WGA.format(VALIDTO, "HH:mm") || "23:59"
+				</tml:script>
+				<div class="input-group col-sm-4" <tml:case condition="!tmlform.validto">style="display:none"</tml:case>>			
+					<tml:input type="date" name="validto_time" cssclass="form-control" store="false" format="HH:mm"/>
+					<div class="input-group-addon">Uhr</div>
+				</div>
+			</tml:[form-field]>
+			
+			<tml:case condition="VERSION!=1">
+				<tml:[form-field] o_label="Grund der Ersetzung" o_type="textarea" o_field="reasonForReplacement" o_placeholder="Warum wurde der Inhalt ersetzt?"/>					
+				<tml:comment>
+					check if other autors (of other lanuages) should be notified
+				</tml:comment>
+				<tml:case if="$mc.isDefaultLang & $mc.translationAutors.size & $mc.translationRequestSubject">
+					<tml:[form-field] o-optionvalues="$mc.translationAutors" o_label="Benachrichtigen" o_name="mail_to_authors" o_type="checkbox" o_labeled="true" o_divider="<br>"/>
 				</tml:case>
-			</tml:else>
-		</tml:if>
+			</tml:case>
+			
+			<tml:case if="$mc.settingsTML">
+				<hr>
+				<tml:include ref="{item:$mc.settingsTML}" designdb="{meta('db', 'dbkey')}">
+					<tml:option name="cm_dbkey" expression="context('main').meta('db', 'dbkey')"/>
+					<tml:option name="label-width">250</tml:option>
+				</tml:include>
+			</tml:case>
 
+		</tml:case>
+		
 	</div>
 	
 	<div class="footer">
 		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
-		<tml:case condition="!tmlform.hasmessages()">
+		<tml:case unless="_validation_errors">
 			<tml:button cssclass="btn btn-primary" clickaction="publish">Veröffentlichen</tml:button>
 		</tml:case>
 	</div>
 
 </tml:form>	
+
+<script>
+	require(["<tml:url type="js" name="::publish-page"/>"], function(Module){
+		Module()
+	})
+</script>
 
