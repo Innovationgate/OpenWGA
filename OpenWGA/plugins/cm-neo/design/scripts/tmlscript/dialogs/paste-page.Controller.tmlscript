@@ -72,6 +72,21 @@ Controller.prototype.isAllowedPageType = function(AFW, $cx, $item__CM_clipboard_
 	return true;
 }
 
+Controller.prototype.isDestChildrenOfSource = function($cx, $item__CM_clipboard_context){
+	var source = $cx.context($item__CM_clipboard_context);
+	source = source.document instanceof Packages.de.innovationgate.webgate.api.WGStructEntry ? source.document : source.content().structEntry;
+	var dest = $cx.document instanceof Packages.de.innovationgate.webgate.api.WGStructEntry ? $cx.document : $cx.content().structEntry;
+
+	// is dest child of source?
+	var s=dest;
+	while(s!=null){
+		if(s==source)
+			return true;
+		s=s.getParentEntry()
+	}
+	return false;
+}
+
 Controller.prototype.destinationChildren = function($cx, $form){
 	if($form.root_or_child=="root"){
 		return $cx.db().getArea($form.area).getRootEntries()
