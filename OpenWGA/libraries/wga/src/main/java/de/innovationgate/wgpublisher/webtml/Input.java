@@ -502,7 +502,9 @@ public class Input extends ActionBase implements DynamicAttributes {
         else {
             String strOptions = this.getOptions();
             if (!WGUtils.isEmpty(strOptions)) {
-                rawOptionsList = WGUtils.deserializeCollection(strOptions, ",");
+            	if(getTMLContext().getDesignContext().getVersionCompliance().isAtLeast(7, 10))
+            		rawOptionsList = WGUtils.deserializeCollection(strOptions, ",", true, '`', true);
+            	else rawOptionsList = WGUtils.deserializeCollection(strOptions, ",");
             }
             else {
                 String relType = getRelationtype();
