@@ -21,7 +21,7 @@ set -e
 case "$1" in
     configure)        
     
-    invoke-rc.d openwga stop
+    invoke-rc.d openwga stop || true
     mv /var/lib/openwga/server.conf /etc/openwga
     
 	addgroup --system openwga
