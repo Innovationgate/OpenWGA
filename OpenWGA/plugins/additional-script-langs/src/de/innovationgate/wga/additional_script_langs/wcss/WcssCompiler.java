@@ -473,6 +473,7 @@ public class WcssCompiler {
 				WcssResource ref = _resource.resolve(params.get(0));
 				if(ref!=null && ref.getCode()!=null){
 					WcssCompiler compiler = new WcssCompiler(ref);
+					compiler.setCompressing(_compress);
 					compiler.compile(getParentBlock());
 				}
 				else LOG.error("@import: ResourceRef not found: " + ref);
