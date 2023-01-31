@@ -99,7 +99,7 @@ public class WcssCompiler {
 		private String _name="";
 		private String _sourceInfo;
 		
-		public boolean last_if_unless_rendered=false;
+		public boolean last_if_unless_rendered=true;
 		
 		CssBlock(){}
 		
