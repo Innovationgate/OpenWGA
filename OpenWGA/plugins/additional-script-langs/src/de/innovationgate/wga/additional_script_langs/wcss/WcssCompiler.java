@@ -206,7 +206,7 @@ public class WcssCompiler {
 						b.parse(st);
 					}
 					else if(className.startsWith("@if") || className.startsWith("@unless") || className.startsWith("@else")){
-						CssIfUnlessBlock b = new CssIfUnlessBlock(className, this);
+						CssConditionBlock b = new CssConditionBlock(className, this);
 						b.parse(st);
 					}
 					else if(className.startsWith("@mixin")){
@@ -688,11 +688,11 @@ public class WcssCompiler {
 		
 	}
 
-	private class CssIfUnlessBlock extends CssBlock{
+	private class CssConditionBlock extends CssBlock{
 
 		String _def;
 		
-		CssIfUnlessBlock(String def, CssBlock parent) {			
+		CssConditionBlock(String def, CssBlock parent) {			
 			super(parent);
 			_def = def;
 		}
@@ -726,8 +726,8 @@ public class WcssCompiler {
 			}
 		}
 
-		protected CssIfUnlessBlock cloneCssBlock(String name, CssBlock parent, CssBlock contentBlock){
-			CssIfUnlessBlock clone = new CssIfUnlessBlock(_def, parent);
+		protected CssConditionBlock cloneCssBlock(String name, CssBlock parent, CssBlock contentBlock){
+			CssConditionBlock clone = new CssConditionBlock(_def, parent);
 			clone.copyFromBlock(this, contentBlock);
 			return clone;
 		}
