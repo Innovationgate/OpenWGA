@@ -169,11 +169,19 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
             		String url = redirect.getPath();
             		if(!url.startsWith("/")){
             			// redirect to some external URL
-                		if(isPermanentRedirect){
+            			URL u = new URL(url);
+            			redirectUrlBuilder.setPath(u.getPath());
+            			redirectUrlBuilder.setHost(u.getHost());
+            			redirectUrlBuilder.setProtocol(u.getProtocol());
+            			redirectUrlBuilder.setPort(u.getPort());
+            			if(u.getQuery()!=null)
+            				redirectUrlBuilder.addQueryString(u.getQuery(), null);
+            			
+                		if(redirect.isPermanentRedirect()){
                     		httpResponse.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-                    		httpResponse.setHeader("Location", httpResponse.encodeRedirectURL(url));        			
+                    		httpResponse.setHeader("Location", httpResponse.encodeRedirectURL(redirectUrlBuilder.build(true)));        			
                 		}
-                		else httpResponse.sendRedirect(httpResponse.encodeRedirectURL(url));
+                		else httpResponse.sendRedirect(httpResponse.encodeRedirectURL(redirectUrlBuilder.build(true)));
                 		return;            			
             		}
             		redirectRequired = true;
@@ -578,6 +586,8 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 	                    	redirectURL = redirectURL.replace("$"+i, matcher.group(i));
 	                    }
 	                }
+	                if(redirectURL.indexOf("$redirected-from")>=0)
+	                	redirectURL = redirectURL.replace("$redirected-from", serverName + path);
 	                return new Redirect(redirectURL, redirect.isForward(), redirect.isPermanentRedirect());
 	            }
     		}
