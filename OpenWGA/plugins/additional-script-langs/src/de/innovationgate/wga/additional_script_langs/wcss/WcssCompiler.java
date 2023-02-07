@@ -3,7 +3,6 @@ package de.innovationgate.wga.additional_script_langs.wcss;
 import java.io.IOException;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -189,7 +188,7 @@ public class WcssCompiler {
 							}
 							else _props.put(propPart, trim(valuePart));
 						}
-						else LOG.warn("line " + st.lineno() + " ignored: " + propName);
+						else LOG.warn("missing : in property definition. Line " + st.lineno() + " ignored: " + propName);
 					}					
 				}
 				else if((char)token == '{'){
