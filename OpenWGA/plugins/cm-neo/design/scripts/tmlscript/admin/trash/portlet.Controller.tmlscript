@@ -8,8 +8,13 @@ Controller.prototype.docs = function($option_dbkey) {
 
 Controller.prototype.clearTrash = function($option_dbkey){
 	console.log("Clear trash")
-	for(let doc in Iterator(this.docs($option_dbkey))){
-		console.log("remove", doc.title);
-		doc.remove();
-	}
+	
+	WGA.Master.runFunction(function(dbkey){
+		var docs = WGA.app(dbkey).db().getArea("$trash-cm-neo").getRootEntries()
+		for(let doc in Iterator(docs)){
+			console.log("remove page", doc.title);
+			doc.remove();
+		}
+	}, $option_dbkey)
+	
 }

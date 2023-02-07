@@ -15,7 +15,7 @@
 				<div class="row">
 					<div class="col">
 						<a href="#" data-wgakey="<tml:item name="_doc.structKey"/>">
-							<tml:item name="_doc.title"/>
+							<tml:script expression="_doc.title || '- keine Leseberechtigung -'"/>
 						</a>
 					</div>
 					<div class="col"><tml:item name="_doc.contentType.name"/></div>

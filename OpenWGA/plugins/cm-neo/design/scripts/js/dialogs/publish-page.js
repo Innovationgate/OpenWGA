@@ -1,8 +1,9 @@
-define(["jquery"], function($){
+define(["jquery", "jquery-textarea-autogrow", "jquery-ui-js/datepicker"], function($){
 
 	return function(){
-
-		$("#form-publish-page [name=validfrom]").datepicker("option", {
+		$("#form-publish-page textarea").autogrow()
+		
+		$("#form-publish-page [name=validfrom]").datepicker({
 			minDate: 0,
 			onClose: function(txt){
 				$("#form-publish-page [name=validto]").datepicker("option", "minDate", txt||0)
@@ -21,7 +22,7 @@ define(["jquery"], function($){
 			}
 		});
 		
-		$("#form-publish-page [name=validto]").datepicker("option", {
+		$("#form-publish-page [name=validto]").datepicker({
 			minDate: 0,
 			onClose: function(txt){
 				$("#form-publish-page [name=validfrom]").datepicker("option", "maxDate", txt)

@@ -7,13 +7,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.json.JsonObject;
+
 import de.innovationgate.webgate.api.WGDesignDocument;
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGScriptModule;
 import de.innovationgate.wga.additional_script_langs.ResourceRef;
-import de.innovationgate.wga.additional_script_langs.wcss.WcssCompiler.WcssFunction;
-import de.innovationgate.wga.additional_script_langs.wcss.WcssCompiler.WcssResource;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
@@ -25,7 +25,6 @@ public class WcssPostProcessor implements PostProcessor{
 
 	WGA _wga;
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public void prepare(WGA wga, PostProcessData data) throws WGException {
 			
@@ -42,11 +41,13 @@ public class WcssPostProcessor implements PostProcessor{
         Map<String,Object> vars = new HashMap<String, Object>();
     	for (Design design : cssVariables) {
             Object result = wga.tmlscript().runScript(design, wga.createTMLContext(data.getDocument().getDatabase(), design), design.getScriptModule(WGScriptModule.CODETYPE_TMLSCRIPT).getCode(), extraObjects);
-            if (!(result instanceof Map<?,?>)) {
-            	wga.getLog().error("The return type of TMLScript module '" + design + "' used to set CSS variables is no lookup table or JS object and will be ignored.");
-            	continue;
+            
+            if (!wga.tmlscript().isNativeObject(result)) {
+            	wga.getLog().error("The return type of TMLScript module '" + design + "' used to set CSS variables is no JS-Object and will be ignored.");
+            	continue;            	
             }
-            vars.putAll((Map<String,Object>)result);
+            else vars.putAll((JsonObject) wga.tmlscript().importJsonData(result));
+
 		}
     	
     	if(wga.getRequest()!=null){
@@ -54,11 +55,10 @@ public class WcssPostProcessor implements PostProcessor{
     		vars.put("requested_host", host);
     	}
     	
-        data.setCacheQualifier((Serializable)vars);
+        data.setCacheQualifier((Serializable) vars);
 			
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public PostProcessResult postProcess(WGA wga, PostProcessData data, String code) throws WGException {
 		
@@ -75,7 +75,8 @@ public class WcssPostProcessor implements PostProcessor{
         WcssCompiler.registerCustomFunction("fileurl", new WGAFileURL());
 
         if (data.getCacheQualifier() != null) {
-        	Map<Object,Object> variables = (Map<Object,Object>) data.getCacheQualifier();
+        	@SuppressWarnings("unchecked")
+			Map<Object,Object> variables = (Map<Object,Object>) data.getCacheQualifier();
         	HashMap<String,String> vars = new HashMap<String,String>();
         	for(Map.Entry<Object, Object> entry: variables.entrySet()){
         		vars.put("$"+entry.getKey().toString(), entry.getValue().toString());
@@ -91,15 +92,17 @@ public class WcssPostProcessor implements PostProcessor{
 
 		try {
 			result.setCode(compiler.compile());
+			result.addIntegratedResource(data.getDocument());
 		} catch (IOException e) {
 			_wga.getLog().error("unable to compile wcss resource", e);
+			data.setCacheable(false);
 		}
         
         return result;
         
 	}
 
-	private class WGAResource implements WcssResource{
+	private class WGAResource extends WcssResource{
 
 		private PostProcessResult _result;
 		private ResourceRef _ref;
@@ -133,6 +136,16 @@ public class WcssPostProcessor implements PostProcessor{
 		}
 
 		@Override
+		public String getCSSCode() {
+			try {
+				return _ref.getCSSCode();
+			} 
+			catch (WGException | IOException e) {
+				return "";
+			}
+		}
+		
+		@Override
 		public WcssResource resolve(String path) {
 			try {
 				return new WGAResource(_result, _ref.resolve(path));
@@ -148,7 +161,7 @@ public class WcssPostProcessor implements PostProcessor{
 			} catch (WGException | IOException e) {
 			}
 		}
-		
+
 	}
 	
 	/*

@@ -1,6 +1,16 @@
-function Controller($cx) {}
+function Controller() {}
 
-Controller.prototype.prepare = function() {}
+Controller.prototype.prepare = function($cx, AFW) {
+	// check for requires settings
+	var tmls = WGA.createList([
+		"overlay:wga:content-manager:publish:"+$cx.CONTENTTYPE,
+		"overlay:wga:content-manager:publish:default",
+		"wga:content-manager:publish:"+$cx.CONTENTTYPE,
+		"wga:content-manager:publish:default"
+	])
+	var tml = AFW.database().checkforTML(tmls);
+	this.settingsTML = tml;
+}
 
 Controller.prototype.workflowMailConfig = function($cx) {
 	var script = WGA.design($cx.db()).resolveSystemScriptModule("workflow:mailconfig", "tmlscript")

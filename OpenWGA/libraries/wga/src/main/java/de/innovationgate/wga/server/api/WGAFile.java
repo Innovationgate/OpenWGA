@@ -1,15 +1,12 @@
 package de.innovationgate.wga.server.api;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -24,6 +21,7 @@ import org.dom4j.io.XMLWriter;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.wga.common.CodeCompletion;
+import de.innovationgate.wga.server.api.WGAList.JSFunction;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 
 @CodeCompletion(methodMode=CodeCompletion.MODE_EXCLUDE)
@@ -32,7 +30,7 @@ public class WGAFile {
 	private File _file;
 	protected WGA _wga;
 	private String _default_encoding;
-	
+
 	public class ZipStream{
 		
 		ZipOutputStream _out;
@@ -126,6 +124,18 @@ public class WGAFile {
 		if(_file==null)
 			return false;
 		return _file.exists();
+	}
+	
+	public boolean isFile(){
+		if(_file==null)
+			return false;
+		return _file.isFile();		
+	}
+
+	public boolean isDirectory(){
+		if(_file==null)
+			return false;
+		return _file.isDirectory();		
 	}
 	
 	public WGAFile createDir(){
@@ -259,43 +269,64 @@ public class WGAFile {
 	}
 
 	/**
-	 * Returns directory list as WGAFile objects
+	 * Returns directory list as WGAFile objects including directories
 	 * @param filter
-	 * @return
 	 */
-	public List<WGAFile> listFiles(FileFilter filter){
-		ArrayList<WGAFile> list = new ArrayList<WGAFile>();
+	public WGAList<WGAFile> list(JSFunction filter){
+		WGAList<WGAFile> list = new WGAList<WGAFile>();
 		if(_file!=null){
-			File [] files = _file.listFiles(filter);
+			File [] files = _file.listFiles();
 			if(files!=null){
 				for (File file: files){
 					list.add(new WGAFile(_wga, file));				
 				}
 			}
 		}
-		return list;
+		return list.filter(filter);
+	}
+	public WGAList<WGAFile> list(){
+		return list(null);
 	}
 
 	/**
-	 * Returns directory list as WGAFile objects
-	 * @return
+	 * Returns directory files list as WGAFile objects
+	 * @param filter
 	 */
-	public List<WGAFile> listFiles(){
+	public WGAList<WGAFile> listFiles(JSFunction f){
+		return list(new JSFunction(){
+			@Override
+			public Object call(Object a, Object b) {
+				return ((WGAFile)a).isFile();
+			}			
+		}).filter(f);
+	}
+	public WGAList<WGAFile> listFiles(){
 		return listFiles(null);
 	}
 	
 	/**
-	 * Returns directory list as WGAFile objects including subdirectories
-	 * @return
+	 * Returns directory folders as WGAFile objects
+	 * @param filter
 	 */
-	public List<WGAFile> list(){
-		ArrayList<WGAFile> list = new ArrayList<WGAFile>();
-		if(_file!=null){
-			for(String filename: _file.list()){
-				list.add(new WGAFile(_wga, this, filename));
+	public WGAList<WGAFile> listFolders(final JSFunction f){
+		return list(new JSFunction(){
+			@Override
+			public Object call(Object a, Object b) {
+				return ((WGAFile)a).isDirectory();
 			}
-		}
-		return list;
+		}).filter(f); 
+	}
+	public WGAList<WGAFile> listFolders(){
+		return listFolders(null);
+	}
+	
+	/**
+	 * Returns the mimeType of a file
+	 */
+	public String getMimeType(){
+		if(_file!=null)
+			return _wga.getCore().getServletContext().getMimeType(_file.getName());
+		else return null;
 	}
 	
 }

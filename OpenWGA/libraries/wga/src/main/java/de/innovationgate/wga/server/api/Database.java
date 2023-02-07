@@ -683,10 +683,7 @@ public class Database {
      * @return Publisher option value
      */
     public Object getPublisherOption(String name) throws WGException {
-        Object opt = _wga.getCore().readPublisherOptionOrDefault(_db, name);
-        if(opt==null)
-        	opt = _wga.getCore().getWgaConfiguration().getGlobalPublisherOptions().get(name);
-        return opt;
+    	return _wga.getCore().readPublisherOptionOrDefault(_db, name);
     }
     
     /**

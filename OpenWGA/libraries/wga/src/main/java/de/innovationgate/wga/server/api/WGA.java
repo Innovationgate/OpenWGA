@@ -3425,11 +3425,11 @@ public class WGA {
     }
 
     // WGA.List
-    public WGAList List(Collection<Object> list){
-    	return new WGAList(list);
+    public WGAList<Object> List(Collection<Object> list){
+    	return new WGAList<Object>(list);
     }
-    public WGAList List(){
-    	return new WGAList();
+    public WGAList<Object> List(){
+    	return new WGAList<Object>();
     }
     
     // WGA.File
@@ -3449,7 +3449,7 @@ public class WGA {
     }
  
     // WGA.TempFile
-    public WGATempFile TempFile(String filename) throws IOException{
+    public WGATempFile TempFile(String filename) throws IOException, WGException{
     	return new WGATempFile(this, filename);
     }
      

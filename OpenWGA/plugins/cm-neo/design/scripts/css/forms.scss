@@ -111,4 +111,8 @@ form{
 			color: black;
 		}
 	}
+
+	input[disabled] + label{
+		color: silver;
+	}
 }
