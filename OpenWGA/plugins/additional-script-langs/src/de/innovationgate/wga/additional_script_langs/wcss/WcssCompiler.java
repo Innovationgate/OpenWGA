@@ -188,7 +188,7 @@ public class WcssCompiler {
 							}
 							else _props.put(propPart, trim(valuePart));
 						}
-						else LOG.warn("missing : in property definition. Line " + st.lineno() + " ignored: " + propName);
+						else LOG.warn("missing : in property definition. " + _resource + ": Line " + st.lineno() + " ignored: " + propName);
 					}					
 				}
 				else if((char)token == '{'){
@@ -213,7 +213,7 @@ public class WcssCompiler {
 						if(b.isValid()){
 							_mixins.put(b.getName(), b);
 						}
-						else LOG.error(st.toString() + ": invalid @mixin definition: " + className);
+						else LOG.error(st.toString() + " in " + _resource + ": invalid @mixin definition: " + className);
 						b.parse(st);	// parse in any case
 					}
 					else if(className.endsWith(":")){
@@ -503,7 +503,7 @@ public class WcssCompiler {
 			else if(directive.equalsIgnoreCase("content")){
 				new CssContentBlock(getParentBlock());
 			}
-			else if(directive.equalsIgnoreCase("include") && params_string.length()>1){
+			else if(directive.equalsIgnoreCase("include") && !params_string.isEmpty()){
 				
 				String mixin_name="";
 				String rest = "";
@@ -623,18 +623,22 @@ public class WcssCompiler {
 	
 	private class CssMixinBlock extends CssBlock{
 
-		ArrayList<String> _params;
+		ArrayList<String> _params = new ArrayList<String>();
 		boolean _valid=false;
 
 		CssMixinBlock(String name) {
-			String search_pattern = "@mixin\\s+(\\S+)\\s*\\(([^\\)]*)\\)";	// search for @mixin name(params)
+			String search_pattern = "@mixin\\s+([\\w-]+)\\s*(\\([^\\)]*\\))?";	// search for @mixin name (params) where (params) is optional
 			Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
         	Matcher matcher = pattern.matcher(name);
         	if(matcher.find()){
-        		if(matcher.groupCount()==2){
-        			setName(matcher.group(1));
-        			_params = parseCommasAndQuotes(matcher.group(2));
+        		if(matcher.groupCount()>0){
         			_valid=true;
+        			setName(matcher.group(1));
+        		}
+    			if(matcher.groupCount()>1 && matcher.group(2)!=null){
+    				String params = matcher.group(2);
+    				params = params.substring(1, params.length()-1);	// removes ( and )
+    				_params = parseCommasAndQuotes(params);
         			for(int i=0; i<_params.size(); i++){
         				String parts[] = _params.get(i).split("\\s*:\\s*");
         				if(parts.length>1){
@@ -642,7 +646,7 @@ public class WcssCompiler {
         					_params.set(i, parts[0]);
         				}
         			}
-        		}
+    			}
         	}
 		}
 		
