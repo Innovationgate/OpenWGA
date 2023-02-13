@@ -15,6 +15,29 @@ public class WcssCompiler {
 
 	public static final Logger LOG = Logger.getLogger("wga.wcss");
 
+	final static int[] toRGB(String value){
+		HashMap<String, String> colors = new HashMap<String, String>();
+		colors.put("black", "0");
+		colors.put("white", "#ffffff");
+		colors.put("silver", "#C0C0C0");
+		colors.put("gray", "#808080");
+		colors.put("red", "#FF0000");
+		colors.put("green", "#008000");
+		colors.put("blue", "#0000FF");
+		colors.put("yellow", "#FFFF00");
+
+		if(colors.get(value.toLowerCase())!=null)
+			value = colors.get(value.toLowerCase());
+		
+		int[] a = new int[3];				
+		Integer intval = Integer.decode(value);
+        int i = intval.intValue();
+        a[0] = (i >> 16) & 0xFF;
+        a[1] = (i >> 8) & 0xFF;
+        a[2] = i & 0xFF;
+        return a;
+	}
+	
 	// map of custom wcss functions
 	final private static HashMap<String, WcssFunction> customFunctions = new HashMap<String, WcssFunction>();
 	static{
@@ -27,6 +50,19 @@ public class WcssCompiler {
 				}
 				return s.toString();
 			}			
+		});
+		customFunctions.put("rgba", new WcssFunction(){
+			@Override
+			public String execute(WcssResource resource, ArrayList<String> params) {
+				if(params.size()==2){
+					try{
+						int[] rgb = toRGB(params.get(0));
+						return "rgba(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ", " + params.get(1) + ")";
+					}
+					catch(Exception e){}
+				}
+				return null;
+			}
 		});
 	}
 	
@@ -317,7 +353,8 @@ public class WcssCompiler {
 		            if(matcher.groupCount()>0) {
 		            	ArrayList<String> params = parseCommasAndQuotes(matcher.group(1));
 		            	String replacement = customFunction.getValue().execute(_resource, params);
-		            	matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+		            	if(replacement!=null)
+		            		matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
 		            }
 	        	}
 	        	matcher.appendTail(sb);
