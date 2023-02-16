@@ -224,7 +224,8 @@ public class WcssCompiler {
 							}
 							else _props.put(propPart, trim(valuePart));
 						}
-						else LOG.warn("missing : in property definition. " + _resource + ": Line " + st.lineno() + " ignored: " + propName);
+						else if(!propName.isEmpty())
+							LOG.warn("missing : in line " + st.lineno() + " of resource " + _resource + ": " + propName);
 					}					
 				}
 				else if((char)token == '{'){
@@ -262,8 +263,13 @@ public class WcssCompiler {
 						b.parse(st);
 					}
 				}
-				else if((char)token == '}')
+				else if((char)token == '}'){
+					String propName = prop.toString().trim();
+					if(!propName.isEmpty()){
+						LOG.warn("missing ; in line " + st.lineno() + " of resource " + _resource + ": " + propName);
+					}
 					break;
+				}
 			}
 			
 		}
