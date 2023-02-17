@@ -44,5 +44,8 @@
 </div>
 
 <div class="footer">
-	<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="new">Neue Sprache</tml:button>
+	<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="new">
+		<i class="fa-solid fa-plus"></i>
+		Neue Sprache
+	</tml:button>
 </div>

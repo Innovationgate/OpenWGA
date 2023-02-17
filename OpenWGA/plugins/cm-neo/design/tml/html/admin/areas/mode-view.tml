@@ -57,5 +57,8 @@
 </div>
 
 <div class="footer">
-	<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="new">Neuer Bereich</tml:button>
+	<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="new">
+		<i class="fa-solid fa-plus"></i>
+		Neuer Bereich
+	</tml:button>
 </div>

@@ -16,17 +16,20 @@
 				urlArgs: "v=<tml:script format="0" expression="WGA.server().getVersion().toProjectVersion()"/>",
 				baseUrl: "<tml:meta type="request" name="wgaurl"/>/<tml:metadata name="dbkey" type="database" context="main"/>/js",
 				paths: {
-					"bootstrap": "<tml:url type="file" doc="bootstrap" file="javascripts/bootstrap.min.js"/>?noext",
-					"bootstrap-multiselect": "<tml:url type="file" doc="bootstrap-multiselect" file="js/bootstrap-multiselect.js"/>?noext",
+					"bootstrap": "<tml:url type="file" doc="bootstrap-3.3.7-dist:js" file="bootstrap.min.js"/>?noext",
+					"bootstrap-multiselect": "<tml:url type="file" doc="bootstrap-multiselect:js" file="bootstrap-multiselect.js"/>?noext",
 					"select2":	"<tml:url type="file" doc="select2-dist:js" file="select2.min.js"/>?noext"
 				},
 				shim: {
 					"bootstrap": { "deps": ["jquery"] },
-					"bootstrap-multiselect": ["css!<tml:url type="file" doc="bootstrap-multiselect" file="css/bootstrap-multiselect.css"/>?noext"],
+					"bootstrap-multiselect": ["css!<tml:url type="file" doc="bootstrap-multiselect:css" file="bootstrap-multiselect.css"/>?noext"],
 					"select2":	["css!<tml:url type="file" doc="select2-dist:css" file="select2.min.css"/>?noext"]					
 				}
 			})
 		</script>
+		
+		<link rel="stylesheet" type="text/css" href="<tml:url type="file" doc="fa6:css" file="all.min.css"/>">
+		<link rel="stylesheet" type="text/css" href="<tml:url type="file" doc="bootstrap-3.3.7-dist:css" file="bootstrap.min.css"/>"/>
 		
 		<link rel="stylesheet" href="<tml:url type="css" name="styles" u_v="{WGA.server().getVersion().toProjectVersion()}"/>">
 		<link rel="icon" href="<tml:url type="static" file="images/brand/icon_32.png"/>"/>	

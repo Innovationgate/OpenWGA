@@ -65,7 +65,6 @@
 					tmlform.addmessage("Es ist ein Fehler beim Ausführen des Validierungs-Scripts aufgetreten:<br><br>"+e.message)
 				}
 			}
-			console.log("_validation_errors", _validation_errors)
 		</tml:script>
 		<tml:[form-messages] o_title="Die Seite kann nicht veröffentlicht werden"/>
 		
