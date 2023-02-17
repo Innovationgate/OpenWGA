@@ -70,7 +70,7 @@ define(["cm", "jquery"], function(CM, $){
 				}
 			})
 			
-			item.addClass(params[1]).show();
+			item.addClass("WGA-editor-"+params[1]).show();
 	
 			var editor_options;
 			var options_el = $(".WGA-Editor-Options", item)

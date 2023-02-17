@@ -65,12 +65,12 @@
 		display: inline;
 	}
 
-	&.rtf, &.textblock, &.image{
+	&.WGA-editor-rtf, &.WGA-editor-textblock, &.WGA-editor-image{
 		.WGA-Item-Label{
 			display: block;
 		}
 	}
-	&.rtf, &.image{
+	&.WGA-editor-rtf, &.WGA-editor-image{
 		.WGA-Item-Label{
 			padding: 30px 5px;
 		}
