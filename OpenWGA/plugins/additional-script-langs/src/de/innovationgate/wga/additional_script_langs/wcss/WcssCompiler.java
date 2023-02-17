@@ -382,7 +382,8 @@ public class WcssCompiler {
 			int start = 0;
 			boolean inQuotes = false;
 			for (int current = 0; current < input.length(); current++) {
-			    if (input.charAt(current) == '\"') inQuotes = !inQuotes; // toggle state
+			    if (input.charAt(current) == '\"') 
+			    	inQuotes = !inQuotes; // toggle state
 			    else if (input.charAt(current) == ',' && !inQuotes) {
 			        result.add(input.substring(start, current).replace("\"", "").trim());
 			        start = current + 1;
