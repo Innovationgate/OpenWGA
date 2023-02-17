@@ -50,9 +50,11 @@ return{
 		"jquery-lightbox": 				["css!" + afw_base_url+"/css/jquery-lightbox"],
 		"jquery-columnslider":			["css!" + afw_base_url+"/css/jquery-columnslider"],
 		"jquery-accordion":				["css!" + afw_base_url+"/css/jquery-accordion"],
+		"jquery-tree": 					["css!" + afw_base_url+"/css/jquery-tree"],
 		
-		"jquery-lookup-surgestions": 	["css!" + afw_base_url+"/stylesheet/jquery-lookup-surgestions.int.stylesheet?noext"],
-		"jquery-tree": 					["css!" + afw_base_url+"/stylesheet/jquery-tree.int.stylesheet?noext"]
+		"jquery-lookup-surgestions": 	["css!" + afw_base_url+"/stylesheet/jquery-lookup-surgestions.int.stylesheet?noext"]
+		//"jquery-tree": 					["css!" + afw_base_url+"/stylesheet/jquery-tree.int.stylesheet?noext"]
+		
 
     }
 

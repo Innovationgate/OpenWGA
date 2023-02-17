@@ -1,14 +1,14 @@
 /*
 
- CSS for jquery-plugin accordion
+ WCSS for jquery-plugin accordion
 
  This file is part of the OpenWGA server platform.
  (c) Innovation Gate
 
 */
 
-$plus: wga_file_url('accordion', 'acc-plus.png');
-$minus: wga_file_url('accordion', 'acc-minus.png');
+$plus: wga_file_url(accordion, acc-plus.png);
+$minus: wga_file_url(accordion, acc-minus.png);
 
 .accordion{
 
@@ -30,7 +30,7 @@ $minus: wga_file_url('accordion', 'acc-minus.png');
 		color: #666666;
 		
 		&:focus {
-			outline: none
+			outline: none;
 		}
 		
 		&.active {

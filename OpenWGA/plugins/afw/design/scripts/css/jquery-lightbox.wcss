@@ -1,6 +1,6 @@
 /*
 
- CSS for jquery-plugin lightbox
+ WCSS for jquery-plugin lightbox
 
  This file is part of the OpenWGA server platform.
  (c) Innovation Gate
@@ -17,7 +17,7 @@
 	opacity: .7;
 	filter: alpha(opacity = 70);
 	display: none;
-	z-index: 101
+	z-index: 101;
 }
 
 #lightbox {

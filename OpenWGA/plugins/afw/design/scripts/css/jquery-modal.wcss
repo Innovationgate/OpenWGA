@@ -1,6 +1,6 @@
 /*
 
- SCSS for jquery-plugin modal
+ WCSS for jquery-plugin modal
 
  This file is part of the OpenWGA server platform.
  (c) Innovation Gate
@@ -54,6 +54,7 @@ body{
 				float: right;
 				cursor: pointer;
 				text-decoration: none;
+				font-size: 1.25em;
 			}
 		}
 		
@@ -90,6 +91,6 @@ body{
 html.small body .modal-popup {
 	width: 90% !important;
 	margin-left: -45% !important;
-	top: 5%
+	top: 5%;
 }
 

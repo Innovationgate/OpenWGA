@@ -1,0 +1,127 @@
+.wga_tree{
+	
+	top: 15px;
+	
+	ul {
+		margin: 0;
+		padding: 0;
+		list-style-type: none;
+		li {
+			margin: 0;
+			padding: 0;
+			line-height: 1.5em;
+			a {
+				cursor: pointer;
+				display: block;
+				color: inherit;
+				outline: none;
+				&:hover, &:focus {
+					color: inherit;
+					font: inherit;
+					text-decoration: none;
+				}
+			}
+			&.placeholder {
+				.entry {
+					height: 2px;
+					a {
+						background: red;
+						color: white;
+						opacity: .5;
+					}
+				}
+			}
+			&.drop-add-children > .entry {
+				color: red !important;
+				.icon {
+					background:{
+						image: url(wga_file_url(icons, add.png)) !important;
+						position: center center !important;
+					}
+				}
+			}
+			
+			&.dragging {
+				.entry {
+					background-color: rgba(255,80,0, .1) !important;
+				}
+			}
+			&.loading {
+				font-style: italic;
+				opacity: .5;
+				.icon {
+					background_image: url(wga_file_url(tree, ajax-loader.gif)) !important; 
+				}
+			}
+			&.selected > .entry {
+				background-color: #efefef;
+			}
+			.entry {
+				overflow: hidden;
+				max-height: 100px;
+				padding-right: 5px;
+				transition: max-height .3s;
+				a {
+					overflow: hidden;
+					text-overflow: ellipsis;
+					.link-text {
+						margin-left: 20px;
+						text-overflow: ellipsis;
+						overflow: hidden;
+					}
+					.symbol {
+						width: 20px;
+						text-align: center;
+						float: right;
+						line-height: inherit;						
+					}
+				}
+			}
+			&.collapsed {
+				> .entry > .twisty {
+					background-position: 0px center;
+					&:hover {
+						background-position: -32px center;
+					}
+				}
+				ul .entry {
+					max-height: 0;
+				}
+			}
+		}
+	}
+
+	.twisty, .icon, .indent, .spacer {
+		float: left;
+		display: block;
+		width: 20px;
+		background:{
+			repeat: no-repeat;
+			position: center center;
+		}
+	}
+	
+	.spacer {
+		width: 16px;
+	}
+	
+	.twisty {
+		cursor: pointer;
+		width: 16px;
+		background-image: url(wga_file_url(tree, arrows.gif)); 
+		background-position: -16px center;
+		&:hover {
+			background-position: -48px center;
+		}
+	}
+	li[data-haschildren=false] .twisty {
+		background-image: none;
+		cursor: auto;
+	}
+
+	.icon {
+		background-image: url(wga_file_url(icons, page_white.png)); 
+		background-size: 16px;
+	}
+		
+}
