@@ -13,7 +13,6 @@
 		
 		<script>
 			require.config({
-				urlArgs: "v=<tml:script format="0" expression="WGA.server().getVersion().toProjectVersion()"/>",
 				baseUrl: "<tml:meta type="request" name="wgaurl"/>/<tml:metadata name="dbkey" type="database" context="main"/>/js",
 				paths: {
 					"bootstrap": "<tml:url type="file" doc="bootstrap-3.3.7-dist:js" file="bootstrap.min.js"/>?noext",

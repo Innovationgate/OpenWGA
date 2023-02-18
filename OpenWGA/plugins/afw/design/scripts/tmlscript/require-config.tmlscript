@@ -1,8 +1,10 @@
 var baseURL = meta("request", "wgaurl");
 var afw_base_url = baseURL + "/plugin-wga-app-framework"
 var cmm_base_url = baseURL + "/plugin-cm-modules"
+var version = WGA.server().getVersion().toProjectVersion();
 
 return{
+	urlArgs: "wga-version="+version,
     paths: {
 
 		"afw":							afw_base_url+"/js",
@@ -52,9 +54,7 @@ return{
 		"jquery-accordion":				["css!" + afw_base_url+"/css/jquery-accordion"],
 		"jquery-tree": 					["css!" + afw_base_url+"/css/jquery-tree"],
 		
-		"jquery-lookup-surgestions": 	["css!" + afw_base_url+"/stylesheet/jquery-lookup-surgestions.int.stylesheet?noext"]
-		//"jquery-tree": 					["css!" + afw_base_url+"/stylesheet/jquery-tree.int.stylesheet?noext"]
-		
+		"jquery-lookup-surgestions": 	["css!" + afw_base_url+"/stylesheet/jquery-lookup-surgestions.int.stylesheet?noext"]		
 
     }
 
