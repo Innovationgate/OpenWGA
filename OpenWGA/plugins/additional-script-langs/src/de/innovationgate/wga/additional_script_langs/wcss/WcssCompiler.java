@@ -106,6 +106,8 @@ public class WcssCompiler {
 		st.wordChars('\t', '\t');
 		
 		st.whitespaceChars('\n', '\n');		// needed to get correct line numbers
+		st.whitespaceChars('\r', '\r');		// needed to get correct line numbers
+		st.eolIsSignificant(true);
 		
 		st.slashSlashComments(true);
 		st.slashStarComments(true);
@@ -121,7 +123,7 @@ public class WcssCompiler {
 		_resource.addIntegratedResource();
 
 	}
-	
+		
 	//--------------------
 
 	private class CssBlock{
@@ -147,15 +149,6 @@ public class WcssCompiler {
 			_parentBlock = parent;
 			if(parent!=null)
 				parent.addSubBlock(this);
-		}
-		
-		@SuppressWarnings("unused")
-		public String dump(String prefix){
-			StringBuffer s = new StringBuffer();
-			s.append("\n" + prefix + "'" + _name + "' (" + getClass().getName() + ")");
-			for(CssBlock b : getSubBlocks())
-				s.append(b.dump(prefix + "\t"));
-			return s.toString();
 		}
 		
 		public String getName(){
@@ -190,22 +183,24 @@ public class WcssCompiler {
 			_subBlocks.add(subblock);
 		}
 		
-		public void parse(StreamTokenizer st) throws IOException{
+		public void parse(StreamTokenizer st) throws IOException{			
 			_sourceInfo = _resource + " line " + st.lineno();
 			int token;
 			StringBuffer prop = new StringBuffer();
 			while((token = st.nextToken()) != StreamTokenizer.TT_EOF){
+				
 				if(token==StreamTokenizer.TT_WORD)
 					prop.append(st.sval);
 				else if((char)token == '/'){
 					prop.append("/");
 				}
-				else if((char)token == ';'){					
+				else if((char)token == ';' || (char)token == '}' || (char)token == StreamTokenizer.TT_EOL){					
 					String propName = prop.toString().trim();
-					prop = new StringBuffer();
-					if(propName.startsWith("@")){
+					
+					if(propName.startsWith("@")){						
 						CssDirectiveBlock b = new CssDirectiveBlock(propName, this);
 						b.parse(st);
+						prop = new StringBuffer();
 					}
 					else{
 						// search for property name:value
@@ -223,10 +218,19 @@ public class WcssCompiler {
 								else _vars.put(propPart, trim(valuePart));
 							}
 							else _props.put(propPart, trim(valuePart));
+							prop = new StringBuffer();
 						}
-						else if(!propName.isEmpty())
-							LOG.warn("missing : in line " + st.lineno() + " of resource " + _resource + ": " + propName);
-					}					
+						else if ((char)token == StreamTokenizer.TT_EOL)
+							continue;
+						else {
+							prop = new StringBuffer();
+							if(!propName.isEmpty())
+								LOG.warn("WCSS missing : in line " + st.lineno() + " of resource " + _resource + ": " + propName);
+						}
+					}
+					if((char)token == '}'){
+						break;
+					}
 				}
 				else if((char)token == '{'){
 					String className = trim(prop.toString());
@@ -266,7 +270,7 @@ public class WcssCompiler {
 				else if((char)token == '}'){
 					String propName = prop.toString().trim();
 					if(!propName.isEmpty()){
-						LOG.warn("missing ; in line " + st.lineno() + " of resource " + _resource + ": " + propName);
+						LOG.warn("WCSS missing ; in line " + st.lineno() + " of resource " + _resource + ": " + propName);
 					}
 					break;
 				}
