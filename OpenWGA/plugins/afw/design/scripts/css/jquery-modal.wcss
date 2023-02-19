@@ -1,10 +1,7 @@
 /*
-
- WCSS for jquery-plugin modal
-
- This file is part of the OpenWGA server platform.
- (c) Innovation Gate
-
+	WCSS for jquery-plugin modal
+	This file is part of the OpenWGA server platform.
+	(c) Innovation Gate
 */ 
 
 body{
