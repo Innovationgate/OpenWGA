@@ -190,6 +190,10 @@
 #dialog-userinfo {
 	width: 900px;
 	margin-left: -450px;
+	.input-length{
+		color: gray;
+		text-align: right;
+	}
 }
 
 #dialog-custom {
