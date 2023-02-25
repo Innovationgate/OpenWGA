@@ -616,6 +616,7 @@ public class WGContentType extends WGSchemaDocument implements PageHierarchyNode
         newContentType.setWorkflow(getWorkflow());
         newContentType.setEventContentCreated(getEventContentCreated());
         newContentType.setEventContentSaved(getEventContentSaved());
+        newContentType.setEventStatusChange(getEventStatusChange());
         newContentType.setEventWorkflowMail(getEventWorkflowMail());
         newContentType.setNameAliases(new ArrayList(getNameAliases()));
         newContentType.setDescriptionAliases(new ArrayList(getDescriptionAliases()));
