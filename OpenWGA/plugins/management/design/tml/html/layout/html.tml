@@ -23,6 +23,7 @@
 			})
 		</script>
 		
+		<link rel="stylesheet" type="text/css" href="<tml:url type="file" doc="bootstrap-3.3.7-dist:css" file="bootstrap.min.css"/>"/>
 		<link rel="stylesheet" href="<tml:url type="css" name="styles"/>">
 		
 	</head>
