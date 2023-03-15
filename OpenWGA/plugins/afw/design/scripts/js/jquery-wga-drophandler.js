@@ -23,6 +23,11 @@
 					: dt.types.contains ? dt.types.contains("wga/files")
 					: false
 		}
+		function isLinkDrop(dt){
+			return dt.types.indexOf ? dt.types.indexOf("wga/link")>=0 
+					: dt.types.contains ? dt.types.contains("wga/link")
+					: false
+		}
 		
 		return this.each(function(){
 			var types = config.types||"";
@@ -30,13 +35,13 @@
 			
 			var onDesktopDrop = config.onDesktopDrop;
 			var onFilesDrop = config.onFilesDrop || (types.indexOf("files")>=0 && config.handler);
-			var onImagesDrop = config.onImagesDrop || (types.indexOf("images")>=0 && config.handler);
+			var onLinkDrop = config.onLinkDrop;
 
 			$(this).on({
 
 				"dragenter": function(e){
 					var dt = e.originalEvent.dataTransfer;
-					if(isFilesDrop(dt) || isDesktopDrop(dt))					
+					if(isFilesDrop(dt) || isDesktopDrop(dt) || isLinkDrop(dt))					
 						$(this).addClass("dragover");
 					return false;
 				},
@@ -48,8 +53,10 @@
 
 				"dragover": function(e){
 					var dt = e.originalEvent.dataTransfer;
-					
-					if(!isFilesDrop(dt) && !isDesktopDrop(dt))
+
+					if(isLinkDrop(dt))
+						dt.dropEffect = "link";				
+					else if(!isFilesDrop(dt) && !isDesktopDrop(dt) && !isLinkDrop(dt))
 						dt.dropEffect = "none"
 					else if(e.shiftKey)
 						dt.dropEffect = ops.indexOf("link")>=0 ? "link" : "none"
@@ -62,19 +69,31 @@
 					var dt = e.originalEvent.dataTransfer; 
 					$(this).removeClass("dragover");
 					if(isDesktopDrop(dt)){
-						if(dt.files && dt.files.length && config.onDesktopDrop)
-							config.onDesktopDrop.call(this, dt.files, e.shiftKey);
+						if(dt.files && dt.files.length && onDesktopDrop)
+							onDesktopDrop.call(this, dt.files, e.shiftKey);
 						return false;
 					}
 					try{
-						var data = JSON.parse(dt.getData("wga/files")||"")
-						if(data && data.length && onFilesDrop){
-							onFilesDrop.call(this, data, e.shiftKey)
-							return false;
+						if(isFilesDrop(dt)){
+							var data = JSON.parse(dt.getData("wga/files")||[])
+							//console.log("afw files drop", onFilesDrop, data)
+							if(data && data.length && onFilesDrop){
+								onFilesDrop.call(this, data, e.shiftKey)
+								return false;
+							}
 						}
+						if(isLinkDrop(dt)){
+							var data = JSON.parse(dt.getData("wga/link"))
+							//console.log("afw link drop", onLinkDrop, data)
+							if(data && onLinkDrop){
+								onLinkDrop.call(this, data, e.shiftKey)
+								return false;
+							}
+						}						
 					}
 					catch(e){
 						// unable to parse JSON?
+						//console.log(e)
 					}
 					
 					return false;
