@@ -5,7 +5,7 @@
 
 		<tml:case if="$option_no_websites_available">
 			<div class="alert alert-danger" style="margin-top:30px">
-				<h4>Keine Websites verfügbar</h4>
+				<h4>Keine Websites / Web-Anwendungn verfügbar</h4>
 				Es stehen keine Websites zum Bearbeiten zur Verfügung.
 				<br>
 				Bitte wenden Sie sich an Ihren Administrator.
@@ -13,7 +13,7 @@
 		</tml:case>
 	
 		<tml:{form} html_id="select-db-form" html_onsubmit="return selectDb(this)" unless="$option_no_websites_available">
-			<h1>Website auswählen</h1>
+			<h1>Webanwendung auswählen</h1>
 			<tml:case condition="option('msg')">
 				<div class="alert alert-warning">
 					<tml:option name="msg"/>
@@ -21,7 +21,7 @@
 			</tml:case>
 			<div class="form-group">
 				<label style="display:none" class="control-label">Bitte geben Sie den Namen der Wesbite ein ...</label>
-				<input name="dbkey" class="form-control" placeholder="Name (Schlüssel) der Website" value="<tml:item name="dbkey" type="portlet"/>">
+				<input name="dbkey" class="form-control" placeholder="Name (Schlüssel) der Webanwendung" value="<tml:item name="dbkey" type="portlet"/>">
 			</div>
 			<div class="form-group">
 				<button type="submit" class="btn btn-primary">Weiter ...</button>
