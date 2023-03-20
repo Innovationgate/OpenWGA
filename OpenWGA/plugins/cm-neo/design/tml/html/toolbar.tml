@@ -11,7 +11,10 @@
 			</a>
 			<ul class="dropdown-menu">
 				<tml:case condition="WGA.app(portlet.dbkey).isChiefEditor()">
-					<li><a href="<tml:url action="$refresh" portletmode="admin"/>">Verwaltung</a></li>
+					<li><a href="<tml:url action="$refresh" portletmode="admin"/>">
+						<i class="fa-solid fa-screwdriver-wrench"></i>
+						Verwaltung
+					</a></li>
 					<li class="divider"></li>
 				</tml:case>
 				<li class="dropdown-header">Webssite wechseln</li>
@@ -26,7 +29,10 @@
 					</ul>
 				</li>
 				<li class="divider"></li>
-				<li><a href="#" data-action="exit">Abmelden und Content Manager beenden</a></li>
+				<li><a href="#" data-action="exit">
+					<i class="fa-solid fa-arrow-right-from-bracket"></i>
+					Abmelden und Content Manager beenden
+				</a></li>
 			</ul>
 		</div>
 		
@@ -105,7 +111,7 @@
 	<div class="toolbar" data-toolbar="content">
 		<div class="btn-group">
 			<a class="btn button" href="#" data-toggle="dropdown" data-action-group="create">
-				<span class="icon glyphicon glyphicon-plus"></span>
+				<i class="icon fa-solid fa-plus"></i>
 				<div class="text">
 					Erstellen
 					<span class="caret"></span>
@@ -151,7 +157,7 @@
 
 		<div class="btn-group" _style="margin-right:50px">
 			<a class="btn button" href="#" data-toggle="dropdown" data-action-group="delete">
-				<span class="icon glyphicon glyphicon-trash"></span>
+				<i class="icon fa-regular fa-trash-can"></i>
 				<div class="text">
 					Löschen
 					<span class="caret"></span>
@@ -168,19 +174,19 @@
 		<div class="spacer"></div>
 
 		<a class="btn button" style="display:none" href="#" data-action="create-draft">
-			<span class="icon glyphicon glyphicon-edit"></span>
+			<i class="icon fa-regular fa-pen-to-square"></i>
 			<div class="text">Bearbeiten</div>
 		</a>
 		<a class="btn button" style="display:none" href="#" data-action="publish-page">
-			<span class="icon glyphicon glyphicon-cloud-upload"></span>
+			<i class="icon fa-solid fa-arrow-up-from-bracket"></i>
 			<div class="text">Veröffentlichen</div>
 		</a>
 		<a class="btn button" style="display:none" href="#" data-action="approve-content">
-			<span class="icon glyphicon glyphicon-cloud-upload"></span>
+			<i class="icon fa-regular fa-thumbs-up"></i>
 			<div class="text">Genehmigen</div>
 		</a>
 		<a class="btn button" style="display:none" href="#" data-action="reject-content">
-			<span class="icon glyphicon glyphicon-cloud-download"></span>
+			<i class="icon fa-regular fa-thumbs-down"></i>
 			<div class="text">Ablehnen</div>
 		</a>
 
@@ -191,22 +197,18 @@
 		</a>
 		
 		<div class="pull-right">
-			<tml:comment><a class="btn button" href="#" data-action="preview">
-				<span class="icon far fa-window-restore"></span>
-				<div class="text">Vorschau</div>
-			</a></tml:comment>
 			<a class="btn button" href="#" data-action="seo">
-				<span class="icon glyphicon glyphicon-education"></span>
+				<i class="icon fa-brands fa-google"></i>
 				<div class="text">SEO</div>
 			</a>
 			<a class="btn button disabled" href="#" data-action="content-modules">
-				<span class="icon glyphicon glyphicon-modal-window"></span>
+				<i class="icon fa-solid fa-table-list"></i>
 				<div class="text">Inhaltsmodule</div>
 			</a>
 
 			<div class="btn-group">
 				<a class="btn button" href="#" data-toggle="dropdown" data-action-group="settings">
-					<span class="icon glyphicon glyphicon-cog"></span>
+					<i class="icon fa-solid fa-sliders"></i>
 					<div class="text">
 						Eigenschaften
 						<span class="caret"></span>
@@ -227,19 +229,19 @@
 		<span class="item-edit-info">Feld in Bearbeitung ...</span>
 		<div class="pull-right">
 			<a class="btn button" href="#" data-action="remove-item" data-toggle="popover" data-trigger="focus" style="margin-right:100px">
-				<span class="icon glyphicon glyphicon-trash"></span>
+				<i class="icon fa-regular fa-trash-can"></i>
 				<div class="text">Feld löschen</div>
 			</a>
 			<a class="btn button" href="#" data-action="cancel-edit">
-				<span class="icon glyphicon glyphicon-remove"></span>
+				<i class="icon fa-solid fa-xmark"></i>
 				<div class="text">Bearbeitung abbrechen</div>
 			</a>
 			<a class="btn button" href="#" data-action="save-item" data-toggle="popover" data-trigger="focus">
-				<span class="icon glyphicon glyphicon-save"></span>
+				<i class="icon fa-solid fa-download"></i>
 				<div class="text">Speichern</div>
 			</a>
 			<a class="btn button" href="#" data-action="save-item-cancel-edit">
-				<span class="icon highlight glyphicon glyphicon-saved"></span>
+				<i class="icon highlight fa-solid fa-check"></i>
 				<div class="text">Speichern und schließen</div>
 			</a>
 		</div>

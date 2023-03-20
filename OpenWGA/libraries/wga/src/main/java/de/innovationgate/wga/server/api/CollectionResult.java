@@ -357,6 +357,9 @@ public abstract class CollectionResult implements Iterable<Context> {
             }
         });
     }
+    public CollectionResult exclude(String expression) throws WGException {
+    	return exclude(WGA.get().context(expression));
+    }
     
 
     /**

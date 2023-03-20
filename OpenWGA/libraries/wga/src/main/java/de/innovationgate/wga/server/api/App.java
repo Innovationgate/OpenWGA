@@ -333,5 +333,9 @@ public class App extends Database {
     	return createTMLContext().context(expression, returnContextOnError);
     }
 
+    
+    public String getTitle() {
+    	return db().getTitle();
+    }
 
 }

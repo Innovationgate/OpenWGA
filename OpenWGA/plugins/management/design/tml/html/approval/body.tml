@@ -31,11 +31,11 @@
 				<iframe src="<tml:url/>"></iframe>
 				<div class="modal-popup" id="released">
 					<div class="header">
-						Seite ist bereits veröffentlicht
+						Seite ist veröffentlicht
 						<a href="#" class="close">&times;</a>
 					</div>
 					<div class="content">
-						Diese Seite wurde bereits freigegeben:
+						Diese Seite wurde freigegeben:
 						<br>
 						<tml:case condition="wfreleasedate">
 							<br>am <tml:item name="wfreleasedate" format="mediumDateTime"/> Uhr

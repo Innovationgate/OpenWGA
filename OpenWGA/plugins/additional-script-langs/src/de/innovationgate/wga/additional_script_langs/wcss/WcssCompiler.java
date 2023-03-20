@@ -15,6 +15,29 @@ public class WcssCompiler {
 
 	public static final Logger LOG = Logger.getLogger("wga.wcss");
 
+	final static int[] toRGB(String value){
+		HashMap<String, String> colors = new HashMap<String, String>();
+		colors.put("black", "0");
+		colors.put("white", "#ffffff");
+		colors.put("silver", "#C0C0C0");
+		colors.put("gray", "#808080");
+		colors.put("red", "#FF0000");
+		colors.put("green", "#008000");
+		colors.put("blue", "#0000FF");
+		colors.put("yellow", "#FFFF00");
+
+		if(colors.get(value.toLowerCase())!=null)
+			value = colors.get(value.toLowerCase());
+		
+		int[] a = new int[3];				
+		Integer intval = Integer.decode(value);
+        int i = intval.intValue();
+        a[0] = (i >> 16) & 0xFF;
+        a[1] = (i >> 8) & 0xFF;
+        a[2] = i & 0xFF;
+        return a;
+	}
+	
 	// map of custom wcss functions
 	final private static HashMap<String, WcssFunction> customFunctions = new HashMap<String, WcssFunction>();
 	static{
@@ -27,6 +50,19 @@ public class WcssCompiler {
 				}
 				return s.toString();
 			}			
+		});
+		customFunctions.put("rgba", new WcssFunction(){
+			@Override
+			public String execute(WcssResource resource, ArrayList<String> params) {
+				if(params.size()==2){
+					try{
+						int[] rgb = toRGB(params.get(0));
+						return "rgba(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ", " + params.get(1) + ")";
+					}
+					catch(Exception e){}
+				}
+				return null;
+			}
 		});
 	}
 	
@@ -70,6 +106,8 @@ public class WcssCompiler {
 		st.wordChars('\t', '\t');
 		
 		st.whitespaceChars('\n', '\n');		// needed to get correct line numbers
+		st.whitespaceChars('\r', '\r');		// needed to get correct line numbers
+		st.eolIsSignificant(true);
 		
 		st.slashSlashComments(true);
 		st.slashStarComments(true);
@@ -85,7 +123,7 @@ public class WcssCompiler {
 		_resource.addIntegratedResource();
 
 	}
-	
+		
 	//--------------------
 
 	private class CssBlock{
@@ -111,15 +149,6 @@ public class WcssCompiler {
 			_parentBlock = parent;
 			if(parent!=null)
 				parent.addSubBlock(this);
-		}
-		
-		@SuppressWarnings("unused")
-		public String dump(String prefix){
-			StringBuffer s = new StringBuffer();
-			s.append("\n" + prefix + "'" + _name + "' (" + getClass().getName() + ")");
-			for(CssBlock b : getSubBlocks())
-				s.append(b.dump(prefix + "\t"));
-			return s.toString();
 		}
 		
 		public String getName(){
@@ -154,22 +183,24 @@ public class WcssCompiler {
 			_subBlocks.add(subblock);
 		}
 		
-		public void parse(StreamTokenizer st) throws IOException{
+		public void parse(StreamTokenizer st) throws IOException{			
 			_sourceInfo = _resource + " line " + st.lineno();
 			int token;
 			StringBuffer prop = new StringBuffer();
 			while((token = st.nextToken()) != StreamTokenizer.TT_EOF){
+				
 				if(token==StreamTokenizer.TT_WORD)
 					prop.append(st.sval);
 				else if((char)token == '/'){
 					prop.append("/");
 				}
-				else if((char)token == ';'){					
+				else if((char)token == ';' || (char)token == '}' || (char)token == StreamTokenizer.TT_EOL){					
 					String propName = prop.toString().trim();
-					prop = new StringBuffer();
-					if(propName.startsWith("@")){
+					
+					if(propName.startsWith("@")){						
 						CssDirectiveBlock b = new CssDirectiveBlock(propName, this);
 						b.parse(st);
+						prop = new StringBuffer();
 					}
 					else{
 						// search for property name:value
@@ -187,9 +218,19 @@ public class WcssCompiler {
 								else _vars.put(propPart, trim(valuePart));
 							}
 							else _props.put(propPart, trim(valuePart));
+							prop = new StringBuffer();
 						}
-						else LOG.warn("missing : in property definition. Line " + st.lineno() + " ignored: " + propName);
-					}					
+						else if ((char)token == StreamTokenizer.TT_EOL)
+							continue;
+						else {
+							prop = new StringBuffer();
+							if(!propName.isEmpty())
+								LOG.warn("WCSS missing : in line " + st.lineno() + " of resource " + _resource + ": " + propName);
+						}
+					}
+					if((char)token == '}'){
+						break;
+					}
 				}
 				else if((char)token == '{'){
 					String className = trim(prop.toString());
@@ -213,7 +254,7 @@ public class WcssCompiler {
 						if(b.isValid()){
 							_mixins.put(b.getName(), b);
 						}
-						else LOG.error(st.toString() + ": invalid @mixin definition: " + className);
+						else LOG.error(st.toString() + " in " + _resource + ": invalid @mixin definition: " + className);
 						b.parse(st);	// parse in any case
 					}
 					else if(className.endsWith(":")){
@@ -226,8 +267,13 @@ public class WcssCompiler {
 						b.parse(st);
 					}
 				}
-				else if((char)token == '}')
+				else if((char)token == '}'){
+					String propName = prop.toString().trim();
+					if(!propName.isEmpty()){
+						LOG.warn("WCSS missing ; in line " + st.lineno() + " of resource " + _resource + ": " + propName);
+					}
 					break;
+				}
 			}
 			
 		}
@@ -317,7 +363,8 @@ public class WcssCompiler {
 		            if(matcher.groupCount()>0) {
 		            	ArrayList<String> params = parseCommasAndQuotes(matcher.group(1));
 		            	String replacement = customFunction.getValue().execute(_resource, params);
-		            	matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+		            	if(replacement!=null)
+		            		matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
 		            }
 	        	}
 	        	matcher.appendTail(sb);
@@ -339,7 +386,8 @@ public class WcssCompiler {
 			int start = 0;
 			boolean inQuotes = false;
 			for (int current = 0; current < input.length(); current++) {
-			    if (input.charAt(current) == '\"') inQuotes = !inQuotes; // toggle state
+			    if (input.charAt(current) == '\"') 
+			    	inQuotes = !inQuotes; // toggle state
 			    else if (input.charAt(current) == ',' && !inQuotes) {
 			        result.add(input.substring(start, current).replace("\"", "").trim());
 			        start = current + 1;
@@ -503,7 +551,7 @@ public class WcssCompiler {
 			else if(directive.equalsIgnoreCase("content")){
 				new CssContentBlock(getParentBlock());
 			}
-			else if(directive.equalsIgnoreCase("include") && params_string.length()>1){
+			else if(directive.equalsIgnoreCase("include") && !params_string.isEmpty()){
 				
 				String mixin_name="";
 				String rest = "";
@@ -623,18 +671,22 @@ public class WcssCompiler {
 	
 	private class CssMixinBlock extends CssBlock{
 
-		ArrayList<String> _params;
+		ArrayList<String> _params = new ArrayList<String>();
 		boolean _valid=false;
 
 		CssMixinBlock(String name) {
-			String search_pattern = "@mixin\\s+(\\S+)\\s*\\(([^\\)]*)\\)";	// search for @mixin name(params)
+			String search_pattern = "@mixin\\s+([\\w-]+)\\s*(\\([^\\)]*\\))?";	// search for @mixin name (params) where (params) is optional
 			Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
         	Matcher matcher = pattern.matcher(name);
         	if(matcher.find()){
-        		if(matcher.groupCount()==2){
-        			setName(matcher.group(1));
-        			_params = parseCommasAndQuotes(matcher.group(2));
+        		if(matcher.groupCount()>0){
         			_valid=true;
+        			setName(matcher.group(1));
+        		}
+    			if(matcher.groupCount()>1 && matcher.group(2)!=null){
+    				String params = matcher.group(2);
+    				params = params.substring(1, params.length()-1);	// removes ( and )
+    				_params = parseCommasAndQuotes(params);
         			for(int i=0; i<_params.size(); i++){
         				String parts[] = _params.get(i).split("\\s*:\\s*");
         				if(parts.length>1){
@@ -642,7 +694,7 @@ public class WcssCompiler {
         					_params.set(i, parts[0]);
         				}
         			}
-        		}
+    			}
         	}
 		}
 		

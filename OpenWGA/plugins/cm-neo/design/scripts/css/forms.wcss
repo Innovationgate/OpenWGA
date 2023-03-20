@@ -1,0 +1,191 @@
+$fa-var-square: 		\f0c8;
+$fa-var-square-check: 	\f14a;
+
+$fa-var-toggle-off: 	\f204;
+$fa-var-toggle-on: 		\f205;
+
+$fa-var-circle: 		\f111;
+$fa-var-check-circle: 	\f058;
+
+form{
+
+	input[type=checkbox].symbol{
+		display: none;
+		+ label{
+			font-weight: normal;
+			display: block;
+			margin-left: 20px;
+			padding: 0;
+			&:before{
+				display: inline-block;
+				width: 20px;
+				margin-left: -20px;
+				font: var(--fa-font-regular);
+				content: "$fa-var-square";
+				color: silver;
+			}
+		}
+		&:checked + label:before{
+			content: "$fa-var-square-check";
+			color: unset;
+		}
+	}
+	
+	input[type=checkbox].switch{
+		display: none;
+		+ label{
+			display: block;
+			padding: 0;
+			&:before{
+				display: inline-block;
+				font: var(--fa-font-solid);
+				content: "$fa-var-toggle-off";
+				color: silver;
+				float: right;
+				font-size: 1.25em;
+			}
+		}
+		&:checked + label:before{
+			content: "$fa-var-toggle-on";
+			color: $blue;
+		}
+	}
+	
+	input[type=radio].symbol{
+		display: none;
+		+ label{
+			display: block;
+			float: left;
+			margin-left: 25px;
+			margin-right: 20px;
+			padding: 0;
+			&:before{
+				float: left;
+				width: 25px;
+				margin-left: -25px;
+				margin-top: 5px;
+				font: var(--fa-font-regular);
+				content: "$fa-var-circle";
+			}
+		}
+		&:checked + label:before{
+			content: "$fa-var-check-circle";
+		}
+	}
+		
+	input[type=text].form-control, input[type=password].form-control, textarea.form-control, a.form-control{
+		padding: 6px;
+	}
+
+	label[for]{
+		cursor: pointer;
+	}
+
+	select.form-control{
+		
+		padding: 6px;
+		
+		-moz-appearance:none;
+		-webkit-appearance:none;
+		appearance:none;
+		background:{
+			image: url(wga_file_url("images", "select-pfeil.png"));
+			position: center right 8px;
+			size: 14px;
+			repeat: no-repeat;
+		}
+	}
+	
+	.clear-field-wrapper {
+		position: relative;
+		.clear-field {
+			cursor: pointer;
+		    position: absolute;
+		    right: 18px;
+		    top: 6px;
+		    z-index: 1
+		}
+		&.col-sm-8 {
+			padding: 0 10px 0 0
+		}
+	}
+
+	.select-tree-wrapper, .select-image-wrapper{
+		position: relative;
+		a.clear-key-field{
+			position: absolute;
+			top: 6px;
+			right: 30px;
+		}
+		.form-control{
+			height:auto;
+			background:{
+				image: url(wga_file_url("images", "select-pfeil.png"));
+				position: top 12px right 8px;
+				size: 14px;
+				repeat: no-repeat;
+			}
+		}
+		.caret{
+			float:right;
+			margin-top:9px;
+		}
+		.title{
+			display: block;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			padding-right: 40px
+		}
+		.placeholder{
+			color:#999;
+		}
+	}
+
+	.select-image-wrapper{
+		.image-selection{
+			display: none;
+			max-height: 250px;
+			width: 100%;
+			background: white;
+			padding: 5px;
+			margin-top: 5px;
+			border: solid silver 1px;
+			overflow: auto;
+			a.file{
+				display: flex;
+				width: 100%;
+				border-bottom: solid #efefef 1px;
+				padding: 5px;
+				&:last-child{
+					border: none;
+				}
+				&:hover{
+					background: #efefef;
+					text-decoration: none;
+				}
+				.image{
+					width: 80px;
+					img{
+						max-width: 100%;
+						max-height: 55px;
+					}
+				}
+				.filename{
+					margin: 0 10px;
+					font-size: .9em;
+				}
+			}
+		}
+	}	
+
+	optgroup{
+		color: silver;
+		option {
+			color: black;
+		}
+	}
+
+	input[disabled] + label{
+		color: silver;
+	}
+}

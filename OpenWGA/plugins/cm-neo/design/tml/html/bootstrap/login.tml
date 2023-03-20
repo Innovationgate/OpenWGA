@@ -34,7 +34,7 @@
 	}
 </tml:action>
 
-<tml:include ref="page" o_title="[{WGA.Brand.name} Content Manager Login]">
+<tml:include ref="page" o_title="[{WGA.Brand.name} Content Manager Anmeldung]">
 	<div class="splash">
 
 		<img class="logo" src="<tml:url type="static" file="images/brand/logo_600.png"/>">
@@ -47,8 +47,8 @@
 			</tml:script>
 			
 			<tml:if istrue="$option_dbkey_auto_selected">
-				<tml:then><h1>Anmelden als Website-Autor</h1></tml:then>
-				<tml:else><h1>Anmelden an Website <tml:item name="dbkey" type="portlet"/></h1></tml:else>
+				<tml:then><h1>Anmelden als Autor</h1></tml:then>
+				<tml:else><h1>Anmelden an <tml:script expression="WGA.app(portlet.dbkey).db().title"/></h1></tml:else>
 			</tml:if>
 			
 			<tml:case condition="tmlform.hasmessages()">
@@ -68,7 +68,10 @@
 				<tml:input name="password" type="password" cssclass="form-control" html_placeholder="Ihr Kennwort ..."/>
 			</div>
 			<div class="form-group">
-				<button id="login-button" type="submit" class="btn btn-primary">Anmelden ...</button>
+				<button id="login-button" type="submit" class="btn btn-primary">
+					<i class="fa-solid fa-arrow-right-to-bracket"></i>
+					Anmelden ...
+				</button>
 			</div>
 			
 			<tml:{div} if="_pwdSelfserviceURL" html_class="request-pwd">

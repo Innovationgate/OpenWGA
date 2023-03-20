@@ -4,6 +4,17 @@ define(["jquery", "cm", "select2"], function($, CM){
 
 		$("#form-settings textarea").autogrow()
 		
+		function showLength(el){
+			var input_el = $("#form-settings [name=" + el + "]");
+			var length_el = input_el.siblings(".input-length").find("span"); 
+			input_el.keyup(function(ev){
+				length_el.html(this.value.length)
+			})
+			length_el.html(input_el.val().length)
+		}
+		showLength("browsertitle");
+		showLength("description");
+		
 		$("#form-settings [name=keywords]").select2({
 			tags: true,
 			tokenSeparators: [","],

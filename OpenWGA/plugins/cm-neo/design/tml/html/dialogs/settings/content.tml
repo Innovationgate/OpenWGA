@@ -65,7 +65,11 @@
 				/>
 				<tml:[form-field] o_label="Fenstertitel (max 60 Zeichen)" o_field="browsertitle" o_meta="true"
 					o_placeholder="Alternativer Titel der Seite im Browser"
-				/>
+				>
+					<div class="input-length">
+						<span>0</span> Zeichen
+					</div>
+				</tml:[form-field]>
 				
 				<tml:script>
 					_isTilepath = false
@@ -81,7 +85,11 @@
 				
 				<tml:[form-field] o_label="Beschreibung (max 160 Zeichen)" o_field="description" o_meta="true" o_type="textarea" o_encode="html"
 					o_placeholder="Kurze Beschreibung des Inhalts für Suchmaschinen"
-				/>
+				>
+					<div class="input-length">
+						<span>0</span> Zeichen
+					</div>
+				</tml:[form-field]>
 				
 				<tml:case condition="content().getUniqueName()">
 					<tml:[form-field] o_label="Eindeutiger Name" o_field="uniquename" o_meta="true"/>

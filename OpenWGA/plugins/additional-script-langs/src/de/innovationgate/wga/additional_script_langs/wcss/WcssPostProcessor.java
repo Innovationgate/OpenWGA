@@ -30,8 +30,6 @@ public class WcssPostProcessor implements PostProcessor{
 			
     	ArrayList<Design> cssVariables = wga.design(data.getDocument().getDatabase().getDbReference())
     			.resolveSystemResources("css-variables", WGDocument.TYPE_CSSJS, WGScriptModule.CODETYPE_TMLSCRIPT, false);
-    	if(cssVariables.size()==0)
-    		return;
 
     	Collections.reverse(cssVariables);		// execute @base design first followed by overlay design
     	
@@ -39,6 +37,12 @@ public class WcssPostProcessor implements PostProcessor{
         extraObjects.put("cssDocument", data.getDocument());
 
         Map<String,Object> vars = new HashMap<String, Object>();
+        vars.put("processor", "wcss");
+    	if(wga.getRequest()!=null){
+    		String host = wga.getRequest().getServerName().replace(".", "_");
+    		vars.put("requested_host", host);
+    	}
+
     	for (Design design : cssVariables) {
             Object result = wga.tmlscript().runScript(design, wga.createTMLContext(data.getDocument().getDatabase(), design), design.getScriptModule(WGScriptModule.CODETYPE_TMLSCRIPT).getCode(), extraObjects);
             
@@ -49,11 +53,6 @@ public class WcssPostProcessor implements PostProcessor{
             else vars.putAll((JsonObject) wga.tmlscript().importJsonData(result));
 
 		}
-    	
-    	if(wga.getRequest()!=null){
-    		String host = wga.getRequest().getServerName().replace(".", "_");
-    		vars.put("requested_host", host);
-    	}
     	
         data.setCacheQualifier((Serializable) vars);
 			

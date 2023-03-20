@@ -1,0 +1,100 @@
+$header_height: 75px;
+$appnav_width: 320px;
+$appnav_toolbar_width: 40px;
+$base_blue: #286090;
+
+$width_breakpoint: 1280px;
+
+$blue: #2e6da4;
+
+html,body {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+}
+
+body {
+	font-family: "Lucida Grande", arial;
+}
+#page {
+
+	#header,#appnav,#content,#footer {
+		position: absolute;
+	}
+
+	#header {
+		left: 0;
+		right: 0;
+		top: 0;
+		height: $header_height;
+		line-height: $header_height;
+	}
+
+	#footer {
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 30px;
+		line-height: 30px;
+		border-top: solid #dddddd 1px;
+	}
+
+	#appnav {
+		left: 0;
+		bottom: 0;
+		top: $header_height;
+		bottom: 0;
+		width: $appnav_width;
+	}
+
+	#content {
+		right: 0;
+		bottom: 0;
+		top: $header_height;
+		bottom: 0;
+		left: $appnav_toolbar_width;
+		transition: left .2s ease-in;
+	}
+
+	&.appnav {
+		#content {
+			left: $appnav_width;
+		}
+	}
+
+	@media screen and (max-width: $width_breakpoint){
+		#appnav {
+			width: $appnav_width - 50px;
+			font-size: .8em;
+		}
+		&.appnav {
+			#content {
+				left: $appnav_width - 50px;
+			}
+		}
+	}
+	
+}
+
+@import "bootstrap";
+@import "jquery-ui";
+@import "appnav";
+@import "content";
+@import "sidebar";
+@import "header";
+@import "footer";
+@import "dialog";
+
+@import "appnav:explorer";
+@import "appnav:outline";
+@import "appnav:child-docs";
+@import "appnav:dashboard";
+@import "appnav:responsive";
+
+@import "forms";
+
+@import "select2";
+
+@import "admin";

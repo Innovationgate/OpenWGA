@@ -64,8 +64,12 @@
 			if(ev.params.redirectto){
 				Sitepanel.load(ev.params.redirectto);
 			}
-			if(ev.params.forcereload){
+			else if(ev.params.forcereload){
 				Siteexplorer.reload();
+				Sitepanel.reload();
+			}
+			else if(ev.params.reloadselected){
+				Siteexplorer.reloadselected();
 				Sitepanel.reload();
 			}
 		});

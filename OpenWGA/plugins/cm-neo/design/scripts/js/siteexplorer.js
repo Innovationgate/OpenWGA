@@ -201,6 +201,9 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 		forceReload: function(){
 			area=null;
 		},
+		reloadselected: function(){
+			$("#explorer").wga_tree("reloadselected");
+		},
 		reload: function(){
 			$("#explorer").wga_tree("reload", {
 				url: getURL(),
