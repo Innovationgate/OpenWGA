@@ -41,6 +41,7 @@ import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGFileAnnotations;
 import de.innovationgate.webgate.api.WGFileMetaData;
 import de.innovationgate.webgate.api.WGScriptModule;
+import de.innovationgate.webgate.api.WGStructEntry;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.GlobalExpressionScope;
 import de.innovationgate.wga.server.api.WGA;
@@ -452,6 +453,17 @@ public class WebTMLScriptletResolver {
                 	context.addwarning("macroFileURL " + fileName + ": target container not valid: " + contentKey);
                 	return "";
                 }
+            }
+            else{
+            	// check if we have a structkey
+            	WGStructEntry struct = targetContext.db().getStructEntryByKey(containerName);
+            	if(struct!=null){
+            		targetContext = context.context("docid:" + containerName, false);
+                    if(targetContext==null){
+                    	context.addwarning("macroFileURL " + fileName + ": target container not valid: " + containerName);
+                    	return "";
+                    }
+            	}            	
             }
         }
         
