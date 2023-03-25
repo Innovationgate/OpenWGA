@@ -46,11 +46,11 @@ public class WcssPostProcessor implements PostProcessor{
     	for (Design design : cssVariables) {
             Object result = wga.tmlscript().runScript(design, wga.createTMLContext(data.getDocument().getDatabase(), design), design.getScriptModule(WGScriptModule.CODETYPE_TMLSCRIPT).getCode(), extraObjects);
             
-            if (!wga.tmlscript().isNativeObject(result)) {
+            if (!(result instanceof Map<?,?>)) {
             	wga.getLog().error("The return type of TMLScript module '" + design + "' used to set CSS variables is no JS-Object and will be ignored.");
-            	continue;            	
+            	continue;
             }
-            else vars.putAll((JsonObject) wga.tmlscript().importJsonData(result));
+            else vars.putAll((Map<String,Object>)result);
 
 		}
     	
