@@ -16,7 +16,7 @@
 		legend {
 			font-size: 1.25em;
 			margin-bottom: 10px;
-			color: $base_blue
+			color: $blue;
 		}
 		&.clip{
 			overflow: hidden;
@@ -177,15 +177,15 @@
 			    width: 50%;
 			    padding: 5px;
 				.attachment { 
-				    background-color: rgba($base_blue, .1);	//#efefef; 
+				    background-color: rgba($blue, .1); 
 				    background-position: center center;
 				    background-repeat: no-repeat;
 				    background-size: contain;
-				    border: 5px solid rgba($base_blue, .1);	//#efefef;
+				    border: 5px solid rgba($blue, .1);
 				    height: 80px;
 				}
 				&.selected .attachment {
-					border-color: $base_blue;
+					border-color: $blue;
 				}
 				span {
 					display: block;

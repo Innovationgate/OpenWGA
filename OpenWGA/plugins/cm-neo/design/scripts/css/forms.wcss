@@ -47,7 +47,7 @@ form{
 		}
 		&:checked + label:before{
 			content: "$fa-var-toggle-on";
-			color: $blue;
+			color: $basecolor;
 		}
 	}
 	
