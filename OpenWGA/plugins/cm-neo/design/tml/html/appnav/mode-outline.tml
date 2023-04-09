@@ -1,8 +1,10 @@
 <div id="app-outline">
 	<h1>Outline</h1>
 
-	<input type="checkbox" id="outline_in_doc_flag"><label for="outline_in_doc_flag">Outline im Dokument anzeigen</label>
-
+	<form>
+	<input type="checkbox" class="symbol" id="outline_in_doc_flag"><label for="outline_in_doc_flag">Outline im Dokument anzeigen</label>
+	</form>
+	
 	<div class="alert alert-danger"></div>
 	<div class="struct"></div>
 </div>

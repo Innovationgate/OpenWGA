@@ -1,5 +1,5 @@
 return{
-	basecolor: java.lang.System.getProperties().get("de.innovationgate.cm-neo.basecolor") || "#2e6da4",
+	basecolor: java.lang.System.getProperties().get("de.innovationgate.cm-neo.basecolor") || "#286090",
 
 	isIE:		AFW.request().isIE,
 	isGecko:	AFW.request().isGecko,
