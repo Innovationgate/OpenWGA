@@ -8,6 +8,8 @@ Controller.prototype.prepare = function($cx) {
 		var mod = script.getTMLScriptModule()
 		try{
 			this.scriptlet_links = mod && WGA.tmlscript().runScript(mod.getCode())
+			if(this.scriptlet_links)
+				this.scriptlet_links.add(0, "- bitte auswählen -|");
 		}
 		catch(e){
 			logException(e);
