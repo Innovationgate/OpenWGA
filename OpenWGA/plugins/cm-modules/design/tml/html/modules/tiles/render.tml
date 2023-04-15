@@ -6,7 +6,11 @@
 		var w = CMM.setting("width", id.getText()) || "1";
 		_total += Number(w);
 	}
-	_class= CMM.setting('responsive') || "clear";
+	
+	if(WGA.design(db()).getGlobal("RESPONSIVE"))
+		_class= CMM.setting('responsive') || "clear";
+	else _class="keep";		// layout is not responsive
+	 
 </tml:script>
 
 <div class="tiles <tml:item name="_class"/>">
