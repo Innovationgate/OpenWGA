@@ -40,7 +40,7 @@ if (manager.isDisplayDefaultErrorPage()) {
 	<head>
 		<META name="robots" content="noindex, nofollow">
 		<TITLE><%= wga.encode("html", WGABrand.getName()) %> Error</TITLE>
-		<%= jspHelper.getContentInfoScript() %>
+		<%= jspHelper.isBrowserInterface() ? jspHelper.getContentInfoScript() : "" %>
 		<style>
 			body {
 				width:70%;

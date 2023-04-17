@@ -35,6 +35,7 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.PageContext;
 
 import de.innovationgate.webgate.api.WGContent;
@@ -193,7 +194,11 @@ public class JspHelper {
             return false;
         }
         
-	    Boolean bi = (Boolean) this._pageContext.getSession().getAttribute(WGACore.ATTRIB_BROWSERINTERFACE);
+        HttpSession session = ((HttpServletRequest)_pageContext.getRequest()).getSession();
+        if(session==null)
+        	return false;
+        
+	    Boolean bi = (Boolean) session.getAttribute(WGACore.ATTRIB_BROWSERINTERFACE);
 		if (bi == null || bi.booleanValue() == false) {
 			return false;
 		}
