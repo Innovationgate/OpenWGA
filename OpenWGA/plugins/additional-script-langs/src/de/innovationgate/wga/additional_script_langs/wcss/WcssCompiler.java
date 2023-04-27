@@ -107,7 +107,6 @@ public class WcssCompiler {
 		
 		st.whitespaceChars('\n', '\n');		// needed to get correct line numbers
 		st.whitespaceChars('\r', '\r');		// needed to get correct line numbers
-		st.eolIsSignificant(true);
 		
 		st.slashSlashComments(true);
 		st.slashStarComments(true);
@@ -194,7 +193,7 @@ public class WcssCompiler {
 				else if((char)token == '/'){
 					prop.append("/");
 				}
-				else if((char)token == ';' || (char)token == '}' || (char)token == StreamTokenizer.TT_EOL){					
+				else if((char)token == ';' || (char)token == '}'){					
 					String propName = prop.toString().trim();
 					
 					if(propName.startsWith("@")){						
@@ -220,8 +219,6 @@ public class WcssCompiler {
 							else _props.put(propPart, trim(valuePart));
 							prop = new StringBuffer();
 						}
-						else if ((char)token == StreamTokenizer.TT_EOL)
-							continue;
 						else {
 							prop = new StringBuffer();
 							if(!propName.isEmpty())
