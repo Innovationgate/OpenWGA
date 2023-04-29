@@ -46,8 +46,8 @@
 		<tml:select switch="tmlform.type">
 			<tml:case value="int">
 				
-				<tml:[form-field] o_label="Dokument">
-					<tml:include ref="util:select-document" o_fieldname="key" o_default="{$option_dialog_options.key}">
+				<tml:[form-field] o_label="Seite">
+					<tml:include ref="util:select-document" o_fieldname="key" o_default="{$option_dialog_options.key}" o_placeholder="Seite auswählen ...">
 						<tml:option name="changeaction"><tml:action ref="setLinkText"/></tml:option>
 					</tml:include>
 				</tml:[form-field]>
@@ -288,7 +288,7 @@
 				var anker = $("[name=anker]", form).val();
 				var link_text = $("[name=link_text]", form).val();
 				if(!key && !anker){
-					alert("Bitte wählen Sie ein Dokument aus.");
+					alert("Bitte wählen Sie eine Seite aus.");
 					$("[name=key]", form).focus();
 					return;
 				}
@@ -337,7 +337,7 @@
 				var key = $("[name=key]", form).val();
 				var anker = $("[name=anker]", form).val();
 				if(!key && !anker){
-					alert("Bitte wählen Sie ein Dokument aus.");
+					alert("Bitte wählen Sie eine Seite aus.");
 					$("[name=key]", form).focus();
 					return;
 				}
