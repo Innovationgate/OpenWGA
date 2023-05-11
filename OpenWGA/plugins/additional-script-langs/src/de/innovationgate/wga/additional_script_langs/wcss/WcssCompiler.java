@@ -604,7 +604,7 @@ public class WcssCompiler {
 		
 		public String getCode(String prefix) throws IOException{
 			StringBuffer result = new StringBuffer();
-			result.append(getName() + "{");
+			result.append(replaceVars(getName()) + "{");
 			if(!_compress)
 				result.append("\n");
 			for(CssBlock b: getSubBlocks()){
