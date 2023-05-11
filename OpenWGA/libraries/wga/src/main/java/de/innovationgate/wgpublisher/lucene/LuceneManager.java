@@ -54,6 +54,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.vfs2.FileMonitor;
 import org.apache.log4j.Logger;
@@ -3203,4 +3204,24 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     	return getTerms(INDEXFIELD_ALLCONTENT);
     }
 
+    public void waitForUpdates(int seconds){
+        if(getRemainingAdditionRequests()>0){
+        	// we have unhandled addition requests
+        	LOG.info("remaining Addition-Requests: " + getRemainingAdditionRequests());
+        	try{
+	        	if(isIndexerRunning()){
+	        		LOG.info("start indexer");
+					updateIndex();
+	        	}
+	            // wait max 10 seconds
+	        	for(int i=0; i<seconds && getRemainingAdditionRequests()>0; i++){
+	        		//LOG.info("wait: " + getRemainingAdditionRequests());
+	        		TimeUnit.SECONDS.sleep(1);
+	        	}
+        	}
+        	catch (InterruptedException e) {}
+        }
+    	
+    }
+    
 }
