@@ -474,10 +474,10 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                 
             }
         };
-        Thread t = new java.lang.Thread();
+        Thread t = new java.lang.Thread(updateIndexRunnable);
         t.start();
         t.join(1000 * 10);
-        
+
     }
     
     public long getIndexInterval() {
@@ -3202,26 +3202,6 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
 
     public List<LuceneTerm> getTerms() throws CorruptIndexException, IOException{
     	return getTerms(INDEXFIELD_ALLCONTENT);
-    }
-
-    public void waitForUpdates(int seconds){
-        if(getRemainingAdditionRequests()>0){
-        	// we have unhandled addition requests
-        	LOG.info("remaining Addition-Requests: " + getRemainingAdditionRequests());
-        	try{
-	        	if(isIndexerRunning()){
-	        		LOG.info("start indexer");
-					updateIndex();
-	        	}
-	            // wait max 10 seconds
-	        	for(int i=0; i<seconds && getRemainingAdditionRequests()>0; i++){
-	        		//LOG.info("wait: " + getRemainingAdditionRequests());
-	        		TimeUnit.SECONDS.sleep(1);
-	        	}
-        	}
-        	catch (InterruptedException e) {}
-        }
-    	
     }
     
 }
