@@ -41,7 +41,12 @@
 
 		<label>Zielfenster:</label>
 		<div style="margin:10px">
-			<tml:input name="{scoped:link_target}" mode="{option:mode}" cssclass="form-control" html_placeholder="Optionaler Names eines Zielfensters"/>
+			<tml:script>
+				// stay compatible with existing custom target names: set ist to _blank.
+				if(tmlform.field(WGA.scoped('link_target')) && tmlform.field(WGA.scoped('link_target'))!="_self")
+					tmlform.setfield(WGA.scoped('link_target'), "_blank")
+			</tml:script>
+			<tml:input name="{scoped:link_target}" type="select" cssclass="form-control" mode="{option:mode}" options="gleiches Fenster|_self,neues Fenster|_blank"/>
 		</div>
 	</tml:case>
 	<tml:case value="zoom">

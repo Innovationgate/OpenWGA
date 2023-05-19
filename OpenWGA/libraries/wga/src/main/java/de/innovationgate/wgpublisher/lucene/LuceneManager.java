@@ -54,6 +54,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.vfs2.FileMonitor;
 import org.apache.log4j.Logger;
@@ -473,10 +474,10 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                 
             }
         };
-        Thread t = new java.lang.Thread();
+        Thread t = new java.lang.Thread(updateIndexRunnable);
         t.start();
         t.join(1000 * 10);
-        
+
     }
     
     public long getIndexInterval() {
@@ -3202,5 +3203,5 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     public List<LuceneTerm> getTerms() throws CorruptIndexException, IOException{
     	return getTerms(INDEXFIELD_ALLCONTENT);
     }
-
+    
 }

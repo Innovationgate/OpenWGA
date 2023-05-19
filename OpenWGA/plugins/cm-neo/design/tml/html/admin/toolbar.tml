@@ -1,7 +1,7 @@
 <div id="toolbars" style="display:block">
 	<div class="toolbar" style="left:10px">
 		<a class="btn button" data-action="back-to-website" href="#">
-			<img class="icon" src="/static/images/brand/icon_32.png">
+			<img class="icon" src="<tml:url type="static" file="images/brand/icon_32.png"/>">
 			<div class="text">
 				Zurück zur Website ...
 			</div>

@@ -1,8 +1,10 @@
+var keep_trash_days = java.lang.System.getProperties().get("de.innovationgate.cm-neo.keep-trash-days") || 7; 
+
 if(WGA.Core.isRunSingleNodeFunctionalities()){
 	var log = jobContext.getLog();
-	log.info("CM-Neo Trash maintenance");
+	log.info("CM-Neo Trash maintenance (keep-trash-days=" + keep_trash_days + ")");
 	var dbs = WGA.Core.getContentdbs().values()
-	var cutoff = WGA.modifyDate(now(), "d", -7)
+	var cutoff = WGA.modifyDate(now(), "d", -keep_trash_days)
 	 
 	for(let db in Iterator(dbs)){
 	

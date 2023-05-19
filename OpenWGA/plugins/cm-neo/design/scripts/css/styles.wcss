@@ -1,11 +1,10 @@
 $header_height: 75px;
 $appnav_width: 320px;
 $appnav_toolbar_width: 40px;
-$base_blue: #286090;
 
 $width_breakpoint: 1280px;
 
-$blue: #2e6da4;
+$blue: #337ab7;		// bootstrap blue
 
 html,body {
 	position: fixed;

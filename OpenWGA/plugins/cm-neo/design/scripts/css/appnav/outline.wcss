@@ -30,7 +30,7 @@
 			&:before {
 				float: left;
 				color: white;
-				background: $base_blue;
+				background: $blue;
 				padding: 0 4px;
 				border-radius: 5px;
 				margin-left: -30px;

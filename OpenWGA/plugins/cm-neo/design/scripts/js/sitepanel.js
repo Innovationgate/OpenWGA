@@ -128,14 +128,14 @@ define(["cm", "jquery"], function(CM, $){
 			if(dt.getData("wga/files")){
 				var data = JSON.parse(dt.getData("wga/files"))
 				var file = data[0]
-				//console.log("image drop", this, file);
+				//console.log("image drop", this, file.poster);
 				
 				var img_el = $(this).find(".WGA-Item-Value img")
 				if(img_el.length){
-					img_el.attr("src", file.url);
+					img_el.attr("src", file.poster);
 				}
 				else{
-					$(this).find(".WGA-Item-Value").prepend('<img src="'+file.url+'">')
+					$(this).find(".WGA-Item-Value").prepend('<img src="'+file.poster+'">')
 					$(this).find(".WGA-Item-Label").css("display", "none");
 				}
 				storeFilenameToItem(file.name, file.container, file.dbkey, file.title || file.name);

@@ -1,5 +1,5 @@
 #header {
-	background-color: $base_blue;
+	background-color: $basecolor;
 	color: white;
 	.logo {
 		position: absolute;
@@ -29,8 +29,8 @@
 				padding: 0 5px;
 				.icon {
 					background: #ebebeb;
-					border: solid 1px transparent;	//#337ab7;
-					color: #337ab7;
+					border: solid 1px transparent; 
+					color: $basecolor;
 					border-radius: 5px;
 					font-size: 125%;
 					padding: 0px 20px;
@@ -80,9 +80,8 @@
 				}
 			}
 			
-			.item-edit-info:{
+			.item-edit-info{
 				font-size: 2em;
-				line-height: 1em;
 			}
 			
 		}

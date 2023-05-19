@@ -23,8 +23,9 @@ public class WGATempFile extends WGAFile{
 		_tmpfile = new TemporaryFile(filename, null, null);
 		setFile(_tmpfile.getFile());
 
-		if(_wga.getRequest()!=null)
-			addTemporaryFileToSession(_wga.getRequest().getSession());
+		if(_wga.isHttpSessionAvailable())
+			addTemporaryFileToSession(_wga.getHttpSession());
+
 	}
 
 	public String addToDownloads() throws WGException{

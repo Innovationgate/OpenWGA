@@ -93,7 +93,6 @@
 		</tml:case>
 		<tml:[::form] o_page="root"/>
 		<tml:include ref="::required-settings" o_page="root"/>
-		<tml:[form-messages] o_title="Seite kann nicht erstellt werden"/>
 	</tml:{div}>
 	<tml:{div} html_class="content" unless="_areasCount">
 		<div class="alert alert-danger">

@@ -35,6 +35,7 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.PageContext;
 
 import de.innovationgate.webgate.api.WGContent;
@@ -188,26 +189,8 @@ public class JspHelper {
 	}
 	
 	public boolean isBrowserInterface() {
-        
-        if (!getCore().isAuthoringPort(_pageContext.getRequest().getLocalPort())) {
-            return false;
-        }
-        
-	    Boolean bi = (Boolean) this._pageContext.getSession().getAttribute(WGACore.ATTRIB_BROWSERINTERFACE);
-		if (bi == null || bi.booleanValue() == false) {
-			return false;
-		}
-		
-        WGContent content = (WGContent) _pageContext.getRequest().getAttribute(WGACore.ATTRIB_MAINCONTEXT);
-        if (content != null) {
-            WGDatabase db = content.getDatabase();
-            String startPageEnabled = (String) db.getAttribute(WGACore.DBATTRIB_STARTPAGE);
-            if (startPageEnabled != null && startPageEnabled.equals("false")) {
-                return false;
-            }
-        }
-        
-        return true;
+        HttpSession session = ((HttpServletRequest)_pageContext.getRequest()).getSession();
+		return WGPDispatcher.isBrowserInterface(session);
 	}
 	
 	public boolean isAdminLoggedIn() {
@@ -308,9 +291,11 @@ public class JspHelper {
             WGContent content = (WGContent) _pageContext.getRequest().getAttribute(WGACore.ATTRIB_MAINCONTEXT);
             if (content != null) {
                 dbKeyStr = quote + content.getDatabase().getDbReference() + quote;
-                contentKeyStr = quote + content.getContentKey().toString() + quote;
-                structKeyStr = quote + content.getContentKey().getStructKey() + quote;
-                titleStr = quote + content.getTitle() + quote;
+                if(!content.isDummy()){
+	                contentKeyStr = quote + content.getContentKey().toString() + quote;
+	                structKeyStr = quote + content.getContentKey().getStructKey() + quote;
+	                titleStr = quote + content.getTitle() + quote;
+                }
             }
         }
         catch (Exception e) {
@@ -324,11 +309,11 @@ public class JspHelper {
         writer.append("dbkey:" + dbKeyStr + ",");
         writer.append("contentkey:" + contentKeyStr + ",");
         writer.append("structkey:" + structKeyStr + ",");
-        writer.append("title: " + titleStr);
+        writer.append("title:" + titleStr);
         writer.append("}");
-        writer.append("}");
+        writer.append("};");
         
-        writer.append("\nwindow.parent.CM && window.parent.CM.pageLoaded(WGA.contentinfo);");
+        writer.append("window.parent.CM && window.parent.CM.pageLoaded(WGA.contentinfo);");
         
         writer.append("</script>");
         

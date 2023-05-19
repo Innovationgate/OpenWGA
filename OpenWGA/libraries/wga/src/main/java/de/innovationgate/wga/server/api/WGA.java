@@ -2483,7 +2483,7 @@ public class WGA {
         
     }
     
-    protected HttpSession getHttpSession() throws WGException {
+    public HttpSession getHttpSession() throws WGException {
         
         if (!isIsolated()) {
             HttpSession session = fetchSession();
@@ -2566,7 +2566,7 @@ public class WGA {
     /**
      * Returns if the environment has a HTTP session in access
      */
-    protected boolean isHttpSessionAvailable() {
+    public boolean isHttpSessionAvailable() {
         return (!isIsolated() && (fetchSession() != null));
     }
     

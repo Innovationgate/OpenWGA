@@ -19,7 +19,7 @@ Controller.prototype.templates = function(AFW, $field_contenttype, $field_langua
 		} 
 	}
 	if(templates.size())
-		templates.add(0, "-|");						
+		templates.add(0, "- keine -|");						
 	
 	return templates
 }

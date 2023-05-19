@@ -4,6 +4,7 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 	var edit_item;
 	var edit_item_format;
 	var contentInfo;
+	var derivatUpdateTimer=null;;
 
 	/* Click handler */
 	var actions = {
@@ -46,6 +47,12 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 	WGA.event.addListener("*", "content-changed", function(ev){
 	
 		contentInfo = ev.params;
+		
+		if(derivatUpdateTimer){
+			//console.log("clear derivatUpdateTimer", derivatUpdateTimer)
+			clearTimeout(derivatUpdateTimer);
+			derivatUpdateTimer=null;
+		}
 		
 		updateContentProperties(ev.params);
 		updateContentAttachments(ev.params);
@@ -202,13 +209,12 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 						_wga && _wga.event.fireEvent("derivates-updated", "cm-neo", {
 							filename: filename								
 						})
-						//console.log("fire event derivates-updated", filename)
 					}
 				}
 				
 				if(count++<10 && current_waitForDerivates.length){
 					//console.log("read again", count, current_waitForDerivates)
-					setTimeout(readAttachments, 1000)
+					derivatUpdateTimer = setTimeout(readAttachments, 1000)
 				}
 			})
 		}
