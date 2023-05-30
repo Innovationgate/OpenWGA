@@ -15,9 +15,9 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>10</minorVersion>
-        <maintenanceVersion>7</maintenanceVersion>
+        <maintenanceVersion>8</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>718</buildVersion>
+        <buildVersion>719</buildVersion>
       </version>
     </id>
     <title>OpenWGA xFire Server</title>
