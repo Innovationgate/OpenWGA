@@ -163,7 +163,7 @@
 			{{/validations.length}}
 
 			{{#custom}}
-				<fieldset>
+				<fieldset class="clip">
 					<legend>{{{legend}}}</legend>
 					{{#fields}}
 						<div class="form-group" {{#important}}style="color:red"{{/important}}>
