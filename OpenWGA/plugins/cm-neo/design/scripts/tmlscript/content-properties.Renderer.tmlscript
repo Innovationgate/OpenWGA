@@ -38,6 +38,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 			replacementReason: c.STATUS==c.content().STATUS_ARCHIVE && c.ersetzungsgrund && WGA.encode("html", c.ersetzungsgrund),
 
 			readprotected: readprotected,
+			page_disabled: c.content().getStructEntry().pageDisabled,
 			pagereaders: WGA.app($urlParam_dbkey).isManager() ? pagereaders : null,
 
 			workflow: c.STATUS==c.content().STATUS_REVIEW && c.WORKFLOW 
