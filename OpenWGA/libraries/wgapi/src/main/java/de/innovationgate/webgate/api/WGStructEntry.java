@@ -402,6 +402,13 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
     public static final String META_PAGESEQUENCE = "PAGESEQUENCE";
     public static final MetaInfo METAINFO_PAGESEQUENCE = new MetaInfo(META_PAGESEQUENCE, Long.class, 0L);
 
+    public static final String META_PAGE_DISABLED = "PAGEDISABLED";
+    public static final MetaInfo METAINFO_PAGE_DISABLED = new MetaInfo(META_PAGE_DISABLED, Boolean.class, false);
+    static {
+    	METAINFO_PAGE_DISABLED.setExtdata(true);
+    }
+
+    
     /**
      * No content has yet been fetched for this struct entry.
      */
@@ -3094,4 +3101,11 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
     	getDatabase().createPageSequence(this, forceCreate);
     }
 
+    public void setPageDisabled(boolean value) throws WGAPIException{
+    	setMetaData(META_PAGE_DISABLED, value);
+    }
+    public boolean isPageDisabled() throws WGAPIException{
+    	return (Boolean)getMetaData(META_PAGE_DISABLED);
+    }
+    
 }

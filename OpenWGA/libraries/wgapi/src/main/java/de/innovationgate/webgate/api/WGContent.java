@@ -690,6 +690,10 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 			return false;
 		}
 
+    	// page disabled?
+    	if(getStructEntry().isPageDisabled())
+    		return false;
+
 		Date validFrom = this.getValidFrom();
 		Date validTo = this.getValidTo();
 		Date now = new Date();
@@ -2279,23 +2283,14 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
                 return false;
             }
 
-            // Visible flag
-            if (content.isVisible() == false) {
+            // Checks visible flag, VALIDTO/FROM and page-disabled
+            if (!content.isVisibleNow()) {
                 return false;
             }
-
-	        // Valid/From to dates
-	        Date now = new Date();
-	        if (content.getValidFrom() != null && content.getValidFrom().after(now)) {
-	            return false;
-	        }
-	        if (content.getValidTo() != null && content.getValidTo().before(now)) {
-	            return false;
-	        }
 	        
 	    }
 	    
-	    // Hidden flags for navigational structures
+	    // Hidden flags for navigation structures
         if (displayType != null && content.isHiddenFrom().contains(displayType)) {
             return false;
         }
