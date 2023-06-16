@@ -6,6 +6,8 @@ define(["jquery", "cm", "select2"], function($, CM){
 		
 		function showLength(el){
 			var input_el = $("#form-settings [name=" + el + "]");
+			if(!input_el.length)
+				return;
 			var length_el = input_el.siblings(".input-length").find("span"); 
 			input_el.keyup(function(ev){
 				length_el.html(this.value.length)

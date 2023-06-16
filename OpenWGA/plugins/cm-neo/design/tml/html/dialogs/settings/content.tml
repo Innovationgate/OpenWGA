@@ -67,7 +67,7 @@
 					o_placeholder="Alternativer Titel der Seite im Browser"
 				>
 					<div class="input-length">
-						<span>0</span> Zeichen
+						<span><tml:script expression="(tmlform.browsertitle||BROWSERTITLE).length"/></span> Zeichen
 					</div>
 				</tml:[form-field]>
 				
@@ -87,7 +87,7 @@
 					o_placeholder="Kurze Beschreibung des Inhalts für Suchmaschinen"
 				>
 					<div class="input-length">
-						<span>0</span> Zeichen
+						<span><tml:script expression="(tmlform.description||DESCRIPTION).length"/></span> Zeichen
 					</div>
 				</tml:[form-field]>
 				
