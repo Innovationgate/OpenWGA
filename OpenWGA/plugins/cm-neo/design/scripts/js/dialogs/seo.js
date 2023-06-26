@@ -5,7 +5,7 @@ define(["jquery", "appnav", "sitepanel"], function($, Appnav, SitePanel){
 		if(Appnav.getContext().status=="w"){
 			var win = SitePanel.getWindow();
 			var href = ((win.location && win.location.href) || SitePanel.iframe().attr("src")) + "?$clean"
-			$.get(href).success(function(html){
+			$.get(href, function(html){
 				var el = document.createElement("div");
 				el.innerHTML = html;
 				setDescriptionPlaceholder(el)
