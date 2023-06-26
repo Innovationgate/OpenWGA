@@ -691,7 +691,8 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 		}
 
     	// page disabled?
-    	if(getStructEntry().isPageDisabled())
+		WGStructEntry struct = getStructEntry(); 
+    	if(struct!=null && struct.isPageDisabled())
     		return false;
 
 		Date validFrom = this.getValidFrom();
