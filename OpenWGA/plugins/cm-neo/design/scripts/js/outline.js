@@ -51,7 +51,7 @@ define(["sitepanel", "appnav"], function(SitePanel, Appnav){
 			}
 			else href = SitePanel.iframe().attr("src") + "?$clean"
 			
-			$.get(href).success(function(html){
+			$.get(href, function(html){
 				var el = document.createElement("div");
 				el.innerHTML = html;
 				validate(el);
