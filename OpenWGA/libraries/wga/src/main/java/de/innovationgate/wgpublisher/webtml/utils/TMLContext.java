@@ -3402,7 +3402,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	
 	public Cookie createcookie(String name, String value) {
 		return new Cookie(name, value);
-	}	public Cookie createCookie(String name, String value) {
+	}	
+	public Cookie createCookie(String name, String value) {
 		return new Cookie(name, value);
 	}
 	
