@@ -224,11 +224,27 @@
 		var entryTop = node.position().top;
 		var entryBottom = entryTop + node.height()
 
-		if(entryTop < containerScrollTop || node.height()>containerHeight)
-			container.animate({scrollTop: entryTop}, 100)
-		else if (entryBottom > containerScrollTop + containerHeight)
-			container.animate({scrollTop: entryBottom-containerHeight}, 100)
-
+		//console.log(node, "offset", node.offset(), "top", entryTop, "bottom", entryBottom, "containerScrollTop", containerScrollTop, "containerHeight", containerHeight)
+		
+		if(Number($.fn.jquery.substr(0,1))>=3){		// jquery 3.x
+			var entryBottom = entryTop + $("a", node).height();
+			if(entryTop < 0){
+				var newTop = entryTop+containerScrollTop;
+				//console.log("-scrolltop", newTop)
+				container.animate({scrollTop: newTop}, 100)
+			}
+			else if(entryBottom > containerHeight){
+				var newTop = entryBottom+containerScrollTop-containerHeight;
+				//console.log("+scrolltop", newTop, entryBottom, containerHeight)
+				container.animate({scrollTop: newTop}, 100)
+			}
+		}
+		else{			
+			if(entryTop < containerScrollTop || node.height()>containerHeight)
+				container.animate({scrollTop: entryTop}, 100)
+			else if (entryBottom > containerScrollTop + containerHeight)
+				container.animate({scrollTop: entryBottom-containerHeight}, 100)
+		}
 	}
 
 	function selectpath(path, parentNode){
