@@ -63,6 +63,7 @@ import com.thoughtworks.xstream.converters.SingleValueConverter;
 
 import de.innovationgate.ext.org.mozilla.javascript.Callable;
 import de.innovationgate.ext.org.mozilla.javascript.ClassCache;
+import de.innovationgate.ext.org.mozilla.javascript.ConsString;
 import de.innovationgate.ext.org.mozilla.javascript.Context;
 import de.innovationgate.ext.org.mozilla.javascript.ContextAction;
 import de.innovationgate.ext.org.mozilla.javascript.ContextFactory;
@@ -471,7 +472,18 @@ public class RhinoExpressionEngineImpl implements ExpressionEngine, RhinoExpress
                 else if (result instanceof Undefined) {
                     result = "";
                 }
-
+                
+                /*
+                 * Mozilla ConsString wollen wir nicht haben, weil das u. A. nicht serialisierbar ist und auch sonst "technisch" kein String ist.
+                 * Hier geht leider nicht sicher instanceof, weil wir die mozilla klassen alle umbenannt haben.
+                 * Als Workaround testen wir zusätzlich auf den Klassennamen und konvertieren ggfl. zu einem echten String.
+                 */
+                try{
+	                if(result instanceof ConsString || result.getClass().getName().equals("org.mozilla.javascript.ConsString"))
+	                	result = result.toString();
+                }
+                catch(Exception e){}
+                
                 return createExpressionResult(result, null);
             }
             catch (Throwable e) {
