@@ -192,9 +192,8 @@ this.mayEditContent=function(){
 			var doc=contList.get(i);
 			if(doc.getStatus()==content.STATUS_REVIEW && doc.getLanguage().getName()==content.getLanguage().getName()){
 				if(doc.getVersion() == content.getVersion()){
-					if(doc.isPendingRelease())
-						return this.isAuthorOrOwner() || Database.isChiefEditor() || _false(label("reason.document-pending"));
-					else return _false(label("reason.document-is-in-workflow"));
+					if(!doc.isPendingRelease())
+						return _false(label("reason.document-is-in-workflow"));
 				}
 				else {
 					if(doc.isPendingRelease())
