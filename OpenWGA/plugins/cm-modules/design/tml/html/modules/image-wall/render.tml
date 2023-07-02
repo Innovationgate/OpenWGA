@@ -15,15 +15,16 @@
 		if(!file)
 			continue;
 			
-		var context = null;
+		var ctx = null;
 		if(!source)
-			context= CMM.settingSource()=="template" ? CMM.getTemplateContextPath() : "this";
-		else context='db:'+dbkey+'/docid:'+sourcedoc
-
-		_images.add({
-			context: context,
-			filename: file
-		})
+			ctx= CMM.settingSource()=="template" ? CMM.getTemplateContextPath() : "this";
+		else ctx = 'db:'+dbkey+'/docid:'+sourcedoc
+		
+		if(context(ctx, false) && context(ctx).content().hasFile(file))
+			_images.add({
+				context: ctx,
+				filename: file
+			})
 	}
 	
 	_usage = "usage=poster";
