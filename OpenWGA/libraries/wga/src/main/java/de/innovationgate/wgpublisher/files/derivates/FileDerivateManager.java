@@ -586,21 +586,26 @@ public class FileDerivateManager {
                         db.getSessionContext().clearCache();
                     }
                     
-                    WGDocumentKey docKey = new WGDocumentKey(update.getDocumentKey());
-                    if (!docKey.isRealDocumentKey()) {
-                        continue;
+                    try{
+	                    WGDocumentKey docKey = new WGDocumentKey(update.getDocumentKey());
+	                    if (!docKey.isRealDocumentKey()) {
+	                        continue;
+	                    }
+	                    
+	                    // Always store revision if actual documents were processed
+	                    currentRun.setSomethingDone(true);
+	                    
+	                    if (docKey.getDocType() != WGDocument.TYPE_CONTENT) {
+	                        continue;
+	                    }
+
+	                    WGContent content = (WGContent) db.getDocumentByKey(update.getDocumentKey());
+	                    if (content != null) {                        
+	                        performDerivateUpdate(content, currentRun, selector);
+	                    }
                     }
-                    
-                    // Always store revision if actual documents were processed
-                    currentRun.setSomethingDone(true);
-                    
-                    if (docKey.getDocType() != WGDocument.TYPE_CONTENT) {
-                        continue;
-                    }
-                    
-                    WGContent content = (WGContent) db.getDocumentByKey(update.getDocumentKey());
-                    if (content != null) {                        
-                        performDerivateUpdate(content, currentRun, selector);
+                    catch(Exception e){
+                    	LOG.error("Unable to perform derivate update", e);
                     }
                 }
             }
