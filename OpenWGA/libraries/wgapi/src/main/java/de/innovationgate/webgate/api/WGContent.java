@@ -1307,13 +1307,9 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     	            setStatus(STATUS_REVIEW);
     	            fireStatusChangeEvent();
     	        }
+    	        workflow.release(comment);
     	        return false;
     	    }
-	    }
-
-	    // Otherwise reset the pending release flag
-	    if (isPendingRelease()) {
-	        setPendingRelease(false);
 	    }
 	    
 		// Get previously released. If present, archive it (in project mode: delete it)
@@ -1364,7 +1360,11 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 		if( this.hasItem(ITEM_REPLACEREASON) ){
 			this.removeItem(ITEM_REPLACEREASON);
 		}
-		workflow.release(comment);
+	    //  reset the pending release flag
+	    if (isPendingRelease()) {
+	        setPendingRelease(false);
+	    }
+	    else workflow.release(comment);
 		
 		// Workflow history
 		this.addWorkflowHistoryEntry(workflowHistoryEntry);
