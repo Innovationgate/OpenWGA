@@ -485,9 +485,6 @@ public class WebTMLScriptletResolver {
         		derivates = (String) context.option(Base.OPTION_IMAGE_DERIVATES);
             if (derivates != null) {
             	DerivateQuery derivateQuery = targetContext.enhanceFileDerivateQuery(derivates);
-                WGA wga = WGA.get(targetContext);
-                if(wga.selectDerivate(fileName, derivateQuery.toString())==null)
-                	derivateQuery = targetContext.enhanceFileDerivateQuery("usage=poster"); 
                 url = addDerivateQueryToURL(targetContext, derivateQuery, url);
             }
         }
