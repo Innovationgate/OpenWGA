@@ -275,7 +275,7 @@ public class TMLPageImpl implements TMLPage {
         // Optionally set options from argument
         if (options != null) {
             for (Map.Entry<Object,Object> option : options.entrySet()) {
-                preserver.preserve(String.valueOf(option.getKey()), option.getValue(), TMLOption.SCOPE_PORTLET);
+                preserver.preserve(String.valueOf(option.getKey()), option.getValue(), TMLOption.SCOPE_GLOBAL);
             }
         }
         
@@ -359,7 +359,7 @@ public class TMLPageImpl implements TMLPage {
                     @SuppressWarnings("unchecked")
                     Map<Object, Object> controllerOptions = (Map<Object,Object>) scriptOptions;
                     for (Map.Entry<Object,Object> option : controllerOptions.entrySet()) {
-                        preserver.preserve(String.valueOf(option.getKey()), option.getValue(), TMLOption.SCOPE_PORTLET);
+                        preserver.preserve(String.valueOf(option.getKey()), option.getValue(), TMLOption.SCOPE_GLOBAL);
                     }
                 }
                 catch (Exception e) {
