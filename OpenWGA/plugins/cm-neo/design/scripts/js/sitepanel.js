@@ -4,7 +4,7 @@ define(["cm", "jquery"], function(CM, $){
 	var currentURL;
 
 	function init(){
-		$("#site-panel").load(function(){
+		$("#site-panel").on("load", function(){
 			$("#loading").hide();
 			initItemEditors()
 			showItemEditors(true)

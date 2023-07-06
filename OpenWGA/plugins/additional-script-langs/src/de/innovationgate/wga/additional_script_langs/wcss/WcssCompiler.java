@@ -26,6 +26,15 @@ public class WcssCompiler {
 		colors.put("blue", "#0000FF");
 		colors.put("yellow", "#FFFF00");
 
+		colors.put("aqua ", "#00FFFF");
+		colors.put("beige", "#F5F5DC");
+		colors.put("brown", "#A52A2A");
+		colors.put("gold", "#FFD700");
+		colors.put("magenta", "#FF00FF");
+		colors.put("navy", "#000080");
+		colors.put("olive", "#808000");
+		colors.put("purple", "#800080");
+
 		if(colors.get(value.toLowerCase())!=null)
 			value = colors.get(value.toLowerCase());
 		

@@ -1,2 +1,4 @@
 //@import type=static js/htmlhead.js
 //@import db=plugin-wga-app-framework require
+
+//@import jquery-3.7.0.js

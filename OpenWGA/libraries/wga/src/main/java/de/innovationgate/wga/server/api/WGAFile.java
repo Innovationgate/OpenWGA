@@ -7,6 +7,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -327,6 +329,20 @@ public class WGAFile {
 		if(_file!=null)
 			return _wga.getCore().getServletContext().getMimeType(_file.getName());
 		else return null;
+	}
+	
+	/**
+	 * Sets file permission. File must already exist to work.
+	 * Sample: setPosixFilePermissions("rw-rw-rw-")
+	 * @param permissions
+	 * @throws IOException
+	 */
+	public void setPosixFilePermissions(String permissions) throws IOException{
+		if(_file!=null){
+			Files.setPosixFilePermissions(_file.toPath(), 
+				PosixFilePermissions.fromString(permissions)
+			);
+		}
 	}
 	
 }

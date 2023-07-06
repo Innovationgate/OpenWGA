@@ -70,8 +70,9 @@ public class WcssPostProcessor implements PostProcessor{
         Design design = wga.design(doc.getDatabase().getDbReference()).resolve(doc.getName());
         ResourceRef ref = new ResourceRef(design, ResourceRef.TYPE_CSS);
 
-        WcssCompiler.registerCustomFunction("wga_file_url", new WGAFileURL());
-        WcssCompiler.registerCustomFunction("fileurl", new WGAFileURL());
+        WcssFunction fileurl = new WGAFileURL();
+        WcssCompiler.registerCustomFunction("wga_file_url", fileurl);
+        WcssCompiler.registerCustomFunction("fileurl", fileurl);
 
         if (data.getCacheQualifier() != null) {
         	@SuppressWarnings("unchecked")

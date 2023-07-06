@@ -31,7 +31,7 @@
 		<link rel="stylesheet" type="text/css" href="<tml:url type="file" doc="bootstrap-3.3.7-dist:css" file="bootstrap.min.css"/>"/>
 		
 		<link rel="stylesheet" href="<tml:url type="css" name="styles" u_v="{WGA.server().getVersion().toProjectVersion()}"/>">
-		<link rel="icon" href="<tml:url type="static" file="images/brand/icon_32.png"/>"/>	
+		<link rel="icon" href="<tml:url type="static" file="images/brand/icon_32.png"/>">	
 		
 	</head>
 	

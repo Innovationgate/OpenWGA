@@ -109,14 +109,22 @@
 			<div class="tab-pane active" id="basic">
 				<tml:if condition="WGA.app().isManager()">
 					<tml:then>
-						<tml:[form-field] o_label="Eindeutiger Name" o_name="UNIQUENAME" o_meta="true" o_mode="{WGA.app().isManager() ? 'edit':'view'}"/>
-						<tml:[form-field] o_label="Seitentitel" o_name="title" o_meta="true" o_mode="{WGA.app().isManager() ? 'edit':'view'}"/>
+						<tml:[form-field] o_label="Eindeutiger Name" o_name="UNIQUENAME" o_meta="true"/>
+						<tml:[form-field] o_label="Seitentitel" o_name="title" o_meta="true"/>
+						<tml:[form-field] o_label="Sichtbarkeit" o_name="pagedisabled" o_type="boolean" o_options="Diese Seite nicht anzeigen|true" o_labeled="true" o_meta="true"/>
 					</tml:then>
-					<tml:elseif condition="UNIQUENAME">
-						<tml:[form-field] o_label="Eindeutiger Name" o_mode="view">
-							<tml:meta name="UNIQUENAME"/>
-						</tml:[form-field]>						
-					</tml:elseif>
+					<tml:else>
+						<tml:case condition="UNIQUENAME">
+							<tml:[form-field] o_label="Eindeutiger Name" o_mode="view">
+								<tml:meta name="UNIQUENAME"/>
+							</tml:[form-field]>						
+						</tml:case>
+						<tml:case condition="PAGEDISABLED">
+							<tml:[form-field] o_label="Sichtbarkeit" o_mode="view">
+								Diese Seite nicht anzeigen
+							</tml:[form-field]>
+						</tml:case>
+					</tml:else>
 				</tml:if>
 				
 				<tml:[form-field] o_label="Seitentyp" o_name="contenttype" o_meta="true" o_type="select" o_optionsitem="_pagetypes"

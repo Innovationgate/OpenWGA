@@ -264,9 +264,6 @@ public class Image extends Base implements DynamicAttributes {
                 if (derivate != null && doc==null) {
                     derivateQuery = getTMLContext().enhanceFileDerivateQuery(derivate);
                     if (!derivateQuery.isNoDerivate()) {
-                    	if(wga.selectDerivate(urlRetrievalContext, file, derivateQuery.toString())==null){
-                    		derivateQuery = getTMLContext().enhanceFileDerivateQuery("usage=poster");
-                    	}
                         fileurl.setParameter(WGPDispatcher.URLPARAM_DERIVATE, derivateQuery.toString());
                         doSrcSet = true;
                     }

@@ -43,7 +43,6 @@
 				font-size: .9em
 			}
 			&.not-visible .link-text {
-				//color: silver;
 				opacity: .4;
 			}
 			&.hidden-in-nav .link-text{

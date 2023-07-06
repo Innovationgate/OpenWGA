@@ -18,8 +18,9 @@
 			margin-bottom: 10px;
 			color: $blue;
 		}
-		&.clip{
+		&.clip, p{
 			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 	}
 

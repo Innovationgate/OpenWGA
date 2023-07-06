@@ -207,18 +207,18 @@ public class IndependentTMLScriptEnvironment implements TMLContextEnvironment {
      * @see de.innovationgate.wgpublisher.webtml.utils.TMLScriptEnvironment#getTMLContextForDocument(de.innovationgate.webgate.api.WGDocument)
      */
     public TMLContext getTMLContextForDocument(TMLContext parentContext, WGDocument doc) {
-        
         TMLContext tmlContext = new TMLContext(doc, _core, _userProfile, _form, _request, _response, _session, parentContext);
         tmlContext.setLastError(null);
         return tmlContext;
-
-        }
+    }
+    
     /* (non-Javadoc)
      * @see de.innovationgate.wgpublisher.webtml.utils.TMLScriptEnvironment#getForm()
      */
     public TMLForm getForm() {
         return _form;
-            }
+    }
+    
     /* (non-Javadoc)
      * @see de.innovationgate.wgpublisher.webtml.utils.TMLScriptEnvironment#getUserProfile()
      */

@@ -1,13 +1,3 @@
 //@import amd:require
-
-require.config(	
-	//@import type=tmlscript require-config
-)
-// don't load jquery if already included:
-if(window.jQuery){
-	define('jquery', [], function() {
-	    return window.jQuery;
-	});	
-}
-
+//@import amd:require-config
 //@import amd:css

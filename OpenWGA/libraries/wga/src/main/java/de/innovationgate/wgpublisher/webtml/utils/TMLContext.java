@@ -3402,7 +3402,8 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	
 	public Cookie createcookie(String name, String value) {
 		return new Cookie(name, value);
-	}	public Cookie createCookie(String name, String value) {
+	}	
+	public Cookie createCookie(String name, String value) {
 		return new Cookie(name, value);
 	}
 	
@@ -4197,6 +4198,20 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         catch(Exception e){
         	return url;
         }
+    }
+    
+    public String fileImageDerivateURL(String filename) throws WGException{
+    	return fileImageDerivateURL(filename, null);
+    }
+    
+    public String fileImageDerivateURL(String filename, String derivate) throws WGException{
+    	URLBuilder url = WGA.get(this).urlBuilder(fileurl(filename));
+    	String existingDerivates = (String) option(Base.OPTION_IMAGE_DERIVATES);
+    	if(derivate!=null)
+    		url.setParameter(WGPDispatcher.URLPARAM_DERIVATE, enhanceFileDerivateQuery(derivate).toString());
+    	else if(existingDerivates!=null && !existingDerivates.isEmpty())
+    		url.setParameter(WGPDispatcher.URLPARAM_DERIVATE, existingDerivates);
+    	return url.build();
     }
     
     /* (non-Javadoc)
@@ -5326,10 +5341,10 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         String existingDerivates = (String) option(Base.OPTION_IMAGE_DERIVATES);
         DerivateQuery derivateQuery;
         if (existingDerivates != null) {
-            derivateQuery = getwgacore().getFileDerivateManager().mergeDerivateQueries(fileDerivates, existingDerivates);
+            derivateQuery = FileDerivateManager.mergeDerivateQueries(fileDerivates, existingDerivates); 
         }
         else {
-            derivateQuery = getwgacore().getFileDerivateManager().parseDerivateQuery(fileDerivates);
+            derivateQuery = FileDerivateManager.parseDerivateQuery(fileDerivates);
         }
         return derivateQuery;
     }

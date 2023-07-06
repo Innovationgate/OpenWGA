@@ -102,6 +102,9 @@
 			<fieldset>
 				<legend>
 					<a href="#" data-dialog="page-settings:render" title="Seiteneigenschaften bearbeiten">Seite</a>
+						{{#page_disabled}}
+							<span style="color:red">(Nicht sichtbar)</span>
+						{{/page_disabled}}
 				</legend>
 				<div class="form-group">
 					<p class="data">
@@ -160,7 +163,7 @@
 			{{/validations.length}}
 
 			{{#custom}}
-				<fieldset>
+				<fieldset class="clip">
 					<legend>{{{legend}}}</legend>
 					{{#fields}}
 						<div class="form-group" {{#important}}style="color:red"{{/important}}>

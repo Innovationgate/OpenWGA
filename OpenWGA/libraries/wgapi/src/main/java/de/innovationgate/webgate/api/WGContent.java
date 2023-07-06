@@ -690,6 +690,11 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 			return false;
 		}
 
+    	// page disabled?
+		WGStructEntry struct = getStructEntry(); 
+    	if(struct!=null && struct.isPageDisabled())
+    		return false;
+
 		Date validFrom = this.getValidFrom();
 		Date validTo = this.getValidTo();
 		Date now = new Date();
@@ -1302,13 +1307,9 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     	            setStatus(STATUS_REVIEW);
     	            fireStatusChangeEvent();
     	        }
+    	        workflow.release(comment);
     	        return false;
     	    }
-	    }
-
-	    // Otherwise reset the pending release flag
-	    if (isPendingRelease()) {
-	        setPendingRelease(false);
 	    }
 	    
 		// Get previously released. If present, archive it (in project mode: delete it)
@@ -1359,7 +1360,11 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 		if( this.hasItem(ITEM_REPLACEREASON) ){
 			this.removeItem(ITEM_REPLACEREASON);
 		}
-		workflow.release(comment);
+	    //  reset the pending release flag
+	    if (isPendingRelease()) {
+	        setPendingRelease(false);
+	    }
+	    else workflow.release(comment);
 		
 		// Workflow history
 		this.addWorkflowHistoryEntry(workflowHistoryEntry);
@@ -2279,23 +2284,14 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
                 return false;
             }
 
-            // Visible flag
-            if (content.isVisible() == false) {
+            // Checks visible flag, VALIDTO/FROM and page-disabled
+            if (!content.isVisibleNow()) {
                 return false;
             }
-
-	        // Valid/From to dates
-	        Date now = new Date();
-	        if (content.getValidFrom() != null && content.getValidFrom().after(now)) {
-	            return false;
-	        }
-	        if (content.getValidTo() != null && content.getValidTo().before(now)) {
-	            return false;
-	        }
 	        
 	    }
 	    
-	    // Hidden flags for navigational structures
+	    // Hidden flags for navigation structures
         if (displayType != null && content.isHiddenFrom().contains(displayType)) {
             return false;
         }

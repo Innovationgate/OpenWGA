@@ -2987,8 +2987,7 @@ public class WGA {
         }
         
         FileDerivateManager manager = getCore().getFileDerivateManager();
-        DerivateQuery derivateQuery = manager.parseDerivateQuery(derivateQueryStr);
-        
+        DerivateQuery derivateQuery = FileDerivateManager.parseDerivateQuery(derivateQueryStr);        
         
         // With a set device pixel ratio > 1 we do additional queries for the given ratio and its bisections
         WGFileAnnotations md = null;
