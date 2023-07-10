@@ -29,11 +29,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 public class LoginAttemptInformation implements Serializable {
     
     private static final long serialVersionUID = 1L;
+    public static final Logger LOG = Logger.getLogger("wga.api.auth");
     
     public static String createLoginAttemptKey(String domain, String user) {
         return domain + "/" + user;
@@ -82,7 +83,9 @@ public class LoginAttemptInformation implements Serializable {
         if (_maxAttempts > 0 && _failedAttempts >= _maxAttempts) {
             _blocked = true;
             _blockedDate = new Date();
-            Logger.getLogger("wga.loginblocker").warning("Blocked login for user '" + createLoginAttemptKey(getDomain(), getName()) + "' because of " + _maxAttempts + " false login attempts");
+            LOG.warn("Blocked login"
+            	+ (_ips.size()>0 ? " from IPs " + _ips : "")
+            	+ " for user '" + getName() + "' in domain '" + getDomain() + "' because of " + _maxAttempts + " failed login attempts");
         }
     }
     
