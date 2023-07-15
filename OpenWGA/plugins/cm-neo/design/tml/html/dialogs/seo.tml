@@ -8,13 +8,6 @@
 	_dialog_closed=true;
 </tml:action>
 
-<tml:action id="open-content-settings">
-	portlet.fireevent("open-dialog", {
-		dialog: "settings:content"
-	})
-	_dialog_closed=true
-</tml:action>
-
 <tml:form id="seo" unless="_dialog_closed" mode="{App.mayUpdateContent(this) ? 'edit':'view'}">
 
 	<div class="header">
