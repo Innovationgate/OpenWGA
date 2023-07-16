@@ -38,6 +38,8 @@
 	function update(){
 		if(ta){
 			var width = ta.width();
+			if(width<=0)
+				return;
 			if(WGA.isMobile)
 				width -= 2;		// Keine Ahnung warum, aber das iPad braucht das.
 			shadow.css("width", width)
