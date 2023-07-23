@@ -18,6 +18,23 @@ import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 
+/*
+ * General Resource Reference Utility
+ * Syntax to address a resource:
+ * 
+ * 		[type=<type>] [db=<dbkey>] [path=]<path-to-resource>
+ * 
+ * If the path does not begin with / or : the path is treated relative to the parent rescource.
+ * The keyword "path" is optional and path-to-resource can either have "path-syntax" or OpenWGA-Designresource-syntax".
+ * Samples:
+ * 	"type=file db=my-dbkey path/to/resource"
+ * 	"type=css path:to:resource"
+ * 	"path/to/resource"
+ * Both "type" and "db" are optional. 
+ * If no type is specified, type is used from the parent resource or if no parent found type=file is used. 
+ * If not db is specified the current db is used. 
+ */
+
 public class ResourceRef {
 
 	public static final String TYPE_JS = "js";
