@@ -3432,8 +3432,9 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
             /*
              * Ist das wirklich notwendig?
              * Bei einer CS-Replikation wird ohnehin immer ein full-comapre für DB-Metas gemacht.
+             * JA. Es bewirkt, das Workflow Änderungen als "Backend-Change" erkannt und auf anderen Cluster Nodes übernommen werden.
              */
-            //createLogEntry(getSession(), WGUpdateLog.TYPE_UPDATE, WGDocument.TYPENAME_DBMETADATA + "/" + name, md.getId());
+            createLogEntry(getSession(), WGUpdateLog.TYPE_UPDATE, WGDocument.TYPENAME_DBMETADATA + "/" + name, md.getId());
             commitHibernateTransaction();
         }
         catch (HibernateException e) {
