@@ -28,21 +28,19 @@ Controller.prototype.prepare = function($cx, CMM) {
 
 	if(this.context && this.filename){
 		
-		this.download_url = this.context.fileurl(this.filename);
+		this.lightbox_url = this.download_url = this.context.fileurl(this.filename);
 		this.downloads = (setting('download') && this.download_url) || false;
 		
-		// Lightbox
-		var lightbox_filename = setting("lightbox_image") || this.filename;
-		this.lightbox_url = this.context.fileurl(lightbox_filename)
-		var option_imagederivates = $cx.option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES)
-		if(option_imagederivates){
-			var derivateQuery = WGA.Core.getFileDerivateManager().parseDerivateQuery(option_imagederivates)
-			var usage = derivateQuery.get("usage").toString();
-			if(!WGA.selectDerivate(this.context, this.filename, usage))
-				usage = "usage=poster"
-			this.lightbox_url = WGA.urlBuilder(this.lightbox_url).setParameter("derivate", usage);	
+		if(setting("onclick")=="zoom"){
+			// Lightbox
+			var lightbox_filename = setting("lightbox_image") || this.filename;
+			this.lightbox_url = this.context.fileurl(lightbox_filename)
+			var option_imagederivates = $cx.option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES)
+			if(option_imagederivates){
+				this.lightbox_url = WGA.urlBuilder(this.lightbox_url).setParameter("derivate", option_imagederivates);
+			}
 		}
-	
+		
 		// ALT / title
 		this.file_md = this.context.content().getFileMetaData(this.filename);
 		if(this.file_md){
