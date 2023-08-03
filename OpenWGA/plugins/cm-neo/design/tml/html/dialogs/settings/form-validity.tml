@@ -43,23 +43,26 @@
 	</tml:if>
 </tml:[form-field]>
 
-<tml:[form-field] o_label="Sichtbar bis">
-	<tml:if condition="tmlform.mode()=='edit'">
-		<tml:then>
-			<div class="clear-field-wrapper<tml:case condition="tmlform.validto"> col-sm-8</tml:case>">
-				<tml:input type="date" name="validto" meta="true" cssclass="form-control" html_placeholder="unbegrenzt" format="dd.MM.yyyy"/>
-				<a class="clear-field" style="display:none">&times;</a>
-			</div>
-			<div class="input-group col-sm-4" <tml:case condition="!tmlform.validto">style="display:none"</tml:case>>
-				<tml:input type="date" name="validto_time" cssclass="form-control" format="HH:mm" store="false"/>
-				<div class="input-group-addon">Uhr</div>
-			</div>
-		</tml:then>
-		<tml:elseif condition="VALIDTO">
-			<tml:meta name="validto" format="d. MMMMM yyyy, HH:mm"/> Uhr
-		</tml:elseif>
-		<tml:else>
-			unbegrenzt
-		</tml:else>
-	</tml:if>		
-</tml:[form-field]>		
+<tml:case condition="!isHomepage() || WGA.app().isChiefEditor()">
+	<tml:[form-field] o_label="Sichtbar bis">
+		<tml:if condition="tmlform.mode()=='edit'">
+			<tml:then>
+				<div class="clear-field-wrapper<tml:case condition="tmlform.validto"> col-sm-8</tml:case>">
+					<tml:input type="date" name="validto" meta="true" cssclass="form-control" html_placeholder="unbegrenzt" format="dd.MM.yyyy"/>
+					<a class="clear-field" style="display:none">&times;</a>
+				</div>
+				<div class="input-group col-sm-4" <tml:case condition="!tmlform.validto">style="display:none"</tml:case>>
+					<tml:input type="date" name="validto_time" cssclass="form-control" format="HH:mm" store="false"/>
+					<div class="input-group-addon">Uhr</div>
+				</div>
+			</tml:then>
+			<tml:elseif condition="VALIDTO">
+				<tml:meta name="validto" format="d. MMMMM yyyy, HH:mm"/> Uhr
+			</tml:elseif>
+			<tml:else>
+				unbegrenzt
+			</tml:else>
+		</tml:if>		
+	</tml:[form-field]>
+</tml:case>
+
