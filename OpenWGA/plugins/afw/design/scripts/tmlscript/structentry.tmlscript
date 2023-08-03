@@ -161,7 +161,7 @@ this.mayDeletePage=function(deep_check){
 			if(e.javaException.getCauseDocument)
 				cause = e.javaException.getCauseDocument();
 			if(cause && cause.getTitle && cause.getTitle()){
-				return _false(label("reason."+errorCode, [cause.getTitle()]))
+				return _false(label("reason."+errorCode, [cause.getTitle(), e.javaException.getCauseDocumentKey()]))
 			}
 			else {
 				cause = e.javaException.getCauseDocumentKey();
