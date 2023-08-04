@@ -93,7 +93,12 @@
 						</tml:if>
 					</tml:then>
 					<tml:else>
-						<tml:script expression="_job.runtime.getLastRun()||'- never -'"/>
+						<tml:script>
+							var date = _job.runtime.getLastRun();
+							if(date)
+								return WGA.format(date, "dd.MM.yyyy HH:mm:ss");
+							else return "- none -"
+						</tml:script>
 						<tml:case condition="!_job.transient">
 							<tml:button clickaction="runJob" param1="{_job.name}" ajax="true">start job now</tml:button>
 						</tml:case>
@@ -103,7 +108,14 @@
 			<div class="clear"></div>
 			
 			<label>Next Schedule:</label>
-			<div class="data"><tml:script expression="_job.runtime.nextScheduledRun()||'- none -'"/></div>
+			<div class="data">
+				<tml:script>
+					var next = _job.runtime.nextScheduledRun();
+					if(next)
+						return WGA.format(next, "dd.MM.yyyy HH:mm:ss");
+					else return "- none -"
+				</tml:script>
+			</div>
 			<div class="clear"></div>
 			
 			<tml:comment><label>Running now:</label>
