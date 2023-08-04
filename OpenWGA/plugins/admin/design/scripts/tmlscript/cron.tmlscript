@@ -75,7 +75,6 @@ this.createCronExpression = function(){
 				seconds = '0';
 				minutes = cal.get(cal.MINUTE);
 				hours = cal.get(cal.HOUR_OF_DAY);
-				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
 			}
 				
 			//Type: Execute on each day of month
@@ -89,7 +88,6 @@ this.createCronExpression = function(){
 				seconds = '0';
 				minutes = cal.get(cal.MINUTE);
 				hours = cal.get(cal.HOUR_OF_DAY);
-				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
 			}
 			
 			//Type: Execute on each day in week
@@ -101,7 +99,6 @@ this.createCronExpression = function(){
 				seconds = '0';
 				minutes = cal.get(cal.MINUTE);
 				hours = cal.get(cal.HOUR_OF_DAY);
-				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
 			}
 			
 			//Type: Execute on each day
@@ -115,7 +112,6 @@ this.createCronExpression = function(){
 				seconds = '0';
 				minutes = cal.get(cal.MINUTE);
 				hours = cal.get(cal.HOUR_OF_DAY);
-				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
 			}
 			
 			//Type: Execute on each hour
@@ -129,33 +125,9 @@ this.createCronExpression = function(){
 				seconds = '0';
 				minutes = cal.get(cal.MINUTE);
 				hours = '*';
-				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
 			}
 		} 
-		/*else if(tmlform.executeOnEach=='every'){
-			
-			//Type: Execute every X hours
-			if(tmlform.subMode_every=='hours'){
-				dayOfMonth = '*';
-				months = '*';
-				dayOfWeek = '?';
-				seconds = '0';
-				minutes = '0';
-				hours = '0/'+tmlform.every_time;
-				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
-			}
-			
-			//Type: Execute every X minutes
-			if(tmlform.subMode_every=='minutes'){
-				dayOfMonth = '*';
-				months = '*';
-				dayOfWeek = '?';
-				seconds = '0';
-				minutes = '0/'+tmlform.every_time;
-				hours = '*';
-				log.info(seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek);
-			}	
-		}*/
+
 		return seconds+' '+minutes+' '+hours+' '+dayOfMonth+' '+months+' '+dayOfWeek;
 	}
 	else log.info("form not valid");
