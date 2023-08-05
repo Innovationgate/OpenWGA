@@ -51,7 +51,15 @@
 	<tml:case if="_usedFiles.size">
 		<hr>
 		<b style="color:red">ACHTUNG:</b>
-		<br>Die folgenden zu löschenden Dateien werden derzeit noch in Inhaltsmodulen auf dieser Seite verwendet:
+		<br>
+		<tml:if condition="_usedFiles.size()==1">
+			<tml:then>
+				Die folgende zu löschende Datei wird derzeit noch in Inhaltsmodulen auf dieser Seite verwendet:
+			</tml:then>
+			<tml:else>
+				Die folgenden zu löschenden Dateien werden derzeit noch in Inhaltsmodulen auf dieser Seite verwendet:
+			</tml:else>
+		</tml:if>
 		<ul>
 			<tml:foreach item="_usedFiles" currentvalue="_filename">
 				<li><tml:item name="_filename"/></li>
