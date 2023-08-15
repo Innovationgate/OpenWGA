@@ -27,7 +27,7 @@ Controller.prototype.filenames = function($cx) {
 				for(var filename in Iterator(filenames)){
 					if(WGA.selectDerivate(filename, derivate))
 						_filenames.add(filename);
-					else console.log("no derivate", filename)
+					//else console.log("no derivate", filename)
 				}
 			}
 			else{
