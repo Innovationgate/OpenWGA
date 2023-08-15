@@ -5574,7 +5574,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 
     @Override
     public boolean ishomepage(){
-    	if(getcontent().isDummy())
+    	if(getcontent()==null || getcontent().isDummy())
     		return false;
     	String homepageName = (String) db().getAttribute(WGACore.DBATTRIB_HOME_PAGE_NAME);
     	if(homepageName!=null){
