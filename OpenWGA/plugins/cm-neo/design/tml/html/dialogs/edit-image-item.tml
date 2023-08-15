@@ -81,7 +81,7 @@
 			<tml:if context="{_ctx}" iscontextvalid="true">
 				<tml:then>
 					<tml:[form-field] o_label="Bild-Datei">
-						<tml:include ref="util:select-file" o_derivate="usage=poster" o_fieldname="filename" o_default="{_filename}" o_placeholder="Bitte auswählen ..."/>
+						<tml:include ref="util:select-file" o_derivate="usage=poster" o_mimetype="image" o_fieldname="filename" o_default="{_filename}" o_placeholder="Bitte auswählen ..."/>
 					</tml:[form-field]>
 
 					<tml:case condition="tmlform.filename">
