@@ -238,11 +238,11 @@
 			</a>
 			<a class="btn button" href="#" data-action="save-item" data-toggle="popover" data-trigger="focus">
 				<i class="icon fa-solid fa-download"></i>
-				<div class="text">Speichern</div>
+				<div class="text">Feld speichern</div>
 			</a>
 			<a class="btn button" href="#" data-action="save-item-cancel-edit">
 				<i class="icon highlight fa-solid fa-check"></i>
-				<div class="text">Speichern und schließen</div>
+				<div class="text">Feld speichern und schließen</div>
 			</a>
 		</div>
 	</div>
