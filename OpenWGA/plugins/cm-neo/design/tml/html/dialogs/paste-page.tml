@@ -17,13 +17,12 @@
 			</tml:range>
 		</tml:[form-field]>	
 		
-		<tml:{div} html_class="alert alert-danger" unless="$mc.isPasteAllowed">
-			Das Einfügen der Seite ist mit Ihren Berechtigungen leider nicht möglich.<br>
-			Die Lese-/Schreibrechte der Seite in der Zwischenablage verhindern das Erstellen von Inhaltsversionen.<br> 
-			Erstellen Sie statt dessen eine neue Seite und fügen die Inhaltselemente in die neue Seite ein.
+		<tml:{div} html_class="alert alert-danger" if="_error">
+			<h4>Hinweis</h4>
+			@{_error}
 		</tml:{div}>
 		
-		<tml:case if="$mc.isPasteAllowed">
+		<tml:case unless="_error">
 			<tml:script>
 				if(!tmlform.area){
 					tmlform.area = $option_areas.contains(AREA) ? AREA : $option_areas.get(0)
@@ -82,8 +81,21 @@
 	</div>
 	
 	<div class="footer">
-		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
-		<tml:button cssclass="btn btn-primary" clickaction="$mc.copyPages" if="$mc.isAllowedPageType & $mc.isPasteAllowed">Erstellen</tml:button>
+		<tml:case if="_error">
+			<a class="btn btn-default" data-modal="hide">Schließen</a>
+		</tml:case>
+		<tml:case unless="_error">
+			<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+			<tml:button cssclass="btn btn-primary" clickaction="$mc.copyPages" if="$mc.isAllowedPageType">Erstellen</tml:button>
+		</tml:case>
 	</div>
 	
 </tml:form>
+
+<tml:case if="_redirectto">
+	<script>
+		require(["sitepanel"], function(Sitepanel){
+			Sitepanel.load("@{_redirectto}");
+		})
+	</script>
+</tml:case>
