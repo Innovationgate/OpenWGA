@@ -110,6 +110,7 @@
 						<tml:input meta="true" name="seo_robots_index" type="boolean" options="index|true"/>
 						<br>
 						<tml:input meta="true" name="seo_robots_follow" type="boolean" options="follow|true"/>
+						<br>
 						<label>Updatehäufigkeit</label>
 						<tml:input meta="true" name="seo_sitemap_changefreq" type="select" options="stündlich|hourly,täglich|daily,wöchentlich|weekly,monatlich|monthly,jährlich|yearly" default="monthly"/>
 						<label>Relative Priorität (1-10)</label>
