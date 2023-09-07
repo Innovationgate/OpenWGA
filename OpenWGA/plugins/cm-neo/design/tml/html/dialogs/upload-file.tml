@@ -1,19 +1,19 @@
 <tml:action id="upload-file">
-	if(!tmlform.filename)
+	if(!tmlform.filenames.size())
 		tmlform.addmessage("Bitte wählen Sie eine Datei aus")
 	else{
 		try{
 			tmlform.attach(content());
-			
-			var file_title = tmlform.filename;
-			var parts = file_title.split(".");
-			if(parts.length>1){
-				parts.pop();
-				file_title = parts.join(".")
+			for(let filename in Iterator(tmlform.filenames)){
+				var file_title = filename;
+				var parts = file_title.split(".");
+				if(parts.length>1){
+					parts.pop();
+					file_title = parts.join(".")
+				}
+				file_title = file_title.replace(/_/g, " ");
+				content().getFileMetaData(filename).setTitle(file_title);
 			}
-			file_title = file_title.replace(/_/g, " ");
-			content().getFileMetaData(tmlform.filename).setTitle(file_title);
-			
 			content().save();
 			portlet.fireevent("close-dialog")
 			portlet.fireevent("attachments-updated");
@@ -33,11 +33,11 @@
 	
 	<div class="content">
 		<tml:[form-messages]/>
-		<tml:input name="filename" type="file"/>
+		<tml:input name="filename" type="file" multiple="true"/>
 	</div>
 	
 	<div class="footer">
 		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
-		<tml:button cssclass="btn btn-primary" clickaction="upload-file" param1="{_filename}">Datei hochladen</tml:button>
+		<tml:button cssclass="btn btn-primary" clickaction="upload-file" param1="{_filename}">Dateien hochladen</tml:button>
 	</div>
 </tml:form>

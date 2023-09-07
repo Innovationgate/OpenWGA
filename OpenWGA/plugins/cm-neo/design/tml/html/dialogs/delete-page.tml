@@ -2,6 +2,7 @@
 
 	<tml:if istrue="$mc.mayDelete">
 		<tml:then>
+		
 			<div class="header">
 				Seite löschen
 				<a data-modal="hide">&times;</a>
@@ -11,33 +12,38 @@
 				<tml:case if="$mc.isHomepage">
 					<div class="alert alert-danger">
 						<h4>Dies ist die Homepage der Website.</h4>
-						Die Website wird nicht mehr korrekt funktionieren, wenn Sie diese Seite löschen.
+						Sind Sie sicher, die Homepage löschen zu wollen?
 					</div> 
 				</tml:case>
 				<tml:case if="$mc.unames.size">
 					<div class="alert alert-danger">
 						<h4>Eindeutige Namen gefunden:</h4>
-						<ul style="margin:10px 0"><tml:item name="$mc.unames" divider="</li><li>" wrap="li"/></ul>
+						<ul style="margin:10px 0"><tml:item name="$mc.unames" divider="</li><li>" wrap="li"/></ul>						
 						<p>Die eindeutigen Namen werden entfernt. Die Website wird danach evtl. nicht mehr korrekt arbeiten.</p>
 					</div>
 				</tml:case>
-				Möchten Sie die Seite "<tml:meta name="title"/>" inklusiver aller Inhaltsversionen und Unterseiten wirklich löschen?
+				<p>Möchten Sie die Seite "<tml:meta name="title"/>" inklusiver aller Inhaltsversionen und Unterseiten wirklich löschen?</p>
 			</div>
 			
 			<div class="footer">
 				<a class="btn btn-default" data-modal="hide">Abbrechen</a>
 				<tml:button cssclass="btn btn-primary" clickaction="$mc.deletePage">Löschen</tml:button>
 			</div>
+			
 		</tml:then>
 		<tml:else>
+		
 			<div class="header">
 				Löschen der Seite nicht möglich
 				<a data-modal="hide">&times;</a>
 			</div>
 			
 			<div class="content">
-				Die Prüfung Ihrer Berechtigung zum Löschen der Seite "<tml:meta name="title"/>" ergab:
-				<div style="color:red"><tml:item name="$mc.reason" encode="none"/></div>
+				<div class="alert alert-danger">
+					<tml:{p} if="$mc.isHomepage">Dies ist die Homepage der Website.</tml:{p}>
+					<tml:{p} if="$mc.unames.size">Diese Seite oder Unterseiten enthalten eindeutige Namen.</tml:{p}>
+					<tml:item name="$mc.reason" encode="none" wrap="p"/>
+				</div>
 			</div>
 			
 			<div class="footer">

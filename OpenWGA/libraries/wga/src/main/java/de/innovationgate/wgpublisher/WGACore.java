@@ -8076,7 +8076,7 @@ private void fireConfigEvent(WGAConfigurationUpdateEvent event) {
             while (dbsInDomain.hasNext()) {
             	WGDatabase db = dbsInDomain.next();
             	if (db.isSessionOpen()) {
-            		db.reopenSession(user, password);
+            		db.reopenSession(user, password, null, request);
             	}
             	if (db.hasFeature(WGDatabase.FEATURE_FULLCONTENTFEATURES)) {
             	    wga.app(db).createEvent("auth=login").param("userName", user).param("authType", DBLoginInfo.AuthType.PASSWORD).fireOnSession();

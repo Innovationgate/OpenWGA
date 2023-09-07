@@ -626,6 +626,9 @@ public class Input extends ActionBase implements DynamicAttributes {
 			// Build html
 			this.appendResult("<input").appendResult(buildDynamicHtmlAttributes()).appendResult(" type=\"").appendResult(type).appendResult("\" name=\"").appendResult(name).appendResult("\" ");
 			this.appendResult(" value=\"").appendResult("\" ");
+			if (isMultipleInput()) {
+				appendResult(" multiple ");
+			}
 			this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">").appendResult("<br/>");
 	}
 

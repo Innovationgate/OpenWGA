@@ -1,5 +1,5 @@
 <tml:action id="search">
-	var ctx = context("docid:"+tmlform.name_or_key, false);
+	var ctx = context("db:" + meta("db", "dbkey") + "/docid:"+tmlform.name_or_key, false);
 	if(ctx){
 		portlet.fireevent("close-dialog", {
 			redirectto: ctx.contenturl("html", null, true)

@@ -108,20 +108,22 @@
 				</div>
 			</tml:[form-field]>
 			
-			<tml:[form-field] o_label="Sichtbar bis">
-				<div class="clear-field-wrapper<tml:case condition="tmlform.validto || VALIDTO"> col-sm-8</tml:case>">
-					<tml:input type="date" name="validto" meta="true" cssclass="date form-control" html_placeholder="unbegrenzt" format="dd.MM.yyyy"/>
-					<a class="clear-field" style="display:none">&times;</a>
-				</div>
-				<tml:script>
-					if(!tmlform.validto_time)
-						tmlform.validto_time = WGA.format(VALIDTO, "HH:mm") || "23:59"
-				</tml:script>
-				<div class="input-group col-sm-4" <tml:case condition="!tmlform.validto">style="display:none"</tml:case>>			
-					<tml:input type="date" name="validto_time" cssclass="form-control" store="false" format="HH:mm"/>
-					<div class="input-group-addon">Uhr</div>
-				</div>
-			</tml:[form-field]>
+			<tml:case condition="!isHomepage() || WGA.app().isChiefEditor()">
+				<tml:[form-field] o_label="Sichtbar bis">
+					<div class="clear-field-wrapper<tml:case condition="tmlform.validto || VALIDTO"> col-sm-8</tml:case>">
+						<tml:input type="date" name="validto" meta="true" cssclass="date form-control" html_placeholder="unbegrenzt" format="dd.MM.yyyy"/>
+						<a class="clear-field" style="display:none">&times;</a>
+					</div>
+					<tml:script>
+						if(!tmlform.validto_time)
+							tmlform.validto_time = WGA.format(VALIDTO, "HH:mm") || "23:59"
+					</tml:script>
+					<div class="input-group col-sm-4" <tml:case condition="!tmlform.validto">style="display:none"</tml:case>>			
+						<tml:input type="date" name="validto_time" cssclass="form-control" store="false" format="HH:mm"/>
+						<div class="input-group-addon">Uhr</div>
+					</div>
+				</tml:[form-field]>
+			</tml:case>
 			
 			<tml:case condition="VERSION!=1">
 				<tml:[form-field] o_label="Grund der Ersetzung" o_type="textarea" o_field="reasonForReplacement" o_placeholder="Warum wurde der Inhalt ersetzt?"/>					
@@ -152,11 +154,13 @@
 		</tml:case>
 	</div>
 
-</tml:form>	
+	<tml:case condition="tmlform.submitted">
+		<script>
+			require(["<tml:url type="js" name="::publish-page"/>"], function(Module){
+				Module()
+			})
+		</script>
+	</tml:case>
 
-<script>
-	require(["<tml:url type="js" name="::publish-page"/>"], function(Module){
-		Module()
-	})
-</script>
+</tml:form>	
 

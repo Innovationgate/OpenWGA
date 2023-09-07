@@ -13,7 +13,7 @@
 				<div class="col">
 					<a href="<tml:url action="$pc.setWorkflow" a-name="_wf.name" portletmode="edit"/>"><tml:item name="_wf.name"/></a>
 				</div>
-				<div class="col">@{_wf.adminReviewers}</div>
+				<div class="col">@{_wf.adminReviewers divider="<br>"}</div>
 				<div class="col">
 					<tml:script divider="<br>">
 						return WGA.List(_wf.levels).map(function(el){

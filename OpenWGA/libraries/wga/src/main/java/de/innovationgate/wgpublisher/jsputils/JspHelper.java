@@ -38,10 +38,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.PageContext;
 
+import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGUnavailableException;
+import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGAError;
 import de.innovationgate.wgpublisher.WGPDispatcher;
@@ -265,6 +267,9 @@ public class JspHelper {
      * This is meant to be used on WGA error pages to provide minimal information about the requested content to WGA Content Manager.
      * @throws IOException
      */
+    private String encodeQuotes(String input){
+    	return WGUtils.strReplace(WGUtils.strReplace(input, "\"", "\\\"", true), "script", "sc\"+\"ript", true);
+    }
     public String getContentInfoScript() throws IOException {
         
         WGPRequestPath requestPath = (WGPRequestPath) _pageContext.getRequest().getAttribute(WGACore.ATTRIB_REQUESTPATH);
@@ -273,28 +278,28 @@ public class JspHelper {
         }
        
         String quote = "\"";
-        String dbKeyStr = quote + requestPath.getDatabaseKey() + quote;
+        String dbKeyStr = "null";
         String contentKeyStr = "null";
         String structKeyStr = "null";
         String titleStr = "null";
-       
-        String requestContentKey = requestPath.getContentKey();
-        if(requestContentKey!=null){
-        	// in case nothing else helps ...
-        	contentKeyStr = quote + requestContentKey + quote;
-        	structKeyStr = quote + requestContentKey.split("\\.")[0] + quote;
-        }
+        try{
+	        dbKeyStr = quote + encodeQuotes(requestPath.getDatabaseKey()) + quote;
+	       
+	        String requestContentKey = requestPath.getContentKey();
+	        if(requestContentKey!=null){
+	        	// in case nothing else helps ...
+	        	contentKeyStr = quote + encodeQuotes(requestContentKey) + quote;
+	        	structKeyStr = quote + encodeQuotes(requestContentKey.split("\\.")[0]) + quote;
+	        }
         
-        
-        // Try to retrieve content key to fill content specific information
-        try {
+	        // Try to retrieve content key to fill content specific information
             WGContent content = (WGContent) _pageContext.getRequest().getAttribute(WGACore.ATTRIB_MAINCONTEXT);
             if (content != null) {
                 dbKeyStr = quote + content.getDatabase().getDbReference() + quote;
                 if(!content.isDummy()){
 	                contentKeyStr = quote + content.getContentKey().toString() + quote;
 	                structKeyStr = quote + content.getContentKey().getStructKey() + quote;
-	                titleStr = quote + content.getTitle() + quote;
+	                titleStr = quote + encodeQuotes(content.getTitle()) + quote;
                 }
             }
         }
@@ -306,7 +311,8 @@ public class JspHelper {
         writer.append("<script>");
         writer.append("WGA = {");
         writer.append("contentinfo: {");
-        writer.append("dbkey:" + dbKeyStr + ",");
+    
+		writer.append("dbkey:" + dbKeyStr + ",");
         writer.append("contentkey:" + contentKeyStr + ",");
         writer.append("structkey:" + structKeyStr + ",");
         writer.append("title:" + titleStr);
@@ -315,8 +321,8 @@ public class JspHelper {
         
         writer.append("window.parent.CM && window.parent.CM.pageLoaded(WGA.contentinfo);");
         
-        writer.append("</script>");
-        
+        writer.append("</script>");        
+
         return writer.toString();
     }
 

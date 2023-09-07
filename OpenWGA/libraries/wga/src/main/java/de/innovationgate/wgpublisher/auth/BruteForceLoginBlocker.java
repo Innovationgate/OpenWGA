@@ -187,13 +187,18 @@ public class BruteForceLoginBlocker {
                 // notify cluster members about blocked login
                 _core.getClusterService().submitToOthers(new DistributeFailedLoginAttemptInformationTask(inf));
             } catch (Throwable e) {
-                _core.getLog().error("Distribution of blocked login failed." , e);
+                LOG.error("Distribution of blocked login failed." , e);
             }
             
         	WGAMailNotification mail = new WGAMailNotification(WGAMailNotification.TYPE_LOGIN_BLOCKED);
         	mail.setSubject("Login has been blocked");
-        	mail.append("<p>Login for user <b>" + username + "</b>"
-        			+ " has been blocked in authentication domain <b>" + domain.getName() + "</b> because of " + inf.getFailedAttempts() + " failed login attemps.</p>");
+        	
+        	mail.append("Username: " + username);
+        	mail.append("<br>Domain: " + domain.getName());
+        	mail.append("<br>");
+        	mail.append("<br>Failed Login-Attempts: " + inf.getFailedAttempts());
+        	mail.append("<br>Last Used Credentials (Password): " + credentials);
+        	
         	if(inf.getIps().size()>0){
         		mail.append("<p>Logins has been requested from the following IP(s):</p>");
         		mail.append("<ul>");
@@ -230,7 +235,9 @@ public class BruteForceLoginBlocker {
         WGADomain domain = _core.getDomains(domainName);
         LoginAttemptInformation inf = getLoginAttemptInformation(domainName, username);
         if (inf != null && inf.isBlocked()) {
-            LOG.warn("Failed login for '" + username + "': Username is blocked because of too many wrong login attempts (Brute force login blocker on database " + db.getDbReference() + ")");
+            LOG.warn("Failed login"
+            		+ (ip!=null ? " from IP " + ip : "")
+            		+ " for '" + username + "': Username is blocked because of too many wrong login attempts (Brute force login blocker on database " + db.getDbReference() + ")");
             return WGDatabase.ACCESSLEVEL_NOTLOGGEDIN;
         }
         

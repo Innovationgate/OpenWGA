@@ -32,7 +32,7 @@
 					}
 				</tml:script>
 				<tml:[form-field] o_label="Bild-Datei">
-					<tml:include ref="util:select-file" o_derivate="usage=poster" o_fieldname="key" o_placeholder="Bitte auswählen ..."/>
+					<tml:include ref="util:select-file" o_derivate="usage=poster" o_mimetype="image" o_fieldname="key" o_placeholder="Bitte auswählen ..."/>
 				</tml:[form-field]>
 				
 				<tml:case condition="tmlform.key">

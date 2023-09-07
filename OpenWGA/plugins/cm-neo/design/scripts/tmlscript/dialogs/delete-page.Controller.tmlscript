@@ -26,7 +26,7 @@ Controller.prototype.prepare = function($cx) {
 
 	var struct = $cx.content() ? $cx.content().structEntry : $cx.document;
 	this.unames = struct ? getNames(struct) : WGA.createList() 
-	
+	this.isHomepage = $cx.isHomepage();
 }
 
 Controller.prototype.mayDelete = function($cx, AFW) {
@@ -39,6 +39,9 @@ Controller.prototype.mayDelete = function($cx, AFW) {
 	var mayDelete = Struct.mayDeletePage(true);
 	if(!mayDelete){
 		this.reason = Struct.getReason();
+	}
+	else if((this.isHomepage || this.unames.size()) && !WGA.app().isChiefEditor()){
+		return false;
 	}
 	return mayDelete;
 }.nonIsolated();		// Struct.getReason() needs this to read labels.

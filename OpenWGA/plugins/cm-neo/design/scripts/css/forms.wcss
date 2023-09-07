@@ -76,7 +76,15 @@ form{
 	input[type=text].form-control, input[type=password].form-control, textarea.form-control, a.form-control{
 		padding: 6px;
 	}
-
+	
+	
+	textarea.form-control{
+		height: 34px;
+		overflow-y: hidden;
+		resize: none;
+	}
+	
+	
 	label[for]{
 		cursor: pointer;
 	}

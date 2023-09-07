@@ -19,15 +19,53 @@
 </div>
 
 <div class="content">
-	Möchten Sie die folgenden Dateianhänge löschen?
 	<tml:script>
 		_filenames = (request.getParameter("filenames")||"").split(",")
+
+		// check if some file is used in content modules
+		_usedFiles=WGA.List();
+		var settings = CMM.getContentModulesSettingsData(content());
+		if(settings){
+			var settingsValues = settings.values();
+			for(let [index, filename] in _filenames){
+				for(let value in Iterator(settingsValues)){
+					if(_usedFiles.contains(filename))
+						continue;
+					if(value instanceof java.util.List){
+						if(value.contains(filename))
+							_usedFiles.add(filename)
+					}
+					else if(value==filename)
+						_usedFiles.add(filename)
+				}
+	
+			}
+		}
 	</tml:script>
+	Möchten Sie die folgenden Dateianhänge löschen?
 	<ul>
 		<tml:foreach item="_filenames" currentvalue="_filename">
 			<li><tml:item name="_filename"/></li>
 		</tml:foreach>
 	</ul>
+	<tml:case if="_usedFiles.size">
+		<hr>
+		<b style="color:red">ACHTUNG:</b>
+		<br>
+		<tml:if condition="_usedFiles.size()==1">
+			<tml:then>
+				Die folgende zu löschende Datei wird derzeit noch in Inhaltsmodulen auf dieser Seite verwendet:
+			</tml:then>
+			<tml:else>
+				Die folgenden zu löschenden Dateien werden derzeit noch in Inhaltsmodulen auf dieser Seite verwendet:
+			</tml:else>
+		</tml:if>
+		<ul>
+			<tml:foreach item="_usedFiles" currentvalue="_filename">
+				<li><tml:item name="_filename"/></li>
+			</tml:foreach>
+		</ul>
+	</tml:case>
 </div>
 
 <div class="footer">

@@ -1,7 +1,7 @@
 <tml:action id="update-file-metas">
 
 	if(!tmlform.filename.trim()){
-		tmlform.addmessage("Dateiname darf nicht leer sein")
+		tmlform.setmessage("filename", "Dateiname darf nicht leer sein")
 		return;
 	}
 
@@ -71,8 +71,6 @@
 	</div>
 	
 	<div class="content clearfix">
-
-		<tml:include ref="form-messages"/>
 
 		<div class="poster">
 			<tml:script>
@@ -162,5 +160,11 @@
 			<tml:button cssclass="btn btn-primary" clickaction="update-file-metas">Aktualisieren</tml:button>
 		</tml:case>
 	</div>
+	
+	<script>
+		require(["jquery", "jquery-textarea-autogrow"], function($){
+			$("#<tml:script expression="tmlform.formid"/> textarea").autogrow();
+		})
+	</script>
 	
 </tml:form>

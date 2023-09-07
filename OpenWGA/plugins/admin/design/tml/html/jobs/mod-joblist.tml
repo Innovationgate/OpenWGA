@@ -80,8 +80,22 @@
 			</td>
 			<tml:if condition="_job.runtime">
 				<tml:then>
-					<td><tml:script expression="_job.runtime.getLastRun()||'- never -'"/></td>
-					<td><tml:script expression="_job.runtime.nextScheduledRun()||'- none -'"/></td>
+					<td>
+						<tml:script>
+							var date = _job.runtime.getLastRun();
+							if(date)
+								return WGA.format(date, "dd.MM.yyyy HH:mm:ss");
+							else return "- never -"
+						</tml:script>
+					</td>
+					<td>
+						<tml:script>
+							var date = _job.runtime.nextScheduledRun();
+							if(date)
+								return WGA.format(date, "dd.MM.yyyy HH:mm:ss");
+							else return "- none -"
+						</tml:script>
+					</td>
 					<td><tml:script expression="_job.runtime.isRunning()?'Yes':'No'"/></td>
 				</tml:then>
 				<tml:else>

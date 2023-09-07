@@ -36,11 +36,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
-import java.nio.charset.CodingErrorAction;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +47,6 @@ import org.apache.commons.vfs2.Capability;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileType;
-import org.apache.commons.vfs2.NameScope;
 import org.apache.log4j.Logger;
 
 import de.innovationgate.utils.DESEncrypter;
@@ -62,11 +57,8 @@ import de.innovationgate.wga.model.DesignMetadataInfo;
 import de.innovationgate.wga.model.FCMetadataInfo;
 import de.innovationgate.wga.model.ScriptMetadataInfo;
 import de.innovationgate.wga.model.TMLMetadataInfo;
-import de.innovationgate.wgpublisher.design.conversion.DesignResourceConversion;
 import de.innovationgate.wgpublisher.design.fs.FileSystemDesignManager.DesignInformation;
 import de.innovationgate.wgpublisher.design.sync.DesignSyncManager;
-import de.innovationgate.wgpublisher.design.sync.ScriptDeployment;
-import de.innovationgate.wgpublisher.design.sync.TMLDeployment;
 import de.innovationgate.wgpublisher.design.sync.WGDesignSyncException;
 
 public abstract class AbstractDesignFile {
@@ -363,7 +355,7 @@ public abstract class AbstractDesignFile {
         	 *  See #00005472
         	 */
         	filePath = file.getName().getPath();
-        	if(filePath.contains(basePath))
+        	if(filePath.startsWith(basePath))
         		return (!isExcludedFileContainerFile(file) ? file : null); 
         }
         
@@ -371,7 +363,7 @@ public abstract class AbstractDesignFile {
         if (file.exists()) {
         	// check if is this really is a child
         	filePath = file.getName().getPath();
-        	if(filePath.contains(basePath.toLowerCase()))
+        	if(filePath.startsWith(basePath.toLowerCase()))
         		return (!isExcludedFileContainerFile(file) ? file : null);
         }
         

@@ -23,4 +23,4 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:include ref="::select-file" o_file-extensions="jpg,jpeg,png,gif"/>
+<tml:include ref="::select-file" o_file-extensions="jpg,jpeg,png,gif,svg"/>

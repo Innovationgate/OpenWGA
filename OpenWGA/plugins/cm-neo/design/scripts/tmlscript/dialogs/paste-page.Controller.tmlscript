@@ -3,7 +3,7 @@ function Controller() {}
 // Vererbung
 Controller.prototype = Object.create($.dialogs.StructList.prototype);
 
-Controller.prototype.prepare = function($cx) {
+Controller.prototype.prepare = function($cx, $item__CM_clipboard_context) {
 
 	// Areas
 	var areas = WGA.createList()
@@ -102,6 +102,8 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 	var source = $cx.context($item__CM_clipboard_context);
 	source = source.document instanceof Packages.de.innovationgate.webgate.api.WGStructEntry ? source.document : source.content().structEntry;
 	
+	var contenttype = source.getContentType().getName();
+	
 	if(source.getAllReleasedContent().isEmpty()){
 		$form.addMessage("Die Quellseite enthält keine freigegebenen Inhaltsversionen und kann daher nicht eingefügt werden.");
 		return;
@@ -114,39 +116,56 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 		dest = $cx.db().getArea($form.area)
 	}
 
+	var errorCreatingSubPages=false;
+
 	try{
 		var struct = copyStruct(source, dest, $form.recursive, $form.publish, $form.position)
-		if($form.position){
-			var children; 
-			if(dest instanceof Packages.de.innovationgate.webgate.api.WGArea)
-				children = dest.getRootEntries();
-			else children = dest.getChildEntries();
-			
-			if(children.size()>0){
-				var position = this.preparePosition(dest.getDatabase(), children, $form.position)
-				struct.setPosition(position);
-				struct.save();
-			}
-		}
+		if(struct){
+			if($form.position){
+				var children; 
+				if(dest instanceof Packages.de.innovationgate.webgate.api.WGArea)
+					children = dest.getRootEntries();
+				else children = dest.getChildEntries();
 				
-		var url;
-		try{
-			url = $cx.context("docid:"+struct.structKey).contenturl()
-		}
-		catch(e){}
-		var ret = {
-			"$portletEvents": {
-				"close-dialog": {}
-			},
-			"$vars": {
-				_dialog_closed: true
+				if(children.size()>0){
+					var position = this.preparePosition(dest.getDatabase(), children, $form.position)
+					struct.setPosition(position);
+					struct.save();
+				}
+			}
+					
+			var url;
+			try{
+				url = $cx.context("docid:"+struct.structKey).contenturl()
+			}
+			catch(e){}
+			if(errorCreatingSubPages){
+				return {
+					"$vars": {
+						_error: "Die Seite in der Ablage wurde dupliziert, aber einige der Unterseiten und/oder Sprachversionen konnten aufgrund Ihrer Berechtigung nicht erzeugt werden.",
+						_redirectto: url
+					}
+				}
+			}
+			else return {
+				"$portletEvents": {
+					"close-dialog": {
+						redirectto: url
+					}
+				},
+				"$vars": {
+					_dialog_closed: true
+				}
 			}
 		}
-		if(url)
-			ret["$portletEvents"]["close-dialog"] = {
-				redirectto: url
+		else {
+			return {
+				"$vars": {
+					_error: "Die Seite in der Ablage konnte aufgrund Ihrer Berechtigung nicht dupliziert werden."
+						+ "\nErstellen Sie statt dessen eine neue Seite vom Seitentyp '" + contenttype + "' und fügen aus der Ablage die Inhaltselemente in die neue Seite ein."
+				}
 			}
-		return ret; 
+		}
 	}
 	catch(e){
 		$form.addMessage(e.message);
@@ -185,11 +204,12 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 		for(let name in Iterator(source.getExtensionDataNames())){
 			source.mayPushExtData(name) && struct.writeExtensionData(name, source.getExtensionData(name));
 		}
-		
+
 		struct.save();
 		
 		// copy contents
 		var docs=source.getAllReleasedContent().values();
+		var contentsCreated = false;
 		for(let doc in Iterator(docs)){
 		
 			var lang = doc.getLanguage().name;
@@ -199,31 +219,48 @@ Controller.prototype.copyPages = function(AFW, $cx, $item__CM_clipboard_context,
 				continue;
 			}
 			
-			var newdoc = struct.createContent(lang, doc.title);
-
-			// copy all items
-			var Content = AFW.content(newdoc);
-
-			Content.copyItems(doc);
-			Content.copyMetas(doc);
-			Content.copyModules(doc);
-			Content.copyAttachments(doc)
-
-			newdoc.save();
-
-			if(publish && doc.status==doc.STATUS_RELEASE){
-				newdoc.publish("copied from " + doc.title);
+			try{
+				var newdoc = struct.createContent(lang, doc.title);
+				contentsCreated = true;
+				
+				// copy all items
+				var Content = AFW.content(newdoc);
+	
+				Content.copyItems(doc);
+				Content.copyMetas(doc);
+				Content.copyModules(doc);
+				Content.copyAttachments(doc)
+	
+				newdoc.save();
+	
+				if(publish && doc.status==doc.STATUS_RELEASE){
+					newdoc.publish("copied from " + doc.title);
+				}
+			}
+			catch(e){
+				errorCreatingSubPages=true;
+				console.error("PASTE: Unable to create content version", doc.title, "in language", lang, e.message);
+				//logException(e);
 			}
 		}
 		
-		if(recursive){
-			var children=source.getChildEntries();
-			for(let child in Iterator(children)){
-				copyStruct(child, struct, recursive, publish);
-			}	
-
+		if(contentsCreated){
+			if(recursive){
+				var children=source.getChildEntries();
+				for(let child in Iterator(children)){
+					if(!copyStruct(child, struct, recursive, publish))
+						errorCreatingSubPages=true;
+				}	
+	
+			}
+			return struct;
 		}
-		
-		return struct;
+		else{
+			WGA.Master.runFunction(function(struct){
+				struct.remove();
+			}, struct)			
+			return null;
+		}
 	}
+	
 }
