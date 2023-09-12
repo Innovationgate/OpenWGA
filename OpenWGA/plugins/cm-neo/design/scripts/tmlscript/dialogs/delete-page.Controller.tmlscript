@@ -68,7 +68,7 @@ Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options
 	}
 		
 	if(redirectContent)
-		redirecturl = redirectContent.contenturl();
+		redirecturl = redirectContent.contenturl(null, null, true);	// ignore virtual links
 	/* else go to home page */
 	
 	$portlet.fireevent("close-dialog", {
