@@ -1013,12 +1013,15 @@ public class WGA {
 
 
     /**
-     * reates a formatted date string from a {@link Date} object or a formatted number string from a {@link Number} object
+     * creates a formatted date string from a {@link Date} object or a formatted number string from a {@link Number} object
      * @param toBeFormatted Either a {@link Date} or a {@link Number}
      * @param formatString The format pattern, just like known from {@link SimpleDateFormat} or {@link DecimalFormat}
      * @return String representing the Date/Number in the specified format 
      * @throws UnavailableResourceException
      */
+    public String format(Object toBeFormatted) throws WGException  {
+        return format(toBeFormatted, "", null);
+    }
     public String format(Object toBeFormatted, String formatString) throws WGException  {
         return format(toBeFormatted, formatString, null);
     }
@@ -1329,6 +1332,9 @@ public class WGA {
      * @throws WGException
      * @throws ParseException If the string is unparseable for the given date format
      */
+    public Date parseDate(String date) throws WGException, ParseException {
+        return parseDate(date, "", null);
+    }
     public Date parseDate(String date, String format) throws WGException, ParseException {
         return parseDate(date, format, null);
     }
@@ -1688,6 +1694,9 @@ public class WGA {
      * @throws ParseException If the string is unparseable for the given number format
      * @throws UnavailableResourceException
      */
+    public Number parseNumber(String number) throws ParseException, WGException {
+        return parseNumber(number, "", null);
+    }
     public Number parseNumber(String number, String format) throws ParseException, WGException {
         return parseNumber(number, format, null);
     }
