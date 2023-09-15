@@ -274,7 +274,7 @@ public class Item extends FormBase implements DynamicAttributes {
 		else if (editor.equalsIgnoreCase("number")) {
 			suffix.append("<div class=\"WGA-Item-Value-Unencoded\" style=\"display:none\" >");
 			if (result.size() > 0)
-				suffix.append(WGA.get(getTMLContext()).format(result.get(0), "decimal"));
+				suffix.append(WGA.get(getTMLContext()).format(result.get(0)));	// default number format local dependent
 			suffix.append("</div>\n");
 		}
 		else if (editor.equalsIgnoreCase("custom")) {

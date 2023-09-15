@@ -23,6 +23,9 @@
 	    outline: medium none;
 	    padding: 5px;
 	    font:inherit;
+	    &:invalid{
+	    	border-color: red;
+	    }
 	}
 
 	[contenteditable]{

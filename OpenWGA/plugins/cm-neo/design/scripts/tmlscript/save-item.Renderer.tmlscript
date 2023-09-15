@@ -35,9 +35,9 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 		case "number":
 			try{
 				if(value.trim()!=""){
-					value = WGA.parseNumber(value, "decimal");
-					result.value = WGA.format(value, "decimal");	// internal editor format
-					result.value_encoded = WGA.format(value, $urlParam_format || "decimal");
+					value = WGA.parseNumber(value);
+					result.value = WGA.format(value);	// default number format
+					result.value_encoded = WGA.format(value, $urlParam_format);
 				}
 				else value=null;
 			}
