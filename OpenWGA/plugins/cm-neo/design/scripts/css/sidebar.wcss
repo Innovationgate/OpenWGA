@@ -221,6 +221,13 @@
 			list-style-type: none;
 			margin: 10px 0 15px;
 			padding: 0;
+			a{
+				display: flex;
+				i{
+					width: 25px;
+					margin-top: 4px;
+				}
+			}
 		}
 	}
 

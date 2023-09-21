@@ -176,7 +176,7 @@
 						{{#dialogs}}
 							<li>
 								<a href="#" data-dialog="custom" data-param="{{tml}}">
-									<i class="fa fa-arrow-right"></i>
+									<i class="fa-regular fa-window-restore"></i>
 									{{label}}
 								</a>
 							</li>
