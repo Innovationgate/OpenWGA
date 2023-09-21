@@ -51,6 +51,9 @@
 				&:first-child{
 					border-bottom: solid silver 2px;
 					color: gray;
+					background: white;
+					position: sticky;
+					top: -10px;
 				}
 				.col{
 					padding: 10px;
