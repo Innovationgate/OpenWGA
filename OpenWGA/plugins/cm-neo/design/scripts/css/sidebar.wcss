@@ -219,12 +219,12 @@
 		}
 		ul.dialog-links{
 			list-style-type: none;
-			margin: 10px 0 15px;
 			padding: 0;
 			a{
 				display: flex;
+				margin: 5px 0;
 				i{
-					width: 25px;
+					width: 16px;
 					margin-top: 4px;
 				}
 			}
