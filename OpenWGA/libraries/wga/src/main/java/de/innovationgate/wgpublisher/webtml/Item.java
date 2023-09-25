@@ -274,7 +274,13 @@ public class Item extends FormBase implements DynamicAttributes {
 		else if (editor.equalsIgnoreCase("htmldate")) {
 			suffix.append("<div class=\"WGA-Item-Value-Unencoded\" style=\"display:none\" >");
 			if (result.size() > 0)
-				suffix.append(WGA.get(getTMLContext()).format(result.get(0), "yyyy-MM-dd"));
+				suffix.append(WGA.get(getTMLContext()).format(result.get(0), "htmlDate"));
+			suffix.append("</div>\n");
+		}
+		else if (editor.equalsIgnoreCase("htmldatetime")) {
+			suffix.append("<div class=\"WGA-Item-Value-Unencoded\" style=\"display:none\" >");
+			if (result.size() > 0)
+				suffix.append(WGA.get(getTMLContext()).format(result.get(0), "htmlDateTime"));
 			suffix.append("</div>\n");
 		}
 		else if (editor.equalsIgnoreCase("number")) {

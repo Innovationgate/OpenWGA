@@ -438,6 +438,14 @@ define([
 					"style": "width:" + "16ch"
 				}))
 			}
+			else if(this.data_type=="htmldatetime"){
+				item_el.append($("<input>", {
+					"type": "datetime-local",
+					"placeholder": "YYYY-MM-DDTHH:mm",
+					"class": "text-editor-input",
+					"style": "width:" + "23ch"
+				}))
+			}
 			else if(this.data_type=="number"){
 				item_el.append($("<input>", {
 					"type": "text",
@@ -512,6 +520,12 @@ define([
 		})	
 	}()
 
+	var htmldatetime_editor = function(){
+		return $.extend({}, text_editor, {
+			data_type: "htmldatetime"
+		})	
+	}()
+
 	var number_editor = function(){
 		return $.extend({}, text_editor, {
 			data_type: "number"		
@@ -565,6 +579,7 @@ define([
 		number: number_editor,
 		date: date_editor,
 		htmldate: htmldate_editor,
+		htmldatetime: htmldatetime_editor,
 		custom: custom_editor
 	
 	}

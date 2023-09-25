@@ -35,9 +35,26 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 		case "htmldate":
 			try{
 				if(value){
-					value = WGA.parseDate(value, "yyyy-MM-dd")
-					result.value = WGA.format(value, "yyyy-MM-dd")	// html date format
+					value = WGA.parseDate(value, "htmlDate")
+					result.value = WGA.format(value, "htmlDate")	// html date format
 					result.value_encoded = WGA.format(value, $urlParam_format || "mediumDate")
+				}
+				else value=null;
+			}
+			catch(e){
+				result = {
+					success: false,
+					message: "Wert kann nicht als Datum interpretiert werden:\n" + value
+				}
+			}
+			break;
+
+		case "htmldatetime":
+			try{
+				if(value){
+					value = WGA.parseDate(value, "htmlDateTime")
+					result.value = WGA.format(value, "htmlDateTime")	// html date format
+					result.value_encoded = WGA.format(value, $urlParam_format || "mediumDateTtime")
 				}
 				else value=null;
 			}
