@@ -7,7 +7,6 @@ define([
 
 	var editor;
 	
-	//var el = $("#sidepanel-date-editor")
 	var el = $("#editor-panel-date")
 	el.datepicker({
 		changeMonth: true,
