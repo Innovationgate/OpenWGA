@@ -126,6 +126,9 @@
 			&.selected{
 				background: #EBEBEB;
 			}
+			&.no-content-versions{
+				color: silver;
+			}
 			&.show-all{
 				display: none;
 				text-align: right;

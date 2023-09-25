@@ -29,7 +29,7 @@
 				<legend>Andere Sprachen</legend>
 			{{/current_lang}}
 			{{#languages}}
-				<a href="{{url}}" data-wgakey="{{key}}">{{language}}</a>
+				<a href="{{url}}" data-wgakey="{{key}}" class="{{cssclass}}">{{language}}</a>
 			{{/languages}}
 		</fieldset>
 	{{/languages.length}}
