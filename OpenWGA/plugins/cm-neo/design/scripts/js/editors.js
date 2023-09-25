@@ -429,6 +429,15 @@ define([
 					"style": "width:" + "12ch"
 				}))
 			}
+			else if(this.data_type=="htmldate"){
+				item_el.append($("<input>", {
+					"type": "date",
+					"placeholder": "YYYY-MM-DD",
+					"pattern": "\\d{4}-\\d{2}-\\d{2}",
+					"class": "text-editor-input",
+					"style": "width:" + "16ch"
+				}))
+			}
 			else if(this.data_type=="number"){
 				item_el.append($("<input>", {
 					"type": "text",
@@ -496,6 +505,13 @@ define([
 		})	
 	}()
 
+	var htmldate_editor = function(){
+		return $.extend({}, text_editor, {
+			toolpanel: "toolpanels/htmldate",
+			data_type: "htmldate"
+		})	
+	}()
+
 	var number_editor = function(){
 		return $.extend({}, text_editor, {
 			data_type: "number"		
@@ -548,6 +564,7 @@ define([
 		textarea: textarea_editor,
 		number: number_editor,
 		date: date_editor,
+		htmldate: htmldate_editor,
 		custom: custom_editor
 	
 	}
