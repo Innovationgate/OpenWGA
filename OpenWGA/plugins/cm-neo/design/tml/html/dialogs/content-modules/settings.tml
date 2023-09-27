@@ -39,7 +39,7 @@
 <tml:input name="modules" type="hidden" store="false"/>
 
 <script>
-	require(["content-modules"], function(M){ 
+	require(["jquery", "content-modules", "jquery-textarea-autogrow"], function($, M){ 
 		WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "content-module-selected", function(ev){
 			var form = document.forms["<tml:script expression="tmlform.formid"/>"];
 			var module = ev.params.module;
