@@ -10,7 +10,7 @@
 		/*
 		  #00005453
 		  Don't allow ChiefEditors to edit in this case
-		  Therefore using App.mayUpdateContent(this) is not want we need
+		  Therefore using App.mayUpdateContent(this) is not what we need
 		 */
 	</tml:script>
 
