@@ -958,6 +958,15 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	}
 
 	/**
+	 * sets a virtual link to a target page
+	 * @param doc
+	 * @throws WGAPIException
+	 */
+	public void setVirtualLink(WGStructEntry target) throws WGAPIException {
+		setVirtualLink(WGContent.VIRTUALLINKTYPE_CONTENT, target.getStructKey().toString());
+	}
+	
+	/**
 	 * Disables virtual link functionality for this content document and clears all fields related to it
 	 * @throws WGAPIException 
 	 */
