@@ -108,13 +108,13 @@
 							o_optionsitem="_opts"
 						/>
 					</tml:then>
-					<tml:elseif condition="metalist('keywords').size()">
+					<tml:elseif condition="metalist('keywords').size() &&  metalist('keywords').get(0)">
 						<tml:[form-field] o_label="Schlüsselwörter">
 							<tml:meta name="keywords" divider=", "/>
 						</tml:[form-field]>
 					</tml:elseif>
 				</tml:if>
-						
+				
 				<tml:if condition="tmlform.mode()=='edit'">
 					<tml:then>
 						<tml:[form-field] o_label="Inhalt verstecken in" o_type="checkbox" o_name="ishiddenfrom" o_meta="true" o_labeled="true"
