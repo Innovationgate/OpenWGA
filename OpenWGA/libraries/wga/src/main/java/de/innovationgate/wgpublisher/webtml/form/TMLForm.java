@@ -41,6 +41,7 @@ import java.io.Writer;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -2219,6 +2220,11 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
     @CodeCompletion
     public void setFormInfo(TMLFormInfo formInfo) {
         _formInfo = formInfo;
+    }
+    
+    
+    public Collection<FieldReg> getFormFields(){
+    	return getforminfo().getFieldRegistrations();
     }
     
     /* (non-Javadoc)

@@ -419,10 +419,44 @@ define([
 					"style": "width:100%;"
 				}).autogrow())
 			}
+			else if(this.data_type=="date"){
+				item_el.append($("<input>", {
+					"type": "text",
+					"placeholder": "TT.MM.JJJJ",
+					"title": "TT.MM.JJJJ",
+					"pattern": "\\d{2}.\\d{2}.\\d{4}",
+					"class": "text-editor-input",
+					"style": "width:" + "12ch"
+				}))
+			}
+			else if(this.data_type=="htmldate"){
+				item_el.append($("<input>", {
+					"type": "date",
+					"placeholder": "YYYY-MM-DD",
+					"pattern": "\\d{4}-\\d{2}-\\d{2}",
+					"class": "text-editor-input",
+					"style": "width:" + "16ch"
+				}))
+			}
+			else if(this.data_type=="htmldatetime"){
+				item_el.append($("<input>", {
+					"type": "datetime-local",
+					"placeholder": "YYYY-MM-DDTHH:mm",
+					"class": "text-editor-input",
+					"style": "width:" + "23ch"
+				}))
+			}
+			else if(this.data_type=="number"){
+				item_el.append($("<input>", {
+					"type": "text",
+					"class": "text-editor-input",
+					"style": "width:" + "11ch"
+				}))
+			}
 			else item_el.append($("<input>", {
 				"type": "text",
 				"class": "text-editor-input",
-				"style": "width:" + (this.data_type=="number"||this.data_type=="date" ? "11ch" : "100%")
+				"style": "width:100%"
 			}))
 			var unencoded_val = $(".WGA-Item-Value-Unencoded", item_el).text()
 			edit_el = item_el.find("input,textarea")
@@ -454,6 +488,11 @@ define([
 		function getContent(){
 			return edit_el.val();
 		}
+		function validationMessage(){
+			if(edit_el.length)
+				return edit_el[0].validationMessage;
+			else return "";
+		}
 		
 		return {
 			data_type: "text",
@@ -461,6 +500,7 @@ define([
 			close: close,
 			update: update,
 			focus: focus,
+			validationMessage: validationMessage,
 			getContent: getContent,
 			setContent: setContent		// used by toolbar for some editors
 		}
@@ -470,6 +510,19 @@ define([
 		return $.extend({}, text_editor, {
 			toolpanel: "toolpanels/date",
 			data_type: "date"
+		})	
+	}()
+
+	var htmldate_editor = function(){
+		return $.extend({}, text_editor, {
+			toolpanel: "toolpanels/htmldate",
+			data_type: "htmldate"
+		})	
+	}()
+
+	var htmldatetime_editor = function(){
+		return $.extend({}, text_editor, {
+			data_type: "htmldatetime"
 		})	
 	}()
 
@@ -525,6 +578,8 @@ define([
 		textarea: textarea_editor,
 		number: number_editor,
 		date: date_editor,
+		htmldate: htmldate_editor,
+		htmldatetime: htmldatetime_editor,
 		custom: custom_editor
 	
 	}

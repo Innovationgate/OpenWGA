@@ -70,6 +70,7 @@
 		<div class="table">
 			<div class="row">
 				<div class="col" _style="width:40%">Titel</div>
+				<div class="col">Bereich</div>
 				<tml:case condition="tmlform.filter=='uname'">
 					<div class="col">Name</div>
 				</tml:case>
@@ -81,7 +82,7 @@
 				</tml:case>
 				<tml:case condition="tmlform.filter!='language'">
 					<div class="col">Sprache</div>
-				</tml:case>
+				</tml:case>				
 				<div class="col">Erstellt</div>
 				<div class="col">Zuletzt geändert</div>
 			</div>
@@ -97,6 +98,7 @@
 							</tml:case>
 						</a>
 					</div>
+					<div class="col"><tml:meta name="area"/></div>
 					<tml:case condition="tmlform.filter=='uname'">
 						<div class="col"><tml:script expression="PAGENAME || UNIQUENAME"/></div>
 					</tml:case>
@@ -110,7 +112,7 @@
 					</tml:case>
 					<tml:case condition="tmlform.filter!='language'">
 						<div class="col"><tml:meta name="language"/></div>
-					</tml:case>
+					</tml:case>					
 					<div class="col"><tml:meta name="created" format="dd.MM.yyy HH:mm:ss"/></div>
 					<div class="col"><tml:meta name="modified" format="dd.MM.yyy HH:mm:ss"/></div>
 				</div>

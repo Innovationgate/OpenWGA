@@ -32,12 +32,46 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 			}
 			break;
 
+		case "htmldate":
+			try{
+				if(value){
+					value = WGA.parseDate(value, "htmlDate")
+					result.value = WGA.format(value, "htmlDate")	// html date format
+					result.value_encoded = WGA.format(value, $urlParam_format || "mediumDate")
+				}
+				else value=null;
+			}
+			catch(e){
+				result = {
+					success: false,
+					message: "Wert kann nicht als Datum interpretiert werden:\n" + value
+				}
+			}
+			break;
+
+		case "htmldatetime":
+			try{
+				if(value){
+					value = WGA.parseDate(value, "htmlDateTime")
+					result.value = WGA.format(value, "htmlDateTime")	// html date format
+					result.value_encoded = WGA.format(value, $urlParam_format || "mediumDateTtime")
+				}
+				else value=null;
+			}
+			catch(e){
+				result = {
+					success: false,
+					message: "Wert kann nicht als Datum interpretiert werden:\n" + value
+				}
+			}
+			break;
+
 		case "number":
 			try{
 				if(value.trim()!=""){
-					value = WGA.parseNumber(value, "decimal");
-					result.value = WGA.format(value, "decimal");	// internal editor format
-					result.value_encoded = WGA.format(value, $urlParam_format || "decimal");
+					value = WGA.parseNumber(value);
+					result.value = WGA.format(value);	// default number format
+					result.value_encoded = WGA.format(value, $urlParam_format);
 				}
 				else value=null;
 			}

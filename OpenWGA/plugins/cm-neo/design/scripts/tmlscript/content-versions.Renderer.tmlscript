@@ -45,7 +45,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 			status: label("content-properties.status." + (version.isPendingRelease() ? 'pending' : version.getStatus())),
 			modified: WGA.format(version.getLastModified(), "dd.MM.yyyy HH:mm"),
 			published: AFW.Util.dateRange(version.getPublished(), version.getLastModified()),
-			cssclass: version.getVersion()==c.VERSION ? "selected":"",
+			cssclass: version.getVersion()==c.VERSION && version.getLanguage().name==current_lang ? "selected":"",
 			language: version.getLanguage().getTitle(),
 			url: context(version).contenturl("html", null, true)
 		}
@@ -109,6 +109,24 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 	for(var i in langs){
 		var version = langs[i].content;
 		languages.push(versionData(version))
+	}
+	
+	var langdefs = db(dbkey).getLanguages().values();
+	for(let langdef in Iterator(langdefs)){
+		if(langdef.name==current_lang || langs[langdef.name])
+			continue;
+		var url = WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
+				.setParameter({
+					dbkey: dbkey,
+					structkey: structkey,
+					lang: langdef.name
+				}).build()
+		languages.push({
+			url: url,
+			language: langdef.title,
+			cssclass: "no-content-versions",
+			key: "change-language"
+		})
 	}
 	
 	var json = {

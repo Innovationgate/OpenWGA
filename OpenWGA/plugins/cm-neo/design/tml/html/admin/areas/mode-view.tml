@@ -29,7 +29,7 @@
 					<a href="<tml:url action="edit" param1="{_area.name}"/>"><tml:item name="_area.name"/></a>
 				</div>
 				<div class="col">
-					<tml:script expression="_area.getExtensionData('CM_area_visible')"/>
+					<tml:script expression="_area.getExtensionData('CM_area_visible')" divider="<br>"/>
 				</div>
 				<div class="col">@{_area.readers divider="<br>"}</div>
 				<div class="col">@{_area.editors divider="<br>"}</div>

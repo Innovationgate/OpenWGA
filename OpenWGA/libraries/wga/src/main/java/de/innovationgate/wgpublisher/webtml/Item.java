@@ -271,10 +271,22 @@ public class Item extends FormBase implements DynamicAttributes {
 				suffix.append(WGA.get(getTMLContext()).format(result.get(0), "dd.MM.yyyy"));
 			suffix.append("</div>\n");
 		}
+		else if (editor.equalsIgnoreCase("htmldate")) {
+			suffix.append("<div class=\"WGA-Item-Value-Unencoded\" style=\"display:none\" >");
+			if (result.size() > 0)
+				suffix.append(WGA.get(getTMLContext()).format(result.get(0), "htmlDate"));
+			suffix.append("</div>\n");
+		}
+		else if (editor.equalsIgnoreCase("htmldatetime")) {
+			suffix.append("<div class=\"WGA-Item-Value-Unencoded\" style=\"display:none\" >");
+			if (result.size() > 0)
+				suffix.append(WGA.get(getTMLContext()).format(result.get(0), "htmlDateTime"));
+			suffix.append("</div>\n");
+		}
 		else if (editor.equalsIgnoreCase("number")) {
 			suffix.append("<div class=\"WGA-Item-Value-Unencoded\" style=\"display:none\" >");
 			if (result.size() > 0)
-				suffix.append(WGA.get(getTMLContext()).format(result.get(0), "decimal"));
+				suffix.append(WGA.get(getTMLContext()).format(result.get(0)));	// default number format local dependent
 			suffix.append("</div>\n");
 		}
 		else if (editor.equalsIgnoreCase("custom")) {

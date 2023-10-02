@@ -126,6 +126,9 @@
 			&.selected{
 				background: #EBEBEB;
 			}
+			&.no-content-versions{
+				color: silver;
+			}
 			&.show-all{
 				display: none;
 				text-align: right;
@@ -219,8 +222,15 @@
 		}
 		ul.dialog-links{
 			list-style-type: none;
-			margin: 10px 0 15px;
 			padding: 0;
+			a{
+				display: flex;
+				margin: 5px 0;
+				i{
+					width: 16px;
+					margin-top: 4px;
+				}
+			}
 		}
 	}
 

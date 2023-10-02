@@ -33,7 +33,7 @@ define(["cm", "appnav"], function(CM, Appnav){
 		function enableDelete(){
 			var checked = $("#app-child-docs input:checked")
 			if(checked.length)
-				$("#app-child-docs [data-action=delete]").removeProp("disabled")
+				$("#app-child-docs [data-action=delete]").prop("disabled", false)
 			else $("#app-child-docs [data-action=delete]").prop("disabled", true)			
 		}
 		

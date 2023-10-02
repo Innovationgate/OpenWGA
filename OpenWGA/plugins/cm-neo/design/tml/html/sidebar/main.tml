@@ -57,6 +57,7 @@
 			</div>
 
 			<div id="editor-panel-date" data-editor="true" style="display:none"></div>
+			<div id="editor-panel-htmldate" data-editor="true" style="display:none"></div>
 
 		</div>
 		

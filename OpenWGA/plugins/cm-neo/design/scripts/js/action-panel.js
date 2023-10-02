@@ -123,6 +123,12 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 
 	WGA.event.addListener("*", "CMS_save_item", function(ev){
 		if(editor){
+		
+			if(editor.validationMessage && editor.validationMessage()){
+				alert(editor.validationMessage())
+				return;
+			}
+		
 			var close_editor = ev.params.close_editor;
 			var url = CM.url.json + "/save-item.int.json"
 			var params = $.extend({}, contentInfo, {
