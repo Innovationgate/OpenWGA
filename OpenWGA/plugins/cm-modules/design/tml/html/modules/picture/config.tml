@@ -1,0 +1,9 @@
+{
+	id:				'cm_picture',
+	category:		'<tml:label key="module.category.media"/>',
+	title:			'Pictute',
+	tml:			'modules:picture:render',
+	settingstml: 	'modules:picture:settings',
+	outlinetml:	 	'modules:image:outline',
+	icon:			'<tml:url db="plugin-wga-app-framework" type="file" doc="icons@base" file="picture.png"/>'
+}
