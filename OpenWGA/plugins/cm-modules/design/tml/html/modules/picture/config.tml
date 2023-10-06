@@ -5,5 +5,8 @@
 	tml:			'modules:picture:render',
 	settingstml: 	'modules:picture:settings',
 	outlinetml:	 	'modules:image:outline',
-	icon:			'<tml:url db="plugin-wga-app-framework" type="file" doc="icons@base" file="picture.png"/>'
+	icon:			'<tml:url db="plugin-wga-app-framework" type="file" doc="icons@base" file="picture.png"/>',
+	includes: {
+		css: 			'modules:picture:css'
+	}
 }
