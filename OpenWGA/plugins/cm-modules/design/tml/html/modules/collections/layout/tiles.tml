@@ -5,7 +5,7 @@
 >
 	<div class="tile">
 		<a href="<tml:url/>" class="content">
-			<div class="bg" style="<tml:item name="$mc.bg_image_style" encode="none"/>"></div>
+			<div class="bg<tml:case if="$option_lazy_backgrounds"> lazy-background</tml:case>" style="<tml:item name="$mc.bg_image_style" encode="none"/>"></div>
 			<p class="title"><tml:script expression="BROWSERTITLE||TITLE" encode="html"/></p>
 			<p class="intro"><tml:meta name="DESCRIPTION"/></p>
 		</a>
