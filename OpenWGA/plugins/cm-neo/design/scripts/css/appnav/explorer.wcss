@@ -26,7 +26,20 @@
 			margin-right: 8px;
 		}
 		.dropdown-menu {
-			margin-left: 10px;
+			left: 0px;
+			right: 0px;
+			border: none;
+			a{
+				overflow: hidden;
+  				text-overflow: ellipsis;
+			}
+			.search{
+				padding: 5px 10px;
+				input{
+					width: 100%;
+					padding: 5px 10px;
+				}
+			}
 		}
 	}
 	

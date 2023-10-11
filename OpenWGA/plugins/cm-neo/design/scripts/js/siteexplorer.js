@@ -75,6 +75,9 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 			}
 		})
 
+		$("#area-dropdown").on("shown.bs.dropdown", function(){
+			$("#area-dropdown input").focus();
+		})
 		$("#area-dropdown ul").on("click", "li a", function(ev){
 			ev.preventDefault();
 			var $this = $(ev.target);
@@ -83,6 +86,8 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 			$("#explorer").wga_tree("reload", {
 				url: getURL()
 			});
+			//$("#area-dropdown input").val("");
+			//$("#area-dropdown li").show();
 		})
 
 		var context = Appnav.getContext();
@@ -115,11 +120,28 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 			//console.log(areas);
 			var el = $("#area-dropdown ul")
 			el.html("");
+			el.append("<li class='search'><input name='area_query' placeholder='Filtern ...'></li>");
+			$("input", el).on("keyup", function(ev){
+				//console.log("key", ev.key);
+				if(ev.key=="Escape")
+					$(this).val("");
+				var val = $(this).val();
+				$("li.area", el).each(function(){
+					var $this = $(this);
+					if(!val)
+						$this.show("fast");
+					else {
+						if($("a", $this).html().indexOf(val)>=0)
+							$this.show("fast");
+						else $this.hide("fast");
+					}
+				})
+			})
 			var systemAreas=[];
 			for(var i=0; i<areas.length; i++){
 				if(areas[i].systemArea)
 					systemAreas.push(areas[i])
-				else el.append("<li><a href='#' data-name='" + areas[i].name + "'>" + getAreaTitle(areas[i].name) + "</a></li>"); 
+				else el.append("<li class='area'><a href='#' data-name='" + areas[i].name + "'>" + getAreaTitle(areas[i].name) + "</a></li>"); 
 			}
 			if(systemAreas.length){
 				el.append("<li class='divider'></li>")
