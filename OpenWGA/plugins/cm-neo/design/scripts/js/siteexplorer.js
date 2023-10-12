@@ -116,15 +116,31 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 	}
 	
 	function buildAreas(callback){
-		$.getJSON(area_json_url + "?dbkey=" + dbkey, function(areas){
+		
+		buildAreasList($("#area-dropdown ul"), area_json_url + "?dbkey=" + dbkey, function(){
+			if(!area){
+				$("#area-dropdown .area-menu .area-title").html("Kein Bereich ausgewählt");
+			}
+			else $("#area-dropdown .area-menu .area-title").html(getAreaTitle(area));
+			
+			if(callback)
+				callback()			
+		})
+		
+	}
+
+	function buildAreasList(el, url, callback){
+		$.getJSON(url, function(areas){
 			//console.log(areas);
-			var el = $("#area-dropdown ul")
 			el.html("");
-			el.append("<li class='search'><input name='area_query' placeholder='Filtern ...'></li>");
+			el.append("<li class='search'><input placeholder='Filtern ...'></li>");
 			$("input", el).on("keyup", function(ev){
 				//console.log("key", ev.key);
 				if(ev.key=="Escape")
 					$(this).val("");
+				else if(ev.key=="ArrowDown")
+					$("li:visible a", el).first().focus()
+				
 				var val = $(this).val();
 				$("li.area", el).each(function(){
 					var $this = $(this);
@@ -149,11 +165,6 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 					el.append("<li><a href='#' data-name='" + systemAreas[i].name + "'>" + getAreaTitle(systemAreas[i].name) + "</a></li>");
 				}
 			}
-			
-			if(!area){
-				$("#area-dropdown .area-menu .area-title").html("Kein Bereich ausgewählt");
-			}
-			else $("#area-dropdown .area-menu .area-title").html(getAreaTitle(area));
 			
 			if(callback)
 				callback()
@@ -220,6 +231,7 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 	
 	return{
 		init: init,
+		buildAreasList: buildAreasList,
 		forceReload: function(){
 			area=null;
 		},

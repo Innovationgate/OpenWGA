@@ -1,6 +1,6 @@
 function Renderer() {}
 
-Renderer.prototype.render = function($urlParam_dbkey) {
+Renderer.prototype.render = function($urlParam_dbkey, $urlParam_not_empty) {
 
 	var database = db($urlParam_dbkey);
 	var areas = []; 
@@ -24,7 +24,9 @@ Renderer.prototype.render = function($urlParam_dbkey) {
 		var visiblefor = area.getExtensionData("CM_area_visible")
 		if(visiblefor && visiblefor.size() && !database.isMemberOfUserList(visiblefor))
 			continue;
-		if(area.mayReadContent())	
+		if($urlParam_not_empty && !area.getChildNodes().size())
+			continue;
+		if(area.mayReadContent())
 			areas.push({
 				name: area.name,
 				systemArea: area.systemArea
