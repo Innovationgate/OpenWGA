@@ -3,6 +3,9 @@
 <tml:script>
 	_dbkey = $option_dbkey || meta('db', 'dbkey')
 	_area = AREA;
+	var areas = db(_dbkey).getAreas() 
+	if(!areas.containsKey(_area))
+		_area = areas.keySet().iterator().next();
 </tml:script>
 
 <tml:if condition="tmlform.mode()=='edit' && $option_mode!='view' && $option_mode!='readonly'">
