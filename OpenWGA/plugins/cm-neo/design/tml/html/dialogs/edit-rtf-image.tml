@@ -12,7 +12,9 @@
 	</div>
 	
 	<div class="content form-horizontal">
-		<tml:[form-field] o_label="Typ" o_name="type" o_type="select" o_options="Externes Bild|exturl,Bild aus diesem Dokument|intfile,Bild aus beliebigem Dokument|extfile" o_default="{$option_dialog_options.type||'exturl'}"
+		<tml:[form-field] o_label="Typ" o_name="type" o_type="select" 
+			o_options="Bild aus diesem Dokument|intfile,Bild aus beliebigem Dokument|extfile,Externes Bild|exturl" 
+			o_default="{$option_dialog_options.type||'intfile'}"
 			o_changeaction="$refresh"
 		/>
 		<tml:select switch="tmlform.type">
