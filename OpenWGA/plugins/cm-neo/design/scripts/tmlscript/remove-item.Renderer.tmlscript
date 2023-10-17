@@ -1,0 +1,27 @@
+function Renderer() {
+}
+
+Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $urlParam_item) {
+
+	if(!$urlParam_dbkey)
+		return;		// access denied 
+
+	var result = {
+		success: true,
+		message: ""
+	}
+	
+	try{
+		var doc = db($urlParam_dbkey).getContentByKey($urlParam_contentkey);
+		doc.removeItem($urlParam_item);
+		doc.save();
+		//console.log("item removed", $urlParam_item)
+	}
+	catch(e){
+		result.success=false;
+		result.message=e.mesage;
+	}
+
+	WGA.TMLPage.write(JSON.stringify(result))
+
+}

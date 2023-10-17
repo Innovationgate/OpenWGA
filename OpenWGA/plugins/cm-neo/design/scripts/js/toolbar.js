@@ -189,7 +189,7 @@ define(["cm", "sitepanel", "jquery", "bootstrap"], function(CM, Sitepanel, $){
 			setTimeout(function(){
 				button.popover("hide");
 			}, 2000)
-			WGA.event.fireEvent('CMS_save_item', "*", {remove_item: true, close_editor: true})
+			WGA.event.fireEvent('CMS_remove_item', "*", {})
 		}
 
 		,"cancel-edit": function(){
