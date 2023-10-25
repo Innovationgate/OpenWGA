@@ -23,7 +23,7 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".content-modules .module-cm_survey">
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_survey">
 	
 	".question":{
 		margin: "5px 0",
