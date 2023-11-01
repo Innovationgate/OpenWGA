@@ -1,0 +1,10 @@
+function Renderer() {
+}
+
+Renderer.prototype.render = function() {
+
+	WGA.synchronizedFunction(function(){
+		WGA.TMLPage.renderDefault();
+	}, db())()
+	
+}
