@@ -10,9 +10,8 @@ Controller.prototype.prepare = function(App, $cx, $item__CM_clipboard_context) {
 	for(let area in Iterator(App.getAllowedAreas($cx.db().getDbReference()))){
 		if(area.name=="$templates")
 			systemAreas.add("Seitenvorlagen|" + area.name)
-		else areas.add(area.name)
+		else areas.add(area.name)		
 	}
-	areas.addAll(systemAreas)
 
 	var root_or_child = ["unter Seite '" + $cx.TITLE + "'|child"];
 	if(areas.size())
@@ -21,7 +20,13 @@ Controller.prototype.prepare = function(App, $cx, $item__CM_clipboard_context) {
 	return {
 		$options: {
 			root_or_child: root_or_child,
-			areas: areas
+			areas: areas,
+			systemAreas: systemAreas.size() && [
+				{
+					label: "Systembereiche",
+					options: systemAreas
+				}
+			] 
 		}
 	}
 

@@ -196,7 +196,8 @@
 	}
 }
 
-#dialog-custom {
+#dialog-custom,
+#dialog-paste-page {
 	width: 800px;
 	margin-left: -400px;
 }

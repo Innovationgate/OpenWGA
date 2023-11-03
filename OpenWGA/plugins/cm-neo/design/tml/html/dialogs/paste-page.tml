@@ -33,7 +33,7 @@
 				o_field="root_or_child" o_type="select" o_default="child" o_optionsitem="$option_root_or_child" o_changeaction="$refresh"/>
 			
 			<tml:case condition="tmlform.root_or_child=='root'">
-				<tml:[form-field] o_label="Bereich" o_field="area" o_type="select" o_optionsitem="$option_areas" o_changeaction="$refresh"/>
+				<tml:[form-field] o_label="Bereich" o_field="area" o_type="select" o_optionsitem="$option_areas" o-optgroups="$option_systemAreas" o_changeaction="$refresh"/>
 			</tml:case>
 	
 			<tml:case if="$mc.destinationChildren.size">
