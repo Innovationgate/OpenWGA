@@ -19,6 +19,7 @@
 	<div class="table">
 		<div class="row">
 			<div class="col">Name</div>
+			<div class="col">Erlaubte Hauptseiten</div>
 			<div class="col">Sichtbar für</div>
 			<div class="col">Leser</div>
 			<div class="col">Editoren</div>
@@ -27,6 +28,9 @@
 			<div class="row">
 				<div class="col">
 					<a href="<tml:url action="edit" param1="{_area.name}"/>"><tml:item name="_area.name"/></a>
+				</div>
+				<div class="col">
+					@{_area.rootPageRestrictions aliases="Beliebig|any,Nur definierte Seitentypen|fixDocTypes,Keine|none"}
 				</div>
 				<div class="col">
 					<tml:script expression="_area.getExtensionData('CM_area_visible')" divider="<br>"/>
@@ -44,6 +48,9 @@
 			<div class="row">
 				<div class="col">
 					<a href="<tml:url action="edit" param1="{_area.name}"/>"><tml:label key="[system-area.{_area.name}]" param1="{_area.name}"/></a>
+				</div>
+				<div class="col">
+					@{_area.rootPageRestrictions aliases="Beliebig|any,Nur definierte Seitentypen|fixDocTypes,Keine|none"}
 				</div>
 				<div class="col">
 					<tml:script expression="_area.getExtensionData('CM_area_visible')"/>

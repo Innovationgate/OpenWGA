@@ -114,3 +114,49 @@ App.prototype.mayUpdateContent = function(ctx) {
 	return ctx.STATUS==ctx.content().STATUS_DRAFT && ismine;
 
 }
+
+App.prototype.getAllowedAreas = function(dbkey){
+
+	// returns all area names where the current user may create root pages
+
+	var areas = WGA.List();
+	var database = WGA.db(dbkey);
+	var app = WGA.app(database);
+
+	function hasAllowedContentTypes(area){
+		for(let ct in Iterator(database.getContentTypes())){
+			try{
+				database.performStructCreationCheck(null, area, ct)
+			}
+			catch(e){
+				continue;	// not allowed
+			}
+			if(ct.mayCreateChildEntry(area))
+				return true;
+		}
+		return false;		
+	}	
+	
+	for(let area in Iterator(database.getAreas().values())){
+		if(area.name=="$templates"){
+			if(!app.isChiefEditor())
+				continue;
+		}
+		else if(area.name.indexOf("$trash")==0)
+			continue;
+		else if(area.name.indexOf("hdb-")==0)
+			continue;
+
+		var visiblefor = area.getExtensionData("CM_area_visible")
+		if(visiblefor && visiblefor.size() && !database.isMemberOfUserList(visiblefor))
+			continue;
+
+		if(!hasAllowedContentTypes(area))
+			continue;
+
+		if(area.mayReadContent()){
+			areas.add(area)
+		}
+	}
+	return areas;
+}

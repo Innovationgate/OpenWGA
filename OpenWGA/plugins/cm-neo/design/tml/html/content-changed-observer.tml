@@ -4,35 +4,10 @@
 	var dbkey = request.getParameter("dbkey")
 	var language = request.getParameter("language")
 
-	function hasAllowedContentTypes(area){
-		for(let ct in Iterator(db(dbkey).getContentTypes())){
-			if(AFW.contenttype(ct).isAllowed(area)){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	var may_create_root_page = false;
-	if(dbkey){
-		for(let area in Iterator(db(dbkey).getAreas().values())){
-			if(area.name=="$trash-cm-neo")
-				continue;
-			if(area.name=="$templates" && !WGA.app(dbkey).isChiefEditor())
-				continue;
-			if(area.mayEditPages()){
-				may_create_root_page = hasAllowedContentTypes(area);
-				if(may_create_root_page)
-					break;
-			}
-		}
-	}
-
 	if(dbkey && (!structkey || structkey=="null")){
 		var event = createevent("content-changed")
 		event.setParameter("dbkey", dbkey)
 		event.setParameter("language", language || db(dbkey).getDefaultLanguage())
-		event.setParameter("may_create_root_page", may_create_root_page);
 		portlet.fireevent(event)
 		return;
 	}
@@ -75,7 +50,6 @@
 	event.setParameter("may_delete_page", Struct.mayDeletePage() && !is_in_trash);
 	
 	event.setParameter("page_visible", Struct.isVisible());
-	event.setParameter("may_create_root_page", may_create_root_page);
 	
 	event.setParameter("has_released_contents", Struct.hasReleasedContents());
 	event.setParameter("is_in_trash", is_in_trash);

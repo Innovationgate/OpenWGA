@@ -125,6 +125,7 @@ public class WGArea extends WGSchemaDocument implements PageHierarchyNode {
         METAINFO_ROOTPAGERESTRICTIONS.setExtdata(true);
         METAINFO_ROOTPAGERESTRICTIONS.addAllowedValue(PAGERESTRICTION_ANY);
         METAINFO_ROOTPAGERESTRICTIONS.addAllowedValue(PAGERESTRICTION_FIXEDTYPES);
+        METAINFO_ROOTPAGERESTRICTIONS.addAllowedValue(PAGERESTRICTION_NONE);
     }
     
     public static final String META_ALLOWED_ROOTTYPES = "ALLOWEDROOTTYPES";

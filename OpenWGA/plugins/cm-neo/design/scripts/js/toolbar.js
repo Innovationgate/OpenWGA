@@ -72,7 +72,6 @@ define(["cm", "sitepanel", "jquery", "bootstrap"], function(CM, Sitepanel, $){
 		$("#toolbars [data-action='approve-content']")[ev.params.may_approve_version ? "show" : "hide"]()
 		$("#toolbars [data-action='reject-content']")[ev.params.may_approve_version ? "show" : "hide"]()
 			
-		$("#toolbars [data-action='create-root-page']").parent()[ev.params.may_create_root_page ? "removeClass" : "addClass"]("disabled")
 		$("#toolbars [data-action='create-child-page']").not("[data-parent]").parent()[ev.params.may_create_child_page ? "removeClass" : "addClass"]("disabled")
 		$("#toolbars [data-action='create-content']").parent()[ev.params.may_create_content ? "removeClass" : "addClass"]("disabled")			
 		$("#toolbars [data-action='delete-version']").parent()[ev.params.may_delete_version ? "removeClass" : "addClass"]("disabled")			
