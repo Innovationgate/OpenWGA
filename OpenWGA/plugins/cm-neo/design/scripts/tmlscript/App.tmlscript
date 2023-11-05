@@ -133,6 +133,9 @@ App.prototype.getAllowedAreas = function(dbkey, may_create){
 			catch(e){
 				continue;	// not allowed
 			}
+			if(ct.isAuthoring && !ct.isAuthoring() && !app.isManager())
+				continue; 
+
 			if(ct.mayCreateChildEntry(area))
 				return true;
 		}
