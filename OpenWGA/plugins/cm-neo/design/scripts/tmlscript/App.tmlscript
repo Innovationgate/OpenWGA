@@ -115,7 +115,7 @@ App.prototype.mayUpdateContent = function(ctx) {
 
 }
 
-App.prototype.getAllowedAreas = function(dbkey){
+App.prototype.getAllowedAreas = function(dbkey, may_create){
 
 	// returns all area names where the current user may create root pages
 
@@ -124,6 +124,8 @@ App.prototype.getAllowedAreas = function(dbkey){
 	var app = WGA.app(database);
 
 	function hasAllowedContentTypes(area){
+		if(area.name.indexOf("$trash")==0)
+			return false;
 		for(let ct in Iterator(database.getContentTypes())){
 			try{
 				database.performStructCreationCheck(null, area, ct)
@@ -138,20 +140,24 @@ App.prototype.getAllowedAreas = function(dbkey){
 	}	
 	
 	for(let area in Iterator(database.getAreas().values())){
-		if(area.name=="$templates"){
+		
+		if(area.name=="$trash" || area.name=="hdb-system")
+			continue;	// hide/ignore old cm-classico trash area		
+
+		else if(area.name=="$templates"){
 			if(!app.isChiefEditor())
 				continue;
 		}
-		else if(area.name.indexOf("$trash")==0)
-			continue;
-		else if(area.name.indexOf("hdb-")==0)
-			continue;
-
+		else if(!app.isManager()){
+			if(area.systemArea || area.name=="hdb-content")
+				continue;
+		}
+		
 		var visiblefor = area.getExtensionData("CM_area_visible")
 		if(visiblefor && visiblefor.size() && !database.isMemberOfUserList(visiblefor))
 			continue;
 
-		if(!hasAllowedContentTypes(area))
+		if(may_create && !hasAllowedContentTypes(area))
 			continue;
 
 		if(area.mayReadContent()){
@@ -159,4 +165,32 @@ App.prototype.getAllowedAreas = function(dbkey){
 		}
 	}
 	return areas;
+}
+
+App.prototype.getAllowedAreaNames = function(dbkey, may_create){
+	var areas = WGA.List();
+	var systemAreas = WGA.List();
+	for(let area in Iterator(this.getAllowedAreas(dbkey, may_create))){
+		if(area.isSystemArea())
+			systemAreas.add(area.name);
+		else areas.add(area.name);
+	}
+	areas.sortList();
+	areas.addAll(systemAreas);	// system-areas ans Ende sortieren
+	return areas;
+
+}
+
+App.prototype.getAreaTitle = function(area){
+
+	var aliases = {	
+		"$templates": "Seitenvorlagen",
+		"$trash": "Papierkorb CM-Classico",
+		"$trash-cm-neo": "Papierkorb CM-Neo",
+		"hdb-system": "HDB System",
+		"hdb-content": "HDB Content"
+	}
+
+	return aliases[area] || area;
+
 }

@@ -4,12 +4,16 @@
 		
 		var areas = WGA.List();
 		var systemAreas = WGA.List();
-		var allAreas = App.getAllowedAreas(db().getDbReference());
+		var allAreas = App.getAllowedAreas(db().getDbReference(), true);
+		var defaultArea;
 		
 		for(let area in Iterator(allAreas)){
-			if(area.name=="$templates")
-				systemAreas.add("Seitenvorlagen|" + area.name)
-			else areas.add(area.name)		
+			if(area.isSystemArea())
+				systemAreas.add(App.getAreaTitle(area.name) + "|" + area.name)
+			else {
+				areas.add(App.getAreaTitle(area.name) + "|" + area.name);
+				defaultArea = defaultArea || area.name;
+			}
 		}
 		
 		WGA.TMLPage.setVar("_areas", areas)
@@ -28,8 +32,8 @@
 			else struct = !document.isDummy() && document.getStructEntry();
 			if(struct && allAreas.contains(struct.getArea()))
 				tmlform.area = struct.getArea().name
-			else if(areas.size())
-				tmlform.area = areas.get(0);
+			else if(allAreas.size())
+				tmlform.area = defaultArea || allAreas.get(0).name;
 			else if(systemAreas.size())
 				tmlform.area = "$templates";
 		}

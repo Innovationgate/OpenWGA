@@ -7,20 +7,26 @@ Controller.prototype.prepare = function(App, $cx, $item__CM_clipboard_context) {
 
 	var areas = WGA.List();
 	var systemAreas = WGA.List();
-	for(let area in Iterator(App.getAllowedAreas($cx.db().getDbReference()))){
-		if(area.name=="$templates")
-			systemAreas.add("Seitenvorlagen|" + area.name)
-		else areas.add(area.name)		
+	var allAreas = App.getAllowedAreas($cx.db().getDbReference(), true);
+	var defaultArea;
+	for(let area in Iterator(allAreas)){
+		if(area.isSystemArea())
+			systemAreas.add(App.getAreaTitle(area.name) + "|" + area.name)
+		else {
+			areas.add(App.getAreaTitle(area.name) + "|" + area.name)
+			defaultArea = defaultArea || area.name;
+		}
 	}
 
 	var root_or_child = ["unter Seite '" + $cx.TITLE + "'|child"];
-	if(areas.size())
+	if(allAreas.size())
 		root_or_child.push("Als Hauptseite|root")
 
 	return {
 		$options: {
 			root_or_child: root_or_child,
 			areas: areas,
+			defaultArea: allAreas.contains($cx.AREA) ? AREA : defaultArea || (allAreas.size() && allAreas.get(0).name),
 			systemAreas: systemAreas.size() && [
 				{
 					label: "Systembereiche",

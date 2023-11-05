@@ -3,9 +3,10 @@
 <tml:script>
 	_dbkey = $option_dbkey || meta('db', 'dbkey')
 	_area = AREA;
-	var areas = db(_dbkey).getAreas() 
-	if(!areas.containsKey(_area))
-		_area = areas.keySet().iterator().next();
+
+	var areas = App.getAllowedAreaNames(_dbkey);
+	if(!_area || !areas.contains(_area))
+		_area = areas.get(0);
 </tml:script>
 
 <tml:if condition="tmlform.mode()=='edit' && $option_mode!='view' && $option_mode!='readonly'">
@@ -41,7 +42,7 @@
 			<div class="select-tree">
 				<div class="dropdown" id="area-dropdown-<tml:option name="fieldname"/>">
 					<a class="area-menu form-control" href="#" data-toggle="dropdown">
-						<span class="area-title">Bereich <tml:item name="_area"/></span>
+						<span class="area-title">Bereich <tml:script expression="App.getAreaTitle(_area)"/></span>
 				  	</a>
 					<ul class="dropdown-menu"></ul>
 				</div>

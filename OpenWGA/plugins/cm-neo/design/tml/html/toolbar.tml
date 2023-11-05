@@ -122,7 +122,7 @@
 				<li class="divider"></li>
 				<li><a data-action="create-child-page" href="#">Neue Unterseite</a></li>
 
-				<li <tml:case condition="App.getAllowedAreas(portlet.dbkey).size()==0">class="disabled"</tml:case>>
+				<li <tml:case condition="App.getAllowedAreas(portlet.dbkey, true).size()==0">class="disabled"</tml:case>>
 					<a data-action="create-root-page" href="#">Neue Hauptseite</a>
 				</li>
 

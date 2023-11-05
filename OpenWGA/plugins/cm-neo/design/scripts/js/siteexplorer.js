@@ -222,11 +222,15 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 	})
 
 	function getAreaTitle(area){
-		if(area=="$templates")
-			return "Seitenvorlagen";
-		else if(area=="$trash-cm-neo")
-			return "Papierkorb";
-		else return area;
+		var aliases = {	
+			"$templates": "Seitenvorlagen",
+			"$trash": "Papierkorb CM-Classico",
+			"$trash-cm-neo": "Papierkorb CM-Neo",
+			"hdb-system": "HDB System",
+			"hdb-content": "HDB Content"
+		}
+
+		return aliases[area] || area;
 	}
 	
 	return{

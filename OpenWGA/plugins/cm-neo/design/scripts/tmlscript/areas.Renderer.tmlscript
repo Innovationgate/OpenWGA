@@ -1,6 +1,6 @@
 function Renderer() {}
 
-Renderer.prototype.render = function($urlParam_dbkey, $urlParam_not_empty) {
+Renderer.prototype.render = function(App, $urlParam_dbkey, $urlParam_not_empty) {
 
 	var database = db($urlParam_dbkey);
 	var areas = []; 
@@ -9,30 +9,16 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_not_empty) {
 		WGA.TMLPage.write(JSON.stringify(areas))
 		return;
 	}
-	for(let area in Iterator(database.getAreas().values())){
-		if(area.name=="$trash" || area.name=="hdb-system")
-			continue;	// hide/ignore old cm-classico trash area
-			
-		if(area.name=="$templates"){
-			if(!WGA.app($urlParam_dbkey).isChiefEditor())
-				continue;
-		}
-		else if(!WGA.app($urlParam_dbkey).isManager()){
-			if(area.systemArea || area.name=="hdb-content")
-				continue;
-		}
-		var visiblefor = area.getExtensionData("CM_area_visible")
-		if(visiblefor && visiblefor.size() && !database.isMemberOfUserList(visiblefor))
-			continue;
+
+	for(let area in Iterator(App.getAllowedAreas($urlParam_dbkey))){
 		if($urlParam_not_empty && !area.getChildNodes().size())
 			continue;
-		if(area.mayReadContent())
-			areas.push({
-				name: area.name,
-				systemArea: area.systemArea
-			});
+		areas.push({
+			name: area.name,
+			systemArea: area.systemArea
+		});
 	}
-
+	
 	WGA.TMLPage.write(JSON.stringify(areas))
 	
 }
