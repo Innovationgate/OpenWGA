@@ -175,7 +175,6 @@ App.prototype.getAllowedAreaNames = function(dbkey, may_create){
 			systemAreas.add(area.name);
 		else areas.add(area.name);
 	}
-	areas.sortList();
 	areas.addAll(systemAreas);	// system-areas ans Ende sortieren
 	return areas;
 
