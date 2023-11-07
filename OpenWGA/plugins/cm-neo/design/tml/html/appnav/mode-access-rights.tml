@@ -1,0 +1,53 @@
+<div class="access-rights">
+
+	<div class="headline">Berechtigungen</div>
+
+	<tml:[template] o_id="appnav-access-rights">
+		{{#may_edit_content}}
+			<div class="title">
+				Inhalt bearbeiten
+			</div>
+			<div class="info {{may_edit_content.cssclass}}">
+				{{may_edit_content.info}}
+			</div>
+		{{/may_edit_content}}
+		
+		<div class="title">
+			Neue Sprachversion erstellen
+		</div>
+		<div class="info {{may_create_version.cssclass}}">
+			{{may_create_version.info}}
+		</div>
+		
+		{{#may_delete_version}}
+			<div class="title">
+				Inhaltsversion löschen
+			</div>
+			<div class="info {{may_delete_version.cssclass}}">
+				{{may_delete_version.info}}
+			</div>
+		{{/may_delete_version}}
+
+		<div class="title">
+			Neue Unterseite erstellen
+		</div>
+		<div class="info {{may_create_page.cssclass}}">
+			{{may_create_page.info}}
+		</div>
+
+		<div class="title">
+			Seite löschen
+		</div>
+		<div class="info {{may_delete_page.cssclass}}">
+			{{may_delete_page.info}}
+		</div>
+		
+	</tml:[template]>
+
+</div>
+
+<script>
+	require(["access-rights"], function(R){
+		R.init();
+	})
+</script>
