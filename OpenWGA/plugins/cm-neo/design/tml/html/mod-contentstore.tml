@@ -75,7 +75,7 @@
 				<i class="icon fas fa-mobile-alt"></i>
 			</a>
 			<a href="#" title="Berechtigungen" data-view="access-rights">
-				<i class="icon fa-solid fa-handcuffs"></i>
+				<i class="icon fa-solid fa-file-circle-question"></i>
 			</a>			
 			<a href="#" title="Dashboard" data-view="dashboard">
 				<i class="icon fas fa-tachometer-alt"></i>
