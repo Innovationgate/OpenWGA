@@ -2,6 +2,9 @@
 
 	if(tmlform.validate()){
 		try{
+		
+			tmlform.store();		// nessesarry for custom form fields
+			
 			var validfrom = tmlform.validfrom && WGA.createCalendar(WGA.dateOnly(tmlform.validfrom))
 			if(validfrom && tmlform.validfrom_time){
 				var time = WGA.createCalendar(tmlform.validfrom_time)
@@ -95,7 +98,7 @@
 
 			<tml:[form-field] o_label="Sichtbar ab">
 				<div class="clear-field-wrapper<tml:case condition="tmlform.validfrom || VALIDFROM"> col-sm-8</tml:case>">
-					<tml:input type="date" name="validfrom" meta="true" cssclass="date form-control" html_placeholder="sofort" format="dd.MM.yyyy"/>
+					<tml:input store="false" type="date" name="validfrom" meta="true" cssclass="date form-control" html_placeholder="sofort" format="dd.MM.yyyy"/>
 					<a class="clear-field" style="display:none">&times;</a>
 				</div>
 				<tml:script>
@@ -111,7 +114,7 @@
 			<tml:case condition="!isHomepage() || WGA.app().isChiefEditor()">
 				<tml:[form-field] o_label="Sichtbar bis">
 					<div class="clear-field-wrapper<tml:case condition="tmlform.validto || VALIDTO"> col-sm-8</tml:case>">
-						<tml:input type="date" name="validto" meta="true" cssclass="date form-control" html_placeholder="unbegrenzt" format="dd.MM.yyyy"/>
+						<tml:input store="false" type="date" name="validto" meta="true" cssclass="date form-control" html_placeholder="unbegrenzt" format="dd.MM.yyyy"/>
 						<a class="clear-field" style="display:none">&times;</a>
 					</div>
 					<tml:script>
@@ -126,12 +129,12 @@
 			</tml:case>
 			
 			<tml:case condition="VERSION!=1">
-				<tml:[form-field] o_label="Grund der Ersetzung" o_type="textarea" o_field="reasonForReplacement" o_placeholder="Warum wurde der Inhalt ersetzt?"/>					
+				<tml:[form-field] o-store="false" o_label="Grund der Ersetzung" o_type="textarea" o_field="reasonForReplacement" o_placeholder="Warum wurde der Inhalt ersetzt?"/>					
 				<tml:comment>
 					check if other autors (of other lanuages) should be notified
 				</tml:comment>
 				<tml:case if="$mc.isDefaultLang & $mc.translationAutors.size & $mc.translationRequestSubject">
-					<tml:[form-field] o-optionvalues="$mc.translationAutors" o_label="Benachrichtigen" o_name="mail_to_authors" o_type="checkbox" o_labeled="true" o_divider="<br>"/>
+					<tml:[form-field] o-store="false" o-optionvalues="$mc.translationAutors" o_label="Benachrichtigen" o_name="mail_to_authors" o_type="checkbox" o_labeled="true" o_divider="<br>"/>
 				</tml:case>
 			</tml:case>
 			
