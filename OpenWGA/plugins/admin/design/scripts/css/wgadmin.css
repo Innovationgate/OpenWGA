@@ -712,3 +712,45 @@ pre{
 	font-family: courier;
 	padding: 0 10px;
 }
+
+.live-heap-usage{
+	display: none;
+}
+.heap-usage{
+	border:solid gray 1px;
+	border-radius: 4px;
+	height: 20px;
+	padding: 0 !important;
+	margin-top: 2px;
+}
+.heap-usage .current{
+	background-color: silver;
+	height: 100%;
+	color: white;
+	transition: width 1s;
+	position: relative;
+}
+.heap-usage .used{
+	background-color: gray;	
+	height: 100%;
+	color: white;
+	transition: width 1s;
+}
+.heap-usage .min{
+	background-color: rgba(0,0,0,.2);
+	border-right: solid white 2px;
+	box-sizing: border-box;
+	padding-left: 5px;	
+	height: 100%;
+	color: white;
+	transition: width 1s;
+	display: none;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.heap-usage .value{
+	float:right;
+	margin-right:5px;
+	color: white;
+}

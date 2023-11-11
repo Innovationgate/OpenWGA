@@ -25,17 +25,49 @@
 <tml:include designdb="@ui" ref="windowview">
 	<tml:option name="title">Java Information</tml:option>	
 	<tml:option name="body" scope="local">
+	
 		<fieldset>		
-						
-			<label>Maximum heap size:</label>		
-			<div class="data"><tml:item name="_maxHeapString"/></div>		
-			<div class="clear"></div>		
-			<label>Current heap size:</label>		
-			<div class="data"><tml:item name="_currentHeapSize"/></div>		
-			<div class="clear"></div>		
-			<label>Unused memory in heap:</label>		
-			<div class="data"><tml:item name="_unusedMemory"/></div>		
-			<div class="clear"></div>		
+			<legend>Memory</legend>
+			
+			<div class="live-heap-usage">
+				<label>Heap usage:</label>
+				<div class="data heap-usage">
+					<div class="current" style="width:0">
+						<div class="value"></div>
+						<div class="used" style="width:0">
+							<div class="value"></div>
+						</div>
+						<div class="min"></div>
+					</div>
+				</div>		
+				<div class="clear"></div>		
+			</div>
+			
+			<div class="heap">
+				<label>Maximum heap size:</label>		
+				<div class="data"><tml:item name="_maxHeapString"/></div>		
+				<div class="clear"></div>		
+				<label>Current heap size:</label>		
+				<div class="data current"><tml:item name="_currentHeapSize"/></div>		
+				<div class="clear"></div>		
+				<label>Unused memory in heap:</label>		
+				<div class="data unused"><tml:item name="_unusedMemory"/></div>		
+				<div class="clear"></div>		
+				<label>Used memory:</label>		
+				<div class="data used">
+					<tml:item name="_usedMemory"/>
+				</div>		
+				<div class="clear"></div>
+				<div class="data">
+					<button data-action="life">Show Life Data</button>
+				</div>		
+				<div class="clear"></div>
+			</div>
+		</fieldset>
+		
+		<fieldset>
+			<legend>Java Runtime</legend>
+			
 			<label>Java Runtime Vendor:</label>		
 			<div class="data"><tml:item name="_javaVendor"/></div>		
 			<div class="clear"></div>		
@@ -95,3 +127,42 @@
 
 	</tml:option>
 </tml:include>
+
+<script>
+
+	$("button[data-action=life]").click(function(ev){
+
+		$(this).parent(".data").hide();
+		$(".live-heap-usage").show();
+		
+		var timer;
+		function getHeadUsage(){
+			$.getJSON("<tml:url medium="json" layout="heap-usage"/>", function(result){
+				//console.log(result)
+				$(".heap-usage .current").css("width", result.p.current+"%").find(".value").html(parseInt(result.p.current) + "%")
+				
+				var el = $(".heap-usage .used");
+				var value = el.data("last-value");
+				if(value && result.p.used < value){
+					$(".heap-usage .min").css("width", result.p.used+"%").html((result.usedGb).toFixed(1) + " GB").show();				
+				}
+				el.data("last-value", result.p.used)
+				
+				el.css("width", result.p.used+"%").find(".value").html(parseInt(result.p.used) + "%")
+				
+				$(".heap .current").html(result.current)
+				$(".heap .unused").html(result.unused)
+				$(".heap .used").html(result.used)
+				
+			})
+		}
+		timer = setInterval(getHeadUsage, 1000);
+	
+		WGA.portlet.registerObject("<tml:script expression="portlet.portletkey"/>", {
+			destroy: function(){
+				timer && clearTimeout(timer);
+			}
+		})
+	})
+
+</script>
