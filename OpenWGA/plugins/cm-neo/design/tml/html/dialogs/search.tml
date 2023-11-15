@@ -6,7 +6,22 @@
 		})
 		_dialog_closed=true;
 	}
-	else tmlform.addmessage("Seite nicht gefunden")
+	else {
+		var struct = db().getStructEntryByName(tmlform.name_or_key) || db().getStructEntryByKey(tmlform.name_or_key);
+		if(struct){
+			var href = WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
+					.setParameter({
+						dbkey: meta("db", "dbkey"),
+						structkey: struct.structKey,
+						lang: LANGUAGE || db().getDefaultLanguage()
+					}).build();
+			portlet.fireevent("close-dialog", {
+				redirectto: href
+			})
+			_dialog_closed=true;
+		}
+		else tmlform.addmessage("Seite nicht gefunden")
+	}
 </tml:action>
 
 <tml:form id="form-create-content" source="none" unless="_dialog_closed">
