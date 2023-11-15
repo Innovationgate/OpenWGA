@@ -147,7 +147,7 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 					if(!val)
 						$this.show("fast");
 					else {
-						if($("a", $this).html().indexOf(val)>=0)
+						if($("a", $this).html().toLowerCase().indexOf(val.toLowerCase())>=0)
 							$this.show("fast");
 						else $this.hide("fast");
 					}
