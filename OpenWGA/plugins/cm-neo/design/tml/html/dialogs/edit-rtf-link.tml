@@ -1,5 +1,6 @@
 <tml:action id="insert-from-cb">
 	var ctx = context(_CM_clipboard_context, false);
+	//console.log("Clipboard insert link", _CM_clipboard_context, ctx);
 	if(ctx){
 		tmlform.type="int"
 		tmlform.key=ctx.STRUCTKEY
@@ -7,6 +8,7 @@
 		if(!tmlform.title)
 			tmlform.title=ctx.TITLE
 	}
+	else console.error("Clipboard context not valid", _CM_clipboard_context);
 </tml:action>
 
 <tml:action id="setLinkText">

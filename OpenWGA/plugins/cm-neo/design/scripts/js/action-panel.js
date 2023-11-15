@@ -100,6 +100,8 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 		$("#section-edit .panel").hide();
 		if(editor)
 			editor.close();
+		if(ev.params.reload)
+			Sitepanel.reload();
 	})
 
 	WGA.event.addListener("*", "CMS_save_image_item", function(ev){
@@ -120,6 +122,34 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 			dataType: "json"
 		}) 
 	})
+
+	WGA.event.addListener("*", "CMS_remove_item", function(ev){
+		if(editor){
+			var url = CM.url.json + "/remove-item.int.json";
+			var params = $.extend({}, contentInfo, {
+				item: edit_item
+			}) 
+			//console.log("remove item", params);
+			$.ajax({
+				method: "POST",
+				url: url, 
+				data: params,
+				dataType: "json", 
+				success: function(data){
+					if(!data.success){
+						alert(data.message)
+						return;
+					}
+					WGA.event.fireEvent("CMS_cancel_item_edit", "action-panel", {reload:true});
+				},
+				error: function(xhr, statusText){
+					console.log("unable to remove item: ", statusText, xhr.status,  xhr);
+					alert("Feld konnte nicht gelöscht werden.\nStatus-Text: " + statusText+"\nPOST " + url + "\nHTTP Status Code: " + xhr.status);
+				}
+			})
+		}
+	})
+
 
 	WGA.event.addListener("*", "CMS_save_item", function(ev){
 		if(editor){

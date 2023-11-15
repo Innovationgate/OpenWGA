@@ -1,0 +1,11 @@
+function Renderer() {
+}
+
+Renderer.prototype.render = function($cx) {
+
+	WGA.synchronizedFunction(function(){
+		//WGA.TMLPage.renderDefault();
+		WGA.TMLPage.render(WGA.design().resolve("init"), "html", $cx); 
+	}, db())()
+	
+}

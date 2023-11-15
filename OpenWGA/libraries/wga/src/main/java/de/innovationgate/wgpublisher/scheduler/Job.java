@@ -442,10 +442,10 @@ public class Job {
 			// Run tasks
 			if (!_quiet) {
                 if (executor != null) {
-                    logger.info("Starting job " + _name + " started by admin account '" + executor + "'");
+                    logger.info("Starting job '" + _name + "' started by admin account '" + executor + "'");
                 }
                 else {
-                    logger.info("Starting job " + _name + " triggered by WGA Scheduler");
+                    logger.info("Starting job '" + _name + "' triggered by WGA Scheduler");
                 }
 			}
 			runTasks(logger, _currentJobContext);

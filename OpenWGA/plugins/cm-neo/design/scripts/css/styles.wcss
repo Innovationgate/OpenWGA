@@ -91,6 +91,7 @@ body {
 @import "appnav:child-docs";
 @import "appnav:dashboard";
 @import "appnav:responsive";
+@import "appnav:access-rights";
 
 @import "forms";
 

@@ -41,7 +41,7 @@
 		</tml:if>
 	</tml:{div}>
 
-	<div class="content" style="<tml:item name="$mc.styles"/>">
+	<div class="content<tml:case if="$option_lazy_backgrounds"> lazy-background</tml:case>" style="<tml:item name="$mc.styles"/>">
 		<tml:include ref="system:include-child-modules">
 			<tml:option name="margins" expression="true" scope="local"/>
 		</tml:include>

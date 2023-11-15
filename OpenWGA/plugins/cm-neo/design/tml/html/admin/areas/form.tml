@@ -24,6 +24,25 @@
 	<tml:[form-field] o_label="Sichtbar für" o_type="textarea" o_name="visiblefor" o_multiple="true" o_store="false"/>
 </tml:case>
 
+<tml:[form-field] o_label="Erlaubte Hauptseiten" o_type="select" o_mode="{_getMode('rootpagerestrictions')}" o_meta="true" o_name="rootpagerestrictions"
+	o_options="Beliebig|any,Nur Seiten folgender Seitentypen|fixDocTypes,Keine|none"
+	o_changeaction="$refresh"
+/>
+
+<tml:case condition="tmlform.field('rootpagerestrictions')=='fixDocTypes'">
+	<tml:script>
+		_docTypes = WGA.createList();
+		for (ct in Iterator(document.getDatabase().getContentTypes())) {
+			_docTypes.add(ct.getName());
+		}
+		WGA.TMLPage.setVar("_docTypes", _docTypes)
+	</tml:script>
+	<tml:[form-field] o_label="Seitentypen" o_mode="{_getMode('allowedroottypes')}"
+		o_name="allowedroottypes"
+		o_multiple="true" o_type="checkbox" o_divider="<br>" o_optionsitem="_docTypes" o_meta="true"
+	/>
+</tml:case>
+
 <script>
 	require(["jquery", "jquery-textarea-autogrow"], function($){
 		$("#<tml:script expression="tmlform.formid"/> textarea").autogrow();

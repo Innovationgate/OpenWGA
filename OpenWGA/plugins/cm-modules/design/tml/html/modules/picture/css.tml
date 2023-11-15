@@ -1,0 +1,7 @@
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".content-modules .module-cm_picture">
+
+	img: {
+		max_width: "100%",
+	}
+
+</tml:include>

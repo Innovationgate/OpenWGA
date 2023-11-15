@@ -25,7 +25,6 @@
 package de.innovationgate.wgpublisher.expressions.tmlscript;
 
 import de.innovationgate.ext.org.mozilla.javascript.Context;
-import de.innovationgate.ext.org.mozilla.javascript.Delegator;
 import de.innovationgate.ext.org.mozilla.javascript.Function;
 import de.innovationgate.ext.org.mozilla.javascript.NativeJavaObject;
 import de.innovationgate.ext.org.mozilla.javascript.Scriptable;
@@ -33,7 +32,8 @@ import de.innovationgate.ext.org.mozilla.javascript.ScriptableObject;
 
 public class SynchronizedFunction extends ScriptableObject implements Function {
     
-    private Object _syncObj;
+	private static final long serialVersionUID = 1L;
+	private Object _syncObj;
     private Function _function;
 
     public SynchronizedFunction(Function funcObj, Object syncObj, Scriptable scope) {

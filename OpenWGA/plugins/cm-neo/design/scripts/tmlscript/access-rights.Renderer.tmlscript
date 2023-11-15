@@ -1,0 +1,97 @@
+function Renderer() {
+}
+
+Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_structkey, $urlParam_contentkey) {
+
+	var data = {}
+
+	var _Struct = AFW.structentry($urlParam_structkey, $urlParam_dbkey)
+
+	if($urlParam_contentkey){
+		
+		var _Content=AFW.content($urlParam_contentkey, $urlParam_dbkey);
+		
+		if(_Content.mayEditContent())
+			data.may_edit_content = {
+				info: "Sie dürfen die Inhaltsversion bearbeiten.",
+				cssclass: "may"
+			}
+		else data.may_edit_content = {
+			info: _Content.getReason(),
+			cssclass: "may-not"
+		}
+
+		// Neue Version erstellen
+		if(_Content.mayCreateContent())
+			data.may_create_version = {
+				info: "Sie dürfen neue Sprachversionen erstellen.",
+				cssclass: "may"
+			}
+		else data.may_create_version = {
+			info: _Content.getReason(),
+			cssclass: "may-not"
+		}
+
+		// Verison löschen
+		if(_Content.mayDeleteContent())
+			data.may_delete_version = {
+				info: "Sie dürfen diese Inhaltsversionen löschen.",
+				cssclass: "may"
+			}
+		else data.may_delete_version = {
+			info: _Content.getReason(),
+			cssclass: "may-not"
+		}
+
+		// Unterseite erstellen
+		if(_Content.mayCreatePage())
+			data.may_create_page = {
+				info: "Sie dürfen neue Unterseiten erstellen.",
+				cssclass: "may"
+			}
+		else data.may_create_page = {
+			info: _Content.getReason(),
+			cssclass: "may-not"
+		}
+			
+	}
+	else{
+		// Neue Version erstellen
+		if(_Struct.mayCreateContent())
+			data.may_create_version = {
+				info: "Sie dürfen neue Sprachversionen erstellen.",
+				cssclass: "may"
+			}
+		else data.may_create_version = {
+			info: _Content.getReason(),
+			cssclass: "may-not"
+		}
+
+		// Unterseite erstellen
+		if(_Struct.mayCreatePage())
+			data.may_create_page = {
+				info: "Sie dürfen neue Unterseiten erstellen.",
+				cssclass: "may"
+			}
+		else data.may_create_page = {
+			info: _Content.getReason(),
+			cssclass: "may-not"
+		}
+	}
+
+
+	// Seite löschen
+	if(_Struct.mayDeletePage())
+		data.may_delete_page = {
+			info: "Sie dürfen diese Seite inkl. aller Unterseiten löschen.",
+			cssclass: "may"
+		}
+	else data.may_delete_page = {
+		info: _Struct.getReason(),
+		cssclass: "may-not"
+	}
+
+	//console.log(JSON.stringify(data))
+
+	WGA.TMLPage.write(JSON.stringify(data));
+}

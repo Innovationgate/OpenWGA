@@ -1,0 +1,41 @@
+<tml:script>
+	_responsive = WGA.design(db()).getGlobal("RESPONSIVE")
+
+	// calc image derivates width
+	_max_width=0;
+	var option_imagederivates = option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES)
+	if(option_imagederivates){
+		var match = /width~([0-9]+)/.exec(option_imagederivates)
+		if(match && match.length>0)
+			_max_width = match[1]
+	}
+
+	console.log("img", CMM.setting('image'))
+
+</tml:script>
+
+<picture>
+	<tml:case condition="CMM.setting('image_small')">
+		<tml:script>
+			_w = String(_responsive.medium.width-1);
+			_d_w = String(Math.min(_w, _max_width) || _w);
+		</tml:script>
+		<source
+			media="(max-width:<tml:item name="_w"/>px)"
+			srcset="<tml:url file="{CMM.setting('image_small')}" derivate="[width~{_d_w}]"/> <tml:script expression="createSrcSet(CMM.setting('image_small'), 'width~'+_d_w)"/>"
+		>
+	</tml:case>
+	<tml:case condition="CMM.setting('image_medium')">
+		<tml:script>
+			_w = String(_responsive.maxPageWidth-1);
+			_d_w = String(Math.min(_w, _max_width) || _w);
+		</tml:script>
+		<source
+			media="(max-width:<tml:item name="_w"/>px)"
+			srcset="<tml:url file="{CMM.setting('image_medium')}" derivate="[width~{_d_w}]"/> <tml:script expression="createSrcSet(CMM.setting('image_medium'), 'width~'+_d_w)"/>"
+		>
+	</tml:case>
+	
+	<tml:image file="{CMM.setting('image')}"/>
+	
+</picture>

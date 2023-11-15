@@ -10,6 +10,7 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
+import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
@@ -46,6 +47,11 @@ public class WGAHttpClient {
 		}
 		public String getText() throws IOException{
 			return _method.getResponseBodyAsString();
+		}
+		public String getResponseBodyAsString(int limit) throws IOException{
+			if(_method instanceof HttpMethodBase)
+				return ((HttpMethodBase)_method).getResponseBodyAsString(limit);
+			else return getText();
 		}
 		public InputStream getInputStream() throws IOException{
 			return _method.getResponseBodyAsStream();

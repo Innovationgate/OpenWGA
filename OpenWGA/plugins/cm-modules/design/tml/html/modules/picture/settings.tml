@@ -1,0 +1,14 @@
+<label>Default Bild</label>
+<div style="margin:10px">
+	<tml:include ref="util:select-image" o_fieldname="image" o_derivate="usage=poster" o_empty-text="Primäres Bild"/>
+</div>
+
+<label>Bild bei mittlerer Auflösung</label>
+<div style="margin:10px">
+	<tml:include ref="util:select-image" o_fieldname="image_medium" o_derivate="usage=poster" o_empty-text="Default Bild"/>
+</div>
+
+<label>Bild bei kleiner Auflösung</label>
+<div style="margin:10px">
+	<tml:include ref="util:select-image" o_fieldname="image_small" o_derivate="usage=poster" o_empty-text="Default Bild"/>
+</div>

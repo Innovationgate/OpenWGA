@@ -1,0 +1,27 @@
+function Renderer() {
+}
+
+Renderer.prototype.render = function() {
+	
+	var maxHeap = Packages.de.innovationgate.utils.WGUtils.getMaxHeap();
+	var currentHeap = java.lang.Runtime.getRuntime().totalMemory();
+	var free = java.lang.Runtime.getRuntime().freeMemory();
+	var used = currentHeap - free;
+
+	var data = {
+		maxHeap: WGA.format(maxHeap / 1024, "#,##0") + " KB",
+		current: WGA.format(currentHeap / 1024, "#,##0") + " KB",
+		unused: WGA.format(free / 1024, "#,##0") + " KB",
+		used: WGA.format(used / 1024, "#,##0") + " KB"
+			+ " (" + WGA.format(100*used/maxHeap, "0") + "%)"
+		,
+		usedGb: used / 1024 / 1024 / 1014,
+		p:{
+			current: 100 * currentHeap / maxHeap,
+			used: 100 * used / currentHeap
+		}
+	}
+	
+	WGA.TMLPage.write(JSON.stringify(data))
+	
+}

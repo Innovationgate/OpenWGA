@@ -22,7 +22,7 @@
 ## along with OpenWGA in file COPYING.
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
-<div class="rtf clearfix iefix">
+<div class="rtf">
 	<tml:item name="{scoped:body}" editor="rtf" label="{option('title')}"
 		highlightprefix ="<span class='lucene-highlight'>"
 		highlightsuffix="</span>"				

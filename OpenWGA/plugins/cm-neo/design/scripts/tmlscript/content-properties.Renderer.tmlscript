@@ -104,7 +104,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 			result = {
 				title: WGA.encode("JSON", c.TITLE),
 				pagetype: c.CONTENTTYPE,
-				pagename: c.PAGENAME
+				pagename: c.UNIQUENAME
 			}
 		}	
 	}

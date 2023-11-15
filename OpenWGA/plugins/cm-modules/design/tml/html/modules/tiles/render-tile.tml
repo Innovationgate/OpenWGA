@@ -41,10 +41,10 @@
 <div class="tile <tml:option name="module_classes"/>" 
 	style="width:<tml:item name="_width"/>"
 >
-	<@{_wrap_tag} @{_wrap_attribs encode="none"} class="content <tml:option name="module_classes"/>"
+	<@{_wrap_tag} @{_wrap_attribs encode="none"} class="content <tml:option name="module_classes"/><tml:case if="$option_lazy_backgrounds"> lazy-background</tml:case>"
 		style="<tml:script>
 			var styles = [
-				"justify-content:"+CMM.setting('justify_content')
+				"justify-content:" + (CMM.setting('justify_content') || "flex-start"),
 			];
 			var image = CMM.setting("image")
 			if(image){

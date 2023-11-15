@@ -720,7 +720,7 @@ public class WebTMLCache {
 
         CacheEntry cacheEntry = new CacheEntry(content, cacheDate, latency);
         CacheEntryParams params = new CacheEntryParams(dbKey, 0);
-        cache.writeEntryWithParams(cacheKey.toString(), cacheEntry, params);
+        cache.writeWithParams(cacheKey.toString(), cacheEntry, params);
         
         return cacheEntry;
         
@@ -735,8 +735,6 @@ public class WebTMLCache {
         return putCacheEntry(_preloadCache, dbKey, tagid, key, content ,cacheDate, latency);
     }
    
-    
-
 
     public int getCapacity() {
         return _capacity;

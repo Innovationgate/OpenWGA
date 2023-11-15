@@ -196,7 +196,8 @@
 	}
 }
 
-#dialog-custom {
+#dialog-custom,
+#dialog-paste-page {
 	width: 800px;
 	margin-left: -400px;
 }
@@ -312,10 +313,23 @@
 form .select-tree{
 
 	position: relative;
+	display: none;
+	//padding-top:5px
+	
+	.dropdown{
+		margin: 10px 0;
+	}
+	
+	li.search{
+		padding: 5px 10px;
+		input{
+			width: 100%;
+			padding: 2px 10px;
+		}
+	}
 	
 	.tree{
-		display: none;
-		
+		border-radius: 4px;
 		max-height: 250px;
 		width: 100%;
 		background: white;

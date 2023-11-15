@@ -130,6 +130,7 @@
 	_maxHeapString = maxHeap != -1 ? (format(maxHeap / 1024,"#,##0")) + " KB" : "(Not determinable in this Java VM. Must be Version 1.4 or higher)";	
 	_currentHeapSize = format(runtime.totalMemory() / 1024,"#,##0")+ " KB";
 	_unusedMemory = format(runtime.freeMemory() / 1024,"#,##0")+ " KB";
+	_usedMemory = format((runtime.totalMemory() - runtime.freeMemory()) / 1024,"#,##0")+ " KB";
 	_javaVendor = system.getProperty("java.vendor");
 	_javaVersion = system.getProperty("java.version");
 	_javaVm = system.getProperty("java.vm.name") + " Version " + system.getProperty("java.vm.version") + " (" + system.getProperty("java.vm.vendor") + ")";

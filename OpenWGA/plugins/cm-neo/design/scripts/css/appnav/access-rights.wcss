@@ -1,0 +1,20 @@
+.access-rights{
+
+	padding: 10px;
+
+	.headline{
+		font-size: 2em;
+	}
+			
+	.title{
+		font-weight: bold;
+		margin: 30px 0 10px;
+		border-bottom: solid silver 1px;
+	}
+	.info{
+		&.may-not{
+			color: red;
+		}
+	}
+
+}

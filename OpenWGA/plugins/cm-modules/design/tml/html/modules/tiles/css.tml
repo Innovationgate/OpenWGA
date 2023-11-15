@@ -16,6 +16,17 @@
 			box_sizing: "border-box",
 			margin: 0,
 			padding: "10px",
+			
+			".module-cm_tiles": {
+				// Sub-Kacheln
+				"&:first-child .tile": {
+					padding_top: 0
+				},
+				"&:last-child .tile": {
+					padding_bottom: 0
+				}
+			},
+			
 			">.content":{
 				height: "100%",
 				box_sizing: "border-box",

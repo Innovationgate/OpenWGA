@@ -2,6 +2,11 @@
 
 <tml:script>
 	_dbkey = $option_dbkey || meta('db', 'dbkey')
+	_area = AREA;
+
+	var areas = App.getAllowedAreaNames(_dbkey);
+	if(!_area || !areas.contains(_area))
+		_area = areas.get(0);
 </tml:script>
 
 <tml:if condition="tmlform.mode()=='edit' && $option_mode!='view' && $option_mode!='readonly'">
@@ -17,9 +22,8 @@
 									var path=[struct.getStructKey()];
 									for(var parent=struct.getParentEntry(); parent; parent=parent.getParentEntry())
 										path.push(parent.getStructKey().toString());
-								
-									path.push("area-"+struct.getArea().getName());
 									_path = path.reverse().join("/");
+									_area = struct.getArea().getName();
 								</tml:script>
 								<tml:path role="none">
 									<tml:meta name="title"/>
@@ -36,13 +40,22 @@
 			</a>
 			<a href="#" style="display:none" class="clear-key-field" id="clear-key-<tml:option name="fieldname"/>" title="Auswahl löschen">&times</a>
 			<div class="select-tree">
-				<div class="tree" id="tree-<tml:option name="fieldname"/>" data-url="<tml:url type="tml" medium="json" layout="siteexplorer" u-dbkey="_dbkey" u_language="{$option_language||LANGUAGE}"/>"></div>
+				<div class="dropdown" id="area-dropdown-<tml:option name="fieldname"/>">
+					<a class="area-menu form-control" href="#" data-toggle="dropdown">
+						<span class="area-title">Bereich <tml:script expression="App.getAreaTitle(_area)"/></span>
+				  	</a>
+					<ul class="dropdown-menu"></ul>
+				</div>
+				<div class="tree" id="tree-<tml:option name="fieldname"/>" data-url="<tml:url type="tml" medium="json" layout="siteexplorer" u-area="_area" u-dbkey="_dbkey" u_language="{$option_language||LANGUAGE}"/>"></div>
 			</div>
 		</div>
 		
 		<script>
-			require(["jquery", "jquery-tree"], function($){
+			require(["jquery", "siteexplorer", "jquery-tree"], function($, Explorer){
 		
+				var tree;
+				var baseurl = "<tml:url type="tml" medium="json" layout="siteexplorer" u-dbkey="_dbkey" u_language="{$option_language||LANGUAGE}"/>";
+				
 				var el = $("#select-key-<tml:option name="fieldname"/>");
 				var field = $("[name='<tml:option name="fieldname"/>']");
 				
@@ -53,7 +66,21 @@
 				
 				el.on("focus click", function(ev){
 					ev.preventDefault();
-					tree.show();
+					tree && tree.parent().show();
+				})
+
+				// build areas drop-down
+				Explorer.buildAreasList($("#area-dropdown-<tml:option name="fieldname"/> ul"), "<tml:url type="tml" medium="json" layout="areas" u-dbkey="_dbkey" u_not_empty="true"/>");
+				$("#area-dropdown-<tml:option name="fieldname"/>").on("shown.bs.dropdown", function(){
+					$("#area-dropdown-<tml:option name="fieldname"/> input").focus();
+				})
+				$("#area-dropdown-<tml:option name="fieldname"/> ul").on("click", "li a", function(ev){
+					ev.preventDefault();
+					var $this = $(ev.target);
+					$("#area-dropdown-<tml:option name="fieldname"/> .area-menu .area-title").html("Bereich " + $this.html())
+					$("#tree-<tml:option name="fieldname"/>").wga_tree("reload", {
+						url: baseurl + "&area=" + $this.data("name")
+					});					
 				})
 			
 				$("#clear-key-<tml:option name="fieldname"/>").on("click", function(ev){
@@ -87,7 +114,7 @@
 					path.push(node.title)
 					$(".title", el).html(path.join(" / "));
 					//$(".title", el).html(node.title);
-					tree.hide();
+					tree.parent().hide();
 
 					$(".placeholder", el).hide();
 					$("#clear-key-<tml:option name="fieldname"/>").show();
@@ -97,7 +124,7 @@
 				$(document).on("focusin click", function(ev){
 					var wrapper = el.parent();
 					if(wrapper.has(ev.target).length==0)
-						tree.hide();
+						tree.parent().hide();
 				})
 			
 			})

@@ -3,40 +3,36 @@ function Controller() {}
 // Vererbung
 Controller.prototype = Object.create($.dialogs.StructList.prototype);
 
-Controller.prototype.prepare = function($cx, $item__CM_clipboard_context) {
+Controller.prototype.prepare = function(App, $cx, $item__CM_clipboard_context) {
 
-	// Areas
-	var areas = WGA.createList()
-	var systemAreas = WGA.createList()
-	for(let area in Iterator($cx.db().getAreas().values())){
-		if(area.name=="$templates"){
-			if(!WGA.app($cx).isChiefEditor())				
-				continue
-		}
-		else if(area.systemArea)
-			continue;
-		if(area.name=="hdb-content" && !WGA.app($cx).isManager())
-			continue;
-		var visiblefor = area.getExtensionData("CM_area_visible")
-		if(visiblefor && visiblefor.size() && !$cx.db().isMemberOfUserList(visiblefor))
-			continue;
-		if(!area.mayEditPages())
-			continue;
-		if(area.mayReadContent()){
-			if(area.name=="$templates")
-				systemAreas.add("Seitenvorlagen|" + area.name)
-			else areas.add(area.name)
+	var areas = WGA.List();
+	var systemAreas = WGA.List();
+	var allAreas = App.getAllowedAreas($cx.db().getDbReference(), true);
+	var defaultArea;
+	for(let area in Iterator(allAreas)){
+		if(area.isSystemArea())
+			systemAreas.add(App.getAreaTitle(area.name) + "|" + area.name)
+		else {
+			areas.add(App.getAreaTitle(area.name) + "|" + area.name)
+			defaultArea = defaultArea || area.name;
 		}
 	}
-	areas.addAll(systemAreas)
+
+	var root_or_child = ["unter Seite '" + $cx.TITLE + "'|child"];
+	if(allAreas.size())
+		root_or_child.push("Als Hauptseite|root")
 
 	return {
 		$options: {
-			root_or_child: [
-				"unter Seite '" + $cx.TITLE + "'|child",
-				"Als Hauptseite|root"
-			],
-			areas: areas
+			root_or_child: root_or_child,
+			areas: areas,
+			defaultArea: allAreas.contains($cx.AREA) ? AREA : defaultArea || (allAreas.size() && allAreas.get(0).name),
+			systemAreas: systemAreas.size() && [
+				{
+					label: "Systembereiche",
+					options: systemAreas
+				}
+			] 
 		}
 	}
 

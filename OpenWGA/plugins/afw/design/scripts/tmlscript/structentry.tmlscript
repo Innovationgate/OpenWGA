@@ -160,8 +160,9 @@ this.mayDeletePage=function(deep_check){
 		if(errorCode){
 			if(e.javaException.getCauseDocument)
 				cause = e.javaException.getCauseDocument();
-			if(cause && cause.getTitle && cause.getTitle()){
-				return _false(label("reason."+errorCode, [cause.getTitle(), e.javaException.getCauseDocumentKey()]))
+			if(cause){
+				var causeTitle = cause.getTitle ? cause.getTitle() : cause.getName ? cause.getName() : "unknown";
+				return _false(label("reason."+errorCode, [causeTitle]))
 			}
 			else {
 				cause = e.javaException.getCauseDocumentKey();

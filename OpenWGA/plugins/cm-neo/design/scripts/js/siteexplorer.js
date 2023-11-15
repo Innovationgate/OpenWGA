@@ -75,6 +75,9 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 			}
 		})
 
+		$("#area-dropdown").on("shown.bs.dropdown", function(){
+			$("#area-dropdown input").focus();
+		})
 		$("#area-dropdown ul").on("click", "li a", function(ev){
 			ev.preventDefault();
 			var $this = $(ev.target);
@@ -83,6 +86,8 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 			$("#explorer").wga_tree("reload", {
 				url: getURL()
 			});
+			//$("#area-dropdown input").val("");
+			//$("#area-dropdown li").show();
 		})
 
 		var context = Appnav.getContext();
@@ -111,15 +116,48 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 	}
 	
 	function buildAreas(callback){
-		$.getJSON(area_json_url + "?dbkey=" + dbkey, function(areas){
+		
+		buildAreasList($("#area-dropdown ul"), area_json_url + "?dbkey=" + dbkey, function(){
+			if(!area){
+				$("#area-dropdown .area-menu .area-title").html("Kein Bereich ausgewählt");
+			}
+			else $("#area-dropdown .area-menu .area-title").html(getAreaTitle(area));
+			
+			if(callback)
+				callback()			
+		})
+		
+	}
+
+	function buildAreasList(el, url, callback){
+		$.getJSON(url, function(areas){
 			//console.log(areas);
-			var el = $("#area-dropdown ul")
 			el.html("");
+			el.append("<li class='search'><input placeholder='Filtern ...'></li>");
+			$("input", el).on("keyup", function(ev){
+				//console.log("key", ev.key);
+				if(ev.key=="Escape")
+					$(this).val("");
+				else if(ev.key=="ArrowDown")
+					$("li:visible a", el).first().focus()
+				
+				var val = $(this).val();
+				$("li.area", el).each(function(){
+					var $this = $(this);
+					if(!val)
+						$this.show("fast");
+					else {
+						if($("a", $this).html().toLowerCase().indexOf(val.toLowerCase())>=0)
+							$this.show("fast");
+						else $this.hide("fast");
+					}
+				})
+			})
 			var systemAreas=[];
 			for(var i=0; i<areas.length; i++){
 				if(areas[i].systemArea)
 					systemAreas.push(areas[i])
-				else el.append("<li><a href='#' data-name='" + areas[i].name + "'>" + getAreaTitle(areas[i].name) + "</a></li>"); 
+				else el.append("<li class='area'><a href='#' data-name='" + areas[i].name + "'>" + getAreaTitle(areas[i].name) + "</a></li>"); 
 			}
 			if(systemAreas.length){
 				el.append("<li class='divider'></li>")
@@ -127,11 +165,6 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 					el.append("<li><a href='#' data-name='" + systemAreas[i].name + "'>" + getAreaTitle(systemAreas[i].name) + "</a></li>");
 				}
 			}
-			
-			if(!area){
-				$("#area-dropdown .area-menu .area-title").html("Kein Bereich ausgewählt");
-			}
-			else $("#area-dropdown .area-menu .area-title").html(getAreaTitle(area));
 			
 			if(callback)
 				callback()
@@ -189,15 +222,20 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 	})
 
 	function getAreaTitle(area){
-		if(area=="$templates")
-			return "Seitenvorlagen";
-		else if(area=="$trash-cm-neo")
-			return "Papierkorb";
-		else return area;
+		var aliases = {	
+			"$templates": "Seitenvorlagen",
+			"$trash": "Papierkorb CM-Classico",
+			"$trash-cm-neo": "Papierkorb CM-Neo",
+			"hdb-system": "HDB System",
+			"hdb-content": "HDB Content"
+		}
+
+		return aliases[area] || area;
 	}
 	
 	return{
 		init: init,
+		buildAreasList: buildAreasList,
 		forceReload: function(){
 			area=null;
 		},
