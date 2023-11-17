@@ -691,7 +691,7 @@ public class Input extends ActionBase implements DynamicAttributes {
 						addWarning("Unable to parse date for input option. Exception: " + e.getMessage());
 					}
 					if (dateValue != null && values.contains(dateValue)) {
-	    				this.appendResult(" selected=\"true\"");
+	    				this.appendResult(" selected");
 	    			}
             	} 
             	else if (getType().equalsIgnoreCase("number")) {
@@ -709,13 +709,13 @@ public class Input extends ActionBase implements DynamicAttributes {
             		 * "values" always is a list of doubles. We therefore need to convert numberValue to a double
             		 */
             		if (numberValue != null && values.contains(numberValue.doubleValue())) {
-	    				this.appendResult(" selected=\"true\"");
+	    				this.appendResult(" selected");
 	    			}
 	    			
             	} 
             	else {
 	    			if ((optionValue != null && values.contains(optionValue)) || (optionValue == null && values.contains(optionText))) {
-	    				this.appendResult(" selected=\"true\"");
+	    				this.appendResult(" selected");
 	    			}
             	}
     			
