@@ -623,13 +623,15 @@ public class Input extends ActionBase implements DynamicAttributes {
     }
     
 	private void renderFileInput(String type, String name, String cssClass, String cssStyle, List<Object> values, String tagContent, String disabled) throws WGException {
-			// Build html
-			this.appendResult("<input").appendResult(buildDynamicHtmlAttributes()).appendResult(" type=\"").appendResult(type).appendResult("\" name=\"").appendResult(name).appendResult("\" ");
-			this.appendResult(" value=\"").appendResult("\" ");
-			if (isMultipleInput()) {
-				appendResult(" multiple ");
-			}
-			this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">").appendResult("<br>");
+		// Build html
+		this.appendResult("<input").appendResult(buildDynamicHtmlAttributes()).appendResult(" type=\"").appendResult(type).appendResult("\" name=\"").appendResult(name).appendResult("\" ");
+		String theId = getId();
+		if (theId!=null)
+			this.appendResult(" id=\"" + theId + "\"");
+		if (isMultipleInput()) {
+			appendResult(" multiple ");
+		}
+		this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">").appendResult("<br>");
 	}
 
 	private void renderSelectInput(String name, String cssClass, String cssStyle, FormInputRegistrator form, List<Object> values, String tagContent, String disabled, boolean onlySelectedValues, String format) throws FormattingException, WGException {
