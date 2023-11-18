@@ -62,7 +62,7 @@
 
 <div class="clearfix formfield field-type-<tml:script expression="CMM.setting('fieldtype')"/><tml:case condition="tmlform.hasmessage(_fieldname)"> error</tml:case>">
 	<tml:case condition="_label">
-		<label for="<tml:option name="ns"/>" <tml:case condition="_validation">class="required"</tml:case>>
+		<label <tml:case condition="!_opts">for="<tml:option name="ns"/>"</tml:case> <tml:case condition="_validation">class="required"</tml:case>>
 			<tml:item name="_label"/>
 		</label>
 	</tml:case>
@@ -82,7 +82,7 @@
 			<tml:case condition="CMM.setting('fieldtype')=='date'">
 				data-year-range="<tml:[setting] o_name="year_range" o_default="-10:+10"/>"
 			</tml:case>
-			<tml:case condition="CMM.setting('placeholder')">
+			<tml:case condition="!_opts && CMM.setting('placeholder')">
 				placeholder="<tml:[setting] o_name="placeholder"/>"
 			</tml:case>
 		</tml:input>
