@@ -894,7 +894,7 @@ public class Input extends ActionBase implements DynamicAttributes {
 			if ( optionValue != null ) {
 				for( int i=0 ; i < values.size() ; i++){
 					if( String.valueOf( values.get(i) ).equalsIgnoreCase(optionValue) ){
-						this.appendResult(" checked=\"true\"");
+						this.appendResult(" checked");
 					}
 				}				
 			}			
@@ -1100,7 +1100,7 @@ public class Input extends ActionBase implements DynamicAttributes {
     
     			if ( optionValue != null ) {				
     				if( String.valueOf( value ).equalsIgnoreCase(optionValue) ){
-    					this.appendResult(" checked=\"true\"");
+    					this.appendResult(" checked");
     				}								
     			}			
     			this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">");
@@ -1138,7 +1138,7 @@ public class Input extends ActionBase implements DynamicAttributes {
             createChangeActionJS(name, form, "onclick");
             
             if ( value.booleanValue() == true ) {                
-                this.appendResult(" checked=\"true\"");
+                this.appendResult(" checked");
             }
             
             if (options.size() == 1 && options.get(0).isDisabled()) {
