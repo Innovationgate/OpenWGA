@@ -77,7 +77,8 @@
 			divider="{_divider}"
 			default="{CMM.setting('defaultvalue')}" 
 			type="{CMM.setting('fieldtype')||'text'}" 
-			optionsitem="_opts"			
+			optionsitem="_opts"		
+			multiple="{CMM.setting('multiple')||VOID}"	
 		>
 			<tml:case condition="CMM.setting('fieldtype')=='date'">
 				data-year-range="<tml:[setting] o_name="year_range" o_default="-10:+10"/>"
