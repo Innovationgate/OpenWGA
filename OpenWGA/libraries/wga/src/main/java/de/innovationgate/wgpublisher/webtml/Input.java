@@ -631,7 +631,7 @@ public class Input extends ActionBase implements DynamicAttributes {
 		if (isMultipleInput()) {
 			appendResult(" multiple ");
 		}
-		this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">").appendResult("<br>");
+		this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">");
 	}
 
 	private void renderSelectInput(String name, String cssClass, String cssStyle, FormInputRegistrator form, List<Object> values, String tagContent, String disabled, boolean onlySelectedValues, String format) throws FormattingException, WGException {
