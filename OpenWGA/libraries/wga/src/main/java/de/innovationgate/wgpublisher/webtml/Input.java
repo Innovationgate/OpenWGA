@@ -691,7 +691,7 @@ public class Input extends ActionBase implements DynamicAttributes {
 						addWarning("Unable to parse date for input option. Exception: " + e.getMessage());
 					}
 					if (dateValue != null && values.contains(dateValue)) {
-	    				this.appendResult(" selected");
+	    				this.appendResult(" selected ");
 	    			}
             	} 
             	else if (getType().equalsIgnoreCase("number")) {
@@ -709,13 +709,13 @@ public class Input extends ActionBase implements DynamicAttributes {
             		 * "values" always is a list of doubles. We therefore need to convert numberValue to a double
             		 */
             		if (numberValue != null && values.contains(numberValue.doubleValue())) {
-	    				this.appendResult(" selected");
+	    				this.appendResult(" selected ");
 	    			}
 	    			
             	} 
             	else {
 	    			if ((optionValue != null && values.contains(optionValue)) || (optionValue == null && values.contains(optionText))) {
-	    				this.appendResult(" selected");
+	    				this.appendResult(" selected ");
 	    			}
             	}
     			
@@ -811,10 +811,10 @@ public class Input extends ActionBase implements DynamicAttributes {
 			for(InputOption option: optgroup.getOptions()){
 				result.append("<option value=\"" + option.getValue() + "\"");
     			if (values.contains(option.getValue())) {
-    				result.append(" selected");
+    				result.append(" selected ");
     			}
     			if(option.isDisabled())
-    				result.append(" disabled");
+    				result.append(" disabled ");
 				result.append(">" + option.getText() + "</option>");				
 			}
 			result.append("</optgroup>");
@@ -894,7 +894,7 @@ public class Input extends ActionBase implements DynamicAttributes {
 			if ( optionValue != null ) {
 				for( int i=0 ; i < values.size() ; i++){
 					if( String.valueOf( values.get(i) ).equalsIgnoreCase(optionValue) ){
-						this.appendResult(" checked");
+						this.appendResult(" checked ");
 					}
 				}				
 			}			
@@ -1100,7 +1100,7 @@ public class Input extends ActionBase implements DynamicAttributes {
     
     			if ( optionValue != null ) {				
     				if( String.valueOf( value ).equalsIgnoreCase(optionValue) ){
-    					this.appendResult(" checked");
+    					this.appendResult(" checked ");
     				}								
     			}			
     			this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">");
@@ -1138,7 +1138,7 @@ public class Input extends ActionBase implements DynamicAttributes {
             createChangeActionJS(name, form, "onclick");
             
             if ( value.booleanValue() == true ) {                
-                this.appendResult(" checked");
+                this.appendResult(" checked ");
             }
             
             if (options.size() == 1 && options.get(0).isDisabled()) {
