@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
+import com.drew.metadata.mp4.media.Mp4VideoDirectory;
 import com.drew.metadata.webp.WebpDirectory;
 
 import de.innovationgate.utils.SimpleImageInfo;
@@ -77,18 +78,31 @@ public class WGADefaultFileAnnotator implements WGFileAnnotator {
             }
         }
 
-        // try webP using ImageMetadataReader
+        // try webP or Mp4 using ImageMetadataReader
         if (mimeType == null || displayWidth == -1 || displayHeight == -1) {
         	in = null;
         	try {
 				in = originalFileData.getInputStream();
 				Metadata metadata = ImageMetadataReader.readMetadata(in);
+				// WebP ?
 				Directory directory = metadata.getFirstDirectoryOfType(WebpDirectory.class);
-			    if(directory!=null && directory.containsTag(WebpDirectory.TAG_IMAGE_WIDTH) && directory.containsTag(WebpDirectory.TAG_IMAGE_HEIGHT)){
-			    	displayWidth = directory.getInt(WebpDirectory.TAG_IMAGE_WIDTH);
-			    	displayHeight = directory.getInt(WebpDirectory.TAG_IMAGE_HEIGHT);
-			    	mimeType = "image/webp";
-			    }				
+			    if(directory!=null){
+			    	// WebP !
+			    	if(directory.containsTag(WebpDirectory.TAG_IMAGE_WIDTH) && directory.containsTag(WebpDirectory.TAG_IMAGE_HEIGHT)){
+				    	displayWidth = directory.getInt(WebpDirectory.TAG_IMAGE_WIDTH);
+				    	displayHeight = directory.getInt(WebpDirectory.TAG_IMAGE_HEIGHT);
+				    	mimeType = "image/webp";
+			    	}
+			    }
+			    else{
+			    	// MP4 ?
+			    	directory = metadata.getFirstDirectoryOfType(Mp4VideoDirectory.class);
+			    	if(directory!=null && directory.containsTag(Mp4VideoDirectory.TAG_WIDTH) && directory.containsTag(Mp4VideoDirectory.TAG_HEIGHT)){
+				    	displayWidth = directory.getInt(Mp4VideoDirectory.TAG_WIDTH);
+				    	displayHeight = directory.getInt(Mp4VideoDirectory.TAG_HEIGHT);
+				    	mimeType = "video/mp4";
+			    	}
+			    }
 			} catch (Exception e) {
 				// Fail silently
 			}
