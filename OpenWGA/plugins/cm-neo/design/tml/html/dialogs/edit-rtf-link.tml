@@ -166,16 +166,22 @@
 		
 		<tml:script>
 			if(!tmlform.submitted){
+
 				tmlform.target = $option_dialog_options.target;
-				if(!$option_dialog_options.target || $option_dialog_options.target=="_self")
-					tmlform.target_window = "self";
-				else if($option_dialog_options.target=="_blank")
-					tmlform.target_window = "blank";
-				else tmlform.target_window = "custom";
+				tmlform.target_window = $option_dialog_options.target_window;
+				
+				if(!$option_dialog_options.target_window){
+					// Not set: backwards compatility				
+					if(!tmlform.target || tmlform.target=="_self")
+						tmlform.target_window = "self";
+					else if(tmlform.target=="_blank")
+						tmlform.target_window = "blank";
+					else tmlform.target_window = "custom";
+				}
 			}
 		</tml:script>
 		<tml:[form-field] o_label="Zielfenster" o_name="target_window" o_type="select" 
-			o_options="gleiches Fenster|self,neues Fenster|blank,neues Fenster mit eigenem Fensternamen|custom"
+			o_options="Default|default,Gleiches Fenster|self,Neues Fenster|blank,Neues Fenster mit eigenem Fensternamen|custom"
 			o_changeaction="setTargetWindow"
 		/>
 		
@@ -239,6 +245,8 @@
 				}
 				a = editor.createLink(url, url, "exturl");
 				editor.setURLInfo(a, {type:"exturl", key:url})
+				if(target_window=="default")
+					a.target = "_blank"
 			}
 			else if(type=="layout"){
 				var layout = $("[name=layout]", form).val();
@@ -314,6 +322,8 @@
 				a.target = target;
 			}
 
+			a.dataset.target=target_window;
+
 			Modal.hide();
 
 		})
@@ -328,6 +338,8 @@
 			var type = $("[name=type]", form).val();
 			var target = $("[name=target]", form).val();
 			var target_window = $("[name=target_window]", form).val();
+			
+			a.removeAttribute("target");
 			
 			if(target_window=="custom" && !target){
 				alert("Bitte geben Sie einen Fensternamen ein.");
@@ -408,6 +420,8 @@
 					type: type, 
 					key: url
 				})
+				if(target_window=="default")
+					a.target = "_blank"
 			}
 			
 			a.title = $("[name=title]", form).val();
@@ -417,7 +431,9 @@
 			else if(target_window=="custom"){
 				a.target = target;
 			}
-			else a.removeAttribute("target")
+			//else a.removeAttribute("target")
+			
+			a.dataset.target=target_window;
 			
 			Modal.hide();
 				

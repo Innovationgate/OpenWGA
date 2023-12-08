@@ -238,6 +238,7 @@ define([
 					var el = editor.createLink(data.href, data.title, "int");
 					editor.setURLInfo(el, {type:"int", key:data.id})
 					el.alt = el.title = data.title;
+					el.dataset.target="default"
 					editor.getRange().setStartAfter(el);
 			    	return;
 			    }
@@ -289,6 +290,8 @@ define([
 				
 				if(as_link && !editor.toolbar.isCmdDisabled("InsertLink")){
 					var el = editor.createLink(file.url, file.name, file.type||"intfile");
+					el.dataset.target="default";
+					el.title = file.title || file.name;
 					editor.setURLInfo(el, {type:file.type||"intfile", key:file.key||file.name})
 					editor.getRange().setStartAfter(el);
 				}
@@ -331,6 +334,7 @@ define([
 				else{
 					// create link
 					var el = editor.createLink(filename, filename, "intfile");
+					el.dataset.target="default";
 					editor.setURLInfo(el, {type:"intfile", key:filename})
 					editor.getRange().setStartAfter(el);
 					UploadManager.upload(file)
