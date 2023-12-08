@@ -392,6 +392,10 @@ public class Server {
         
     }
     
+    public String getServerName(){
+    	return _wga.getCore().getWgaConfiguration().getServerName();
+    }
+    
     /**
      * Returns the folder in which is used for WGA configuration
      * Every OpenWGA installation uses a special folder for file data that is managed by the server itself. This contains files like the basic OpenWGA configuration file "wgaconfig.xml", the plugin management folder, folders for internally managed databases etc.
