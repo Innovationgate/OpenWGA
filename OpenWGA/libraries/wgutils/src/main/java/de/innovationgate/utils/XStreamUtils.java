@@ -174,15 +174,15 @@ public abstract class XStreamUtils {
     
     public static XStream createXStream(){
     	XStream xstream = new XStream(new DomDriver());
-    	//xstream.addPermission(AnyTypePermission.ANY);
-    	xstream.allowTypesByWildcard(new String[] {"de.innovationgate.**", "org.dom4j.**"});
+    	xstream.addPermission(AnyTypePermission.ANY);
+    	//xstream.allowTypesByWildcard(new String[] {"de.innovationgate.**", "org.dom4j.**"});
     	return xstream;
     }
 
 	public static XStream createXStream(Dom4JDriver driver) {
     	XStream xstream = new XStream(driver);
-    	//xstream.addPermission(AnyTypePermission.ANY);
-    	xstream.allowTypesByWildcard(new String[] {"de.innovationgate.**", "org.dom4j.**"});
+    	xstream.addPermission(AnyTypePermission.ANY);
+    	//xstream.allowTypesByWildcard(new String[] {"de.innovationgate.**", "org.dom4j.**"});
     	return xstream;
 	}
     
