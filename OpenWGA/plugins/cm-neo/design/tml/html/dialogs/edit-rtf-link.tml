@@ -183,7 +183,11 @@
 		<tml:[form-field] o_label="Zielfenster" o_name="target_window" o_type="select" 
 			o_options="Default|default,Gleiches Fenster|self,Neues Fenster|blank,Neues Fenster mit eigenem Fensternamen|custom"
 			o_changeaction="setTargetWindow"
-		/>
+		>
+			<tml:case condition="tmlform.target_window=='default'">
+				Interne Links im gleichen Fenster, externe Links in neuem Fenster
+			</tml:case>
+		</tml:[form-field]>
 		
 		<tml:case condition="tmlform.target_window=='custom'">
 			<tml:[form-field] o_label="Name des Zielfensters" o_name="target" o_placeholder="Name eingeben ..."/>
