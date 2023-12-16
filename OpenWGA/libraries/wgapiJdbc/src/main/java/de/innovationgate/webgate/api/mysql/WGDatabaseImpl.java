@@ -25,33 +25,21 @@
 
 package de.innovationgate.webgate.api.mysql;
 
-
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import org.hibernate.dialect.MySQL5Dialect;
-import org.hibernate.dialect.MySQLDialect;
 import org.hibernate.jdbc.Work;
-import org.omg.CORBA._PolicyStub;
 
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGDocument;
-import de.innovationgate.webgate.api.WGFactory;
 import de.innovationgate.webgate.api.WGInvalidDatabaseException;
 import de.innovationgate.webgate.api.WGNotSupportedException;
 import de.innovationgate.webgate.api.WGUserAccess;
@@ -60,7 +48,6 @@ import de.innovationgate.webgate.api.jdbc.CSSJSModule;
 import de.innovationgate.webgate.api.jdbc.Content;
 import de.innovationgate.webgate.api.jdbc.ContentType;
 import de.innovationgate.webgate.api.jdbc.FileContainer;
-import de.innovationgate.webgate.api.jdbc.HotPatch;
 import de.innovationgate.webgate.api.jdbc.Language;
 import de.innovationgate.webgate.api.jdbc.MainEntity;
 import de.innovationgate.webgate.api.jdbc.StructEntry;
@@ -71,9 +58,7 @@ public class WGDatabaseImpl extends de.innovationgate.webgate.api.jdbc.WGDatabas
 
     public static final String SOCKET_TIMEOUT_DEFAULT = "600000";
     public static final String CONNECT_TIMEOUT_DEFAULT = "60000";
-    public static final String DRIVER = "com.mysql.jdbc.Driver";
-    
-
+    public static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 
     public WGUserAccess open(WGDatabase db, String path, String user, String pwd, boolean prepareOnly) throws WGAPIException {
         
