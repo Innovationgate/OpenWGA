@@ -157,13 +157,11 @@
 		</tml:case>
 	</div>
 
-	<tml:case condition="tmlform.submitted">
-		<script>
-			require(["<tml:url type="js" name="::publish-page"/>"], function(Module){
-				Module()
-			})
-		</script>
-	</tml:case>
-
 </tml:form>	
+
+<script>
+	require(["<tml:url type="js" name="::publish-page"/>"], function(Module){
+		Module()
+	})
+</script>
 
