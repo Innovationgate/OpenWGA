@@ -61,7 +61,7 @@
 					</tml:if>
 				</div>
 				<script>
-					require(["jquery"], function(){
+					require(["jquery"], function($){
 						$(".result.<tml:item name="_id"/> .bar<tml:item name="_i"/>").animate({"width":"<tml:item format="0" name="_value"/>%"}, 1000);
 					})
 				</script>

@@ -33,7 +33,7 @@
 
 <tml:case condition="CMM.setting('onclick')=='zoom'">
 	<tml:[script]>
-		require(["jquery-lightbox", "jquery-swipehandler"], function(){
+		require(["jquery", "jquery-lightbox", "jquery-swipehandler"], function($){
 			$("#module-<tml:option name="ns"/> img").css("cursor", "pointer").lightbox({
 				group: "<tml:script expression="CMM.setting('image_group')||'default'"/>"
 			})
@@ -43,7 +43,7 @@
 
 <tml:case condition="$mc.url_mo">
 	<script>
-		require(["jquery"], function(){
+		require(["jquery"], function($){
 			var src = $("#module-<tml:option name="ns"/> img").prop("src"); 
 			var srcset = $("#module-<tml:option name="ns"/> img").prop("srcset");
 			$("#module-<tml:option name="ns"/> img").on({

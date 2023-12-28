@@ -82,7 +82,7 @@
 </div>
 
 <script>
-	require(["jquery", "jquery-columnslider", "jquery-swipehandler"], function(){
+	require(["jquery", "jquery-columnslider", "jquery-swipehandler"], function($){
 		$("#module-<tml:option name="ns"/> .column-slider").columnslider({
 			<tml:case condition="CMM.setting('autorun')">
 				autoslide: 4000

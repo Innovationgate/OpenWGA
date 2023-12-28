@@ -93,7 +93,7 @@
 </video>
 
 <script>
-	require(["jquery"], function(){
+	require(["jquery"], function($){
 		$("#module-<tml:option name="ns"/> source").each(function(index, el){
 			el.src = el.src.split(";").slice(0)[0];
 		})

@@ -79,9 +79,9 @@
 
 <script>
 	require(["jquery", 
-		"async!///maps.googleapis.com/maps/api/js?libraries=weather,places<tml:case condition="_apikey">&key=<tml:item name="_apikey"/></tml:case>"
-	], function(){
-		console.log("google plz field");
+		"async!///maps.googleapis.com/maps/api/js?libraries=places<tml:case condition="_apikey">&key=<tml:item name="_apikey"/></tml:case>"
+	], function($){
+		//console.log("google plz field");
 		var autocomplete = new google.maps.places.Autocomplete(
 			$("#<tml:script expression="tmlform.formid"/> [name=<tml:item name="_fieldname"/>]")[0],			
 			{

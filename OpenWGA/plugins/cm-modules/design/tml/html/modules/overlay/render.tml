@@ -57,7 +57,7 @@
 	
 </div>
 <script>
-	require(["jquery", "jquery-modal"], function(){
+	require(["jquery", "jquery-modal"], function($){
 		
 		$(document).off('click.<tml:option name="ns"/> modal-shown.<tml:option name="ns"/> modal-closed.<tml:option name="ns"/>')
 		

@@ -30,7 +30,7 @@
 if(typeof(require)==="undefined"){
 	// create dummy require():
 	window.require = function(deps, callback){
-		callback();
+		callback(window.jQuery);
 	}
 }
 

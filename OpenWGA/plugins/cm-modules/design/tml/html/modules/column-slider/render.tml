@@ -42,7 +42,7 @@
 </div>
 
 <tml:[script]>
-	require(["jquery", "jquery-columnslider", "jquery-swipehandler"], function(){
+	require(["jquery", "jquery-columnslider", "jquery-swipehandler"], function($){
 		$(function(){
 			$("#module-<tml:option name="ns"/> .column-slider").columnslider({
 				<tml:if condition="_responsive">

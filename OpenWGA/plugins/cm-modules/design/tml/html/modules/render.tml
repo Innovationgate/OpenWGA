@@ -44,7 +44,7 @@
 				<tml:label key="cm.add-your-modules-please" param1="{$mc.section}"/>				
 			</a>
 			<script>
-				require(["jquery", "jquery-wga-drophandler"], function(){				
+				require(["jquery", "jquery-wga-drophandler"], function($){				
 					if(window.name=="wga-contentmanager-iframe" && window.parent.BI.sitepanel.editItemsVisible){
 						var el = document.getElementById("no-modules-<tml:item name="$mc.uid"/>");
 						el.style.display="block";
@@ -81,7 +81,7 @@
 					</a>
 				</div>
 				<script>
-					require(["jquery"], function(){		
+					require(["jquery"], function($){		
 						if(window.name=="wga-contentmanager-iframe"){
 							$("#content-modules-<tml:item name="$mc.uid"/>").bind({
 								mouseover: function(){
@@ -109,7 +109,7 @@
 		
 		<tml:case condition="option('animate')===true || option('animate')=='true'">
 			<tml:[script]>
-				require(["jquery"], function(){
+				require(["jquery"], function($){
 					$("#content-modules-<tml:item name="$mc.uid"/>").css("opacity", 1);
 				})
 			</tml:[script]>
@@ -120,7 +120,7 @@
 
 <tml:case isbrowserinterface="true" if="$mc.mayEdit & !$mc.isCleanMode">
 	<script>
-		require(["jquery"], function(){
+		require(["jquery"], function($){
 			if(window.name=="wga-contentmanager-iframe"){		
 				$("#no-modules-<tml:item name="$mc.uid"/>.no-modules, #content-modules-<tml:item name="$mc.uid"/> .edit-modules-button").click(function(ev){
 					ev.preventDefault();

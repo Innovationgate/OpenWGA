@@ -31,7 +31,7 @@
 	<tml:input name="height" type="hidden"/>
 
 	<script>
-		require(["jquery", "jquery-ui-js/resizable", "jquery-ui-js/draggable", "css!jquery-ui-css"], function(){ 
+		require(["jquery", "jquery-ui-js/resizable", "jquery-ui-js/draggable", "css!jquery-ui-css"], function($){ 
 			$(".content-modules .drag-drop-box.resizeable").resizable({
 				autoHide: true,
 				handles: "e",
