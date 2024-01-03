@@ -25,7 +25,7 @@
 
 <tml:[script] if="$mc.hasCss & !$mc.isCssRendered">
 	<tml:include if="$mc.hasIncludeCss" medium="stylesheets" ref="module-css" o_tml="{$mc.mod_config.includes.css}" o_designdb="{$mc.mod_config.designdb}" var="_css"/>
-	require(["cmm"], function(CMM){
+	require(["jquery", "cmm"], function($, CMM){
 		CMM && CMM.createStyle("<tml:item name="$mc.getCssCode" a-css="_css" encode="none"/>", "<tml:item name="$mc.mod_config.id"/>");
 	})
 	<tml:script expression="$mc.setCssRendered()"/>
