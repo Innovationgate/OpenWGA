@@ -2,6 +2,9 @@ function Renderer() {
 }
 
 Renderer.prototype.render = function() {
+
+    var info = WGA.request.getAttribute(Packages.de.innovationgate.wgpublisher.log.WGARequestInformation.REQUEST_ATTRIBUTENAME);
+    info.setLoggingEnabled(false);
 	
 	var maxHeap = Packages.de.innovationgate.utils.WGUtils.getMaxHeap();
 	var currentHeap = java.lang.Runtime.getRuntime().totalMemory();
