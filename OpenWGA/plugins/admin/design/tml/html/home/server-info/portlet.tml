@@ -45,13 +45,12 @@
 
 <tml:action id="clear-cache" master="true">
 	try{
-		_errors = WGA.Server.clearAllCaches();
-		
-		if (_errors.length > 0) {
-			_server_message = "Caches cleared. There have been errors clearing the following caches: <ul><li>" + _errors.join("<li>") +  "</ul>Details may be found in the application log.";
+		var errors = WGA.Server.clearAllCaches();
+		if (errors.size()) {
+			_server_message = "There have been errors clearing the following caches: <ul><li>" + WGA.List(errors).join("<li>") +  "</ul>Details may be found in the application log.";
 		}
 		else {
-			_server_message = "Caches cleared";
+			_server_message = "All caches cleared.";
 		}
 	}
 	catch (e) {
