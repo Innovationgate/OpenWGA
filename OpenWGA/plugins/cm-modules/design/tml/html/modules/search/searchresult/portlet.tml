@@ -78,7 +78,7 @@
 							info.setClassID("Search for: " + tmlform.query);
 					</tml:script>
 					<script>
-						require(["jquery"], function(){
+						require(["jquery"], function($){
 							$(function(){
 								var el = document.forms['searchresult-query-form'].elements['query'];
 								el.focus();

@@ -59,7 +59,7 @@
 				</div>		
 				<div class="clear"></div>
 				<div class="data">
-					<button data-action="life">Show Life Data</button>
+					<button data-action="life">Show Live Data</button>
 				</div>		
 				<div class="clear"></div>
 			</div>

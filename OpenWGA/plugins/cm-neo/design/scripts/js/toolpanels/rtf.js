@@ -188,7 +188,9 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 			var a = editor.getNearestTagFromSelection("a")
 			if(a)
 				return; // should not happen 
-			CM.openDialog("edit-rtf-link")
+			CM.openDialog("edit-rtf-link", {
+				target_window: "default"
+			})
 		},
 		"edit-link": function(el){
 			var a = editor.getNearestTagFromSelection("a")
@@ -205,6 +207,7 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 			CM.openDialog("edit-rtf-link", {
 				title: a.title,
 				target: a.target,
+				target_window: a.dataset.target,
 				type: info.type,
 				key: key,
 				anker: anker,

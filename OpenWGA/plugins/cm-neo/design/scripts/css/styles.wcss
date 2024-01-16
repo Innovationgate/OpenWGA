@@ -65,16 +65,16 @@ body {
 
 	@media screen and (max-width: $width_breakpoint){
 		#appnav {
-			width: $appnav_width - 50px;
+			width: calc($appnav_width - 50px);
 			font-size: .8em;
 		}
 		&.appnav {
 			#content {
-				left: $appnav_width - 50px;
+				left: calc($appnav_width - 50px);
 			}
 		}
 	}
-	
+
 }
 
 @import "bootstrap";

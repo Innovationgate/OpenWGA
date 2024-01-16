@@ -50,7 +50,7 @@
 
 <label><tml:label key="google-maps.settings.layer"/>:</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:layers}" type="checkbox" 
+	<tml:input name="{scoped:layers}" type="checkbox" labeled="true"
 		options="{label('google-maps.settings.layer-options')}"
 		mode="{option('mode')}"
 	/>

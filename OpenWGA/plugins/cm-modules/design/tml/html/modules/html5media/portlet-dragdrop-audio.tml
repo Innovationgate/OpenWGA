@@ -29,7 +29,7 @@
 </tml:script>
 
 <script>
-	require(["jquery", "jquery-wga-drophandler"], function(){
+	require(["jquery", "jquery-wga-drophandler"], function($){
 		$(function(){
 			
 			var BI = window.parent.BI

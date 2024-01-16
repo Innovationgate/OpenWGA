@@ -47,8 +47,8 @@
 			<script>
 				require(["jquery", 
 					"<tml:url type="tml" name="google-maps" medium="javascripts" u_noext=""/>",
-					"async!//maps.googleapis.com/maps/api/js?libraries=weather,places&key=<tml:item name="_apikey"/>"
-				], function(){
+					"async!//maps.googleapis.com/maps/api/js?libraries=places&key=<tml:item name="_apikey"/>"
+				], function($){
 	
 					$(function(){
 						MAPS.codeAddress("<tml:[setting] o_name="map_address"/>", function (lat, lng) {
@@ -80,12 +80,15 @@
 							    }
 						    })
 		
+							<tml:comment>
+								Lobrary "weather" is no longer supported by google
 							<tml:case condition="CMM.settingList('layers').contains('weather')">
 								var weatherLayer = new google.maps.weather.WeatherLayer({
 									temperatureUnits: google.maps.weather.TemperatureUnit.CELSIUS
 								});
 								weatherLayer.setMap(map);
 							</tml:case>
+							</tml:comment>
 							
 							<tml:case condition="CMM.settingList('layers').contains('traffic')">
 								var trafficLayer = new google.maps.TrafficLayer();

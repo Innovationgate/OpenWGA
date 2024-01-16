@@ -31,7 +31,7 @@
 </div>
 
 <tml:[script]>
-	require(["jquery-accordion"], function(){
+	require(["jquery", "jquery-accordion"], function($){
 		$("#module-<tml:option name="ns"/> > .accordion").wga_accordion({
 			effectSpeed: "<tml:script expression="CMM.setting('effect_speed')||'fast'"/>"
 			<tml:case condition="CMM.setting('expand_first')==true">

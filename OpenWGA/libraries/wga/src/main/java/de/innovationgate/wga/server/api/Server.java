@@ -236,11 +236,14 @@ public class Server {
         protected List<String> execute() throws Exception {
             
             List<String> errors = new ArrayList<String>();
+            
             for (String dbKey : getDatabaseKeys()) {
                 
                 WGDatabase db = _wga.db(dbKey);
                 
                 try {
+                	if(!db.isSessionOpen())
+                		db.openSession();
                     db.refresh();
                 }
                 catch (Throwable e) {
@@ -390,6 +393,10 @@ public class Server {
         
         return _wga.getCore().getWgaConfiguration().getRootURL();
         
+    }
+    
+    public String getServerName(){
+    	return _wga.getCore().getWgaConfiguration().getServerName();
     }
     
     /**
@@ -777,6 +784,5 @@ public class Server {
     public void waitForAppEvents() {
         _wga.getCore().getEventManager().waitForEvents();
     }
-
 
 }

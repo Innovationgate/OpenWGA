@@ -3535,7 +3535,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
                 this.baseAppender = new AsyncAppender();
                 this.baseAppender.setBufferSize(1000);
                 this.baseAppender.setBlocking(true);
-                this.log.addAppender(this.baseAppender);
+                WGACore.log.addAppender(this.baseAppender);
             }
 
             // Transient log

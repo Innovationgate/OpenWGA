@@ -44,7 +44,7 @@
 </div>
 
 <script>
-	require(["jquery"], function() {
+	require(["jquery"], function($) {
 		$("#module-<tml:option name="ns"/> .tabs a").click(function(ev){
 			ev.preventDefault();
 			$("#module-<tml:option name="ns"/> .tabs a").removeClass("current");

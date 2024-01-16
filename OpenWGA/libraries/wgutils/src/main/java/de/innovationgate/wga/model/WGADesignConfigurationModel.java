@@ -38,8 +38,7 @@ import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import net.java.dev.genesis.annotation.DataProvider;
-import net.java.dev.genesis.annotation.NotBound;
+import de.innovationgate.wga.model.annotation.DataProvider;
 
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -63,6 +62,7 @@ import de.innovationgate.wga.common.beans.csconfig.v1.PublisherOption;
 import de.innovationgate.wga.common.beans.csconfig.v1.RemoteAction;
 import de.innovationgate.wga.common.beans.csconfig.v1.Version;
 import de.innovationgate.wga.common.beans.csconfig.v2.Shortcut;
+import de.innovationgate.wga.model.annotation.DataProvider;
 
 public class WGADesignConfigurationModel extends AbstractModel {
 	
@@ -197,7 +197,6 @@ public class WGADesignConfigurationModel extends AbstractModel {
     private String _minimumWGAVersionSourceInfo;
     private Version _minimumWGAVersionAsVersion;
 
-    @NotBound
     public Version getMinimumWGAVersionAsVersion() {
         return _minimumWGAVersionAsVersion;
     }
@@ -310,7 +309,6 @@ public class WGADesignConfigurationModel extends AbstractModel {
     }
     
     @SuppressWarnings("unchecked")
-    @NotBound
     public List<PublisherOption> getPublisherOptions() {
     	return _csConfig.getPublisherOptions();
     }
@@ -446,7 +444,7 @@ public class WGADesignConfigurationModel extends AbstractModel {
         return new ArrayList<VersionCompliance>(VersionCompliance.VERSIONCOMPLIANCES.values());  
     }
 
- public AccessLevel getAnonymousAccessLevel() {
+    public AccessLevel getAnonymousAccessLevel() {
         return ACCESSLEVELS.get(_csConfig.getAnonymousAccessLevel());
     }
 
@@ -487,7 +485,6 @@ public class WGADesignConfigurationModel extends AbstractModel {
         fireModelChanged();
     }
 
-    @NotBound
     public File getTMLScriptDirectory() {
         return new File(_designDirectory, "scripts/tmlscript");
     }
@@ -500,7 +497,6 @@ public class WGADesignConfigurationModel extends AbstractModel {
         return _designDirectory.getAbsolutePath();
     }
 
-    @NotBound
     public String[] getLibraryNames() {
         File systemDir = new File(_designDirectory, "files/system");
         String[] names = systemDir.list(new FilenameFilter() {
@@ -615,7 +611,6 @@ public class WGADesignConfigurationModel extends AbstractModel {
         return null;
     }
 
-    @NotBound
     private String retrieveDesignEncodingValue() {
         String encValue = getPublisherOptionValue(PublisherOption.OPTION_DESIGN_ENCODING);
         if (encValue == null || encValue.trim().equals("")) {
@@ -733,7 +728,6 @@ public class WGADesignConfigurationModel extends AbstractModel {
         setPublisherOption(PublisherOption.OPTION_USES_HDB, value);
     }
 
-    @NotBound
     public boolean hasPluginConfig() {
         return _csConfig.getPluginConfig() != null;
     }
@@ -830,7 +824,6 @@ public class WGADesignConfigurationModel extends AbstractModel {
     }
 
     @SuppressWarnings("unchecked")
-    @NotBound
     public List<PluginID> getPluginDependencies() {
         if (hasPluginConfig()) {
             return _csConfig.getPluginConfig().getDependencies();
@@ -1149,43 +1142,36 @@ public class WGADesignConfigurationModel extends AbstractModel {
     }
 
     @SuppressWarnings("unchecked")
-    @NotBound
     public List<EncoderMapping> getEncoderMappings() {
         return _csConfig.getEncoderMappings();
     }
 
     @SuppressWarnings("unchecked")
-    @NotBound
     public List<ElementMapping> getElementMappings() {
         return _csConfig.getElementMappings();
     }
 
     @SuppressWarnings("unchecked")
-    @NotBound
     public List<MediaKey> getMediaKeys() {
         return _csConfig.getMediaKeys();
     }
 
     @SuppressWarnings("unchecked")
-    @NotBound
     public List<RemoteAction> getRemoteActions() {
         return _csConfig.getRemoteActions();
     }
 
     @SuppressWarnings("unchecked")
-    @NotBound
     public List<ACLRole> getACLRoles() {
         return _csConfig.getRoles();
     }
 
     @SuppressWarnings("unchecked")
-    @NotBound
     public List<JobDefinition> getJobDefinitions() {
         return _csConfig.getJobDefinitions();
     }
 
     @SuppressWarnings("unchecked")
-    @NotBound
     public List<Shortcut> getShortcuts() {
         if (_csConfig instanceof de.innovationgate.wga.common.beans.csconfig.v2.CSConfig) {
             return ((de.innovationgate.wga.common.beans.csconfig.v2.CSConfig) _csConfig).getShortcuts();
@@ -1861,7 +1847,6 @@ public class WGADesignConfigurationModel extends AbstractModel {
         return overlayConfig.exists();
     }
     
-    @NotBound
     @SuppressWarnings("unchecked")
     public List<MediaKey> getBaseMediaKeys() {
         if (_csConfigBase != null) {
@@ -1887,7 +1872,6 @@ public class WGADesignConfigurationModel extends AbstractModel {
         }
     }
     
-    @NotBound
     public List<Shortcut> getBaseShortcuts() {
         if (_csConfigBase != null &&  _csConfigBase instanceof de.innovationgate.wga.common.beans.csconfig.v2.CSConfig) {
             return ((de.innovationgate.wga.common.beans.csconfig.v2.CSConfig)_csConfigBase).getShortcuts();
@@ -1896,7 +1880,6 @@ public class WGADesignConfigurationModel extends AbstractModel {
         }
     }
     
-    @NotBound
     public VersionCompliance getBaseVersionCompliance() {
         if (_csConfigBase != null) {
             return VersionCompliance.VERSIONCOMPLIANCES.get(_csConfigBase.getVersionCompliance());

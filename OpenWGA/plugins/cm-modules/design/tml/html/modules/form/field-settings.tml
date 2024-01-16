@@ -49,6 +49,13 @@
 	/>	
 </div>
 
+<tml:case condition="createlist(['file']).contains(tmlform.field(WGA.scoped('fieldtype')))">
+	<label>Mehrfachauswahl:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:multiple}" type="boolean" mode="{option('mode')}"/> 
+	</div>	
+</tml:case>
+
 <tml:case condition="createlist(['text', 'textarea', 'number', 'date']).contains(tmlform.field(WGA.scoped('fieldtype')))">
 	<label><tml:label key="form.settings.placeholder"/>:</label>
 	<div style="margin:10px">

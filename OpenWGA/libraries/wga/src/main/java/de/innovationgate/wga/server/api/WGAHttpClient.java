@@ -102,7 +102,7 @@ public class WGAHttpClient {
 		return setRequestHeader("Authorization", "Basic " + authString);
 	}
 	
-	private int executeMethod(HttpMethod method, Callback callback) throws HttpException, IOException{
+	private synchronized int executeMethod(HttpMethod method, Callback callback) throws HttpException, IOException{
 		// set request headers
 		for(Entry<String,String> entry: _headers.entrySet()){
 			method.setRequestHeader(entry.getKey(), entry.getValue());

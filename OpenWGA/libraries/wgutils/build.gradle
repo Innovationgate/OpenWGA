@@ -18,7 +18,6 @@ dependencies {
     compile 'com.github.relaxng:relaxngDatatype:2011.1'
     compile 'com.sun.msv.datatype.xsd:xsdlib:2013.2'
     compile 'net.sf.ehcache:ehcache-core:2.5.2'
-    compile fileTree(dir: '../../customLibs/genesis', include: ['*.jar'])
     compile 'com.google.code.gson:gson:2.5'
     compile 'org.imgscalr:imgscalr-lib:4.2'
     compile 'com.googlecode.java-ipv6:java-ipv6:0.16'
@@ -31,6 +30,10 @@ dependencies {
     
     // used for CMYK JPEG images
     compile 'com.twelvemonkeys.imageio:imageio-jpeg:3.8.1'
+    
+    // JPEG2000
+    compile 'com.github.jai-imageio:jai-imageio-core:1.4.0'
+    compile 'com.github.jai-imageio:jai-imageio-jpeg2000:1.4.0'
     
     compileClasspath 'javax.servlet:javax.servlet-api:3.0.1'
 

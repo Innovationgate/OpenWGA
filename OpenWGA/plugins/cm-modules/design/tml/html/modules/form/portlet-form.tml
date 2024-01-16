@@ -191,6 +191,7 @@
 			
 			<tml:[script]>
 				require([
+					"jquery",
 					"jquery-ui-js/datepicker",
 					<tml:case condition="LANGUAGE!='en'">
 						<tml:script>
@@ -202,7 +203,7 @@
 					</tml:case> 
 					"css!jquery-ui-css",
 					"jquery-textarea-autogrow"
-				], function(picker, config){
+				], function($, picker, config){
 					if(picker){
 						config && picker.setDefaults(config);
 						picker.setDefaults({							

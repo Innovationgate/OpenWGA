@@ -83,7 +83,7 @@
 		</tml:option>
 	
 		<tml:option name="appnav">
-			<tml:portlet name="appnav" ref="appnav:portlet"/>
+			<tml:portlet name="appnav" ref="appnav:portlet" forcestate="true"/>
 		</tml:option>
 	
 		<tml:option name="body">
@@ -100,26 +100,31 @@
 					</div>
 					<div class="sitepanel-mask"></div>
 					<div class="sitepanel-wrapper <tml:script expression="profile.scale ? 'scale'+profile.scale : ''"/>">
-						<iframe
-							id="site-panel"
-							<tml:if context="[db:{portlet.dbkey}/docid:{portlet.contentkey}]" iscontextvalid="true">
-								<tml:then>
-									src="<tml:script expression="contenturl('html', null, true)"/>"								
-								</tml:then>
-								<tml:elseif condition="WGA.app(portlet.dbkey).getHomepageURL()">
-									src="<tml:script expression="WGA.app(portlet.dbkey).getHomepageURL()"/>"
-								</tml:elseif>
-								<tml:else>								
-									src="<tml:script>
-										var baseurl = meta("request", "wgaurl")
-										return (baseurl ? "/" + baseurl : "") + "/" + portlet.dbkey
-									</tml:script>"
-								</tml:else>
-							</tml:if>
-						></iframe>
+						<iframe id="site-panel"></iframe>
 						<script>
-							require(["sitepanel"], function(S){
-								S.init();
+							<tml:comment>
+								#00006160
+								Load iframe after sitepanel init() and "siteexplorer", "toolbar", "action-panel" are loaded.
+								Content changed events may otherwise not be fired or not catched and panels may stay blank
+							</tml:comment>
+							require(["jquery", "sitepanel", "siteexplorer", "toolbar", "action-panel", "dashboard"], function($, Sitepanel){
+								var src;
+								<tml:if context="[db:{portlet.dbkey}/docid:{portlet.contentkey}]" iscontextvalid="true">
+									<tml:then>
+										src="<tml:script expression="contenturl('html', null, true)"/>"								
+									</tml:then>
+									<tml:elseif condition="WGA.app(portlet.dbkey).getHomepageURL()">
+										src="<tml:script expression="WGA.app(portlet.dbkey).getHomepageURL()"/>"
+									</tml:elseif>
+									<tml:else>								
+										src="<tml:script>
+											var baseurl = meta("request", "wgaurl")
+											return (baseurl ? "/" + baseurl : "") + "/" + portlet.dbkey
+										</tml:script>"
+									</tml:else>
+								</tml:if>
+								Sitepanel.init();
+								Sitepanel.load(src);
 							});
 						</script>
 					</div>

@@ -148,7 +148,7 @@
 					/>
 					
 					<script>
-						require(["jquery", "jquery-textarea-autogrow"], function(){
+						require(["jquery", "jquery-textarea-autogrow"], function($){
 							$("#module-<tml:option name="ns"/> textarea").autogrow()
 						})						
 					</script>

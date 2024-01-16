@@ -53,7 +53,7 @@
 </div>
 
 <script>
-	require(["jquery"], function(){
+	require(["jquery"], function($){
 		
 		$("#module-<tml:option name="ns"/> .voting_bar_vote li").on({
 			"mouseover": function(){
