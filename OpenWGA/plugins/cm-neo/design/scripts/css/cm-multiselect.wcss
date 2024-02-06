@@ -1,0 +1,61 @@
+$fa-var-square: 		\f0c8;
+$fa-var-square-check: 	\f14a;
+
+$fa-var-circle: 		\f111;
+$fa-var-circle-check: 	\f058;
+
+.cm-multiselect{
+
+	width: 100%;
+
+	button{
+		width: 100%;
+		overflow: hidden;
+  		text-overflow: ellipsis;
+  		.caret{
+  			margin-left: 5px;
+  		}		
+	}
+	
+	li.group-divider a{
+		text-align: right;
+		color: silver;
+	}
+
+	a[data-key]{
+		margin-left: 20px;
+		
+		&:before{
+			display: inline-block;
+			width: 20px;
+			margin-left: -20px;
+			font: var(--fa-font-regular);
+			content: "$fa-var-circle";
+		}
+
+		&.selected:before{
+			content: "$fa-var-circle-check";
+		}
+	}
+
+	&.multi{
+		li.group{
+			background: #efefef;
+			a{
+				background: transparent;
+			}
+			&:hover{
+				background: #e4e4e4;
+			}
+		}
+		a[data-key]:not(a[data-group]){
+			&:before{
+				content: "$fa-var-square";
+			}
+			&.selected:before{
+				content: "$fa-var-square-check";
+			}
+		}	
+	}
+
+}

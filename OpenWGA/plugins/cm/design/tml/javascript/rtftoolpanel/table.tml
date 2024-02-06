@@ -169,13 +169,15 @@ function tableStyleHandler(menu, ev){
 
 var menu = new Ext.menu.Menu()
 for(var i=0; i<BI.rtftoolbar.tableStyleList.length; i++){
-	var style = BI.rtftoolbar.tableStyleList[i].split("|");
-	menu.add(new Ext.menu.CheckItem({
-		text: style[0],
-		el_type: "table",
-		el_style: style[1],
-		handler: tableStyleHandler
-	}))
+	if(typeof(BI.rtftoolbar.tableStyleList[i])=="string"){
+		var style = BI.rtftoolbar.tableStyleList[i].split("|");
+		menu.add(new Ext.menu.CheckItem({
+			text: style[0],
+			el_type: "table",
+			el_style: style[1],
+			handler: tableStyleHandler
+		}))
+	}
 }
 var tableStyleMenu = menu;
 var tableStyleButton = new Ext.Button("rtf-toolbar-table-tableStyles-button", {
@@ -184,7 +186,7 @@ var tableStyleButton = new Ext.Button("rtf-toolbar-table-tableStyles-button", {
 })
 
 var menu = new Ext.menu.Menu()
-for(var i=0; i<BI.rtftoolbar.trStyleList.length; i++){
+for(var i=0; i<BI.rtftoolbar.trStyleList.length; i++){	
 	var style = BI.rtftoolbar.trStyleList[i].split("|");
 	menu.add(new Ext.menu.CheckItem({
 		text: style[0],

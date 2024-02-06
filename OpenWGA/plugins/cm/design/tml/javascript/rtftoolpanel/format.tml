@@ -188,12 +188,14 @@ function pStyleHandler(menu, ev){
 
 var menu = new Ext.menu.Menu()
 for(var i=0; i<BI.rtftoolbar.paragraphStyleList.length; i++){
-	var style = BI.rtftoolbar.paragraphStyleList[i].split("|");
-	menu.add(new Ext.menu.CheckItem({
-		text: style[0],
-		el_style: style[1],
-		handler: pStyleHandler
-	}))
+	if(typeof(BI.rtftoolbar.paragraphStyleList[i])=="string"){
+		var style = BI.rtftoolbar.paragraphStyleList[i].split("|");
+		menu.add(new Ext.menu.CheckItem({
+			text: style[0],
+			el_style: style[1],
+			handler: pStyleHandler
+		}))
+	}
 }
 var pStyleMenu = menu;
 var pStyleButton = new Ext.Button("rtf-toolbar-format-style", {
@@ -208,12 +210,14 @@ if(BI.rtftoolbar.textStyleList.length)
 	Ext.get("rtf-has-text-styles").show();
 var textStyleMenu = new Ext.menu.Menu()
 for(var i=0; i<BI.rtftoolbar.textStyleList.length; i++){
-	var style = BI.rtftoolbar.textStyleList[i].split("|");
-	textStyleMenu.add(new Ext.menu.CheckItem({
-		text: style[0],
-		el_style: style[1],
-		handler: textStyleHandler
-	}))
+	if(typeof(BI.rtftoolbar.textStyleList[i])=="string"){
+		var style = BI.rtftoolbar.textStyleList[i].split("|");
+		textStyleMenu.add(new Ext.menu.CheckItem({
+			text: style[0],
+			el_style: style[1],
+			handler: textStyleHandler
+		}))
+	}
 }
 var textStyleButton = new Ext.Button("rtf-toolbar-text-styles", {
 	text: BI.rtftoolbar.textStyleList.length ? "<tml:label key="rtf.style.none"/>" : "<tml:label key="rtf.no-styles-defined"/>",

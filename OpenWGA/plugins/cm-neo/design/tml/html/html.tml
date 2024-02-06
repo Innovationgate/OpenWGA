@@ -16,12 +16,10 @@
 				baseUrl: "<tml:meta type="request" name="wgaurl"/>/<tml:metadata name="dbkey" type="database" context="main"/>/js",
 				paths: {
 					"bootstrap": "<tml:url type="file" doc="bootstrap-3.3.7-dist:js" file="bootstrap.min.js"/>?noext",
-					"bootstrap-multiselect": "<tml:url type="file" doc="bootstrap-multiselect:js" file="bootstrap-multiselect.js"/>?noext",
 					"select2":	"<tml:url type="file" doc="select2-dist:js" file="select2.min.js"/>?noext"
 				},
 				shim: {
 					"bootstrap": { "deps": ["jquery"] },
-					"bootstrap-multiselect": ["css!<tml:url type="file" doc="bootstrap-multiselect:css" file="bootstrap-multiselect.css"/>?noext"],
 					"select2":	["css!<tml:url type="file" doc="select2-dist:css" file="select2.min.css"/>?noext"]					
 				}
 			})

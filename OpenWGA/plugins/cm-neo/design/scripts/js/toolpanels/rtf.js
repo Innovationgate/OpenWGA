@@ -1,128 +1,96 @@
-define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, CM){
+define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 
 	var editor;
 	var options;
 	var selectedImg;
 
-	$("#editor-panel-rtf textarea").autogrow();
-	
-	$("#editor-panel-rtf [name=para]").multiselect({
-		nonSelectedText: "Kein Absatz",
-		buttonWidth: '100%',
-		onChange: function(option){
+	function setClasses(el, classes){
+		editor.focus();
+		if(el){
+			for(let cls in classes){
+				if(classes[cls])
+					$(el).addClass(cls)
+				else $(el).removeClass(cls)
+			}
+		}
+	}
+
+	MS.buildSelect("#para-select", {
+		onChange: function(options){
+			//console.log(options)
 			if(editor){
 				editor.focus();
-				var para = $(option).val()
-				if(para){
-					editor.execCmd("FormatBlock", para||null);
-				}
-				else {
-					var el = editor.getParagraph();
-					if(el){
-						editor.removeNode(el, true);
+				var el = editor.getParagraph();
+				var something_done=false;
+				for(let para in options){
+					if(options[para]){
+						editor.execCmd("FormatBlock", para||null);
+						something_done=true
+						break;
 					}
 				}
+				if(!something_done && el)
+					editor.removeNode(el, true);
 			}
+		},
+		nonSelectedText: "Kein Absatz"
+	})
+
+	MS.buildSelect("#text-style-ms", {
+		onChange: function(options){
+			setClasses(editor.getParagraph(), options);
+		},
+		multiselect: true,
+		nonSelectedText: "Kein Stil ausgewählt",
+		nSelectedText: "Stile ausgewählt"
+	})
+
+	MS.buildSelect("#table-style-ms", {
+		nonSelectedText: "Kein Stil ausgewählt",
+		nSelectedText: "Stile ausgwewählt",
+		buttonClass: "btn-sm",
+		multiselect: true,
+		onChange: function(options){
+			var el = editor.getNearestTagFromSelection("table")
+			setClasses(el, options);
+		}
+	})
+
+	MS.buildSelect("#link-style-ms", {
+		nonSelectedText: "Kein Stil ausgewählt",
+		nSelectedText: "Stile ausgwewählt",
+		buttonClass: "btn-sm",
+		multiselect: true,
+		onChange: function(options){
+			var el = editor.getNearestTagFromSelection("a")
+			setClasses(el, options);
+		}
+	})
+
+	MS.buildSelect("#image-style-ms", {
+		nonSelectedText: "Kein Stil ausgewählt",
+		nSelectedText: "Stile ausgwewählt",
+		buttonClass: "btn-sm",
+		multiselect: true,
+		onChange: function(options){
+			var el = editor.getNearestTagFromSelection("img")
+			setClasses(el, options);
+		}		
+	})
+
+	MS.buildSelect("#list-style-ms", {
+		nonSelectedText: "Kein Listenstil ausgewählt",
+		nSelectedText: "Stile ausgwewählt",
+		buttonClass: "btn-sm",
+		multiselect: true,
+		onChange: function(options){
+			var el = editor.getNearestTagFromSelection("ul")
+			setClasses(el, options);
 		}
 	})
 	
-	$("#editor-panel-rtf [name=text-style]").multiselect({
-		nonSelectedText: "Kein Stil ausgewählt",
-		numberDisplayed: 2,
-		nSelectedText: "Stile ausgwewählt",
-		allSelectedText: "Alle Stile ausgewählt",
-		disableIfEmpty: true,
-		buttonWidth: '100%',
-		onChange: function(option, checked){
-			editor.focus();
-			var el = editor.getParagraph()
-			var cls = $(option).val()
-			if(el){
-				if(checked)
-					$(el).addClass(cls)
-				else $(el).removeClass(cls)
-				if(editor.toolbar)
-					editor.toolbar.update();
-			}
-		}
-	});
-
-	$("#editor-panel-rtf [name=table-style]").multiselect({
-		nonSelectedText: "Kein Stil ausgewählt",
-		numberDisplayed: 2,
-		nSelectedText: "Stile ausgwewählt",
-		allSelectedText: "Alle Stile ausgewählt",
-		buttonClass: "btn btn-default btn-sm",
-		disableIfEmpty: true,
-		buttonWidth: '100%',
-		onChange: function(option, checked){
-			var el = editor.getNearestTagFromSelection("table")
-			var cls = $(option).val()
-			if(el){
-				if(checked)
-					$(el).addClass(cls)
-				else $(el).removeClass(cls)
-			}
-		}
-	});
-
-	$("#editor-panel-rtf [name=link-style]").multiselect({
-		nonSelectedText: "Kein Stil ausgewählt",
-		numberDisplayed: 2,
-		nSelectedText: "Stile ausgwewählt",
-		allSelectedText: "Alle Stile ausgewählt",
-		buttonClass: "btn btn-default btn-sm",
-		disableIfEmpty: true,
-		buttonWidth: '100%',
-		onChange: function(option, checked){
-			var el = editor.getNearestTagFromSelection("a")
-			var cls = $(option).val()
-			if(el){
-				if(checked)
-					$(el).addClass(cls)
-				else $(el).removeClass(cls)
-			}
-		}
-	});
-
-	$("#editor-panel-rtf [name=image-style]").multiselect({
-		nonSelectedText: "Kein Stil ausgewählt",
-		numberDisplayed: 2,
-		nSelectedText: "Stile ausgwewählt",
-		allSelectedText: "Alle Stile ausgewählt",
-		buttonClass: "btn btn-default btn-sm",
-		disableIfEmpty: true,
-		buttonWidth: '100%',
-		onChange: function(option, checked){
-			var el = editor.getNearestTagFromSelection("img")
-			var cls = $(option).val()
-			if(el){
-				if(checked)
-					$(el).addClass(cls)
-				else $(el).removeClass(cls)
-			}
-		}
-	});
-
-	$("#editor-panel-rtf [name=list-style]").multiselect({
-		nonSelectedText: "Kein Listenstil ausgewählt",
-		numberDisplayed: 2,
-		nSelectedText: "Stile ausgwewählt",
-		allSelectedText: "Alle Stile ausgewählt",
-		buttonClass: "btn btn-default btn-sm",
-		disableIfEmpty: true,
-		buttonWidth: '100%',
-		onChange: function(option, checked){
-			var el = editor.getNearestTagFromSelection("ul")
-			var cls = $(option).val()
-			if(el){
-				if(checked)
-					$(el).addClass(cls)
-				else $(el).removeClass(cls)
-			}
-		}
-	});
-
+	$("#editor-panel-rtf textarea").autogrow();
+	
 	// attach click handler
 	$("#editor-panel-rtf").on("click", "[data-cmd]", function(ev){
 		ev.preventDefault();
@@ -334,32 +302,25 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 			
 			// paragraph
 			var el = editor.getParagraph()
-			$("#editor-panel-rtf [name=para]").multiselect('deselectAll', false)
-			$("#editor-panel-rtf [name=text-style]").multiselect('deselectAll', false)
 			if(el){
-				$("#editor-panel-rtf [name=para]").multiselect('select', el.tagName.toLowerCase())
-
-				var classes = el.className.split(" ");
-				if(options && options.paragraphStyleList && options.paragraphStyleList.length){
-					$("#editor-panel-rtf [name=text-style]").multiselect('select', classes)
-					$("#editor-panel-rtf [name=text-style]").multiselect('enable')
-				}
+				MS.select("#text-style-ms", el.className.split(" "));
+				MS.disable("#text-style-ms", false);
+				MS.select("#para-select", [el.tagName.toLowerCase()])
 			}
 			else{
-				$("#editor-panel-rtf [name=para]").multiselect('select', "")
-				$("#editor-panel-rtf [name=text-style]").multiselect('disable')
-				$("#editor-panel-rtf [name=text-style]").multiselect('updateButtonText')
+				MS.select("#text-style-ms", []);
+				MS.disable("#text-style-ms", true);
+				MS.select("#para-select", [])
 			}
 			
 			// table
-			$("#editor-panel-rtf [name=table-style]").multiselect('deselectAll', false)
 			var el = editor.getNearestTagFromSelection("table")
 			if(el){
 				$("#editor-panel-rtf [data-action=create-table]").hide()
 				$("#editor-panel-rtf .table-edit-actions").show()
 				var classes = el.className.split(" ");
 				if(options && options.tableStyleList && options.tableStyleList.length){
-					$("#editor-panel-rtf [name=table-style]").multiselect('select', classes)
+					MS.select("#table-style-ms", classes);
 				}
 			}
 			else{
@@ -368,7 +329,6 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 			}
 			
 			// links
-			$("#editor-panel-rtf [name=link-style]").multiselect('deselectAll', false)
 			var el = editor.getNearestTagFromSelection("a")
 			if(el){
 				$("#editor-panel-rtf [data-action=create-link]").hide()
@@ -377,9 +337,9 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 				$("#editor-panel-rtf [data-id=link-info-wrapper]").show()
 				
 				var classes = el.className.split(" ");
-				if(options && options.linkStyleList && options.linkStyleList.length){
+				if(options && options.linkStyleList && options.linkStyleList.length){					
 					$("#editor-panel-rtf .link-options").show()
-					$("#editor-panel-rtf [name=link-style]").multiselect('select', classes)
+					MS.select("#link-style-ms", classes);
 				}
 				var info = editor.getURLInfo(el)
 				var types={
@@ -414,20 +374,18 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 			}
 
 			// List
-			$("#editor-panel-rtf [name=list-style]").multiselect('deselectAll', false)
 			var el = editor.getNearestTagFromSelection("ul")
 			if(el){
 				var classes = el.className.split(" ");
 				if(options && options.listStyleList && options.listStyleList.length){
+					MS.select("#list-style-ms", classes);					
 					$("#editor-panel-rtf .list-options").show()
-					$("#editor-panel-rtf [name=list-style]").multiselect('select', classes)
 				}
 			}
 			else $("#editor-panel-rtf .list-options").hide()
 			
 			// Image
 			var el = editor.getNearestTagFromSelection("img")
-			$("#editor-panel-rtf [name=image-style]").multiselect('deselectAll', false)
 			selectedImg=el;
 			if(el){
 				$("#rtf-tab-image [data-action=create-image]").hide()
@@ -441,7 +399,7 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 				var classes = el.className.split(" ");
 				if(options && options.imageStyleList && options.imageStyleList.length){
 					$("#editor-panel-rtf [data-id=image-style]").show()
-					$("#editor-panel-rtf [name=image-style]").multiselect('select', classes)					
+					MS.select("#image-style-ms", classes);					
 				}
 				var info = editor.getURLInfo(el)
 				var types={
@@ -512,86 +470,52 @@ define(["jquery", "cm", "afw/rtfeditor", "bootstrap-multiselect"], function($, C
 					$("#editor-panel-rtf [data-action=edit-html]").hide();
 				if(options.hideoptions.indexOf("InsertTable")>=0)
 					$("#editor-panel-rtf .InsertTable").hide();
-				if(options.hideoptions.indexOf("no-para")>=0){
-					var el = $("#editor-panel-rtf [name=para] + div input[value='']")
-						.parents("li").first();
-					el.hide();
-					el.next("li").hide();	// li.divider
-				}
-				// headings
-				var headings = ["h1", "h2", "h3", "h4", "h5", "h6", "pre"]
-				for(var i=0; i<headings.length; i++){
-					var heading = headings[i];
-					if(options.hideoptions.indexOf(heading)>=0){
-						$("#editor-panel-rtf [name=para] + div input[value=" + heading + "]")
-							.parents("li").first().hide()
+			}
+			
+			// headings
+			var headings = {
+				"h1": "Überschrift 1",
+				"h2": "Überschrift 2",
+				"h3": "Überschrift 3",
+				"h4": "Überschrift 4",
+				"h5": "Überschrift 5",
+				"h6": "Überschrift 6"
+			}
+			heading_opts=["normaler Absatz|p"]
+			var add_divider=true;
+			for(let heading in headings){
+				if(!options.hideoptions || options.hideoptions.indexOf(heading)<0){
+					if(add_divider){
+						heading_opts.push("-")
+						add_divider=false;
 					}
+					heading_opts.push(headings[heading] + "|" + heading)
 				}
 			}
+			if(!options.hideoptions || options.hideoptions.indexOf("pre")<0){
+				heading_opts.push("-")
+				heading_opts.push("PRE|pre")
+			}
+			MS.buildOptions("#para-select", heading_opts)
+			
 			if(options && options.paragraphStyleList && options.paragraphStyleList.length){
-				var opts=[]
-				toolbar.paragraphStyleList = options.paragraphStyleList;
-				for(var i=0; i<options.paragraphStyleList.length; i++){
-					var parts = options.paragraphStyleList[i].split("|");
-					opts.push({
-						label: parts[0],
-						title: parts[0],
-						value: parts[1]
-					})
-				}
-				$("#editor-panel-rtf [name=text-style]").multiselect("dataprovider", opts)
+				toolbar.paragraphStyleList = MS.buildOptions("#text-style-ms", options.paragraphStyleList);
 			}
+			
 			if(options && options.linkStyleList && options.linkStyleList.length){
-				opts=[]
-				toolbar.linkStyleList = options.linkStyleList;
-				for(var i=0; i<options.linkStyleList.length; i++){
-					var parts = options.linkStyleList[i].split("|");
-					opts.push({
-						label: parts[0],
-						title: parts[0],
-						value: parts[1]
-					})
-				}
-				$("#editor-panel-rtf [name=link-style]").multiselect("dataprovider", opts)
+				toolbar.linkStyleList = MS.buildOptions("#link-style-ms", options.linkStyleList);
 			}
+			
 			if(options && options.imageStyleList && options.imageStyleList.length){
-				opts=[]
-				toolbar.imageStyleList = options.imageStyleList;
-				for(var i=0; i<options.imageStyleList.length; i++){
-					var parts = options.imageStyleList[i].split("|");
-					opts.push({
-						label: parts[0],
-						title: parts[0],
-						value: parts[1]
-					})
-				}
-				$("#editor-panel-rtf [name=image-style]").multiselect("dataprovider", opts)
+				toolbar.imageStyleList = MS.buildOptions("#image-style-ms", options.imageStyleList);
 			}
+
 			if(options && options.listStyleList && options.listStyleList.length){
-				opts=[]
-				toolbar.listStyleList = options.listStyleList;
-				for(var i=0; i<options.listStyleList.length; i++){
-					var parts = options.listStyleList[i].split("|");
-					opts.push({
-						label: parts[0],
-						title: parts[0],
-						value: parts[1]
-					})
-				}
-				$("#editor-panel-rtf [name=list-style]").multiselect("dataprovider", opts)
+				toolbar.listStyleList = MS.buildOptions("#list-style-ms", options.listStyleList);
 			}
+
 			if(options && options.tableStyleList && options.tableStyleList.length){
-				opts=[]
-				toolbar.tableStyleList = options.tableStyleList;
-				for(var i=0; i<options.tableStyleList.length; i++){
-					var parts = options.tableStyleList[i].split("|");
-					opts.push({
-						label: parts[0],
-						title: parts[0],
-						value: parts[1]
-					})
-				}
-				$("#editor-panel-rtf [name=table-style]").multiselect("dataprovider", opts)
+				toolbar.tableStyleList = MS.buildOptions("#table-style-ms", options.tableStyleList);
 			}
 		}
 		

@@ -552,8 +552,9 @@ define(["jquery"], function($){
 			if(!classes)
 				return false;
 			for(var i=0; i<classes.length; i++){
-				var c = classes[i].split("|");
-				if(c[1]==cls)
+				var parts = classes[i].split("|");
+				var c = parts.length>1 ? parts[1] : parts[0]; 
+				if(c==cls)
 					return true;
 			}
 			return false;
