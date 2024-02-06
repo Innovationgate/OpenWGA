@@ -48,10 +48,10 @@
 </tml:action>
 
 <tml:script>
-	portlet.context = this;
+	portlet.context = this;	
 </tml:script>
 
-<tml:form id="form-page-settings" context="[$struct:{document.structKey}]" unless="_dialog_closed" mode="{WGA.app().isChiefEditor()?'edit':'view'}">
+<tml:form id="form-page-settings" context="[$struct:{document.structKey}]" unless="_dialog_closed" mode="{document.mayEditPage() ? 'edit':'view'}">
 
 	<tml:script>
 		var pagetypes = WGA.createList()
@@ -187,7 +187,7 @@
 
 	<div class="footer">
 		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
-		<tml:case condition="WGA.app().isChiefEditor()">
+		<tml:case condition="document.mayEditPage()">
 			<tml:button clickaction="save-page-settings" cssclass="btn btn-primary">Aktualisieren</tml:button>
 		</tml:case>
 	</div>

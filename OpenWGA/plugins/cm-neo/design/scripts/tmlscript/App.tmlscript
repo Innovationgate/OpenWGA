@@ -107,7 +107,7 @@ App.prototype.mayUpdateContent = function(ctx) {
 	if(ctx.AREA=="$trash-cm-neo")
 		return false;
 
-	if(WGA.app(ctx.meta("db", "dbkey")).isChiefEditor())
+	if(WGA.app(ctx.meta("db", "dbkey")).isChiefEditor() && ctx.content().mayEditContent())
 		return true;
 
 	var ismine = (ctx.AUTHOR==ctx.meta("db", "username"))
