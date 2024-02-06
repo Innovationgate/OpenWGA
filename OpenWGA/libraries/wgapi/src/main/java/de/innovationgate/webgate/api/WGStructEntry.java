@@ -1630,17 +1630,17 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
             return prohibitingDoc;
         }
         
-        // test if user has at least chief editor rights, if so grant access in anyway.
-        if (this.getDatabase().getSessionContext().getAccessLevel() >= WGDatabase.ACCESSLEVEL_CHIEF_EDITOR) {
-            return null;
-        }
-
         // Ask PageRightsFilter first end stop other checks if ALLOWED_SKIP_DEFAULT_CHECKS
         PageRightsFilter.Right editRight = getDatabase().getPageRightsFilter().mayEditPage(this, getDatabase().getSessionContext().getUserAccess());
         if (editRight == PageRightsFilter.Right.DENIED) 
         	return this;
         else if (editRight == PageRightsFilter.Right.ALLOWED_SKIP_DEFAULT_CHECKS)
         	return null;
+
+        // test if user has at least chief editor rights, if so grant access in anyway.
+        if (this.getDatabase().getSessionContext().getAccessLevel() >= WGDatabase.ACCESSLEVEL_CHIEF_EDITOR) {
+            return null;
+        }
 
         // Retrieve the list of editors. If we have retrieved backend data we prefer that one
         // bc. the current data may have been modified
