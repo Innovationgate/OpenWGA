@@ -9,9 +9,6 @@
 		if(match && match.length>0)
 			_max_width = match[1]
 	}
-
-	console.log("img", CMM.setting('image'))
-
 </tml:script>
 
 <picture>
