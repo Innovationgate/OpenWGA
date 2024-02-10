@@ -196,6 +196,17 @@ for(var i=0; i<BI.rtftoolbar.paragraphStyleList.length; i++){
 			handler: pStyleHandler
 		}))
 	}
+	else{
+		var grouplabel=BI.rtftoolbar.paragraphStyleList[i].label.split("|")[0];
+		for(let j=0; j<BI.rtftoolbar.paragraphStyleList[i].values.length; j++){
+			var style = BI.rtftoolbar.paragraphStyleList[i].values[j].split("|");
+			menu.add(new Ext.menu.CheckItem({
+				text: grouplabel + " " + style[0],
+				el_style: style[1],
+				handler: pStyleHandler
+			}))
+		}
+	}
 }
 var pStyleMenu = menu;
 var pStyleButton = new Ext.Button("rtf-toolbar-format-style", {
