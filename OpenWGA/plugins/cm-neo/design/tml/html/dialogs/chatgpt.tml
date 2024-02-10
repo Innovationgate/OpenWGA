@@ -1,0 +1,80 @@
+<tml:action id="angragen">
+	if(!tmlform.frage)
+		_msg = "Bitte geben Sie eine Frage ein."
+	else {
+		//tmlform.antwort="Weit hinten, hinter den Wortbergen,\n\n fern der Länder Vokalien\n und Konsonantien leben die Blindtexte.";
+		//return;
+		var data = {
+			"model": "gpt-3.5-turbo",
+			"messages": [
+				{
+					"role": "user", 
+					"content": tmlform.frage
+				}
+			],
+			"temperature": 0.7
+		}
+		var auth = String("Bearer " + WGA.app().getPublisherOption("chatgpt-api-key"));
+		WGA.HttpClient("https://api.openai.com/v1/chat/completions")
+			.setRequestHeader("Authorization", auth)
+			.post(JSON.stringify(data), "application/json", function(result){
+				console.log("Antwort", result.text);
+				var antwort = JSON.parse(result.text);
+				tmlform.antwort = antwort.choices[0].message.content
+			})
+	}
+</tml:action>
+
+<tml:form id="chatgpt">
+
+	<div class="header">
+		ChatGPT
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content form-horizontal">
+		<tml:item name="_msg" wrap="p" wrap_style="color:red"/>
+		<p style="font-weight:bold">Frage:</p>
+		<tml:input name="frage" type="textarea" cssclass="form-control" html_spellcheck="false" html_data-focus="true"/>
+		<tml:case condition="tmlform.antwort">
+			<p style="font-weight:bold;margin:10px 0">Antwort:</p>
+			<tml:input name="antwort" type="textarea" cssclass="form-control" html_spellcheck="false"/>
+		</tml:case>
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:button cssclass="[btn {tmlform.antwort ? 'btn-default' : 'btn-primary'}]" clickaction="angragen">
+			<tml:if condition="tmlform.antwort">
+				<tml:then>Erneut anfragen</tml:then>
+				<tml:else>Anfragen</tml:else>
+			</tml:if>
+		</tml:button>
+		<tml:case condition="tmlform.antwort">	
+			<a class="btn btn-primary" data-action="save" data-modal="hide">Einfügen</a>
+		</tml:case>
+	</div>
+
+</tml:form>
+
+<script>
+	require(["jquery", "jquery-tabhandler"], function($){
+		$("#chatgpt textarea").tabhandler().autogrow();
+		$("#chatgpt [data-action=save]").on("click", function(ev){
+			ev.preventDefault();
+			var text = $("#chatgpt [name=antwort]").val()
+			require(["toolpanels/rtf"], function(RTF){
+				var parts = text.split("\n");
+				var html = "";
+				for(let i=0; i<parts.length; i++){
+					if(parts[i])
+						html += "<p>" + parts[i] + "</p>"
+				}				
+				//RTF.getEditor().insertHTML(text.replace(/\n/g, "<br>"));
+				RTF.getEditor().insertHTML(html);
+				RTF.getEditor().focus();
+			})
+		})
+	})
+</script>
+

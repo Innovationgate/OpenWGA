@@ -197,6 +197,7 @@
 }
 
 #dialog-custom,
+#dialog-chatgpt,
 #dialog-paste-page {
 	width: 800px;
 	margin-left: -400px;

@@ -220,3 +220,13 @@
 		</a>
 	</div>
 </fieldset>
+
+<tml:case condition="WGA.app().getPublisherOption('chatgpt-api-key')">
+	<fieldset>
+		<legend>Text generieren</legend>
+		<a data-action="chatgpt" style="width:100%" href="#" class="btn btn-default btn-sm">
+			<i class="far fa-comment-dots"></i>
+			ChatGPT
+		</a>
+	</fieldset>
+</tml:case>

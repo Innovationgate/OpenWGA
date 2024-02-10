@@ -212,6 +212,10 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 			CM.openDialog("edit-html", {
 				html: editor.html()
 			});
+		},
+
+		"chatgpt": function(el){
+			CM.openDialog("chatgpt");
 		}
 	
 	}
