@@ -64,13 +64,12 @@
 			ev.preventDefault();
 			var text = $("#chatgpt [name=antwort]").val()
 			require(["toolpanels/rtf"], function(RTF){
-				var parts = text.split("\n");
 				var html = "";
+				var parts = text.split("\n");
 				for(let i=0; i<parts.length; i++){
 					if(parts[i])
 						html += "<p>" + parts[i] + "</p>"
-				}				
-				//RTF.getEditor().insertHTML(text.replace(/\n/g, "<br>"));
+				}
 				RTF.getEditor().insertHTML(html);
 				RTF.getEditor().focus();
 			})
