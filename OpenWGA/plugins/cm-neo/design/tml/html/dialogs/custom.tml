@@ -1,6 +1,8 @@
 <tml:item name="$mc.settingsTML" var="_tml"/>
 
-<tml:include ref="{_tml}" designdb="{meta('db', 'dbkey')}" if="_tml"/>
+<tml:form id="custom-dialog-form" cssclass="form-horizontal" if="_tml">
+	<tml:include ref="{_tml}" designdb="{meta('db', 'dbkey')}"/>
+</tml:form>
 
 <tml:range unless="_tml">
 	<div class="header">
