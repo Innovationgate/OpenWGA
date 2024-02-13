@@ -84,8 +84,13 @@
 			mail.setMimeType("text/html");			
 			mail.to=mail_addresses.to;
 			mail.cc=mail_addresses.cc;
-			mail.bcc=mail_addresses.bcc;			
-			mail.subject=$option_title;
+			mail.bcc=mail_addresses.bcc;
+			
+			var subject = CMM.setting("subject") || "";			
+			var exp = /{(\w.+)}/;
+			exp.exec(subject);		// generates RegExp.$1
+			subject = subject.replace(exp, tmlform.field(RegExp.$1))			
+			mail.subject = subject || $option_title;
 		
 			var mailbody="";
 			var forminfo = tmlform.processcontext.get("forminfo");
