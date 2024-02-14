@@ -86,5 +86,9 @@
 	<div style="margin:10px">
 		<tml:input name="{scoped:autoplay}" type="boolean" mode="{option:mode}"/>
 	</div>
+	<label>Endlosschleife:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:loop}" type="boolean" mode="{option:mode}"/>
+	</div>
 	
 </tml:case>
