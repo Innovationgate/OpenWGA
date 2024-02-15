@@ -41,10 +41,10 @@
 	
 	<div class="content form-horizontal">
 		<tml:item name="_msg" wrap="p" wrap_style="color:red"/>
-		<p style="font-weight:bold">Frage:</p>
+		<p style="font-weight:bold">Frage / Input:</p>
 		<tml:input name="frage" type="textarea" cssclass="form-control" html_spellcheck="false" html_data-focus="true"/>
 		<tml:case condition="tmlform.antwort">
-			<p style="font-weight:bold;margin:10px 0">Antwort:</p>
+			<p style="font-weight:bold;margin:10px 0">Antwort / Ergebnis:</p>
 			<tml:input name="antwort" type="textarea" cssclass="form-control" html_spellcheck="false"/>
 		</tml:case>
 	</div>
