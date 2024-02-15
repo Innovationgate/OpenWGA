@@ -65,8 +65,8 @@
 </tml:form>
 
 <script>
-	require(["jquery", "jquery-tabhandler"], function($){
-		$("#chatgpt textarea").tabhandler().autogrow();
+	require(["jquery", "jquery-textarea-autogrow"], function($){
+		$("#chatgpt textarea").autogrow();
 		$("#chatgpt [data-action=save]").on("click", function(ev){
 			ev.preventDefault();
 			var text = $("#chatgpt [name=antwort]").val()
