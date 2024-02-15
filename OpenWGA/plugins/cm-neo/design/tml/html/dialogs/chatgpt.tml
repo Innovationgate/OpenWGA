@@ -18,9 +18,16 @@
 		WGA.HttpClient("https://api.openai.com/v1/chat/completions")
 			.setRequestHeader("Authorization", auth)
 			.post(JSON.stringify(data), "application/json", function(result){
-				console.log("Antwort", result.text);
-				var antwort = JSON.parse(result.text);
-				tmlform.antwort = antwort.choices[0].message.content
+				try{
+					//console.log("Antwort", result.text);
+					var antwort = JSON.parse(result.text);
+					if(antwort.error)
+						_msg = antwort.error.message
+					else tmlform.antwort = antwort.choices[0].message.content
+				}
+				catch(e){
+					_msg = e.message
+				}
 			})
 	}
 </tml:action>
