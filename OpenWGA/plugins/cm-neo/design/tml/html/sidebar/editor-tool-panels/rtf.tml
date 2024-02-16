@@ -221,7 +221,7 @@
 	</div>
 </fieldset>
 
-<tml:case condition="WGA.app().getPublisherOption('chatgpt-api-key')">
+<tml:case condition="WGA.app().getPublisherOption('chatgpt-api-key') && WGA.app().userRoles.contains('chatgpt')">
 	<fieldset>
 		<legend>Text generieren</legend>
 		<a data-action="chatgpt" style="width:100%" href="#" class="btn btn-default btn-sm">
