@@ -82,13 +82,23 @@
 	<div style="margin:10px">
 		<tml:include ref="util:select-image" o_empty-text="{_hasPoster ? 'Aus Video':VOID}"/>
 	</div>
-	<label><tml:label key="html5media.autoplay"/>:</label>
+
+	<label>Optionen:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:autoplay}" type="boolean" options="Automatisch starten|true" labeled="wrap" mode="{option:mode}"/>
+		<br><tml:input name="{scoped:loop}" type="boolean" options="Endlosschleife|true" labeled="wrap" mode="{option:mode}"/>
+		<br><tml:input name="{scoped:no_controls}" type="boolean" options="Controls ausblenden|true" labeled="wrap" mode="{option:mode}"/>
+		<br><tml:input name="{scoped:muted}" type="boolean" options="Ohne Ton abspielen|true" labeled="wrap" mode="{option:mode}"/>
+		<br><tml:input name="{scoped:playsinline}" type="boolean" options="Mobile inline abspielen|true" labeled="wrap" mode="{option:mode}"/>
+	</div>
+	
+	<tml:comment><label><tml:label key="html5media.autoplay"/>:</label>
 	<div style="margin:10px">
 		<tml:input name="{scoped:autoplay}" type="boolean" mode="{option:mode}"/>
 	</div>
 	<label>Endlosschleife:</label>
 	<div style="margin:10px">
 		<tml:input name="{scoped:loop}" type="boolean" mode="{option:mode}"/>
-	</div>
+	</div></tml:comment>
 	
 </tml:case>

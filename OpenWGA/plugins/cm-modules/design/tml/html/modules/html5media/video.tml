@@ -73,13 +73,23 @@
 	
 </tml:script>
 
-<video controls="controls" preload="metadata" title="<tml:item name="_title"/>"
+<video preload="metadata" title="<tml:item name="_title"/>"
 	<tml:case condition="_poster_url">
 		poster="<tml:item name="_poster_url"/>"
 	</tml:case> 
 	<tml:case condition="CMM.setting('loop')">
 		loop
 	</tml:case>
+	<tml:case condition="CMM.setting('muted')">
+		muted
+	</tml:case>
+	<tml:case condition="CMM.setting('playsinline')">
+		playsinline
+	</tml:case>
+	<tml:case condition="!CMM.setting('no_controls')">
+		controls
+	</tml:case>
+
 	style="opacity:0;transition: opacity .2s"
 >
 		
