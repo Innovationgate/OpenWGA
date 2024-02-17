@@ -39,5 +39,5 @@
 
 <label><tml:label key="html5media.audio.options"/>:</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:opts}" type="checkbox" default="controls" options="{label('html5media.audio.options.values')}" mode="{option:mode}"/>
+	<tml:input name="{scoped:opts}" type="checkbox" labeled="wrap" default="controls" options="{label('html5media.audio.options.values')}" mode="{option:mode}"/>
 </div>
