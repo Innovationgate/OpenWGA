@@ -92,13 +92,4 @@
 		<br><tml:input name="{scoped:playsinline}" type="boolean" options="Mobile inline abspielen|true" labeled="wrap" mode="{option:mode}"/>
 	</div>
 	
-	<tml:comment><label><tml:label key="html5media.autoplay"/>:</label>
-	<div style="margin:10px">
-		<tml:input name="{scoped:autoplay}" type="boolean" mode="{option:mode}"/>
-	</div>
-	<label>Endlosschleife:</label>
-	<div style="margin:10px">
-		<tml:input name="{scoped:loop}" type="boolean" mode="{option:mode}"/>
-	</div></tml:comment>
-	
 </tml:case>
