@@ -759,8 +759,10 @@ public class FileDerivateManager {
                             if (existingMd != null) {
                                 content.removeFileDerivate(existingMd.getId());
                             }
-                            WGFileDerivateMetaData derivateMd = content.createFileDerivate(md.getName(), creatorMd5, derivateInfo.getName(), tempFile.getFile(), derivateInfo.getUsage(), annotators);
-                            currentRun.addCreatedDerivate();
+                            if(tempFile.getFile().length()>0) {
+	                            WGFileDerivateMetaData derivateMd = content.createFileDerivate(md.getName(), creatorMd5, derivateInfo.getName(), tempFile.getFile(), derivateInfo.getUsage(), annotators);
+	                            currentRun.addCreatedDerivate();
+                            }
                         }
                         finally {
                             tempFile.delete();
