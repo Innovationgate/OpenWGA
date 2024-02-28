@@ -73,13 +73,23 @@
 	
 </tml:script>
 
-<video controls="controls" preload="metadata" title="<tml:item name="_title"/>"
+<video preload="metadata" title="<tml:item name="_title"/>"
 	<tml:case condition="_poster_url">
 		poster="<tml:item name="_poster_url"/>"
 	</tml:case> 
-	<tml:case condition="CMM.setting('autoplay')">
-		autoplay 
+	<tml:case condition="CMM.setting('loop')">
+		loop
 	</tml:case>
+	<tml:case condition="CMM.setting('muted')">
+		muted
+	</tml:case>
+	<tml:case condition="CMM.setting('playsinline')">
+		playsinline
+	</tml:case>
+	<tml:case condition="!CMM.setting('no_controls')">
+		controls
+	</tml:case>
+
 	style="opacity:0;transition: opacity .2s"
 >
 		
@@ -98,8 +108,15 @@
 			el.src = el.src.split(";").slice(0)[0];
 		})
 		$("#module-<tml:option name="ns"/> video").each(function(index, el){
-			if(el.poster)	
+			if(el.poster){	
 				el.poster = el.poster.split(";").slice(0)[0];
+			}
+			<tml:case condition="CMM.setting('autoplay')">
+				el.play().catch(function(){
+					el.muted=true;
+					el.play();
+				})
+			</tml:case>
 		}).css("opacity", 1);
 		if(window.parent.BI){
 			WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "derivates-updated", function(ev){

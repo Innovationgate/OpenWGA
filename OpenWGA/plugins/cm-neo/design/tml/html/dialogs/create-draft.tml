@@ -39,12 +39,16 @@
 			Es existiert bereits ein in Arbeit befindliches Dokument.
 			
 			<tml:case condition="_username!=_draftdoc.getAuthor()">
-				Das Dokument ist in Bearbeitung von <b style="color:red"><tml:script expression="_draftdoc.getAuthor()"/></b>.
-				Die letzte Bearbeitung liegt 
-				<b style="color:red"><tml:script format="0">
-					var milis=now().time - _draftdoc.getLastModified().time;
-					return milis/1000/60/60/24;
-				</tml:script></b> Tag(e) zurück.
+				<p>
+					Das Dokument ist in Bearbeitung von
+					<b style="color:red"><tml:script expression="WGA.app().domain().auth().fetchCommonName(_draftdoc.getAuthor())"/></b>.
+					<br>
+					Die letzte Bearbeitung liegt 
+					<b style="color:red"><tml:script format="0">
+						var milis=now().time - _draftdoc.getLastModified().time;
+						return milis/1000/60/60/24;
+					</tml:script></b> Tag(e) zurück.
+				</p>				
 			</tml:case> 
 			
 			<p>Möchten Sie dieses Dokument bearbeiten ?</p>

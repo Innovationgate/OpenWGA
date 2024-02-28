@@ -70,10 +70,10 @@
       <uniqueName>de.innovationgate.cm-modules</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>10</minorVersion>
-        <maintenanceVersion>12</maintenanceVersion>
+        <minorVersion>11</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>723</buildVersion>
+        <buildVersion>724</buildVersion>
       </version>
     </id>
     <title>OpenWGA Content Management Modules</title>

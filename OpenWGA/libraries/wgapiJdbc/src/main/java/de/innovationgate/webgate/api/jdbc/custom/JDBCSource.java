@@ -651,7 +651,8 @@ public class JDBCSource extends SimpleContentSource {
 			}
 			
 			DatabaseMetaData dbMeta = connection.getMetaData();
-			ResultSet resultSet = dbMeta.getTables(null, null, null, new String[] {"TABLE", "VIEW", "GLOBAL TEMPORARY", "LOCAL TEMPORARY"});
+			String dbname = (String)creationOptions.get("Path");
+			ResultSet resultSet = dbMeta.getTables(dbname, null, null, new String[] {"TABLE", "VIEW", "GLOBAL TEMPORARY", "LOCAL TEMPORARY"});
 			startResultSet(resultSet);
 			while (resultSet.next()) {
 			

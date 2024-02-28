@@ -22,6 +22,10 @@
 	<div style="margin:10px">
 		<tml:input name="{scoped:mail}" type="textarea" multiple="true" cssstyle="width:100%" mode="{option('mode')}"/>
 	</div>	
+	<label>Betreff:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:subject}" type="textarea" cssstyle="width:100%" mode="{option('mode')}"/>
+	</div>	
 </tml:case>
 
 <tml:case condition="tmlform.fieldlist(WGA.scoped('action')).contains('store')">

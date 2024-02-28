@@ -37,7 +37,13 @@ Controller.prototype.prepare = function($cx, CMM) {
 			this.lightbox_url = this.context.fileurl(lightbox_filename)
 			var option_imagederivates = $cx.option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES)
 			if(option_imagederivates){
-				this.lightbox_url = WGA.urlBuilder(this.lightbox_url).setParameter("derivate", option_imagederivates);
+				var parts = option_imagederivates.split(",")
+				for(let [index, value] in parts){
+					if(value.indexOf("usage=")==0){
+						this.lightbox_url = WGA.urlBuilder(this.lightbox_url).setParameter("derivate", value);
+						break;
+					}
+				}
 			}
 		}
 		
