@@ -204,16 +204,7 @@ public class Image extends Base implements DynamicAttributes {
             	cssClass = this.getCssclass();
             	cssStyle = this.getCssstyle();
             }
-            
-            String titleAttributeString="";
-            if(titleAttribute!=null && !titleAttribute.equals("")) {
-            	titleAttributeString=" title=\"" + titleAttribute + "\" ";
-            }
-            String altAttributeString="";
-            if(altAttribute!=null && !altAttribute.equals("")) {
-            	altAttributeString=" alt=\"" + altAttribute + "\"";
-            }
-            
+                        
             // Cleanup file and doc
             if (file != null && file.equals("")) {
             	file = null;
@@ -239,7 +230,23 @@ public class Image extends Base implements DynamicAttributes {
             		}
             	}
             }
-            
+
+            String titleAttributeString="";
+            if(titleAttribute!=null && !titleAttribute.equals("")) {
+            	titleAttributeString=" title=\"" + titleAttribute + "\" ";
+            }
+            String altAttributeString="";
+            if(altAttribute!=null && !altAttribute.equals("")) {
+            	altAttributeString=" alt=\"" + altAttribute + "\"";
+            }
+            else {
+            	String html_alt=getDynamicHtmlAttribute("alt");
+            	if(html_alt==null) {
+            		int i = file.indexOf("."); 
+            		altAttributeString = " alt=\"" + (i>0 ? file.substring(0, i) : file) + "\"";
+            	}
+            }
+
             // Determine CSS
             StringBuffer css = new StringBuffer();
             if (cssClass != null) {
