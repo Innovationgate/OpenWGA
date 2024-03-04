@@ -31,7 +31,7 @@
 	try {
 	
 		// Store dump file to disk
-		var tempFile = java.io.File.createTempFile("dmp", ".tmp");
+		var tempFile = java.io.File.createTempFile("dump", ".tmp");
 		var inStr = new java.io.FileInputStream(tmlform.getfile(tmlform.dump));
 		var outStr = new java.io.FileOutputStream(tempFile);
 		Packages.de.innovationgate.utils.WGUtils.inToOut(inStr, outStr, 2048);
@@ -68,11 +68,12 @@
 <tml:form id="load-dump-form" source="none" maxuploadsize="-1">
 	<div id="load-dump-select"> 
 		<div style="color:red">
-			NOTE: Loading a dump will delete all content data and schema from this content store! 
+			Loading a dump will delete all content data and schema from this content store! 
 		</div>
 		Dump file: <tml:input name="dump" type="file">
 			onchange="if(this.value)document.getElementById('load-dump-button').disabled=false"
 		</tml:input>
+		<br>
 		<button id="load-dump-button" disabled="disabled" onclick="loadDump()">
 			Import Dump
 		</button>
