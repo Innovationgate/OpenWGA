@@ -48,7 +48,7 @@
 			];
 			var image = CMM.setting("image")
 			if(image){
-				var derivate = "usage=poster"
+				var derivate = option(Packages.de.innovationgate.wgpublisher.webtml.Base.OPTION_IMAGE_DERIVATES) || "usage=poster";
 				if(_imagederivates){
 					derivate = enhanceFileDerivateQuery("width~"+WGA.format(_imagederivates, '0'))
 				}
