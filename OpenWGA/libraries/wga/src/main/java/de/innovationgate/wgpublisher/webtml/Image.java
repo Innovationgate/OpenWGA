@@ -241,7 +241,7 @@ public class Image extends Base implements DynamicAttributes {
             }
             else {
             	String html_alt=getDynamicHtmlAttribute("alt");
-            	if(html_alt==null) {
+            	if(html_alt==null && file!=null) {
             		int i = file.indexOf("."); 
             		altAttributeString = " alt=\"" + (i>0 ? file.substring(0, i) : file) + "\"";
             	}
