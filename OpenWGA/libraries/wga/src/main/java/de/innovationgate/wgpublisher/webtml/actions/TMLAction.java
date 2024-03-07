@@ -852,7 +852,11 @@ public class TMLAction implements Serializable {
             if(qualifier!=null && qualifier.equalsIgnoreCase("no-validation"))
             	validate = false;
             
-            return tmlForm.store(validate);
+            boolean includeFiles=true;
+            if(qualifier!=null && qualifier.equalsIgnoreCase("no-files"))
+            	includeFiles = false;
+            
+            return tmlForm.store(validate, includeFiles);
 
         }
         catch (WGCancelledException e) {

@@ -524,7 +524,7 @@ public class Item extends FormBase implements DynamicAttributes {
     }
 
     public String getSaveaction() {
-        return getTagAttributeValue("saveaction", saveaction, "$store");
+        return getTagAttributeValue("saveaction", saveaction, "$store.no-files");
     }
 
     public void setSaveaction(String saveaction) {
