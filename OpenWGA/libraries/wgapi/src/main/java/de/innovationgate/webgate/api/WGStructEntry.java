@@ -1630,7 +1630,7 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
             return prohibitingDoc;
         }
         
-        // Ask PageRightsFilter first end stop other checks if ALLOWED_SKIP_DEFAULT_CHECKS
+        // Ask PageRightsFilter first and stop other checks if ALLOWED_SKIP_DEFAULT_CHECKS
         PageRightsFilter.Right editRight = getDatabase().getPageRightsFilter().mayEditPage(this, getDatabase().getSessionContext().getUserAccess());
         if (editRight == PageRightsFilter.Right.DENIED) 
         	return this;
