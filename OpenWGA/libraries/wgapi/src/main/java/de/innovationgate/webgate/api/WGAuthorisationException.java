@@ -36,11 +36,15 @@ public class WGAuthorisationException extends WGAPIException {
      */
     private static final long serialVersionUID = 1L;
     public static final String ERRORCODE_OP_DENIED_BY_AREA = "area-settings-denies-edit";
+    public static final String ERRORCODE_DELETION_DENIED_BY_AREA = "area-settings-denies-deletion";
     public static final String ERRORCODE_OP_DENIED_BY_PAGE = "struct-settings-denies-edit";
+    public static final String ERRORCODE_DELETION_DENIED_BY_PAGE = "struct-settings-denies-deletion";
     public static final String ERRORCODE_OP_DENIED_BY_CONTENTTYPE = "pagetype-settings-denies-edit";
+    public static final String ERRORCODE_DELETION_DENIED_BY_CONTENTTYPE = "pagetype-settings-denies-deletion";
     public static final String ERRORCODE_OP_DENIED_BY_LANGUAGE = "language-settings-denies-edit";
     public static final String ERRORCODE_OP_DENIED_BY_INVISIBLE_CONTENT = "content-with-no-readaccess";
     public static final String ERRORCODE_OP_DENIED_BY_PAGERIGHTSFILTER = "pagerightsfilter-denies-edit";
+    public static final String ERRORCODE_DELETION_DENIED_BY_PAGERIGHTSFILTER = "pagerightsfilter-denies-deletion";
     
     public static final String ERRORCODE_OP_NEEDS_AUTHORING_RIGHTS = "you-are-no-author";
     public static final String ERRORCODE_OP_NEEDS_WORKFLOW_APPROVER_RIGHTS = "you-are-no-approver";

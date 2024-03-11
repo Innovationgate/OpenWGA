@@ -27,14 +27,17 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_structkey, 
 		}
 
 		// Neue Version erstellen
-		if(_Content.mayCreateContent())
-			data.may_create_version = {
-				info: "Sie dürfen neue Sprachversionen erstellen.",
-				cssclass: "may"
+		var langs = WGA.db($urlParam_dbkey).getLanguages().keySet().size()
+		if(langs>1){
+			if(_Content.mayCreateContent())
+				data.may_create_version = {
+					info: "Sie dürfen neue Sprachversionen erstellen.",
+					cssclass: "may"
+				}
+			else data.may_create_version = {
+				info: _Content.getReason(),
+				cssclass: "may-not"
 			}
-		else data.may_create_version = {
-			info: _Content.getReason(),
-			cssclass: "may-not"
 		}
 
 		// Verison löschen
