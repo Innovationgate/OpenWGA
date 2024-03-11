@@ -53,6 +53,8 @@ public class WGAuthorisationException extends WGAPIException {
     public static final String ERRORCODE_OP_NEEDS_CHIEF_EDITOR_RIGHTS = "you-are-no-chief-editor";
     public static final String ERRORCODE_OP_NEEDS_MOVEPAGE_RIGHTS = "move-page-denied";
     
+    public static final String ERRORCODE_ACL_DENIED_DELETION = "database.acl-denies-deletion";
+    
     public static final String ERRORCODE_OP_NEEDS_EDITOR_LEVEL = "database.you-need-to-be-editor";
     public static final String ERRORCODE_OP_NEEDS_AUTHOR_LEVEL = "database.you-need-to-be-author";
     public static final String ERRORCODE_OP_NEEDS_MANAGER_LEVEL = "database.you-need-to-be-manager";
