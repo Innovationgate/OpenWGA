@@ -204,6 +204,7 @@ define(["cm", "jquery"], function(CM, $){
 
 		WGA.event.fireEvent("CMS_item_edit", "sitepanel.js", {
 			item: this.item,
+			label: this.el.find(".WGA-Item-Label").text(),
 			format: this.el.find(".WGA-Item-Format").text(),
 			editor: this.editor,
 			options: this.options			

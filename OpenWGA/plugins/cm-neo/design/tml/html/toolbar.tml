@@ -234,7 +234,7 @@
 		<div class="pull-right">
 			<a class="btn button margin-right" href="#" data-action="remove-item" data-toggle="popover" data-trigger="focus">
 				<i class="icon fa-regular fa-trash-can"></i>
-				<div class="text">Feld löschen</div>
+				<div class="text">Feld leeren</div>
 			</a>
 			<a class="btn button" href="#" data-action="cancel-edit">
 				<i class="icon fa-solid fa-xmark"></i>
