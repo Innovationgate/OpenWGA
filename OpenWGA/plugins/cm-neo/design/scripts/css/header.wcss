@@ -50,6 +50,10 @@
 				&:hover .icon {
 					border-color: yellow;
 				}
+				&.margin-right{
+					margin-right: 100px;
+				}
+			
 				.text {
 	 				font-size: 80%;	 				
 					margin-top: 5px;
@@ -97,7 +101,13 @@
 					.text{
 						font-size: 63%;
 					}
-				}				
+					&.margin-right{
+						margin-right: 0px;
+					}
+				}
+				.item-edit-info{
+					font-size: 1em;
+				}
 			}
 		}
 

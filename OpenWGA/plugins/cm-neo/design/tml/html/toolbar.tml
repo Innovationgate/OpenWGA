@@ -159,7 +159,7 @@
 			</ul>
 		</div>
 
-		<div class="btn-group" _style="margin-right:50px">
+		<div class="btn-group">
 			<a class="btn button" href="#" data-toggle="dropdown" data-action-group="delete">
 				<i class="icon fa-regular fa-trash-can"></i>
 				<div class="text">
@@ -232,7 +232,7 @@
 	<div class="toolbar" data-toolbar="edit" style="display:none;right:10px">
 		<span class="item-edit-info">Feld in Bearbeitung ...</span>
 		<div class="pull-right">
-			<a class="btn button" href="#" data-action="remove-item" data-toggle="popover" data-trigger="focus" style="margin-right:100px">
+			<a class="btn button margin-right" href="#" data-action="remove-item" data-toggle="popover" data-trigger="focus">
 				<i class="icon fa-regular fa-trash-can"></i>
 				<div class="text">Feld löschen</div>
 			</a>
