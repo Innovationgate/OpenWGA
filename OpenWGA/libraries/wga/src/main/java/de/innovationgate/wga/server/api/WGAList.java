@@ -13,7 +13,7 @@ public class WGAList<T> extends ArrayList<T>{
         public Object call(Object a, Object b);
     }
 		
-	public WGAList(Collection<T> list){
+	public WGAList(Collection<? extends T> list){
 		super(list);
 	}
 	public WGAList(){
