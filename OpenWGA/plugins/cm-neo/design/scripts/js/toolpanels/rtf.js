@@ -38,6 +38,10 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 
 	MS.buildSelect("#text-style-ms", {
 		onChange: function(options){
+			editor.focus();
+			var el = editor.getParagraph();
+			if(!el)
+				editor.execCmd("FormatBlock", "p");
 			setClasses(editor.getParagraph(), options);
 		},
 		multiselect: true,
@@ -308,12 +312,12 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 			var el = editor.getParagraph()
 			if(el){
 				MS.select("#text-style-ms", el.className.split(" "));
-				MS.disable("#text-style-ms", false);
+				//MS.disable("#text-style-ms", false);
 				MS.select("#para-select", [el.tagName.toLowerCase()])
 			}
 			else{
 				MS.select("#text-style-ms", []);
-				MS.disable("#text-style-ms", true);
+				//MS.disable("#text-style-ms", true);
 				MS.select("#para-select", [])
 			}
 			
