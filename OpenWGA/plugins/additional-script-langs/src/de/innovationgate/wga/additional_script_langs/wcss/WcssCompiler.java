@@ -294,7 +294,7 @@ public class WcssCompiler {
 				prefix="";
 
 			if(!_props.isEmpty() && getSourceInfo()!=null && !getSourceInfo().isEmpty())
-				result.append("\n" + prefix + "/* " + getSourceInfo() + " */\n");
+				result.append("\n" + prefix + "/* wcss " + getSourceInfo() + " */\n");
 
 			String path = getPath();
 			if(!path.isEmpty() && !_props.isEmpty()){
