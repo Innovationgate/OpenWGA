@@ -54,7 +54,7 @@
 			</div>
 		
 			<div style="margin:10px">
-				<tml:input name="{scoped:lang}" default="{_lang}" type="select" optionsitem="_langs" changeaction="$refresh" cssclass="form-control"/>
+				<tml:input name="{scoped:lang}" default="{_lang}" type="select" optionsitem="_langs" changeaction="$refresh" cssclass="form-control" mode="{option:mode}"/>
 			</div>
 			
 			<div style="margin:10px">
