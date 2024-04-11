@@ -6,11 +6,16 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_structkey, 
 	var data = {}
 
 	var _Struct = AFW.structentry($urlParam_structkey, $urlParam_dbkey)
+	var isProtectedHomepage=false;
 
 	if($urlParam_contentkey){
 		
 		var _Content=AFW.content($urlParam_contentkey, $urlParam_dbkey);
+		var ctx = WGA.context("db:" + $urlParam_dbkey + "/docid:"+$urlParam_contentkey, false)
 		
+		if(ctx && ctx.isHomepage() && !WGA.app($urlParam_dbkey).isChiefEditor())
+			isProtectedHomepage=true;
+			
 		if(_Content.mayEditContent())
 			data.may_edit_content = {
 				info: "Sie dürfen die Inhaltsversion bearbeiten.",
@@ -22,22 +27,32 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_structkey, 
 		}
 
 		// Neue Version erstellen
-		if(_Content.mayCreateContent())
-			data.may_create_version = {
-				info: "Sie dürfen neue Sprachversionen erstellen.",
-				cssclass: "may"
+		var langs = WGA.db($urlParam_dbkey).getLanguages().keySet().size()
+		if(langs>1){
+			if(_Content.mayCreateContent())
+				data.may_create_version = {
+					info: "Sie dürfen neue Sprachversionen erstellen.",
+					cssclass: "may"
+				}
+			else data.may_create_version = {
+				info: _Content.getReason(),
+				cssclass: "may-not"
 			}
-		else data.may_create_version = {
-			info: _Content.getReason(),
-			cssclass: "may-not"
 		}
 
 		// Verison löschen
-		if(_Content.mayDeleteContent())
-			data.may_delete_version = {
+		if(_Content.mayDeleteContent()){
+			if(ctx && ctx.STATUS == ctx.content().STATUS_RELEASE && isProtectedHomepage){
+				data.may_delete_version = {
+					info: "Sie dürfen diese Inhaltsversionen nicht löschen, weil es die Hompage der Website ist.",
+					cssclass: "may-not"
+				}
+			}
+			else data.may_delete_version = {
 				info: "Sie dürfen diese Inhaltsversionen löschen.",
 				cssclass: "may"
 			}
+		}
 		else data.may_delete_version = {
 			info: _Content.getReason(),
 			cssclass: "may-not"
@@ -81,11 +96,18 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_structkey, 
 
 
 	// Seite löschen
-	if(_Struct.mayDeletePage())
-		data.may_delete_page = {
+	if(_Struct.mayDeletePage()){
+		if(isProtectedHomepage){
+			data.may_delete_page = {
+				info: "Sie dürfen diese Seite nicht löschen, weil es die Hompage der Website ist.",
+				cssclass: "may-not"
+			}
+		}	
+		else data.may_delete_page = {
 			info: "Sie dürfen diese Seite inkl. aller Unterseiten löschen.",
 			cssclass: "may"
 		}
+	}
 	else data.may_delete_page = {
 		info: _Struct.getReason(),
 		cssclass: "may-not"

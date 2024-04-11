@@ -728,6 +728,7 @@ public class Input extends ActionBase implements DynamicAttributes {
                     this.appendResult("<option ");
                     if (optionValue != null) {
                         this.appendResult(" value=\"").appendResult(displayOptionValue).appendResult("\"");
+                        this.appendResult(" selected ");
                     }
                     this.appendResult(" >").appendResult(displayOptionText).appendResult("</option>");
                 }

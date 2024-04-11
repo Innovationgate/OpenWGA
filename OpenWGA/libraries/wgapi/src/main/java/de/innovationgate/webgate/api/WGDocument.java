@@ -2399,7 +2399,7 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
             if (!(this instanceof WGContent && ((WGContent) this).getStatus().equals(WGContent.STATUS_DRAFT)) && 
                 !(this instanceof WGStructEntry &&((WGStructEntry) this).isActive() == false) &&
                 !(this instanceof WGContent && getDatabase().isProjectMode() && db.getSessionContext().getAccessLevel() >= WGDatabase.ACCESSLEVEL_AUTHOR)) {
-                throw new WGAuthorisationException("You are not authorized to delete active documents in this database!", WGAuthorisationException.ERRORCODE_OP_NEEDS_EDITOR_LEVEL);
+                throw new WGAuthorisationException("You are not authorized to delete active documents in this database!", WGAuthorisationException.ERRORCODE_ACL_DENIED_DELETION);
             }
         }
         

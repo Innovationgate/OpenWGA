@@ -190,8 +190,10 @@ define(["jquery"], function($){
 			var copyTo = document.createElement(p.tagName);
 			
 			// copy styles and classes
-			copyTo.setAttribute("style",  p.getAttribute("style"));
-			copyTo.className = p.className;
+			if(p.getAttribute("style"))
+				copyTo.setAttribute("style",  p.getAttribute("style"));
+			if(p.className)
+				copyTo.className = p.className;
 			
 			p.parentNode.insertBefore(copyTo, p);
 

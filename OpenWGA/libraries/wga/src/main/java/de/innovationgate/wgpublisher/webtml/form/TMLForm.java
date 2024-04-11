@@ -2471,9 +2471,13 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
      */
     @Override
     public boolean store() throws WGException {
-    	return store(true);
+    	return store(true);		// validate and includeFiles
     }
     public boolean store(boolean validate) throws WGException {
+    	return store(validate, true);	// includFiles
+    }
+
+    public boolean store(boolean validate, boolean includeFiles) throws WGException {
         
         if (validate){
         	if(!this.validate()) 
@@ -2482,7 +2486,7 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
         else clearmessages();
         
         FormSource fs = fetchFormSource(TMLContext.getThreadMainContext(), false);
-        return fs.storeForm(this, true);
+        return fs.storeForm(this, includeFiles);
 
     }
 

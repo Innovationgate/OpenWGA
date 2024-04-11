@@ -2202,12 +2202,12 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     		if (right == Right.ALLOWED_SKIP_DEFAULT_CHECKS)
     			return;		// cancel all other tests
     		else if (right == Right.DENIED)
-    			throw new WGAuthorisationException("PageRightsFilter denies to edit content in this language", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGERIGHTSFILTER, getLanguage());            
+    			throw new WGAuthorisationException("PageRightsFilter denies to edit content in this language", WGAuthorisationException.ERRORCODE_DELETION_DENIED_BY_PAGERIGHTSFILTER, getLanguage());            
             
 			WGDocument document = this.getStructEntry().testEditPageHierarchyRights();
 			if (document != null) {
 				if (document instanceof WGArea) {
-					throw new WGAuthorisationException("User is not allowed to delete content in this area", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_AREA, document);
+					throw new WGAuthorisationException("User is not allowed to delete content in this area", WGAuthorisationException.ERRORCODE_DELETION_DENIED_BY_AREA, document);
 				}
 				else {
 					WGStructEntry entry = (WGStructEntry) document;
@@ -2216,7 +2216,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 							+ entry.getTitle()
 							+ "' (Key "
 							+ entry.getStructKey()
-							+ ") disallows it", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGE, entry);
+							+ ") disallows it", WGAuthorisationException.ERRORCODE_DELETION_DENIED_BY_PAGE, entry);
 				}
 
 			}
@@ -2224,7 +2224,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	        // Check edit rights from content type
 			WGContentType contentType = this.getStructEntry().getContentType();
 			if (contentType != null && !contentType.mayCreateContent()) {
-				throw new WGAuthorisationException("User is not allowed to delete content of this content type", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_CONTENTTYPE, contentType);
+				throw new WGAuthorisationException("User is not allowed to delete content of this content type", WGAuthorisationException.ERRORCODE_DELETION_DENIED_BY_CONTENTTYPE, contentType);
 			}
 			
             // Check edit rights from language

@@ -64,9 +64,19 @@
 			event.setParameter("language", c.LANGUAGE)
 			event.setParameter("ismine", c.AUTHOR==c.meta("db", "username"))
 			
+			var may_archive_version = Content.mayArchiveContent();
+			var may_delete_version = Content.mayDeleteContent();
+			if(c.ishomepage() && ! WGA.app(dbkey).isChiefEditor()){
+				event.setParameter("may_delete_page", false);
+				if(c.content().getStatus()==c.content().STATUS_RELEASE){
+					may_archive_version = false;
+					may_delete_version = false;
+				}
+			}
+			
 			event.setParameter("may_update_content", App.mayUpdateContent(c));
-			event.setParameter("may_delete_version", Content.mayDeleteContent());
-			event.setParameter("may_archive_version", Content.mayArchiveContent());
+			event.setParameter("may_delete_version", may_delete_version);
+			event.setParameter("may_archive_version", may_archive_version);
 			event.setParameter("may_publish_page", c.STATUS==c.content().STATUS_DRAFT && Content.isMine() && !is_in_trash);
 			event.setParameter("may_approve_version", !is_in_trash && c.STATUS==c.content().STATUS_REVIEW && !c.content().isPendingRelease() && Content.mayApprove());
 			event.setParameter("may_edit_content", 

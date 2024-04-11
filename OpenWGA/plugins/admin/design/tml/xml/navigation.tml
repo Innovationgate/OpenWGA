@@ -63,7 +63,7 @@
 
 	<nav id="domains" tml="domains:portlet" img="folder_blue.png"/>
 
-	<nav id="shares" tml="shares:portlet" img="hdd_mount.png"/>
+	<tml:comment><nav id="shares" tml="shares:portlet" img="hdd_mount.png"/></tml:comment>
 	
 	<nav id="plugins" redirectto="plugins.plugin-management" img="kcmdf.png">
 		<nav id="plugins.plugin-management" tml="plugins:portlet"/>

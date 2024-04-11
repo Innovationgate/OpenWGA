@@ -22,8 +22,16 @@
 	// create and store module settings
 	var settings = WGA.createLookupTable()
 	for(let field in Iterator(tmlform.fieldnames)){
-		if(hasModule(field))
-			settings.put(field, tmlform.fieldlist(field))
+		if(hasModule(field)){
+			var value = WGA.List(tmlform.fieldlist(field));
+			/*
+			 *	special handling for field module_css_classes: remove empty entries.
+			 *	May be this could/should be used for all field values but this in theory may brake some older code.
+			 */
+			if(field.indexOf("module_css_classes")==0)
+				value = value.trim();
+			settings.put(field, value);
+		}
 	}
 	CMM.writeContentModulesSettingsData(settings)
 

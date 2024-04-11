@@ -1630,7 +1630,7 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
             return prohibitingDoc;
         }
         
-        // Ask PageRightsFilter first end stop other checks if ALLOWED_SKIP_DEFAULT_CHECKS
+        // Ask PageRightsFilter first and stop other checks if ALLOWED_SKIP_DEFAULT_CHECKS
         PageRightsFilter.Right editRight = getDatabase().getPageRightsFilter().mayEditPage(this, getDatabase().getSessionContext().getUserAccess());
         if (editRight == PageRightsFilter.Right.DENIED) 
         	return this;
@@ -2260,15 +2260,7 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
         // Test rights to delete this entry and content
         // Test rights to edit this entry and content
         if (getContentType() != null && !getContentType().mayCreateContent()) {
-            throw new WGAuthorisationException("You are not allowed to delete documents of content type '" + getContentType().getName() + "'", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_CONTENTTYPE, getContentType());
-        }
-        
-        // Test languages
-        for(WGContent content: getAllContent(true)){
-        	WGLanguage lang = content.getLanguage(); 
-        	if(!lang.mayCreateContent(this)){
-        		throw new WGAuthorisationException("You are not allowed to delete documents of language '" + lang.getName() + "'", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_LANGUAGE, lang);
-        	}
+            throw new WGAuthorisationException("You are not allowed to delete documents of content type '" + getContentType().getName() + "'", WGAuthorisationException.ERRORCODE_DELETION_DENIED_BY_CONTENTTYPE, getContentType());
         }
         
         WGDocument cause = testEditPageHierarchyRights();
@@ -2276,12 +2268,20 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
             if (cause instanceof WGStructEntry) {
                 WGStructEntry entry = (WGStructEntry) cause;
                 throw new WGAuthorisationException(
-                        "You cannot delete struct entry " + getStructKey() + " because the settings of struct entry " + entry.getStructKey() + " deny this", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGE , entry);
+                        "You cannot delete struct entry " + getStructKey() + " because the settings of struct entry " + entry.getStructKey() + " deny this", WGAuthorisationException.ERRORCODE_DELETION_DENIED_BY_PAGE , entry);
             } else {
                 WGArea area = (WGArea) cause;
                 throw new WGAuthorisationException(
-                        "You cannot delete struct entry " + getStructKey() + " because the settings of area '" + area.getName() + " deny this", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_AREA, area);
+                        "You cannot delete struct entry " + getStructKey() + " because the settings of area '" + area.getName() + " deny this", WGAuthorisationException.ERRORCODE_DELETION_DENIED_BY_AREA, area);
             }
+        }
+
+        // Test languages
+        for(WGContent content: getAllContent(true)){
+        	WGLanguage lang = content.getLanguage(); 
+        	if(!lang.mayCreateContent(this)){
+        		throw new WGAuthorisationException("You are not allowed to delete documents of language '" + lang.getName() + "'", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_LANGUAGE, lang);
+        	}
         }
 
         if (deepCheck) {
@@ -2292,11 +2292,11 @@ public class WGStructEntry extends WGDocument implements Comparable<WGStructEntr
                     if (cause instanceof WGStructEntry) {
                         WGStructEntry entry = (WGStructEntry) cause;
                         throw new WGAuthorisationException(
-                                "You cannot delete the children of struct entry " + getStructKey() + " because the settings of child entry " + entry.getStructKey() + " deny this", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_PAGE, entry);
+                                "You cannot delete the children of struct entry " + getStructKey() + " because the settings of child entry " + entry.getStructKey() + " deny this", WGAuthorisationException.ERRORCODE_DELETION_DENIED_BY_PAGE, entry);
                     } else {
                         WGArea area = (WGArea) cause;
                         throw new WGAuthorisationException(
-                                "You cannot delete the children of struct entry " + getStructKey() + " children, because the settings of area '" + area.getName() + " denies this", WGAuthorisationException.ERRORCODE_OP_DENIED_BY_AREA, area);
+                                "You cannot delete the children of struct entry " + getStructKey() + " children, because the settings of area '" + area.getName() + " denies this", WGAuthorisationException.ERRORCODE_DELETION_DENIED_BY_AREA, area);
                     }
                 }
             }

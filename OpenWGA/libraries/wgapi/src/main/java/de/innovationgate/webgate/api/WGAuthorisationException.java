@@ -36,11 +36,15 @@ public class WGAuthorisationException extends WGAPIException {
      */
     private static final long serialVersionUID = 1L;
     public static final String ERRORCODE_OP_DENIED_BY_AREA = "area-settings-denies-edit";
+    public static final String ERRORCODE_DELETION_DENIED_BY_AREA = "area-settings-denies-deletion";
     public static final String ERRORCODE_OP_DENIED_BY_PAGE = "struct-settings-denies-edit";
+    public static final String ERRORCODE_DELETION_DENIED_BY_PAGE = "struct-settings-denies-deletion";
     public static final String ERRORCODE_OP_DENIED_BY_CONTENTTYPE = "pagetype-settings-denies-edit";
+    public static final String ERRORCODE_DELETION_DENIED_BY_CONTENTTYPE = "pagetype-settings-denies-deletion";
     public static final String ERRORCODE_OP_DENIED_BY_LANGUAGE = "language-settings-denies-edit";
     public static final String ERRORCODE_OP_DENIED_BY_INVISIBLE_CONTENT = "content-with-no-readaccess";
     public static final String ERRORCODE_OP_DENIED_BY_PAGERIGHTSFILTER = "pagerightsfilter-denies-edit";
+    public static final String ERRORCODE_DELETION_DENIED_BY_PAGERIGHTSFILTER = "pagerightsfilter-denies-deletion";
     
     public static final String ERRORCODE_OP_NEEDS_AUTHORING_RIGHTS = "you-are-no-author";
     public static final String ERRORCODE_OP_NEEDS_WORKFLOW_APPROVER_RIGHTS = "you-are-no-approver";
@@ -48,6 +52,8 @@ public class WGAuthorisationException extends WGAPIException {
     public static final String ERRORCODE_OP_NEEDS_DESIGNER_RIGHTS = "you-are-no-designer";
     public static final String ERRORCODE_OP_NEEDS_CHIEF_EDITOR_RIGHTS = "you-are-no-chief-editor";
     public static final String ERRORCODE_OP_NEEDS_MOVEPAGE_RIGHTS = "move-page-denied";
+    
+    public static final String ERRORCODE_ACL_DENIED_DELETION = "database.acl-denies-deletion";
     
     public static final String ERRORCODE_OP_NEEDS_EDITOR_LEVEL = "database.you-need-to-be-editor";
     public static final String ERRORCODE_OP_NEEDS_AUTHOR_LEVEL = "database.you-need-to-be-author";

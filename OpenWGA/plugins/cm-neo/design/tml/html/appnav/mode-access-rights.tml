@@ -12,12 +12,14 @@
 			</div>
 		{{/may_edit_content}}
 		
+		{{#may_create_version}}
 		<div class="title">
 			Neue Sprachversion erstellen
 		</div>
 		<div class="info {{may_create_version.cssclass}}">
 			{{may_create_version.info}}
 		</div>
+		{{/may_create_version}}
 		
 		{{#may_delete_version}}
 			<div class="title">

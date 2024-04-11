@@ -347,7 +347,7 @@
 
 		<tml:case istrue="_query_create_dump">
 			<tml:include designdb="@ui" ref="message">
-				<tml:option name="title">Create ContentStore dump ...</tml:option>
+				<tml:option name="title">Create ContentStore Dump ...</tml:option>
 				<tml:option name="body">
 					<tml:include ref="::cs-dump:export"/>
 				</tml:option>
@@ -356,7 +356,7 @@
 		
 		<tml:case istrue="_query_load_dump">
 			<tml:include designdb="@ui" ref="message">
-				<tml:option name="title">Load ContentStore dump ...</tml:option>
+				<tml:option name="title">Load ContentStore Dump ...</tml:option>
 				<tml:option name="body">
 					<tml:include ref="::cs-dump:import"/>
 				</tml:option>

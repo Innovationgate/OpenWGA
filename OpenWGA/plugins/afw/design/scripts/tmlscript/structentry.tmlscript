@@ -156,19 +156,21 @@ this.mayDeletePage=function(deep_check){
 		var errorCode, cause;
 		if(e.javaException.getErrorCode)
 			errorCode = e.javaException.getErrorCode()
-			
+
 		if(errorCode){
 			if(e.javaException.getCauseDocument)
 				cause = e.javaException.getCauseDocument();
 			if(cause){
 				var causeTitle = cause.getTitle ? cause.getTitle() : cause.getName ? cause.getName() : "unknown";
-				return _false(label("reason."+errorCode, [causeTitle]))
+				if(causeTitle)
+					return _false(label("reason."+errorCode, [causeTitle]))
+				else return _false(label("reason.struct-denies-deletion.readprotected-subpage"));
 			}
 			else {
 				cause = e.javaException.getCauseDocumentKey();
 				if(cause)
 					return _false(label("reason."+errorCode, [cause]))
-				else return _false(label("reason.page.unknown"))
+				else return _false(label("reason."+errorCode))
 			}
 		}
 		else{
