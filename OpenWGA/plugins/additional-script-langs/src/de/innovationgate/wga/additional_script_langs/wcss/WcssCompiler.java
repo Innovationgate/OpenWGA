@@ -106,7 +106,7 @@ public class WcssCompiler {
 		return b.getCode();
 	}
 	
-	private void compile(CssBlock parent) throws IOException{
+	private CssBlock compile(CssBlock parent) throws IOException{
 		StreamTokenizer st = new StreamTokenizer(new StringReader(_resource.getCode()));
 
 		st.resetSyntax();
@@ -129,6 +129,7 @@ public class WcssCompiler {
 		rootCssBlock.parse(st);
 		
 		_resource.addIntegratedResource();
+		return rootCssBlock;
 
 	}
 		
@@ -214,8 +215,8 @@ public class WcssCompiler {
 						// search for property name:value
 						int index = propName.indexOf(':');
 						if(index>0){
-							String propPart = propName.substring(0, index);
-							String valuePart = propName.substring(index+1);
+							String propPart = trim(propName.substring(0, index));
+							String valuePart = trim(propName.substring(index+1));
 							if(propPart.startsWith("$")){
 								valuePart = replaceVars(valuePart);
 								if(valuePart.endsWith("!default")){
@@ -542,7 +543,8 @@ public class WcssCompiler {
 				if(ref!=null && ref.getCode()!=null){
 					WcssCompiler compiler = new WcssCompiler(ref);
 					compiler.setCompressing(_compress);
-					compiler.compile(getParentBlock());
+					CssBlock b = compiler.compile(getParentBlock());
+					getParentBlock().getVars().putAll(b.getVars());
 				}
 				else LOG.error("@import: ResourceRef not found: " + ref);
 			}
