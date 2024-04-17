@@ -39,7 +39,7 @@
 <table width="100%" class="collection">
 	<tr class="collection-title">
 		<td width="1%"></td>
-		<td>Name</td>
+		<td>Job</td>
 		<td>Description</td>
 		<td>Last run</td>
 		<td>Next scheduled run</td>
@@ -67,7 +67,15 @@
 					align="left" width="28" height="28"
  				</tml:image>
 			</td>
-			<td><tml:script expression="_job.name"/></td>
+			<td>
+				<b><tml:script expression="_job.name"/></b>
+				<br>
+				<tml:script divider="<br>">
+					return WGA.List(_job.runtime.getTasks()).map(function(task){
+						return task.getTitle(java.util.Locale.getDefault())
+					})
+				</tml:script>
+			</td>
 			<td>
 				<tml:script expression="_job.transient ? _job.runtime.getTasks().get(0).getTitle(java.util.Locale.getDefault()) : _job.description ? _job.description : '- no description -'"/>
 				<tml:script>				

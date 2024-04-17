@@ -94,7 +94,7 @@ public class ScriptTaskModuleDefinition implements ModuleDefinition, RegistryAwa
                 boolean usePlugin = Boolean.parseBoolean(task.getOptions().get(ScriptTask.OPTION_MODULEFROMPLUGIN));
                 String db = (usePlugin ? task.getOptions().get(ScriptTask.OPTION_PLUGINDB) : task.getOptions().get(ScriptTask.OPTION_DATABASE));
                 String module = task.getOptions().get(ScriptTask.OPTION_MODULE);
-                return "Execute TMLScript module " + db + "/" + module;
+                return "TMLScript task " + db + "/" + module;
             }
         };
     }
