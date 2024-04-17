@@ -1,12 +1,3 @@
-$fa-var-square: 		\f0c8;
-$fa-var-square-check: 	\f14a;
-
-$fa-var-toggle-off: 	\f204;
-$fa-var-toggle-on: 		\f205;
-
-$fa-var-circle: 		\f111;
-$fa-var-check-circle: 	\f058;
-
 form{
 
 	input[type=checkbox].symbol{
