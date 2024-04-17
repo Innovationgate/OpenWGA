@@ -110,9 +110,21 @@ public class WcssPostProcessor implements PostProcessor{
 		WGAResource(PostProcessResult result, ResourceRef ref){
 			_result = result;
 			_ref = ref;
+			String resourceName = _ref.getResourceName();
 			try {
 				if(_ref.getCode()==null)
-					_ref.setResourceName("_"+_ref.getResourceName());
+					_ref.setResourceName("_"+resourceName);
+				if(_ref.getCode()==null && _ref.getType().equals(ResourceRef.TYPE_FILE)) {
+					_ref.setResourceName(resourceName+".wcss");
+					if(_ref.getCode()==null)
+						_ref.setResourceName("_"+resourceName+".wcss");
+					if(_ref.getCode()==null)
+						_ref.setResourceName(resourceName+".scss");
+					if(_ref.getCode()==null)
+						_ref.setResourceName("_"+resourceName+".scss");
+				}
+				if(_ref.getCode()==null)
+					_ref.setResourceName(resourceName);	// ensures correct error message
 			} 
 			catch (WGException | IOException e) {}
 		}
