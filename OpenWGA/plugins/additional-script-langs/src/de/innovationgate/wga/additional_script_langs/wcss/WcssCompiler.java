@@ -545,6 +545,7 @@ public class WcssCompiler {
 					compiler.setCompressing(_compress);
 					CssBlock b = compiler.compile(getParentBlock());
 					getParentBlock().getVars().putAll(b.getVars());
+					getParentBlock().getMixins().putAll(b.getMixins());
 				}
 				else LOG.error("@import: ResourceRef not found: " + ref);
 			}
