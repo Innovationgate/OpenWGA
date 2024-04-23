@@ -73,6 +73,14 @@ public class WcssCompiler {
 				return null;
 			}
 		});
+		customFunctions.put("equals", new WcssFunction(){
+			public String execute(WcssResource resource, ArrayList<String> params) {
+				if(params.size()>1){
+					return params.get(0).equalsIgnoreCase(params.get(1)) ? "true":"false";
+				}
+				return null;
+			}
+		});
 	}
 	
 	// map of custom vars
@@ -587,7 +595,9 @@ public class WcssCompiler {
 					mixin.cloneCssBlock(getParentBlock(), params, null);
 				else LOG.error("@mixin not found " + mixin_name);
 			}
-			else LOG.error("unknown directive " + getName());
+			else {
+				_csscode = "@"+directive + " " + replaceCustomFunctions(replaceVars(params_string)) + ";";
+			}
 		}
 		
 		protected CssDirectiveBlock cloneCssBlock(String name, CssBlock parent, CssBlock contentBlock){
@@ -599,7 +609,7 @@ public class WcssCompiler {
 		public String getCode(String prefix) throws IOException{
 			String info="";
 			if(getSourceInfo()!=null)
-				info = "\n" + prefix + "/* " + getName() + " in " + getSourceInfo() + " */\n";
+				info = "\n" + prefix + "/* wcss " + getName() + " in " + getSourceInfo() + " */\n";
 			return info + _csscode;
 		}
 	}
