@@ -37,7 +37,8 @@ public class WcssPostProcessor implements PostProcessor{
         extraObjects.put("cssDocument", data.getDocument());
 
         Map<String,Object> vars = new HashMap<String, Object>();
-        vars.put("processor", "wcss");
+        vars.put("wcss", "true");
+        vars.put("charset", wga.design(data.getDocument().getDatabase().getDbReference()).getFileEncoding());
     	if(wga.getRequest()!=null){
     		String host = wga.getRequest().getServerName().replace(".", "_");
     		vars.put("requested_host", host);
@@ -50,8 +51,10 @@ public class WcssPostProcessor implements PostProcessor{
             	wga.getLog().error("The return type of TMLScript module '" + design + "' used to set CSS variables is no JS-Object and will be ignored.");
             	continue;
             }
-            else vars.putAll((Map<String,Object>)result);
-
+        	// this is necessary for the data to be cached because TMLScript native objects are not Serializable ?
+            for(Map.Entry<String, Object> entry : ((Map<String,Object>)result).entrySet()){
+            	vars.put(entry.getKey(), entry.getValue().toString());
+            }
 		}
     	
         data.setCacheQualifier((Serializable) vars);
