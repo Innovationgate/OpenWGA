@@ -547,15 +547,17 @@ public class WcssCompiler {
 			if(directive.equalsIgnoreCase("import") && params_string.length()>1){	
 				params_string = replaceCustomFunctions(replaceVars(params_string));
 				ArrayList<String> params = parseCommasAndQuotes(params_string);
-				WcssResource ref = _resource.resolve(params.get(0));
-				if(ref!=null && ref.getCode()!=null){
-					WcssCompiler compiler = new WcssCompiler(ref);
-					compiler.setCompressing(_compress);
-					CssBlock b = compiler.compile(getParentBlock());
-					getParentBlock().getVars().putAll(b.getVars());
-					getParentBlock().getMixins().putAll(b.getMixins());
+				for(String p : params) {
+					WcssResource ref = _resource.resolve(p);
+					if(ref!=null && ref.getCode()!=null){
+						WcssCompiler compiler = new WcssCompiler(ref);
+						compiler.setCompressing(_compress);
+						CssBlock b = compiler.compile(getParentBlock());
+						getParentBlock().getVars().putAll(b.getVars());
+						getParentBlock().getMixins().putAll(b.getMixins());
+					}
+					else LOG.error("@import: ResourceRef not found: " + ref);
 				}
-				else LOG.error("@import: ResourceRef not found: " + ref);
 			}
 			else if(directive.equalsIgnoreCase("importcss") && params_string.length()>1){	
 				params_string = replaceCustomFunctions(replaceVars(params_string));
