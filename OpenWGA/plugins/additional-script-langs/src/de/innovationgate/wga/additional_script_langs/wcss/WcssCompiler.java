@@ -107,6 +107,21 @@ public class WcssCompiler {
 		_compress=value;
 	}
 	
+	public static String preprocess(String s) {
+		String search_pattern = "#\\{([^\\}]*)\\}";	// search for #{....}
+		Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
+    	Matcher matcher = pattern.matcher(s);
+    	StringBuffer sb = new StringBuffer();
+    	while(matcher.find()){
+            if(matcher.groupCount()>0) {
+           		matcher.appendReplacement(sb, Matcher.quoteReplacement("concat(" + matcher.group(1)) + ")");
+            }
+    	}
+    	matcher.appendTail(sb);
+    	return sb.toString();		
+	}
+	
+	
 	public String compile() throws IOException{
 		CssBlock b = new CssBlock(); 
 		b.getVars().putAll(customVars);
@@ -115,7 +130,10 @@ public class WcssCompiler {
 	}
 	
 	private CssBlock compile(CssBlock parent) throws IOException{
-		StreamTokenizer st = new StreamTokenizer(new StringReader(_resource.getCode()));
+		
+		String preprosessed = preprocess(_resource.getCode());
+		
+		StreamTokenizer st = new StreamTokenizer(new StringReader(preprosessed));
 
 		st.resetSyntax();
 		
@@ -305,7 +323,7 @@ public class WcssCompiler {
 			if(!_props.isEmpty() && getSourceInfo()!=null && !getSourceInfo().isEmpty())
 				result.append("\n" + prefix + "/* wcss " + getSourceInfo() + " */\n");
 
-			String path = getPath();
+			String path = replaceCustomFunctions(replaceVars(getPath()));
 			if(!path.isEmpty() && !_props.isEmpty()){
 				result.append(prefix);
 				result.append(path + "{");
@@ -628,7 +646,7 @@ public class WcssCompiler {
 		
 		public String getCode(String prefix) throws IOException{
 			StringBuffer result = new StringBuffer();
-			result.append(replaceVars(getName()) + "{");
+			result.append(replaceCustomFunctions(replaceVars(getName())) + "{");
 			if(!_compress)
 				result.append("\n");
 			for(CssBlock b: getSubBlocks()){
