@@ -157,7 +157,7 @@ public class WGDatabaseImpl extends de.innovationgate.webgate.api.fake.WGFakeDat
             props.put("dbcp.dbkey", db.getDbReference());
     		
     		try {
-                _connProvider = new JDBCConnectionProvider(path, driverName, props, true);
+                _connProvider = new JDBCConnectionProvider(path, props, true);
             }
             catch (JDBCConnectionException e) {
                 throw new WGInvalidDatabaseException("Exception setting up JDBC connection", e);

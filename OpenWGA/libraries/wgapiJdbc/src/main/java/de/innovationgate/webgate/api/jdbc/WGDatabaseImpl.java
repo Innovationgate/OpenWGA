@@ -1734,13 +1734,11 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
                     props.put("hibernate.connection.username", WGUtils.getValueOrDefault(user, ""));
                     props.put("hibernate.connection.password", WGUtils.getValueOrDefault(pwd, ""));
                 }
-                String driverClass = (String) db.getCreationOptions().get("Driver");
-           
                 props.put(Environment.ISOLATION, String.valueOf(Connection.TRANSACTION_READ_COMMITTED));
            
                 props.putAll(db.getCreationOptions());    
                 try {
-                    _connProvider = new JDBCConnectionProvider(path, driverClass, props, true);
+                    _connProvider = new JDBCConnectionProvider(path, props, true);
                 }
                 catch (JDBCConnectionException e) {
                     throw new WGInvalidDatabaseException("Exception creating connection pool", e);
@@ -2062,7 +2060,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
         }
         props.put("user", WGUtils.getValueOrDefault(userName, ""));
         props.put("password", WGUtils.getValueOrDefault(password, ""));
-        JDBCConnectionProvider connProvider = new JDBCConnectionProvider(path, jdbcDriver, props, false);
+        JDBCConnectionProvider connProvider = new JDBCConnectionProvider(path, props, false);
         return connProvider;
     }
 

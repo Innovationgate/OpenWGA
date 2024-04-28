@@ -25,6 +25,8 @@
 
 package de.innovationgate.webgate.api.jdbc.modules.dbs;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Locale;
 
 import de.innovationgate.utils.WGUtils;
@@ -141,9 +143,9 @@ public class MySQLDatabaseServerModuleDefinition implements ModuleDefinition, Re
     
     public void testDependencies() throws ModuleDependencyException {
         try {
-            Class.forName(WGDatabaseImpl.DRIVER);
+        	DriverManager.getDriver(MySqlDatabaseServer.JDBC_BASE_PATH);
         }
-        catch (ClassNotFoundException e) {
+        catch (SQLException e) {
             throw new ModuleDependencyException("The MySQL JDBC Driver \"Connector/J\" is not in classpath");
         }
     }

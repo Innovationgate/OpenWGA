@@ -32,6 +32,7 @@ import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -92,7 +93,7 @@ public class MySqlServerDatabaseRetriever implements ServerDatabaseRetriever {
             String path = options.get(Database.OPTION_PATH);
             String jdbcPath;
             if (!path.contains("/")) {
-                jdbcPath = "jdbc:mysql://" + hostName + "/" + path;
+                jdbcPath = MySqlDatabaseServer.JDBC_BASE_PATH + hostName + "/" + path;
             }
             else {
                 jdbcPath = path;
@@ -101,7 +102,7 @@ public class MySqlServerDatabaseRetriever implements ServerDatabaseRetriever {
             // Retrieve driver
             Driver driver;
             try {
-                driver = (Driver) Class.forName(WGDatabaseImpl.DRIVER).newInstance();
+                driver = DriverManager.getDriver(MySqlDatabaseServer.JDBC_BASE_PATH);
             }
             catch (Exception e) {
                 throw new WGInvalidDatabaseException("Cannot create database bc. of exception when retrieving driver: " + e.getClass().getName() + " - " + e.getMessage(), e);
@@ -117,7 +118,8 @@ public class MySqlServerDatabaseRetriever implements ServerDatabaseRetriever {
             // First connect to verify the database does not yet exist
             Connection con;
             try {
-                con = driver.connect(jdbcPath, props);
+                //con = driver.connect(jdbcPath, props);
+                con = DriverManager.getConnection(jdbcPath, props);
                 con.close();
                 throw new WGInvalidDatabaseException("Cannot create database bc. it already exists");
             }
@@ -204,9 +206,7 @@ public class MySqlServerDatabaseRetriever implements ServerDatabaseRetriever {
             String masterUser = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_USER);
             String masterPassword = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_PASSWORD);
             
-            String jdbcPath = "jdbc:mysql://" + hostName; //+ "/mysql";
-            
-            Driver driver = (Driver) Class.forName(WGDatabaseImpl.DRIVER).newInstance();
+            String jdbcPath = MySqlDatabaseServer.JDBC_BASE_PATH + hostName;
             
             Properties props = new Properties();
             
@@ -218,7 +218,8 @@ public class MySqlServerDatabaseRetriever implements ServerDatabaseRetriever {
                 props.put("password", "");
             }
             
-            Connection con = driver.connect(jdbcPath, props);
+            //Connection con = driver.connect(jdbcPath, props);
+            Connection con = DriverManager.getConnection(jdbcPath, props);
             Statement showDbsStmt = null;
             try {
                showDbsStmt = con.createStatement();
@@ -311,7 +312,7 @@ public class MySqlServerDatabaseRetriever implements ServerDatabaseRetriever {
             String path = options.get(Database.OPTION_PATH);
             String jdbcPath;
             if (!path.contains("/")) {
-                jdbcPath = "jdbc:mysql://" + hostName + "/" + path;
+                jdbcPath = MySqlDatabaseServer.JDBC_BASE_PATH + hostName + "/" + path;
             }
             else {
                 jdbcPath = path;

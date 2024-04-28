@@ -151,7 +151,7 @@ public class HsqlServerDatabaseRetriever implements ServerDatabaseRetriever {
             File dbFile = new File(dir, dbName);
             String path = "jdbc:hsqldb:file:" + dbFile.getPath();
             
-            connProvider = new JDBCConnectionProvider(path, WGDatabaseImpl.DRIVER, props, false);
+            connProvider = new JDBCConnectionProvider(path, props, false);
             Iterator<String> tables = connProvider.getDatabaseTables().iterator();
             boolean isContentStore = false;
             while (tables.hasNext()) {

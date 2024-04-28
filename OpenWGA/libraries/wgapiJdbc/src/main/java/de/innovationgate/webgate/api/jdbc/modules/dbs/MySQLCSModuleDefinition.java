@@ -25,6 +25,8 @@
 
 package de.innovationgate.webgate.api.jdbc.modules.dbs;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Locale;
 
 import de.innovationgate.utils.WGUtils;
@@ -32,6 +34,7 @@ import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.jdbc.JNDIServerDatabaseRetriever;
 import de.innovationgate.webgate.api.modules.dbs.DatabaseProperties;
 import de.innovationgate.webgate.api.modules.dbs.GenericCSModuleDefinition;
+import de.innovationgate.webgate.api.mysql.MySqlDatabaseServer;
 import de.innovationgate.webgate.api.mysql.MySqlServerDatabaseRetriever;
 import de.innovationgate.webgate.api.mysql.WGDatabaseImpl;
 import de.innovationgate.wga.config.Database;
@@ -66,9 +69,9 @@ public class MySQLCSModuleDefinition extends GenericCSModuleDefinition {
     
     public void testDependencies() throws ModuleDependencyException {
         try {
-            Class.forName(WGDatabaseImpl.DRIVER);
+			DriverManager.getDriver(MySqlDatabaseServer.JDBC_BASE_PATH);
         }
-        catch (ClassNotFoundException e) {
+        catch (SQLException e) {
             throw new ModuleDependencyException("The MySQL JDBC Driver \"Connector/J\" is not in classpath");
         }
     }

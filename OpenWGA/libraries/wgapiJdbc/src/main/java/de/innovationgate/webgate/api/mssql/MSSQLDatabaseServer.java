@@ -272,7 +272,7 @@ public class MSSQLDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             poolProps.putAll(getOptions());
             try {
                 WGFactory.getLogger().info("Creating shared connection pool for server " + getTitle(Locale.getDefault()));
-                _pool = new JDBCCatalogSwitchingConnectionPool(path, WGDatabaseImpl.DRIVER, poolProps);
+                _pool = new JDBCCatalogSwitchingConnectionPool(path, poolProps);
                 
             }
             catch (JDBCConnectionException e) {
