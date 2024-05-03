@@ -19,8 +19,11 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 		$("#explorer").wga_tree({
 			dragdrop: true,
 			mayDrag: function(source){
-				var sourceStruct = source.context
-				return sourceStruct.mayMovePage;
+				/*
+					allow drag in any case and check everything in mayDrop().
+					This enables all pages to be droped in RTF fields as link.
+				*/
+				return true;	
 			},
 			mayDrop: function(source, target){
 
@@ -33,6 +36,9 @@ define(["sitepanel", "jquery", "appnav", "jquery-tree"], function(Sitepanel, $, 
 				
 				if(targetStruct && !targetStruct.mayEditChildren)
 					return false;		// user is not allowed to create children.
+
+				if(sourceStruct && !sourceStruct.mayMovePage)
+					return false;		// user is not allowed to move (change) the source
 				
 				var allowedPositions = sourceStruct.allowedPositions;
 				switch(sourceStruct.ctPositioning){
