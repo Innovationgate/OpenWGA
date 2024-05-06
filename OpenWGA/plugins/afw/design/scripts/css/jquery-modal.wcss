@@ -85,7 +85,7 @@ body{
 	
 }
 
-html.small body .modal-popup {
+html.small body .modal-popup, html.medium body .modal-popup.large {
 	width: 90% !important;
 	margin-left: -45% !important;
 	top: 5%;
