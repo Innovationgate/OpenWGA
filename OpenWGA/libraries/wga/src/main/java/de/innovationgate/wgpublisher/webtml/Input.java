@@ -913,13 +913,16 @@ public class Input extends ActionBase implements DynamicAttributes {
 			if (doLabelling) {
 			    this.appendResult("<label for=\"").appendResult(optionId).appendResult("\">").appendResult(optionText).appendResult("</label>");
 			}
+			else if(wrapWithLabels) {
+				this.appendResult("<span>")
+					.appendResult(optionText)
+					.appendResult("</span>")
+					.appendResult("</label>");
+			}
 			else {
 			    this.appendResult(optionText);
 			}
 
-			if(wrapWithLabels)
-				this.appendResult("</label>");
-			
 			if (options.hasNext()) {
 				appendResult(htmlDivider);
 			}
