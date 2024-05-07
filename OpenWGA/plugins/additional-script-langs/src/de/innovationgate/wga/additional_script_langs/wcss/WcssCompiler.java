@@ -607,7 +607,7 @@ public class WcssCompiler {
 					pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
 		        	matcher = pattern.matcher(rest);
 		        	if(matcher.find())
-	        			params = parseCommasAndQuotes(matcher.group(1));
+	        			params = parseCommasAndQuotes(replaceCustomFunctions(replaceVars(matcher.group(1))));
 	        	}
 								
 				CssMixinBlock mixin = findMixin(mixin_name);
