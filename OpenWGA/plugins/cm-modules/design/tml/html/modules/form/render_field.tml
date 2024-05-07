@@ -72,7 +72,7 @@
 			focus="{CMM.setting('focus')||false}"
 			validation="{_validation||true}"
 			message="{_message}"
-			labeled="true"
+			labeled="{$option_formfield_labeled!=null ? $option_formfield_labeled : true}"
 			format="{_format}"
 			divider="{_divider}"
 			default="{CMM.setting('defaultvalue')}" 
