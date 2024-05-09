@@ -46,6 +46,11 @@ public class WcssCompiler {
         a[2] = i & 0xFF;
         return a;
 	}
+	public static final String toHex(int[] rgb) {
+		return "#" + String.format("%02x", rgb[0])
+				+ String.format("%02x", rgb[1])
+				+ String.format("%02x", rgb[2]);
+	}
 	
 	// map of custom wcss functions
 	final private static HashMap<String, WcssFunction> customFunctions = new HashMap<String, WcssFunction>();
@@ -67,6 +72,23 @@ public class WcssCompiler {
 					try{
 						int[] rgb = toRGB(params.get(0));
 						return "rgba(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ", " + params.get(1) + ")";
+					}
+					catch(Exception e){}
+				}
+				return null;
+			}
+		});
+		customFunctions.put("color", new WcssFunction(){
+			@Override
+			public String execute(WcssResource resource, ArrayList<String> params) {
+				if(params.size()==2){
+					try{
+						int[] rgb = toRGB(params.get(0));
+						float f = Float.parseFloat(params.get(1));
+						
+						for(int i=0; i<3; i++)
+							rgb[i] = Math.max(Math.min(Math.round(rgb[i]*f), 255), 0);
+						return toHex(rgb);
 					}
 					catch(Exception e){}
 				}
