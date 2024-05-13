@@ -60,7 +60,10 @@
 	tmlform.processcontext.get("forminfo").put(WGA.scoped(""), fieldinfo);		
 </tml:script>
 
-<div class="clearfix formfield field-type-<tml:script expression="CMM.setting('fieldtype')"/><tml:case condition="tmlform.hasmessage(_fieldname)"> error</tml:case>">
+<div class="clearfix formfield field-type-<tml:script expression="CMM.setting('fieldtype')"/>
+		<tml:case condition="tmlform.hasmessage(_fieldname)"> error</tml:case>
+		<tml:case condition="CMM.setting('divider')=='single-line'">single-line</tml:case>
+	">
 	<tml:case condition="_label">
 		<label <tml:case condition="!_opts">for="<tml:option name="ns"/>"</tml:case> <tml:case condition="_validation">class="required"</tml:case>>
 			<tml:item name="_label"/>
@@ -87,10 +90,12 @@
 				placeholder="<tml:[setting] o_name="placeholder"/>"
 			</tml:case>
 		</tml:input>
+		
+		<tml:case condition="tmlform.hasmessage(_fieldname)">
+			<div class="field-message">
+				<tml:script expression="tmlform.getmessage(_fieldname)"/>
+			</div>
+		</tml:case>
+
 	</div>
 </div>
-<tml:case condition="tmlform.hasmessage(_fieldname)">
-	<div class="field-message">
-		<tml:script expression="tmlform.getmessage(_fieldname)"/>
-	</div>
-</tml:case>
