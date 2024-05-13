@@ -25,6 +25,7 @@
 
 .google-map{
 	border: solid silver 1px; 
+	box-sizing: border-box;
 	width:100%;
 	color: black; 
 }
