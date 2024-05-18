@@ -1152,6 +1152,23 @@ public class Design {
         
     }
 
+    public Integer getModuleCodeHash(WGScriptModule mod) throws InstantiationException, IllegalAccessException, WGException {
+        PostProcessResult result = null;
+        WGPDispatcher dispatcher = _wga.getCore().getDispatcher();
+        if (dispatcher != null && _wga.isRequestAvailable() && _wga.isResponseAvailable()) {
+            result = dispatcher.postProcessDesignResource(
+                mod, 
+                _wga.getRequest(), 
+                _wga.getResponse(),
+                true
+            );
+            if (result != null) {
+                return result.getHash();
+            }
+        }
+        return mod.getCode().hashCode();
+    }
+    
     private String getModuleCode(WGScriptModule mod, Boolean compress) throws WGException, WGAServerException {
         try {
             PostProcessResult result = null;
