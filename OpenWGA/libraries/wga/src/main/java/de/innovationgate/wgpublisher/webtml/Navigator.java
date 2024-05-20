@@ -150,24 +150,13 @@ public class Navigator extends ForEach {
 	public void tmlStartTag() throws WGException {
 		
 	    Status status = (Status) getStatus();
-		WGContentNavigator navigator;
 		
 		if (this.allowdefaultlang != null) {
 		    addWarning("Attribute \"allowdefaultlang\" is deprecated and inoperable since OpenWGA 5.1");
 		}
 		
 		WGContent relContent = this.getTMLContext().content();
-        // IF the relContent is a dummy, use the first released content of this database
-        if (relContent.isDummy()) {
-            relContent = relContent.getDatabase().getFirstReleasedContent((String) getTMLContext().meta("language"), true);
-            if (relContent == null) {
-                addWarning("No content in context and cannot find released content of language " +  getTMLContext().meta("language") + " in the current database", true);
-                return;
-            }
-        } 
-        
-		String theRole = this.getRole();
-		
+
 		String type = status.navType;
        
 		Map<String,Object> atts = new java.util.HashMap<String,Object>();
