@@ -869,7 +869,7 @@ public class URL extends ActionBase implements DynamicAttributes {
             URLBuilder currentRequest = WGA.get(getTMLContext()).urlBuilder(getTMLContext().getrequest().getAttribute(WGACore.ATTRIB_REQUESTURL).toString());
             for (String paramName : currentRequest.getParameterNames()) {
                 if (!status.urlparams.containsKey(paramName) && !currentURL.hasParameter(paramName)) {
-                    status.urlparams.put(paramName, currentRequest.getParameter(paramName));
+                    status.urlparams.put(paramName, currentRequest.getParameterValues(paramName));
                 }
             }
             
@@ -895,7 +895,7 @@ public class URL extends ActionBase implements DynamicAttributes {
             
             // URL Params
             for (Map.Entry<String,Object> param : status.urlparams.entrySet()) {
-                builder.setParameter(param.getKey(), String.valueOf(param.getValue()));
+                builder.setParameter(param.getKey(), param.getValue());
             }
             
             // Var Params
