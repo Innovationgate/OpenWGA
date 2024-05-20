@@ -425,16 +425,16 @@ public class WGContentNavigator {
 	 */
 	public WGContentList getLanguagesContent(WGContent relContent, boolean includeThisOne) throws WGAPIException {
 		
-		if (relContent.isDummy()) {
-			return null;
-		}
-		
-		WGStructEntry struct = relContent.getStructEntry();
 		java.util.ArrayList<WGContent> contents = new java.util.ArrayList<WGContent>();
+
+		if (relContent.isDummy()) {
+			return WGContentList.create(contents);		// empty list
+		}
+
+		WGStructEntry struct = relContent.getStructEntry();
 		
 		java.util.Iterator<WGLanguage> languages = relContent.getDatabase().getLanguages().values().iterator();
 		WGLanguage language = null;
-		
 		
 		while (languages.hasNext()) {
 		    WGContent content = null;
