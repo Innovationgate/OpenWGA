@@ -1693,8 +1693,35 @@ public class Design {
         
     }
     
+
     /**
-     * Creates a URL to render a WebTML module, adressed by the base reference of this design object, in a contextless request
+     * Creates a URL to render a WebTML module, addressed by the base reference of this design object, in a contextless request for the given langiage
+     * @param lang The language code
+     * @return The URL
+     * @throws WGException
+	 */
+    public String layoutURLforLang(String lang) throws WGException {
+    	return layoutURLforLang(lang, null);
+    }
+    /**
+     * Creates a URL to render a WebTML module, addressed by the base reference of this design object, in a contextless request for the given langiage
+     * @param lang The language code
+     * @param medium The media key for which to create the URL or null
+     * @return The URL
+     * @throws WGException
+	 */
+    public String layoutURLforLang(String lang, String medium) throws WGException {
+        String resource = getBaseReference().getResourceName();
+        if (WGUtils.isEmpty(resource)) {
+            throw new WGAServerException("The design object needs to have a base reference to generate a layout URL. Create a design with a base reference using the resolve() method.");
+        }
+        WGDatabase db = _designContext.getDesignDB();
+        TMLContext cx = (TMLContext)_wga.createTMLContext(db.getDummyContent(lang), null);
+        return cx.getURLBuilder().buildLayoutURL(cx, db.getDbReference(), medium, resource);
+    }
+    
+    /**
+     * Creates a URL to render a WebTML module, addressed by the base reference of this design object, in a contextless request
      * @param medium The media key for which to create the URL
      * @return The URL
      * @throws WGException
