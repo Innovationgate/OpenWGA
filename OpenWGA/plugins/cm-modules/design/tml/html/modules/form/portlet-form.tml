@@ -158,7 +158,7 @@
 
 <tml:include ref="init"/>
 
-<tml:form source="none" id="{WGA.scoped('form-id')}">
+<tml:form source="none" id="{WGA.scoped('form')}" cssclass="{$option_module_classes || VOID}">
 
 	<tml:script>
 		tmlform.processcontext.put("forminfo", new Packages.java.util.LinkedHashMap())		
