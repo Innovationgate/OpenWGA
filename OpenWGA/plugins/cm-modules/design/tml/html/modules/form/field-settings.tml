@@ -63,7 +63,7 @@
 	</div>	
 </tml:case>
 
-<tml:case condition="createlist(['text', 'textarea', 'number', 'radio', 'checkbox', 'date', 'password']).contains(tmlform.field(WGA.scoped('fieldtype')))">
+<tml:case condition="createlist(['text', 'textarea', 'number', 'radio', 'checkbox', 'date', 'password', 'select']).contains(tmlform.field(WGA.scoped('fieldtype')))">
 	<label><tml:label key="form.settings.validation"/>:</label>
 	<div style="margin:10px">
 		<tml:script>

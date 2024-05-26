@@ -41,7 +41,9 @@
 		_validation = "$E_VALUE.trim()!=''"
 		if(fieldtype=="checkbox")
 			_validation = "$E_VALUE.size()"
-		_message = _message || label("form.validation.message.required", [_label||_fieldname]) 
+		if(fieldtype=="select" || fieldtype=="radio" || fieldtype=="checkbox")
+			_message = _message || label("form.validation.message.select.required", [_label||_fieldname])
+		else _message = _message || label("form.validation.message.required", [_label||_fieldname])
 	}
 	else if(validation=="mail"){
 		_validation = "AFW.Util.validate.mailAddress($E_VALUE)"
