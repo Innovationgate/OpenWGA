@@ -28,7 +28,8 @@
 	_divider = CMM.setting('divider')=="single-line" ? " " : null;
 	
 	_message = CMM.setting('validationmessage');
-	_fieldname = CMM.setting('fieldname').trim();
+	_fieldname = CMM.setting('fieldname');
+	_fieldname = _fieldname && _fieldname.trim();
 	_label = CMM.setting("label");
 
 	var fieldtype = CMM.setting('fieldtype');
