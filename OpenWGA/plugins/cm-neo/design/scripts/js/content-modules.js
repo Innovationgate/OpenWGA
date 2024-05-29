@@ -4,6 +4,8 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 	var selected_tree_node;
 	var mode;
 	var deleted_mods;
+	var clipboardModules;
+	var allowedModules;
 	
 	function init(mods, content_modules, edit_mode, section, last_selected){
 
@@ -85,6 +87,8 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 		$("#dialog-content-modules").on("click", "[data-button=delete]", deleteModuleClick)
 		$("#dialog-content-modules").on("click", "[data-action=save-modules]", saveModulesClick)
 		$("#dialog-content-modules").on("click", "[data-button=duplicate]", duplicateModulesClick)
+		$("#dialog-content-modules").on("click", "[data-button=copy-to-clipboard]", copyModulesToClipboardClick)
+		$("#dialog-content-modules").on("click", "[data-button=copy-from-clipboard]", copyModulesFromClipboardClick)
 		$("#dialog-content-modules").on("click", ".container-toggle", toggleContainerClick)
 		$("#dialog-content-modules").on("click", "[data-module-id]", addModuleClick)
 		
@@ -185,18 +189,27 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 		var content_modules_list = $("#dialog-content-modules .content-modules-toolbar .content-module-list")
 		content_modules_list.html('');
 		
-		// delete button
-		if(Number(node.level)>1)
-			$("#dialog-content-modules .content-modules-toolbar button[data-button=delete]").removeClass("disabled")
-		else $("#dialog-content-modules .content-modules-toolbar button[data-button=delete]").addClass("disabled")
+		var tb = $("#dialog-content-modules .content-modules-toolbar"); 
+		if(Number(node.level)>1){
+			$("button[data-button=delete]", tb).removeClass("disabled")
+			$("button[data-button=duplicate]", tb).removeClass("disabled")
+			$("button[data-button=copy-to-clipboard]", tb).removeClass("disabled")
+		}
+		else {
+			$("button[data-button=delete]", tb).addClass("disabled")
+			$("button[data-button=duplicate]", tb).addClass("disabled")
+			$("button[data-button=copy-to-clipboard]", tb).addClass("disabled")
+		}
 		
-		// duplicate button
-		if(Number(node.level)>1)
-			$("#dialog-content-modules .content-modules-toolbar button[data-button=duplicate]").removeClass("disabled")
-		else $("#dialog-content-modules .content-modules-toolbar button[data-button=duplicate]").addClass("disabled")
-
+		var modules = allowedModules = getAllowedModules(node);
+		
+		if(clipboardModules){
+			if(isAllowedModule(clipboardModules.context))
+				$("button[data-button=copy-from-clipboard]", tb).removeClass("disabled")
+			else $("button[data-button=copy-from-clipboard]", tb).addClass("disabled")
+		}
+		
 		// add button
-		var modules = getAllowedModules(node);
 		if(modules==null){
 			$("#dialog-content-modules .content-modules-toolbar button[data-button=add]").addClass("disabled")
 			return;
@@ -328,6 +341,64 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 		
 	}
 	
+	function copyModulesToClipboardClick(e){
+		e.preventDefault();
+		if($(this).hasClass("disabled"))
+			return;
+		
+		var data = getNodeData(selected_tree_node)
+		setClipboardModules(data);
+		WGA.event.fireEvent("modules-copied-to-clipboard", "module-editor", {mods: JSON.stringify(data)})
+		
+		$("#dialog-content-modules .content-modules-toolbar button[data-button=copy-to-clipboard] .filled").hide()
+		$("#dialog-content-modules .content-modules-toolbar button[data-button=copy-to-clipboard] .checked").show()
+
+		function getNodeData(el){
+			var mod = modules[el.data("context")];
+			var new_id = mod.id + "_" + guid();
+			var children = [];
+			el.find(">ul >.node").each(function(){
+				children.push(getNodeData($(this)))
+			})
+			return {					
+				duplicated_from: el.data("id"),		// nessessarry to read module properties
+				title: mod.title,
+				iconurl: mod.icon,
+				id: new_id,
+				context: mod.id,
+				children: children
+			}
+		}
+
+	}
+
+	function isAllowedModule(id){
+		for(let c in allowedModules){
+			var mods = allowedModules[c];
+			for(var i=0; i<mods.length; i++){
+				var mod = mods[i];
+				if(mod.id==id){
+					return true;
+				}
+			}
+		}
+		return false;		
+	}
+
+	function copyModulesFromClipboardClick(e){	
+		e.preventDefault();
+		if($(this).hasClass("disabled") || !clipboardModules)
+			return;
+		
+		if(!isAllowedModule(clipboardModules.context)){
+			alert("Das Modul '" + clipboardModules.title + " (" + clipboardModules.context + ")' kann an dieser Stelle nicht eingefügt werden.");
+			return;
+		}
+
+		$("#module-tree").wga_tree("addnode", selected_tree_node, clipboardModules, true);
+		WGA.event.fireEvent("modules-copied-from-clipboard", "module-editor", {});
+	}
+
 	function duplicateModulesClick(e){
 		e.preventDefault();
 		if($(this).hasClass("disabled"))
@@ -335,7 +406,6 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 		
 		var parent = selected_tree_node.parents(".node").first();
 		var data = getNodeData(selected_tree_node)
-
 		$("#module-tree").wga_tree("addnode", parent, data, true);
 		WGA.event.fireEvent("modules-duplicated", "module-editor", {mod:data})
 
@@ -398,11 +468,28 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 		$("#module-tree").wga_tree("selectnode", id, true);
 	}
 	
+	function setClipboardModules(mods){
+		clipboardModules = mods;
+		var tb = $("#dialog-content-modules .content-modules-toolbar");
+		$("button[data-button=copy-from-clipboard]", tb)
+			.attr("title", "Modul '" + clipboardModules.title + " (" + clipboardModules.context + ")' aus der Zwischenablage einfügen");
+
+		if(isAllowedModule(clipboardModules.context))
+			$("button[data-button=copy-from-clipboard]", tb).removeClass("disabled")
+		else $("button[data-button=copy-from-clipboard]", tb).addClass("disabled")
+			
+		$("button[data-button=copy-to-clipboard] .filled", tb).show()
+		$("button[data-button=copy-to-clipboard] .empty", tb).hide()
+		$("button[data-button=copy-from-clipboard] .filled", tb).show()
+		$("button[data-button=copy-from-clipboard] .empty", tb).hide()
+	}
+	
 	// public interface:
 	return {
 		init: init,
 		selectNode: selectNode,
-		getModules: getModules
+		getModules: getModules,
+		setClipboardModules: setClipboardModules
 	}
 
 })
