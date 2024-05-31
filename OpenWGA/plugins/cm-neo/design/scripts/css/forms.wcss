@@ -87,11 +87,13 @@ form{
 		-moz-appearance:none;
 		-webkit-appearance:none;
 		appearance:none;
-		background:{
-			image: url(wga_file_url("images", "select-pfeil.png"));
-			position: center right 8px;
-			size: 14px;
-			repeat: no-repeat;
+		&:not(:disabled){
+			background:{
+				image: url(wga_file_url("images", "select-pfeil.png"));
+				position: center right 8px;
+				size: 14px;
+				repeat: no-repeat;
+			}
 		}
 	}
 	
