@@ -70,7 +70,7 @@ public class JDBCConnectionProvider implements ConnectionProvider, Stoppable {
 
     private DBCPConnectionProvider _connectionProvider;
 
-    public JDBCConnectionProvider(String path, String driverClass, Properties props, boolean pool) throws JDBCConnectionException {
+    public JDBCConnectionProvider(String path, Properties props, boolean pool) throws JDBCConnectionException {
 
         _path = path;
         _props = props;
@@ -78,10 +78,10 @@ public class JDBCConnectionProvider implements ConnectionProvider, Stoppable {
         // Get DataSource or Driver object
         if (path.startsWith("jdbc:")) {
             if (pool) {
-                setupDBCPDataSource(path, driverClass, props);
+                setupDBCPDataSource(path, props);
             }
             else {
-                setupNonpoolingDriver(path, driverClass, props);
+                setupNonpoolingDriver(path, props);
             }
         }
         else {
@@ -96,14 +96,9 @@ public class JDBCConnectionProvider implements ConnectionProvider, Stoppable {
 
 
 
-    private void setupDBCPDataSource(String path, String driverClass, Properties props) throws JDBCConnectionException {
+    private void setupDBCPDataSource(String path, Properties props) throws JDBCConnectionException {
         
         try {
-            // Load driver so it registers with driver manager
-            if (driverClass != null) {
-                Class.forName(driverClass);
-            }
-            
             // Divide properties up between JDBC properties and DBCP properties, store them as hibernate properties so the hibernate DBCP connection provider understands them
             Properties providerProps = new Properties();
             providerProps.put(Environment.URL, path);
@@ -131,10 +126,11 @@ public class JDBCConnectionProvider implements ConnectionProvider, Stoppable {
         catch (HibernateException e) {
             throw new JDBCConnectionException("Exception creating DBCP data source", e);
         }
+        /*
         catch (ClassNotFoundException e) {
             throw new JDBCConnectionException("Exception creating DBCP data source", e);
         }
-        
+        */
     }
 
     private void setupJNDIDataSource(String path) throws JDBCConnectionException {
@@ -154,30 +150,14 @@ public class JDBCConnectionProvider implements ConnectionProvider, Stoppable {
         }
     }
 
-    private void setupNonpoolingDriver(String path, String driverClass, Properties props) throws JDBCConnectionException {
+    private void setupNonpoolingDriver(String path, Properties props) throws JDBCConnectionException {
         _driver = null;
-        if (driverClass != null) {
-            try {
-                _driver = (Driver) Class.forName(driverClass).newInstance();
-            }
-            catch (ClassNotFoundException e1) {
-                throw new JDBCConnectionException("Unable to load driver class " + driverClass);
-            }
-            catch (InstantiationException e) {
-                throw new JDBCConnectionException("Unable to instantiate driver class " + driverClass);
-            }
-            catch (IllegalAccessException e) {
-                throw new JDBCConnectionException("No access to driver class " + driverClass);
-            }
-        }
-        else {
-            try {
-                _driver = DriverManager.getDriver(path);
-            }
-            catch (SQLException e) {
-                throw new JDBCConnectionException("SQL Error while determining driver: ", e);
-            }
-        }
+        try {
+			_driver = DriverManager.getDriver(path);
+		} catch (SQLException e) {
+			throw new JDBCConnectionException("Cannot find JDBC driver for url: " + path);
+		}
+                
         if (_driver == null) {
             throw new JDBCConnectionException("Cannot find JDBC driver for url: " + path);
         }

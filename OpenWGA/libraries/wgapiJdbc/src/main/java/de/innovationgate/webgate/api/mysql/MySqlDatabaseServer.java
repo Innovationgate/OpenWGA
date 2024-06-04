@@ -33,6 +33,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -94,6 +95,8 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
     public static final int DEFAULT_SHAREDPOOL_MAX_WAIT = 30;
     public static final int DEFAULT_SHAREDPOOL_MAX_CONNECTION_LIFETIME = 1000 * 60 * 10;
     
+    public static final String JDBC_BASE_PATH = "jdbc:mysql://";
+
     private JDBCCatalogSwitchingConnectionPool _pool = null;
     private Boolean _usePool;
     
@@ -115,7 +118,7 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
         String path = options.get(Database.OPTION_PATH);
         String jdbcPath;
         if (!path.contains("/")) {
-            jdbcPath = "jdbc:mysql://" + hostName + "/" + path;
+            jdbcPath = JDBC_BASE_PATH + hostName + "/" + path;
         }
         else {
             jdbcPath = path;
@@ -140,12 +143,10 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             String masterUser = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_USER);
             String masterPassword = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_PASSWORD);
 			
-			String jdbcPath = "jdbc:mysql://" + hostName;
+			String jdbcPath = JDBC_BASE_PATH + hostName;
 			if (db != null) {
 				jdbcPath += "/" + db.getOptions().get(Database.OPTION_PATH);
 			}
-			
-			Driver driver = (Driver) Class.forName(WGDatabaseImpl.DRIVER).newInstance();
 			
 			if (props == null) {
 				props = new Properties();
@@ -171,7 +172,9 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
 			    props.put("password", "");
 			}
 			
-			return driver.connect(jdbcPath, props);
+			return DriverManager.getConnection(jdbcPath, props);
+			
+			//return driver.connect(jdbcPath, props);
 		} catch (Exception e) {
 			throw new WGBackendException("Unable to create connection.", e);
 		}
@@ -332,7 +335,7 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
         if (_pool == null) {
             
             // Build configuration
-            String path = "jdbc:mysql://" + buildHostName();
+            String path = JDBC_BASE_PATH + buildHostName();
     
             // Configure and build pool
             Properties poolProps = new Properties();
@@ -368,7 +371,7 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             poolProps.putAll(getOptions());
             try {
                 WGFactory.getLogger().info("Creating shared connection pool for server " + getTitle(Locale.getDefault()));
-                _pool = new JDBCCatalogSwitchingConnectionPool(path, WGDatabaseImpl.DRIVER, poolProps);
+                _pool = new JDBCCatalogSwitchingConnectionPool(path, poolProps);
                 
             }
             catch (JDBCConnectionException e) {

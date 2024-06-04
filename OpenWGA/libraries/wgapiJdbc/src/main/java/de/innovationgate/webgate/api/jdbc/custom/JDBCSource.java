@@ -626,7 +626,7 @@ public class JDBCSource extends SimpleContentSource {
     		
     		// Build JDBC Connection Creator
     		try {
-                _connProvider = new JDBCConnectionProvider(path, (String) db.getCreationOptions().get(COPTION_DRIVER), props, true);
+                _connProvider = new JDBCConnectionProvider(path, props, true);
             }
             catch (JDBCConnectionException e3) {
                 throw new WGInvalidDatabaseException("Exception setting up JDBC connection", e3);

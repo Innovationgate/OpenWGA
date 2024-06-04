@@ -40,7 +40,6 @@ import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGDocument;
-import de.innovationgate.webgate.api.WGInvalidDatabaseException;
 import de.innovationgate.webgate.api.WGNotSupportedException;
 import de.innovationgate.webgate.api.WGUserAccess;
 import de.innovationgate.webgate.api.jdbc.Area;
@@ -58,24 +57,14 @@ public class WGDatabaseImpl extends de.innovationgate.webgate.api.jdbc.WGDatabas
 
     public static final String SOCKET_TIMEOUT_DEFAULT = "600000";
     public static final String CONNECT_TIMEOUT_DEFAULT = "60000";
-    public static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 
     public WGUserAccess open(WGDatabase db, String path, String user, String pwd, boolean prepareOnly) throws WGAPIException {
-        
-        // Register drivers with driver manager
-        try {
-            Class.forName(DRIVER);
-        }
-        catch (ClassNotFoundException e) {
-            throw new WGInvalidDatabaseException("Necessary JDBC driver not found: " + e.getMessage());
-        }
         
         // Build creations options
         Map creationOptions = db.getCreationOptions();
         
         // Hibernate configuration
         WGDatabase.putDefaultOption(creationOptions, "hibernate.dialect", MySQL5Dialect.class.getName());
-        WGDatabase.putDefaultOption(creationOptions, "hibernate.connection.driver_class", DRIVER);
         WGDatabase.putDefaultOption(creationOptions, "hibernate.dbcp.validationQuery", "select 1");
         WGDatabase.putDefaultOption(creationOptions, "hibernate.dbcp.testOnBorrow", "true");
         WGDatabase.putDefaultOption(creationOptions, "hibernate.dbcp.maxWait", "30000");

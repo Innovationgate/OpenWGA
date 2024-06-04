@@ -35,7 +35,11 @@ public class UsageQueryTermProcessor implements DerivateQueryTermProcessor {
     @Override
     public float matchTermToFileAnnotations(WGFileAnnotations fileAnnotations, DerivateQueryTerm term, ClientHints clientHints) throws WGException {
 
-    	String[] values = term.getValue().split("\\|");
+    	String[] values = term.getValue().split(";");
+    	if(values.length==1)
+    		values = term.getValue().split("\\|");	// backwards compatibility: allow | as well
+    	
+    	//String[] values = term.getValue().split("\\|");
     	float prio = 1;
     	for(String value : values){
     		if (value.equals(fileAnnotations.getUsage())) 

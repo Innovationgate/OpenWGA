@@ -93,8 +93,8 @@ public class JDBCCatalogSwitchingConnectionPool extends JDBCConnectionProvider i
         }
     }
 
-    public JDBCCatalogSwitchingConnectionPool(String path, String driverClass, Properties props) throws JDBCConnectionException {
-        super(path, driverClass, props, true);
+    public JDBCCatalogSwitchingConnectionPool(String path, Properties props) throws JDBCConnectionException {
+        super(path, props, true);
     }
 
     @Override

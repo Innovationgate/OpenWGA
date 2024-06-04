@@ -77,6 +77,8 @@ body {
 
 }
 
+@import "type=file /fa6/scss/_variables.scss";
+
 @import "bootstrap";
 @import "jquery-ui";
 @import "appnav";

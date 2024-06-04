@@ -37,7 +37,8 @@ public class WcssPostProcessor implements PostProcessor{
         extraObjects.put("cssDocument", data.getDocument());
 
         Map<String,Object> vars = new HashMap<String, Object>();
-        vars.put("processor", "wcss");
+        vars.put("wcss", "true");
+        vars.put("charset", wga.design(data.getDocument().getDatabase().getDbReference()).getFileEncoding());
     	if(wga.getRequest()!=null){
     		String host = wga.getRequest().getServerName().replace(".", "_");
     		vars.put("requested_host", host);
@@ -50,8 +51,10 @@ public class WcssPostProcessor implements PostProcessor{
             	wga.getLog().error("The return type of TMLScript module '" + design + "' used to set CSS variables is no JS-Object and will be ignored.");
             	continue;
             }
-            else vars.putAll((Map<String,Object>)result);
-
+        	// this is necessary for the data to be cached because TMLScript native objects are not Serializable ?
+            for(Map.Entry<String, Object> entry : ((Map<String,Object>)result).entrySet()){
+            	vars.put(entry.getKey(), entry.getValue().toString());
+            }
 		}
     	
         data.setCacheQualifier((Serializable) vars);
@@ -110,9 +113,21 @@ public class WcssPostProcessor implements PostProcessor{
 		WGAResource(PostProcessResult result, ResourceRef ref){
 			_result = result;
 			_ref = ref;
+			String resourceName = _ref.getResourceName();
 			try {
 				if(_ref.getCode()==null)
-					_ref.setResourceName("_"+_ref.getResourceName());
+					_ref.setResourceName("_"+resourceName);
+				if(_ref.getCode()==null && _ref.getType().equals(ResourceRef.TYPE_FILE)) {
+					_ref.setResourceName(resourceName+".wcss");
+					if(_ref.getCode()==null)
+						_ref.setResourceName("_"+resourceName+".wcss");
+					if(_ref.getCode()==null)
+						_ref.setResourceName(resourceName+".scss");
+					if(_ref.getCode()==null)
+						_ref.setResourceName("_"+resourceName+".scss");
+				}
+				if(_ref.getCode()==null)
+					_ref.setResourceName(resourceName);	// ensures correct error message
 			} 
 			catch (WGException | IOException e) {}
 		}

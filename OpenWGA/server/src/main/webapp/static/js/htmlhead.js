@@ -958,6 +958,8 @@ WGA.ajax = {
 	portletFormCallbacks : {},
 	runningPortlets : {},
 
+	info: {},
+
 	hasRunningPortlets : function() {
 		var now = (new Date()).getTime();
 		for ( var p in this.runningPortlets) {
@@ -1244,7 +1246,7 @@ WGA.ajax.post = function(actionDef, customObj) {
 	}
 
 	// retrieve ajaxInfo object
-	var ajaxInfo = eval("$ajaxInfo_" + actionDef.id);
+	var ajaxInfo = WGA.ajax.info[actionDef.id];
 
 	// build url
 	var strURL = location.pathname + "?$action=" + link.actionLink;

@@ -43,7 +43,7 @@ public class DisplaySizeQueryTermProcessor implements DerivateQueryTermProcessor
             requestedDimension = Integer.parseInt(term.getValue());
         }
         catch (NumberFormatException e) {
-            throw new WGInvalidDerivateQueryException("Not parseable as integer: " + term.getValue());
+            throw new WGInvalidDerivateQueryException("Value for term '" + term.getName() + "' not parseable as integer: " + term.getValue());
         }
         
         if (clientHints.getDevicePixelRatio() != null) {

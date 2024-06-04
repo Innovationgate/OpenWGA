@@ -3,12 +3,12 @@
 	<tml:[util:tab-page] designdb="plugin-cm-neo" o_id="basic" o_title="Layout">
 		<label><tml:label key="tiles.tile.setting.width"/></label>
 		<div style="margin:10px">
-			<tml:input name="{scoped:width}" type="number" default="1" mode="{option:mode}"/>
+			<tml:input cssclass="form-control" name="{scoped:width}" type="number" default="1" mode="{option:mode}"/>
 		</div>
 		
 		<label><tml:label key="tiles.tile.setting.background-image"/></label>
 		<div style="margin:10px">
-			<tml:include ref="util:select-image" o_empty-text="Kein Hintergrundbild" o_derivate="usage=poster" o_mode="{option:mode}"/>
+			<tml:portlet name="[{$option_ns}hintergrund]" ref="util:select-image" o_empty-text="Kein Hintergrundbild" o_derivate="usage=poster" o_mode="{option:mode}"/>
 		</div>
 		
 		<label><tml:label key="tiles.tile.setting.vertical-align"/></label>

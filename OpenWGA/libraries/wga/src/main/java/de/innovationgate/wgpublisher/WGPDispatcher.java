@@ -119,6 +119,7 @@ import de.innovationgate.wgpublisher.design.conversion.PostProcessor;
 import de.innovationgate.wgpublisher.design.fs.DesignFileDocument;
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptAppGlobalRegistry;
 import de.innovationgate.wgpublisher.expressions.tmlscript.TMLScriptException;
+import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager;
 import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager.DerivateQuery;
 import de.innovationgate.wgpublisher.files.derivates.FileDerivateManager.DerivateQueryTerm;
 import de.innovationgate.wgpublisher.files.derivates.TypeQueryTermProcessor;
@@ -990,7 +991,10 @@ public class WGPDispatcher extends HttpServlet {
                     response.sendError(exc.getCode(), exc.getMessage());
                 }
                 else {
-                	_log.error("Exception in processing request from " + request.getRemoteAddr() + " to URL " + String.valueOf(request.getRequestURL()));
+                	_log.error("Exception in processing request from " + request.getRemoteAddr() 
+                		+ " to URL " + String.valueOf(request.getRequestURL())
+                		+ (request.getQueryString()!=null ? " with query " + String.valueOf(request.getQueryString()) : "")
+                	);
                     throw new ServletException(exc);
                 }
             }
@@ -2288,12 +2292,11 @@ public class WGPDispatcher extends HttpServlet {
             	
                 DerivateQuery derivateQuery=null;
                 try{
-                	derivateQuery = getCore().getFileDerivateManager().parseDerivateQuery(derivate);
+					derivateQuery = FileDerivateManager.parseDerivateQuery(derivate);
                 }
                 catch(WGInvalidDerivateQueryException e){
                 	// parameter may be encoded. Try with decoded version
-                	String decoded = URIUtil.decode(derivate);
-                	derivateQuery = getCore().getFileDerivateManager().parseDerivateQuery(decoded);
+					derivateQuery = FileDerivateManager.parseDerivateQuery(URIUtil.decode(derivate));
                 }
                 
                 if (publishingFile instanceof DocumentPublishingFile) {
@@ -2312,15 +2315,21 @@ public class WGPDispatcher extends HttpServlet {
             }
         
         }
+        catch(WGNotSupportedException | WGInvalidDerivateQueryException | WGFailedDerivateQueryException e) {
+        	_log.error("Request " + request.getRequestURI() + " from " + request.getRemoteAddr() + ": Invalid derivate query '" + request.getParameter(URLPARAM_DERIVATE) + "': " + e.getMessage());
+        }
+        /*
         catch (WGNotSupportedException e) {
             throw new HttpErrorException(412, e.getMessage(), path.getDatabaseKey());
         }
         catch (WGInvalidDerivateQueryException e) {
-            throw new HttpErrorException(400, "Invalid derivate query: " + e.getMessage(), path.getDatabaseKey());
+            //throw new HttpErrorException(400, "Invalid derivate query: " + e.getMessage(), path.getDatabaseKey());
+        	_log.error(path.getDatabaseKey() + ": Invalid derivate query '" + request.getParameter(URLPARAM_DERIVATE) + "': " + e.getMessage());
         }
         catch (WGFailedDerivateQueryException e) {
             throw new HttpErrorException(412, "No derivate of file '" + publishingFile.getFileName() + "' matches the derivate query", path.getDatabaseKey());
         }
+        */
         
         // Put out the used device pixel ratio, if any
         if (usedDevicePixelRatio != null) {

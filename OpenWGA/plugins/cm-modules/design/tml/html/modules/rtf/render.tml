@@ -23,7 +23,7 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 <div class="rtf">
-	<tml:item name="{scoped:body}" editor="rtf" label="{option('title')}"
+	<tml:item name="{scoped:body}" editor="rtf" label="{option('title')}" encode="[rtf{$option_rtf_encoder?','+$option_rtf_encoder:''}]"
 		highlightprefix ="<span class='lucene-highlight'>"
 		highlightsuffix="</span>"				
 		highlight="{request.getParameter('highlight')=='true'}"

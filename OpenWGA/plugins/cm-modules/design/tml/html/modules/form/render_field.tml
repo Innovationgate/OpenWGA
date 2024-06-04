@@ -28,7 +28,8 @@
 	_divider = CMM.setting('divider')=="single-line" ? " " : null;
 	
 	_message = CMM.setting('validationmessage');
-	_fieldname = CMM.setting('fieldname').trim();
+	_fieldname = CMM.setting('fieldname');
+	_fieldname = _fieldname && _fieldname.trim();
 	_label = CMM.setting("label");
 
 	var fieldtype = CMM.setting('fieldtype');
@@ -41,7 +42,9 @@
 		_validation = "$E_VALUE.trim()!=''"
 		if(fieldtype=="checkbox")
 			_validation = "$E_VALUE.size()"
-		_message = _message || label("form.validation.message.required", [_label||_fieldname]) 
+		if(fieldtype=="select" || fieldtype=="radio" || fieldtype=="checkbox")
+			_message = _message || label("form.validation.message.select.required", [_label||_fieldname])
+		else _message = _message || label("form.validation.message.required", [_label||_fieldname])
 	}
 	else if(validation=="mail"){
 		_validation = "AFW.Util.validate.mailAddress($E_VALUE)"
@@ -60,7 +63,10 @@
 	tmlform.processcontext.get("forminfo").put(WGA.scoped(""), fieldinfo);		
 </tml:script>
 
-<div class="clearfix formfield field-type-<tml:script expression="CMM.setting('fieldtype')"/><tml:case condition="tmlform.hasmessage(_fieldname)"> error</tml:case>">
+<div class="clearfix formfield field-type-<tml:script expression="CMM.setting('fieldtype')"/>
+		<tml:case condition="tmlform.hasmessage(_fieldname)"> error</tml:case>
+		<tml:case condition="CMM.setting('divider')=='single-line'">single-line</tml:case>
+	">
 	<tml:case condition="_label">
 		<label <tml:case condition="!_opts">for="<tml:option name="ns"/>"</tml:case> <tml:case condition="_validation">class="required"</tml:case>>
 			<tml:item name="_label"/>
@@ -72,7 +78,7 @@
 			focus="{CMM.setting('focus')||false}"
 			validation="{_validation||true}"
 			message="{_message}"
-			labeled="true"
+			labeled="{$option_formfield_labeled!=null ? $option_formfield_labeled : true}"
 			format="{_format}"
 			divider="{_divider}"
 			default="{CMM.setting('defaultvalue')}" 
@@ -87,10 +93,12 @@
 				placeholder="<tml:[setting] o_name="placeholder"/>"
 			</tml:case>
 		</tml:input>
+		
+		<tml:case condition="tmlform.hasmessage(_fieldname)">
+			<div class="field-message">
+				<tml:script expression="tmlform.getmessage(_fieldname)"/>
+			</div>
+		</tml:case>
+
 	</div>
 </div>
-<tml:case condition="tmlform.hasmessage(_fieldname)">
-	<div class="field-message">
-		<tml:script expression="tmlform.getmessage(_fieldname)"/>
-	</div>
-</tml:case>

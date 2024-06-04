@@ -109,6 +109,9 @@
 					"<tml:script expression="request.section"/>",
 					"<tml:item name="last_selected_module" type="portlet"/>"
 				)
+				<tml:case if="_CM_clipboard_modules">
+					M.setClipboardModules(JSON.parse('@{_CM_clipboard_modules encode="none"}'));
+				</tml:case>
 				
 			})
 		</script>
@@ -118,23 +121,43 @@
 	<div class="footer clearfix">
 	
 		<div class="content-modules-toolbar">
-			<tml:case condition="$option_mode=='edit'">
-				<div class="btn-group dropup">
-					<button class="btn btn-default dropdown-toggle disabled" data-toggle="dropdown" data-button="add" title="Modul einfügen">
-						<i class="fas fa-plus"></i>
+			<tml:if condition="$option_mode=='edit'">
+				<tml:then>
+					<div class="btn-group dropup">
+						<button class="btn btn-default dropdown-toggle disabled" data-toggle="dropdown" data-button="add" title="Modul einfügen">
+							<i class="fas fa-plus"></i>
+						</button>
+						<div class="dropdown-menu content-module-list"></div>
+					</div>
+					<div class="btn-group">
+						<button class="btn btn-default disabled" data-button="delete" title="Modul löschen">
+							<i class="far fa-trash-alt"></i>
+						</button>
+						<button class="btn btn-default disabled" data-button="duplicate" title="Modul duplizieren">
+							<i class="far fa-clone"></i>
+						</button>
+					</div>
+					<div class="btn-group">
+						<button class="btn btn-default disabled" data-button="copy-to-clipboard" title="Modul in die Zwischenablage kopieren">
+							<i class="filled fa-solid fa-clipboard" style="display:none"></i>
+							<i class="checked fa-solid fa-clipboard-check" style="display:none"></i>						
+							<i class="empty fa-regular fa-clipboard"></i>
+						</button>
+						<button class="btn btn-default disabled" data-button="copy-from-clipboard" title="Modul aus der Zwischenablage einfügen">						
+							<i class="filled fa-solid fa-paste" style="display:none"></i>
+							<i class="empty fa-regular fa-paste"></i>
+						</button>
+					</div>
+				</tml:then>
+				<tml:else>
+					<button class="btn btn-default disabled" data-button="copy-to-clipboard" title="Modul in die Zwischenablage kopieren">
+						<i class="filled fa-solid fa-clipboard" style="display:none"></i>			
+						<i class="checked fa-solid fa-clipboard-check" style="display:none"></i>			
+						<i class="empty fa-regular fa-clipboard"></i>
 					</button>
-					<div class="dropdown-menu content-module-list"></div>
-				</div>
-				<div class="btn-group">
-					<button class="btn btn-default disabled" data-button="delete" title="Modul löschen">
-						<i class="far fa-trash-alt"></i>
-					</button>
-					<button class="btn btn-default disabled" data-button="duplicate" title="Modul duplizieren">
-						<i class="far fa-copy"></i>
-					</button>
-				</div>
-			</tml:case>
-			<div class="btn-group" <tml:case condition="$option_mode=='edit'">style="margin-left:100px"</tml:case>>
+				</tml:else>
+			</tml:if>
+			<div class="btn-group" style="margin-left:20px">
 				<button class="btn btn-default"
 						title="Alle Bereiche ausklappen" 
 						data-button="expand-all">

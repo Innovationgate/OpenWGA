@@ -1,9 +1,3 @@
-$fa-var-square: 		\f0c8;
-$fa-var-square-check: 	\f14a;
-
-$fa-var-circle: 		\f111;
-$fa-var-circle-check: 	\f058;
-
 .cm-multiselect{
 
 	width: 100%;

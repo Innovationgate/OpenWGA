@@ -903,7 +903,9 @@ public class FileDerivateManager {
     }
     public static DerivateQuery parseDerivateQuery(String derivateQuery, boolean add_usage) throws WGInvalidDerivateQueryException {
         DerivateQuery queryTerms = new DerivateQuery();
-        for (String queryTermStr :WGUtils.deserializeCollection(derivateQuery, ",", true)) {
+        for (String queryTermStr : WGUtils.deserializeCollection(derivateQuery, ",", true)) {
+        	if(queryTermStr.isEmpty())
+        		continue;
             DerivateQueryTerm queryTerm = new DerivateQueryTerm(queryTermStr);
             
             // Handle special terms that go into special properties of the derivate query

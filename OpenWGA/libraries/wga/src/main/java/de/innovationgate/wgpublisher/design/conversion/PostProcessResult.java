@@ -97,10 +97,15 @@ public class PostProcessResult implements Serializable {
         
     }
     
+    private Integer _hash;
     private String _code;
     private String _mimeType;
     private Set<IntegratedResource> _integratedResources = new HashSet<IntegratedResource>();
 
+    public Integer getHash() {
+   		return _hash;
+    }
+    
     public String getMimeType() {
         return _mimeType;
     }
@@ -114,6 +119,7 @@ public class PostProcessResult implements Serializable {
     }
 
     public void setCode(String code) {
+    	_hash = code.hashCode();
         _code = code;
     }
 

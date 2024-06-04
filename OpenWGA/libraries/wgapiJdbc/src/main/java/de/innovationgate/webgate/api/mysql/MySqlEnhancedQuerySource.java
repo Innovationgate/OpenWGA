@@ -33,14 +33,7 @@ import de.innovationgate.webgate.api.WGUserAccess;
 import de.innovationgate.webgate.api.jdbc.custom.JDBCSource;
 
 public class MySqlEnhancedQuerySource extends JDBCSource {
-	
-	
-
-    @Override
-    protected String getJDBCDriver(WGDatabase db) {
-        return de.innovationgate.webgate.api.mysql.WGDatabaseImpl.DRIVER;
-    }
-
+    
 	@Override
 	public WGUserAccess open(WGDatabase db, String path, String user, String pwd, boolean prepareOnly) throws WGAPIException {
         // Build creations options

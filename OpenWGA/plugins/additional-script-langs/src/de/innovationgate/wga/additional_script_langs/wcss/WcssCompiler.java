@@ -46,6 +46,11 @@ public class WcssCompiler {
         a[2] = i & 0xFF;
         return a;
 	}
+	public static final String toHex(int[] rgb) {
+		return "#" + String.format("%02x", rgb[0])
+				+ String.format("%02x", rgb[1])
+				+ String.format("%02x", rgb[2]);
+	}
 	
 	// map of custom wcss functions
 	final private static HashMap<String, WcssFunction> customFunctions = new HashMap<String, WcssFunction>();
@@ -69,6 +74,31 @@ public class WcssCompiler {
 						return "rgba(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ", " + params.get(1) + ")";
 					}
 					catch(Exception e){}
+				}
+				return null;
+			}
+		});
+		customFunctions.put("color", new WcssFunction(){
+			@Override
+			public String execute(WcssResource resource, ArrayList<String> params) {
+				if(params.size()==2){
+					try{
+						int[] rgb = toRGB(params.get(0));
+						float f = Float.parseFloat(params.get(1));
+						
+						for(int i=0; i<3; i++)
+							rgb[i] = Math.max(Math.min(Math.round(rgb[i]*f), 255), 0);
+						return toHex(rgb);
+					}
+					catch(Exception e){}
+				}
+				return null;
+			}
+		});
+		customFunctions.put("equals", new WcssFunction(){
+			public String execute(WcssResource resource, ArrayList<String> params) {
+				if(params.size()>1){
+					return params.get(0).equalsIgnoreCase(params.get(1)) ? "true":"false";
 				}
 				return null;
 			}
@@ -99,6 +129,21 @@ public class WcssCompiler {
 		_compress=value;
 	}
 	
+	public static String preprocess(String s) {
+		String search_pattern = "#\\{([^\\}]*)\\}";	// search for #{....}
+		Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
+    	Matcher matcher = pattern.matcher(s);
+    	StringBuffer sb = new StringBuffer();
+    	while(matcher.find()){
+            if(matcher.groupCount()>0) {
+           		matcher.appendReplacement(sb, Matcher.quoteReplacement("concat(" + matcher.group(1)) + ")");
+            }
+    	}
+    	matcher.appendTail(sb);
+    	return sb.toString();		
+	}
+	
+	
 	public String compile() throws IOException{
 		CssBlock b = new CssBlock(); 
 		b.getVars().putAll(customVars);
@@ -106,8 +151,11 @@ public class WcssCompiler {
 		return b.getCode();
 	}
 	
-	private void compile(CssBlock parent) throws IOException{
-		StreamTokenizer st = new StreamTokenizer(new StringReader(_resource.getCode()));
+	private CssBlock compile(CssBlock parent) throws IOException{
+		
+		String preprosessed = preprocess(_resource.getCode());
+		
+		StreamTokenizer st = new StreamTokenizer(new StringReader(preprosessed));
 
 		st.resetSyntax();
 		
@@ -129,6 +177,7 @@ public class WcssCompiler {
 		rootCssBlock.parse(st);
 		
 		_resource.addIntegratedResource();
+		return rootCssBlock;
 
 	}
 		
@@ -214,8 +263,8 @@ public class WcssCompiler {
 						// search for property name:value
 						int index = propName.indexOf(':');
 						if(index>0){
-							String propPart = propName.substring(0, index);
-							String valuePart = propName.substring(index+1);
+							String propPart = trim(propName.substring(0, index));
+							String valuePart = trim(propName.substring(index+1));
 							if(propPart.startsWith("$")){
 								valuePart = replaceVars(valuePart);
 								if(valuePart.endsWith("!default")){
@@ -296,7 +345,7 @@ public class WcssCompiler {
 			if(!_props.isEmpty() && getSourceInfo()!=null && !getSourceInfo().isEmpty())
 				result.append("\n" + prefix + "/* wcss " + getSourceInfo() + " */\n");
 
-			String path = getPath();
+			String path = replaceCustomFunctions(replaceVars(getPath()));
 			if(!path.isEmpty() && !_props.isEmpty()){
 				result.append(prefix);
 				result.append(path + "{");
@@ -538,13 +587,17 @@ public class WcssCompiler {
 			if(directive.equalsIgnoreCase("import") && params_string.length()>1){	
 				params_string = replaceCustomFunctions(replaceVars(params_string));
 				ArrayList<String> params = parseCommasAndQuotes(params_string);
-				WcssResource ref = _resource.resolve(params.get(0));
-				if(ref!=null && ref.getCode()!=null){
-					WcssCompiler compiler = new WcssCompiler(ref);
-					compiler.setCompressing(_compress);
-					compiler.compile(getParentBlock());
+				for(String p : params) {
+					WcssResource ref = _resource.resolve(p);
+					if(ref!=null && ref.getCode()!=null){
+						WcssCompiler compiler = new WcssCompiler(ref);
+						compiler.setCompressing(_compress);
+						CssBlock b = compiler.compile(getParentBlock());
+						getParentBlock().getVars().putAll(b.getVars());
+						getParentBlock().getMixins().putAll(b.getMixins());
+					}
+					else LOG.error("@import: ResourceRef not found: " + ref);
 				}
-				else LOG.error("@import: ResourceRef not found: " + ref);
 			}
 			else if(directive.equalsIgnoreCase("importcss") && params_string.length()>1){	
 				params_string = replaceCustomFunctions(replaceVars(params_string));
@@ -576,7 +629,7 @@ public class WcssCompiler {
 					pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
 		        	matcher = pattern.matcher(rest);
 		        	if(matcher.find())
-	        			params = parseCommasAndQuotes(matcher.group(1));
+	        			params = parseCommasAndQuotes(replaceCustomFunctions(replaceVars(matcher.group(1))));
 	        	}
 								
 				CssMixinBlock mixin = findMixin(mixin_name);
@@ -584,7 +637,9 @@ public class WcssCompiler {
 					mixin.cloneCssBlock(getParentBlock(), params, null);
 				else LOG.error("@mixin not found " + mixin_name);
 			}
-			else LOG.error("unknown directive " + getName());
+			else {
+				_csscode = "@"+directive + " " + replaceCustomFunctions(replaceVars(params_string)) + ";";
+			}
 		}
 		
 		protected CssDirectiveBlock cloneCssBlock(String name, CssBlock parent, CssBlock contentBlock){
@@ -596,7 +651,7 @@ public class WcssCompiler {
 		public String getCode(String prefix) throws IOException{
 			String info="";
 			if(getSourceInfo()!=null)
-				info = "\n" + prefix + "/* " + getName() + " in " + getSourceInfo() + " */\n";
+				info = "\n" + prefix + "/* wcss " + getName() + " in " + getSourceInfo() + " */\n";
 			return info + _csscode;
 		}
 	}
@@ -613,7 +668,7 @@ public class WcssCompiler {
 		
 		public String getCode(String prefix) throws IOException{
 			StringBuffer result = new StringBuffer();
-			result.append(replaceVars(getName()) + "{");
+			result.append(replaceCustomFunctions(replaceVars(getName())) + "{");
 			if(!_compress)
 				result.append("\n");
 			for(CssBlock b: getSubBlocks()){

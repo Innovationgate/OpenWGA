@@ -35,13 +35,6 @@ import de.innovationgate.webgate.api.query.jdbc.WGDatabaseImpl;
 
 public class MySqlQuerySource extends WGDatabaseImpl {
 	
-	
-
-    @Override
-    protected String getJDBCDriver() {
-        return de.innovationgate.webgate.api.mysql.WGDatabaseImpl.DRIVER;
-    }
-
 	@Override
 	public WGUserAccess open(WGDatabase db, String path, String user, String pwd, boolean prepareOnly) throws WGInvalidDatabaseException, WGBackendException {
         // Build creations options
