@@ -33,7 +33,6 @@ import java.util.List;
 import de.innovationgate.utils.IteratorWrapper;
 import de.innovationgate.utils.PrefetchingIterator;
 import de.innovationgate.utils.SkippingIterator;
-import de.innovationgate.webgate.api.WGStandardResultSet.FetchingIterator;
 
 /**
  * Abstract base class for result set iterators, implementing shared functionality like prefetching which is neccessary for implicit filtering
@@ -41,7 +40,6 @@ import de.innovationgate.webgate.api.WGStandardResultSet.FetchingIterator;
 public abstract class WGAbstractResultSetIterator<T extends Object> extends PrefetchingIterator<WGContent> implements SkippingIterator<WGContent>, Closeable, IteratorWrapper<T> {
 
     protected Iterator<T> _it;
-    private boolean _fetched = false;
 
     protected abstract WGContent fetchContentForResult(T result) throws WGAPIException;
 
@@ -85,19 +83,18 @@ public abstract class WGAbstractResultSetIterator<T extends Object> extends Pref
     @Override
     protected WGContent fetchNextValue() {
         
-        _fetched = true;
         try {
             WGContent currentContent = null;
             while (_it.hasNext()) {
                 T result = _it.next();
                 
-                // Backend iterators may return null if a result is was read protected
+                // Backend iterators may return null if a result is read protected
                 if (result == null) {
                     continue;
                 }
                 
                 WGContent content = fetchContentForResult(result);
-                if (content != null && passesFilter(content)) {
+                if (content != null && !content.isDummy() && passesFilter(content)) {
                     currentContent = content;
                     break;
                 }
