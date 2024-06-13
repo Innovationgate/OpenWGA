@@ -103,11 +103,6 @@ public class SassPostProcessor implements PostProcessor {
             }
             else vars.putAll((Map<String,Object>)result);
 		}
-    	if(wga.getRequest()!=null){
-    		String host = wga.getRequest().getServerName().replace(".", "_");
-    		//wga.getLog().info("requested host: " + host);
-    		vars.put("requested_host", host);
-    	}
         data.setCacheQualifier((Serializable)vars);
     }
 
