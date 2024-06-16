@@ -25,7 +25,6 @@
 
 package de.innovationgate.wgpublisher.webtml.utils;
 
-import de.innovationgate.utils.FormattingException;
 import de.innovationgate.utils.ObjectFormatter;
 import de.innovationgate.utils.WGUtils;
 
@@ -41,6 +40,7 @@ public class UniqueNamePartFormatter implements ObjectFormatter {
         String str = String.valueOf(obj).toLowerCase();
         str = WGUtils.strReplace(str, ".", "_", true);
         str = WGUtils.strReplace(str, "/", "_", true);
+        str = WGUtils.strReplace(str, "\\", "_", true);
         return str;
         
     }
