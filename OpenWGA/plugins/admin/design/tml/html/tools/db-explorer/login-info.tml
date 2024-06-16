@@ -23,11 +23,13 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 <tml:script>
+	var domain = WGA.app(portlet.getSessionVar('dbkey')).domain().name;
+	_username = meta("domain:"+domain, "username");
 	_Database = AFW.database(portlet.getSessionVar('dbkey'));
 </tml:script>
 
 <tml:include designdb="@ui" ref="windowview">
-	<tml:option name="title">DB Access as: <b><tml:script expression="_Database.getUserName() + ' / ' + _Database.getAccessLevelText()"/></b></tml:option>	
+	<tml:option name="title">DB Access as: <b><tml:script expression="_username + ' / ' + _Database.getAccessLevelText()"/></b></tml:option>	
 	<tml:option name="config">
 		collapsible: true,
 		collapsed: false	//<tml:script expression="!_loginerror"/>
@@ -39,7 +41,7 @@
 				
 			<div id="login-info" style="display:<tml:script expression="_loginerror?'none':'block'"/>">
 				<label>Username:</label>
-				<div class="data"><tml:script expression="_Database.getUserName()"/></div>
+				<div class="data">@{_username}</div>
 				<div class="clear"></div>
 				
 				<label>Access:</label>
