@@ -40,6 +40,12 @@ public class WcssPostProcessor implements PostProcessor{
         vars.put("wcss", "true");
         vars.put("charset", wga.design(data.getDocument().getDatabase().getDbReference()).getFileEncoding());
 
+        if(wga.getRequest()!=null){
+        	// calculated URLs may depend on v-hosts. Therefore we must cache per v-host. 	
+    		String host = wga.getRequest().getServerName().replace(".", "_");
+    		vars.put("requested_host", host);
+    	}
+
     	for (Design design : cssVariables) {
             Object result = wga.tmlscript().runScript(design, wga.createTMLContext(data.getDocument().getDatabase(), design), design.getScriptModule(WGScriptModule.CODETYPE_TMLSCRIPT).getCode(), extraObjects);
             

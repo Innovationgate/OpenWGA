@@ -112,6 +112,11 @@ public class SassPostProcessor implements PostProcessor {
             }
             else vars.putAll((Map<String,Object>)result);
 		}
+    	if(wga.getRequest()!=null){
+    		// calculated URLs may depend on v-hosts. Therefore we must cache per v-host.
+    		String host = wga.getRequest().getServerName().replace(".", "_");
+    		vars.put("requested_host", host);
+    	}
         data.setCacheQualifier((Serializable)vars);
     }
 
