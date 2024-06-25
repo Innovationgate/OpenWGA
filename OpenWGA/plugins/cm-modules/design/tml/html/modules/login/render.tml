@@ -66,58 +66,52 @@
 		
 		<tml:select switch="CMM.setting('action')">
 			<tml:case value="login">
-				<div class="login-message">
-					<tml:[setting] o_name="loginmessage" encode="html"/>
-				</div>
 				
-				<tml:if condition="CMM.setting('https')===true && !request.isSecure()">
-					<tml:then>
-						<tml:url protocol="https" var="_url"/>
-						<tml:label key="login.https-link" param1="{_url}"/>
-					</tml:then>
-
-					<tml:else>				
-						<tml:form id="{scoped:login-form}" onsubmit="window.login()">
-							<script>
-								function login(){
-									WGA.callAction("<tml:action ref="login" param1="{_dbkey}"/>");
-								}
-							</script>
-							
-							<fieldset>
-							
-								<tml:case condition="tmlform.hasmessages()">
-									<div class="login-error">
-										<tml:formmessages divider="<br>"/>
-									</div>
-								</tml:case>
-								
-								<div class="formfield">
-									<label><tml:label key="module.login.label.username"/>:</label>
-									<div class="data">
-										<tml:input type="text" name="username" focus="true"
-											validation="$E_VALUE!=''"
-											message="{label('module.login.username.validation')}"
-										/>
-									</div>
+				<tml:[setting] o_name="loginmessage" encode="html" wrap="div" wrap_class="login-message"/>
+				
+				<tml:form id="{scoped:login-form}" onsubmit="window.login()">
+					<script>
+						function login(){
+							WGA.callAction("<tml:action ref="login" param1="{_dbkey}"/>");
+						}
+					</script>
+					
+					<fieldset>
+					
+						<tml:[setting] o_name="legend" encode="html" wrap="legend"/>
+					
+						<div>
+							<tml:case condition="tmlform.hasmessages()">
+								<div class="login-error">
+									<tml:formmessages divider="<br>"/>
 								</div>
-								
-								<div class="formfield">
-									<label><tml:label key="module.login.label.password"/>:</label>
-									<div class="data">
-										<tml:input type="password" name="password"/>
-									</div>
-								</div>
-								
-								<div class="button-bar formfield">
-									<button type="submit">login</button>
-								</div>
-								
-							</fieldset>
+							</tml:case>
 							
-						</tml:form>
-					</tml:else>
-				</tml:if>
+							<div class="formfield">
+								<label><tml:label key="module.login.label.username"/></label>
+								<div class="data">
+									<tml:input type="text" name="username" focus="true"
+										validation="$E_VALUE!=''"
+										message="{label('module.login.username.validation')}"
+									/>
+								</div>
+							</div>
+							
+							<div class="formfield">
+								<label><tml:label key="module.login.label.password"/></label>
+								<div class="data">
+									<tml:input type="password" name="password"/>
+								</div>
+							</div>
+							
+							<div class="button-bar formfield">
+								<button type="submit">login</button>
+							</div>
+						</div>
+						
+					</fieldset>
+					
+				</tml:form>
 				
 			</tml:case>
 
