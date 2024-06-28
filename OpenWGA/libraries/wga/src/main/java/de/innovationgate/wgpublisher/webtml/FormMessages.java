@@ -40,6 +40,7 @@ public class FormMessages extends Base {
     private static final long serialVersionUID = 1L;
     private static final String SCOPE_ALL = "all";
     private static final String SCOPE_GLOBAL = "global";
+    private static final String SCOPE_FIELDS = "fields";
     
     private String _scope;
     
@@ -70,6 +71,9 @@ public class FormMessages extends Base {
         }
         else if (SCOPE_GLOBAL.equals(scope)) {
             messages = status._tmlForm.getglobalmessages().iterator();
+        }
+        else if (SCOPE_FIELDS.equals(scope)) {
+        	messages = status._tmlForm.getfieldmessages().iterator();
         }
         else {
             String msg = status._tmlForm.getmessage(scope);
