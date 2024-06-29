@@ -180,11 +180,9 @@
 				<div class="form-message"> 
 					<div class="headline"><tml:label key="form.validationmessage.title"/></div>
 					<tml:formmessages scope="global" divider="<br>" wrap="div" wrap_class="global-messages"/>
-					<tml:case condition="!tmlform.getfieldmessages().isEmpty()">
-						<ul class="field-messages">
-							<li><tml:formmessages scope="fields" divider="</li><li>"/></li>
-						</ul>
-					</tml:case>
+					<tml:foreach expression="tmlform.getfieldmessages()" currentvalue="_msg" wrap="ul" wrap_class="field-messages">
+						@{_msg wrap="li"}
+					</tml:foreach>
 				</div>
 			</tml:case>
 			
