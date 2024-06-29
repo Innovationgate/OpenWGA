@@ -153,7 +153,7 @@ public class BaseTagStatus {
     protected String suffix = "";
 
     /**
-     * A suffix for the tag result, put out after it in unencoded form
+     * A prefix for the tag result, put out after it in unencoded form
      */
     protected String prefix = "";
     
