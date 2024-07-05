@@ -2,7 +2,7 @@
 
 	"+ .module-cm_tiles": {
 		// if we have a following tile module remove default module margin 
-		margin_top: "-10px"
+		margin_top: "-<tml:script expression="option('section-margin')||10" format="0"/>px",
 	},
 
 	">.tiles": {

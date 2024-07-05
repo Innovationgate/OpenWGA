@@ -39,7 +39,9 @@ public class WcssPostProcessor implements PostProcessor{
         Map<String,Object> vars = new HashMap<String, Object>();
         vars.put("wcss", "true");
         vars.put("charset", wga.design(data.getDocument().getDatabase().getDbReference()).getFileEncoding());
-    	if(wga.getRequest()!=null){
+
+        if(wga.getRequest()!=null){
+        	// calculated URLs may depend on v-hosts. Therefore we must cache per v-host. 	
     		String host = wga.getRequest().getServerName().replace(".", "_");
     		vars.put("requested_host", host);
     	}

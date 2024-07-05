@@ -45,8 +45,8 @@
 		console.log("send mail", CMM.setting("mail"));
 		var mailto = CMM.settingList("mail")
 		if(!mailto.size()){
-			tmlform.addmessage("No mail address specified in form");
-			log.error("module 'form' in document '" + TITLE + "': No mail address specified.");
+			//tmlform.addmessage("Module configuration error: No mail address specified in form");
+			log.error("module 'form' in document '" + KEY + " / " + TITLE + "': No mail address specified.");
 			return;
 		}
 		
@@ -161,7 +161,9 @@
 <tml:form source="none" id="{WGA.scoped('form')}" cssclass="{$option_module_classes || VOID}">
 
 	<tml:script>
-		tmlform.processcontext.put("forminfo", new Packages.java.util.LinkedHashMap())		
+		tmlform.processcontext.put("forminfo", new Packages.java.util.LinkedHashMap())
+		if(CMM.settingList("action").contains("mail") && !CMM.settingList("mail").size())
+			tmlform.addmessage("Module configuration error: No mail address specified in form");
 	</tml:script>
 
 	<tml:if condition="tmlform.successmessage">
@@ -177,9 +179,10 @@
 			<tml:case condition="tmlform.hasmessages()">
 				<div class="form-message"> 
 					<div class="headline"><tml:label key="form.validationmessage.title"/></div>
-					<ul>
-						<li><tml:formmessages divider="</li><li>"/></li>
-					</ul>
+					<tml:formmessages scope="global" divider="<br>" wrap="div" wrap_class="global-messages"/>
+					<tml:foreach expression="tmlform.getfieldmessages()" currentvalue="_msg" wrap="ul" wrap_class="field-messages">
+						@{_msg wrap="li"}
+					</tml:foreach>
 				</div>
 			</tml:case>
 			

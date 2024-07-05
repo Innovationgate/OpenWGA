@@ -23,31 +23,17 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<tml:include medium="stylesheets" ref="cmm-styles"/>
+<tml:include designdb="@afw" medium="jss" ref="toCSS" o_scope=".module-cm_login">
 
-.login-form{
-	padding: 10px;
-}
+	".login-error":{
+		color: "red",
+		margin: "10px 0"
+	},
+	".logout": {
+		margin: "10px 0",
+		".username":{
+			font_weight: "bold"
+		}
+	}
 
-.login-form label{
-	display: block;
-	margin-top: 10px;
-}
-
-.login-form input{
-	width: 100%;
-}
-
-.login-form .data{
-	margin-right: 10px;
-}
-
-.login-form .button-bar{
-	margin: 10px 0 0 0;
-}
-
-.login-form .login-error{
-	color: red;
-	font-weight: bold;
-	margin: 10px 0;
-}
+</tml:include>

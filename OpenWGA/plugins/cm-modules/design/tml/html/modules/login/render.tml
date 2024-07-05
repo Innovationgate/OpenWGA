@@ -66,48 +66,52 @@
 		
 		<tml:select switch="CMM.setting('action')">
 			<tml:case value="login">
-				<div class="login-message">
-					<tml:[setting] o_name="loginmessage" encode="html"/>
-				</div>
 				
-				<tml:if condition="CMM.setting('https')===true && !request.isSecure()">
-					<tml:then>
-						<tml:url protocol="https" var="_url"/>
-						<tml:label key="login.https-link" param1="{_url}"/>
-					</tml:then>
-
-					<tml:else>				
-						<tml:form id="{scoped:login-form}" onsubmit="window.login()" cssclass="login-form box">
-							<script>
-								function login(){
-									WGA.callAction("<tml:action ref="login" param1="{_dbkey}"/>");
-								}
-							</script>
+				<tml:[setting] o_name="loginmessage" encode="html" wrap="div" wrap_class="login-message"/>
+				
+				<tml:form id="{scoped:login-form}" onsubmit="window.login()">
+					<script>
+						function login(){
+							WGA.callAction("<tml:action ref="login" param1="{_dbkey}"/>");
+						}
+					</script>
+					
+					<fieldset>
+					
+						<tml:[setting] o_name="legend" encode="html" wrap="legend"/>
+					
+						<div>
+							<tml:case condition="tmlform.hasmessages()">
+								<div class="login-error">
+									<tml:formmessages divider="<br>"/>
+								</div>
+							</tml:case>
 							
-							<div class="login-error">
-								<tml:formmessages divider="<br>"/>
-							</div>			
-							
-							<label><tml:label key="module.login.label.username"/>:</label>
-							<div class="data">
-								<tml:input type="text" name="username" focus="true"
-									validation="$E_VALUE!=''"
-									message="{label('module.login.username.validation')}"
-								/>
+							<div class="formfield">
+								<label><tml:label key="module.login.label.username"/></label>
+								<div class="data">
+									<tml:input type="text" name="username" focus="true"
+										validation="$E_VALUE!=''"
+										message="{label('module.login.username.validation')}"
+									/>
+								</div>
 							</div>
 							
-							<label><tml:label key="module.login.label.password"/>:</label>
-							<div class="data">
-								<tml:input type="password" name="password"/>
+							<div class="formfield">
+								<label><tml:label key="module.login.label.password"/></label>
+								<div class="data">
+									<tml:input type="password" name="password"/>
+								</div>
 							</div>
 							
-							<div class="button-bar">
-								<button type="submit" class="btn">login</button>
+							<div class="button-bar formfield">
+								<button type="submit">login</button>
 							</div>
-							
-						</tml:form>
-					</tml:else>
-				</tml:if>
+						</div>
+						
+					</fieldset>
+					
+				</tml:form>
 				
 			</tml:case>
 
@@ -119,9 +123,13 @@
 	<tml:else>
 
 		<div class="logout">
-			<tml:label key="module.login.you-are-loggedin-as"/>
-			<strong><tml:item name="_username" encode="html"/></strong>.
-			<tml:button cssclass="btn" clickaction="logout" param1="{_dbkey}">logout</tml:button>		
+			<div class="msg">
+				<tml:label key="module.login.you-are-loggedin-as"/>
+				<span class="username"><tml:item name="_username" encode="html"/></span>.
+			</div>
+			<div class="button">
+				<tml:button cssclass="btn" clickaction="logout" param1="{_dbkey}">logout</tml:button>
+			</div>		
 		</div>
 		
 	

@@ -1064,13 +1064,7 @@ public class Input extends ActionBase implements DynamicAttributes {
 
         List<InputOption> options = this.retrieveInputOptions();
         
-        boolean renderCheckbox = false;
-        if (options.size() == 0) {
-            renderCheckbox = true;
-        }
-        else if (options.size() == 1 && options.get(0).getValue().equals("true")) {
-            renderCheckbox = true;
-        }
+        boolean renderCheckbox = options.size()<2;
         
         int idx=0;
         if (!renderCheckbox) {
@@ -1112,13 +1106,16 @@ public class Input extends ActionBase implements DynamicAttributes {
     			if (doLabelling && optionId!=null) {
     			    this.appendResult("<label for=\"").appendResult(optionId).appendResult("\">").appendResult(optionText).appendResult("</label>");
     			}
-    			else {
-    			    this.appendResult(optionText);
-    			}
+				else if(wrapWithLabels) {
+					this.appendResult("<span>")
+						.appendResult(optionText)
+						.appendResult("</span>")
+						.appendResult("</label>");
+				}
+				else {
+				    this.appendResult(optionText);
+				}
     			
-    			if(wrapWithLabels)
-    				this.appendResult("</label>");
-
     			if (optionsIt.hasNext()) {
     				appendResult(htmlDivider);
     			}
@@ -1141,7 +1138,7 @@ public class Input extends ActionBase implements DynamicAttributes {
             
             createChangeActionJS(name, form, "onclick");
             
-            if ( value.booleanValue() == true ) {                
+            if (value.booleanValue() == true) {                
                 this.appendResult(" checked ");
             }
             
@@ -1152,14 +1149,23 @@ public class Input extends ActionBase implements DynamicAttributes {
             
             this.appendResult(cssClass).appendResult(cssStyle).appendResult(disabled).appendResult(tagContent).appendResult(">");
 
-            if (options.size() == 1) {
+            if (options.size() == 0) {
+            	if(wrapWithLabels)
+            		this.appendResult("<span></span>");
+            }
+            else if (options.size() == 1) {
             	String optionText = options.get(0).getText();
     			if (doLabelling) {
     			    this.appendResult("<label for=\"").appendResult(theId).appendResult("\">").appendResult(optionText).appendResult("</label>");
     			}
-    			else {
-    			    this.appendResult(optionText);
-    			}
+				else if(wrapWithLabels) {
+					this.appendResult("<span>")
+						.appendResult(optionText)
+						.appendResult("</span>");
+				}
+				else {
+				    this.appendResult(optionText);
+				}
             }
 
     		if(wrapWithLabels)

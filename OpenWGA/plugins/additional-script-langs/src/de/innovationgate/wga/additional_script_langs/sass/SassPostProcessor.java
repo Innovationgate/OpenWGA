@@ -20,6 +20,7 @@ import de.innovationgate.webgate.api.WGDesignDocument;
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGScriptModule;
+import de.innovationgate.wga.common.beans.csconfig.v1.Version;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wga.server.api.tml.Context;
@@ -32,6 +33,14 @@ public class SassPostProcessor implements PostProcessor {
     @Override
     public PostProcessResult postProcess(WGA wga, PostProcessData data, String code) throws WGException {
     
+    	if(Version.getJavaVersion().getMinorVersion()>11) {
+    		PostProcessResult result = new PostProcessResult();
+    		result.setCode("/* SASS does not run on Java Version > 11. */");
+    		wga.getLog().error("SASS does not run on Java Version > 11. Please update your project to use WCSS.");
+    		data.setCacheable(false);
+    		return result;
+    	}
+    	
         ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
         try {
@@ -104,8 +113,8 @@ public class SassPostProcessor implements PostProcessor {
             else vars.putAll((Map<String,Object>)result);
 		}
     	if(wga.getRequest()!=null){
+    		// calculated URLs may depend on v-hosts. Therefore we must cache per v-host.
     		String host = wga.getRequest().getServerName().replace(".", "_");
-    		//wga.getLog().info("requested host: " + host);
     		vars.put("requested_host", host);
     	}
         data.setCacheQualifier((Serializable)vars);

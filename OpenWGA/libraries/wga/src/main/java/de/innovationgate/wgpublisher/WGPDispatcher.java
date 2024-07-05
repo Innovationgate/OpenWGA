@@ -41,7 +41,6 @@ import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.SocketException;
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -769,6 +768,8 @@ public class WGPDispatcher extends HttpServlet {
 
     public void doGet(javax.servlet.http.HttpServletRequest request, javax.servlet.http.HttpServletResponse response) throws javax.servlet.ServletException, java.io.IOException {
         
+    	long start = System.currentTimeMillis();
+    	
         if (!isServePages()) {
             response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "Website is currently updating configuration. Please try again later.");
             return;
@@ -973,6 +974,7 @@ public class WGPDispatcher extends HttpServlet {
 
             // moved from finally block to ensure errorpage can be displayed
             commitResponse(response);
+            _log.debug("doGet :" + (System.currentTimeMillis()-start) + "ms");
         }
         catch(ClientAccessException exc){
         	response.sendError(403, exc.getMessage());
@@ -1707,7 +1709,7 @@ public class WGPDispatcher extends HttpServlet {
 			String url = WGA.get(request, response, _core).urlBuilder(virtualLink).build(true);
 			response.sendRedirect(response.encodeRedirectURL(url));
 		} catch (WGException e) {
-			_core.getLog().warn("Unable to create absolute Redirect URL. Using relative URL", e);
+			_log.warn("Unable to create absolute Redirect URL. Using relative URL", e);
 			response.sendRedirect(response.encodeRedirectURL(virtualLink));
 		}
     	
@@ -2063,7 +2065,7 @@ public class WGPDispatcher extends HttpServlet {
 	    		}
 	    		wga.tmlscript().runScript(headerModuleContext, headerModule.getCode());
     		} catch (Exception e) {
-            	_core.getLog().error("Failed to execute header module '" + headerModuleName + "'", e);
+            	_log.error("Failed to execute header module '" + headerModuleName + "'", e);
             }
     	}        
 
@@ -2140,7 +2142,7 @@ public class WGPDispatcher extends HttpServlet {
 
         if (!externalCacheFolder.exists()) {
             // fallback to normal dispatch
-            _core.getLog().warn("Unable to create external file cache directory '" + externalCacheFolder.getAbsolutePath() + "'. Performing file dispatch in default mode.");
+            _log.warn("Unable to create external file cache directory '" + externalCacheFolder.getAbsolutePath() + "'. Performing file dispatch in default mode.");
             dispatchFileDefaultImpl(path, request, response, database, fileContainer);
             return;
         }
@@ -2155,7 +2157,7 @@ public class WGPDispatcher extends HttpServlet {
 
         if (cachedFile.exists()) {
             // perform redirect
-        	//_core.getLog().info("redirect " + filename + " (" + path.getQueryString() + ") " + publishingFile.getContentType() + ") to " + cacheFileName);
+        	//_log.info("redirect " + filename + " (" + path.getQueryString() + ") " + publishingFile.getContentType() + ") to " + cacheFileName);
         	response.sendRedirect(config.getRootURL() + database.getDbReference() + "/" + fileContainer.getDocumentKey().replaceAll("/", ":") + "/" + cacheFileName);
         }
         else {
@@ -2193,7 +2195,7 @@ public class WGPDispatcher extends HttpServlet {
                             temp.renameTo(cachedFile);
                         }
                         catch (Throwable e) {
-                            _core.getLog().error("Unable to create cache for external file serving.", e);
+                            _log.error("Unable to create cache for external file serving.", e);
                         }
                         finally {
                             WGFactory.getInstance().closeSessions();
