@@ -217,6 +217,9 @@ public class WcssCompiler {
 		public CssBlock getParentBlock(){
 			return _parentBlock;
 		}
+		public void setParentBlock(CssBlock parent){
+			_parentBlock = parent;
+		}
 		public ArrayList<CssBlock> getSubBlocks(){
 			return _subBlocks;
 		}
@@ -305,7 +308,7 @@ public class WcssCompiler {
 						b.parse(st);
 					}
 					else if(className.startsWith("@mixin")){
-						CssMixinBlock b = new CssMixinBlock(className);
+						CssMixinBlock b = new CssMixinBlock(className, this);
 						if(b.isValid()){
 							_mixins.put(b.getName(), b);
 						}
@@ -735,7 +738,8 @@ public class WcssCompiler {
 		ArrayList<String> _params = new ArrayList<String>();
 		boolean _valid=false;
 
-		CssMixinBlock(String name) {
+		CssMixinBlock(String name, CssBlock parent) {
+			setParentBlock(parent);
 			String search_pattern = "@mixin\\s+([\\w-]+)\\s*(\\([^\\)]*\\))?";	// search for @mixin name (params) where (params) is optional
 			Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
         	Matcher matcher = pattern.matcher(name);
