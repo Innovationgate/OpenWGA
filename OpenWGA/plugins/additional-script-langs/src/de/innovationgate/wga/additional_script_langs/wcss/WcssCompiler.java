@@ -631,8 +631,19 @@ public class WcssCompiler {
 	        		search_pattern = "\\(([^\\)]*)\\)";	// search for (params)
 					pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
 		        	matcher = pattern.matcher(rest);
-		        	if(matcher.find())
-	        			params = parseCommasAndQuotes(replaceCustomFunctions(replaceVars(matcher.group(1))));
+		        	if(matcher.find()) {
+		        		params = parseCommasAndQuotes(replaceCustomFunctions(matcher.group(1)));
+
+		        		// #00006253: be careful not to replaceVars for "$var:value" paramater
+						for(int i=0; i<params.size(); i++){
+							String parts[] = params.get(i).split("\\s*:\\s*");	// format $var:value
+							if(parts.length>1){
+								params.set(i, parts[0] + ":" + replaceVars(parts[1]));
+							}
+							else params.set(i, replaceVars(parts[0]));
+						}
+		        		
+		        	}
 	        	}
 								
 				CssMixinBlock mixin = findMixin(mixin_name);
