@@ -392,7 +392,7 @@ public class WcssCompiler {
             	}
             	else {
             		LOG.error("variable not found: " + replacement);
-            		matcher.appendReplacement(sb, "");
+            		matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
             	}
         	}
         	matcher.appendTail(sb);
@@ -402,8 +402,11 @@ public class WcssCompiler {
 		private String searchVar(String var){			
 			for(CssBlock block = this; block!=null; block = block.getParentBlock()){
 				String value = block.getVars().get(var);
-				if(value!=null)
-					return value;
+				if(value!=null) {
+					if(value.startsWith("$"))
+						var = value;
+					else return value;
+				}
 			}
 			return null;
 		}
@@ -633,16 +636,6 @@ public class WcssCompiler {
 		        	matcher = pattern.matcher(rest);
 		        	if(matcher.find()) {
 		        		params = parseCommasAndQuotes(replaceCustomFunctions(matcher.group(1)));
-
-		        		// #00006253: be careful not to replaceVars for "$var:value" paramater
-						for(int i=0; i<params.size(); i++){
-							String parts[] = params.get(i).split("\\s*:\\s*");	// format $var:value
-							if(parts.length>1){
-								params.set(i, parts[0] + ":" + replaceVars(parts[1]));
-							}
-							else params.set(i, replaceVars(parts[0]));
-						}
-		        		
 		        	}
 	        	}
 								
