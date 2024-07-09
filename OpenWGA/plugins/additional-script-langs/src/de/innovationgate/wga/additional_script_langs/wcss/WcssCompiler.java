@@ -269,7 +269,7 @@ public class WcssCompiler {
 							String propPart = trim(propName.substring(0, index));
 							String valuePart = trim(propName.substring(index+1));
 							if(propPart.startsWith("$")){
-								valuePart = replaceVars(valuePart);
+								valuePart = replaceCustomFunctions(replaceVars(valuePart));
 								if(valuePart.endsWith("!default")){
 									valuePart = valuePart.substring(0, valuePart.indexOf("!default"));
 									if(searchVar(propPart)==null)
