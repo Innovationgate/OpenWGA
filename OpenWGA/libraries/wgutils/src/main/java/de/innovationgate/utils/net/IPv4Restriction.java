@@ -40,7 +40,7 @@ public class IPv4Restriction implements IPRestriction {
         try {
             // Range
             if (str.contains("-")) {
-                String[] parts = str.split("-");
+                String[] parts = str.split("\\s*-\\s*");
                 IPv4Restriction restriction = new IPv4Restriction(ClientRestriction.TYPE_RANGE);
                 restriction.setStartIP(new IPv4Address(parts[0]));
                 restriction.setEndIP(new IPv4Address(parts[1]));
@@ -49,7 +49,7 @@ public class IPv4Restriction implements IPRestriction {
             
             // Network
             else if (str.contains("/")) {
-                String[] parts = str.split("/");
+                String[] parts = str.split("\\s*/\\s*");
                 IPv4Restriction restriction = new IPv4Restriction(ClientRestriction.TYPE_NETWORK);
                 restriction.setNetwork(new IPv4Address(parts[0]));
                 if (parts[1].contains(".")) {
