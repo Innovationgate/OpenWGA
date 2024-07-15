@@ -241,7 +241,7 @@
 			}
 			
 			if(type=="exturl"){
-				var url = $("[name=url]", form).val();
+				var url = $("[name=url]", form).val().toLowerCase();
 				if(!url){
 					alert("Bitte geben Sie eine Link-URL ein.");
 					$("[name=url]", form).focus();
@@ -249,7 +249,7 @@
 				}
 				a = editor.createLink(url, url, "exturl");
 				editor.setURLInfo(a, {type:"exturl", key:url})
-				if(target_window=="default")
+				if(target_window=="default" && url.indexOf("mailto:")==-1 && url.indexOf("tel:")==-1) 
 					a.target = "_blank"
 			}
 			else if(type=="layout"){
@@ -413,7 +413,7 @@
 			}
 
 			else{	// exturl
-				var url = $("[name=url]", form).val();
+				var url = $("[name=url]", form).val().toLowerCase();
 				if(!url){
 					alert("Bitte geben Sie eine Link-URL ein.");
 					$("[name=url]", form).focus();
@@ -424,7 +424,7 @@
 					type: type, 
 					key: url
 				})
-				if(target_window=="default")
+				if(target_window=="default" && url.indexOf("mailto:")==-1 && url.indexOf("tel:")==-1) 
 					a.target = "_blank"
 			}
 			
@@ -435,7 +435,6 @@
 			else if(target_window=="custom"){
 				a.target = target;
 			}
-			//else a.removeAttribute("target")
 			
 			a.dataset.target=target_window;
 			
