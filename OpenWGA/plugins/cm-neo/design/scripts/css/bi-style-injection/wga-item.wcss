@@ -43,14 +43,6 @@
 		}
 	}
 
-	&.___WGA-Item-hover{
-		background: rgba(135, 161, 212, .2);	/*#f4f4f4;*/
-		-moz-border-radius: 4px;
-		-webkit-border-radius: 4px;	
-		border-radius: 4px;
-		box-shadow: 0 0 2px gray;
-	}
-
 	.WGA-Item-Info, .WGA-Editor-Options, .WGA4-Editor-Options{
 		display: none;
 	}
