@@ -35,6 +35,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.zip.ZipInputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -206,9 +207,17 @@ public class TemporaryFile {
         if (_waitingForEviction) {
             throw new IllegalStateException("The TemporaryFile is waiting for eviction of a context object and cannot be deleted manually");
         }
-        
-        _file.delete();
-        _dir.delete();
+
+        /*
+         * #00006259
+         * _dir.delete() does not delete directory if it is not empty.
+         * We now use FileUtils.deleteDirectory()
+         */
+        try {
+			FileUtils.deleteDirectory(_dir);		// deletes directory and all files even if it is not empty
+		} catch (IOException e) {
+			throw new IllegalStateException("Unable to delete TemporaryFile directory " + _dir.toString());
+		}
     }
 
     /**
