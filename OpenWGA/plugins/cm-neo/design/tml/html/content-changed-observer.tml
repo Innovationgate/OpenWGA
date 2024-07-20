@@ -230,7 +230,7 @@
 					portlet.fireEvent("page-moved")
 				}
 				catch(e){
-					log.error(e);
+					console.error("unable to move page", struct.structKey, e);
 					portlet.fireEvent("open-dialog", {
 						dialog: "unable-to-move",
 						errorCode: e.javaException.getErrorCode(),
