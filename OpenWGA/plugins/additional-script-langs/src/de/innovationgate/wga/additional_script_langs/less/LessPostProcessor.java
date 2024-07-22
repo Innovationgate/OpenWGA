@@ -28,13 +28,13 @@ import de.innovationgate.webgate.api.WGDesignDocument;
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGScriptModule;
-import de.innovationgate.wga.additional_script_langs.ResourceRef;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessData;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessResult;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessor;
+import de.innovationgate.wgpublisher.design.conversion.ResourceRef;
 
 public class LessPostProcessor implements PostProcessor{
 

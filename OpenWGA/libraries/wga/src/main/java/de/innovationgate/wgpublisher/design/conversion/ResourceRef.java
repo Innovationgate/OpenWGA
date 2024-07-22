@@ -1,4 +1,4 @@
-package de.innovationgate.wga.additional_script_langs;
+package de.innovationgate.wgpublisher.design.conversion;
 
 import java.io.IOException;
 import java.util.ArrayList;

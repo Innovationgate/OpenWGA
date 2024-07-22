@@ -29,6 +29,8 @@ import de.innovationgate.wga.modules.ModuleRegistrar;
 import de.innovationgate.wga.modules.ModuleRegistry;
 import de.innovationgate.wgpublisher.modules.auth.CSAuthModuleDefinition;
 import de.innovationgate.wgpublisher.modules.auth.PluginAuthModuleDefinition;
+import de.innovationgate.wgpublisher.modules.conversion.JSMinConversionModuleDefinition;
+import de.innovationgate.wgpublisher.modules.conversion.WcssConversionModuleDefinition;
 import de.innovationgate.wgpublisher.modules.derivatecreators.ManualDerivateCreatorModuleDefinition;
 import de.innovationgate.wgpublisher.modules.derivatecreators.ThumbnailDerivateCreatorModuleDefinition;
 import de.innovationgate.wgpublisher.modules.design.provider.DBDesignProviderModuleDefinition;
@@ -39,6 +41,7 @@ import de.innovationgate.wgpublisher.modules.design.sources.DefaultFileSystemDes
 import de.innovationgate.wgpublisher.modules.design.sources.FileSystemDesignSourceModuleDefinition;
 import de.innovationgate.wgpublisher.modules.design.sources.PluginDesignSourceModuleDefinition;
 import de.innovationgate.wgpublisher.modules.encoders.ConciseEncoderModuleDefinition;
+import de.innovationgate.wgpublisher.modules.encoders.JSMinEncoderModuleDefinition;
 import de.innovationgate.wgpublisher.modules.encoders.OneLineEncoderModuleDefinition;
 import de.innovationgate.wgpublisher.modules.fileannotators.WGADefaultFileAnnotatorModuleDefinition;
 import de.innovationgate.wgpublisher.modules.formsources.ContextDocumentFormSourceModuleDefinition;
@@ -169,6 +172,7 @@ public class WGARegistrar implements ModuleRegistrar {
         // WebTML Encoders
         registry.addModuleDefinition(new OneLineEncoderModuleDefinition());
         registry.addModuleDefinition(new ConciseEncoderModuleDefinition());       
+        registry.addModuleDefinition(new JSMinEncoderModuleDefinition());
         
         // File derivate creators
         registry.addModuleDefinition(new ThumbnailDerivateCreatorModuleDefinition());
@@ -201,6 +205,10 @@ public class WGARegistrar implements ModuleRegistrar {
         
         // HTTP Session Managers
         registry.addModuleDefinition(new InMemoryHttpSessionManagerModuleDefinition());
+        
+        // conversion
+        registry.addModuleDefinition(new WcssConversionModuleDefinition());
+        registry.addModuleDefinition(new JSMinConversionModuleDefinition());
     }
     
     
