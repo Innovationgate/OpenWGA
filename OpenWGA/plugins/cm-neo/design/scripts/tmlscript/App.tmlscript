@@ -115,7 +115,7 @@ App.prototype.mayUpdateContent = function(ctx) {
 
 }
 
-App.prototype.getAllowedAreas = function(dbkey, may_create){
+App.prototype.getAllowedAreas = function(dbkey, may_create, allow_hdb){
 
 	// returns all area names where the current user may create root pages
 
@@ -147,14 +147,14 @@ App.prototype.getAllowedAreas = function(dbkey, may_create){
 		if(area.name=="$trash" || area.name=="hdb-system")
 			continue;	// hide/ignore old cm-classico trash area		
 
-		else if(area.name=="$templates"){
-			if(!app.isChiefEditor())
-				continue;
-		}
-		else if(!app.isManager()){
-			if(area.systemArea || area.name=="hdb-content")
-				continue;
-		}
+		else if(area.name=="$templates" && !app.isChiefEditor())
+			continue;
+		
+		else if(area.name=="hdb-content" && !app.isManager() && !allow_hdb)
+			continue;
+		
+		else if(area.systemArea && !app.isManager())
+			continue; 
 		
 		var visiblefor = area.getExtensionData("CM_area_visible")
 		if(visiblefor && visiblefor.size() && !database.isMemberOfUserList(visiblefor))
@@ -170,10 +170,10 @@ App.prototype.getAllowedAreas = function(dbkey, may_create){
 	return areas;
 }
 
-App.prototype.getAllowedAreaNames = function(dbkey, may_create){
+App.prototype.getAllowedAreaNames = function(dbkey, may_create, allow_hdb){
 	var areas = WGA.List();
 	var systemAreas = WGA.List();
-	for(let area in Iterator(this.getAllowedAreas(dbkey, may_create))){
+	for(let area in Iterator(this.getAllowedAreas(dbkey, may_create, allow_hdb))){
 		if(area.isSystemArea())
 			systemAreas.add(area.name);
 		else areas.add(area.name);
