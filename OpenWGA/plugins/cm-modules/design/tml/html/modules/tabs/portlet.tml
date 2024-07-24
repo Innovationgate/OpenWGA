@@ -43,19 +43,19 @@
 	</div>
 </div>
 
-<script>
+<tml:{script} encode="jsmin">
 	require(["jquery"], function($) {
 		$("#module-<tml:option name="ns"/> .tabs a").click(function(ev){
 			ev.preventDefault();
 			$("#module-<tml:option name="ns"/> .tabs a").removeClass("current");
 			$(this).addClass("current");
 			var id = $(this).data("id");
-			$("#module-<tml:option name="ns"/> .pane").removeClass("active")
+			$("#module-<tml:option name="ns"/> .pane").removeClass("active");
 			$("#module-"+id).addClass("active");
-			WGA.event.fireEvent("tab-activated", "cmm", {id: id})
+			WGA.event.fireEvent("tab-activated", "cmm", {id: id});
 			WGA.event.fireEvent("CMM-element-activated", "CMM", {
 				el: $("#module-"+id)[0]
-			})
+			});
 
 			WGA.ajax.action({
 				action: "<tml:action ajax="norefresh">
@@ -68,12 +68,12 @@
 				}
 			})
 
-		})
+		});
 		
 		$("#module-<tml:option name="ns"/> .tabs a[data-id=<tml:item name="_current_tab"/>]").addClass("current");
 		$("#module-<tml:item name="_current_tab"/>").addClass("active");
 
-		WGA.event.fireEvent("tab-activated", "cmm", {id: "<tml:item name="_current_tab"/>"})
+		WGA.event.fireEvent("tab-activated", "cmm", {id: "<tml:item name="_current_tab"/>"});
 
 	});
-</script>
+</tml:{script}>

@@ -29,9 +29,9 @@
 			new google.maps.LatLng(<tml:script expression="String(CMM.setting('map_lat')).replace(/,/,'.')"/>, <tml:script expression="String(CMM.setting('map_lng')).replace(/,/,'.')"/>),
 			"<tml:option name="title"/>", 
 			"<tml:script expression="CMM.settingList('map_address_info')" divider="<br>"/>"
-		)
+		);
 	</tml:then>
 	<tml:else>
-		MAPS.addMarkerToAdress(map, "<tml:option name="title"/>", "<tml:[setting] o_name="map_address"/>", "<tml:script expression="CMM.settingList('map_address_info')" divider="<br>"/>")		
+		MAPS.addMarkerToAdress(map, "<tml:option name="title"/>", "<tml:[setting] o_name="map_address"/>", "<tml:script expression="CMM.settingList('map_address_info')" divider="<br>"/>");		
 	</tml:else>
 </tml:if>

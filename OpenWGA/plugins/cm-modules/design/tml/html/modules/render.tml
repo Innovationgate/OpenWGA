@@ -26,13 +26,13 @@
 <tml:include ref="init"/>
 
 <tml:case isbrowserinterface="true" iscurrentdocument="true">
-	<script>
+	<tml:{script} encode="jsmin">
 		WGA.CMM.hasSections=true;
 		WGA.CMM.sections["<tml:item name="$mc.section"/>"]={
 			title: "<tml:item name="$mc.sectionTitle"/>",
 			allowedModules: <tml:item name="$mc.allowedModules" encode="none"/>
 		};
-	</script>
+	</tml:{script}>
 </tml:case>
 
 <tml:if condition="$mc.mods.isEmpty()">

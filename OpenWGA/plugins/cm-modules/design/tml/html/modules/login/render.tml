@@ -70,11 +70,11 @@
 				<tml:[setting] o_name="loginmessage" encode="html" wrap="div" wrap_class="login-message"/>
 				
 				<tml:form id="{scoped:login-form}" onsubmit="window.login()">
-					<script>
+					<tml:{script} encode="jsmin">
 						function login(){
 							WGA.callAction("<tml:action ref="login" param1="{_dbkey}"/>");
 						}
-					</script>
+					</tml:{script}>
 					
 					<fieldset>
 					

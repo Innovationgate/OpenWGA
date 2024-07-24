@@ -44,7 +44,7 @@
 			</tml:case>			
 		</div>
 		<tml:case if="_apikey">
-			<script>
+			<tml:{script} encode="jsmin">
 				require(["jquery", 
 					"<tml:url type="tml" name="google-maps" medium="javascripts" u_noext=""/>",
 					"async!//maps.googleapis.com/maps/api/js?libraries=places&key=<tml:item name="_apikey"/>"
@@ -57,7 +57,7 @@
 								lat: lat||51.30268,
 								lng: lng||6.84192,
 								zoom: <tml:script expression="CMM.setting('map_zoom')||15"/>
-							}
+							};
 							
 						    var latlng = new google.maps.LatLng(MyMap.lat, MyMap.lng);
 						    var myOptions = {
@@ -72,13 +72,13 @@
 						    WGA.event.addListener("google-map-module", "CMM-element-activated", function(e){
 						    	if(e.params.el){
 							    	var p = $(e.params.el);
-							    	var me = document.getElementById("<tml:script expression="WGA.scoped('map_canvas')"/>")
+							    	var me = document.getElementById("<tml:script expression="WGA.scoped('map_canvas')"/>");
 							    	if(p.length && $.contains(p[0], me)){
 							    		google.maps.event.trigger(map, 'resize');
-							    		map.setCenter(latlng)
+							    		map.setCenter(latlng);
 							    	}
 							    }
-						    })
+						    });
 		
 							<tml:comment>
 								Lobrary "weather" is no longer supported by google
@@ -131,7 +131,7 @@
 						})
 					})
 				})
-			</script>
+			</tml:{script}>
 		</tml:case>
 		
 	</tml:else>
