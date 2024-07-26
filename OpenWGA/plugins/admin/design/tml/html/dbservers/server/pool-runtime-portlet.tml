@@ -1,0 +1,39 @@
+<tml:script>
+	var server = WGACore.getDatabaseServers().get($option_uid)
+	_info = server && server.getPoolInfo && server.getPoolInfo()
+	//console.log(server, _info)
+</tml:script>
+<tml:case if="_info">
+	<fieldset>
+		<legend>Runtime Shared Connection Pool Info</legend>
+		
+		<label>Driver</label>
+		<div class="data">							
+			@{_info.driverClassName}
+		</div>
+		<div class="clear"></div>
+		
+		<label>URL</label>
+		<div class="data">							
+			@{_info.url}
+		</div>
+		<div class="clear"></div>
+		
+		<label>Active Connections</label>
+		<div class="data">
+			@{_info.numActive}
+		</div>
+		<div class="clear"></div>
+		
+		<label>Idle Connections</label>
+		<div class="data">
+			@{_info.numIdle}
+		</div>
+		<div class="clear"></div>
+		
+		<div class="data">
+			<tml:button clickaction="$refresh">refresh</tml:button>
+		</div>
+		
+	</fieldset>
+</tml:case>

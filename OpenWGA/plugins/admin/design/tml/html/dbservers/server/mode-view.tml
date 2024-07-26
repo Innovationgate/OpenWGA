@@ -196,6 +196,7 @@
 		<tml:case condition="_config_bean">
 			<tml:form id="view-server" source="none" mode="view">
 				<tml:include ref="::form" o_portletmode="view"/>
+				<tml:portlet name="pool-runtime" ref="::pool-runtime-portlet" o-uid="_config_bean.uid"/>
 			</tml:form>
 		</tml:case>
 		
