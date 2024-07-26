@@ -72,6 +72,7 @@ import de.innovationgate.webgate.api.jdbc.WGDatabaseImpl.CSVersion;
 import de.innovationgate.webgate.api.jdbc.custom.JDBCConnectionException;
 import de.innovationgate.webgate.api.jdbc.modules.dbs.MySQLCSModuleDefinition;
 import de.innovationgate.webgate.api.jdbc.modules.dbs.MySQLDatabaseServerModuleDefinition;
+import de.innovationgate.webgate.api.jdbc.pool.DBCPPoolInformation;
 import de.innovationgate.webgate.api.jdbc.pool.JDBCCatalogSwitchingConnectionPool;
 import de.innovationgate.webgate.api.servers.DatabaseFilter;
 import de.innovationgate.webgate.api.servers.DatabaseInformation;
@@ -99,6 +100,7 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
 
     private JDBCCatalogSwitchingConnectionPool _pool = null;
     private Boolean _usePool;
+	private DBCPPoolInformation _poolInfo;
     
     @Override
     public void testConnection() throws ServerConnectionException {
@@ -381,6 +383,7 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
         }
         
         try {
+        	_poolInfo = new DBCPPoolInformation(_pool.getConnectionProvider());
             return _pool.createTenantConnectionProvider(dbName);
         }
         catch (JDBCConnectionException e) {
@@ -438,4 +441,9 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             _pool = null;
         }
     }
+    
+    public DBCPPoolInformation getPoolInfo() {
+    	return _poolInfo;    	
+    }
+    
 }

@@ -94,7 +94,9 @@ public class JDBCConnectionProvider implements ConnectionProvider, Stoppable {
         stop();
     }
 
-
+    public DBCPConnectionProvider getConnectionProvider() {
+    	return _connectionProvider; 
+    }
 
     private void setupDBCPDataSource(String path, Properties props) throws JDBCConnectionException {
         
