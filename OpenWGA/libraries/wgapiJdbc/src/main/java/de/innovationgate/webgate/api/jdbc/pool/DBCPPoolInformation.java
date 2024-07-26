@@ -341,10 +341,22 @@ public class DBCPPoolInformation implements DBCPPoolInformationMBean {
         _ds.setValidationQuery(arg0);
     }
     
+    /*
+     * @deprecated
+     * use getRemoveAbandonedOnMaintenance()
+     */    
     public boolean getRemoveAbandoned() {
         return _ds.getRemoveAbandonedOnMaintenance();
     }
-    
+
+    public boolean getRemoveAbandonedOnBorrow() {
+        return _ds.getRemoveAbandonedOnBorrow();
+    }
+
+    public boolean getRemoveAbandonedOnMaintenance() {
+        return _ds.getRemoveAbandonedOnMaintenance();
+    }
+
     public void setRemoveAbandoned(boolean arg0) {
         _ds.setRemoveAbandonedOnMaintenance(arg0);
         _ds.setRemoveAbandonedOnBorrow(arg0);

@@ -2824,7 +2824,12 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
         WGUtils.setDefaultProperty(props, "hibernate.dbcp.poolPreparedStatements", "true");
         WGUtils.setDefaultProperty(props, "hibernate.dbcp.maxOpenPreparedStatements", DEFAULT_MAXOPENPREPAREDSTATEMENTS);
         
+        // das gibt es als prop gar nicht!
         WGUtils.setDefaultProperty(props, "hibernate.dbcp.removeAbandoned", "true");
+        
+        WGUtils.setDefaultProperty(props, "hibernate.dbcp.removeAbandonedOnMaintenance", "true");
+        WGUtils.setDefaultProperty(props, "hibernate.dbcp.removeAbandonedOnBorrow", "true");
+        
         WGUtils.setDefaultProperty(props, "hibernate.dbcp.removeAbandonedTimeout", String.valueOf(60 * 60 * 24));
         WGUtils.setDefaultProperty(props, "hibernate.dbcp.legacyJMX", String.valueOf("true".equals(server.getOptions().get(DatabaseServer.OPTION_SHAREDPOOL_LEGACY_DBCP_MONITORING))));
 
