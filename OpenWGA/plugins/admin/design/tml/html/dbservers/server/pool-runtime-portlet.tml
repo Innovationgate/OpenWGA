@@ -1,7 +1,7 @@
 <tml:script>
 	var server = WGACore.getDatabaseServers().get($option_uid)
 	_info = server && server.getPoolInfo && server.getPoolInfo()
-	//console.log(server, _info)
+	//console.log(server, $option_uid, _info)
 </tml:script>
 <tml:case if="_info">
 	<fieldset>
