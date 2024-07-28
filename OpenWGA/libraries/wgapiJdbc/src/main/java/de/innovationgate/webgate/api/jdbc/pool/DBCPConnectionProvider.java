@@ -236,9 +236,11 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
                 dbcpProperties.put("jmxName", JMX_DBCP2_SERVERPOOLS_ADDRESS + ",pool=" + JmxManager.normalizeJmxKey(entityTitle));
             }
 
+            dbcpProperties.put("logExpiredConnections", "false");
+
             // Let the factory create the pool
             _ds = BasicDataSourceFactory.createDataSource(dbcpProperties);
-            _ds.setLogExpiredConnections(false);
+            //_ds.setLogExpiredConnections(false);
             
             // The BasicDataSource has lazy initialization
             // borrowing a connection will start the DataSource

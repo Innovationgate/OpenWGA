@@ -374,6 +374,10 @@ public class DBCPPoolInformation implements DBCPPoolInformationMBean {
         return _ds.getLogAbandoned();
     }
 
+    public boolean getLogExpiredConnections() {
+    	return _ds.getLogExpiredConnections();
+    }
+    
     public int getValidationQueryTimeout() {
         return _ds.getValidationQueryTimeout();
     }
