@@ -112,8 +112,15 @@ public class MySQLDatabaseServerModuleDefinition implements ModuleDefinition, Re
         LocalizedOptionDefinition poolConnLifetime = new LocalizedOptionDefinition(DatabaseServer.OPTION_SHAREDPOOL_MAX_CONNECTION_LIFETIME, IntegerOptionType.INSTANCE, _bundleLoader);
         poolConnLifetime.addDependentOption(DatabaseServer.OPTION_SHAREDPOOL, Boolean.TRUE.toString());
         poolConnLifetime.setDefaultValue(String.valueOf(MySqlDatabaseServer.DEFAULT_SHAREDPOOL_MAX_CONNECTION_LIFETIME));
+        poolConnLifetime.setOptional(true);
         options.addOption(poolConnLifetime);
-        
+
+        LocalizedOptionDefinition removeAbandonedTimeout = new LocalizedOptionDefinition(DatabaseServer.OPTION_SHAREDPOOL_REMOVE_ABANDONED_TIMEOUT, IntegerOptionType.INSTANCE, _bundleLoader);
+        removeAbandonedTimeout.addDependentOption(DatabaseServer.OPTION_SHAREDPOOL, Boolean.TRUE.toString());
+        removeAbandonedTimeout.setDefaultValue(String.valueOf(MySqlDatabaseServer.DEFAULT_SHAREDPOOL_REMOVE_ABANDONED_TIMEOUT));
+        removeAbandonedTimeout.setOptional(true);
+        options.addOption(removeAbandonedTimeout);
+
         LocalizedOptionDefinition connectTimeout = new LocalizedOptionDefinition("hibernate.connection.connectTimeout", IntegerOptionType.INSTANCE, _bundleLoader);
         connectTimeout.addDependentOption(DatabaseServer.OPTION_SHAREDPOOL, Boolean.TRUE.toString());
         connectTimeout.setOptional(true);

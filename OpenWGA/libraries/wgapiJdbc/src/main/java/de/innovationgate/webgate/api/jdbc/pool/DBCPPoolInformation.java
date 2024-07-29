@@ -75,6 +75,10 @@ public class DBCPPoolInformation implements DBCPPoolInformationMBean {
         return _ds.getDefaultAutoCommit();
     }
 
+    public long getMaxConnLifetimeMillis() {
+    	return _provider.getDs().getMaxConnLifetimeMillis();
+    }
+    
     /* (non-Javadoc)
      * @see de.innovationgate.webgate.api.jdbc.pool.DBCPPoolInformationMBean#getDefaultCatalog()
      */

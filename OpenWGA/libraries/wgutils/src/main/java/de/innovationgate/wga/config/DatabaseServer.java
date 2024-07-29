@@ -55,6 +55,7 @@ public class DatabaseServer extends IdentifiableConfigBean {
     public static final String OPTION_SHAREDPOOL_MAX_CONNECTION_LIFETIME = "SharedPool.MaxConnectionLifetime";
     public static final String OPTION_SHAREDPOOL_MAX_WAIT = "SharedPool.MaxWait";
     public static final String OPTION_SHAREDPOOL_LEGACY_DBCP_MONITORING = "SharedPool.LegacyDBCPMonitoring";
+	public static final String OPTION_SHAREDPOOL_REMOVE_ABANDONED_TIMEOUT = "SharedPool.RemoveAbandonedTimeout";
 	
 	@Element
 	@NotNull

@@ -78,7 +78,8 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
     public static final int DEFAULT_SHAREDPOOL_MAX_IDLE = 80;
     public static final int DEFAULT_SHAREDPOOL_MIN_IDLE = 10;
     public static final int DEFAULT_SHAREDPOOL_MAX_WAIT = 30;
-    public static final int DEFAULT_SHAREDPOOL_MAX_CONNECTION_LIFETIME = 1000 * 60 * 10;	// 10 minutes
+    public static final int DEFAULT_SHAREDPOOL_MAX_CONNECTION_LIFETIME = -1;
+	public static final int DEFAULT_SHAREDPOOL_REMOVE_ABANDONED_TIMEOUT = 300;
     
     public static final String JDBC_BASE_PATH = "jdbc:mysql://";
 
@@ -342,6 +343,7 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             poolProps.put("hibernate.dbcp.maxIdle", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MAX_IDLE_CONNECTIONS)));
             poolProps.put("hibernate.dbcp.minIdle", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MIN_IDLE_CONNECTIONS)));
             poolProps.put("hibernate.dbcp.initialSize", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MIN_IDLE_CONNECTIONS)));
+            poolProps.put("hibernate.dbcp.removeAbandonedTimeout", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_REMOVE_ABANDONED_TIMEOUT)));
             poolProps.put("hibernate.dbcp.maxConnLifetimeMillis", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MAX_CONNECTION_LIFETIME)));
 
             poolProps.put("hibernate.dbcp.validationQuery", "/* ping */ SELECT 1");
