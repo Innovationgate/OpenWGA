@@ -48,6 +48,9 @@
 
 	<tml:option name="config" scope="local">
 		tbar: [
+			<tml:script>
+				_empty = true;
+			</tml:script>
 			<tml:case condition="_config_bean">
 				{
 					cls:'x-btn-text-icon',						
@@ -96,20 +99,43 @@
 					</tml:else>
 				</tml:if>
 				
-			</tml:case>
-			<tml:case condition="_server_runtime && _server_runtime.isConnectionTestable()">
-				<tml:case condition="_config_bean">,</tml:case>"->"
-				,{
-					cls:'x-btn-text-icon',						
-					icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="server_connect.png"/>',		                
-					text: "<tml:label key="btn.test-server-connection"/>",
-					handler: function(){
-						WGA.ajax.callAction("<tml:action ref="::testConnection" param1="{portlet.getSessionVar('key')}"/>",
-							"<tml:script expression="portlet.portletkey"/>");
+				,"->"
+				
+				<tml:case condition="_config_bean.enabled">
+					,{
+						cls:'x-btn-text-icon',						
+						icon: '<tml:url type="file" db="@afw" doc="icons" file="database_refresh.png"/>',		                
+						text: "Reconnect",
+						handler: function(){
+							WGA.ajax.callAction("<tml:action ref="actions:reconnect-databases" param1="{_config_bean.uid}"/>","<tml:script expression="portlet.portletkey"/>");
+						}
 					}
-				}
+				</tml:case>
+				
+				<tml:script>
+					_empty = false;
+				</tml:script>
+				
+			</tml:case>
+			<tml:case condition="_server_runtime">
+				<tml:case condition="_server_runtime.isConnectionTestable()">
+					<tml:case condition="_empty">"->"</tml:case>
+					,{
+						cls:'x-btn-text-icon',						
+						icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="server_connect.png"/>',		                
+						text: "<tml:label key="btn.test-server-connection"/>",
+						handler: function(){
+							WGA.ajax.callAction("<tml:action ref="::testConnection" param1="{portlet.getSessionVar('key')}"/>",
+								"<tml:script expression="portlet.portletkey"/>");
+						}
+					}
+					<tml:script>
+						_empty = false;
+					</tml:script>
+				</tml:case>
 			</tml:case>
 			<tml:case condition="DBM.wgaconfig.get().clusterConfiguration.enabled && DBM.getConfigBean() != null">
+				<tml:case condition="_empty">"->"</tml:case>
 				,{
 					cls:'x-btn-text-icon',						
 					icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="chart_organisation.png"/>',		                
