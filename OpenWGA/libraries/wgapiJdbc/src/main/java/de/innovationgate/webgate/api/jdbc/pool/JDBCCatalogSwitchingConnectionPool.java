@@ -60,6 +60,10 @@ public class JDBCCatalogSwitchingConnectionPool extends JDBCConnectionProvider i
             _catalogName = catalogName;
         }
 
+        public String getCatalog() {
+        	return _catalogName;
+        }
+        
         @Override
         public boolean isUnwrappableAs(Class arg0) {
             return JDBCCatalogSwitchingConnectionPool.this.isUnwrappableAs(arg0);

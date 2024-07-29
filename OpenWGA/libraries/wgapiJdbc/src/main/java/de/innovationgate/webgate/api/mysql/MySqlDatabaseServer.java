@@ -57,6 +57,7 @@ import de.innovationgate.webgate.api.jdbc.WGDatabaseImpl.CSVersion;
 import de.innovationgate.webgate.api.jdbc.custom.JDBCConnectionException;
 import de.innovationgate.webgate.api.jdbc.pool.DBCPPoolInformation;
 import de.innovationgate.webgate.api.jdbc.pool.JDBCCatalogSwitchingConnectionPool;
+import de.innovationgate.webgate.api.jdbc.pool.JDBCCatalogSwitchingConnectionPool.TenantConnectionProvider;
 import de.innovationgate.webgate.api.servers.DatabaseFilter;
 import de.innovationgate.webgate.api.servers.DatabaseInformation;
 import de.innovationgate.webgate.api.servers.ServerConnectionException;
@@ -73,11 +74,11 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
     public static final String OPTION_PORT = "Port";
     public static final int DEFAULT_PORT = 3306;
     
-    public static final int DEFAULT_SHAREDPOOL_MAX_CONNECTIONS = 95;
+    public static final int DEFAULT_SHAREDPOOL_MAX_CONNECTIONS = 100;
     public static final int DEFAULT_SHAREDPOOL_MAX_IDLE = 80;
     public static final int DEFAULT_SHAREDPOOL_MIN_IDLE = 10;
     public static final int DEFAULT_SHAREDPOOL_MAX_WAIT = 30;
-    public static final int DEFAULT_SHAREDPOOL_MAX_CONNECTION_LIFETIME = 1000 * 60 * 10;
+    public static final int DEFAULT_SHAREDPOOL_MAX_CONNECTION_LIFETIME = 1000 * 60 * 10;	// 10 minutes
     
     public static final String JDBC_BASE_PATH = "jdbc:mysql://";
 
@@ -436,6 +437,12 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
     
     public DBCPPoolInformation getPoolInfo() {
     	return _poolInfo;    	
+    }
+    
+    public List<TenantConnectionProvider> getActiveTenantProviders() {
+    	if(_pool!=null)
+    		return _pool.getActiveTenantProviders();
+    	else return null;
     }
     
 }
