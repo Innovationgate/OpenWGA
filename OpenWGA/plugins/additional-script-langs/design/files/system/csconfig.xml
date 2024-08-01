@@ -24,6 +24,7 @@
     <description>Adds addition script languages to OpenWGA:
 
 - SCSS
+- LESS
 - TypeScript
 - CoffeeScript</description>
     <vendor>Innovation Gate</vendor>
