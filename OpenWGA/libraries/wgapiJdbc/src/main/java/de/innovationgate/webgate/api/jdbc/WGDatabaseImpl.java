@@ -2816,7 +2816,7 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
     public static void putDefaultServerConPoolProps(WGDatabaseServer server, Properties props) {
         
         WGUtils.setDefaultProperty(props, "hibernate.dbcp.timeBetweenEvictionRunsMillis", String.valueOf(1000 * 60));
-        WGUtils.setDefaultProperty(props, "hibernate.dbcp.minEvictableIdleTimeMillis", String.valueOf(1000 * 60));
+        WGUtils.setDefaultProperty(props, "hibernate.dbcp.minEvictableIdleTimeMillis", String.valueOf(1000 * 60 * 5)); // 5 minutes (dbcp-default is 30 minutes)
         WGUtils.setDefaultProperty(props, "hibernate.dbcp.numTestsPerEvictionRun", String.valueOf(10));
         
         WGUtils.setDefaultProperty(props, "hibernate.dbcp.whenExhaustedAction", "1");
