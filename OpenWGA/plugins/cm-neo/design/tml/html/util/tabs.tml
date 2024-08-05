@@ -14,7 +14,7 @@
 	}
 </tml:script>
 
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs" id="util-tabs">
 	<tml:foreach item="_tabs" currentvalue="_tab">
 		<li
 			<tml:case condition="(isfirstloop() && !portlet.active_tab) || portlet.active_tab==_tab.id">
@@ -41,7 +41,7 @@
 
 <script>
 	require(["jquery"], function($){
-		$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {		
+		$('#util-tabs a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 			var tab_id = this.hash.substr(1);
 			WGA.ajax.action({
 				action: "<tml:action ajax="norefresh">
