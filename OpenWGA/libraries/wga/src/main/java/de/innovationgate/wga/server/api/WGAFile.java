@@ -98,7 +98,9 @@ public class WGAFile {
 
 	public WGAFile(WGA wga, String filename){
 		_wga = wga;
-		_file = new File(wga.getCore().getConfigFile().getParentFile(), filename);
+		if(filename.startsWith("/"))
+			_file = new File(filename);
+		else _file = new File(wga.getCore().getConfigFile().getParentFile(), filename);
 		_default_encoding = wga.getCore().getCharacterEncoding();
 	}
 	public WGAFile(WGA wga, File file){
