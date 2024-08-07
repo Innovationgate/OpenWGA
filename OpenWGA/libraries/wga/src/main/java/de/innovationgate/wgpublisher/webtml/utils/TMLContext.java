@@ -2577,6 +2577,30 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		return (document == getmaincontext().content());
 	}
 
+	/*
+	 * Test if the content is visible by calling WGContent.isVisibleNow()
+	 * This tests VALIDTO/-FROM and optionally STATUS==STATUS_RELEASE
+	 */
+	public boolean isVisibleNow(boolean published) throws WGAPIException {
+		WGContent c = getcontent();
+		if(c!=null) {
+			if(published && !c.getStatus().equals(WGContent.STATUS_RELEASE))
+				return false;
+			else return c.isVisibleNow();
+		}
+		return false;
+	}
+	public boolean isVisibleNow(String exp, boolean onlyPublished) throws WGAPIException {
+		TMLContext ctx = context(exp, false);
+		return ctx != null && ctx.isVisibleNow(onlyPublished);
+	}
+	public boolean isVisibleNow(String exp) throws WGAPIException {
+		return isVisibleNow(exp, true);
+	}
+	public boolean isVisibleNow() throws WGAPIException {
+		return isVisibleNow(true);
+	}
+	
 	/* (non-Javadoc)
      * @see de.innovationgate.wgpublisher.webtml.utils.Context#isbrowserinterface()
      */
