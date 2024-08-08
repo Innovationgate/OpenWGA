@@ -306,7 +306,7 @@ public class Root extends Base {
 	        	}
         	}
         	catch(Exception e){
-        		// content deleted? die quite
+        		// content deleted? die quiet
         	}
         }
         
