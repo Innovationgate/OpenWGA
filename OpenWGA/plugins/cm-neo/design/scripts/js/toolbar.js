@@ -213,7 +213,7 @@ define(["cm", "sitepanel", "jquery", "bootstrap"], function(CM, Sitepanel, $){
 		}
 
 		,"preview": function(){
-			window.open(Sitepanel.getDocument().location.href, "preview")
+			window.open(Sitepanel.getDocument().location.href + "?$clean", "preview")
 		}
 
 		,"seo": function(){
