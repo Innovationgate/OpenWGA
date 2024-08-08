@@ -2581,7 +2581,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	 * Test if the content is visible by calling WGContent.isVisibleNow()
 	 * This tests VALIDTO/-FROM and optionally STATUS==STATUS_RELEASE
 	 */
-	public boolean isVisibleNow(boolean published) throws WGAPIException {
+	public boolean visibleNow(boolean published) throws WGAPIException {
 		WGContent c = getcontent();
 		if(c!=null) {
 			if(published && !c.getStatus().equals(WGContent.STATUS_RELEASE))
@@ -2590,15 +2590,15 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		}
 		return false;
 	}
-	public boolean isVisibleNow(String exp, boolean onlyPublished) throws WGAPIException {
+	public boolean visibleNow(String exp, boolean onlyPublished) throws WGAPIException {
 		TMLContext ctx = context(exp, false);
-		return ctx != null && ctx.isVisibleNow(onlyPublished);
+		return ctx != null && ctx.visibleNow(onlyPublished);
 	}
-	public boolean isVisibleNow(String exp) throws WGAPIException {
-		return isVisibleNow(exp, true);
+	public boolean visibleNow(String exp) throws WGAPIException {
+		return visibleNow(exp, true);
 	}
-	public boolean isVisibleNow() throws WGAPIException {
-		return isVisibleNow(true);
+	public boolean visibleNow() throws WGAPIException {
+		return visibleNow(true);
 	}
 	
 	/*
@@ -2606,7 +2606,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	 * See de.innovationgate.wgpublisher.webtml.Root.processAbsoluteRoot() where this information is set as request attribute 
 	 */
 	@Override
-	public boolean isEditMode() throws WGAPIException {
+	public boolean inEditMode() throws WGAPIException {
 		Object attribEdit = getrequest().getAttribute(WGACore.ATTRIB_EDITDOCUMENT);
 		if(attribEdit != null && attribEdit.equals(content().getContentKey().toString()) ){
 			return true;
@@ -2617,19 +2617,19 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	/*
 	 * Test for content STATUS
 	 */
-	public boolean isDraft() throws WGAPIException {
+	public boolean statusIsDraft() throws WGAPIException {
 		return content().getStatus().equals(WGContent.STATUS_DRAFT);
 	}
-	public boolean isPublished() throws WGAPIException {
+	public boolean statusIsPublished() throws WGAPIException {
 		return content().getStatus().equals(WGContent.STATUS_RELEASE);
 	}
-	public boolean isArchived() throws WGAPIException {
+	public boolean statusIsArchived() throws WGAPIException {
 		return content().getStatus().equals(WGContent.STATUS_ARCHIVE);
 	}
-	public boolean isInReview() throws WGAPIException {
+	public boolean statusIsReview() throws WGAPIException {
 		return content().getStatus().equals(WGContent.STATUS_REVIEW);
 	}
-	public boolean isPendingRelease() throws WGAPIException {
+	public boolean StatusIsPendingRelease() throws WGAPIException {
 		return content().isPendingRelease();
 	}
 	

@@ -763,6 +763,6 @@ public interface Context {
     public abstract boolean hasrelation(String relname) throws WGAPIException;
 
     @CodeCompletion(preferredCase="isEditMode")
-    public abstract boolean isEditMode() throws WGAPIException;
+    public abstract boolean inEditMode() throws WGAPIException;
 
 }
