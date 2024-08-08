@@ -2605,6 +2605,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 	 * Test if this document currently is edited
 	 * See de.innovationgate.wgpublisher.webtml.Root.processAbsoluteRoot() where this information is set as request attribute 
 	 */
+	@Override
 	public boolean isEditMode() throws WGAPIException {
 		Object attribEdit = getrequest().getAttribute(WGACore.ATTRIB_EDITDOCUMENT);
 		if(attribEdit != null && attribEdit.equals(content().getContentKey().toString()) ){
