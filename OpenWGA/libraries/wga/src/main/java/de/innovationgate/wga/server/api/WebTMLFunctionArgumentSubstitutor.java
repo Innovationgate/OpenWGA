@@ -280,6 +280,8 @@ public class WebTMLFunctionArgumentSubstitutor implements FunctionArgumentSubsti
 					return _wga.tmlcontext().isbrowserinterface();
 				case "anonymous":
 					return _wga.tmlcontext().isanonymous();
+				case "ineditmode":
+					return _wga.tmlcontext().inEditMode();
 				default:
 					return null;
 			}
