@@ -2601,6 +2601,37 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 		return isVisibleNow(true);
 	}
 	
+	/*
+	 * Test if this document currently is edited
+	 * See de.innovationgate.wgpublisher.webtml.Root.processAbsoluteRoot() where this information is set as request attribute 
+	 */
+	public boolean isEditMode() throws WGAPIException {
+		Object attribEdit = getrequest().getAttribute(WGACore.ATTRIB_EDITDOCUMENT);
+		if(attribEdit != null && attribEdit.equals(content().getContentKey().toString()) ){
+			return true;
+		}
+		return false;
+	}
+	
+	/*
+	 * Test for content STATUS
+	 */
+	public boolean isDraft() throws WGAPIException {
+		return content().getStatus().equals(WGContent.STATUS_DRAFT);
+	}
+	public boolean isPublished() throws WGAPIException {
+		return content().getStatus().equals(WGContent.STATUS_RELEASE);
+	}
+	public boolean isArchived() throws WGAPIException {
+		return content().getStatus().equals(WGContent.STATUS_ARCHIVE);
+	}
+	public boolean isInReview() throws WGAPIException {
+		return content().getStatus().equals(WGContent.STATUS_REVIEW);
+	}
+	public boolean isPendingRelease() throws WGAPIException {
+		return content().isPendingRelease();
+	}
+	
 	/* (non-Javadoc)
      * @see de.innovationgate.wgpublisher.webtml.utils.Context#isbrowserinterface()
      */
