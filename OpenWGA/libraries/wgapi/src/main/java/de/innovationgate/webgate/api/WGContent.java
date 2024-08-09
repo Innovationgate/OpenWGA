@@ -706,9 +706,9 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 			return false;
 		}
 
-		return true;
+		return true; 
 	}
-
+	
 	/**
 	 * Returns the general visibility setting of this document. If this method returns true, the document can nevertheless be not visible bc. of other settings.
 	 * If this method returns false, the document is in no case visible.
@@ -1721,19 +1721,24 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     }
     
     /**
-     * Determines if the current user is an author of this document
+     * Determines if the current user is an author or owner of this document
      */
-    public boolean isAuthorOrOwner() throws WGAPIException {
-        
+    public boolean isAuthorOrOwner() throws WGAPIException {        
         List userNameList = new ArrayList();
         userNameList.add(getAuthor());
         userNameList.add(getOwner());
         userNameList.addAll(getCoauthors());
         return db.isMemberOfUserList(userNameList);
-        
     }
 
-
+    /**
+     * Determines if the current user is author of this document
+     */
+    public boolean isAuthor() throws WGAPIException {        
+        List userNameList = new ArrayList();
+        userNameList.add(getAuthor());
+        return db.isMemberOfUserList(userNameList);
+    }
 
 	/**
 	 * Returns a description for this content document
@@ -3432,6 +3437,24 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
         return getCache().getVisibilityCache();
     }
 
+	/*
+	 * Test for content STATUS
+	 */
+	public boolean isDraft() throws WGAPIException {
+		return getStatus().equals(STATUS_DRAFT);
+	}
+
+	public boolean isPublished() throws WGAPIException {
+		return getStatus().equals(STATUS_RELEASE);
+	}
+	
+	public boolean isArchived() throws WGAPIException {
+		return getStatus().equals(STATUS_ARCHIVE);
+	}
+	
+	public boolean isInReview() throws WGAPIException {
+		return getStatus().equals(STATUS_REVIEW);
+	}
    
     
 }
