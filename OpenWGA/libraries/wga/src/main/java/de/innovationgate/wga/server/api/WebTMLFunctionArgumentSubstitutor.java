@@ -65,6 +65,9 @@ public class WebTMLFunctionArgumentSubstitutor implements FunctionArgumentSubsti
                 return _wga.tmlcontext();
             }
         }
+        else if (argumentName.equals("$wga")) {
+        	return _wga;
+        }
         else if (argumentName.equals("$mainCx")) {
             if (_wga.isTMLContextAvailable()) {
                 return ((TMLContext) _wga.tmlcontext()).getmaincontext();
@@ -280,8 +283,8 @@ public class WebTMLFunctionArgumentSubstitutor implements FunctionArgumentSubsti
 					return _wga.tmlcontext().isbrowserinterface();
 				case "anonymous":
 					return _wga.tmlcontext().isanonymous();
-				case "ineditmode":
-					return _wga.tmlcontext().inEditMode();
+				case "editmode":
+					return _wga.isEditMode();
 				default:
 					return null;
 			}
