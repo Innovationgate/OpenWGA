@@ -3517,6 +3517,21 @@ public class WGA {
     		return new String(org.apache.commons.codec.binary.Base64.decodeBase64(text), "UTF-8");
     	}
     }
-    
+ 
+	/*
+	 * Test if this document currently is edited in content manager
+	 * See de.innovationgate.wgpublisher.webtml.Root.processAbsoluteRoot() where this information is set as request attribute 
+	 */
+	public boolean isEditMode(WGContent content) throws WGException {
+		Object attribEdit = getRequest().getAttribute(WGACore.ATTRIB_EDITDOCUMENT);
+		if(attribEdit != null && attribEdit.equals(content.getContentKey().toString()) ){
+			return true;
+		}
+		return false;
+	}
+	public boolean isEditMode() throws WGException {
+		return isEditMode(((TMLContext)context()).content());
+	}
+
 }
  
