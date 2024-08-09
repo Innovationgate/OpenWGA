@@ -2576,62 +2576,6 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     public boolean ismaindocument() throws WGAPIException {
 		return (document == getmaincontext().content());
 	}
-
-	/*
-	 * Test if the content is visible by calling WGContent.isVisibleNow()
-	 * This tests VALIDTO/-FROM and optionally STATUS==STATUS_RELEASE
-	 */
-	public boolean visibleNow(boolean published) throws WGAPIException {
-		WGContent c = getcontent();
-		if(c!=null) {
-			if(published && !c.getStatus().equals(WGContent.STATUS_RELEASE))
-				return false;
-			else return c.isVisibleNow();
-		}
-		return false;
-	}
-	public boolean visibleNow(String exp, boolean onlyPublished) throws WGAPIException {
-		TMLContext ctx = context(exp, false);
-		return ctx != null && ctx.visibleNow(onlyPublished);
-	}
-	public boolean visibleNow(String exp) throws WGAPIException {
-		return visibleNow(exp, true);
-	}
-	public boolean visibleNow() throws WGAPIException {
-		return visibleNow(true);
-	}
-	
-	/*
-	 * Test if this document currently is edited
-	 * See de.innovationgate.wgpublisher.webtml.Root.processAbsoluteRoot() where this information is set as request attribute 
-	 */
-	@Override
-	public boolean inEditMode() throws WGAPIException {
-		Object attribEdit = getrequest().getAttribute(WGACore.ATTRIB_EDITDOCUMENT);
-		if(attribEdit != null && attribEdit.equals(content().getContentKey().toString()) ){
-			return true;
-		}
-		return false;
-	}
-	
-	/*
-	 * Test for content STATUS
-	 */
-	public boolean statusIsDraft() throws WGAPIException {
-		return content().getStatus().equals(WGContent.STATUS_DRAFT);
-	}
-	public boolean statusIsPublished() throws WGAPIException {
-		return content().getStatus().equals(WGContent.STATUS_RELEASE);
-	}
-	public boolean statusIsArchived() throws WGAPIException {
-		return content().getStatus().equals(WGContent.STATUS_ARCHIVE);
-	}
-	public boolean statusIsReview() throws WGAPIException {
-		return content().getStatus().equals(WGContent.STATUS_REVIEW);
-	}
-	public boolean StatusIsPendingRelease() throws WGAPIException {
-		return content().isPendingRelease();
-	}
 	
 	/* (non-Javadoc)
      * @see de.innovationgate.wgpublisher.webtml.utils.Context#isbrowserinterface()
