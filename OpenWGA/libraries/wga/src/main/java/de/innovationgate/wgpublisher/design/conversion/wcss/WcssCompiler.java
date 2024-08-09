@@ -293,13 +293,7 @@ public class WcssCompiler {
 				else if((char)token == '{'){
 					String className = trim(prop.toString());
 					prop = new StringBuffer();
-					if(className.startsWith("@media")){
-						// special handling for @media
-						CssBlock parent = new CssMediaBlock(className, this);	// no parent
-						CssBlock b = new CssBlock(getPath(), parent);
-						b.parse(st);
-					}
-					else if(className.startsWith("@include")){
+					if(className.startsWith("@include")){
 						CssIncludeBlock b = new CssIncludeBlock(className, this);
 						b.parse(st);
 					}
@@ -318,6 +312,17 @@ public class WcssCompiler {
 					else if(className.endsWith(":")){
 						className = className.substring(0, className.length()-1);
 						CssBlock b = new CssPropertiesBlock(className, this);
+						b.parse(st);
+					}					
+					else if(className.startsWith("@media")){
+						// special handling for @media: inherit path to sub blocks
+						CssBlock parent = new CssRootBlock(className, this);	// no parent
+						CssBlock b = new CssBlock(getPath(), parent);			// inherit path to sub blocks
+						b.parse(st);
+					}
+					else if(className.startsWith("@")){		// all other @-blocks
+						CssBlock parent = new CssRootBlock(className, this);	// no parent
+						CssBlock b = new CssBlock("", parent);					// no 'name' to avoid inheritance to sub blocks
 						b.parse(st);
 					}
 					else {
@@ -663,9 +668,9 @@ public class WcssCompiler {
 		}
 	}
 	
-	private class CssMediaBlock extends CssBlock{
+	private class CssRootBlock extends CssBlock{
 
-		CssMediaBlock(String name, CssBlock parent) {
+		CssRootBlock(String name, CssBlock parent) {
 			super(name, parent);
 		}
 		
