@@ -180,17 +180,16 @@ public class WGPRequestPath {
 
 		// Tokenize Path
 		int tildeTokenPos = -1;
-		java.util.StringTokenizer pathTokens = new StringTokenizer(this.basePath, "/");
-		String token;
-		while (pathTokens.hasMoreTokens()) {
-			token = pathTokens.nextToken();
+		String[] parts = this.basePath.split("\\s*/\\s*");
+		for(String token : parts) {
+			if(token.isEmpty())
+				continue;
 			this.pathElements.add(token);
 			if (token.charAt(0) == '~') {
 				tildeTokenPos = this.pathElements.size() - 1;
-			}
-			
+			}			
 		}
-
+		
 		if (this.pathElements.size() < 1) {
 			this.pathType = TYPE_INVALID;
 			return;

@@ -232,7 +232,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                 // determine default database key
                 String defaultDBKey = getDefaultDBKey(_core, vHost);
                 
-                String[] pathElements = uri.split("/");
+                String[] pathElements = uri.split("\\s*/\\s*");
                 if (pathElements == null || pathElements.length < 1) {
                     // root url request - redirect to default database or hide db
                     if (defaultDBKey != null) {
