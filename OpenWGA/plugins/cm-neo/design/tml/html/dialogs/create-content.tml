@@ -53,7 +53,7 @@
 		</tml:script>
 		<tml:[form-field] o_label="Sprache" o_type="select" o_field="language" o_optionsitem="_languages" o_mode="{_languages.size()>1?'edit':'view'}"/>
 		<tml:[form-field] o_label="Titel" o_field="title"
-			o_validation="$E_VALUE!=''"
+			o_validation="$E_VALUE.trim()!=''"
 			o_message="Bitte geben Sie einen Titel ein"
 			o_focus="true"
 		/>

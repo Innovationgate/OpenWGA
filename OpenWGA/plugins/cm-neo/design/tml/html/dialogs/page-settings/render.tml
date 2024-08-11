@@ -110,7 +110,11 @@
 				<tml:if condition="WGA.app().isManager()">
 					<tml:then>
 						<tml:[form-field] o_label="Eindeutiger Name" o_name="UNIQUENAME" o_meta="true"/>
-						<tml:[form-field] o_label="Seitentitel" o_name="title" o_meta="true"/>
+						<tml:[form-field] o_label="Seitentitel" o_name="title" o_meta="true"
+							o_validation="$E_VALUE.trim()!=''"
+							o_message="Bitte geben Sie einen Titel ein"
+							o_placeholder="Bitte einen Titel eingeben"
+						/>
 						<tml:[form-field] o_label="Sichtbarkeit" o_name="pagedisabled" o_type="boolean" o_options="Diese Seite nicht anzeigen|true" o_labeled="true" o_meta="true"/>
 					</tml:then>
 					<tml:else>
