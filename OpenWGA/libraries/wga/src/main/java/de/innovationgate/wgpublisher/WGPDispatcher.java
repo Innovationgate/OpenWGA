@@ -2253,7 +2253,10 @@ public class WGPDispatcher extends HttpServlet {
         if (!publishingFile.isPublishable()) {
             throw new HttpErrorException(403, "Files from this container may not be published", path.getDatabaseKey());
         }
-        
+        if (!publishingFile.isAvailable()) {
+            throw new HttpErrorException(404, "File not found: " + publishingFile.getName(), path.getDatabaseKey());
+        }
+
         String designEncoding = (String) database.getAttribute(WGACore.DBATTRIB_DESIGN_ENCODING);
         FileCache fileCache = (FileCache) database.getAttribute(WGACore.DBATTRIB_FILECACHE);
         

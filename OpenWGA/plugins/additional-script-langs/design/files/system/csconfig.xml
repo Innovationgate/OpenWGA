@@ -15,19 +15,20 @@
       <version>
         <majorVersion>7</majorVersion>
         <minorVersion>11</minorVersion>
-        <maintenanceVersion>3</maintenanceVersion>
+        <maintenanceVersion>4</maintenanceVersion>
         <patchVersion>0</patchVersion>
-        <buildVersion>727</buildVersion>
+        <buildVersion>728</buildVersion>
       </version>
     </id>
     <title>OpenWGA Additional Script Languages</title>
     <description>Adds addition script languages to OpenWGA:
 
 - SCSS
+- LESS
 - TypeScript
 - CoffeeScript</description>
     <vendor>Innovation Gate</vendor>
-    <webHomepage>http://innovationgate.com</webHomepage>
+    <webHomepage>https://innovationgate.com</webHomepage>
     <minimumWGAVersion>
       <majorVersion>4</majorVersion>
       <minorVersion>0</minorVersion>

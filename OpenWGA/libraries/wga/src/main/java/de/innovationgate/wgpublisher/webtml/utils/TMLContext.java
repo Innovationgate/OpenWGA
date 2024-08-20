@@ -2576,7 +2576,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     public boolean ismaindocument() throws WGAPIException {
 		return (document == getmaincontext().content());
 	}
-
+	
 	/* (non-Javadoc)
      * @see de.innovationgate.wgpublisher.webtml.utils.Context#isbrowserinterface()
      */

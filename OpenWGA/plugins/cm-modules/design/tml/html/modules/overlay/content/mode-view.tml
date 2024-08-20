@@ -1,8 +1,9 @@
 <tml:img db="{WGA.design().db().getDbReference()}" doc="images" file="ajax-loader.gif" html_alt="loading"/>
 
-<script>
+<tml:{script} encode="jsmin">
 	WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "overlay-loaded", function(ev){
-		if(ev.params.id=="<tml:[setting] o_name="id"/>")
-			WGA.ajax.callAction('<tml:action ref="$refresh" portletmode="loaded"/>', '<tml:script expression="portlet.portletkey"/>')
+		if(ev.params.id=="<tml:[setting] o_name="id"/>"){
+			WGA.ajax.callAction('<tml:action ref="$refresh" portletmode="loaded"/>', '<tml:script expression="portlet.portletkey"/>');
+		}
 	})
-</script>
+</tml:{script}>

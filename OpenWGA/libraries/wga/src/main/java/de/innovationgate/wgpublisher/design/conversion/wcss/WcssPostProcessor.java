@@ -1,4 +1,4 @@
-package de.innovationgate.wga.additional_script_langs.wcss;
+package de.innovationgate.wgpublisher.design.conversion.wcss;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -7,19 +7,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.json.JsonObject;
-
 import de.innovationgate.webgate.api.WGDesignDocument;
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGScriptModule;
-import de.innovationgate.wga.additional_script_langs.ResourceRef;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessData;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessResult;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessor;
+import de.innovationgate.wgpublisher.design.conversion.ResourceRef;
 
 public class WcssPostProcessor implements PostProcessor{
 

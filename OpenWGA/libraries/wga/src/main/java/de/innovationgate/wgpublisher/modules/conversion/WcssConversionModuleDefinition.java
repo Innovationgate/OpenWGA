@@ -1,25 +1,25 @@
-package de.innovationgate.wga.additional_script_langs.modules;
+package de.innovationgate.wgpublisher.modules.conversion;
 
 import java.util.Locale;
 
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGScriptModule;
-import de.innovationgate.wga.additional_script_langs.jsmin.JSMinConversion;
 import de.innovationgate.wga.modules.KeyBasedModuleDefinition;
 import de.innovationgate.wga.modules.ModuleDefinition;
 import de.innovationgate.wga.modules.ModuleDependencyException;
 import de.innovationgate.wga.modules.OptionDefinitionsMap;
 import de.innovationgate.wga.modules.types.DesignResourceConversionModuleType;
 import de.innovationgate.wgpublisher.design.conversion.DesignResourceConversionProperties;
+import de.innovationgate.wgpublisher.design.conversion.wcss.WcssConversion;
 
-public class JSMinConversionModuleDefinition implements ModuleDefinition, KeyBasedModuleDefinition {
+public class WcssConversionModuleDefinition implements ModuleDefinition, KeyBasedModuleDefinition {
 
     public String getTitle(Locale locale) {
-        return "JSMin Conversion";
+        return "WCSS Conversion";
     }
 
     public String getDescription(Locale locale) {
-        return "Converts JS module files with Suffix .jsmin to JS";
+        return "Converts CSS module files with Suffix .wcss to CSS";
     }
 
     public OptionDefinitionsMap getOptionDefinitions() {
@@ -30,8 +30,8 @@ public class JSMinConversionModuleDefinition implements ModuleDefinition, KeyBas
         return DesignResourceConversionModuleType.class;
     }
 
-    public Class<JSMinConversion> getImplementationClass() {
-        return JSMinConversion.class;
+    public Class<WcssConversion> getImplementationClass() {
+        return WcssConversion.class;
     }
 
     public void testDependencies() throws ModuleDependencyException {
@@ -40,13 +40,13 @@ public class JSMinConversionModuleDefinition implements ModuleDefinition, KeyBas
     public Object getProperties() {
         DesignResourceConversionProperties props = new DesignResourceConversionProperties();
         props.setDesignType(WGDocument.TYPE_CSSJS);
-        props.setCodeType(WGScriptModule.CODETYPE_JS);
-        props.getSuffixes().add("jsmin");
+        props.setCodeType(WGScriptModule.CODETYPE_CSS);
+        props.getSuffixes().add("wcss");
         return props;
     }
 
     public String getRegistrationKey() {
-        return WGDocument.TYPENAME_CSSJS + "/" + WGScriptModule.CODETYPE_JS + "/jsmin";
+        return WGDocument.TYPENAME_CSSJS + "/" + WGScriptModule.CODETYPE_CSS + "/wcss";
     }
 
 }

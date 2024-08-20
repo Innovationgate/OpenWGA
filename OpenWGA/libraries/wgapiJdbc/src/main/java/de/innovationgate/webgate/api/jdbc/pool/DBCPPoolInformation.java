@@ -75,6 +75,10 @@ public class DBCPPoolInformation implements DBCPPoolInformationMBean {
         return _ds.getDefaultAutoCommit();
     }
 
+    public long getMaxConnLifetimeMillis() {
+    	return _provider.getDs().getMaxConnLifetimeMillis();
+    }
+    
     /* (non-Javadoc)
      * @see de.innovationgate.webgate.api.jdbc.pool.DBCPPoolInformationMBean#getDefaultCatalog()
      */
@@ -341,10 +345,22 @@ public class DBCPPoolInformation implements DBCPPoolInformationMBean {
         _ds.setValidationQuery(arg0);
     }
     
+    /*
+     * @deprecated
+     * use getRemoveAbandonedOnMaintenance()
+     */    
     public boolean getRemoveAbandoned() {
         return _ds.getRemoveAbandonedOnMaintenance();
     }
-    
+
+    public boolean getRemoveAbandonedOnBorrow() {
+        return _ds.getRemoveAbandonedOnBorrow();
+    }
+
+    public boolean getRemoveAbandonedOnMaintenance() {
+        return _ds.getRemoveAbandonedOnMaintenance();
+    }
+
     public void setRemoveAbandoned(boolean arg0) {
         _ds.setRemoveAbandonedOnMaintenance(arg0);
         _ds.setRemoveAbandonedOnBorrow(arg0);
@@ -362,6 +378,10 @@ public class DBCPPoolInformation implements DBCPPoolInformationMBean {
         return _ds.getLogAbandoned();
     }
 
+    public boolean getLogExpiredConnections() {
+    	return _ds.getLogExpiredConnections();
+    }
+    
     public int getValidationQueryTimeout() {
         return _ds.getValidationQueryTimeout();
     }

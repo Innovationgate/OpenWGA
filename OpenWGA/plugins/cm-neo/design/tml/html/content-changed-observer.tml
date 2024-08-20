@@ -223,11 +223,20 @@
 				}
 				//console.log("new position", pos);
 				
-				db(portlet.dbkey).moveStructEntry(struct, parent)
-				struct.setPosition(pos);
-				struct.save();
-				
-				portlet.fireEvent("page-moved")
+				try{
+					db(portlet.dbkey).moveStructEntry(struct, parent)
+					struct.setPosition(pos);
+					struct.save();
+					portlet.fireEvent("page-moved")
+				}
+				catch(e){
+					console.error("unable to move page", struct.structKey, e);
+					portlet.fireEvent("open-dialog", {
+						dialog: "unable-to-move",
+						errorCode: e.javaException.getErrorCode(),
+						cause: e.javaException.getCauseDocumentKey()
+					})
+				}				
 				
 			</tml:action>",
 			mode: "norefresh",

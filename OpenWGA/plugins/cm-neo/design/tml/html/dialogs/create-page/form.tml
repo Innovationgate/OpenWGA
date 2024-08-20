@@ -87,7 +87,7 @@
 		/>	
 	
 		<tml:[form-field] o_label="Titel" o_field="title"
-			o_validation="$E_VALUE!=''"
+			o_validation="$E_VALUE.trim()!=''"
 			o_message="Bitte geben Sie einen Titel ein"
 			o_focus="true"
 			o_store="false"

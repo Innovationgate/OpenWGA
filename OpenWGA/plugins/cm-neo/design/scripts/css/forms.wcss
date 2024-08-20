@@ -186,7 +186,8 @@ form{
 		}
 	}
 
-	input[disabled] + label{
+	input:disabled + label{
 		color: silver;
+		cursor: not-allowed;
 	}
 }

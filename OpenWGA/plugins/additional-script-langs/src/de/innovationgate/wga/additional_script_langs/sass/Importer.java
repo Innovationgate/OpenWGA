@@ -11,8 +11,8 @@ import org.jruby.javasupport.JavaEmbedUtils;
 import org.jruby.runtime.builtin.IRubyObject;
 
 import de.innovationgate.webgate.api.WGException;
-import de.innovationgate.wga.additional_script_langs.ResourceRef;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessResult;
+import de.innovationgate.wgpublisher.design.conversion.ResourceRef;
 
 public class Importer {
     

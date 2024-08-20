@@ -18,7 +18,6 @@
 	id:				'cm_image-wall-image',
 	title:			'<tml:label key="module.image-wall-image"/>',
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="photo.png"/>",
-	tml:			'modules:image-wall:render-image',
 	settingstml: 	'modules:image-wall:settings-image',
 	outlinetml: 	'modules:image:outline',
 	allowedparents: ["cm_image-wall"]

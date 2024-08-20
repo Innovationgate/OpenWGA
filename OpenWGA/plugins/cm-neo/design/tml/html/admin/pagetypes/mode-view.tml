@@ -10,7 +10,7 @@
 		<div class="row">
 			<div class="col">Name</div>
 			<div class="col">Aliase</div>
-			<div class="col">Inner-Layout</div>
+			<div class="col">Layout</div>
 			<div class="col">Editoren</div>
 			<div class="col">Workflow</div>
 		</div>

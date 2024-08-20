@@ -1483,6 +1483,10 @@ public class RhinoExpressionEngineImpl implements ExpressionEngine, RhinoExpress
                     }
                 }
                 
+                if (result instanceof Undefined) {
+                	result = null;
+                }
+                
                 if (result instanceof NativeJavaObject) {
                     result = ((NativeJavaObject) result).unwrap();
                 }

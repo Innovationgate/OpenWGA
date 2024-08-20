@@ -1,5 +1,6 @@
-package de.innovationgate.wga.additional_script_langs.jsmin;
+package de.innovationgate.wgpublisher.design.conversion.jsmin;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Iterator;
@@ -10,7 +11,6 @@ import org.apache.commons.io.IOUtils;
 
 import de.innovationgate.webgate.api.WGDesignDocument;
 import de.innovationgate.webgate.api.WGException;
-import de.innovationgate.wga.additional_script_langs.ResourceRef;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wga.server.api.tml.Context;
@@ -18,7 +18,10 @@ import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessData;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessResult;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessor;
-import ro.isdc.wro.extensions.processor.js.UglifyJsProcessor;
+import de.innovationgate.wgpublisher.design.conversion.ResourceRef;
+import de.innovationgate.wgpublisher.design.conversion.jsmin.JSMin.UnterminatedCommentException;
+import de.innovationgate.wgpublisher.design.conversion.jsmin.JSMin.UnterminatedRegExpLiteralException;
+import de.innovationgate.wgpublisher.design.conversion.jsmin.JSMin.UnterminatedStringLiteralException;
 
 public class JSMinPostProcessor implements PostProcessor{
 
@@ -85,22 +88,18 @@ public class JSMinPostProcessor implements PostProcessor{
         	result.setCode(convertedCode.toString());
         }
 		else{
-	        StringWriter minOut = new StringWriter();
-	        ClassLoader oldLoader = Thread.currentThread().getContextClassLoader();
-	        Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());	        
 	        try {
-	        	UglifyJsProcessor engine = new UglifyJsProcessor();
-	        	engine.process(new StringReader(convertedCode.toString()), minOut);
-	        	result.setCode(minOut.toString());
-			} catch (Exception e) {
-				wga.getLog().error("UglifyJsProcessor: unable to process JS-module " + design.toString(), e);
+		        StringWriter minOut = new StringWriter();
+		        JSMin processor = new JSMin(new StringReader(convertedCode.toString()), minOut);
+				processor.jsmin();
+				result.setCode(minOut.toString());
+			} catch (IOException | UnterminatedRegExpLiteralException | UnterminatedCommentException
+					| UnterminatedStringLiteralException e) {
+				wga.getLog().error("JSMin-Processor: unable to process JS-module " + design.toString(), e);
     			// Unable to process Source: don't cache.
     			data.setCacheable(false);
 				result.setCode(convertedCode.toString());
 			}
-	        finally{
-	        	Thread.currentThread().setContextClassLoader(oldLoader);
-	        }	        
 		}
 		
         return result;

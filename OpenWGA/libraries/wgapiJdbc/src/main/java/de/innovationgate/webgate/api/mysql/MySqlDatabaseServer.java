@@ -25,14 +25,12 @@
 
 package de.innovationgate.webgate.api.mysql;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -44,25 +42,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import org.hibernate.HibernateException;
-import org.hibernate.MappingException;
-import org.hibernate.MultiTenancyStrategy;
-import org.hibernate.SessionBuilder;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Environment;
-import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
-import org.hibernate.dialect.MySQL5Dialect;
-import org.hibernate.service.Service;
-import org.hibernate.service.ServiceRegistryBuilder;
 import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
-import org.hibernate.service.jdbc.connections.spi.MultiTenantConnectionProvider;
-import org.hibernate.service.spi.ServiceRegistryImplementor;
 
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGBackendException;
-import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGFactory;
 import de.innovationgate.webgate.api.WGInvalidDatabaseException;
 import de.innovationgate.webgate.api.WGNotSupportedException;
@@ -70,9 +55,9 @@ import de.innovationgate.webgate.api.jdbc.JDBCDatabaseServerExtension;
 import de.innovationgate.webgate.api.jdbc.SharedPoolJDBCDatabaseServer;
 import de.innovationgate.webgate.api.jdbc.WGDatabaseImpl.CSVersion;
 import de.innovationgate.webgate.api.jdbc.custom.JDBCConnectionException;
-import de.innovationgate.webgate.api.jdbc.modules.dbs.MySQLCSModuleDefinition;
-import de.innovationgate.webgate.api.jdbc.modules.dbs.MySQLDatabaseServerModuleDefinition;
+import de.innovationgate.webgate.api.jdbc.pool.DBCPPoolInformation;
 import de.innovationgate.webgate.api.jdbc.pool.JDBCCatalogSwitchingConnectionPool;
+import de.innovationgate.webgate.api.jdbc.pool.JDBCCatalogSwitchingConnectionPool.TenantConnectionProvider;
 import de.innovationgate.webgate.api.servers.DatabaseFilter;
 import de.innovationgate.webgate.api.servers.DatabaseInformation;
 import de.innovationgate.webgate.api.servers.ServerConnectionException;
@@ -89,16 +74,19 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
     public static final String OPTION_PORT = "Port";
     public static final int DEFAULT_PORT = 3306;
     
-    public static final int DEFAULT_SHAREDPOOL_MAX_CONNECTIONS = 95;
+    public static final int DEFAULT_SHAREDPOOL_MAX_CONNECTIONS = 100;
     public static final int DEFAULT_SHAREDPOOL_MAX_IDLE = 80;
     public static final int DEFAULT_SHAREDPOOL_MIN_IDLE = 10;
     public static final int DEFAULT_SHAREDPOOL_MAX_WAIT = 30;
-    public static final int DEFAULT_SHAREDPOOL_MAX_CONNECTION_LIFETIME = 1000 * 60 * 10;
+    public static final int DEFAULT_SHAREDPOOL_MAX_CONNECTION_LIFETIME = -1;
+	public static final int DEFAULT_SHAREDPOOL_REMOVE_ABANDONED_TIMEOUT = 300;
+	public static final int DEFAULT_SHAREDPOOL_MIN_EVICTABLE_IDLE_TIME_MILLIS = 1000*60*5;
     
     public static final String JDBC_BASE_PATH = "jdbc:mysql://";
 
     private JDBCCatalogSwitchingConnectionPool _pool = null;
     private Boolean _usePool;
+	private DBCPPoolInformation _poolInfo;
     
     @Override
     public void testConnection() throws ServerConnectionException {
@@ -355,12 +343,17 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             poolProps.put("hibernate.dbcp.maxActive", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MAX_CONNECTIONS)));
             poolProps.put("hibernate.dbcp.maxIdle", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MAX_IDLE_CONNECTIONS)));
             poolProps.put("hibernate.dbcp.minIdle", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MIN_IDLE_CONNECTIONS)));
+            poolProps.put("hibernate.dbcp.initialSize", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MIN_IDLE_CONNECTIONS)));
+            poolProps.put("hibernate.dbcp.removeAbandonedTimeout", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_REMOVE_ABANDONED_TIMEOUT)));
             poolProps.put("hibernate.dbcp.maxConnLifetimeMillis", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MAX_CONNECTION_LIFETIME)));
+            poolProps.put("hibernate.dbcp.minEvictableIdleTimeMillis", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MIN_EVICTABLE_IDLE_TIME_MILLIS)));
 
-            poolProps.put("hibernate.dbcp.validationQuery", "select 1");
+            poolProps.put("hibernate.dbcp.validationQuery", "/* ping */ SELECT 1");
+            
             poolProps.put("hibernate.dbcp.validationQueryTimeout", "5");
             poolProps.put("hibernate.dbcp.testOnBorrow", "true");
             poolProps.put("hibernate.dbcp.testWhileIdle", "true");
+            
             Integer maxWait = (Integer) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MAX_WAIT);
             poolProps.put("hibernate.dbcp.maxWait", String.valueOf(maxWait * 1000));
             poolProps.put("hibernate.connection.connectTimeout", WGDatabaseImpl.CONNECT_TIMEOUT_DEFAULT);
@@ -372,6 +365,7 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             try {
                 WGFactory.getLogger().info("Creating shared connection pool for server " + getTitle(Locale.getDefault()));
                 _pool = new JDBCCatalogSwitchingConnectionPool(path, poolProps);
+                _poolInfo = new DBCPPoolInformation(_pool.getConnectionProvider());
                 
             }
             catch (JDBCConnectionException e) {
@@ -380,7 +374,7 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             
         }
         
-        try {
+        try {        	
             return _pool.createTenantConnectionProvider(dbName);
         }
         catch (JDBCConnectionException e) {
@@ -397,12 +391,17 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             MySqlDatabaseServer oldMySql = (MySqlDatabaseServer) oldServer;
             if (oldMySql._pool != null) {
                 synchronized (oldMySql._pool) {
+                	
+                	WGFactory.getLogger().info("Managing old shared connection pool of server " + oldMySql.getTitle(Locale.getDefault()));
                     if (oldMySql._pool.getActiveTenantProviders().size() > 0) {
                         _pool = oldMySql._pool;
+                        _poolInfo = oldMySql._poolInfo;
                         oldMySql._pool = null;
+                        oldMySql._poolInfo = null;
+                        WGFactory.getLogger().info("Reusing old pool");
                     }
                     else {
-                        WGFactory.getLogger().info("Dropping old shared connection pool of server " + getTitle(Locale.getDefault()));
+                        WGFactory.getLogger().info("Dropping old shared connection pool of server " + oldMySql.getTitle(Locale.getDefault()));
                         try {
                             oldMySql._pool.close();
                             oldMySql._pool = null;
@@ -411,6 +410,7 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
                             WGFactory.getLogger().error("Exception dropping old shared connection pool", e);
                         }
                     }
+                    
                 }
             }
         }
@@ -438,4 +438,15 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             _pool = null;
         }
     }
+    
+    public DBCPPoolInformation getPoolInfo() {
+    	return _poolInfo;    	
+    }
+    
+    public List<TenantConnectionProvider> getActiveTenantProviders() {
+    	if(_pool!=null)
+    		return _pool.getActiveTenantProviders();
+    	else return null;
+    }
+    
 }

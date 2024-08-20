@@ -102,11 +102,11 @@
 	
 </video>
 
-<script>
+<tml:{script} encode="jsmin">
 	require(["jquery"], function($){
 		$("#module-<tml:option name="ns"/> source").each(function(index, el){
 			el.src = el.src.split(";").slice(0)[0];
-		})
+		});
 		$("#module-<tml:option name="ns"/> video").each(function(index, el){
 			if(el.poster){	
 				el.poster = el.poster.split(";").slice(0)[0];
@@ -126,7 +126,7 @@
 			})
 		}
 	})
-</script>
+</tml:{script}>
 
 <tml:case condition="option('mode')=='edit'">
 	<tml:include ref="::dragdrop-video"/>

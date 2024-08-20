@@ -1,4 +1,4 @@
-package de.innovationgate.wga.additional_script_langs.wcss;
+package de.innovationgate.wgpublisher.design.conversion.wcss;
 
 import java.io.IOException;
 import java.io.StreamTokenizer;
@@ -217,6 +217,9 @@ public class WcssCompiler {
 		public CssBlock getParentBlock(){
 			return _parentBlock;
 		}
+		public void setParentBlock(CssBlock parent){
+			_parentBlock = parent;
+		}
 		public ArrayList<CssBlock> getSubBlocks(){
 			return _subBlocks;
 		}
@@ -266,7 +269,7 @@ public class WcssCompiler {
 							String propPart = trim(propName.substring(0, index));
 							String valuePart = trim(propName.substring(index+1));
 							if(propPart.startsWith("$")){
-								valuePart = replaceVars(valuePart);
+								valuePart = replaceCustomFunctions(replaceVars(valuePart));
 								if(valuePart.endsWith("!default")){
 									valuePart = valuePart.substring(0, valuePart.indexOf("!default"));
 									if(searchVar(propPart)==null)
@@ -290,13 +293,7 @@ public class WcssCompiler {
 				else if((char)token == '{'){
 					String className = trim(prop.toString());
 					prop = new StringBuffer();
-					if(className.startsWith("@media")){
-						// special handling for @media
-						CssBlock parent = new CssMediaBlock(className, this);	// no parent
-						CssBlock b = new CssBlock(getPath(), parent);
-						b.parse(st);
-					}
-					else if(className.startsWith("@include")){
+					if(className.startsWith("@include")){
 						CssIncludeBlock b = new CssIncludeBlock(className, this);
 						b.parse(st);
 					}
@@ -305,7 +302,7 @@ public class WcssCompiler {
 						b.parse(st);
 					}
 					else if(className.startsWith("@mixin")){
-						CssMixinBlock b = new CssMixinBlock(className);
+						CssMixinBlock b = new CssMixinBlock(className, this);
 						if(b.isValid()){
 							_mixins.put(b.getName(), b);
 						}
@@ -315,6 +312,17 @@ public class WcssCompiler {
 					else if(className.endsWith(":")){
 						className = className.substring(0, className.length()-1);
 						CssBlock b = new CssPropertiesBlock(className, this);
+						b.parse(st);
+					}					
+					else if(className.startsWith("@media")){
+						// special handling for @media: inherit path to sub blocks
+						CssBlock parent = new CssRootBlock(className, this);	// no parent
+						CssBlock b = new CssBlock(getPath(), parent);			// inherit path to sub blocks
+						b.parse(st);
+					}
+					else if(className.startsWith("@")){		// all other @-blocks
+						CssBlock parent = new CssRootBlock(className, this);	// no parent
+						CssBlock b = new CssBlock("", parent);					// no 'name' to avoid inheritance to sub blocks
 						b.parse(st);
 					}
 					else {
@@ -389,7 +397,7 @@ public class WcssCompiler {
             	}
             	else {
             		LOG.error("variable not found: " + replacement);
-            		matcher.appendReplacement(sb, "");
+            		matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
             	}
         	}
         	matcher.appendTail(sb);
@@ -399,8 +407,11 @@ public class WcssCompiler {
 		private String searchVar(String var){			
 			for(CssBlock block = this; block!=null; block = block.getParentBlock()){
 				String value = block.getVars().get(var);
-				if(value!=null)
-					return value;
+				if(value!=null) {
+					if(value.startsWith("$"))
+						var = value;
+					else return value;
+				}
 			}
 			return null;
 		}
@@ -628,8 +639,9 @@ public class WcssCompiler {
 	        		search_pattern = "\\(([^\\)]*)\\)";	// search for (params)
 					pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
 		        	matcher = pattern.matcher(rest);
-		        	if(matcher.find())
-	        			params = parseCommasAndQuotes(replaceCustomFunctions(replaceVars(matcher.group(1))));
+		        	if(matcher.find()) {
+		        		params = parseCommasAndQuotes(replaceCustomFunctions(matcher.group(1)));
+		        	}
 	        	}
 								
 				CssMixinBlock mixin = findMixin(mixin_name);
@@ -656,9 +668,9 @@ public class WcssCompiler {
 		}
 	}
 	
-	private class CssMediaBlock extends CssBlock{
+	private class CssRootBlock extends CssBlock{
 
-		CssMediaBlock(String name, CssBlock parent) {
+		CssRootBlock(String name, CssBlock parent) {
 			super(name, parent);
 		}
 		
@@ -735,7 +747,8 @@ public class WcssCompiler {
 		ArrayList<String> _params = new ArrayList<String>();
 		boolean _valid=false;
 
-		CssMixinBlock(String name) {
+		CssMixinBlock(String name, CssBlock parent) {
+			setParentBlock(parent);
 			String search_pattern = "@mixin\\s+([\\w-]+)\\s*(\\([^\\)]*\\))?";	// search for @mixin name (params) where (params) is optional
 			Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
         	Matcher matcher = pattern.matcher(name);

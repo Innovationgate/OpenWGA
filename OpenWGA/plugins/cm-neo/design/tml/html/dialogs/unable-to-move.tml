@@ -1,0 +1,24 @@
+<div class="header">
+	Seite konnte nicht verschoben werden
+	<a data-modal="hide">&times;</a>
+</div>
+
+<div class="content">
+	<p>
+		<tml:label key="[reason.{$option_dialog_options.errorCode}]" param1="{$option_dialog_options.cause}"/>
+	</p>
+	<p>
+		Möglicherweise handelt es sich dabei um eine für Sie nicht sichtbare Unterseite. 
+		Bitte wenden Sie sich für weitere Informationen an Ihren Administrator.
+	</p>
+</div>
+
+<div class="footer">
+	<a class="btn btn-default" data-modal="hide">Schließen</a>
+</div>
+
+<script>
+	require(["siteexplorer"], function(S){
+		S.reload();
+	})
+</script>

@@ -24,12 +24,12 @@ import org.slf4j.LoggerFactory;
 
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGException;
-import de.innovationgate.wga.additional_script_langs.ResourceRef;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wga.server.api.tml.Context;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.design.conversion.PostProcessResult;
+import de.innovationgate.wgpublisher.design.conversion.ResourceRef;
 
 public class SassEngine {
     private static final Logger LOG = LoggerFactory.getLogger(SassEngine.class);

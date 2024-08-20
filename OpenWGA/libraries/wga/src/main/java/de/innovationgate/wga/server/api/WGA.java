@@ -2030,6 +2030,16 @@ public class WGA {
     }
     
     /**
+     * Redirects the users browser to the URL of the current TMLContext (without url parameters)
+     * @throws WGException 
+     * @throws IOException 
+     */
+    public void reloadPage() throws WGException, IOException  {
+    	TMLContext ctx = ((TMLContext) tmlcontext());
+    	redirectTo(ctx.contenturl());
+    }
+    
+    /**
      * Builds options for WebTML form inputs from a list of contents
      * Use this method to build the options of WebTML form inputs whose choices are based on content documents. This will be the case if you want to store them as content relations, but may also be the case if you want to store document keys for a choice of documents.
      * The method takes a list of content documents and builds a list of option strings from them. The titles of these options are either the titles of the content documents or the result of a title expression given as parameter. The option values will always be the struct keys of the documents in the list (which is mostly used to store relations to documents of equal languages).
@@ -3507,6 +3517,21 @@ public class WGA {
     		return new String(org.apache.commons.codec.binary.Base64.decodeBase64(text), "UTF-8");
     	}
     }
-    
+ 
+	/*
+	 * Test if this document currently is edited in content manager
+	 * See de.innovationgate.wgpublisher.webtml.Root.processAbsoluteRoot() where this information is set as request attribute 
+	 */
+	public boolean isEditMode(WGContent content) throws WGException {
+		Object attribEdit = getRequest().getAttribute(WGACore.ATTRIB_EDITDOCUMENT);
+		if(attribEdit != null && attribEdit.equals(content.getContentKey().toString()) ){
+			return true;
+		}
+		return false;
+	}
+	public boolean isEditMode() throws WGException {
+		return isEditMode(((TMLContext)context()).content());
+	}
+
 }
  

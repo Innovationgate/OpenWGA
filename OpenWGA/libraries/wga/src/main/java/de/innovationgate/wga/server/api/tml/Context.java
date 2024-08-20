@@ -48,7 +48,7 @@ import de.innovationgate.wgpublisher.webtml.utils.TagInfo;
  * The Context is the base object of the WebTML runtime. It combines two purposes:
  * It represents the document context under which a WebTML functionality is executed, mostly the context of some WebTML tag or TMLScript script. That is it points to a special content document and offers it's item and metadata fields, just like <tml:item> and <tml:meta> do in WebTML.
  * It offers the most frequently used TMLScript functionalities as methods, like for example many condition tests, context changes, and access to WGAPI objects
- * This object is the same as the TMLContext object in TMLScript. Documentation on this object and its methods in more detail can therefor be found on the TMLScript reference of the OpenWGA documenation library of the respective OpenWGA version for Object "TMLContext". 
+ * This object is the same as the TMLContext object in TMLScript. Documentation on this object and its methods in more detail can therefore be found on the TMLScript reference of the OpenWGA documenation library of the respective OpenWGA version for Object "TMLContext". 
  */
 @CodeCompletion(methodMode=CodeCompletion.MODE_INCLUDE)
 public interface Context {

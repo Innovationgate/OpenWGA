@@ -34,6 +34,7 @@
 		
 		<tml:include designdb="@ui" ref="include:all" o_theme="gray-extend" o_debug="false"/>
 		<script type="text/javascript" src="<tml:url type="js" name="scripts"/>"></script>		
+		<script src="<tml:url type="js" name="Chart.min"/>"></script>
 		
 		<link rel="stylesheet" type="text/css" href="<tml:url type="css" name="wgadmin"/>"/>
 				
@@ -47,7 +48,7 @@
 		
 		<tml:include designdb="@afw" ref="include:jquery" o_jquery-plugins="tabhandler, textarea-autogrow"/>
 		<tml:include designdb="@afw" ref="include:jquery-ui-all"/>
-		
+				
 		<script>
 			DBM.baseurl = "<tml:metadata name="absolutewgaurl" type="request"/>";
 			DBM.handleSystemEvent = function(event) {

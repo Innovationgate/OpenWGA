@@ -1,4 +1,4 @@
-package de.innovationgate.wga.additional_script_langs.wcss;
+package de.innovationgate.wgpublisher.design.conversion.wcss;
 
 import java.util.ArrayList;
 

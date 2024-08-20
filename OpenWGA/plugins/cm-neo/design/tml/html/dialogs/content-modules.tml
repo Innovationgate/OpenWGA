@@ -1,4 +1,4 @@
-<tml:form id="module-settings">
+<tml:form id="module-settings" htmlinput="true">
 
 	<tml:script>
 		var settings_map = CMM.getModulesSettingsMap("content");

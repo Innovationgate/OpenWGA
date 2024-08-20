@@ -56,32 +56,34 @@
 	</tml:case>
 	
 </div>
-<script>
+<tml:{script} encode="jsmin">
 	require(["jquery", "jquery-modal"], function($){
 		
-		$(document).off('click.<tml:option name="ns"/> modal-shown.<tml:option name="ns"/> modal-closed.<tml:option name="ns"/>')
+		$(document).off('click.<tml:option name="ns"/> modal-shown.<tml:option name="ns"/> modal-closed.<tml:option name="ns"/>');
 		
 		$(document).on('click.<tml:option name="ns"/>', "a[href='#<tml:[setting] o_name="id"/>']", function(e){
 			e.preventDefault();
-			if(!$(this).parents("[contenteditable]").length)
+			if(!$(this).parents("[contenteditable]").length){
 				$.wga_modal.show(this.hash);
-		})
+			}
+		});
 		
 		$("#<tml:[setting] o_name="id"/>").on({
 			"modal-shown.<tml:option name="ns"/>": function(ev, el){
 			
 				if(el.id=="<tml:[setting] o_name="id"/>"){
-					WGA.event.fireEvent("overlay-loaded", "cmm", {id: "<tml:[setting] o_name="id"/>"})
+					WGA.event.fireEvent("overlay-loaded", "cmm", {id: "<tml:[setting] o_name="id"/>"});
 					WGA.event.fireEvent("CMM-element-activated", "CMM", {
 						el: $("#module-<tml:option name="ns"/> .content")[0]
 					})
 				}
 			},
 			"modal-closed.<tml:option name="ns"/>": function(ev, el){
-				if(el.id=="<tml:[setting] o_name="id"/>")
+				if(el.id=="<tml:[setting] o_name="id"/>"){
 					WGA.event.fireEvent("overlay-closed", "cmm", {id: "<tml:[setting] o_name="id"/>"})
+				}
 			}
 		})
 
 	})
-</script>
+</tml:{script}>

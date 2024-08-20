@@ -109,22 +109,40 @@ public class MySQLDatabaseServerModuleDefinition implements ModuleDefinition, Re
         poolMaxWait.setOptional(true);
         options.addOption(poolMaxWait);
         
+        
         LocalizedOptionDefinition poolConnLifetime = new LocalizedOptionDefinition(DatabaseServer.OPTION_SHAREDPOOL_MAX_CONNECTION_LIFETIME, IntegerOptionType.INSTANCE, _bundleLoader);
         poolConnLifetime.addDependentOption(DatabaseServer.OPTION_SHAREDPOOL, Boolean.TRUE.toString());
         poolConnLifetime.setDefaultValue(String.valueOf(MySqlDatabaseServer.DEFAULT_SHAREDPOOL_MAX_CONNECTION_LIFETIME));
+        poolConnLifetime.setOptional(true);
         options.addOption(poolConnLifetime);
+		
+        LocalizedOptionDefinition minEvictableIdleTimeMillis = new LocalizedOptionDefinition(DatabaseServer.OPTION_SHAREDPOOL_MIN_EVICTABLE_IDLE_TIME_MILLIS, IntegerOptionType.INSTANCE, _bundleLoader);
+        minEvictableIdleTimeMillis.addDependentOption(DatabaseServer.OPTION_SHAREDPOOL, Boolean.TRUE.toString());
+        minEvictableIdleTimeMillis.setDefaultValue(String.valueOf(MySqlDatabaseServer.DEFAULT_SHAREDPOOL_MIN_EVICTABLE_IDLE_TIME_MILLIS));
+        minEvictableIdleTimeMillis.setOptional(true);
+        options.addOption(minEvictableIdleTimeMillis);
         
+        LocalizedOptionDefinition removeAbandonedTimeout = new LocalizedOptionDefinition(DatabaseServer.OPTION_SHAREDPOOL_REMOVE_ABANDONED_TIMEOUT, IntegerOptionType.INSTANCE, _bundleLoader);
+        removeAbandonedTimeout.addDependentOption(DatabaseServer.OPTION_SHAREDPOOL, Boolean.TRUE.toString());
+        removeAbandonedTimeout.setDefaultValue(String.valueOf(MySqlDatabaseServer.DEFAULT_SHAREDPOOL_REMOVE_ABANDONED_TIMEOUT));
+        removeAbandonedTimeout.setOptional(true);
+        options.addOption(removeAbandonedTimeout);
+
+        /*
         LocalizedOptionDefinition connectTimeout = new LocalizedOptionDefinition("hibernate.connection.connectTimeout", IntegerOptionType.INSTANCE, _bundleLoader);
         connectTimeout.addDependentOption(DatabaseServer.OPTION_SHAREDPOOL, Boolean.TRUE.toString());
         connectTimeout.setOptional(true);
         connectTimeout.setDefaultValue(WGDatabaseImpl.CONNECT_TIMEOUT_DEFAULT);
         options.addOption(connectTimeout);
+        */
         
+        /*
         LocalizedOptionDefinition socketTimeout = new LocalizedOptionDefinition("hibernate.connection.socketTimeout", IntegerOptionType.INSTANCE, _bundleLoader);
         socketTimeout.addDependentOption(DatabaseServer.OPTION_SHAREDPOOL, Boolean.TRUE.toString());
         socketTimeout.setOptional(true);
         socketTimeout.setDefaultValue(WGDatabaseImpl.SOCKET_TIMEOUT_DEFAULT);
         options.addOption(socketTimeout);
+        */
         
         return options;
         

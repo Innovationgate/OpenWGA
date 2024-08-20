@@ -34,7 +34,7 @@
 		}
 		var fn = $.wga_modal.effect == "slide" ? "slideUp" : "fadeOut"
 		bodyMask && bodyMask.fadeOut({duration: 200});
-		currentModal[fn]({
+		currentModal && currentModal[fn]({
 			duration: 200,
 			complete: function(){
 				$("body").removeClass("modal-open");
