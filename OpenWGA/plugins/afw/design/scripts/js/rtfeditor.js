@@ -597,7 +597,7 @@ define(["jquery"], function($){
 					var attributes=[];
 					switch(tagname){
 						case "a":
-							attributes = ["href", "title", "data-wga-urlinfo", "wga:urlinfo"]
+							attributes = ["href", "title", "data-wga-urlinfo", "wga:urlinfo", "data-target", "target"]
 							break;
 						case "img":
 							attributes = ["src", "title", "alt", "data-wga-urlinfo", "wga:urlinfo"];
@@ -649,7 +649,20 @@ define(["jquery"], function($){
 					
 					// special handling of womodo URLs
 					if(tagname=="a" || tagname=="img"){
-						setURLInfo(dest, getURLInfo(source));
+						var urlInfo = getURLInfo(source)
+						setURLInfo(dest, urlInfo);
+						if(tagname=="a"){
+							// handle target attribute							
+							var data_target = dest.getAttribute("data-target");
+							if(!data_target){
+								dest.setAttribute("data-target", "default");
+								if(urlInfo.type=="exturl"){
+									if(urlInfo.key.indexOf("mailto:")==-1 && urlInfo.key.indexOf("tel:")==-1)
+										dest.setAttribute("target", "_blank");
+									else dest.removeAttribute("target");
+								}
+							}
+						}
 					}
 					
 				}
