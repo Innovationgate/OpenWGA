@@ -66,6 +66,7 @@ import de.innovationgate.webgate.api.mail.WGMail;
 import de.innovationgate.webgate.api.mail.WGMailException;
 import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wga.server.api.WGAFile;
+import de.innovationgate.wgpublisher.webtml.form.TMLForm;
 import de.innovationgate.wgpublisher.webtml.utils.TMLException;
 
 public abstract class MailBase implements WGMail {
@@ -580,6 +581,20 @@ public abstract class MailBase implements WGMail {
     	}
     }
 
+    /**
+     * adds all TMLForm attachments to this mail object
+     * @param form
+     * @throws WGAPIException
+     * @throws IOException
+     */
+    @CodeCompletion
+    public void addAttachments(TMLForm form) throws WGAPIException, IOException {
+    	for(String filename: form.getfilenames()) {
+    		File file = form.getfile(filename);
+    		addAttachment(file);
+    	}
+    }
+    
     @CodeCompletion
     public String getReplyTo() {
         return (_replyTo != null ? _replyTo.getAddress() : null);
