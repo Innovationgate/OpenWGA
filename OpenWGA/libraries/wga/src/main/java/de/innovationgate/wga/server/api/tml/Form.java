@@ -167,7 +167,7 @@ public interface Form {
      * Lists the names of files that have been uploaded to this form
      */
     @CodeCompletion(preferredCase="fileNames",isProperty=true)
-    public abstract List<Object> getfilenames();
+    public abstract List<String> getfilenames();
 
     /**
      * Returns the text contents of an uploaded file
