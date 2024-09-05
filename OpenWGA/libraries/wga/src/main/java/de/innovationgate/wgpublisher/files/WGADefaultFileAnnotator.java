@@ -132,7 +132,9 @@ public class WGADefaultFileAnnotator implements WGFileAnnotator {
                                     mimeType = reader.getOriginatingProvider().getMIMETypes()[0];
                                 }
                             }
-                        }
+                        } catch (Exception e) {
+            				// Fail silently
+            			}
                         finally {
                             reader.dispose();
                         }
