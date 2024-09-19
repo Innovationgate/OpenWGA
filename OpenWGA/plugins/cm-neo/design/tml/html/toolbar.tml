@@ -17,12 +17,12 @@
 					</a></li>
 					<li class="divider"></li>
 				</tml:case>
-				<li class="dropdown-header">Webssite wechseln</li>
+				<li class="dropdown-header">Websites</li>
 				<li>
 					<ul class="other-sites">
 						<tml:foreach item="$mc.dbkeys" currentvalue="_dbkey">
 							<li><a href="<tml:url u-dbkey="_dbkey"/>">
-								<span class="far <tml:script expression="_dbkey==portlet.dbkey ? 'fa-check-square':'fa-square'"/>"></span> 
+								<span class="<tml:script expression="_dbkey==portlet.dbkey ? 'fa fa-check-square':'far fa-square'"/>"></span> 
 								<tml:item name="_dbkey"/>
 							</a></li>
 						</tml:foreach>
