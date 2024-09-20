@@ -26,22 +26,27 @@ Controller.prototype.statuse = function($option_dbkey) {
 		"In Arbeit|w",
 		"Veröffentlicht|p",
 		"Zur Genehmigung|g",
-		"Bevorstehend|pending"
+		"Bevorstehend|pending",
+		"Archiviert|a"
 	])
 }
 
-/*
-Controller.prototype.modules = function($option_dbkey, CMM) {
-	var mods = CMM.getModuleDefs($option_dbkey);
-	var ret = [];
-	for(let [index, mod] in mods){
-		if(mod.allowedparents)
-			continue;
-		ret.push((mod.category ? (mod.category + "/") : "") + mod.title + "|" + mod.id)
+Controller.prototype.fileSize = function(AFW, $cx) {
+	var c = $cx.content();
+	var count = 0;
+	var size = 0;
+	for(let filename in Iterator(c.getFileNames())){
+		count++;
+		size += c.getFileMetaData(filename).getSize(); 
+		for(let d in Iterator(c.getFileDerivates(filename))){
+			size += d.getSize();
+		}
 	}
-	return ret.sort();
+	return count ? 
+		AFW.Util.renderFileSize(size)
+		: "";
 }
-*/
+
 
 Controller.prototype.rootModules = function(modules) {
 	var ret = [{
@@ -111,8 +116,9 @@ Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 			params.p_value = String("%" + $portlet.module + "%");
 			break;
 	}
+	if($form.filter!="status")
+		query += " AND content.status!='a'"
 	var result = WGA.app($option_dbkey).query(query 
-			+ " AND content.status!='a'"
 			+ " order by content." + $form.order 
 			+ " " + $form.dir
 		, params)
