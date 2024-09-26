@@ -62,7 +62,7 @@
 		return this.each(function(){
 			var el = $(this);
 			updateSize(el)
-			$(window).on("resize", function(){
+			$(window).on("resize load", function(){
 				updateSize(el)
 			});
 		})
