@@ -104,7 +104,7 @@
 		</tml:case>
 
 		<hr>
-		<tml:[form-field] o_label="ALT-Text" o_name="alt" o_default="{_alt}" o_placeholder="Alternate Text für das Bild ..."/>
+		<tml:[form-field] o_label="ALT-Text" o_name="alt" o_default="{_alt}" o_placeholder="Default aus Bild Metadaten"/>
 		<tml:[form-field] o_label="Titel" o_name="title" o_default="{_title}" o_placeholder="Optionaler Mouse-Over-Titel des Bildes ..."/>
 
 	</div>
