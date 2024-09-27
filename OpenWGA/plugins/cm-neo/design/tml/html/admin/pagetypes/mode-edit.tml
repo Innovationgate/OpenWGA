@@ -1,5 +1,18 @@
 <tml:action id="save">
+	
+	// remove all fields that are defined by schema.xml
+	if(document.isMetaDeterminedInSchema){
+		var fields = tmlform.fieldnames.iterator()
+		while(fields.hasNext()){
+			var field = fields.next();
+			if(document.isMetaDeterminedInSchema(field)){
+				tmlform.removefield(field)
+			}
+		}
+	}		
+	
 	tmlform.store()
+
 </tml:action>
 
 <tml:action id="delete">
