@@ -3,7 +3,10 @@ function Controller() {}
 Controller.prototype.prepare = function() {}
 
 Controller.prototype.dbkeys = function(AFW, $portlet, $request) {
-	var _dbkeys = WGA.createList();
+
+	var _website_dbkeys = WGA.createList();
+	var _app_dbkeys = WGA.createList();
+	
 	var dbkeys = WGA.app($portlet.dbkey).domain().getAppKeys();
 	
 	var vHost = null;
@@ -15,14 +18,19 @@ Controller.prototype.dbkeys = function(AFW, $portlet, $request) {
 	
 	for(let dbkey in Iterator(dbkeys)){
 		var Database = AFW.database(dbkey);
-		if(!Database.isAuthoringAllowed())
-			continue;
 
 		if(vHost && !vhost_filter.isDBKeyAllowed(wgaconfig, vHost, dbkey))
 			continue;
 
-		if(WGA.app(dbkey).isAuthor())
-			_dbkeys.add(dbkey);
+		if(WGA.app(dbkey).isAuthor()){
+			if(Database.isAuthoringAllowed())
+				_website_dbkeys.add(dbkey);
+			else if(WGA.app(dbkey).getHomepageURL())
+				_app_dbkeys.add(dbkey);
+		}
 	}
-	return WGA.sortList(_dbkeys);
+	return {
+		websites: WGA.sortList(_website_dbkeys),
+		apps: WGA.sortList(_app_dbkeys),
+	}
 }.nonIsolated();	// request is only available if non-isolated :-(
