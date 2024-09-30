@@ -4,8 +4,8 @@ Controller.prototype.prepare = function() {}
 
 Controller.prototype.dbkeys = function(AFW, $portlet, $request) {
 
-	var _website_dbkeys = WGA.createList();
-	var _app_dbkeys = WGA.createList();
+	var _website_dbkeys = WGA.List();
+	var _app_dbkeys = WGA.List();
 	
 	var dbkeys = WGA.app($portlet.dbkey).domain().getAppKeys();
 	
@@ -30,7 +30,11 @@ Controller.prototype.dbkeys = function(AFW, $portlet, $request) {
 		}
 	}
 	return {
-		websites: WGA.sortList(_website_dbkeys),
-		apps: WGA.sortList(_app_dbkeys),
+		websites: _website_dbkeys.sortList(function(a, b){
+			return WGA.app(a).title.toLowerCase() < WGA.app(b).title.toLowerCase() ? -1 : 1;
+		}),
+		apps: _app_dbkeys.sortList(function(a, b){
+			return WGA.app(a).title.toLowerCase() < WGA.app(b).title.toLowerCase() ? -1 : 1;
+		})
 	}
 }.nonIsolated();	// request is only available if non-isolated :-(
