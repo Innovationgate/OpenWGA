@@ -26,7 +26,6 @@
 package de.innovationgate.wga.modules.types;
 
 import de.innovationgate.wga.modules.DeclaringModuleType;
-import de.innovationgate.wga.modules.ModuleType;
 
 public class ContentStorePublisherOptionsModuleType implements DeclaringModuleType {
 
