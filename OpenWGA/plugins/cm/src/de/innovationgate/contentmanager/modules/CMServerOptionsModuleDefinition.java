@@ -52,11 +52,6 @@ public class CMServerOptionsModuleDefinition implements ModuleDefinition {
     public OptionDefinitionsMap getOptionDefinitions() {
         OptionDefinitionsMap options = new OptionDefinitionsMap();
         
-        LocalizedOptionDefinition customLoginURL = new LocalizedOptionDefinition("CM.customLoginURL", StringOptionType.INSTANCE, _bundleLoader);
-        customLoginURL.setOptional(true);
-        customLoginURL.setDefaultValue(null);
-        options.addOption(customLoginURL);
-
         LocalizedOptionDefinition dashboardTML = new LocalizedOptionDefinition("CM.dashboardTML", StringOptionType.INSTANCE, _bundleLoader);
         dashboardTML.setOptional(true);
         dashboardTML.setDefaultValue(null);

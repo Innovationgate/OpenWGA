@@ -1720,9 +1720,8 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
      * @see de.innovationgate.wgpublisher.webtml.form.Form#getfilenames()
      */
 	@Override
-    public List getfilenames() {
-	
-		return new ArrayList(getProcessContext().getFiles().keySet());
+    public List<String> getfilenames() {
+		return new ArrayList<String>(getProcessContext().getFiles().keySet());
 	}
 	
 	/* (non-Javadoc)

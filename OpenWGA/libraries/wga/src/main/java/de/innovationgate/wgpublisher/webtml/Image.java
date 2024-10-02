@@ -155,7 +155,6 @@ public class Image extends Base implements DynamicAttributes {
             String item = this.getItem();
             WGA wga = WGA.get(getTMLContext());
             if (item != null) {
-            	@SuppressWarnings("unchecked")
                 List<String> itemValues = WGUtils.toString(this.getTMLContext().itemlist(item));
             	ImageLinkReader iliReader = wga.service(ImageLinkReader.class);
             	ImageLink ili = iliReader.read(itemValues);
@@ -178,8 +177,14 @@ public class Image extends Base implements DynamicAttributes {
             	
             	titleAttribute = ili.getTitle();
             	altAttribute = ili.getAlt();
-            	if(altAttribute==null || altAttribute.isEmpty())
-            		altAttribute = file;
+            	if(altAttribute==null || altAttribute.isEmpty()) {
+            		if(file!=null) {
+                		altAttribute = file;
+	            		WGFileMetaData md = urlRetrievalContext.getcontent().getFileMetaData(file);
+	            		if(md!=null)
+	            			altAttribute = md.getTitle();	
+            		}
+            	}
 
                 if( !WGUtils.isEmpty(ili.getBorder())){
                     borderAttributesHTML.append(" border=\"");

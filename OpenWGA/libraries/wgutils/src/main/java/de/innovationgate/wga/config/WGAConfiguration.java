@@ -188,6 +188,8 @@ public class WGAConfiguration extends ConfigBean {
     public static final String SERVEROPTION_PERMANENT_REDIRECT = "Server.UsePermanentRedirect";
     public static final String SERVEROPTIONDEFAULT_PERMANENT_REDIRECT = Boolean.FALSE.toString();
     
+    public static final String SERVEROPTION_CM_CUSTOM_LOGIN_URL = "CM.customLoginURL";
+    
     private transient CachingOptionReader _cachingOptionReader = new CachingOptionReader();
 
 	@Attribute(required=false)

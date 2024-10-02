@@ -2,10 +2,10 @@
 	<div class="toolbar" style="left:10px">
 		
 		<div class="btn-group">
-			<a class="btn button" href="#" data-toggle="dropdown">
+			<a class="btn button" href="#" data-toggle="dropdown" title="<tml:meta name="title" type="database" context="[db:{portlet.dbkey}]"/>">
 				<img class="icon" src="<tml:url type="static" file="images/brand/icon_32.png"/>">
 				<div class="text">
-					Website
+					Website					
 					<span class="caret"></span>
 				</div>
 			</a>
@@ -17,17 +17,36 @@
 					</a></li>
 					<li class="divider"></li>
 				</tml:case>
-				<li class="dropdown-header">Webssite wechseln</li>
+				<li class="dropdown-header">Websites</li>
 				<li>
 					<ul class="other-sites">
-						<tml:foreach item="$mc.dbkeys" currentvalue="_dbkey">
+						<tml:foreach item="$mc.dbkeys.websites" currentvalue="_dbkey">
 							<li><a href="<tml:url u-dbkey="_dbkey"/>">
-								<span class="far <tml:script expression="_dbkey==portlet.dbkey ? 'fa-check-square':'fa-square'"/>"></span> 
-								<tml:item name="_dbkey"/>
+								<span class="<tml:script expression="_dbkey==portlet.dbkey ? 'fa fa-check-square':'far fa-square'"/>"></span> 								
+								<tml:meta name="title" type="database" context="[db:{_dbkey}]"/>
 							</a></li>
 						</tml:foreach>
 					</ul>
 				</li>
+				
+				<tml:case if="$mc.dbkeys.apps.size">
+					<li class="dropdown-header">Anwendungen</li>
+					<li>
+						<ul class="other-sites">
+							<tml:foreach item="$mc.dbkeys.apps" currentvalue="_dbkey">
+								<li>
+									<tml:range context="[db:{_dbkey}]">
+										<a href="<tml:url type="homepage"/>" target="@{_dbkey}">
+											<i class="fa-solid fa-database"></i>
+											@{TITLE type="database"}
+										</a>
+									</tml:range>
+								</li>
+							</tml:foreach>
+						</ul>
+					</li>
+				</tml:case>
+				
 				<li class="divider"></li>
 				<li><a href="#" data-action="exit">
 					<i class="fa-solid fa-arrow-right-from-bracket"></i>

@@ -90,11 +90,18 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey)
 	
 		var dbs=wgacore.getContentdbs().values().iterator();
 		var imageLibDbs = [];
+
+		var wgaconfig = WGA.Core.getWgaConfiguration()
+		var vhost_filter = Packages.de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
+		var vHost = vhost_filter.findMatchingHost(wgaconfig, WGA.request);
 		
 		while(dbs.hasNext()){
 			// Fetch database
 			var database = dbs.next();
 			var Database = AFW.database(database);
+
+			if(vHost && !vhost_filter.isDBKeyAllowed(wgaconfig, vHost, database.getDbReference()))
+				continue;
 			
 			var imgLibRoot = database.getAttribute("ImageLibraryRoot")
 			if(imgLibRoot && Database.isPublishingAllowed()){

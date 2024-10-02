@@ -177,7 +177,8 @@ this.fileTemplate = function(container, file, data){
 
 this.resourceTemplate = function(resource, data){
 
-	var ResourceRef = Packages.de.innovationgate.wga.additional_script_langs.ResourceRef;
+	var ResourceRef = Packages.de.innovationgate.wgpublisher.design.conversion.ResourceRef;
+	
 	var ref;
 	if(wga_design){
 		ref = new ResourceRef(wga_design, "file");

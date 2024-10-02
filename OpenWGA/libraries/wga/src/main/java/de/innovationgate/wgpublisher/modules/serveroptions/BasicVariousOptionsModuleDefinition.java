@@ -172,6 +172,10 @@ public class BasicVariousOptionsModuleDefinition implements ModuleDefinition, Re
         webSocketsSessionWorkaround.setDefaultValue(Boolean.FALSE.toString());
         options.addOption(webSocketsSessionWorkaround);
                 
+        LocalizedOptionDefinition cmCustomLoginURL = new LocalizedOptionDefinition(WGAConfiguration.SERVEROPTION_CM_CUSTOM_LOGIN_URL, StringOptionType.INSTANCE, _bundleLoader);
+        cmCustomLoginURL.setOptional(true);
+        cmCustomLoginURL.setDefaultValue(null);
+        options.addOption(cmCustomLoginURL);
         
         return options;
         

@@ -3159,13 +3159,14 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
         }
 
         
-        try {
-            return getCore().createFileDerivate(fileName, creator, name, new BufferedInputStream(new FileInputStream(file)), meta.getAllExtensionData());
+        try (FileInputStream in = new FileInputStream(file)){
+            return getCore().createFileDerivate(fileName, creator, name, new BufferedInputStream(in), meta.getAllExtensionData());
         }
         catch (FileNotFoundException e) {
             throw new WGAPIException("File not found: " + file.getPath(), e);
-        }
-        
+        } catch (IOException e1) {
+        	throw new WGAPIException("IO-Exception: " + file.getPath(), e1);
+		}
         
     }
     
