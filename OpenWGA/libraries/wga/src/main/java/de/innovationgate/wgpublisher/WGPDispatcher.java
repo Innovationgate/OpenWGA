@@ -3545,6 +3545,7 @@ public class WGPDispatcher extends HttpServlet {
             if(pathType==WGPRequestPath.TYPE_FILE
             		|| pathType==WGPRequestPath.TYPE_CSS
             		|| pathType==WGPRequestPath.TYPE_JS
+            		|| pathType==WGPRequestPath.TYPE_FAVICON
             	)
             	return false;	// show error page only for normal pages
             
