@@ -3541,12 +3541,17 @@ public class WGPDispatcher extends HttpServlet {
                 return false;
             }
     
+            int pathType = path.getPathType(); 
+            if(pathType==WGPRequestPath.TYPE_FILE
+            		|| pathType==WGPRequestPath.TYPE_CSS
+            		|| pathType==WGPRequestPath.TYPE_JS
+            	)
+            	return false;	// show error page only for normal pages
+            
             WGContent content = errorDatabase.getDummyContent(path==null ? null : path.getRequestLanguage());
     
             // Personalize
             TMLUserProfile tmlUserProfile = null;
-            WGTransientPortletRegistry portletRegistry = null;
-            TMLPortletStateStorage portletStateStorage = null;
             try {
                 tmlUserProfile = getCore().getPersManager().prepareUserProfileForRequest(request, response, content, errorDatabase, null, false);            
             }
