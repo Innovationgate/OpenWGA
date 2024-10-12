@@ -44,11 +44,12 @@
 	
 	_options = option("options")||"";
 	
-	/*
-	if(_type=="boolean" && tmlform.mode()=="view"){
-		_options="Enabled|true,Disabled|false"
+	_wrap = "";
+	if(option("wrap_input")){
+		_wrap = "<" + option("wrap_input") + ">"
+		_end_wrap = "</" + option("wrap") + ">"
 	}
-	*/
+	
 </tml:script>
 
 <tml:range labelfile="wgaconfig">
@@ -63,7 +64,7 @@
 					<a href="#" onclick="switchToObject('<tml:option name="switchto"/>', '<tml:item name="_default"/>')"> 
 				</tml:case>
 				
-				<span style="visibility:<tml:script expression="_mode=='view'||tmlform.mode()=='view'?'visible':'hidden'"/>"><tml:input cssclass="{'type-'+_type}" name="{_fieldname}" 
+				<span style="visibility:<tml:script expression="_mode=='view'||tmlform.mode()=='view'?'visible':'hidden'"/>">@{_wrap}<tml:input cssclass="{'type-'+_type}" name="{_fieldname}" 
 					type="{_type}"
 					validation="{option('validation')||true}"
 					message="{option('message')||''}" 
@@ -73,7 +74,7 @@
 					default="{_default}"
 					mode="{_mode}"
 					divider=" "
-				/></span>
+				/>@{_end_wrap}</span>
 				
 				<tml:case condition="tmlform.getMode()!='edit' && option('switchto')">
 					</a>
