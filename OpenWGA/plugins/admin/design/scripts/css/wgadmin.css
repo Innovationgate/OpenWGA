@@ -710,7 +710,6 @@ textarea.source-code{
 }
 pre{
 	font-family: courier;
-	padding: 0 10px;
 }
 
 .live-heap-usage{
