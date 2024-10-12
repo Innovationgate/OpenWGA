@@ -47,7 +47,7 @@
 	_wrap = "";
 	if(option("wrap_input")){
 		_wrap = "<" + option("wrap_input") + ">"
-		_end_wrap = "</" + option("wrap") + ">"
+		_end_wrap = "</" + option("wrap_input") + ">"
 	}
 	
 </tml:script>

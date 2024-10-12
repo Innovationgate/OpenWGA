@@ -708,8 +708,11 @@ textarea.source-code{
 	-moz-tab-size:4;
 	tab-size:4;
 }
-pre{
-	font-family: courier;
+pre, pre textarea{
+	font-family: Monaco, Courier;
+	font-weight:normal !important;
+	-moz-tab-size:4;
+	tab-size:4;
 }
 
 .live-heap-usage{
