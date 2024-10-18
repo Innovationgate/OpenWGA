@@ -71,7 +71,7 @@
 <tml:case context="[db:{option('dbkey')}/docid:{option('contentkey')}]" iscontextvalid="true">
 
 	<tml:script>
-		_derivates = content().getFileDerivates(option('filename'))
+		_derivates = content().getFileDerivates(option('filename'), ["poster"])
 		_file_md = content().getFileMetaData(option('filename'))
 		_fields = WGA.createList([
 			"title",
