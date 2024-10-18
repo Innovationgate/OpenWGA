@@ -94,7 +94,7 @@ public abstract class WGAbstractResultSetIterator<T extends Object> extends Pref
                 }
                 
                 WGContent content = fetchContentForResult(result);
-                if (content != null && !content.isDummy() && passesFilter(content)) {
+                if (content != null && passesFilter(content)) {
                     currentContent = content;
                     break;
                 }
