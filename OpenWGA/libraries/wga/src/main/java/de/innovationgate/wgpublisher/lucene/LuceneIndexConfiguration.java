@@ -125,7 +125,13 @@ public class LuceneIndexConfiguration {
                     config.setEnabled(true);
                 } else {
                     config.setEnabled(false);
-                }            
+                }
+                
+                String useDefaultAnalylizer = configElement.attributeValue("useDefaultAnalyzer", "false");
+                if(useDefaultAnalylizer.trim().equalsIgnoreCase("true"))
+                	config.setUseDefaultAnalyzer(true);
+                else config.setUseDefaultAnalyzer(false);
+                
                 //Lucene Indexing rules
                 List itemRules = LuceneIndexItemRule.getRules(configElement);
                 List fileRules = LuceneIndexFileRule.getRules(configElement);
@@ -160,6 +166,7 @@ public class LuceneIndexConfiguration {
             dbElement.addElement("lastupdate");
             Element configElement = dbElement.addElement("configuration");
             configElement.addAttribute("enabled","false");
+            configElement.addAttribute("useDefaultAnalyzer","false");
             configElement.addElement("itemrules");
             LuceneIndexItemRule.addDefaultRule(configElement);
             configElement.addElement("filerules");
@@ -268,7 +275,12 @@ public class LuceneIndexConfiguration {
             configElement.addAttribute("enabled", "true");
         } else {
             configElement.addAttribute("enabled", "false");
-        }       
+        }
+        
+        if (config.isUseDefaultAnalyzer()) 
+            configElement.addAttribute("useDefaultAnalyzer", "true");
+        else configElement.addAttribute("useDefaultAnalyzer", "false");
+               
         LuceneIndexItemRule.saveRules(configElement, config.getItemRules());
         LuceneIndexFileRule.saveRules(configElement, config.getFileRules());
     }    

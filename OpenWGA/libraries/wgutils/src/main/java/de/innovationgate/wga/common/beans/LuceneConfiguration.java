@@ -25,6 +25,7 @@ import java.util.List;
 public class LuceneConfiguration {
     
     private boolean _enabled;
+    private boolean _useDefaultAnalyzer;
     private List _itemRules;
     private List _fileRules;
     
@@ -33,11 +34,20 @@ public class LuceneConfiguration {
      */
     public LuceneConfiguration() {
         _enabled = false;
+        _useDefaultAnalyzer = false;
         _itemRules = new ArrayList();
         _fileRules = new ArrayList();
         _itemRules.add(LuceneIndexItemRule.getDefaultRule());
         _fileRules.add(LuceneIndexFileRule.getDefaultRule());
     }    
+    
+    
+    public boolean isUseDefaultAnalyzer() {
+    	return _useDefaultAnalyzer;
+    }
+    public void setUseDefaultAnalyzer(boolean value) {
+    	_useDefaultAnalyzer = value;
+    }
     
     /**
      * Returns if the lucene index is enabled for this database
@@ -83,7 +93,11 @@ public class LuceneConfiguration {
     public boolean equals(Object obj) {
         if (obj instanceof LuceneConfiguration) {
             LuceneConfiguration config = (LuceneConfiguration) obj;
-            if (!_enabled == config.isEnabled()) {
+
+            if (_enabled != config.isEnabled()) {
+                return false;
+            }
+            if (_useDefaultAnalyzer != config.isUseDefaultAnalyzer()) {
                 return false;
             }
             

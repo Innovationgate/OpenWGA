@@ -50,13 +50,9 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.vfs2.FileMonitor;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
@@ -73,14 +69,12 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriter.MaxFieldLength;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermEnum;
-import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MultiTermQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Similarity;
@@ -95,7 +89,6 @@ import org.apache.lucene.search.highlight.QueryTermScorer;
 import org.apache.lucene.search.highlight.WeightedTerm;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.dom4j.DocumentException;
 
 import de.innovationgate.utils.WGUtils;
@@ -134,7 +127,6 @@ import de.innovationgate.wga.common.beans.LuceneIndexItemRule;
 import de.innovationgate.wga.common.beans.csconfig.v1.PluginConfig;
 import de.innovationgate.wga.config.ContentStore;
 import de.innovationgate.wga.config.LuceneManagerConfiguration;
-import de.innovationgate.wga.config.WGAConfiguration;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.lucene.analysis.FileHandler;
@@ -856,6 +848,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     		if (luceneIndexConfig != null) {
     			LuceneConfiguration config = new LuceneConfiguration();
     			config.setEnabled(luceneIndexConfig.isEnabled());
+    			config.setUseDefaultAnalyzer(luceneIndexConfig.isUseDefaultAnalyzer());
     			List itemRules = LuceneIndexItemRule.getRules(luceneIndexConfig.getItemRules());
     			List fileRules = LuceneIndexFileRule.getRules(luceneIndexConfig.getFileRules());
     			config.setItemRules(itemRules);
@@ -969,6 +962,11 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     			return analyzer;
     	}
     	
+    	// use default analyzer?
+    	LuceneConfiguration config = retrieveLuceneConfig(dbkey);
+    	if(config!=null && config.isUseDefaultAnalyzer())
+    		return _core.getDefaultAnalyzer();
+    		
         String langCode = content.getLanguage().getName();
         Analyzer analyzer = null;
         if (langCode != null) {
@@ -2492,7 +2490,362 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
     	List<String> fields=new ArrayList<String>();
     	return search(db, fields, phrase, parameters, wga);
     }
+
+    public WGResultSet search_old(WGDatabase db, String phrase, Map parameters, WGA wga) throws WGQueryException {
+    	List<String> fields=new ArrayList<String>();
+    	return search_old(db, fields, phrase, parameters, wga);
+    }
+
+    private ArrayList<String> getSearchDbKeys(WGDatabase db, Map parameters, WGA wga) throws WGException {
+
+        ArrayList<String> searchDBKeys = new ArrayList<String>();            
+
+    	// list of dbs to search in
+        String searchScope = (String) parameters.get(LuceneManager.QUERYOPTION_SEARCHSCOPE);
+        if (searchScope.equals(LuceneManager.SEARCHSCOPE_DB)) {
+            searchDBKeys.add(db.getDbReference());
+        }
+        else if (searchScope.equals(LuceneManager.SEARCHSCOPE_DOMAIN)) {
+            Iterator<WGDatabase> dbs = _core.getDatabasesForDomain((String) db.getAttribute(WGACore.DBATTRIB_DOMAIN)).iterator();
+            while (dbs.hasNext()) {
+                WGDatabase currentDB = dbs.next();
+                if (wga.openDatabase(currentDB)) {
+                    searchDBKeys.add(currentDB.getDbReference());
+                }
+            }                               
+        }
+        else if (searchScope.equals(LuceneManager.SEARCHSCOPE_WGA)) {
+            Iterator dbs = _core.getContentdbs().values().iterator();
+            while (dbs.hasNext()) {
+                WGDatabase currentDB = (WGDatabase) dbs.next();
+                if (wga.openDatabase(currentDB)) {
+                    searchDBKeys.add(currentDB.getDbReference());
+                }
+            }                
+        }
+        else if (searchScope.equals(LuceneManager.SEARCHSCOPE_DB_LIST)) {
+            String dbListCSV = (String) parameters.get(QUERYOPTION_SEARCHDBKEYS);
+            if (dbListCSV == null || dbListCSV.trim().equals("")) {
+                throw new WGQueryException("serchDbs", "Search scope is 'dblist' but no db keys given.");
+            } else {
+                Iterator dbkeys = WGUtils.deserializeCollection(dbListCSV, ",").iterator(); 
+                while (dbkeys.hasNext()) {
+                    String dbkey = ((String) dbkeys.next()).trim().toLowerCase();
+                    WGDatabase currentDB = wga.db(dbkey);
+                    if (currentDB!=null && currentDB.isSessionOpen()) {
+                        searchDBKeys.add(dbkey);
+                    }
+                }       
+            }         
+        }    
+        return searchDBKeys;
+    }
+    
+    private List<WGLanguage> getSearchLanguages(Map parameters, ArrayList<String> searchDBKeys) throws WGAPIException{
+        if (parameters.containsKey(WGDatabase.QUERYOPTION_LANGUAGES)) 
+            return (List<WGLanguage>) parameters.get(WGDatabase.QUERYOPTION_LANGUAGES);
+        return getLanguagesForSearchDBKeys(searchDBKeys);
+    }
+
+    private Query buildPhraseQueryForLanguage(String phrase, String lang, boolean useDefaultAnalyzer, List<String> searchFields, Map<String,Float> searchBoosts, ArrayList<String> searchDBKeys, Operator defaultOperator) throws org.apache.lucene.queryParser.ParseException {
+
+    	// parse field with language specific analyzer or default analyzer
+        Analyzer analyzer = null;
+    	if(!useDefaultAnalyzer)
+    		analyzer = _core.getAnalyzerForLanguageCode(lang.substring(0, 2));
+    	if(analyzer==null)
+    		analyzer = _core.getDefaultAnalyzer();
+
+    	QueryParser parser = new IndexingRuleBasedQueryParser(searchFields.toArray(new String[0]), analyzer, searchBoosts, _indexedDbs, searchDBKeys, _metaKeywordFields);
+    	parser.setDefaultOperator(defaultOperator);
+    	Query query = parser.parse(phrase);
+    	query.setBoost(10);
+    	
+    	return query;
+    }
+    
+    /*
+     * for eqch dbkey
+     * 		for each language
+     * 			create phrase query using language specific or default analyzer
+     */
+    private Query buildPhraseQuery(ArrayList<String> searchDBKeys, List<WGLanguage> languages, List<String> fields, String phrase, Operator defaultOperator) throws WGException, org.apache.lucene.queryParser.ParseException {
+        
+        // Field List
+        List<String> searchFields = new ArrayList<String>();
+        Map<String,Float> searchBoosts = new HashMap<String,Float>();
+        for(String field: fields){
+        	String[] parts = field.split("\\^");
+        	searchFields.add(parts[0]);
+        	if(parts.length==2){
+        		searchBoosts.put(parts[0], Float.parseFloat(parts[1]));
+        	}
+        }
+        if(!searchFields.contains("allcontent"))
+        	searchFields.add("allcontent");
+        if(!searchFields.contains("TITLE"))
+        	searchFields.add("TITLE");
+        if(!searchFields.contains("DESCRIPTION"))
+        	searchFields.add("DESCRIPTION");
+        if(!searchFields.contains("KEYWORDS"))
+        	searchFields.add("KEYWORDS");
+        
+        // build dbQuery (OR combination of all searchDbs indexed by lucene)
+        BooleanQuery dbQueries = new BooleanQuery();
+        
+        for(String dbkey: searchDBKeys) {
+        	
+        	if (!_indexedDbs.containsKey(dbkey))
+        		continue;	// not indexed
+        	
+        	WGDatabase db = (WGDatabase) _core.getContentdbs().get(dbkey);
+        	LuceneConfiguration config = retrieveLuceneConfig(dbkey);
+
+            BooleanQuery dbquery = new BooleanQuery();
+            dbquery.add(new TermQuery(new Term(INDEXFIELD_DBKEY, dbkey)), BooleanClause.Occur.MUST);       
+
+        	boolean langs_found;
+
+        	// if multi language db create phrase query for each language 
+        	if(db.getBooleanAttribute(WGACore.DBATTRIB_MULTILANGUAGE_CONTENT, true)) {
+
+        		// build language queries
+                BooleanQuery lang_queries = new BooleanQuery();
+        		Set<String> dbLangs = db.getLanguages().keySet();
+        		langs_found=false;
+        		
+            	for(WGLanguage lang: languages) {
+            		if(dbLangs.contains(lang.getName())){
+            			langs_found=true;
+                        BooleanQuery langquery = new BooleanQuery();
+                        langquery.add(new TermQuery(new Term(WGContent.META_LANGUAGE, lang.getName())), BooleanClause.Occur.MUST);
+                        
+                        // parse field with lang specific analyzer or default analyzer
+                        Query query = buildPhraseQueryForLanguage(phrase, lang.getName(), config.isUseDefaultAnalyzer(), searchFields, searchBoosts, searchDBKeys, defaultOperator);
+                    	langquery.add(query, BooleanClause.Occur.MUST);
+                    	
+                        lang_queries.add(langquery, BooleanClause.Occur.SHOULD);
+            		}
+            	}
+
+                if(langs_found) {
+                	dbquery.add(lang_queries, BooleanClause.Occur.MUST);            
+                }
+                
+        	}
+        	else {
+            	// if not multi language db ignore given language list and use default language
+        		langs_found=true;
+        		Query query = buildPhraseQueryForLanguage(phrase, db.getDefaultLanguage(), config.isUseDefaultAnalyzer(), searchFields, searchBoosts, searchDBKeys, defaultOperator);
+            	dbquery.add(query, BooleanClause.Occur.MUST);            
+        	}
+
+            if(langs_found) {
+            	dbQueries.add(dbquery, BooleanClause.Occur.SHOULD);
+            }
+
+        }
+        	
+        //LOG.info(dbQuerys.toString());
+
+    	return dbQueries;
+    }
+    
     public WGResultSet search(WGDatabase db, List<String> fields, String phrase, Map parameters, WGA wga) throws WGQueryException {
+
+        if (wga == null) {
+            wga = WGA.get(_core);
+        }
+        
+        // set max clause count for boolean queries
+        BooleanQuery.setMaxClauseCount(_booleanQueryMaxClauseCount);
+        
+        if (this.isRebuildingIndex()) {            
+            throw new WGQueryException(phrase, "Lucene search temporary disabled. Rebuilding lucene index ...");
+        }
+        
+        // Registering problem in that case but not cancelling the query, as this is old, expected behaviour. The query will just return no results.
+        if (!_core.getLuceneManager().indexIsEnabled(db.getDbReference())) {
+            _core.getProblemRegistry().addProblem(Problem.create(new TMLContext.WebTMLOccasion(), new DatabaseScope(db.getDbReference()), "webtmlProblem.luceneIndexExpected", ProblemSeverity.LOW));
+        }
+        
+        if (phrase == null || phrase.trim().equals("")) {
+            return null;
+        }
+                
+        try {
+        	BooleanQuery wholeQuery = new BooleanQuery();
+
+        	// handle dboption EXCLUDEDOCUMENT
+            WGContent excludeContent = (WGContent) parameters.get(WGDatabase.QUERYOPTION_EXCLUDEDOCUMENT);
+            if (excludeContent != null) {
+                String uniqueKey = buildUniqueIndexKey(excludeContent.getDatabase().getDbReference(), excludeContent.getDocumentKey());                
+                wholeQuery.add(new TermQuery(new Term(INDEXFIELD_UNIQUEKEY, uniqueKey)), BooleanClause.Occur.MUST_NOT);
+                wholeQuery.add(new TermQuery(new Term(INDEXFIELD_PARENTKEY, uniqueKey)), BooleanClause.Occur.MUST_NOT);
+            }
+
+            // Handle visibility selection
+            if (!parameters.containsKey(WGDatabase.QUERYOPTION_ENHANCE) || parameters.get(WGDatabase.QUERYOPTION_ENHANCE).equals(new Boolean(true))) {
+ 
+                wholeQuery.add(new TermQuery(new Term(WGContent.META_VISIBLE, "true")), BooleanClause.Occur.MUST);
+                
+                String role = (String)parameters.get(WGDatabase.QUERYOPTION_ROLE);
+                if (role != null) {
+                	if (!role.equalsIgnoreCase(WGContent.DISPLAYTYPE_NONE)) {            
+	            		wholeQuery.add(new TermQuery(new Term("HIDDENIN" + role.toUpperCase(), "false")), BooleanClause.Occur.MUST);
+                	}
+                }
+            }
+            
+            if (parameters.containsKey(WGDatabase.QUERYOPTION_ONLYRELEASED)) {
+            	// Das ist eigentlich überflüssig, denn ein LuceneResultSet liefert nut veröffentlichte Seiten
+                wholeQuery.add(new TermQuery(new Term(WGContent.META_STATUS, WGContent.STATUS_RELEASE)), BooleanClause.Occur.MUST);
+            }
+
+            // parse native options
+            Sort sort = null;
+            String sortFieldName = "";
+            Operator defaultOperator = QueryParser.AND_OPERATOR; 
+            String nativeOptionsStr = (String) parameters.get(WGDatabase.QUERYOPTION_NATIVEOPTIONS);
+            boolean includeVirtualContent = false;
+            String doctype = DOCTYPE_CONTENT;
+            if (nativeOptionsStr != null) {
+                Iterator nativeOptions = WGUtils.deserializeCollection(nativeOptionsStr, ",", true).iterator();
+                while (nativeOptions.hasNext()) {
+                    String option = (String) nativeOptions.next();
+                    if (option.startsWith("sort:")) {
+                        sortFieldName = option.substring(5).trim();
+                        boolean reverse = false;
+                        if (sortFieldName.toLowerCase().endsWith("(asc)")) {
+                            sortFieldName = sortFieldName.substring(0, sortFieldName.length() - 5).trim();
+                        }
+                        else if (sortFieldName.toLowerCase().endsWith("(desc)")) {
+                            sortFieldName = sortFieldName.substring(0, sortFieldName.length() - 6).trim();
+                            reverse = true;
+                        }
+                        
+                        if (sortFieldName.length() > 0) {
+                        	char first = sortFieldName.charAt(0);
+	                        if (first >= 'A' && first <= 'Z') {
+	                        	// meta sort
+	                        	sortFieldName = sortFieldName.toUpperCase();
+	                        } else {
+	                        	// item sort
+	                        	sortFieldName = sortFieldName.toLowerCase();
+	                        }
+                        }
+                        
+                        // sort order currently only german
+                        sort = new Sort(new SortField(SORTITEM_PREFIX + sortFieldName, Locale.GERMANY, reverse));
+                    } else if (option.equalsIgnoreCase(NATIVE_QUERYOPTION_INCLUDEVIRTUALCONTENT)) {
+                    	includeVirtualContent = true;
+                    } else if (option.startsWith("doctype:")) {
+                        doctype = option.substring("doctype:".length()).trim();
+                    }
+                    else if(option.startsWith("operator:")) {
+                    	String op = option.substring("operator:".length()).trim();
+                    	if(op.equalsIgnoreCase("or"))
+                    		defaultOperator = QueryParser.OR_OPERATOR;
+                    }
+                    
+                }
+            }    
+            
+            if (!includeVirtualContent) {
+            	wholeQuery.add(new TermQuery(new Term(INDEXFIELD_ISVIRTUALCONTENT, String.valueOf(true))), BooleanClause.Occur.MUST_NOT);
+            }
+            
+            // handle doctype option
+            // we cannot be sure that all documents in index already contains the field DOCTYPE (introduced with OpenWGA 7.1) therefore we have to perform some excludes
+            if (doctype.equals(DOCTYPE_CONTENT)) {
+                wholeQuery.add(new TermQuery(new Term(INDEXFIELD_DOCTYPE, DOCTYPE_ATTACHMENT)), BooleanClause.Occur.MUST_NOT);
+            } else if (!doctype.equals(DOCTYPE_ALL)) {
+                wholeQuery.add(new TermQuery(new Term(INDEXFIELD_DOCTYPE, doctype)), BooleanClause.Occur.MUST);
+            }
+        	
+            // build phrase query
+            ArrayList<String> searchDbKeys = getSearchDbKeys(db, parameters, wga);
+            List<WGLanguage> languages = getSearchLanguages(parameters, searchDbKeys);
+            
+        	wholeQuery.add(buildPhraseQuery(searchDbKeys, languages, fields, phrase, defaultOperator), BooleanClause.Occur.MUST);
+
+        	//LOG.info(wholeQuery.toString());
+
+            int max = WGACore.DEFAULT_QUERY_MAXRESULTS;
+            Integer maxResults = (Integer) parameters.get(WGDatabase.QUERYOPTION_MAXRESULTS);
+            if (maxResults != null) {
+                if (maxResults == 0 || maxResults == -1) {
+                    max = Integer.MAX_VALUE;
+                }
+            else {
+                    max = maxResults;
+                }
+            }
+
+            TopDocs hits;
+            //register executed query as output parameter
+            parameters.put(WGDatabase.QUERYOPTION_RETURNQUERY, wholeQuery.toString());   
+            // simplify query and register as taginfo
+            parameters.put(TAGINFO_SIMPLIFIEDQUERY, rewrite(wholeQuery));
+            
+            long timeBefore = System.currentTimeMillis();
+            if (sort != null) {
+            	try {
+            		hits = search(wholeQuery, max, sort);
+            	} catch (NullPointerException e) {
+            		// lucene bug when sorting for non existing fields with Locale
+            		throw new WGQueryException(wholeQuery.toString(), "Sortfield '" + sortFieldName + "' not indexed.");
+            	}
+            }
+            else {                
+                try {
+                    hits = search(wholeQuery, max, null);
+                } catch (BooleanQuery.TooManyClauses e) {
+                    parameters.put(TAGINFO_UNSPECIFICQUERY, new Boolean(true));
+                    throw new WGQueryException(phrase, "Too many BooleanClauses in query. " +
+                            "Please use a more specific query or increase value of " +
+                            "'booleanQueryMaxClauseCount' via WGA admin app. Current value is '" + this.getBooleanQueryMaxClauseCount() + "'.");
+                }
+            }
+            
+            long timeAfter = System.currentTimeMillis();
+            long executionTime = timeAfter - timeBefore;
+
+            /*
+             * The LuceneLanguageChoosingResultSet doensn't really make sense for me.
+             * 
+            LuceneResultSet resultSet;
+            if (languages.size()>1) {
+                resultSet = new LuceneLanguageChoosingResultSet(hits, wga, parameters, wholeQuery, executionTime, languages);
+            }
+            else {
+                resultSet = new LuceneMultiDBResultSet(hits, wga, parameters, wholeQuery, executionTime);
+            }
+            */
+            
+            LuceneResultSet resultSet = new LuceneMultiDBResultSet(hits, wga, parameters, wholeQuery, executionTime);
+            
+            // put resultset in per thread list
+            List rsList = (List) _resultsetList.get();
+            if (rsList == null) {
+                rsList = new LinkedList();
+                _resultsetList.set(rsList);
+            }
+            rsList.add(resultSet);
+            
+            return resultSet;        	
+        }
+        catch (org.apache.lucene.queryParser.ParseException e) {
+            throw new WGQueryException("Unable to parse lucene query", e.getMessage(), e);
+        }
+        catch (Exception e) {
+            LOG.error("Error executing lucene search: " + e.getClass().getName() + " - " + e.getMessage(), e);
+            throw new WGQueryException(phrase, e.getClass().getName() + ": " + e.getMessage(), e);
+        }
+
+    }
+
+    public WGResultSet search_old(WGDatabase db, List<String> fields, String phrase, Map parameters, WGA wga) throws WGQueryException {
         
         if (wga == null) {
             wga = WGA.get(_core);
@@ -2567,10 +2920,10 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                 } else {
                     Iterator dbkeys = WGUtils.deserializeCollection(dbListCSV, ",").iterator(); 
                     while (dbkeys.hasNext()) {
-                        String dbkey = (String) dbkeys.next();
+                        String dbkey = ((String) dbkeys.next()).trim().toLowerCase();
                         WGDatabase currentDB = wga.db(dbkey);
                         if (currentDB.isSessionOpen()) {
-                            searchDBKeys.add(dbkey.trim().toLowerCase());
+                            searchDBKeys.add(dbkey);
                         }
                     }       
                 }         
@@ -2646,7 +2999,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
             
             //if no languages found search at least with DefaultAnalyzer
             if (languagesPriorityList.size() <= 0) {
-              searchWithDefaultAnalyzer = true;
+            	searchWithDefaultAnalyzer = true;
             }
                         
             // parse native options
@@ -2761,6 +3114,7 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                 Query query = parser.parse(phrase);
                 phraseQuery.add(query, BooleanClause.Occur.SHOULD);
             }
+            
             //LOG.info(phraseQuery.toString());
             wholeQuery.add(phraseQuery, BooleanClause.Occur.MUST);
     

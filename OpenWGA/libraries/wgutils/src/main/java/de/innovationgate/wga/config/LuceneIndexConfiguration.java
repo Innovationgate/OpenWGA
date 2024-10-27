@@ -41,7 +41,10 @@ public class LuceneIndexConfiguration extends ConfigBean {
 
     @Attribute(required=false)
     private boolean enabled = false;
-	
+
+    @Attribute(required=false)
+    private boolean useDefaultAnalyzer = false;
+
 	@ElementList(required=false)
 	@NotNull
     private List<LuceneIndexItemRule> itemRules = new ArrayList<LuceneIndexItemRule>();
@@ -57,6 +60,13 @@ public class LuceneIndexConfiguration extends ConfigBean {
     @Attribute(required=false)
     private boolean indexFileContentOnDocuments = false;
 
+    public boolean isUseDefaultAnalyzer() {
+    	return useDefaultAnalyzer;
+    }
+    public void setUseDefaultAnalyzer(boolean value) {
+    	useDefaultAnalyzer = value;
+    }
+    
 	public boolean isIndexFileContentOnDocuments() {
         return indexFileContentOnDocuments;
     }
