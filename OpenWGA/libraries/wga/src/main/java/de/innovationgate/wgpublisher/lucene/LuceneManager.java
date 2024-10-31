@@ -1949,6 +1949,11 @@ public class LuceneManager implements WGContentEventListener, WGDatabaseConnectL
                 } 
                 field.setBoost(boost);
                 doc.add(field);
+                if (value instanceof String) {
+                    field = new Field(name, ((String) value).toLowerCase(), Field.Store.YES, Field.Index.NOT_ANALYZED);
+                    field.setBoost(boost);
+                    doc.add(field);
+                }
             }
         }
         
