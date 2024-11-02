@@ -1976,10 +1976,10 @@ public class Design {
     
 
     public Object executeTMLScript() throws WGException{
-   		return WGA.get().tmlscript().runScript(getTMLScriptCode());
+   		return WGA.get().tmlscript().runScript(this, getTMLScriptCode());
     }
     public Object executeTMLScript(Context context) throws WGException{
-   		return WGA.get().tmlscript().runScript(context, getTMLScriptCode());
+   		return WGA.get().tmlscript().runScript(this, context, getTMLScriptCode());
     }
     
 
