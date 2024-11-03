@@ -9,9 +9,7 @@ define(["cm", "appnav"], function(CM, Appnav){
 			$("#app-child-docs [data-action=cancel]").hide();
 			$("#app-child-docs [data-action=delete]").hide();
 			$("#app-child-docs [data-action=edit]").show()
-			if(result.children.length)
-				$("#app-child-docs [data-action=edit]").removeProp("disabled")
-			else $("#app-child-docs [data-action=edit]").prop("disabled", true)			
+				.prop("disabled", result.children.length==0)
 		})		
 	}
 	
