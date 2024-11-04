@@ -3458,9 +3458,15 @@ public class WGPDispatcher extends HttpServlet {
     
             // Handle If-Modified-Since
             if (lastModified != null) {
-                long modSince = request.getDateHeader("If-Modified-Since");
-                if (modSince != -1 && modSince >= WGUtils.cutoffTimeMillis(lastModified)) {
-                    return true;
+            	try {
+	                long modSince = request.getDateHeader("If-Modified-Since");
+	                if (modSince != -1 && modSince >= WGUtils.cutoffTimeMillis(lastModified)) {
+	                    return true;
+	                }
+            	}
+                catch(IllegalArgumentException e) {
+                	getCore().getLog().error("http header If-Modified-Since can't be converted to a date: " + request.getHeader("If-Modified-Since"));
+                	return false;
                 }
             }
 
