@@ -3467,7 +3467,6 @@ public class WGPDispatcher extends HttpServlet {
                 catch(IllegalArgumentException e) {
                 	// http header If-Modified-Since can't be converted to a date.
                 	//getCore().getLog().warn("http header If-Modified-Since can't be converted to a date: " + request.getHeader("If-Modified-Since"));
-                	return false;
                 }
             }
 
