@@ -25,7 +25,6 @@
 <fieldset>	
 	
 	<tml:[system:fs-input] o_field="customErrorPageEnabled" o_type="boolean"/>
-	<tml:[system:fs-input] o_field="customErrorPage" o_type="textarea" o_renderAs="textarea"/>
-
+	<tml:[system:fs-input] o_field="customErrorPage" o_type="textarea" o_renderAs="textarea" o_wrap_input="pre" o_width="800px"/>
+	
 </fieldset>
-

@@ -38,6 +38,7 @@
 			duration: 200,
 			complete: function(){
 				$("body").removeClass("modal-open");
+				$(this).removeClass("modal-open");
 				if(onclose){
 					onclose.call(currentModal);
 					onclose=null
@@ -70,6 +71,7 @@
 			duration: 200,
 			complete: function(){
 				$("body").addClass("modal-open");
+				el.addClass("modal-open");
 				if(onload){
 					onload.call(el);
 					onload=null;

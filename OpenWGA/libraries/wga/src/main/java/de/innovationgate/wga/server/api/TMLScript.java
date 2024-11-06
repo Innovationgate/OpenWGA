@@ -250,7 +250,7 @@ public class TMLScript {
             objects.putAll(extraObjects);
         }
         
-        ExpressionResult result = engine.evaluateExpression(expression, cx, type, extraObjects);
+        ExpressionResult result = engine.evaluateExpression(expression, cx, type, objects);
         if (result.isError()) {
             throw result.getException();
         }

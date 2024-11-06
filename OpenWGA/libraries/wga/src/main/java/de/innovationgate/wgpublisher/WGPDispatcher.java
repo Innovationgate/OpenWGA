@@ -3458,9 +3458,15 @@ public class WGPDispatcher extends HttpServlet {
     
             // Handle If-Modified-Since
             if (lastModified != null) {
-                long modSince = request.getDateHeader("If-Modified-Since");
-                if (modSince != -1 && modSince >= WGUtils.cutoffTimeMillis(lastModified)) {
-                    return true;
+            	try {
+	                long modSince = request.getDateHeader("If-Modified-Since");
+	                if (modSince != -1 && modSince >= WGUtils.cutoffTimeMillis(lastModified)) {
+	                    return true;
+	                }
+            	}
+                catch(IllegalArgumentException e) {
+                	// http header If-Modified-Since can't be converted to a date.
+                	//getCore().getLog().warn("http header If-Modified-Since can't be converted to a date: " + request.getHeader("If-Modified-Since"));
                 }
             }
 
@@ -3541,12 +3547,18 @@ public class WGPDispatcher extends HttpServlet {
                 return false;
             }
     
+            int pathType = path.getPathType(); 
+            if(pathType==WGPRequestPath.TYPE_FILE
+            		|| pathType==WGPRequestPath.TYPE_CSS
+            		|| pathType==WGPRequestPath.TYPE_JS
+            		|| pathType==WGPRequestPath.TYPE_FAVICON
+            	)
+            	return false;	// show error page only for normal pages
+            
             WGContent content = errorDatabase.getDummyContent(path==null ? null : path.getRequestLanguage());
     
             // Personalize
             TMLUserProfile tmlUserProfile = null;
-            WGTransientPortletRegistry portletRegistry = null;
-            TMLPortletStateStorage portletStateStorage = null;
             try {
                 tmlUserProfile = getCore().getPersManager().prepareUserProfileForRequest(request, response, content, errorDatabase, null, false);            
             }

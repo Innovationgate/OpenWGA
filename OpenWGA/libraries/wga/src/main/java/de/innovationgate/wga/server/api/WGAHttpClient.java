@@ -1,5 +1,6 @@
 package de.innovationgate.wga.server.api;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -14,9 +15,11 @@ import org.apache.commons.httpclient.HttpMethodBase;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
+import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.methods.DeleteMethod;
+import org.apache.commons.httpclient.methods.FileRequestEntity;
 
 import de.innovationgate.utils.Base64;
 import de.innovationgate.webgate.api.WGException;
@@ -146,25 +149,32 @@ public class WGAHttpClient {
 	/*
 	 * http-method post
 	 */
-	public int post(String body, String contentType, String charset, Callback callback) throws HttpException, IOException{
+	public int post(Object body, String contentType, String charset, Callback callback) throws HttpException, IOException{
 		PostMethod method = new PostMethod(_url);
-		StringRequestEntity entity = new StringRequestEntity(body, contentType, charset);
-		method.setRequestEntity(entity);
+		RequestEntity entity=null;
+		if(body instanceof String)
+			entity = new StringRequestEntity((String)body, contentType, charset);
+		else if(body instanceof File)
+			entity = new FileRequestEntity((File)body, contentType);
+		else if(body instanceof WGAFile)
+			entity = new FileRequestEntity(((WGAFile)body).getFile(), contentType);
+		if(entity!=null)
+			method.setRequestEntity(entity);
 		return executeMethod(method, callback);
 	}
-	public int post(String body, String contentType, String charset) throws HttpException, IOException{
+	public int post(Object body, String contentType, String charset) throws HttpException, IOException{
 		return post(body, contentType, charset, null);
 	}
-	public int post(String body, String contentType, Callback callback) throws HttpException, IOException{
+	public int post(Object body, String contentType, Callback callback) throws HttpException, IOException{
 		return post(body, contentType, _default_charset, callback);
 	}
-	public int post(String body, String contentType) throws HttpException, IOException{
+	public int post(Object body, String contentType) throws HttpException, IOException{
 		return post(body, contentType, _default_charset, null);
 	}
-	public int post(String body, Callback callback) throws HttpException, IOException{
+	public int post(Object body, Callback callback) throws HttpException, IOException{
 		return post(body, DEFAULT_CONTENTTYPE, _default_charset, callback);
 	}
-	public int post(String body) throws HttpException, IOException{
+	public int post(Object body) throws HttpException, IOException{
 		return post(body, DEFAULT_CONTENTTYPE, _default_charset, null);
 	}
 	

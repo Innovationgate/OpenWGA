@@ -297,8 +297,8 @@ public class Auth {
      * @throws WGException
      */
     public String fetchCommonName(String dn) throws WGException{
-    	if(dn.equalsIgnoreCase(WGDatabase.ANONYMOUS_USER))
-    		return dn;	// don't lookup anonymous user
+    	if(dn.equalsIgnoreCase(WGDatabase.ANONYMOUS_USER) || dn.equalsIgnoreCase(WGDatabase.MASTER_USERNAME))
+    		return dn;	// don't lookup anonymous and master session user
     	String cn=null;
     	UserGroupInfo info = lookupUserDN(dn);
     	if(info != null && info instanceof LabeledNamesProvider)

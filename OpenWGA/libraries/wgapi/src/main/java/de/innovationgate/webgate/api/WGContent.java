@@ -2281,13 +2281,14 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	    		isAuthoringMode = content.getWorkflowRole() >= WGWorkflow.ROLE_APPROVER;
 	    }
 	    
+	    // check, if isAuthoringMode is allowed
+	    if(content.isDummy()) 
+	    	isAuthoringMode = false;
 	    // A user below ACL level author cannot use authoring mode
-	    if (isAuthoringMode == true && content.getDatabase().getSessionContext().getAccessLevel() < WGDatabase.ACCESSLEVEL_AUTHOR) {
+	    else if (isAuthoringMode == true && content.getDatabase().getSessionContext().getAccessLevel() < WGDatabase.ACCESSLEVEL_AUTHOR)
 	        isAuthoringMode = false;
-	    }
-	    
 	    // If not released and may-not-edit author cannot use authoring mode
-	    if (!content.getStatus().equals(WGContent.STATUS_REVIEW) && !content.mayEditContent())
+	    else if (!content.getStatus().equals(WGContent.STATUS_REVIEW) && !content.mayEditContent())
 	    	isAuthoringMode = false;
 	    
 	    // Tests that are bypassed by authoring mode

@@ -71,13 +71,9 @@ public abstract class WGAAsyncLogger<D extends LogData> implements WGALogger {
 	        throw new WGALoggerException("Exception instantiating async logger", e);
 	    }
 	        
-}
-	
-	
+	}
 
 	protected abstract void initLogWriting(AccessLog config, WGACore core) throws Exception;
-
-
 
     public void logRequest(ServletRequest request) throws WGALoggerException {
 	    try {
@@ -110,8 +106,6 @@ public abstract class WGAAsyncLogger<D extends LogData> implements WGALogger {
 	protected abstract D extractLogData(ServletRequest req, WGARequestInformation reqInfo) throws Exception;
 	
 	protected abstract void writeLog(Queue<D> logData) throws Exception;
-
-
 
     public long getLastLogged() {
         return _lastLogged;

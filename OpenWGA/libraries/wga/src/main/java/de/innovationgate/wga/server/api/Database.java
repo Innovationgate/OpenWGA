@@ -268,6 +268,9 @@ public class Database {
         else if (queryType.equals("lucene") || queryType.startsWith("lucene:")) {
             set = executeLuceneQuery(queryType, queryString, wgapiParams, outputParams);
         }
+        else if (queryType.equals("lucene-old") || queryType.startsWith("lucene-old:")) {
+            set = executeOldLuceneQuery(queryType, queryString, wgapiParams, outputParams);
+        }
         else if (queryType.startsWith("hdbmodel:")) {
             set = executeHdbModelQuery(queryType, queryString, wgapiParams, context, outputParams);
         }
@@ -483,6 +486,37 @@ public class Database {
         
         return resultSet;
     }
+
+    private WGResultSet executeOldLuceneQuery(String queryType, String queryString, Map<String,Object> wgapiParams, Map<String,Object> outputParams) throws WGException {
+        
+        // Tweak WGAPI parameters: Lucenes search method defaults to max results 500, so if we do not want to set a limit we must enforce the parameter being 0 here (#00002483)
+        if (!wgapiParams.containsKey(WGDatabase.QUERYOPTION_MAXRESULTS)) {
+            wgapiParams.put(WGDatabase.QUERYOPTION_MAXRESULTS, new Integer(0));
+        }
+       
+        LuceneManager manager = _wga.getCore().getLuceneManager();
+        if (manager == null) {
+            throw new WGQueryException(queryString, "Lucene index is disabled");
+        }
+        
+        List<String> fields=new ArrayList<String>();
+        if(queryType.startsWith("lucene-old:")){
+        	String field_list = queryType.substring("lucene-old:".length());
+        	fields = WGUtils.deserializeCollection(field_list, ",");
+        }
+        
+        WGResultSet resultSet= manager.search_old(_db, fields, queryString, wgapiParams, _wga);
+        
+        outputParams.put(QUERYOUT_SIMPLIFIED_QUERY, wgapiParams.get(LuceneManager.TAGINFO_SIMPLIFIEDQUERY));
+        
+        // if highlighting enabled store simplified lucene query in session
+        if (ConversionUtils.getBoolean(wgapiParams.get(LuceneManager.QUERYOPTION_HIGHLIGHT), false) == true && _wga.isRequestAvailable()) {
+            _wga.getHttpSession().setAttribute(Query.SESSION_ATTRIBUTE_SIMPLIFIED_LUCENEQUERY, wgapiParams.get(LuceneManager.TAGINFO_SIMPLIFIEDQUERY));
+        }
+        
+        return resultSet;
+    }
+
 
     private WGResultSet executeExpressionQuery(Context context, String queryType, String queryString, Map<String,Object> wgapiParams, Map<String,Object> outputParams) throws WGException {
     

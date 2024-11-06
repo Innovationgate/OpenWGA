@@ -94,6 +94,7 @@ public class ErrorPageManager {
         else if (_jspHelper.getCore().getWgaConfiguration().isCustomErrorPageEnabled() && _jspHelper.getCore().getErrorPage() != null) {
             response.reset();
             response.setContentType("text/html");
+            response.setStatus(_error.getErrorCode());
             request.getRequestDispatcher(_jspHelper.getCore().getErrorPage()).forward(request, response);
             _displayDefaultErrorPage = false;
         }

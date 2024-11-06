@@ -402,6 +402,13 @@ public class WGPRequestPath {
     		pathType = TYPE_TML;
             int elementIdx = this.readMediaKey(core, this.pathElements, 1);
     		elementIdx = this.readLayoutKey(core, this.pathElements, elementIdx);
+    		/*
+    		 * Das folgende führt dazu, daß bei unique name "home" alle requests der Form /home/irgendwas auf home umgeleitet werden.
+    		 * Eigentlich sollte es eher zu einem 404 führen.
+    		 * Die richtigere Abfrage wäre hier:
+    		 * 	if (elementIdx == this.pathElements.size()-1) {	// must be last element
+    		 * Aber wir ändern das zunächst nicht.
+    		 */
             if (elementIdx < this.pathElements.size()) {
                 this.contentKey = this.database.toLowerCaseMeta((String) this.pathElements.get(elementIdx));
     		}

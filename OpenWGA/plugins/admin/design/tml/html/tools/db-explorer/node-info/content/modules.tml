@@ -39,7 +39,7 @@
 		</fieldset></tml:comment>
 		<fieldset>
 			<legend>Structure</legend>
-			<pre><tml:script encode="html" trim="true">
+			<pre style="padding:0 10px"><tml:script encode="html" trim="true">
 				var o = JSON.parse(content().getExtensionData("content-modules"))
 				for(let [section, mods] in o){
 					//console.log(section, mods, mods.length);

@@ -25,8 +25,8 @@
 
 <tml:script>
 	try{
-		_result = WGA.database(tmlform.db).query(tmlform.query, {
-			 context: isEmptyValue(tmlform.context) ? 'this' : 'db:'+tmlform.db+'/'+tmlform.context,
+	
+		var params = {
 		     includecurrent: true,
 			 alllanguages: tmlform.alllanguages, 
 			 onlypublished: tmlform.onlypublished,
@@ -36,7 +36,11 @@
 			 options: tmlform.options,
 			 max: tmlform.max,
 			 cache: tmlform.cache
-		})
+		}
+		if(tmlform.context.trim())
+			params.context= String("db:"+tmlform.db+"/"+tmlform.context);
+		_result = WGA.database(tmlform.db).query(tmlform.query, params);
+		
 	}
 	catch(e){
 		_error = e.message;

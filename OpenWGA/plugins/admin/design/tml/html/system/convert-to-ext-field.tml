@@ -192,23 +192,9 @@
 					</tml:case>
 					
 					<tml:case value="textarea">
-						//el.type="hidden";						
-						el.style.display="none"
-						
-						var f = new Ext.form.TextArea({
-							<tml:case condition="tmlform.field(_fieldname)">
-								value: el.value,
-							</tml:case>
-							width: <tml:script expression="option('width')||500"/>,
-							grow: !Ext.isIE,
-							renderTo: el.parentNode					
-						});
-						f.getEl().dom.setAttribute("spellcheck", false);
-						WGA.portlet.registerObject(portletkey, f);
-						f.on("change", function(field, newVal, oldVal){
-							this.value = newVal;
-						}, el)
-						
+						var w = "<tml:script expression="option('width')||'500px'"/>";
+						$(el).css("width", w);
+						$(el).tabhandler().autogrow();
 					</tml:case>
 		
 					<tml:case value="checkbox">
