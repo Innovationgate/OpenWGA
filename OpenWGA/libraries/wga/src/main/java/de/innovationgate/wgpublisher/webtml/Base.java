@@ -136,8 +136,8 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
 
                 String resolvedValue = getValue();
             
-                if (_valueType == DynamicAttributeValueType.ITEM_EXPRESSION && resolvedValue!=null && !resolvedValue.isEmpty()) {
-                	if(resolvedValue.charAt(0)>='A' && resolvedValue.charAt(0)<='Z') {
+                if (_valueType == DynamicAttributeValueType.ITEM_EXPRESSION) {
+                	if(!resolvedValue.isEmpty() && resolvedValue.charAt(0)>='A' && resolvedValue.charAt(0)<='Z') {
                 		return tmlContext.meta(resolvedValue);
                 	}
                 	else return tmlContext.item(resolvedValue);
