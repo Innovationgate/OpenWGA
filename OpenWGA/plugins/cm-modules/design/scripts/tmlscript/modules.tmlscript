@@ -114,6 +114,7 @@ this.getIncludes = function(type){
 				}
 				
 				includes.put(key, {
+					id: id,
 					tml: tml,
 					designdb: designdb
 				});
