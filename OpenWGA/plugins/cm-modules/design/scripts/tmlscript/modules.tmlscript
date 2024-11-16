@@ -137,3 +137,14 @@ this.getIncludes = function(type){
 	return includes.values();
 }
 
+this.markModuleCssIncluded = function(){
+	if(!WGA.request.getAttribute("CMM_module_css_reg")){
+		WGA.request.setAttribute("CMM_module_css_reg", WGA.List());
+	}
+	var request_module_css_reg = WGA.request.getAttribute("CMM_module_css_reg");
+	var mods = this.getIncludes("css");
+	for(let mod in Iterator(mods)){
+		if(mod.id && !request_module_css_reg.contains(mod.id))
+			request_module_css_reg.add(mod.id);
+	}
+}
