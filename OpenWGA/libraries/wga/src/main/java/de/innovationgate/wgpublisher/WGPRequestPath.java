@@ -707,14 +707,21 @@ public class WGPRequestPath {
         
         // Try to retrieve the module directly from the open database
         WGTMLModule module = database.getTMLModule(layoutKeyCandidate, mediaKeyStr);
-        if (module != null) {
-            return true;
-        }
+        if (module != null) 
+        	return module.isDirectAccessAllowed();
+        
         // We may have a module renderer script
+        /*
+         * A renderer Script without direct accessible TML?
+         * This should not be supported as direct accessible module
+         * See #00006320
+         */
+        /*
         WGScriptModule scriptModule = database.getScriptModule(layoutKeyCandidate + ".renderer", WGScriptModule.CODETYPE_TMLSCRIPT);
         if (scriptModule != null) {
             return true;
         }
+        */
         return false;
     }
 
