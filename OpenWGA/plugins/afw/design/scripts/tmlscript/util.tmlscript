@@ -816,6 +816,7 @@ this.csvReader = function(config){
 						else if(column.type=="boolean"){
 							value = (value.toLowerCase()=="true" || value.toLowerCase()=="ja" || value=="1") ? true : false;
 						}
+						else value=String(value);
 						data[column.key]=value
 					}
 					catch(e){
