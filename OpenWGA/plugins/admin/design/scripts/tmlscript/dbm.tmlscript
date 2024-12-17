@@ -653,7 +653,10 @@ this.jobs = function(){
 			var it = job.schedules.iterator();
 			while(it.hasNext()){
 				var schedule = it.next();
-				schedules.add(Cron.createDescription(schedule.data, schedule.type))
+				schedules.add({
+					description: Cron.createDescription(schedule.data, schedule.type),
+					enabled: schedule.enabled
+				})
 			}
 		}
 		allJobs.put(job.uid, {
@@ -677,7 +680,10 @@ this.jobs = function(){
 			for(var i=0; i<triggers.length; i++){
 				var trigger = triggers[i];
 				if(trigger instanceof Packages.org.quartz.CronTrigger)
-					schedules.add(Cron.createDescription(trigger.getCronExpression(), "cron"));
+					schedules.add({
+						description: Cron.createDescription(trigger.getCronExpression(), "cron"),
+						enabled: true
+					});
 			} 
 			allJobs.put(job.uid, {
 				name: job.name,
