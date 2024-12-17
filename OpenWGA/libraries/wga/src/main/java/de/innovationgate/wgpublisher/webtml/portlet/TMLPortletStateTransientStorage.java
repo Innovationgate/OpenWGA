@@ -190,6 +190,10 @@ public class TMLPortletStateTransientStorage implements TMLPortletStateStorage {
                     if (!WGUtils.isEmpty(stateStr)) {
                         state = deserializePortletState(stateStr);
                         if (state == null) { // Decoding error. Extract the portlet key so we at least know that this was sent and don't try to retrieve it again
+
+                        	if(stateStr.indexOf("//")<0)	// avoid StringIndexOutOfBoundsException
+                        		throw new WGException("Invalid state '" + stateStr + "' not containing //");
+                        	
                             String portletKey = stateStr.substring(0, stateStr.indexOf("//"));
                             _statesSentByClient.add(portletKey);
                             continue;
