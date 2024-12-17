@@ -50,11 +50,11 @@
 				>
 			</div>
 			<tml:input type="text" name="_captcha_answer" store="false"/>
+			<tml:case istrue="_captcha_error">
+				<div class="field-message">
+					<tml:[setting] o_name="validationmessage" encode="html"/>
+				</div>
+			</tml:case>
 		</div>	
 	</div>
-	<tml:case istrue="_captcha_error">
-		<div class="field-message">
-			<tml:[setting] o_name="validationmessage" encode="html"/>
-		</div>
-	</tml:case>
 </tml:case>

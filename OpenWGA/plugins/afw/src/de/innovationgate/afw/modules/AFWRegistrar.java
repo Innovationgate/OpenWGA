@@ -32,8 +32,8 @@ public class AFWRegistrar implements ModuleRegistrar {
 
     public void registerModules(ModuleRegistry registry) {
         registry.addModuleDefinition(new CAPTCHAServiceApiModuleDefinition());
-        registry.addModuleDefinition(new SimpleCAPTCHAServiceApiModuleDefinition());
-        registry.addModuleDefinition(new JCAPTCHAServiceApiModuleDefinition());
+        registry.addModuleDefinition(new SimpleCAPTCHAServiceModuleDefinition());
+        registry.addModuleDefinition(new JCAPTCHAServiceModuleDefinition());
     }
 
 }

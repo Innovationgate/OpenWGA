@@ -62,9 +62,9 @@ public class SimpleCaptchaService implements CaptchaServiceIF {
 		
 		Captcha captcha = new Captcha.Builder(200, 50)
 	     .addText()
-	     .addBackground(new FlatColorBackgroundProducer(backgroundColor))
-	     .gimp()
-	     .addNoise()
+	     //.addBackground(new FlatColorBackgroundProducer(backgroundColor))
+	     //.gimp()
+	     //.addNoise()
 	     .build(); // Required! Always!
 		
 		try{

@@ -35,10 +35,10 @@ import de.innovationgate.wga.modules.ModuleDependencyException;
 import de.innovationgate.wga.modules.ModuleType;
 import de.innovationgate.wga.modules.OptionDefinitionsMap;
 
-public class JCAPTCHAServiceApiModuleDefinition implements ModuleDefinition {
+public class JCAPTCHAServiceModuleDefinition implements ModuleDefinition {
 
     public String getTitle(Locale locale) {
-        return "JCAPTCHA Service";
+        return "JCAPTCHA Service (deprecated since Java 8)";
     }
 
     public String getDescription(Locale locale) {

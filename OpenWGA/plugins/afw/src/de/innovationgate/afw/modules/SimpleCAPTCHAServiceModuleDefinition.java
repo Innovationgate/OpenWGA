@@ -35,7 +35,7 @@ import de.innovationgate.wga.modules.ModuleDependencyException;
 import de.innovationgate.wga.modules.ModuleType;
 import de.innovationgate.wga.modules.OptionDefinitionsMap;
 
-public class SimpleCAPTCHAServiceApiModuleDefinition implements ModuleDefinition {
+public class SimpleCAPTCHAServiceModuleDefinition implements ModuleDefinition {
 
     public String getTitle(Locale locale) {
         return "Simple CAPTCHA Service";
