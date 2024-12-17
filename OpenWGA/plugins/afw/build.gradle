@@ -1,7 +1,10 @@
 
 dependencies {
 
-    compile fileTree(dir: 'design/files/system', include: ['*.jar'])
+    compile 'org.apache.poi:poi:4.1.2'
+    compile 'org.apache.poi:poi-ooxml:4.1.2'
+	
+    compileClasspath fileTree(dir: 'design/files/system', include: ['*.jar'])
 
     compileClasspath project(":wgaBuildTools");
     
@@ -23,6 +26,19 @@ sourceSets {
 	}
 } 
 
+
+task cleanupPluginJars(type: Delete) {
+	println "Delete old *.jar-s ..."
+	delete fileTree(dir: "design/files/system/jars", include: "*.jar")
+}
+
+task buildPluginJars(type: Copy, dependsOn: [cleanupPluginJars,jar]) {
+	println "Copy *.jar-s ..."
+    from(configurations.runtime.files)
+   	into 'design/files/system/jars'
+}
+
+
 task updatePluginVersion << {
 	def version = "${openwga_version_major}.${openwga_version_minor}.${openwga_version_maintenance}.${openwga_version_patch}"
 	def build = "${openwga_version_build}"
@@ -33,7 +49,7 @@ task updatePluginVersion << {
 
 }
 
-task buildPlugin(type: Zip, dependsOn: [build, updatePluginVersion]){
+task buildPlugin(type: Zip, dependsOn: [buildPluginJars,updatePluginVersion]){
     archiveName = "de.innovationgate.wga-app-framework-${project.version}.wgaplugin"
     from('design') {
         into '/'

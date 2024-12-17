@@ -846,3 +846,95 @@ this.context = function(exp){
 		}
 	}
 }
+
+/*
+ *	Excel Reader (Importer)
+ *	Config options:
+ *		columns:				Array column definitions. Required.
+ *		skiprows:				Number of lines/rows to skip. Default = 0.
+ *		process(data, rowNumber, totalRowNumbers):	Function called for each line in input stream. Required.
+ *
+ *	Column Definition (config.columns):
+ *		null columns are ignored
+ *
+ *	Sampe usages:
+ *		AFW.Util.excelReader({
+ *			columns: ["title", {key:"created",type:"date"}, null, "ean", "price"],
+ *			process: function(data){...}
+ *		}).read(inputStreamOrFile [,encoding])
+ */
+this.excelReader = function(config){
+
+	/*
+		JavaDoc
+		https://javadoc.io/doc/org.apache.poi/poi/4.2.1/index.html
+		(Newer versions of POI needs at last java 10)
+	*/
+
+	var skiprows = config.skiprows || 0;
+	var columns = config.columns || [];
+
+	return {
+
+		read:  function(stream_or_file){
+
+			var inputstream;
+			
+			if(typeof(stream_or_file)=="string")
+				stream_or_file = WGA.File(stream_or_file);
+			else if(stream_or_file instanceof Packages.java.io.File)
+				inputstream = new Packages.java.io.FileInputStream(stream_or_file);
+			else if(stream_or_file instanceof Packages.de.innovationgate.wga.server.api.WGAFile)
+				inputstream = stream_or_file.inputStream;
+			else inputstream = stream_or_file;
+		
+		    //Create Workbook instance holding reference to .xlsx file
+		    var workbook = new Packages.org.apache.poi.xssf.usermodel.XSSFWorkbook(inputstream); 
+		    //console.log("workbook", workbook)
+		
+			var sheet = workbook.getSheetAt(0);
+		    var rowIterator = sheet.iterator();
+		
+			// skip rows
+			for(let i=0; i < skiprows; i++){
+			    if(rowIterator.hasNext())
+			    	rowIterator.next();
+			}
+		
+			var DateUtil = Packages.org.apache.poi.ss.usermodel.DateUtil;
+		
+		    while (rowIterator.hasNext()){
+		    	var values = [];
+		    	var row = rowIterator.next();
+				var cellIterator = row.cellIterator();
+		        while (cellIterator.hasNext()){
+		        	var cell = cellIterator.next();
+		        	switch (cell.getCellType()){
+		        		case Packages.org.apache.poi.ss.usermodel.CellType.NUMERIC:
+			            	if(DateUtil.isCellDateFormatted(cell))
+			            		values.push(cell.getDateCellValue())	            		
+		        			else values.push(cell.getNumericCellValue())
+		        			break;
+		        		case Packages.org.apache.poi.ss.usermodel.CellType.STRING:
+			            	values.push(cell.getStringCellValue())
+			            	break;
+		        		case Packages.org.apache.poi.ss.usermodel.CellType.BOOLEAN:
+			            	values.push(cell.getBooleanCellValue())
+			            	break;
+			        }
+		        }
+				//console.log(values);
+				
+				var data = {};
+				for(let [index, column] in columns){
+					if(!column)
+						continue;	// null column
+					data[column]=values[index]		
+				}
+				config.process && config.process(data, row.getRowNum()+1, sheet.getLastRowNum()+1);
+		        
+			}
+
+		}
+	}
+}
