@@ -26,6 +26,7 @@
 <tml:script>
 	WGA.accessLogging().setLoggingEnabled(false);
 	_context = context("db:" + request.dbkey + "/docid:" + request.contentkey, false) || context("db:"+request.dbkey, false)
+	setOption("section-margin", request.section_margin||10);
 </tml:script>
 
 <tml:case condition="_context" context="{_context}" iscontextvalid="true">
