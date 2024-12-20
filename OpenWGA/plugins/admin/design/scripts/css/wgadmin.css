@@ -756,3 +756,17 @@ pre, pre textarea{
 	margin-right:5px;
 	color: white;
 }
+
+#tmlscript .char-codes{
+	display: none;
+}
+#tmlscript .char-codes .char-box{
+	background: gray;
+	color: white;
+	margin: 2px;
+	padding: 2px;
+	display: inline-block;
+	text-align: center;
+	width: 40px;	
+}
+
