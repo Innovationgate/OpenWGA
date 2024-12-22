@@ -29,7 +29,6 @@ import java.util.Locale;
 
 import de.innovationgate.afw.modules.types.CAPTCHAServiceModuleType;
 import de.innovationgate.igutils.security.CaptchaService;
-import de.innovationgate.igutils.security.SimpleCaptchaService;
 import de.innovationgate.wga.modules.ModuleDefinition;
 import de.innovationgate.wga.modules.ModuleDependencyException;
 import de.innovationgate.wga.modules.ModuleType;

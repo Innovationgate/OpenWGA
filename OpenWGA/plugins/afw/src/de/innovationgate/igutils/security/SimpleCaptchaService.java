@@ -25,14 +25,12 @@
 
 package de.innovationgate.igutils.security;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.io.Serializable;
 
 import javax.imageio.ImageIO;
 
 import nl.captcha.Captcha;
-import nl.captcha.backgrounds.FlatColorBackgroundProducer;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
 
 public class SimpleCaptchaService implements CaptchaServiceIF {
@@ -58,7 +56,6 @@ public class SimpleCaptchaService implements CaptchaServiceIF {
 
 
 	public void renderCaptcha(TMLContext context) throws IOException {
-		java.awt.Color backgroundColor = Color.WHITE;
 		
 		Captcha captcha = new Captcha.Builder(200, 50)
 	     .addText()
