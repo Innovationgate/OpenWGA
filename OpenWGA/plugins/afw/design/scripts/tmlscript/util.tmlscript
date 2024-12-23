@@ -850,18 +850,18 @@ this.context = function(exp){
 /*
  *	Excel Reader (Importer)
  *	Config options:
- *		columns:				Array column definitions. Required.
+ *		columns:				Array column definitions. Default = [].
  *		skiprows:				Number of lines/rows to skip. Default = 0.
- *		process(data, rowNumber, totalRowNumbers):	Function called for each line in input stream. Required.
+ *		process(data, rowNumber, totalRowNumbers):	Function called for each line in input stream.
  *
  *	Column Definition (config.columns):
- *		null columns are ignored
+ *		null or empty columns are ignored
  *
  *	Sampe usages:
  *		AFW.Util.excelReader({
- *			columns: ["title", {key:"created",type:"date"}, null, "ean", "price"],
+ *			columns: ["title", null, "ean", "price"],
  *			process: function(data){...}
- *		}).read(inputStreamOrFile [,encoding])
+ *		}).read(inputStreamOrFile)
  */
 this.excelReader = function(config){
 
@@ -888,10 +888,8 @@ this.excelReader = function(config){
 				inputstream = stream_or_file.inputStream;
 			else inputstream = stream_or_file;
 		
-		    //Create Workbook instance holding reference to .xlsx file
+			var DateUtil = Packages.org.apache.poi.ss.usermodel.DateUtil;	// udes to check for date values
 		    var workbook = new Packages.org.apache.poi.xssf.usermodel.XSSFWorkbook(inputstream); 
-		    //console.log("workbook", workbook)
-		
 			var sheet = workbook.getSheetAt(0);
 		    var rowIterator = sheet.iterator();
 		
@@ -900,8 +898,6 @@ this.excelReader = function(config){
 			    if(rowIterator.hasNext())
 			    	rowIterator.next();
 			}
-		
-			var DateUtil = Packages.org.apache.poi.ss.usermodel.DateUtil;
 		
 		    while (rowIterator.hasNext()){
 		    	var values = [];
@@ -928,11 +924,10 @@ this.excelReader = function(config){
 				var data = {};
 				for(let [index, column] in columns){
 					if(!column)
-						continue;	// null column
+						continue;	// ignore null or empty column
 					data[column]=values[index]		
 				}
 				config.process && config.process(data, row.getRowNum()+1, sheet.getLastRowNum()+1);
-		        
 			}
 
 		}
