@@ -149,7 +149,6 @@ public class ItemExpression {
                 }
                 catch (IOException e) {
                     _context.addwarning("Exception interpreting string literal in item expression: " + _fullItemName, true);
-                    
                 }
             }
             

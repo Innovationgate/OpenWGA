@@ -23,7 +23,7 @@
 ## If not, see <http://www.gnu.org/licenses/>.
 ## LICENSE END #################################################################
 
-<label><tml:label key="form.captcha.settings.hint"/>:</label>
+<label><tml:label key="form.settings.label"/>:</label>
 <div style="margin:10px">
 	<tml:input name="{scoped:label}" mode="{option('mode')}" cssstyle="width:100%"/> 
 </div>

@@ -422,7 +422,10 @@ public class TMLPageImpl implements TMLPage {
         HttpServletResponse response = _wga.getResponse();
         
         // Setup response, cancel if we do not write the body on this type of request
-        MediaKey mediaKeyObj = _wga.getCore().getMediaKey(_wga.call().getMediaKey());
+        String key = _wga.call().getMediaKey();
+        if(key==null)
+        	return;	// no media key
+        MediaKey mediaKeyObj = _wga.getCore().getMediaKey(key);
         if (!setupResponse(tmllib, request, response, mediaKeyObj)) {
             return;
         }

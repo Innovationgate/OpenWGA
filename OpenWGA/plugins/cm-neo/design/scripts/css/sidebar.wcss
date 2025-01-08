@@ -266,6 +266,7 @@
 	#editor-panel-date{
 		.ui-datepicker{
 			width: 100%;
+			background: white;
 		}
 	}
 	

@@ -155,7 +155,7 @@ this.fileTemplate = function(container, file, data){
 		c = database.getFileContainer(container)
 	}
 	if(!c)
-		throw "file container " + container + " not found."
+		throw "file container " + database.dbReference + "/" + container + " not found."
 	var f = c.getFileData(file)
 	if(!f)
 		throw "File " + file + " not found in container " + container;

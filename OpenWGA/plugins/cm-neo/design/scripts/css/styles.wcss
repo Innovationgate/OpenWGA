@@ -15,8 +15,16 @@ html,body {
 }
 
 body {
+
 	font-family: "Lucida Grande", arial;
+
+	.ui-widget-header{
+		background: $blue;
+		border-color: $blue;
+	}
+
 }
+
 #page {
 
 	#header,#appnav,#content,#footer {

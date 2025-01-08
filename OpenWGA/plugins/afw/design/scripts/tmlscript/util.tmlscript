@@ -569,6 +569,8 @@ this.getAppKeysBasedOnPlugin=function(plugin_name){
  *		query:			A HQL query defining the contentlist. Optional. If empty, all child-Contents are used.
  *		dateFormat:		optional date format. If Empty yyyy-MM-dd HH:mm:SS is used.
  *		divider:		Column divider. Default is Semicolon
+ *		header:			Boolean. If true a header-line is generated
+ *		processed:		Optiona callback-Function. Called when doc is processed.
  *
  *	Columns Definition (config.columns):
  *		Each column is either a Sting or Object.
@@ -612,8 +614,7 @@ this.csvWriter = function(config){
 		if(typeof(col)=="string"){
 			var parts = col.split("|");
 			var value = parts[1]||parts[0];
-			//return value==value.toUpperCase() ? $cx.meta(value) : $cx.item(value);
-			return $cx[value]; 
+			return value ? $cx[value] : ""; 
 		}
 		else return col.value.call($cx, $cx);
 	}
@@ -673,6 +674,8 @@ this.csvWriter = function(config){
 					addValue(value);
 				}
 				flush(out);
+				if(config.processed)
+					config.processed.call(doc, doc);
 			}
 			
 			out.close();
@@ -816,6 +819,7 @@ this.csvReader = function(config){
 						else if(column.type=="boolean"){
 							value = (value.toLowerCase()=="true" || value.toLowerCase()=="ja" || value=="1") ? true : false;
 						}
+						else value=String(value);
 						data[column.key]=value
 					}
 					catch(e){
@@ -839,6 +843,98 @@ this.context = function(exp){
 		},
 		item: function(name, defaultvalue){
 			return ctx!=null ? ctx.item(name) : defaultvalue || "";
+		}
+	}
+}
+
+/*
+ *	Excel Reader (Importer)
+ *
+ *	Usage:
+ *		excelReader(config).read(filename | java.io.File | WGAFile | inputstream)
+ *
+ *	Config options:
+ *		columns:				Array column definitions. Default = [].
+ *		skiprows:				Number of lines/rows to skip. Default = 0.
+ *		process(data, rowNumber, totalRowNumbers):	Function called for each line in input stream.
+ *
+ *	Column Definition (config.columns):
+ *		null or empty columns are ignored
+ *
+ *	Sampe usages:
+ *		AFW.Util.excelReader({
+ *			columns: ["title", null, "ean", "price"],
+ *			process: function(data){...}
+ *		}).read(inputStreamOrFile)
+ */
+this.excelReader = function(config){
+
+	/*
+		JavaDoc
+		https://javadoc.io/doc/org.apache.poi/poi/4.2.1/index.html
+		(Newer versions of POI needs at last java 10)
+	*/
+
+	var skiprows = config.skiprows || 0;
+	var columns = config.columns || [];
+
+	return {
+
+		read:  function(stream_or_file){
+
+			var inputstream;
+			
+			if(typeof(stream_or_file)=="string")
+				stream_or_file = WGA.File(stream_or_file);
+				
+			if(stream_or_file instanceof Packages.java.io.File)
+				inputstream = new Packages.java.io.FileInputStream(stream_or_file);
+			else if(stream_or_file instanceof Packages.de.innovationgate.wga.server.api.WGAFile)
+				inputstream = stream_or_file.inputStream;
+			else inputstream = stream_or_file;
+		
+			var DateUtil = Packages.org.apache.poi.ss.usermodel.DateUtil;	// udes to check for date values
+		    var workbook = new Packages.org.apache.poi.xssf.usermodel.XSSFWorkbook(inputstream); 
+			var sheet = workbook.getSheetAt(0);
+		    var rowIterator = sheet.iterator();
+		
+			// skip rows
+			for(let i=0; i < skiprows; i++){
+			    if(rowIterator.hasNext())
+			    	rowIterator.next();
+			}
+		
+		    while (rowIterator.hasNext()){
+		    	var values = [];
+		    	var row = rowIterator.next();
+				var cellIterator = row.cellIterator();
+		        while (cellIterator.hasNext()){
+		        	var cell = cellIterator.next();
+		        	switch (cell.getCellType()){
+		        		case Packages.org.apache.poi.ss.usermodel.CellType.NUMERIC:
+			            	if(DateUtil.isCellDateFormatted(cell))
+			            		values.push(cell.getDateCellValue())	            		
+		        			else values.push(cell.getNumericCellValue())
+		        			break;
+		        		case Packages.org.apache.poi.ss.usermodel.CellType.STRING:
+			            	values.push(cell.getStringCellValue())
+			            	break;
+		        		case Packages.org.apache.poi.ss.usermodel.CellType.BOOLEAN:
+			            	values.push(cell.getBooleanCellValue())
+			            	break;
+			        }
+		        }
+				//console.log(values);
+				
+				var data = {};
+				for(let [index, column] in columns){
+					if(!column)
+						continue;	// ignore null or empty column
+					data[column]=values[index]		
+				}
+				config.process && config.process(data, row.getRowNum()+1, sheet.getLastRowNum()+1);
+			}
+
 		}
 	}
 }

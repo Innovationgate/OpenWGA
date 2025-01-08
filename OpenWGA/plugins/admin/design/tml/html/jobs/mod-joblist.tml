@@ -82,8 +82,9 @@
 					_schedules = _job.schedules;
 				</tml:script>
 				<tml:foreach type="itemvalue" item="_schedules" currentvalue="_schedule">
-					<br>
-					<tml:item name="_schedule"/>
+					<div <tml:case condition="!_schedule.enabled">style="text-decoration: line-through"</tml:case>>
+						<tml:item name="_schedule.description"/>
+					</div>
 				</tml:foreach>
 			</td>
 			<tml:if condition="_job.runtime">

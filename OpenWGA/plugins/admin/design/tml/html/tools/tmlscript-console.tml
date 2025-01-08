@@ -200,12 +200,37 @@
 						
 						<tml:else>
 							<label>Result:</label>
-							<div class="data">						
-								<tml:script encode="html">
-									return _result && _result.toString ? _result.toString() : _result
-								</tml:script>
+							<div class="data">
+								<span style="white-space:break-spaces"><tml:script encode="html">
+									return _result && _result.toString ? _result.toString() : _result;
+								</tml:script></span>
 							</div>
 							<div class="clear"></div>
+							
+							<tml:case condition="_result && _result.toString">
+								<label>Char-Codes:</label>
+								<div class="data">									
+									<tml:script>
+										var r = _result.toString();
+										_codes=[];
+										for(var i=0; i<r.length; i++){
+											_codes.push({
+												char: r.charAt(i),
+												code: r.charCodeAt(i).toString(16)
+											})
+										}
+									</tml:script>
+									<button class="toggle-char-codes">Show</button>
+									<div class="char-codes">
+										<tml:foreach item="_codes" currentvalue="_c">
+											<span class="char-box">
+												@{_c.char}<br>@{_c.code}
+											</span>
+										</tml:foreach>
+									</div>
+								</div>
+								<div class="clear"></div>
+							</tml:case>
 							
 							<label>Data type of result:</label>
 							<div class="data">
@@ -237,3 +262,11 @@
 	</tml:include>
 
 </tml:form>
+
+<script>
+	$("#tmlscript .toggle-char-codes").click(function(ev){
+		ev.preventDefault();
+		$(this).hide().next().toggle();
+	})
+</script>
+
