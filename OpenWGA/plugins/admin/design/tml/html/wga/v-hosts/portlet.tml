@@ -141,9 +141,9 @@
 					
 					<table class="collection" width="100%">
 						<tr class="collection-title">
-							<td>Server Name</td>
-							<td>Allowed Databases</td>
-							<td>Default Database</td>
+							<td>Host Name</td>
+							<td>Allowed Apps</td>
+							<td>Default App</td>
 							<td></td>
 							<td width="1%"></td>
 							<td width="1%"></td>
