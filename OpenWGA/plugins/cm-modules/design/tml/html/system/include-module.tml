@@ -33,7 +33,7 @@
 
 <tml:{div} if="$mc.tml" wrapif="!$option_raw"
 	html_class="[module module-{$mc.module_id} {$mc.moduleCssClasses} {option('module-class')}]"
-	html_style="{option('module-style')}"
+	html_style="{$mc.mod_config.margins===false ? VOID : option('module-style')}"
 	html_id="[module-{$mc.id}]"
 	trim="true"
 >
