@@ -48,7 +48,19 @@
 					if(window.name=="wga-contentmanager-iframe" && window.parent.BI.sitepanel.editItemsVisible){
 						var el = document.getElementById("no-modules-<tml:item name="$mc.uid"/>");
 						el.style.display="block";
+						$("#no-modules-<tml:item name="$mc.uid"/>").click(function(ev){
+							ev.preventDefault();
+							parent.BI.dialog.show('content-modules', this, {mode:'edit', section:"<tml:item name="$mc.section"/>"})
+						})
 					}
+
+					if(window.parent.CM && window.parent.CM.openDialog){
+						$("#no-modules-<tml:item name="$mc.uid"/>").click(function(ev){
+							ev.preventDefault();
+							window.parent.CM.openDialog('content-modules', {mode:'edit', section:"<tml:item name="$mc.section"/>"})
+						})
+					}
+
 					$(function(){
 						function onFilesDrop(data){
 							WGA.action({
@@ -72,39 +84,10 @@
 	</tml:then>
 	<tml:else>
 		<div class="content-modules" id="content-modules-<tml:item name="$mc.uid"/>" <tml:case condition="option('animate')===true || option('animate')=='true'">style="opacity:0;transition:opacity .2s"</tml:case>>
-			<tml:case if="$mc.mayEdit & !$mc.isCleanMode">
-				<div style="position:relative">
-					<a style="display:none" class="WGA-Item-Edit edit-modules-button" href="#">
-						<div>
-							<tml:label key="cm.edit-modules"/>
-						</div>
-					</a>
-				</div>
-				<script>
-					require(["jquery"], function($){		
-						if(window.name=="wga-contentmanager-iframe"){
-							$("#content-modules-<tml:item name="$mc.uid"/>").bind({
-								mouseover: function(){
-									$(this).find(".edit-modules-button").show();
-								},
-								mouseout: function(){
-									if(!window.parent.BI.sitepanel.editItemsVisible)
-										$(this).find(".edit-modules-button").hide();
-								}	 
-							})						
-						}
-						WGA.event.addListener("module-editor", "CMS_item_edit", function(){
-							$("#content-modules-<tml:item name="$mc.uid"/>").unbind();
-						})
-					})
-				</script>
-			</tml:case>
-			
 			<tml:include ref="system:include-child-modules" trim="true">
 				<tml:option name="child-modules" expression="$mc.mods"/>
 				<tml:option name="margins" expression="true" scope="local"/>
 			</tml:include>
-			
 		</div>
 		
 		<tml:case condition="option('animate')===true || option('animate')=='true'">
@@ -117,22 +100,3 @@
 		
 	</tml:else>
 </tml:if>
-
-<tml:case isbrowserinterface="true" if="$mc.mayEdit & !$mc.isCleanMode">
-	<script>
-		require(["jquery"], function($){
-			if(window.name=="wga-contentmanager-iframe"){		
-				$("#no-modules-<tml:item name="$mc.uid"/>.no-modules, #content-modules-<tml:item name="$mc.uid"/> .edit-modules-button").click(function(ev){
-					ev.preventDefault();
-					parent.BI.dialog.show('content-modules', this, {mode:'edit', section:"<tml:item name="$mc.section"/>"})
-				})
-			}
-			if(window.parent.CM && window.parent.CM.openDialog){
-				$("#no-modules-<tml:item name="$mc.uid"/>.no-modules, #content-modules-<tml:item name="$mc.uid"/> .edit-modules-button").click(function(ev){
-					ev.preventDefault();
-					window.parent.CM.openDialog('content-modules', {mode:'edit', section:"<tml:item name="$mc.section"/>"})
-				})
-			}
-		})
-	</script>
-</tml:case>
