@@ -4,6 +4,6 @@
 	title:			'Sprungmarke (Anker)',
 	tml:			'modules:anker:render',
 	settingstml: 	'modules:anker:settings',
-	raw:			true,
-	icon:			'<tml:url db="plugin-wga-app-framework" type="file" doc="icons@base" file="anchor.png"/>'
+	icon:			'<tml:url db="plugin-wga-app-framework" type="file" doc="icons@base" file="anchor.png"/>',
+	margins:		false
 }
