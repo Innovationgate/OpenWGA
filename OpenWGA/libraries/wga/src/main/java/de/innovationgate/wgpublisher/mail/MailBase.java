@@ -358,15 +358,17 @@ public abstract class MailBase implements WGMail {
     @CodeCompletion
     public List<String> getCc() {
         List<String> toAddr = new ArrayList();
-        for (InternetAddress addr : _cc) {
-            toAddr.add(addr.getAddress());
+        if(_cc!=null) {
+	        for (InternetAddress addr : _cc) {
+	            toAddr.add(addr.getAddress());
+	        }
         }
         return toAddr;
     }
 
     @CodeCompletion
     public void setCc(List<String> addresses) throws AddressException {
-        ArrayList newAddresses = new ArrayList<InternetAddress>();
+        ArrayList<InternetAddress> newAddresses = new ArrayList<InternetAddress>();
         for (String address : addresses) {
             newAddresses.add(new InternetAddress(address));
         }
@@ -375,9 +377,8 @@ public abstract class MailBase implements WGMail {
 
     @CodeCompletion
     public void setCc(String address) throws AddressException {
-        _bcc = new ArrayList<InternetAddress>();
-        _bcc.add(new InternetAddress(address));
-    
+        _cc = new ArrayList<InternetAddress>();
+        _cc.add(new InternetAddress(address)); 
     }
 
     @CodeCompletion
@@ -405,7 +406,7 @@ public abstract class MailBase implements WGMail {
     public void setFrom(String address, String name) throws UnsupportedEncodingException {
     	_from = new InternetAddress(address, name);
     }
-
+    
     @CodeCompletion
     public List getTo() {
        List<String> toAddr = new ArrayList();
@@ -433,8 +434,10 @@ public abstract class MailBase implements WGMail {
     @CodeCompletion
     public List<String> getBcc() {
         List<String> addresses = new ArrayList();
-        for (InternetAddress addr : _bcc) {
-            addresses.add(addr.getAddress());
+        if(_bcc!=null) {
+	        for (InternetAddress addr : _bcc) {
+	            addresses.add(addr.getAddress());
+	        }
         }
         return addresses;
     }
