@@ -1614,9 +1614,16 @@ public class WGA {
                 	mail.setEncodeText(encodeText);
                 else mail.setEncodeText(true);
 
-                String from = (String)config.get("from");
-                if(from!=null)
-                	mail.setFrom(from);
+                Object from = config.get("from");
+                if(from instanceof String)
+                	mail.setFrom((String)from);
+                else if(from instanceof List) {
+                	@SuppressWarnings("unchecked")
+					List<String> fromList = (List<String>)from;
+                	if(fromList.size()==1)
+                		mail.setFrom(fromList.get(0));
+                	else mail.setFrom(fromList.get(0), fromList.get(1));
+                }
                 
                 Object to = config.get("to");
                 if(to!=null){
