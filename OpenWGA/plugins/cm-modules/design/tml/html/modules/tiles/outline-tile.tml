@@ -8,6 +8,16 @@
 		justify-content: <tml:script>
 			return (tmlform && tmlform.field(WGA.scoped("justify_content"))) || CMM.setting('justify_content');
 		</tml:script>;
+		<tml:script>
+			var image = CMM.setting("image");
+			if(image){
+				return "background-image:url(" + fileImageDerivateURL(image, "width~200") + ");"
+					+ "background-position: center center;"
+					+ "background-repeat: no-repeat;"
+  					+ "background-size: cover;" 
+  					+ "min-height: 100px;"
+			}			
+		</tml:script>
 	</tml:option>
 	<tml:include ref="system:include-child-outlines"/>
 </tml:include>
