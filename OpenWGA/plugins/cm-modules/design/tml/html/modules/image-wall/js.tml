@@ -6,12 +6,6 @@
 
 	var resizeTimer={};
 
-	function updateAlbums(){
-		$(".module-cm_image-wall .album").each(function(){
-			updateSize(this);
-		})
-	}
-
 	function updateImageSrc(el, usage){
 		if(el.naturalWidth									// available in IE>9 and all modern browser
 				&& el.naturalWidth < $(el).data("width")	// do we have a better derivate? 

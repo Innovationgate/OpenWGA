@@ -87,7 +87,7 @@
 </div>
 
 <tml:[script]>
-	require(["jquery", "<tml:url type="tml" name="image-wall" medium="javascripts" u_noext=""/>"], function($){
+	require(["jquery", "<tml:url type="tml" name="::js"/>"], function($){
 		$("#album-<tml:option name="ns"/>").imageAlbum();
 	});
 	<tml:case condition="CMM.setting('lightbox')">
