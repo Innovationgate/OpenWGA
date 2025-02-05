@@ -570,7 +570,7 @@ this.getAppKeysBasedOnPlugin=function(plugin_name){
  *		dateFormat:		optional date format. If Empty yyyy-MM-dd HH:mm:SS is used.
  *		divider:		Column divider. Default is Semicolon
  *		header:			Boolean. If true a header-line is generated
- *		processed:		Optiona callback-Function. Called when doc is processed.
+ *		processed:		Optional callback-Function. Called when doc is processed.
  *
  *	Columns Definition (config.columns):
  *		Each column is either a Sting or Object.
@@ -871,7 +871,7 @@ this.excelReader = function(config){
 
 	/*
 		JavaDoc
-		https://javadoc.io/doc/org.apache.poi/poi/4.2.1/index.html
+		https://javadoc.io/doc/org.apache.poi/poi/4.1.2/index.html
 		(Newer versions of POI needs at last java 10)
 	*/
 
@@ -893,7 +893,7 @@ this.excelReader = function(config){
 				inputstream = stream_or_file.inputStream;
 			else inputstream = stream_or_file;
 		
-			var DateUtil = Packages.org.apache.poi.ss.usermodel.DateUtil;	// udes to check for date values
+			var DateUtil = Packages.org.apache.poi.ss.usermodel.DateUtil;	// uses to check for date values
 		    var workbook = new Packages.org.apache.poi.xssf.usermodel.XSSFWorkbook(inputstream); 
 			var sheet = workbook.getSheetAt(0);
 		    var rowIterator = sheet.iterator();
@@ -934,6 +934,155 @@ this.excelReader = function(config){
 				}
 				config.process && config.process(data, row.getRowNum()+1, sheet.getLastRowNum()+1);
 			}
+
+		}
+	}
+}
+
+/*
+ *	Excel Writer (Exporter)
+ *	Config options:
+ *		dateformat: 	dateformat - default is "dd.MM.yyyy HH:mm:ss"
+ *		numberformat: 	optional numberformat
+ *		columns:		Array or List of item (column) definitions. Required.
+ *		contentlist:	List of WGContent-s or TMLContext-s. Optional. If empty, option "query" is used.
+ *		query:			A HQL query defining the contentlist. Optional. If empty, all child-Contents are used.
+ *		header:			Boolean. If true a header-line is generated
+ *		processed:		Optional callback-Function. Called when doc is processed.
+ *		title: 			Optional sheet title
+ *
+ *	Columns Definition (config.columns):
+ *		Each column is either a Sting or Object.
+ *		If String, the itemvalue or metavalue is written (meta if String is all uppercase)
+ *		If Object it must have the format {label:<String>, value: <Function(TMLContext)>}
+ *
+ *	Sampe usages:
+ *		AFW.Util.excelWriter({
+ *			columns: ["TITLE", "CREATED", "ean", "price"],
+ *			query: "content.structentry.contenttype.name='product'"
+ *		}).write(filename)
+ */
+this.excelWriter = function(config){
+
+	/*
+		JavaDoc
+		https://javadoc.io/doc/org.apache.poi/poi/4.1.2/index.html
+		(Newer versions of POI needs at last java 10)
+	*/
+
+	var workbook = new Packages.org.apache.poi.xssf.usermodel.XSSFWorkbook();
+	var sheet = config.title ? workbook.createSheet(config.title) : workbook.createSheet();
+	
+	var row, cell;
+	var rownum = 0;
+	var cellnum = 0;
+
+	var createHelper = workbook.getCreationHelper();
+	var dateCellStyle = workbook.createCellStyle();
+	dateCellStyle.setDataFormat(
+		createHelper.createDataFormat().getFormat(config.dateformat || "dd.MM.yyyy HH:mm:ss")
+	);			
+	var numberCellStyle = workbook.createCellStyle();
+	numberCellStyle.setDataFormat(
+		createHelper.createDataFormat().getFormat(config.numberformat || "#")
+	);			
+
+
+	function addValue(value){
+		cell = row.createCell(cellnum++);
+		cell.setCellValue(value||"");
+
+		if(value instanceof Packages.java.util.Date){
+			cell.setCellStyle(dateCellStyle);
+		}
+		else if(typeof(value)=="number"){
+			config.numberformat && cell.setCellStyle(numberCellStyle);
+		}
+		
+	}
+
+	function colLabel(col) {
+		return typeof(col)=="string" ? col.split("|")[0] : (col.label||"");
+	};
+
+	function colValue($cx, col) {
+		if(typeof(col)=="string"){
+			var parts = col.split("|");
+			var value = parts[1]||parts[0];
+			return value ? $cx[value] : ""; 
+		}
+		else return col.value.call($cx, $cx);
+	}
+
+	return {
+		write: function(stream_or_file){
+			
+		  	var out;
+		  	if(stream_or_file){
+
+				if(typeof(stream_or_file)=="string")
+					stream_or_file = WGA.File(stream_or_file);
+		  				  		
+		  		if(stream_or_file instanceof Packages.de.innovationgate.wga.server.api.WGAFile)
+		  			stream_or_file = stream_or_file.file
+
+		  		if(stream_or_file instanceof java.io.OutputStream)
+		  			out = stream_or_file;
+				else if(stream_or_file instanceof java.io.File)
+					out = new java.io.FileOutputStream(stream_or_file);
+				else{
+					console.error("stream_or_file no stream or file", stream_or_file);
+				}
+		  	}
+		  	else {
+		  		console.error("no file")
+		  		return;
+		  	}
+		  	console.log("out", out, "stream_or_file", stream_or_file)
+		  	
+			var itemlist = config.columns;
+			if(itemlist instanceof Array)
+				itemlist = WGA.createList(itemlist);
+			
+			var contentlist = config.contentlist
+			if(!contentlist){
+				if(config.query){
+					contentlist = WGA.database().query("hql", config.query, {max:0})
+				}
+				else contentlist = WGA.database().query("hql", "content.structentry.parententry.key=:structkey", {max:0}, {structkey:STRUCTKEY})
+			}
+			
+			// headline:
+			if(config.header!==false){
+				row = sheet.createRow(rownum++);
+				cellnum = 0;
+				for(let col in Iterator(itemlist))
+					addValue(colLabel(col));
+			}
+
+			// data
+			for(let doc in Iterator(contentlist)){
+				row = sheet.createRow(rownum++);
+				cellnum = 0;
+				if(doc instanceof Packages.de.innovationgate.webgate.api.WGContent)
+					doc=context(doc);
+				for(let col in Iterator(itemlist)){
+					var value="";
+					try{
+						var value = colValue(doc, col);
+					}
+					catch(e){
+						value = e.message;
+						log.info(e.message);
+					}
+					addValue(value);
+				}
+				if(config.processed)
+					config.processed.call(doc, doc);
+			}
+			
+			workbook.write(out);
+			out.close();
 
 		}
 	}
