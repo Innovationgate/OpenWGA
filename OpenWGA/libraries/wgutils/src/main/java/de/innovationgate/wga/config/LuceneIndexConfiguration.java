@@ -108,7 +108,11 @@ public class LuceneIndexConfiguration extends ConfigBean {
 			itemRules.add(LuceneIndexItemRule.DEFAULT_RULE);
 		}    		
 		Collections.sort(itemRules, LuceneIndexItemRule.COMPARATOR);
-        return itemRules;
+		
+		// return a copy of itemRules to avoid ConcurrentModificationException
+		ArrayList<LuceneIndexItemRule> result = new ArrayList<LuceneIndexItemRule>();
+		result.addAll(itemRules);
+        return result; 
     }
 
     public synchronized List<LuceneIndexFileRule> getFileRules() {
