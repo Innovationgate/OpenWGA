@@ -395,7 +395,9 @@
 
 				<script>
 				
-					window.$ajaxInfo_<tml:script>return portlet.portletkey</tml:script>=$ajaxInfo_<tml:script>return portlet.portletkey</tml:script>;
+					// #00006343: Keine Ahnung, warum das hier gemacht wird.
+					// Jedenfalls funktioniert es nach Issue #00006216 nicht mehr.
+					//window.$ajaxInfo_<tml:script>return portlet.portletkey</tml:script>=$ajaxInfo_<tml:script>return portlet.portletkey</tml:script>;
 				
 					// create attachment grid
 					<tml:case context="{'db:'+option('dbkey')+'/docid:'+option('contentkey')}" iscontextvalid="true">
