@@ -1,0 +1,115 @@
+<tml:[util:tabs] designdb="plugin-cm-neo">
+
+	<tml:[util:tab-page] designdb="plugin-cm-neo" o_id="basic" o_title="Basisdaten">
+
+		<label><tml:label key="form.settings.label"/>:</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:label}" mode="{option('mode')}" cssstyle="width:100%"/> 
+		</div>
+		
+		<label><tml:label key="form.settings.fieldname"/> (Empfohlen: a-Z und _. Keine Leerzeichen oder Umlaute):</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:fieldname}" mode="{option('mode')}" cssstyle="width:100%"/>
+		</div>
+		
+		<label><tml:label key="form.settings.field-type"/>:</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:fieldtype}" cssclass="form-control" type="select" options="{label('form.settings.field-type.options')}"
+				default="text"
+				changeaction="$refresh" ajax="true"
+				mode="{option('mode')}"
+			/>	
+		</div>
+		
+		<tml:case condition="createlist(['file']).contains(tmlform.field(WGA.scoped('fieldtype')))">
+			<label>Mehrfachauswahl:</label>
+			<div style="margin:10px">
+				<tml:input name="{scoped:multiple}" type="boolean" mode="{option('mode')}"/> 
+			</div>	
+		</tml:case>
+		
+		<tml:case condition="createlist(['text', 'textarea', 'number', 'date']).contains(tmlform.field(WGA.scoped('fieldtype')))">
+			<label><tml:label key="form.settings.placeholder"/>:</label>
+			<div style="margin:10px">
+				<tml:input name="{scoped:placeholder}" mode="{option('mode')}" cssstyle="width:100%"/> 
+			</div>	
+		</tml:case>
+				
+		<tml:case condition="createlist(['select', 'checkbox','radio']).contains(tmlform.field(WGA.scoped('fieldtype')))">
+			<label><tml:label key="form.settings.options"/>:</label>
+			<div style="margin:10px">
+				<tml:input name="{scoped:options}" type="textarea" multiple="true" cssstyle="width:100%" mode="{option('mode')}"/>
+			</div>
+		</tml:case>
+		
+		<tml:case condition="tmlform.field(WGA.scoped('fieldtype'))=='date'">
+			<label><tml:label key="form.settings.date.year-range"/>:</label>
+			<div style="margin:10px">
+				<tml:input name="{scoped:year_range}" type="text" default="-10:+10" cssstyle="width:100%" mode="{option('mode')}"/>
+			</div>
+		</tml:case>
+		
+		<label><tml:label key="form.settings.defaultvalue"/>:</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:defaultvalue}" type="text" cssstyle="width:100%" mode="{option('mode')}"/>
+		</div>
+		
+		<script>
+			WGA.event.addListener("<tml:script expression="portlet.portletkey"/>", "cm.tab-changed", function(){
+				$("#<tml:script expression="tmlform.formid"/> textarea").autogrow()
+			})
+		</script>
+		
+	</tml:[util:tab-page]>
+	
+	<tml:case condition="createlist(['text', 'textarea', 'number', 'radio', 'checkbox', 'date', 'password', 'select']).contains(tmlform.field(WGA.scoped('fieldtype')))">
+		<tml:[util:tab-page] designdb="plugin-cm-neo" o_id="validate" o_title="Validierung">
+			<label><tml:label key="form.settings.validation"/>:</label>
+			<div style="margin:10px">
+				<tml:script>
+					_opts = label('form.settings.validation.options');
+					if(tmlform.field(WGA.scoped('fieldtype'))=="text")
+						_opts += label('form.settings.validation.options.mail');
+				</tml:script>
+				<tml:input name="{scoped:validation}" cssclass="form-control" type="select" options="{_opts}"
+					changeaction="$refresh" ajax="true"
+					mode="{option('mode')}"
+				/>	
+			</div>
+			<tml:case condition="tmlform.field(WGA.scoped('validation'))">
+				<label><tml:label key="form.settings.validationmessage"/>:</label>
+				<div style="margin:10px">
+					<tml:input name="{scoped:validationmessage}" type="textarea" cssstyle="width:100%" mode="{option('mode')}"/>
+				</div>
+			</tml:case>
+		</tml:[util:tab-page]>
+	</tml:case>
+	
+	<tml:[util:tab-page] designdb="plugin-cm-neo" o_id="focus" o_title="Fokus">
+		<div style="margin:10px">
+			<tml:input name="{scoped:focus}" mode="{option('mode')}" type="boolean" options="Fokus wenn Seite geladen wird|true"/>
+		</div>
+	</tml:[util:tab-page]>
+	
+	<tml:case condition="createlist(['checkbox','radio']).contains(tmlform.field(WGA.scoped('fieldtype'))) || $option_cmm_styles">
+		<tml:[util:tab-page] designdb="plugin-cm-neo" o_id="style" o_title="Layout">
+			
+			<tml:case condition="createlist(['checkbox','radio']).contains(tmlform.field(WGA.scoped('fieldtype')))">
+				<div style="margin:10px">
+					<tml:input name="{scoped:divider}" type="checkbox" labeled="true" options="{label('form.settings.layout.options')}" mode="{option('mode')}"/>
+				</div>
+			</tml:case>
+			
+			<tml:case if="$option_cmm_styles">
+				<div style="padding:10px;_background: #efefef">
+					<tml:option name="cmm_styles"/>
+				</div>
+				<tml:script>
+					$option_module_styles.included=true;
+				</tml:script>
+			</tml:case>
+			
+		</tml:[util:tab-page]>
+	</tml:case>
+	
+</tml:[util:tabs]>
