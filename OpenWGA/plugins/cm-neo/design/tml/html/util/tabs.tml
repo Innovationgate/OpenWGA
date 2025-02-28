@@ -46,7 +46,7 @@
 			WGA.ajax.action({
 				action: "<tml:action ajax="norefresh">
 					portlet.active_tab = request.getParameter("tab")
-					var ev = createevent("appkit.tab-changed")
+					var ev = createevent("cm.tab-changed")
 					ev.addParameter("tab", portlet.active_tab)
 					portlet.fireevent(ev)
 				</tml:action>",
