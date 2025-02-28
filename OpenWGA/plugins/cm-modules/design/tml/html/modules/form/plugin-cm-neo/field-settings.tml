@@ -101,7 +101,7 @@
 			</tml:case>
 			
 			<tml:case if="$option_cmm_styles">
-				<div style="padding:10px;_background: #efefef">
+				<div style="padding:10px>
 					<tml:option name="cmm_styles"/>
 				</div>
 				<tml:script>
