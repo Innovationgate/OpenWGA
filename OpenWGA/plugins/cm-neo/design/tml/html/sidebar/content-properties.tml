@@ -40,7 +40,11 @@
 					
 					<div class="form-group">
 						<label>Autor</label>
-						<p class="data">{{author}}</p>
+						<p class="data">
+							<a href="#" data-dialog="author-info">
+								{{author_name}}
+							</a>
+						</p>
 					</div>
 					
 					{{#created}}

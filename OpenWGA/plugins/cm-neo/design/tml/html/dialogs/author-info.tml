@@ -1,0 +1,18 @@
+<div class="header">
+	Autor dieser Inhaltsversion
+	<a data-modal="hide">&times;</a>
+</div>
+
+<div class="content">
+	<div class="form-horizontal">
+		<tml:[util:form-field] o_label="User-ID">
+			@{AUTHOR}
+		</tml:[util:form-field]>
+		<tml:[util:form-field] o_label="Name">
+			@{AUTHORNAME}
+		</tml:[util:form-field]>
+		<tml:[util:form-field] o_label="E-Mail" if="EMAIL">
+			<a href="mailto:@{EMAIL}">@{EMAIL}</a>
+		</tml:[util:form-field]>
+	</div>
+</div>
