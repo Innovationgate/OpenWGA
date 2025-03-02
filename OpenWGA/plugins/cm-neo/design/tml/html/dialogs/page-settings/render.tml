@@ -167,7 +167,7 @@
 						"none": 		"Keine Unterseiten erlaubt",
 						"fixDocTypes": 	"Nur Seiten bestimmter Seitentypen"
 					}[pagetype.getChildPageRestrictions()];
-					_opts = "Beliebig|any,Keine|none,Nur Seiten folgender Seitentypen|fixDocTypes,Default aus Seitentyp: " + pagetype_restrictions + "|unspecified"
+					_opts = "Default aus Seitentyp: " + pagetype_restrictions + "|unspecified,Beliebig|any,Keine|none,Nur Seiten folgender Seitentypen|fixDocTypes"
 				</tml:script>
 				<tml:[form-field] o_label="Erlaubte Unterseiten" o_name="struct_childpagerestrictions" o_type="select"
 					o_options="{_opts}"
