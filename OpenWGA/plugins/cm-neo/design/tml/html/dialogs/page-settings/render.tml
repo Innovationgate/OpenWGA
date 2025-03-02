@@ -180,12 +180,13 @@
 						if(!tmlform.submitted)
 							tmlform.struct_allowedchildtypes = document.getAllowedChildTypes()
 					</tml:script>
-					<tml:[form-field] o_label="Seitentypen" o_name="struct_allowedchildtypes" o_type="checkbox"
+					<tml:[form-field] o_name="struct_allowedchildtypes" o_type="checkbox"
 						o_multiple="true"
 						o_labeled="true"
 						o_divider="<br>"
 						o_optionsitem="_pagetypes"
 						o_store="false"
+						o_mode="{WGA.app().isChiefEditor() ? 'edit':'view'}"
 					/>
 				</tml:case>
 				
