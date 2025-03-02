@@ -161,9 +161,16 @@
 				<tml:script>
 					if(!tmlform.submitted)
 						tmlform.struct_childpagerestrictions = document.getChildPageRestrictions()
+					var pagetype = db().getContentType(tmlform.contenttype);
+					var pagetype_restrictions = {
+						"any": 			"Beliebig",
+						"none": 		"Keine Unterseiten erlaubt",
+						"fixDocTypes": 	"Nur Seiten bestimmter Seitentypen"
+					}[pagetype.getChildPageRestrictions()];
+					_opts = "Beliebig|any,Keine|none,Nur Seiten folgender Seitentypen|fixDocTypes,Default aus Seitentyp: " + pagetype_restrictions + "|unspecified"
 				</tml:script>
 				<tml:[form-field] o_label="Erlaubte Unterseiten" o_name="struct_childpagerestrictions" o_type="select"
-					o_options="Beliebig|any,Keine|none,Nur Seiten folgender Seitentypen|fixDocTypes,Default (im Seitentyp festgelegt)|unspecified"
+					o_options="{_opts}"
 					o_changeaction="$refresh"
 					o_store="false"
 				/>
