@@ -161,7 +161,7 @@
 				<tml:script>
 					if(!tmlform.submitted)
 						tmlform.struct_childpagerestrictions = document.getChildPageRestrictions()
-					var pagetype = db().getContentType(tmlform.contenttype);
+					var pagetype = db().getContentType(tmlform.contenttype);					
 					var pagetype_restrictions = {
 						"any": 			"Beliebig",
 						"none": 		"Keine Unterseiten erlaubt",
