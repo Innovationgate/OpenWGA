@@ -173,6 +173,7 @@
 					o_options="{_opts}"
 					o_changeaction="$refresh"
 					o_store="false"
+					o_mode="{WGA.app().isChiefEditor() ? 'edit':'view'}"
 				/>
 				<tml:case condition="tmlform.struct_childpagerestrictions=='fixDocTypes'">
 					<tml:script>
