@@ -15,4 +15,8 @@
 	<div style="margin:10px">
 		<tml:input name="{scoped:download}" type="boolean" default="false" mode="{option:mode}"/>
 	</div>
+	<label><tml:label key="image.settings.lightbox-group"/>:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:image_group}" cssclass="form-control" cssstyle="width:100%" html_placeholder="default" mode="{option:mode}"/>
+	</div>	
 </tml:case>

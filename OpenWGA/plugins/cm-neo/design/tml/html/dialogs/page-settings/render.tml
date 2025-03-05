@@ -161,23 +161,32 @@
 				<tml:script>
 					if(!tmlform.submitted)
 						tmlform.struct_childpagerestrictions = document.getChildPageRestrictions()
+					var pagetype = db().getContentType(tmlform.contenttype);					
+					var pagetype_restrictions = {
+						"any": 			"Beliebig",
+						"none": 		"Keine Unterseiten erlaubt",
+						"fixDocTypes": 	"Nur Seiten bestimmter Seitentypen"
+					}[pagetype.getChildPageRestrictions()];
+					_opts = "Default aus Seitentyp: " + pagetype_restrictions + "|unspecified,Beliebig|any,Keine|none,Nur Seiten folgender Seitentypen|fixDocTypes"
 				</tml:script>
 				<tml:[form-field] o_label="Erlaubte Unterseiten" o_name="struct_childpagerestrictions" o_type="select"
-					o_options="Beliebig|any,Keine|none,Nur Seiten folgender Seitentypen|fixDocTypes,Default (im Seitentyp festgelegt)|unspecified"
+					o_options="{_opts}"
 					o_changeaction="$refresh"
 					o_store="false"
+					o_mode="{WGA.app().isChiefEditor() ? 'edit':'view'}"
 				/>
 				<tml:case condition="tmlform.struct_childpagerestrictions=='fixDocTypes'">
 					<tml:script>
 						if(!tmlform.submitted)
 							tmlform.struct_allowedchildtypes = document.getAllowedChildTypes()
 					</tml:script>
-					<tml:[form-field] o_label="Seitentypen" o_name="struct_allowedchildtypes" o_type="checkbox"
+					<tml:[form-field] o_name="struct_allowedchildtypes" o_type="checkbox"
 						o_multiple="true"
 						o_labeled="true"
 						o_divider="<br>"
 						o_optionsitem="_pagetypes"
 						o_store="false"
+						o_mode="{WGA.app().isChiefEditor() ? 'edit':'view'}"
 					/>
 				</tml:case>
 				

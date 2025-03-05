@@ -70,7 +70,7 @@
 	<div class="header">
 		<div class="title">Inhaltsmodule</div>
 		<div class="module"></div>
-		<a data-modal="hide">&times;</a>
+		<a data-modal="hide" title="Dialog schließen">&times;</a>
 	</div>
 	
 	<div class="content">
@@ -172,10 +172,15 @@
 		</div>
 		
 		<div class="pull-right">
-			<a class="btn btn-default" data-modal="hide">Abbrechen</a>
-			<tml:case condition="$option_mode=='edit'">
-				<button class="btn btn-primary" data-action="save-modules">Speichern</button>
-			</tml:case>
+			<tml:if condition="$option_mode=='edit'">
+				<tml:then>
+					<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+					<button class="btn btn-primary" data-action="save-modules">Speichern</button>
+				</tml:then>
+				<tml:else>
+					<a class="btn btn-default" data-modal="hide">Schließen</a>
+				</tml:else>
+			</tml:if>
 		</div>
 	</div>
 </tml:case>

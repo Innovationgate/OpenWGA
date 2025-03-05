@@ -94,41 +94,41 @@ public class LuceneIndexConfiguration extends ConfigBean {
         this.enabled = enabled;
     }
 
-    public List<LuceneIndexItemRule> getItemRules() {
-    	if (itemRules != null) {
-    		Iterator<LuceneIndexItemRule> itemRulesIt = itemRules.iterator();
-    		boolean hasDefaultRule = false;
-    		while (itemRulesIt.hasNext()) {
-    			LuceneIndexItemRule rule = itemRulesIt.next();
-    			if (rule.getItemExpression().equals(LuceneIndexItemRule.DEFAULT_RULE.getItemExpression())) {
-    				hasDefaultRule = true;
-    				break;
-    			}
-    		}
-    		if (!hasDefaultRule) {
-    			itemRules.add(LuceneIndexItemRule.DEFAULT_RULE);
-    		}
-    		Collections.sort(itemRules, LuceneIndexItemRule.COMPARATOR);
-    	}
-        return itemRules;
+    public synchronized List<LuceneIndexItemRule> getItemRules() {
+		Iterator<LuceneIndexItemRule> itemRulesIt = itemRules.iterator();
+		boolean hasDefaultRule = false;
+		while (itemRulesIt.hasNext()) {
+			LuceneIndexItemRule rule = itemRulesIt.next();
+			if (rule.getItemExpression().equals(LuceneIndexItemRule.DEFAULT_RULE.getItemExpression())) {
+				hasDefaultRule = true;
+				break;
+			}
+		}
+		if (!hasDefaultRule) {
+			itemRules.add(LuceneIndexItemRule.DEFAULT_RULE);
+		}    		
+		Collections.sort(itemRules, LuceneIndexItemRule.COMPARATOR);
+		
+		// return a copy of itemRules to avoid ConcurrentModificationException
+		ArrayList<LuceneIndexItemRule> result = new ArrayList<LuceneIndexItemRule>();
+		result.addAll(itemRules);
+        return result; 
     }
 
-    public List<LuceneIndexFileRule> getFileRules() {
-    	if (fileRules != null) {
-    		Iterator<LuceneIndexFileRule> fileRulesIt = fileRules.iterator();
-    		boolean hasDefaultRule = false;
-    		while (fileRulesIt.hasNext()) {
-    			LuceneIndexFileRule rule = fileRulesIt.next();
-    			if (rule.getFilePattern().equals(LuceneIndexFileRule.DEFAULT_RULE.getFilePattern())) {
-    				hasDefaultRule = true;
-    				break;
-    			}
-    		}
-    		if (!hasDefaultRule) {
-    			fileRules.add(LuceneIndexFileRule.DEFAULT_RULE);
-    		}
-    		Collections.sort(fileRules, LuceneIndexFileRule.COMPARATOR);
-    	}
+    public synchronized List<LuceneIndexFileRule> getFileRules() {
+		Iterator<LuceneIndexFileRule> fileRulesIt = fileRules.iterator();
+		boolean hasDefaultRule = false;
+		while (fileRulesIt.hasNext()) {
+			LuceneIndexFileRule rule = fileRulesIt.next();
+			if (rule.getFilePattern().equals(LuceneIndexFileRule.DEFAULT_RULE.getFilePattern())) {
+				hasDefaultRule = true;
+				break;
+			}
+		}
+		if (!hasDefaultRule) {
+			fileRules.add(LuceneIndexFileRule.DEFAULT_RULE);
+		}
+		Collections.sort(fileRules, LuceneIndexFileRule.COMPARATOR);
         return fileRules;
     }
     
@@ -139,7 +139,7 @@ public class LuceneIndexConfiguration extends ConfigBean {
 		} else {
 			this.itemRules = itemRules;
 		}
-		Collections.sort(itemRules, LuceneIndexItemRule.COMPARATOR);
+		Collections.sort(this.itemRules, LuceneIndexItemRule.COMPARATOR);
 	}
 
 	public void setFileRules(List<LuceneIndexFileRule> fileRules) {
@@ -149,7 +149,7 @@ public class LuceneIndexConfiguration extends ConfigBean {
 		} else {
 			this.fileRules = fileRules;
 		}
-		Collections.sort(fileRules, LuceneIndexFileRule.COMPARATOR);
+		Collections.sort(this.fileRules, LuceneIndexFileRule.COMPARATOR);
 	}
 
 	@Override

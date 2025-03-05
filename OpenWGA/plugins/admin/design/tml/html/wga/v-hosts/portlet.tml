@@ -141,9 +141,9 @@
 					
 					<table class="collection" width="100%">
 						<tr class="collection-title">
-							<td>Server Name</td>
-							<td>Allowed Databases</td>
-							<td>Default Database</td>
+							<td>Host Name</td>
+							<td>Allowed Apps</td>
+							<td>Default App</td>
 							<td></td>
 							<td width="1%"></td>
 							<td width="1%"></td>
@@ -185,8 +185,10 @@
 								</td>								
 								<td>
 									<tml:script>
-										if(_host.defaultDatabase)
-											return DBM.wgaconfig.getByUid(_host.defaultDatabase).key;
+										if(_host.defaultDatabase){
+											var d = DBM.wgaconfig.getByUid(_host.defaultDatabase)
+											return d ? d.key : "App not found: " + _host.defaultDatabase
+										}
 										else return "- None -"
 									</tml:script>
 								</td>
