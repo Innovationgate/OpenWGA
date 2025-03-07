@@ -1,18 +1,23 @@
 <tml:action id="approve-content">
 
-	content().approve(tmlform.comment);
-	
-	if(content().getStatus()==content().STATUS_RELEASE){
-		portlet.fireevent("struct-updated", {
-			id: STRUCTKEY,
-			symbolclass: App.getSymbolIcon(content()),
-			cssclass: App.getCssClass(content())
+	try{
+		content().approve(tmlform.comment);
+		
+		if(content().getStatus()==content().STATUS_RELEASE){
+			portlet.fireevent("struct-updated", {
+				id: STRUCTKEY,
+				symbolclass: App.getSymbolIcon(content()),
+				cssclass: App.getCssClass(content())
+			})
+		}
+		
+		portlet.fireevent("close-dialog", {
+			redirectto: contenturl("html", null, true)
 		})
 	}
-	
-	portlet.fireevent("close-dialog", {
-		redirectto: contenturl("html", null, true)
-	})
+	catch(e){
+		_error = e.message
+	}
 	
 </tml:action>
 
@@ -23,20 +28,50 @@
 	</div>
 	
 	<div class="content form-horizontal">
-		<tml:[form-field] o_label="Titel" o_mode="view">
-			<tml:metadata name="title"/>
-		</tml:[form-field]>
-		<tml:[form-field] o_label="Author" o_mode="view">
-			<tml:metadata name="authorname"/>
-		</tml:[form-field]>
-		<tml:[form-field] o_label="Kommentar" o_field="comment" o_type="textarea">
-			Der Autor wird über die Freigabe benachrichtigt.
-			Der optionale Kommentar wird per Mail an den Autor gesendet. 
-		</tml:[form-field]>
+		<tml:case if="_error">
+			<p>Es ist ein Fehler aufgetreten:</p>
+			@{_error wrap="p"}
+		</tml:case>
+		<tml:case unless="_error">
+			<tml:if condition="content().mayEditContent()">
+				<tml:then>
+					<tml:[form-field] o_label="Titel" o_mode="view">
+						<tml:metadata name="title"/>
+					</tml:[form-field]>
+					<tml:[form-field] o_label="Author" o_mode="view">
+						<tml:metadata name="authorname"/>
+					</tml:[form-field]>
+					<tml:[form-field] o_label="Kommentar" o_field="comment" o_type="textarea">
+						Der Autor wird über die Freigabe benachrichtigt.
+						Der optionale Kommentar wird per Mail an den Autor gesendet. 
+					</tml:[form-field]>
+				</tml:then>
+				<tml:else>
+					<p>Die Bearbeitungsrechte der Seite verhindern diese Aktionen für den angemeldeten User.</p>
+					<a href="#" data-action="more-info">
+						<i class="fa fa-arrow-right"></i>
+						Weitere Informationen
+					</a>
+					<script>
+						require(["jquery"], function($){
+							$("a[data-action='more-info']").click(function(ev){
+								ev.preventDefault();
+								WGA.event.fireEvent("appnav-view-change", "approve-page-dialog", {
+									view: "access-rights"
+								})
+								WGA.event.fireEvent("close-dialog", "approve-page-dialog", {});
+							})
+						})					
+					</script>
+				</tml:else>
+			</tml:if>
+		</tml:case>
 	</div>
 	
 	<div class="footer">
 		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
-		<tml:button cssclass="btn btn-primary" clickaction="approve-content">Freigeben</tml:button>
+		<tml:case condition="content().mayEditContent()">
+			<tml:button cssclass="btn btn-primary" clickaction="approve-content" unless="_error">Freigeben</tml:button>
+		</tml:case>
 	</div>
 </tml:form>
