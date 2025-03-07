@@ -55,9 +55,6 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 	var parent = null
 	struct = struct && struct.getParentEntry();
 	if(struct){
-		parent = {
-			title: struct.title
-		};
 		var c = context("db:"+dbkey+"/docid:"+struct.getStructKey()+ "<" + $urlParam_language + ">", false)
 		if(c){
 			parent = {
