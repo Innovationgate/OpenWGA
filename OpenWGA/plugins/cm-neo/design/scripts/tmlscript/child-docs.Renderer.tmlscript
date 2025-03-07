@@ -66,6 +66,20 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 				"href": c.contenturl('html', null, true)
 			}
 		}
+		else{
+			parent = {
+				title: WGA.encode("html", struct.title),
+					id: struct.getStructKey(),
+					href: WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
+								.setParameter({
+									dbkey: dbkey,
+									structkey: struct.getStructKey(),
+									lang: $urlParam_language
+								})
+								.build()
+			}
+		
+		}
 	}
 	
 	//console.log(JSON.stringify(docs));
