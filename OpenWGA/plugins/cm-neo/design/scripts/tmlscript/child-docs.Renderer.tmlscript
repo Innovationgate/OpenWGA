@@ -20,7 +20,7 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 					href: c.contenturl('html', null, true)
 				})
 			}
-			else if(doc.mayReadContent()){
+			else if(AFW.structentry(doc).isVisible()){
 				docs.push({
 					title: WGA.encode("html", doc.title),
 					id: doc.getStructKey(),
