@@ -1,11 +1,23 @@
 <tml:action id="approve-content">
-	content().approve(tmlform.comment);
-	_msg = "Seite wurde genehmigt"
+	try{
+		content().approve(tmlform.comment);
+		_msg = "Seite wurde genehmigt"
+	}
+	catch(e){
+		log.error(e.message);
+		_error = e.message;
+	}
 </tml:action>
 
 <tml:action id="reject-content">
-	content().reject(tmlform.comment);
-	_msg = "Genehmigung der Seite wurde ablehnt"
+	try{
+		content().reject(tmlform.comment);
+		_msg = "Genehmigung der Seite wurde ablehnt"
+	}
+	catch(e){
+		log.error(e.message);
+		_error = e.message;
+	}
 </tml:action>
 
 <div id="approve" class="modal-popup">
@@ -54,8 +66,42 @@
 	</tml:form>
 </div>
 
+<div id="not-allowed" class="modal-popup">
+	<div class="header">
+		Keine Bearbeitungsrechte
+		<a data-modal="hide">&times;</a>
+	</div>
+	<div class="content">
+		<p>Sie haben keine Bearbeitungsrechte für diese Seite.</p>
+		<p>Sie können diese Seite weder genehmigen noch ablehnen.</p>
+	</div>
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Schließen</a>
+	</div>
+</div>
+
+<div id="error" class="modal-popup">
+	<div class="header">
+		Es ist ein Fehler aufgetreten
+		<a data-modal="hide">&times;</a>
+	</div>
+	<div class="content">
+		<p><tml:item name="_error"/></p>
+	</div>
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Schließen</a>
+	</div>
+</div>
+
+
 <script>
 	require(["jquery", "jquery-modal", "jquery-textarea-autogrow"], function($){
 		$("textarea").autogrow();
+		<tml:case condition="!content().mayEditContent()">
+			$("#not-allowed").wga_modal("show")
+		</tml:case>
+		<tml:case if="_error">
+			$("#error").wga_modal("show")
+		</tml:case>
 	});
 </script>

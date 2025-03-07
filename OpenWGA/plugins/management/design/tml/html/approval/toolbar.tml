@@ -1,7 +1,7 @@
 <div class="toolbar">
 	
 	<tml:case condition="AFW.database(option('dbkey')).isEditor()" context="[db:{option('dbkey')}/docid:{option('key')}]" iscontextvalid="true">
-		<tml:case condition="STATUS==content().STATUS_REVIEW && content().getWorkflow().isApprovableByUser()">
+		<tml:case condition="STATUS==content().STATUS_REVIEW && content().getWorkflow().isApprovableByUser() && content().mayEditContent()">
 			<a class="btn button" href="#approve" data-modal="show">
 				<span class="icon glyphicon glyphicon-cloud-upload"></span>
 				<div class="text">Genehmigen</div>
