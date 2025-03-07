@@ -26,7 +26,8 @@
 						<tml:else>
 							<div class="splash">
 								<h1>Dokument nicht gefunden</h1>
-								Das Dokument mit Schlüssel <tml:item name="_key"/> konnte in Website <tml:item name="_dbkey"/>nicht gefunden werden.
+								Das Dokument mit Schlüssel <tml:item name="_key"/> konnte in Website '<tml:item name="_dbkey"/>' nicht gefunden werden 
+								oder ist für Sie nicht sichtbar.
 							</div>
 						</tml:else>
 					</tml:if>
