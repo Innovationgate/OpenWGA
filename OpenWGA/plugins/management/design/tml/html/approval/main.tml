@@ -21,7 +21,7 @@
 		
 				<tml:elseif condition="AFW.database(_dbkey).isEditor()">
 				
-					<tml:if context="[db:{_dbkey}/docid:{_key}]" iscontextvalid="true">
+					<tml:if context="[db:{_dbkey}/docid:{_key}]" iscontextvalid="true" condition="content().mayEditContent() || STATUS==content().STATUS_RELEASE">
 						<tml:then><tml:include ref="::body"/></tml:then>
 						<tml:else>
 							<div class="splash">
