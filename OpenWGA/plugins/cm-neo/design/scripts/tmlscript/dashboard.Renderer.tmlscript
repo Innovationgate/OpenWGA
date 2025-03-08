@@ -82,7 +82,7 @@ Renderer.prototype.getData = function(AFW, $urlParam_dbkey, $urlParam_contentkey
 				approverNames.push(auth.fetchCommonName(id))
 		
 			waiting.push({
-				title: WGA.encode("html", doc.TITLE),
+				title: doc.content().mayEditContent() ? WGA.encode("html", doc.TITLE) : "- nicht sichtbar -",
 				href: doc.contenturl('html', null, true),
 				modified: AFW.Util.timeElapsed(doc.MODIFIED),
 				workflow: doc.wfname + " / " + doc.wflevelnr,
@@ -104,7 +104,7 @@ Renderer.prototype.getData = function(AFW, $urlParam_dbkey, $urlParam_contentkey
 		
 		for(let doc in Iterator(docs)){
 			toapprove.push({
-				title: WGA.encode("html", doc.TITLE),
+				title: doc.content().mayEditContent() ? WGA.encode("html", doc.TITLE) : "- nicht sichtbar -",
 				href: doc.contenturl('html', null, true),
 				modified: AFW.Util.timeElapsed(doc.MODIFIED),
 				workflow: doc.wfname + " / " + doc.wflevelnr,

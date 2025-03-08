@@ -26,7 +26,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 		}
 		
 		result = {
-			title: WGA.encode("html", c.TITLE),
+			title: c.content().isInReview() && !c.content().mayEditContent() ? "- nicht sichtbar -" : WGA.encode("html", c.TITLE),
 			pagetype: db($urlParam_dbkey).getContentType(c.CONTENTTYPE).getNameForLanguage("de"),
 			pagename: c.PAGENAME,
 			version: c.VERSION,
