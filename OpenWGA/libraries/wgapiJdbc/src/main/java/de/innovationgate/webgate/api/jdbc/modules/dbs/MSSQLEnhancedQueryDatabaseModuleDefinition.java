@@ -4,6 +4,8 @@
  */
 package de.innovationgate.webgate.api.jdbc.modules.dbs;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Locale;
 
 import de.innovationgate.utils.WGUtils;
@@ -12,6 +14,7 @@ import de.innovationgate.webgate.api.jdbc.JNDIServerDatabaseRetriever;
 import de.innovationgate.webgate.api.jdbc.custom.JDBCSource;
 import de.innovationgate.webgate.api.modules.dbs.DatabaseProperties;
 import de.innovationgate.webgate.api.modules.dbs.GenericContentDatabaseModuleDefinition;
+import de.innovationgate.webgate.api.mssql.MSSQLDatabaseServer;
 import de.innovationgate.webgate.api.mssql.MSSQLEnhancedQuerySource;
 import de.innovationgate.webgate.api.mssql.MSSQLServerDatabaseRetriever;
 import de.innovationgate.webgate.api.query.jdbc.WGDatabaseImpl;
@@ -76,11 +79,12 @@ public class MSSQLEnhancedQueryDatabaseModuleDefinition extends GenericContentDa
     }
 
     public void testDependencies() throws ModuleDependencyException {
+
         try {
-            Class.forName(de.innovationgate.webgate.api.mssql.WGDatabaseImpl.DRIVER);
+            DriverManager.getDriver(MSSQLDatabaseServer.JDBC_BASE_PATH);
         }
-        catch (ClassNotFoundException e) {
-            throw new ModuleDependencyException("The jTDS JDBC Driver is not in classpath");
+        catch (SQLException e) {
+            throw new ModuleDependencyException("No MSSQL JDBC Driver found.");
         }
     }
 }

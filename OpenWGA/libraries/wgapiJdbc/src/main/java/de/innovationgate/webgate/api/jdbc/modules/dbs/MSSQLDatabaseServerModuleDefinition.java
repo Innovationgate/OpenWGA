@@ -4,6 +4,8 @@
  */
 package de.innovationgate.webgate.api.jdbc.modules.dbs;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Locale;
 
 import de.innovationgate.utils.WGUtils;
@@ -88,9 +90,22 @@ public class MSSQLDatabaseServerModuleDefinition implements ModuleDefinition, Re
         
         LocalizedOptionDefinition poolConnLifetime = new LocalizedOptionDefinition(DatabaseServer.OPTION_SHAREDPOOL_MAX_CONNECTION_LIFETIME, IntegerOptionType.INSTANCE, _bundleLoader);
         poolConnLifetime.addDependentOption(DatabaseServer.OPTION_SHAREDPOOL, Boolean.TRUE.toString());
-        poolConnLifetime.setDefaultValue(String.valueOf(MySqlDatabaseServer.DEFAULT_SHAREDPOOL_MAX_CONNECTION_LIFETIME));
+        poolConnLifetime.setDefaultValue(String.valueOf(MSSQLDatabaseServer.DEFAULT_SHAREDPOOL_MAX_CONNECTION_LIFETIME));
+        poolConnLifetime.setOptional(true);
         options.addOption(poolConnLifetime);
-        
+
+        LocalizedOptionDefinition minEvictableIdleTimeMillis = new LocalizedOptionDefinition(DatabaseServer.OPTION_SHAREDPOOL_MIN_EVICTABLE_IDLE_TIME_MILLIS, IntegerOptionType.INSTANCE, _bundleLoader);
+        minEvictableIdleTimeMillis.addDependentOption(DatabaseServer.OPTION_SHAREDPOOL, Boolean.TRUE.toString());
+        minEvictableIdleTimeMillis.setDefaultValue(String.valueOf(MSSQLDatabaseServer.DEFAULT_SHAREDPOOL_MIN_EVICTABLE_IDLE_TIME_MILLIS));
+        minEvictableIdleTimeMillis.setOptional(true);
+        options.addOption(minEvictableIdleTimeMillis);
+
+        LocalizedOptionDefinition removeAbandonedTimeout = new LocalizedOptionDefinition(DatabaseServer.OPTION_SHAREDPOOL_REMOVE_ABANDONED_TIMEOUT, IntegerOptionType.INSTANCE, _bundleLoader);
+        removeAbandonedTimeout.addDependentOption(DatabaseServer.OPTION_SHAREDPOOL, Boolean.TRUE.toString());
+        removeAbandonedTimeout.setDefaultValue(String.valueOf(MSSQLDatabaseServer.DEFAULT_SHAREDPOOL_REMOVE_ABANDONED_TIMEOUT));
+        removeAbandonedTimeout.setOptional(true);
+        options.addOption(removeAbandonedTimeout);
+
         return options;
         
     }
@@ -108,10 +123,10 @@ public class MSSQLDatabaseServerModuleDefinition implements ModuleDefinition, Re
     
     public void testDependencies() throws ModuleDependencyException {
         try {
-            Class.forName(de.innovationgate.webgate.api.mssql.WGDatabaseImpl.DRIVER);
+            DriverManager.getDriver(MSSQLDatabaseServer.JDBC_BASE_PATH);
         }
-        catch (ClassNotFoundException e) {
-            throw new ModuleDependencyException("The jTDS JDBC Driver is not in classpath");
+        catch (SQLException e) {
+            throw new ModuleDependencyException("No MSSQL JDBC Driver found.");
         }
     }
 

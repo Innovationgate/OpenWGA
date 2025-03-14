@@ -12,15 +12,9 @@ import de.innovationgate.webgate.api.jdbc.custom.JDBCSource;
 import de.innovationgate.webgate.api.templates.ContentSourceSpecs;
 
 public class MSSQLEnhancedQuerySource extends JDBCSource {
-
-    @Override
-    protected String getJDBCDriver(WGDatabase db) {
-        return de.innovationgate.webgate.api.mssql.WGDatabaseImpl.DRIVER;
-    }
-
+	
     @Override
     public ContentSourceSpecs init(WGDatabase db, String path) throws WGInvalidDatabaseException {
-        
         
         // Build creations options
         Map creationOptions = db.getCreationOptions();
