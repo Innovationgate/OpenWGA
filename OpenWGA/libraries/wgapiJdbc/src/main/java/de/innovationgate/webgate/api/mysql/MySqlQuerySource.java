@@ -41,7 +41,7 @@ public class MySqlQuerySource extends WGDatabaseImpl {
         Map creationOptions = db.getCreationOptions();
         
         // configuration of connection related properties
-        WGDatabase.putDefaultOption(creationOptions, "jdbc.dbcp.validationQuery", "select 1");
+        //WGDatabase.putDefaultOption(creationOptions, "jdbc.dbcp.validationQuery", "select 1");
         WGDatabase.putDefaultOption(creationOptions, "jdbc.dbcp.testOnBorrow", "true");
         WGDatabase.putDefaultOption(creationOptions, "jdbc.connection.connectTimeout", "60000");
         WGDatabase.putDefaultOption(creationOptions, "jdbc.connection.socketTimeout", "120000");
