@@ -348,7 +348,7 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             poolProps.put("hibernate.dbcp.maxConnLifetimeMillis", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MAX_CONNECTION_LIFETIME)));
             poolProps.put("hibernate.dbcp.minEvictableIdleTimeMillis", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MIN_EVICTABLE_IDLE_TIME_MILLIS)));
 
-            poolProps.put("hibernate.dbcp.validationQuery", "/* ping */ SELECT 1");
+            //poolProps.put("hibernate.dbcp.validationQuery", "/* ping */ SELECT 1");
             
             poolProps.put("hibernate.dbcp.validationQueryTimeout", "5");
             poolProps.put("hibernate.dbcp.testOnBorrow", "true");

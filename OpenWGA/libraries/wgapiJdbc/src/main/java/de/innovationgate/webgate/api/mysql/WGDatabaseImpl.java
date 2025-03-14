@@ -65,7 +65,7 @@ public class WGDatabaseImpl extends de.innovationgate.webgate.api.jdbc.WGDatabas
         
         // Hibernate configuration
         WGDatabase.putDefaultOption(creationOptions, "hibernate.dialect", MySQL5Dialect.class.getName());
-        WGDatabase.putDefaultOption(creationOptions, "hibernate.dbcp.validationQuery", "select 1");
+        //WGDatabase.putDefaultOption(creationOptions, "hibernate.dbcp.validationQuery", "/* ping */ SELECT 1");
         WGDatabase.putDefaultOption(creationOptions, "hibernate.dbcp.testOnBorrow", "true");
         WGDatabase.putDefaultOption(creationOptions, "hibernate.dbcp.maxWait", "30000");
         WGDatabase.putDefaultOption(creationOptions, "hibernate.connection.connectTimeout", CONNECT_TIMEOUT_DEFAULT);
