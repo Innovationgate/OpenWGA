@@ -44,7 +44,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 			key: version.getContentKey().toString(),
 			status: label("content-properties.status." + (version.isPendingRelease() ? 'pending' : version.getStatus())),
 			modified: WGA.format(version.getLastModified(), "dd.MM.yyyy HH:mm"),
-			published: AFW.Util.dateRange(version.getPublished(), version.getLastModified()),
+			published: version.getPublished() ? AFW.Util.dateRange(version.getPublished(), version.getLastModified()) : "- nie veröffentlicht -",
 			cssclass: version.getVersion()==c.VERSION && version.getLanguage().name==current_lang ? "selected":"",
 			language: version.getLanguage().getTitle(),
 			url: context(version).contenturl("html", null, true)
