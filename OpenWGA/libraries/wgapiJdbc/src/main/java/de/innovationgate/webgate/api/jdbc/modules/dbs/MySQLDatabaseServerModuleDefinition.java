@@ -128,22 +128,6 @@ public class MySQLDatabaseServerModuleDefinition implements ModuleDefinition, Re
         removeAbandonedTimeout.setOptional(true);
         options.addOption(removeAbandonedTimeout);
 
-        /*
-        LocalizedOptionDefinition connectTimeout = new LocalizedOptionDefinition("hibernate.connection.connectTimeout", IntegerOptionType.INSTANCE, _bundleLoader);
-        connectTimeout.addDependentOption(DatabaseServer.OPTION_SHAREDPOOL, Boolean.TRUE.toString());
-        connectTimeout.setOptional(true);
-        connectTimeout.setDefaultValue(WGDatabaseImpl.CONNECT_TIMEOUT_DEFAULT);
-        options.addOption(connectTimeout);
-        */
-        
-        /*
-        LocalizedOptionDefinition socketTimeout = new LocalizedOptionDefinition("hibernate.connection.socketTimeout", IntegerOptionType.INSTANCE, _bundleLoader);
-        socketTimeout.addDependentOption(DatabaseServer.OPTION_SHAREDPOOL, Boolean.TRUE.toString());
-        socketTimeout.setOptional(true);
-        socketTimeout.setDefaultValue(WGDatabaseImpl.SOCKET_TIMEOUT_DEFAULT);
-        options.addOption(socketTimeout);
-        */
-        
         return options;
         
     }
@@ -164,7 +148,7 @@ public class MySQLDatabaseServerModuleDefinition implements ModuleDefinition, Re
         	DriverManager.getDriver(MySqlDatabaseServer.JDBC_BASE_PATH);
         }
         catch (SQLException e) {
-            throw new ModuleDependencyException("The MySQL JDBC Driver \"Connector/J\" is not in classpath");
+            throw new ModuleDependencyException("No MySQL JDBC Driver found.");
         }
     }
 
