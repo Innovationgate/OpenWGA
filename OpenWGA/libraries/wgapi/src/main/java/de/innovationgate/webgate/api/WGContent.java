@@ -501,7 +501,14 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     static {
         METAINFO_PUBLISHED.setMinCsVersion(WGDatabase.CSVERSION_WGA5);
     }
-    
+
+    public static final String META_ARCHIVED = "ARCHIVED";
+    public static final MetaInfo METAINFO_ARCHIVED = new MetaInfo(META_ARCHIVED, Date.class, null);
+    static {
+    	METAINFO_ARCHIVED.setExtdata(true);
+        METAINFO_ARCHIVED.setMinCsVersion(WGDatabase.CSVERSION_WGA5);
+    }
+
     public static final String META_PENDINGRELEASE = "PENDINGRELEASE";
     public static final MetaInfo METAINFO_PENDINGRELEASE = new MetaInfo(META_PENDINGRELEASE, Boolean.class, Boolean.FALSE);
     static {
@@ -1508,6 +1515,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 		this.setStatus(WGContent.STATUS_ARCHIVE);
 		WGWorkflow workflow = getWorkflow();
 		workflow.archive(comment);
+		this.setArchived(new Date());
 
 		// Write workflow history
 		if (comment != null && !comment.trim().equals("")) {
@@ -1835,6 +1843,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
                 newContent.setCoauthors(new ArrayList(getCoauthors()));
                 newContent.setContentClass(getContentClass());
                 newContent.setPublished(getPublished());
+                newContent.setArchived(getArchived());
             }
             
             // If the source is no CS5 we initialize the published date of the target with the creation date
@@ -2866,7 +2875,19 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     protected void setPublished(Date published) throws WGAPIException {
         setMetaData(META_PUBLISHED, published);
     }
+
+    /**
+     * Returns the time when this content version was archived
+     * @throws WGAPIException
+     */
+    public Date getArchived() throws WGAPIException {
+        return (Date) getMetaData(META_ARCHIVED);
+    }
     
+    protected void setArchived(Date date) throws WGAPIException {
+        setMetaData(META_ARCHIVED, date);
+    }
+
     /**
      * Returns the E-Mail address of the author of the current document
      * This method remains bc. of compatibility reasons. Unlike in earlier WGA versions it does not read an E-Mail address stored in the document
