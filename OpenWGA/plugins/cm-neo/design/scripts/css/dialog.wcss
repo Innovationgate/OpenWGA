@@ -91,6 +91,11 @@ body .modal-popup{
 		.module{
 			float:left;
 			margin-left: 5px;
+			padding-bottom: 5px;
+			max-width: 65%;
+			overflow: hidden;
+			text-overflow: ellipsis;
+ 			white-space: nowrap;
 		}
 	}
 
@@ -144,6 +149,11 @@ body .modal-popup{
 			padding: 5px 10px;
 			img{
 				filter: grayscale(100%);
+				float: left;
+				margin-top: 3px;
+			}
+			>div{
+				margin-left: 22px;
 			}
 			&:hover {
 				background: #efefef;

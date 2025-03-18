@@ -223,8 +223,8 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 			for(var i=0; i<cat_mods.length; i++){
 				var module = cat_mods[i];
 				content_modules_list.append('<a data-module-id="' + module.id + '">'
-						+ '<img src="' + module.icon + '">  '
-						+ module.text 
+						+ '<img src="' + module.icon + '">'
+						+ '<div>'+module.text+'</div>' 
 						+ '</a>')
 			}
 		}
@@ -250,8 +250,8 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 				for(var i=0; i<cat_mods.length; i++){
 					var module = cat_mods[i];
 					s.append('<li><a data-module-id="' + module.id + '">'
-							+ '<img src="' + module.icon + '">  '
-							+ module.text 
+							+ '<img src="' + module.icon + '">'
+							+ '<div>'+module.text+'</div>'
 							+ '</a>')
 				}
 			}
