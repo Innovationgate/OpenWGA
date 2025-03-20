@@ -13,7 +13,7 @@ import org.apache.log4j.Logger;
 
 public class WcssCompiler {
 
-	public static final Logger LOG = Logger.getLogger("wga.wcss");
+	private static final Logger LOG = Logger.getLogger("wga.wcss");
 
 	final static int[] toRGB(String value){
 		HashMap<String, String> colors = new HashMap<String, String>();
@@ -129,7 +129,7 @@ public class WcssCompiler {
 		_compress=value;
 	}
 	
-	public static String preprocess(String s) {
+	private static String preprocess(String s) {
 		String search_pattern = "#\\{([^\\}]*)\\}";	// search for #{....}
 		Pattern pattern = Pattern.compile(search_pattern, Pattern.CASE_INSENSITIVE);
     	Matcher matcher = pattern.matcher(s);
@@ -787,7 +787,7 @@ public class WcssCompiler {
 					if(parts.length>1){
 						clone.getVars().put(parts[0], parts[1]);
 					}
-					else if(_params.size()>i){
+					else if(_params.size()>i && !parts[0].isEmpty()){
 						String p = _params.get(i);
 						clone.getVars().put(p, parts[0]);
 					}
