@@ -11,7 +11,7 @@
 	includes: {
 		jquery_plugins: ["lightbox"],
 		css: 			'modules:image-wall:css',
-		js: 			'modules:image-wall:js'
+		js: 			'image-wall'
 	}	
 },
 {
