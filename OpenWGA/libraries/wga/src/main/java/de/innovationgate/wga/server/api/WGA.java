@@ -113,6 +113,7 @@ import de.innovationgate.wgpublisher.WGACore.SessionLoginMap;
 import de.innovationgate.wgpublisher.WGAServerException;
 import de.innovationgate.wgpublisher.api.Unlocker;
 import de.innovationgate.wgpublisher.design.DesignResourceReference;
+import de.innovationgate.wgpublisher.design.conversion.ResourceRef;
 import de.innovationgate.wgpublisher.encoders.EncoderOutput;
 import de.innovationgate.wgpublisher.encoders.EncodingFormatterEncoder;
 import de.innovationgate.wgpublisher.encoders.TextChunk;
@@ -3540,5 +3541,12 @@ public class WGA {
 		return isEditMode(((TMLContext)context()).content());
 	}
 
+	public static ResourceRef ResourceRef(String path) throws WGException {
+		return new ResourceRef(path); 
+	}
+	public static ResourceRef ResourceRef(ResourceRef parent, String path) throws WGException {
+		return new ResourceRef(parent, path); 
+	}
+	
 }
  
