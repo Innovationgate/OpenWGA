@@ -3547,6 +3547,9 @@ public class WGA {
 	public static ResourceRef ResourceRef(ResourceRef parent, String path) throws WGException {
 		return new ResourceRef(parent, path); 
 	}
+	public static ResourceRef ResourceRef(Design design) throws WGException {
+		return new ResourceRef(design, ResourceRef.TYPE_FILE); 
+	}
 	
 }
  
