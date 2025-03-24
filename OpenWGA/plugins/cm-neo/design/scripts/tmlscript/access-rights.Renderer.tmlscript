@@ -78,7 +78,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_structkey, 
 				cssclass: "may"
 			}
 		else data.may_create_version = {
-			info: _Content.getReason(),
+			info: _Struct.getReason(),
 			cssclass: "may-not"
 		}
 
@@ -89,7 +89,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_structkey, 
 				cssclass: "may"
 			}
 		else data.may_create_page = {
-			info: _Content.getReason(),
+			info: _Struct.getReason(),
 			cssclass: "may-not"
 		}
 	}
@@ -109,7 +109,8 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_structkey, 
 		}
 	}
 	else data.may_delete_page = {
-		info: _Struct.getReason(),
+		//info: _Struct.getReason(),
+		info: "Sie dürfen diese Seite nicht löschen.",
 		cssclass: "may-not"
 	}
 
