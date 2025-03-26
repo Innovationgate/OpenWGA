@@ -1,0 +1,83 @@
+<tml:script>
+	_action_opts = ["Daten per Mail senden|mail"];
+	_dbkeys_options = createlist()
+	var ctx = context("db:"+WGA.design().db().getDbReference()+"/name:cm_form", false)
+	if(ctx){
+		_dbkeys_options = ctx.itemlist("dbkeys");
+		_dbkeys_options.size() && _action_opts.push("Daten in Datenbank speichern|store")
+	}
+</tml:script>
+
+<label><tml:label key="form.settings.action"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:action}" type="checkbox" optionsitem="_action_opts"
+		default="mail" 
+		changeaction="$refresh" ajax="true"
+		mode="{option('mode')}"
+	/>
+</div>
+
+<tml:case condition="tmlform.fieldlist(WGA.scoped('action')).contains('mail')">
+	<label><tml:label key="form.settings.email"/>:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:mail}" type="textarea" multiple="true" cssstyle="width:100%" mode="{option('mode')}"/>
+	</div>	
+	<label>Betreff:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:subject}" type="textarea" cssstyle="width:100%" mode="{option('mode')}"/>
+	</div>	
+</tml:case>
+
+<tml:case condition="tmlform.fieldlist(WGA.scoped('action')).contains('store')">
+	<tml:if condition="_dbkeys_options.size()">
+		<tml:then>
+			<label><tml:label key="form.settings.database"/>:</label>
+			<div style="margin:10px">
+				<tml:input name="{scoped:dbkey}" type="select" cssclass="form-control" optionsitem="_dbkeys_options" mode="{option:mode}"/>
+			</div>
+		</tml:then>
+		<tml:else>
+			<tml:script>
+				tmlform.setfield(WGA.scoped("dbkey"), "");
+			</tml:script>
+		</tml:else>
+	</tml:if>
+</tml:case>
+
+<label><tml:label key="form.settings.submit-button-text"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:submit-button-text}" cssstyle="width:100%" mode="{option('mode')}"
+		default="{label('form.settings.submit-button-text.default')}"
+	/>
+</div>
+
+<label><tml:label key="form.settings.after-submit"/>:</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:aftersubmit}" type="select"
+		cssclass="form-control"
+		changeaction="$refresh" ajax="true" 
+		options="{label('form.settings.after-submit.options')}" mode="{option('mode')}"
+		default="message"
+	/>
+</div>
+
+<tml:select switch="tmlform.field(WGA.scoped('aftersubmit'))">
+	<tml:case value="message">
+		<label><tml:label key="form.settings.successmessage"/>:</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:successmessage}" type="textarea" cssstyle="height:auto;width:100%;overflow:hidden" mode="{option('mode')}"/>
+		</div>
+	</tml:case>
+	<tml:case value="redirect">
+		<label><tml:label key="form.settings.redirect-page"/>:</label>
+		<div style="margin:10px">
+			<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document" o_default="{STRUCTKEY}">
+				<tml:option name="fieldname" expression="WGA.scoped('redirect')"/>
+			</tml:include>
+		</div>
+	</tml:case>
+</tml:select>
+
+<script>
+	BI.makeTextareasResizable("<tml:script expression="tmlform.formid"/>");
+</script>
