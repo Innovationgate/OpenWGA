@@ -43,7 +43,7 @@
 		</tml:case>
 		<div class="data">
 			<div class="capcha-image">
-				<img style="height:100px" src="<tml:url type="tml" medium="captcha" u_bustCache="{_bustCache}" name="image"/>"
+				<img style="max-width:100%" src="<tml:url type="tml" medium="captcha" u_bustCache="{_bustCache}" name="image"/>"
 					style="cursor:pointer"
 					title="<tml:label key="form.captcha.refresh"/>"
 					onclick="this.src='<tml:url type="tml" medium="captcha" name="image"/>?'+new Date().getTime()"
