@@ -15,6 +15,7 @@ Renderer.prototype.getData = function(AFW, $urlParam_dbkey, $urlParam_contentkey
 	var docs = WGA.app($urlParam_dbkey).query("content.status='p' AND content.author = :me order by content.published DESC", {
 		alllanguages: true,
 		max: 3,
+		role: "none",
 		p_me: me
 	});
 	for(let doc in Iterator(docs)){
