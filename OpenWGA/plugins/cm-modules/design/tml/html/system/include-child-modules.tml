@@ -37,6 +37,7 @@
 		<tml:option name="module-class" scope="local" trim="true">
 			<tml:case isfirstloop="true">first-child</tml:case>
 			<tml:case islastloop="true">last-child</tml:case>
+			<tml:script expression="$tag.parent('foreach').getInfo('iteration') % 2 ? 'odd-child':'even-child'"/>
 			<tml:option name="module-class"/>
 		</tml:option>
 		<tml:option name="raw" scope="local" expression="$option_raw"/>
