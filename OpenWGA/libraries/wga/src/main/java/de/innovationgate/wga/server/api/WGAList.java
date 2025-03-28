@@ -111,6 +111,11 @@ public class WGAList<T> extends ArrayList<T>{
 	public WGAList<T> reverse(){
 		Collections.reverse(this);
 		return this;
+	}	
+	
+	public WGAList<T> shuffle(){
+		Collections.shuffle(this);
+		return this;		
 	}
 	
 }
