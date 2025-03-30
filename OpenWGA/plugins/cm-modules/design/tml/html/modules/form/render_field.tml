@@ -64,6 +64,7 @@
 </tml:script>
 
 <div class="clearfix formfield field-type-<tml:script expression="CMM.setting('fieldtype')"/>
+		<tml:option name="module_classes"/>
 		<tml:case condition="tmlform.hasmessage(_fieldname)"> error</tml:case>
 		<tml:case condition="CMM.setting('divider')=='single-line'">single-line</tml:case>
 	">
