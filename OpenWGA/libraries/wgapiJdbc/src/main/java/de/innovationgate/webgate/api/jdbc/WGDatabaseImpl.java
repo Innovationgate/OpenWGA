@@ -266,7 +266,8 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
     private static final String HQLQUERY_PENDING_RELEASE_DOCS_CS3 = "content.status ='" + WGContent.STATUS_REVIEW + "' AND content.items['" + WGContent.ITEM_PENDINGRELEASE.toLowerCase() + "'].number = 1";
     
 	private static final String HQLQUERY_GET_STRUCT_BY_NAME = "from StructEntry as struct where struct.uniquename=:name";
-    public static final String HQL_FETCHTYPE_LAZY = "lazy";
+	public static final String HQL_ALLOW_QUOTES = "allowQuotes";
+	public static final String HQL_FETCHTYPE_LAZY = "lazy";
 	public static final String HQL_FETCHTYPE_STRAIGHT = "straight";
     private static final String HQLQUERY_LAZY_PARENTCHECK = 
             "select new de.innovationgate.webgate.api.WGContentQueryResult(content.structentry.key, content.language.name, content.version, parent.key, area.name) " +
@@ -2487,7 +2488,8 @@ public class WGDatabaseImpl implements WGDatabaseCore, WGPersonalisationDatabase
             throw new WGQueryException(query, "Unknown query type: " + type);
         }
         
-        builtQuery = WGUtils.strReplace(builtQuery, "\"", "'", true);
+        if(!options.contains(HQL_ALLOW_QUOTES))
+        	builtQuery = WGUtils.strReplace(builtQuery, "\"", "'", true);
 
         if (queryOptions != null) {
             queryOptions.put(WGDatabase.QUERYOPTION_RETURNQUERY, builtQuery);

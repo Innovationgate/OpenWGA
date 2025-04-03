@@ -215,7 +215,7 @@
 		</tml:option>
 		<tml:inline name="body">
 			<tml:script>
-				var defaultValue = _config_option.getDefaultValue()
+				var defaultValue = _config_option.isOptional() && _config_option.getDefaultValue()
 				return encode("html", _config_option.getDescription(DBM.locale))
 					+ (defaultValue ? '<br>Default Value: ' + _config_option.getDefaultValue() : '');
 			</tml:script> 

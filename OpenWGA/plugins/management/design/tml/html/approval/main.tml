@@ -21,12 +21,13 @@
 		
 				<tml:elseif condition="AFW.database(_dbkey).isEditor()">
 				
-					<tml:if context="[db:{_dbkey}/docid:{_key}]" iscontextvalid="true">
+					<tml:if context="[db:{_dbkey}/docid:{_key}]" iscontextvalid="true" condition="content().mayEditContent() || STATUS==content().STATUS_RELEASE">
 						<tml:then><tml:include ref="::body"/></tml:then>
 						<tml:else>
 							<div class="splash">
 								<h1>Dokument nicht gefunden</h1>
-								Das Dokument mit Schlüssel <tml:item name="_key"/> konnte in Website <tml:item name="_dbkey"/>nicht gefunden werden.
+								Das Dokument mit Schlüssel <tml:item name="_key"/> konnte in Website '<tml:item name="_dbkey"/>' nicht gefunden werden 
+								oder ist für Sie nicht sichtbar.
 							</div>
 						</tml:else>
 					</tml:if>

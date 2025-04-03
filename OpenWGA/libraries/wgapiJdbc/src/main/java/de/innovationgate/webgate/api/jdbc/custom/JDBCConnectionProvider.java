@@ -331,7 +331,7 @@ public class JDBCConnectionProvider implements ConnectionProvider, Stoppable {
     public static List<String> getDatabaseTables(Connection conn) throws SQLException {
         List<String> tables = new ArrayList<String>();
         DatabaseMetaData dbMeta = conn.getMetaData();
-        ResultSet resultSet = dbMeta.getTables(null, null, null, new String[] {"TABLE"});
+        ResultSet resultSet = dbMeta.getTables(conn.getCatalog(), null, null, new String[] {"TABLE"});
         if (resultSet.getType() != ResultSet.TYPE_FORWARD_ONLY && !resultSet.isBeforeFirst()) {
             resultSet.beforeFirst();
         }

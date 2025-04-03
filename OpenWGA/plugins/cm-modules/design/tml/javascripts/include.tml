@@ -53,7 +53,17 @@ if(typeof(require)==="undefined"){
 	</tml:script>
 
 	<tml:foreach type="itemvalue" item="_js" currentvalue="_tml">
-		<tml:include designdb="{_tml.designdb}" ref="{_tml.tml}" medium="html"/>
+		<tml:comment>
+			Try to find JS module. If not found, include TML.
+		</tml:comment>
+		<tml:script>
+			try{
+				_code = WGA.design(_tml.designdb).resolve(_tml.tml).getJavaScriptCode();
+			}
+			catch(e){}
+		</tml:script>
+		<tml:item name="_code" encode="none" if="_code"/>
+		<tml:include designdb="{_tml.designdb}" ref="{_tml.tml}" medium="html" unless="_code"/>
 	</tml:foreach>
 	
 </tml:case>

@@ -65,7 +65,12 @@ public class UserProfileWrapper extends de.innovationgate.ext.org.mozilla.javasc
                 return scope.get(arg0, arg1);
             }
             else if (super.has(argLC, arg1)) {
-    			return RhinoWrapFactory.notFoundToNull(super.get(argLC, arg1));
+            	// compatible with older version: try lower case 
+                return RhinoWrapFactory.notFoundToNull(super.get(argLC, arg1));
+            }
+            else if (super.has(arg0, arg1)) {
+            	// preferred: exact case
+    			return RhinoWrapFactory.notFoundToNull(super.get(arg0, arg1));
     		}
     		else {
     			char first = arg0.charAt(0);

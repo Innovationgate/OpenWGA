@@ -76,6 +76,7 @@ Controller.prototype.catModules = function(modules) {
 			value: mod.id
 		})
 	}
+	
 	return ret;
 }
 
@@ -113,7 +114,8 @@ Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 			if(!$portlet.module)
 				return [];
 			query = "content.extensionData['content-modules'].text like :value"
-			params.p_value = String("%" + $portlet.module + "%");
+			params.p_value = String('%"module_id":"' + $portlet.module + '"%');
+			params.options = "allowQuotes"
 			break;
 	}
 	if($form.filter!="status")

@@ -46,7 +46,7 @@
 		<tml:case if="_apikey">
 			<tml:{script} encode="jsmin">
 				require(["jquery", 
-					"<tml:url type="tml" name="::js"/>",
+					"<tml:url type="js" name="google-maps"/>",
 					"async!//maps.googleapis.com/maps/api/js?libraries=places&key=<tml:item name="_apikey"/>"
 				], function($){
 	

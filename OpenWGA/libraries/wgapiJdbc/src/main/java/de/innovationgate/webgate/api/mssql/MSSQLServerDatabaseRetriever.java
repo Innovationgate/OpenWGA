@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collections;
@@ -58,7 +59,7 @@ public class MSSQLServerDatabaseRetriever implements ServerDatabaseRetriever {
             OptionReader serverOptionReader = OptionReader.create(dbServer.getOptions(), serverDef);
             
             MSSQLDatabaseServer msServer = (MSSQLDatabaseServer) dbServer;
-            String hostName = msServer.buildHostName();
+            String globalJdbcPath = MSSQLDatabaseServer.JDBC_BASE_PATH + msServer.buildHostName();
             
             String masterUser = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_USER);
             String masterPassword = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_PASSWORD);
@@ -68,19 +69,18 @@ public class MSSQLServerDatabaseRetriever implements ServerDatabaseRetriever {
                 throw new WGInvalidDatabaseException("The database name is invalid: " + dbName + ". It must consist of alphanumeric characters and the underscore, but start with a letter.");
             }
             
-            String globalJdbcPath = MSSQLDatabaseServer.JDBC_URL_PREFIX + hostName;
-            
             // Retrieve driver
             Driver driver;
             try {
-                driver = (Driver) Class.forName(WGDatabaseImpl.DRIVER).newInstance();
+                driver = DriverManager.getDriver(MSSQLDatabaseServer.JDBC_BASE_PATH);
             }
             catch (Exception e) {
-                throw new WGInvalidDatabaseException("Cannot create database bc. of exception when retrieving driver: " + e.getClass().getName() + " - " + e.getMessage());
+                throw new WGInvalidDatabaseException("Cannot create database bc. of exception when retrieving driver: " + e.getClass().getName() + " - " + e.getMessage(), e);
             }
 
             // Build props
             Properties props = new Properties();
+            props.setProperty("encrypt", "false");
             props.setProperty("user", masterUser);
             if (masterPassword != null) {
                 props.setProperty("password", masterPassword);
@@ -206,7 +206,7 @@ public class MSSQLServerDatabaseRetriever implements ServerDatabaseRetriever {
     }
 
     private boolean isContentStore(Connection con) throws SQLException {
-        
+        try {
            Iterator<String> tables = JDBCConnectionProvider.getDatabaseTables(con).iterator();
            boolean isContentStore = false;
            while (tables.hasNext()) {
@@ -217,8 +217,12 @@ public class MSSQLServerDatabaseRetriever implements ServerDatabaseRetriever {
                }
            }
            return isContentStore;
+        }
+        catch(SQLException e) {
+        	return false;
+        }
     }
-
+    
     public Class<? extends WGDatabaseServer> getDatabaseServerType() {
         return MSSQLDatabaseServer.class;
     }
@@ -254,6 +258,9 @@ public class MSSQLServerDatabaseRetriever implements ServerDatabaseRetriever {
             else {
                 jdbcPath = path;
             }
+            
+            options.put("encrypt", "false");
+            
             return WGFactory.getInstance().openDatabase(dbServer, implClass.getName(), jdbcPath, masterUser, masterPassword, options, prepareOnly);
             
         }
@@ -267,6 +274,5 @@ public class MSSQLServerDatabaseRetriever implements ServerDatabaseRetriever {
     public List<String> getDatabasePathOptions() {
         return Collections.singletonList(Database.OPTION_PATH);
     }
-
 
 }

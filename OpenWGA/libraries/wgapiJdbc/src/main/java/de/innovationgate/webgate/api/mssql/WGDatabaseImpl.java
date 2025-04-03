@@ -16,27 +16,17 @@ import de.innovationgate.webgate.api.WGUserAccess;
 
 public class WGDatabaseImpl extends de.innovationgate.webgate.api.jdbc.WGDatabaseImpl {
 
-    public static final String DRIVER = "net.sourceforge.jtds.jdbc.Driver";
     public static final String SOCKET_TIMEOUT_DEFAULT = "120000";
     public static final String CONNECT_TIMEOUT_DEFAULT = "60000";
 
 
     public WGUserAccess open(WGDatabase db, String path, String user, String pwd, boolean prepareOnly) throws WGAPIException {
         
-        // Register drivers with driver manager
-        try {
-            Class.forName(DRIVER);
-        }
-        catch (ClassNotFoundException e) {
-            throw new WGInvalidDatabaseException("Necessary JDBC driver not found: " + e.getMessage());
-        }
-        
         // Build creations options
         Map creationOptions = db.getCreationOptions();
         
         // Hibernate configuration
         WGDatabase.putDefaultOption(creationOptions, "hibernate.dialect", SQLServerDialect.class.getName());
-        WGDatabase.putDefaultOption(creationOptions, "hibernate.connection.driver_class", DRIVER);
         WGDatabase.putDefaultOption(creationOptions, "hibernate.dbcp.validationQuery", "select 1");
         WGDatabase.putDefaultOption(creationOptions, "hibernate.dbcp.testOnBorrow", "true");
         WGDatabase.putDefaultOption(creationOptions, "hibernate.dbcp.maxWait", "30000");

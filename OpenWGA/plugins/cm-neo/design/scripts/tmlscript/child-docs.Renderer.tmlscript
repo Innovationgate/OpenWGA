@@ -1,6 +1,6 @@
 function Renderer() {}
 
-Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $urlParam_structkey) {
+Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $urlParam_structkey, $urlParam_language) {
 
 	var contentkey = $urlParam_contentkey
 	var structkey = $urlParam_structkey
@@ -11,7 +11,7 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 	if(struct){
 		var children = struct.getChildEntries();
 		for(let doc in Iterator(children)){
-			var c = context("db:"+dbkey+"/docid:"+doc.getStructKey(), false)
+			var c = context("db:"+dbkey+"/docid:"+doc.getStructKey() + "<" + $urlParam_language + ">", false)
 			if(c){
 				docs.push({
 					title: WGA.encode("html", c.TITLE),
@@ -20,7 +20,7 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 					href: c.contenturl('html', null, true)
 				})
 			}
-			else if(doc.mayReadContent()){
+			else if(AFW.structentry(doc).isVisible()){
 				docs.push({
 					title: WGA.encode("html", doc.title),
 					id: doc.getStructKey(),
@@ -29,7 +29,7 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 								.setParameter({
 									dbkey: dbkey,
 									structkey: doc.getStructKey(),
-									lang: "de"
+									lang: $urlParam_language
 								})
 								.build()
 				})
@@ -42,7 +42,7 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 		current = {
 			title: struct.title
 		};
-		var c = context("db:"+dbkey+"/docid:"+struct.getStructKey(), false)
+		var c = context("db:"+dbkey+"/docid:"+struct.getStructKey()+ "<" + $urlParam_language + ">", false)
 		if(c){
 			current = {
 				"title": c.TITLE,
@@ -55,16 +55,27 @@ Renderer.prototype.render = function($urlParam_dbkey, $urlParam_contentkey, $url
 	var parent = null
 	struct = struct && struct.getParentEntry();
 	if(struct){
-		parent = {
-			title: struct.title
-		};
-		var c = context("db:"+dbkey+"/docid:"+struct.getStructKey(), false)
+		var c = context("db:"+dbkey+"/docid:"+struct.getStructKey()+ "<" + $urlParam_language + ">", false)
 		if(c){
 			parent = {
 				"title": c.TITLE,
 				"id": c.STRUCTKEY,
 				"href": c.contenturl('html', null, true)
 			}
+		}
+		else{
+			parent = {
+				title: WGA.encode("html", struct.title),
+					id: struct.getStructKey(),
+					href: WGA.urlBuilder(WGA.design().resolve("no-content").layoutURL("html"))
+								.setParameter({
+									dbkey: dbkey,
+									structkey: struct.getStructKey(),
+									lang: $urlParam_language
+								})
+								.build()
+			}
+		
 		}
 	}
 	

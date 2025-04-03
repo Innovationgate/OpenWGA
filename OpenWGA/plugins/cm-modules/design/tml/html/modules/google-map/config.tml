@@ -35,7 +35,7 @@
 	allowedchildren: ["cm_google_map_marker"],
 	includes:		{
 		tml:	'modules:google-map:google-maps-api',
-		js:		'modules:google-map:js',
+		js:		'google-maps',
 		css:	'modules:google-map:css'
 	}
 }

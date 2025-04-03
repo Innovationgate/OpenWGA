@@ -501,7 +501,14 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     static {
         METAINFO_PUBLISHED.setMinCsVersion(WGDatabase.CSVERSION_WGA5);
     }
-    
+
+    public static final String META_ARCHIVED = "ARCHIVED";
+    public static final MetaInfo METAINFO_ARCHIVED = new MetaInfo(META_ARCHIVED, Date.class, null);
+    static {
+    	METAINFO_ARCHIVED.setExtdata(true);
+        METAINFO_ARCHIVED.setMinCsVersion(WGDatabase.CSVERSION_WGA5);
+    }
+
     public static final String META_PENDINGRELEASE = "PENDINGRELEASE";
     public static final MetaInfo METAINFO_PENDINGRELEASE = new MetaInfo(META_PENDINGRELEASE, Boolean.class, Boolean.FALSE);
     static {
@@ -1396,60 +1403,70 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	 */
 	public void reject(String comment) throws WGAPIException {
 
-        // Content should be saved prior to rejection to enforce validity
-        if (!isSaved() || isEdited()) {
-            if (save() == false) {
-                throw new WGBackendException("Could not reject document " + getContentKey().toString() + " because it could not be saved");
-            }
-        }
-        
-		// Test access level
-		int accessLevel = this.db.getSessionContext().getAccessLevel();
-		String user = this.db.getSessionContext().getUser();
-		if (accessLevel < WGDatabase.ACCESSLEVEL_AUTHOR
-			|| (accessLevel == WGDatabase.ACCESSLEVEL_AUTHOR && !isAuthorOrOwner())) {
-			throw new WGAuthorisationException("You are not authorized to reject this document", WGAuthorisationException.ERRORCODE_OP_NEEDS_AUTHORING_RIGHTS);
+		WGTransaction trans = getDatabase().startTransaction();
+		try {
+	        // Content should be saved prior to rejection to enforce validity
+	        if (!isSaved() || isEdited()) {
+	            if (save() == false) {
+	                throw new WGBackendException("Could not reject document " + getContentKey().toString() + " because it could not be saved");
+	            }
+	        }
+	        
+			// Test access level
+			int accessLevel = this.db.getSessionContext().getAccessLevel();
+			String user = this.db.getSessionContext().getUser();
+			if (accessLevel < WGDatabase.ACCESSLEVEL_AUTHOR
+				|| (accessLevel == WGDatabase.ACCESSLEVEL_AUTHOR && !isAuthorOrOwner())) {
+				throw new WGAuthorisationException("You are not authorized to reject this document", WGAuthorisationException.ERRORCODE_OP_NEEDS_AUTHORING_RIGHTS);
+			}
+	
+			// Test document status
+			if (!this.getStatus().equals(WGContent.STATUS_REVIEW) && !this.getStatus().equals(WGContent.STATUS_RELEASE)) {
+				throw new WGIllegalStateException("The content is not in status review or release and cannot be rejected");
+			}
+	
+			// Test workflow role - On reject must only be approver if one is not author/owner and may not edit the page generally
+			WGWorkflow workflow = getWorkflow();
+			if (!isAuthorOrOwner() && !getStructEntry().mayEditPage()) {
+	    		if (workflow.getWorkflowRole() < WGWorkflow.ROLE_APPROVER) {
+	    			throw new WGAuthorisationException("You are no approver for the current workflow level", WGAuthorisationException.ERRORCODE_OP_NEEDS_WORKFLOW_APPROVER_RIGHTS);
+	    		}
+			}
+			
+			String previousStatus = getStatus();
+	
+			// Reject
+			workflow.reject(comment);
+			setStatus(WGContent.STATUS_DRAFT);
+			setPendingRelease(false);
+			
+			// If the previous state was released, query- and structentry cache must be cleared (default cache maintenance won't do this)
+			if (previousStatus == WGContent.STATUS_RELEASE) {
+				try {
+	                getDatabase().masterQueryCache.flushAll();
+	            }
+	            catch (CacheException e) {
+	                WGFactory.getLogger().error("Exception flushing query cache on database '" + getDatabase().getDbReference() + "'", e);
+	            }
+				getStructEntry().dropCache();
+			}
+	
+			// Write history
+			this.addWorkflowHistoryEntry("Rejected and returned to draft status");
+			
+	        fireStatusChangeEvent();
+	
+			if (save(new Date(), false) == false) {
+				throw new WGBackendException("Could not reject document " + getContentKey().toString() + " because it could not be saved");
+			}
+			
+			trans.commit();
 		}
-
-		// Test document status
-		if (!this.getStatus().equals(WGContent.STATUS_REVIEW) && !this.getStatus().equals(WGContent.STATUS_RELEASE)) {
-			throw new WGIllegalStateException("The content is not in status review or release and cannot be rejected");
-		}
-
-		// Test workflow role - On reject must only be approver if one is not author/owner and may not edit the page generally
-		WGWorkflow workflow = getWorkflow();
-		if (!isAuthorOrOwner() && !getStructEntry().mayEditPage()) {
-    		if (workflow.getWorkflowRole() < WGWorkflow.ROLE_APPROVER) {
-    			throw new WGAuthorisationException("You are no approver for the current workflow level", WGAuthorisationException.ERRORCODE_OP_NEEDS_WORKFLOW_APPROVER_RIGHTS);
-    		}
-		}
-		
-		String previousStatus = getStatus();
-
-		// Reject
-		workflow.reject(comment);
-		setStatus(WGContent.STATUS_DRAFT);
-		setPendingRelease(false);
-		
-		// If the previous state was released, query- and structentry cache must be cleared (default cache maintenance won't do this)
-		if (previousStatus == WGContent.STATUS_RELEASE) {
-			try {
-                getDatabase().masterQueryCache.flushAll();
-            }
-            catch (CacheException e) {
-                WGFactory.getLogger().error("Exception flushing query cache on database '" + getDatabase().getDbReference() + "'", e);
-            }
-			getStructEntry().dropCache();
-		}
-
-		// Write history
-		this.addWorkflowHistoryEntry("Rejected and returned to draft status");
-		
-        fireStatusChangeEvent();
-
-		if (save(new Date(), false) == false) {
-			throw new WGBackendException("Could not reject document " + getContentKey().toString() + " because it could not be saved");
-		}
+	    finally {
+	        if (trans.isOpen()) {
+	            trans.rollback();
+	        }
+	    }
 
 	}
 
@@ -1498,6 +1515,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 		this.setStatus(WGContent.STATUS_ARCHIVE);
 		WGWorkflow workflow = getWorkflow();
 		workflow.archive(comment);
+		this.setArchived(new Date());
 
 		// Write workflow history
 		if (comment != null && !comment.trim().equals("")) {
@@ -1825,6 +1843,7 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
                 newContent.setCoauthors(new ArrayList(getCoauthors()));
                 newContent.setContentClass(getContentClass());
                 newContent.setPublished(getPublished());
+                newContent.setArchived(getArchived());
             }
             
             // If the source is no CS5 we initialize the published date of the target with the creation date
@@ -2287,8 +2306,8 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 	    // A user below ACL level author cannot use authoring mode
 	    else if (isAuthoringMode == true && content.getDatabase().getSessionContext().getAccessLevel() < WGDatabase.ACCESSLEVEL_AUTHOR)
 	        isAuthoringMode = false;
-	    // If not released and may-not-edit author cannot use authoring mode
-	    else if (!content.getStatus().equals(WGContent.STATUS_REVIEW) && !content.mayEditContent())
+	    // If may-not-edit author cannot use authoring mode
+	    else if(!content.mayEditContent())
 	    	isAuthoringMode = false;
 	    
 	    // Tests that are bypassed by authoring mode
@@ -2856,7 +2875,19 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     protected void setPublished(Date published) throws WGAPIException {
         setMetaData(META_PUBLISHED, published);
     }
+
+    /**
+     * Returns the time when this content version was archived
+     * @throws WGAPIException
+     */
+    public Date getArchived() throws WGAPIException {
+        return (Date) getMetaData(META_ARCHIVED);
+    }
     
+    protected void setArchived(Date date) throws WGAPIException {
+        setMetaData(META_ARCHIVED, date);
+    }
+
     /**
      * Returns the E-Mail address of the author of the current document
      * This method remains bc. of compatibility reasons. Unlike in earlier WGA versions it does not read an E-Mail address stored in the document

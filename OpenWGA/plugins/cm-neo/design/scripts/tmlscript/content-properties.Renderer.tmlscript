@@ -26,7 +26,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 		}
 		
 		result = {
-			title: WGA.encode("html", c.TITLE),
+			title: c.content().isInReview() && !c.content().mayEditContent() ? "- nicht sichtbar -" : WGA.encode("html", c.TITLE),
 			pagetype: db($urlParam_dbkey).getContentType(c.CONTENTTYPE).getNameForLanguage("de"),
 			pagename: c.PAGENAME,
 			version: c.VERSION,
@@ -48,9 +48,10 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 	
 			pageworkflow: c.content().getStructEntry().getWorkflowName(), 
 
-			created: c.STATUS==c.content().STATUS_DRAFT ? WGA.format(c.CREATED, "d. MMMMM yyyy, HH:mm", "de") + " Uhr" : "",
-			modified: c.STATUS==c.content().STATUS_ARCHIVE || (c.PUBLISHED && c.PUBLISHED==c.MODIFIED) || c.MODIFIED==c.CREATED ? '' : WGA.format(c.MODIFIED, "d. MMMMM yyyy, HH:mm", "de") + " Uhr",
+			created: c.content().isDraft() || (c.content().isArchived() && !c.content().getPublished()) ? WGA.format(c.CREATED, "d. MMMMM yyyy, HH:mm", "de") + " Uhr" : "",
+			modified: (c.STATUS==c.content().STATUS_ARCHIVE && !c.ARCHIVED || c.ARCHIVED==c.MODIFIED) || (c.PUBLISHED && c.PUBLISHED==c.MODIFIED) || c.MODIFIED==c.CREATED ? '' : WGA.format(c.MODIFIED, "d. MMMMM yyyy, HH:mm", "de") + " Uhr",
 			published: getPublished(c),
+			archived: c.content().isArchived() && !c.content().getPublished() ? WGA.format(c.ARCHIVED||c.MODIFIED, "d. MMMMM yyyy, HH:mm", "de") + " Uhr" : "",
 
 			pagepublished: c.content().getStructEntry().getReleasedContent(c.LANGUAGE) && c.PAGEPUBLISHED 
 				? WGA.format(c.PAGEPUBLISHED, 'd. MMMMM yyyy, HH:mm', 'de') + " Uhr" 
@@ -116,9 +117,9 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 	/*------------*/
 	
 	function getPublished(c){
-		if(c.STATUS==c.content().STATUS_ARCHIVE)
-			return AFW.Util.dateRange(c.PUBLISHED, c.MODIFIED, "de")
-		else if(c.STATUS==c.content().STATUS_RELEASE)
+		if(c.content().isArchived())
+			return c.content().getPublished() ? AFW.Util.dateRange(c.PUBLISHED, c.ARCHIVED || c.MODIFIED, "de") : ""
+		else if(c.content().isPublished())
 			return WGA.format(c.PUBLISHED, "d. MMMMM yyyy, HH:mm", "de") + " Uhr"
 		else return ""
 	}

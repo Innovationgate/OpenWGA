@@ -73,6 +73,15 @@
 						
 					{{/published}}
 
+					{{#archived}}
+						<div class="form-group">
+							<label>Archiviert</label>
+							<p class="data">
+								{{archived}}
+							</p>
+						</div>
+					{{/archived}}
+					
 					{{#abgelaufen}}
 						<div class="form-group" style="color:red">
 							<label>

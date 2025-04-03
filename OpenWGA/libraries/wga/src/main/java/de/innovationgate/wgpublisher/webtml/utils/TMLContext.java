@@ -2084,6 +2084,12 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
 			}
 			else return 0;
 		}
+		else if (name.equals("pageseq")) {
+			if (content.getStructEntry() != null) {
+				return Long.toHexString(content.getStructEntry().getPageSequence());
+			}
+			else return null;
+		}
 		else if (name.equals("key")) {
 			return content.getContentKey(true).toString();
 		}

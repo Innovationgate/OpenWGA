@@ -4,6 +4,8 @@
  */
 package de.innovationgate.webgate.api.jdbc.modules.dbs;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Locale;
 
 import de.innovationgate.utils.WGUtils;
@@ -11,6 +13,7 @@ import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.jdbc.JNDIServerDatabaseRetriever;
 import de.innovationgate.webgate.api.modules.dbs.DatabaseProperties;
 import de.innovationgate.webgate.api.modules.dbs.GenericCSModuleDefinition;
+import de.innovationgate.webgate.api.mssql.MSSQLDatabaseServer;
 import de.innovationgate.webgate.api.mssql.MSSQLServerDatabaseRetriever;
 import de.innovationgate.webgate.api.mssql.WGDatabaseImpl;
 import de.innovationgate.wga.config.Database;
@@ -45,10 +48,10 @@ public class MSSQLCSModuleDefinition extends GenericCSModuleDefinition {
     
     public void testDependencies() throws ModuleDependencyException {
         try {
-            Class.forName(WGDatabaseImpl.DRIVER);
+            DriverManager.getDriver(MSSQLDatabaseServer.JDBC_BASE_PATH);
         }
-        catch (ClassNotFoundException e) {
-            throw new ModuleDependencyException("The MS-SQL JDBC Driver \"Connector/J\" is not in classpath");
+        catch (SQLException e) {
+            throw new ModuleDependencyException("The MS-SQL JDBC Driver is not in classpath");
         }
     }
 

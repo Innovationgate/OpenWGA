@@ -1,5 +1,5 @@
 <tml:[form-field] o_mode="{$pc.getMode('authoring')}" 
-	o_name="authoring" o_meta="true" o_type="boolean" o_default="true"
+	o_name="authoring" o_meta="true" o_type="boolean" o_default="true" o_labeled="wrap"
 	o_options="Verwendbar für Autoren|true"
 />
 

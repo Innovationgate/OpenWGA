@@ -32,7 +32,7 @@ import de.innovationgate.wgpublisher.WGACore;
  * 	"path/to/resource"
  * Both "type" and "db" are optional. 
  * If no type is specified, type is used from the parent resource or if no parent found type=file is used. 
- * If not db is specified the current db is used. 
+ * If no db is specified the current db is used. 
  */
 
 public class ResourceRef {
@@ -87,19 +87,21 @@ public class ResourceRef {
 
 		if(_type==null)
 			_type = parentref.getType();
-				
+		
+		boolean absolute = _path.startsWith(":");
+		
 		List<String> path_parts = new ArrayList<String>(Arrays.asList(_path.split(":")));
 		_resourceName = path_parts.get(path_parts.size()-1);
 		path_parts.remove(_resourceName);
-		_path = StringUtils.join(path_parts, ":");
-
+		_path = StringUtils.join(path_parts, ":");		
+		
 		if((_type.equals(TYPE_CSS) || _type.equals(TYPE_JS)) && _resourceName.contains(".")){			
 			_resourceName = _resourceName.substring(0, _resourceName.lastIndexOf("."));	// remove file extension
 		}
 		
 		if(_db==null){
 			_db = parentref.getDb();
-			if(!_path.startsWith(":") && !_resourceName.contains("@") && !_type.equals(TYPE_STATIC))	// relative Adressierung
+			if(!absolute && !_resourceName.contains("@") && !_type.equals(TYPE_STATIC))	// relative Adressierung
 				_path = parentref.getPath() + (_path.equals("") ? "" : ":" + _path);
 		}
 		else if(!_path.equals("") && !_path.startsWith(":")){

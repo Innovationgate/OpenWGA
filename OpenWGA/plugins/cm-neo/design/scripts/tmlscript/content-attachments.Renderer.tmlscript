@@ -1,10 +1,17 @@
 function Renderer() {}
 
-Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey) {
+Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey, $urlParam_structkey) {
 
 	var result = {}
 
 	var c = context("db:" + $urlParam_dbkey + "/docid:" + $urlParam_contentkey, false)
+	
+	// special check for content in REVIEW without edit rights
+	if(c && c.content().isInReview() && !c.content().mayEditContent()){
+		WGA.TMLPage.write(JSON.stringify(result));
+		return;
+	}
+	
 	if(c){
 
 		result.title = WGA.encode("html", c.TITLE);

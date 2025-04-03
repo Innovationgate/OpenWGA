@@ -7,6 +7,7 @@ package de.innovationgate.webgate.api.mssql;
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ import de.innovationgate.webgate.api.jdbc.JDBCDatabaseServerExtension;
 import de.innovationgate.webgate.api.jdbc.SharedPoolJDBCDatabaseServer;
 import de.innovationgate.webgate.api.jdbc.WGDatabaseImpl.CSVersion;
 import de.innovationgate.webgate.api.jdbc.custom.JDBCConnectionException;
+import de.innovationgate.webgate.api.jdbc.pool.DBCPPoolInformation;
 import de.innovationgate.webgate.api.jdbc.pool.JDBCCatalogSwitchingConnectionPool;
 import de.innovationgate.webgate.api.servers.DatabaseFilter;
 import de.innovationgate.webgate.api.servers.DatabaseInformation;
@@ -44,15 +46,23 @@ public class MSSQLDatabaseServer extends WGDatabaseServer implements JDBCDatabas
 
     public static final String OPTION_PORT = "Port";
     public static final int DEFAULT_PORT = 1433;
-    public static final String JDBC_URL_PREFIX = "jdbc:jtds:sqlserver://";
+    
+    public static final String JDBC_BASE_PATH = "jdbc:sqlserver://";
+    //public static final String JDBC_BASE_PATH = "jdbc:jtds:sqlserver://";
+    
     private Boolean _usePool;
     private JDBCCatalogSwitchingConnectionPool _pool = null;
+    private DBCPPoolInformation _poolInfo;
     
     public static final int DEFAULT_SHAREDPOOL_MAX_CONNECTIONS = 100;
     public static final int DEFAULT_SHAREDPOOL_MAX_IDLE = 80;
     public static final int DEFAULT_SHAREDPOOL_MAX_WAIT = 30;
     public static final int DEFAULT_SHAREDPOOL_MIN_IDLE = 10;
-    
+
+    public static final int DEFAULT_SHAREDPOOL_MAX_CONNECTION_LIFETIME = -1;
+	public static final int DEFAULT_SHAREDPOOL_REMOVE_ABANDONED_TIMEOUT = 300;
+	public static final int DEFAULT_SHAREDPOOL_MIN_EVICTABLE_IDLE_TIME_MILLIS = 1000*60*5;
+
     @Override
     public void testConnection() throws ServerConnectionException {
         
@@ -72,7 +82,8 @@ public class MSSQLDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             String path = options.get(Database.OPTION_PATH);
             String jdbcPath;
             if (!path.contains("/")) {
-                jdbcPath = JDBC_URL_PREFIX + hostName + "/" + path;
+                //jdbcPath = JDBC_BASE_PATH + hostName + "/" + path;
+                jdbcPath = JDBC_BASE_PATH + hostName + ";databaseName=" + path;
             }
             else {
                 jdbcPath = path;
@@ -94,16 +105,17 @@ public class MSSQLDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             String masterUser = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_USER);
             String masterPassword = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_PASSWORD);
 			
-			String jdbcPath = JDBC_URL_PREFIX + hostName;
-			if (db != null) {
-				jdbcPath += "/" + db.getOptions().get(Database.OPTION_PATH);
-			}
-			
-			Driver driver = (Driver) Class.forName(WGDatabaseImpl.DRIVER).newInstance();
+			String jdbcPath = JDBC_BASE_PATH + hostName;
 			
 			if (props == null) {
 				props = new Properties();
 			}
+			props.put("encrypt", "false");
+			
+			if(db!=null) {
+				props.put("databaseName", db.getOptions().get(Database.OPTION_PATH));
+			}
+				
 			if (!props.containsKey("user")) {
 				props.put("user", masterUser);
 			}
@@ -114,7 +126,8 @@ public class MSSQLDatabaseServer extends WGDatabaseServer implements JDBCDatabas
 			    props.put("password", "");
 			}
 			
-			return driver.connect(jdbcPath, props);
+			return DriverManager.getConnection(jdbcPath, props);
+			
 		} catch (Exception e) {
 			throw new WGBackendException("Unable to create connection.", e);
 		}
@@ -124,30 +137,8 @@ public class MSSQLDatabaseServer extends WGDatabaseServer implements JDBCDatabas
         
         try {
             List<DatabaseInformation> dbs = new ArrayList<DatabaseInformation>();
+            Connection con = createJDBCConnection();
             
-            ModuleDefinition serverDef = getModuleDefinition();
-            OptionReader serverOptionReader = OptionReader.create(getOptions(), serverDef);
-            
-            String hostName = buildHostName();
-            
-            String masterUser = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_USER);
-            String masterPassword = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_PASSWORD);
-            
-            String jdbcPath = JDBC_URL_PREFIX + hostName;
-            
-            Driver driver = (Driver) Class.forName(WGDatabaseImpl.DRIVER).newInstance();
-            
-            Properties props = new Properties();
-            
-            props.put("user", masterUser);
-            if (masterPassword != null) {
-                props.put("password", masterPassword);
-            }
-            else {
-                props.put("password", "");
-            }
-            
-            Connection con = driver.connect(jdbcPath, props);
             Statement showDbsStmt = null;
             try {
                showDbsStmt = con.createStatement();
@@ -236,7 +227,7 @@ public class MSSQLDatabaseServer extends WGDatabaseServer implements JDBCDatabas
         if (_pool == null) {
             
             // Build configuration
-            String path = JDBC_URL_PREFIX + buildHostName();
+            String path = JDBC_BASE_PATH + buildHostName();
     
             // Configure and build pool
             Properties poolProps = new Properties();
@@ -256,12 +247,21 @@ public class MSSQLDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             poolProps.put("hibernate.dbcp.maxActive", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MAX_CONNECTIONS)));
             poolProps.put("hibernate.dbcp.maxIdle", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MAX_IDLE_CONNECTIONS)));
             poolProps.put("hibernate.dbcp.minIdle", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MIN_IDLE_CONNECTIONS)));
+            poolProps.put("hibernate.dbcp.initialSize", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MIN_IDLE_CONNECTIONS)));
+            poolProps.put("hibernate.dbcp.removeAbandonedTimeout", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_REMOVE_ABANDONED_TIMEOUT)));
             poolProps.put("hibernate.dbcp.maxConnLifetimeMillis", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MAX_CONNECTION_LIFETIME)));
+            poolProps.put("hibernate.dbcp.minEvictableIdleTimeMillis", String.valueOf(serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MIN_EVICTABLE_IDLE_TIME_MILLIS)));
 
-            poolProps.put("hibernate.dbcp.validationQuery", "select 1");
+            /*
+             * don't set validationQuery
+             * Let the driver test the connection by himself by calling conn.isValid()
+             */
+            //poolProps.put("hibernate.dbcp.validationQuery", "select 1");
+            
             poolProps.put("hibernate.dbcp.validationQueryTimeout", "5");
             poolProps.put("hibernate.dbcp.testOnBorrow", "true");
             poolProps.put("hibernate.dbcp.testWhileIdle", "true");
+            
             Integer maxWait = (Integer) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL_MAX_WAIT);
             poolProps.put("hibernate.dbcp.maxWait", String.valueOf(maxWait * 1000));
             poolProps.put("hibernate.connection.connectTimeout", WGDatabaseImpl.CONNECT_TIMEOUT_DEFAULT);
@@ -270,9 +270,13 @@ public class MSSQLDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             poolProps.put("hibernate.dbcp.dbserver.id", getUid());
             poolProps.put(Environment.ISOLATION, String.valueOf(Connection.TRANSACTION_READ_COMMITTED));
             poolProps.putAll(getOptions());
+            
+            poolProps.put("encrypt", "false");
+            
             try {
                 WGFactory.getLogger().info("Creating shared connection pool for server " + getTitle(Locale.getDefault()));
                 _pool = new JDBCCatalogSwitchingConnectionPool(path, poolProps);
+                _poolInfo = new DBCPPoolInformation(_pool.getConnectionProvider());
                 
             }
             catch (JDBCConnectionException e) {
@@ -298,7 +302,7 @@ public class MSSQLDatabaseServer extends WGDatabaseServer implements JDBCDatabas
         ModuleDefinition serverDef = WGFactory.getModuleRegistry().getModuleDefinition(DatabaseServerModuleType.class, MSSQLDatabaseServer.class);
         OptionReader serverOptionReader = OptionReader.create(getOptions(), serverDef);
         try {
-        _usePool = (Boolean) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL);
+        	_usePool = (Boolean) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_SHAREDPOOL);
         }
         catch (OptionConversionException e) {
             throw new WGBackendException("Exception reading server configuration", e);
@@ -337,4 +341,9 @@ public class MSSQLDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             _pool = null;
         }
     }
+
+    public DBCPPoolInformation getPoolInfo() {
+    	return _poolInfo;    	
+    }
+    
 }

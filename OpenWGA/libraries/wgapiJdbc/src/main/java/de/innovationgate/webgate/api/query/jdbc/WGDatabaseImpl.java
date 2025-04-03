@@ -24,14 +24,11 @@
  ******************************************************************************/
 package de.innovationgate.webgate.api.query.jdbc;
 
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -41,9 +38,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import javax.sql.DataSource;
-
-import org.apache.log4j.Logger;
 import org.hibernate.service.jdbc.connections.spi.ConnectionProvider;
 import org.hibernate.service.spi.Stoppable;
 
@@ -55,7 +49,6 @@ import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGDocumentCore;
 import de.innovationgate.webgate.api.WGFactory;
-import de.innovationgate.webgate.api.WGFileDerivateMetaData;
 import de.innovationgate.webgate.api.WGInvalidDatabaseException;
 import de.innovationgate.webgate.api.WGLanguage;
 import de.innovationgate.webgate.api.WGNotSupportedException;
@@ -107,9 +100,11 @@ public class WGDatabaseImpl extends de.innovationgate.webgate.api.fake.WGFakeDat
 			this.driverName = null;
 		}
 		
+		/* #00006357
 		if (this.driverName == null && this.path.startsWith("jdbc:")) {
 			throw new WGInvalidDatabaseException("No jdbc driver specified for database \"" + path + "\". Add database option \"Driver\" with name of driver class.");
 		}
+		*/
 		
 		// Try to get connection provider for shared server pool
 		boolean useSharedPool = WGUtils.getBooleanMapValue(db.getCreationOptions(), WGDatabase.COPTION_SHAREDPOOL, true);
