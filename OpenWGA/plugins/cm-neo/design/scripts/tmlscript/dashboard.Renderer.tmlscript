@@ -1,4 +1,6 @@
-function Renderer() {}
+function Renderer() {
+	WGA.accessLogging().loggingEnabled=false
+}
 
 Renderer.prototype.getData = function(AFW, $urlParam_dbkey, $urlParam_contentkey) {
 
