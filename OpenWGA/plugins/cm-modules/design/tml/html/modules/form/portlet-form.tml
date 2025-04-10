@@ -163,7 +163,7 @@
 	<tml:script>
 		tmlform.processcontext.put("forminfo", new Packages.java.util.LinkedHashMap())
 		if(CMM.settingList("action").contains("mail") && !CMM.settingList("mail").size())
-			tmlform.addmessage("Module configuration error: No mail address specified in form");
+			tmlform.addmessage(label("form.settings.no-mail-address"));
 	</tml:script>
 
 	<tml:if condition="tmlform.successmessage">
