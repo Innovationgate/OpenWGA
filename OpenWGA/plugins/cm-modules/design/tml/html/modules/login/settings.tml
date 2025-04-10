@@ -34,7 +34,7 @@
 	<tml:input type="select" name="{scoped:action}" options="{label('login.settings.if-not-logged-in.options')}" mode="{option:mode}" changeaction="$refresh"/>
 	<tml:case condition="tmlform.field(WGA.scoped('action'))=='login'">
 		<p style="margin:15px 0 5px">Überschrift:</p>
-		<tml:input name="{scoped:legend}"/> 
+		<tml:input name="{scoped:legend}" mode="{option:mode}"/> 
 		<p style="margin:15px 0 5px"><tml:label key="login.settings.not-logged-in-message"/>:</p>
 		<tml:input type="textarea" name="{scoped:loginmessage}" mode="{option:mode}"
 			cssstyle="width:100%;resize:none" 
