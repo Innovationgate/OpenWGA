@@ -91,8 +91,12 @@
 					</div>
 				</tml:[form-field]>
 				
-				<tml:case condition="content().getUniqueName()">
-					<tml:[form-field] o_label="Eindeutiger Name" o_field="uniquename" o_meta="true"/>
+				<tml:script>
+					// uinque names may only changed by managers.
+					_uniqueNamesOnContents = WGA.app().isManager() && (db().getAttribute("UniqueNamesOnContents")=='true' || db().getContentStoreVersion()<5);
+				</tml:script>
+				<tml:case condition="content().getUniqueName() || _uniqueNamesOnContents">
+					<tml:[form-field] o_label="Eindeutiger Name" o_field="uniquename" o_meta="true" o_mode="{WGA.app().isManager()?'edit':'view'}"/>
 				</tml:case>
 				
 				<tml:if condition="tmlform.mode()=='edit'">
