@@ -5,6 +5,7 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -186,9 +187,9 @@ public class WcssCompiler {
 	private class CssBlock{
 		
 		private ArrayList<CssBlock> _subBlocks = new ArrayList<CssBlock>();
-		private HashMap<String,CssMixinBlock> _mixins = new HashMap<String,CssMixinBlock>();		
-		private HashMap<String,String> _props = new HashMap<String,String>();
-		private HashMap<String,String> _vars = new HashMap<String,String>();
+		private LinkedHashMap<String,CssMixinBlock> _mixins = new LinkedHashMap<String,CssMixinBlock>();		
+		private LinkedHashMap<String,String> _props = new LinkedHashMap<String,String>();
+		private LinkedHashMap<String,String> _vars = new LinkedHashMap<String,String>();
 		private CssBlock _parentBlock = null;
 		private String _name="";
 		private String _sourceInfo;
@@ -229,13 +230,13 @@ public class WcssCompiler {
 		public void setSourceInfo(String info){
 			_sourceInfo=info;
 		}
-		public HashMap<String,String> getProperties(){
+		public LinkedHashMap<String,String> getProperties(){
 			return _props;
 		}
-		public HashMap<String,String> getVars(){
+		public LinkedHashMap<String,String> getVars(){
 			return _vars;
 		}
-		protected HashMap<String,CssMixinBlock> getMixins(){
+		protected LinkedHashMap<String,CssMixinBlock> getMixins(){
 			return _mixins;
 		}
 						
