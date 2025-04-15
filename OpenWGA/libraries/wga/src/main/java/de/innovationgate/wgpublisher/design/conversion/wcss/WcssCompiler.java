@@ -187,9 +187,10 @@ public class WcssCompiler {
 	private class CssBlock{
 		
 		private ArrayList<CssBlock> _subBlocks = new ArrayList<CssBlock>();
-		private LinkedHashMap<String,CssMixinBlock> _mixins = new LinkedHashMap<String,CssMixinBlock>();		
 		private LinkedHashMap<String,String> _props = new LinkedHashMap<String,String>();
-		private LinkedHashMap<String,String> _vars = new LinkedHashMap<String,String>();
+		
+		private HashMap<String,CssMixinBlock> _mixins = new HashMap<String,CssMixinBlock>();		
+		private HashMap<String,String> _vars = new HashMap<String,String>();
 		private CssBlock _parentBlock = null;
 		private String _name="";
 		private String _sourceInfo;
@@ -233,10 +234,10 @@ public class WcssCompiler {
 		public LinkedHashMap<String,String> getProperties(){
 			return _props;
 		}
-		public LinkedHashMap<String,String> getVars(){
+		public HashMap<String,String> getVars(){
 			return _vars;
 		}
-		protected LinkedHashMap<String,CssMixinBlock> getMixins(){
+		protected HashMap<String,CssMixinBlock> getMixins(){
 			return _mixins;
 		}
 						
