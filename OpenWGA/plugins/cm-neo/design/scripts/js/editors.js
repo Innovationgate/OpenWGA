@@ -325,7 +325,7 @@ define([
 					
 					UploadManager.upload(file, {
 						callback: function(filename){
-					    	editor.setURLInfo(el, {type:"intfile", key:filename})
+					    	editor.setURLInfo(el, {type:"intfile", key:filename.toLowerCase()})
 					    	el.src="../../file/" + Sitepanel.getContentInfo().contentkey + "/"+filename;
 					    	el.alt = filename;
 						}
