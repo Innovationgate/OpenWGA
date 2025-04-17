@@ -223,77 +223,6 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 		}
 	
 	}
-
-	$("#rtf-tab-image [name=width]").on({
-		keyup: function(ev){
-			if(!selectedImg)
-				return;
-			var img = $(selectedImg);
-			var h_el = $("#rtf-tab-image [name=height]")
-			var w_el = $(this);
-			var value = w_el.val();
-			if(ev.keyCode==40)
-				value--;
-			else if(ev.keyCode==38)
-				value++;
-			
-			img.removeAttr("height");
-			img.removeAttr("width");
-			
-			if(!value){
-				img.css("width", "");
-			}
-			else if(value != img.width()){
-				img.css("width", value);
-				img.css("height", "");
-				if(value != img.width())
-					img.css("width", "");
-			}
-			
-			h_el.css("color", img.prop("style").height ? "brown" : "gray")
-			w_el.css("color", img.prop("style").width ? "brown" : "gray")
-			
-			if(h_el.val() != img.height())
-				h_el.val(parseInt(img.height()));
-			if(w_el.val() != img.width())
-				w_el.val(parseInt(img.width()));
-		}
-	})
-	$("#rtf-tab-image [name=height]").on({
-		keyup: function(ev){
-			if(!selectedImg)
-				return;
-			var img = $(selectedImg);
-			var w_el = $("#rtf-tab-image [name=width]")
-			var h_el = $(this);
-			var value = h_el.val();
-			if(ev.keyCode==40)
-				value--;
-			else if(ev.keyCode==38)
-				value++;
-			
-			img.removeAttr("height");
-			img.removeAttr("width");
-			
-			if(!value){
-				img.css("height", "");
-			}
-			else if(value != img.height()){
-				img.css("height", value);
-				img.css("width", "");
-				if(value != img.height())
-					img.css("height", "");
-			}
-			
-			h_el.css("color", img.prop("style").height ? "brown" : "gray")
-			w_el.css("color", img.prop("style").width ? "brown" : "gray")
-			
-			if(h_el.val() != img.height())
-				h_el.val(parseInt(img.height()));
-			if(w_el.val() != img.width())
-				w_el.val(parseInt(img.width()));
-		}
-	})
 	
 	var toolbar = {
 		update: function(){
@@ -401,9 +330,6 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 				$("#editor-panel-rtf .img-options").show()
 				$("#editor-panel-rtf [data-id=image-info-wrapper]").show()
 				
-				$("#rtf-tab-image [name=width]").val(parseInt(el.width)).css("color", el.style.width?"brown":"gray")
-				$("#rtf-tab-image [name=height]").val(parseInt(el.height)).css("color", el.style.height?"brown":"gray")
-
 				var classes = el.className.split(" ");
 				if(options && options.imageStyleList && options.imageStyleList.length){
 					$("#editor-panel-rtf [data-id=image-style]").show()

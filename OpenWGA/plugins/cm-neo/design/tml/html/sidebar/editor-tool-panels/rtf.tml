@@ -179,14 +179,6 @@
 				</div>
 				
 				<div class="img-options">
-					<div style="margin-bottom:10px">
-						<label>Breite x Höhe:</label>
-						<br>
-						<input type="text" name="width" class="form-control input-sm" style="display:inline;width:70px">
-						x
-						<input type="text" name="height" class="form-control input-sm" style="display:inline;width:70px">
-					</div>
-	
 					<div style="margin:10px 0" data-id="image-style">
 						<label>Stil:</label>
 						<div id="image-style-ms"></div>
