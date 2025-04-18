@@ -684,6 +684,7 @@ In addition, as a special exception, the copyright holders of OpenWGA give
 you permission to combine the program with independent modules that
 extend OpenWGA in the form of an OpenWGA Plugin that is installed and
 invoked via the well defined OpenWGA Plugin Architecture.
+OpenWGA Plugins may have an individual license - not necessarily open source.
 
 You may copy and distribute such a system following the terms of the GNU GPL
 for OpenWGA and the licenses of the OpenWGA Plugins concerned.
