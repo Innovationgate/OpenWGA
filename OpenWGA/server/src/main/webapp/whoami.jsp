@@ -30,10 +30,10 @@ WGUserAccess userAccess = db.getSessionContext().getUserAccess();
 de.innovationgate.webgate.api.WGUserDetails userDetails = db.getSessionContext().getUserDetails();
 
 
-String aliasesText = "(none)";
-String groupsText = "(none)";
-String rolesText = "(none)";
-String matchingEntriesText = "(none)";
+String aliasesText = "-none-";
+String groupsText = "-none-";
+String rolesText = "-none-";
+String matchingEntriesText = "-none-";
 String labeledNamesText = null;
 if (userDetails != null) {
 	if (userDetails.getAliases().size() > 0) {
@@ -66,11 +66,20 @@ String docTitle = "You are logged in to database '" + db.getTitle() +"' ("+ dbKe
 
 	<p><b><%= docTitle %></b></p>
 	<p>
-		Primary username: <%= db.getSessionContext().getUser() %>
+		<b>Primary username:</b><br><%= db.getSessionContext().getUser() %>
 	</p>
 	<p>
-		Access level: <%= de.innovationgate.webgate.api.WGDatabase.accessLevelText(accessLevel) %>
+		<b>Access level:</b><br><%= de.innovationgate.webgate.api.WGDatabase.accessLevelText(accessLevel) %>
 	</p>
+
+	<%
+	if (userDetails != null) {
+	%>
+		<p><b>Groups:</b><br><%=groupsText%></p>
+		<p><b>Roles:</b><br><%=rolesText%></p>
+	<%
+	}
+	%>
 
 </BODY>
 </HTML>
