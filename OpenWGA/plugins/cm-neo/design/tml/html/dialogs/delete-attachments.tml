@@ -42,30 +42,48 @@
 			}
 		}
 	</tml:script>
-	Möchten Sie die folgenden Dateianhänge löschen?
-	<ul>
-		<tml:foreach item="_filenames" currentvalue="_filename">
-			<li><tml:item name="_filename"/></li>
-		</tml:foreach>
-	</ul>
+	
+	Möchten Sie die folgenden Dateianhänge löschen?	
+	<tml:foreach item="_filenames" currentvalue="_filename">
+		<tml:script>
+			_file_md = content().getFileMetaData(_filename)
+			_Attachment = AFW.content().attachment(_filename)
+		</tml:script>
+		<div class="file<tml:case condition="_usedFiles.contains(_filename)"> used</tml:case>">
+			<div class="image">
+				<img src="<tml:script expression="_Attachment.getThumbnailURL()"/>">
+			</div>
+			<div class="filename">
+				<b><tml:item name="_filename"/></b>
+				<div class="metas">
+					<tml:label key="[filetype.single.{_Attachment.getType().name}]"/>
+					-
+					<tml:script expression="AFW.Util.renderFileSize(_file_md.size)"/>
+					<tml:case condition="_file_md && _file_md.displayWidth>0">
+						<br>
+						<tml:script expression="_file_md.displayWidth"/>
+						x
+						<tml:script expression="_file_md.displayHeight"/>
+						Pixel
+					</tml:case>
+					<tml:case condition="_file_md && _file_md.getCustomFieldValue('pageCount')">
+						<tml:script>
+							_pages = _file_md.getCustomFieldValue('pageCount')
+						</tml:script>
+						<p><tml:script expression="_pages > 1 ? _pages + ' Seiten' : 'Eine Seite'"/></p>
+					</tml:case>
+				</div>
+			</div>
+		</div>
+	</tml:foreach>
+	
 	<tml:case if="_usedFiles.size">
-		<hr>
 		<b style="color:red">ACHTUNG:</b>
-		<br>
-		<tml:if condition="_usedFiles.size()==1">
-			<tml:then>
-				Die folgende zu löschende Datei wird derzeit noch in Inhaltsmodulen auf dieser Seite verwendet:
-			</tml:then>
-			<tml:else>
-				Die folgenden zu löschenden Dateien werden derzeit noch in Inhaltsmodulen auf dieser Seite verwendet:
-			</tml:else>
-		</tml:if>
-		<ul>
-			<tml:foreach item="_usedFiles" currentvalue="_filename">
-				<li><tml:item name="_filename"/></li>
-			</tml:foreach>
-		</ul>
+		<p>
+			Die rot markierten Dateien werden derzeit noch in Inhaltsmodulen auf dieser Seite verwendet.
+		</p>
 	</tml:case>
+
 </div>
 
 <div class="footer">
