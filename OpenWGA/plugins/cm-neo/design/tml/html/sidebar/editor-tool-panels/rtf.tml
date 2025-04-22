@@ -95,19 +95,18 @@
 					<div id="link-style-ms"></div> 
 				</div>
 
-				<div _class="btn-group">
-					<a class="btn btn-sm btn-default" data-action="create-link" href="#">
-						<i class="fa fa-plus"></i>
-						Link einfügen
-					</a>
-					<a class="btn btn-sm btn-default" data-action="edit-link" href="#">
-						<i class="fas fa-edit"></i>
-						Link bearbeiten
-					</a>
-					<a class="btn btn-sm btn-default pull-right" data-action="delete-link" href="#" title="Link löschen">
-						<i class="fa fa-trash"></i>
-					</a>
-				</div>
+				<a class="btn btn-sm btn-default" data-action="create-link" href="#">
+					<i class="fa fa-plus"></i>
+					Link einfügen
+				</a>
+				<a class="btn btn-sm btn-default" data-action="edit-link" href="#">
+					<i class="fas fa-edit"></i>
+					Link bearbeiten
+				</a>
+				<a class="btn btn-sm btn-default pull-right" data-action="delete-link" href="#" title="Link löschen">
+					<i class="fa fa-trash"></i>
+				</a>
+
 			</div>
 			
 			<div class="tab-pane" id="rtf-tab-table">
@@ -193,6 +192,10 @@
 					<i class="fas fa-edit"></i>
 					Bild ändern
 				</a>
+				<a class="btn btn-sm btn-default pull-right" data-action="remove-image-styles" href="#" title="Stile entfernen">
+					<i class="fas fa-code"></i>
+				</a>
+
 			</div>
 		</div>
 	</div>

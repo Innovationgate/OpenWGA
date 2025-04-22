@@ -220,6 +220,14 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 
 		"chatgpt": function(el){
 			CM.openDialog("chatgpt");
+		},
+		
+		"remove-image-styles": function(){
+			var el = editor.getNearestTagFromSelection("img")
+			if(el){
+				el.removeAttribute("style");
+				editor.focus();
+			}
 		}
 	
 	}
@@ -328,6 +336,11 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 				$("#rtf-tab-image [data-action=create-image]").hide()
 				$("#rtf-tab-image [data-action=edit-image]").show()
 				$("#editor-panel-rtf .img-options").show()
+
+				if(el.style.length)
+					$("#rtf-tab-image [data-action=remove-image-styles]").show()
+				else $("#rtf-tab-image [data-action=remove-image-styles]").hide()
+				
 				$("#editor-panel-rtf [data-id=image-info-wrapper]").show()
 				
 				var classes = el.className.split(" ");
@@ -335,6 +348,8 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 					$("#editor-panel-rtf [data-id=image-style]").show()
 					MS.select("#image-style-ms", classes);					
 				}
+				else $("#editor-panel-rtf [data-id=image-style]").hide()
+				
 				var info = editor.getURLInfo(el)
 				var types={
 					"exturl": "Externes Bild",
@@ -364,13 +379,12 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 			}
 			else{
 				$("#rtf-tab-image [data-action=edit-image]").hide()
+				$("#rtf-tab-image [data-action=remove-image-styles]").hide()
 				$("#editor-panel-rtf [data-id=image-info-wrapper]").hide()
 				$("#rtf-tab-image [data-action=create-image]").show()
-				$("#rtf-tab-image [name=width]").val("").css("color", "black")
-				$("#rtf-tab-image [name=height]").val("").css("color", "black")
 				
 				$("#editor-panel-rtf .img-options").hide()
-				$("#editor-panel-rtf [data-id=image-style]").show()
+				//$("#editor-panel-rtf [data-id=image-style]").show()
 			}
 		
 		},
