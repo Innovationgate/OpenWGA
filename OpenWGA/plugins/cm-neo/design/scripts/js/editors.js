@@ -106,12 +106,12 @@ define([
 					break;
 				case "intfile":
 					if(img.style){
-						if(img.style.width){
+						if(img.style.width && img.style.width!="auto"){
 							var index = img.style.width.indexOf("px");
 							if(index)
 								wgakey += "?width~"+parseInt(img.style.width.substr(0, index));
 						}
-						else if(img.style.height){
+						else if(img.style.height && img.style.height!="auto"){
 							var index = img.style.height.indexOf("px");
 							wgakey += "?height~"+parseInt(img.style.height.substr(0, index));
 						}

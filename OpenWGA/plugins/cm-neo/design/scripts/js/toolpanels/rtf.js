@@ -231,6 +231,79 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 		}
 	
 	}
+
+	$("#rtf-tab-image [name=width]").on({
+		keyup: function(ev){
+			if(!selectedImg)
+				return;
+			var img = $(selectedImg);
+			var h_el = $("#rtf-tab-image [name=height]")
+			var w_el = $(this);
+			var value = w_el.val();
+			if(ev.keyCode==40)
+				value--;
+			else if(ev.keyCode==38)
+				value++;
+			
+			img.removeAttr("height");
+			img.removeAttr("width");
+			
+			if(!value){
+				img.css("width", "");
+				img.css("height", "");
+			}
+			else if(value != img.outerWidth()){
+				img.css("width", value);
+				img.css("height", "auto");
+				if(value != img.outerWidth())
+					img.css("width", "");
+			}
+			
+			h_el.css("color", img.prop("style").height && img.prop("style").height!="auto" ? "brown" : "gray")
+			w_el.css("color", img.prop("style").width && img.prop("style").width!="auto" ? "brown" : "gray")
+			
+			if(h_el.val() != img.outerHeight())
+				h_el.val(parseInt(img.outerHeight()));
+			if(w_el.val() != img.outerWidth())
+				w_el.val(parseInt(img.outerWidth()));
+		}
+	})
+	$("#rtf-tab-image [name=height]").on({
+		keyup: function(ev){
+			if(!selectedImg)
+				return;
+			var img = $(selectedImg);
+			var w_el = $("#rtf-tab-image [name=width]")
+			var h_el = $(this);
+			var value = h_el.val();
+			if(ev.keyCode==40)
+				value--;
+			else if(ev.keyCode==38)
+				value++;
+			
+			img.removeAttr("height");
+			img.removeAttr("width");
+			
+			if(!value){
+				img.css("height", "");
+				img.css("width", "");
+			}
+			else if(value != img.outerHeight()){
+				img.css("height", value);
+				img.css("width", "auto");
+				if(value != img.outerHeight())
+					img.css("height", "");
+			}
+			
+			h_el.css("color", img.prop("style").height && img.prop("style").height!="auto" ? "brown" : "gray")
+			w_el.css("color", img.prop("style").width && img.prop("style").width!="auto" ? "brown" : "gray")
+			
+			if(h_el.val() != img.outerHeight())
+				h_el.val(parseInt(img.outerHeight()));
+			if(w_el.val() != img.outerWidth())
+				w_el.val(parseInt(img.outerWidth()));
+		}
+	})
 	
 	var toolbar = {
 		update: function(){
@@ -341,7 +414,14 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 					$("#rtf-tab-image [data-action=remove-image-styles]").show()
 				else $("#rtf-tab-image [data-action=remove-image-styles]").hide()
 				
+				if(options.customImageSizes)
+					$("#rtf-tab-image [data-id=image-size]").show()
+				else $("#rtf-tab-image [data-id=image-size]").hide()
+				
 				$("#editor-panel-rtf [data-id=image-info-wrapper]").show()
+
+				$("#rtf-tab-image [name=width]").val(parseInt(el.width)).css("color", el.style.width && el.style.width!="auto" ? "brown":"gray")
+				$("#rtf-tab-image [name=height]").val(parseInt(el.height)).css("color", el.style.height && el.style.height!="auto" ? "brown":"gray")
 				
 				var classes = el.className.split(" ");
 				if(options && options.imageStyleList && options.imageStyleList.length){
@@ -384,7 +464,6 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 				$("#rtf-tab-image [data-action=create-image]").show()
 				
 				$("#editor-panel-rtf .img-options").hide()
-				//$("#editor-panel-rtf [data-id=image-style]").show()
 			}
 		
 		},
