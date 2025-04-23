@@ -1,7 +1,5 @@
 <tml:action id="delete-attachments">
-
 	var filenames = tmlparam1.split(",")
-	//console.log("delete", filenames);
 	for(let [i, filename] in filenames)
 		content().removeFile(filename)
 	content().save();
@@ -11,82 +9,102 @@
 		dbkey: "<tml:metadata type="database" name="dbkey"/>",
 		contentkey: "<tml:metadata name="key"/>"
 	})
+	_closed=true;
 </tml:action>
 
-<div class="header">
-	Dateianhänge löschen
-	<a data-modal="hide">&times;</a>
-</div>
+<tml:case unless="_closed">
 
-<div class="content">
-	<tml:script>
-		_filenames = (request.getParameter("filenames")||"").split(",")
-
-		// check if some file is used in content modules
-		_usedFiles=WGA.List();
-		var settings = CMM.getContentModulesSettingsData(content());
-		if(settings){
-			var settingsValues = settings.values();
-			for(let [index, filename] in _filenames){
-				for(let value in Iterator(settingsValues)){
-					if(_usedFiles.contains(filename))
-						continue;
-					if(value instanceof java.util.List){
-						if(value.contains(filename))
+	<div class="header">
+		Dateianhänge löschen
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content">
+		<tml:script>
+			_filenames = (request.getParameter("filenames")||"").split(",")
+	
+			// check if some file is used in content modules
+			_usedFiles=WGA.List();
+			var settings = CMM.getContentModulesSettingsData(content());
+			if(settings){
+				var settingsValues = settings.values();
+				for(let [index, filename] in _filenames){
+					for(let value in Iterator(settingsValues)){
+						if(_usedFiles.contains(filename))
+							continue;
+						if(value instanceof java.util.List){
+							if(value.contains(filename))
+								_usedFiles.add(filename)
+						}
+						else if(value==filename)
 							_usedFiles.add(filename)
 					}
-					else if(value==filename)
-						_usedFiles.add(filename)
+		
 				}
-	
 			}
-		}
-	</tml:script>
-	
-	Möchten Sie die folgenden Dateianhänge löschen?	
-	<tml:foreach item="_filenames" currentvalue="_filename">
-		<tml:script>
-			_file_md = content().getFileMetaData(_filename)
-			_Attachment = AFW.content().attachment(_filename)
+			
+			// check RTF fields:
+			let exp = /data-wga-urlinfo="intfile\|([^"]*)"/g;
+			var fields = AFW.content().getItemNames()
+			var match;
+			for(let field in Iterator(fields)){
+				var str = item(field)
+				while ((match = exp.exec(str)) !== null) {
+					var filename = match[1];
+					if(_filenames.indexOf(filename)<0 || _usedFiles.contains(filename))
+						continue;
+					_usedFiles.add(filename)
+				}
+			}
+			
 		</tml:script>
-		<div class="file<tml:case condition="_usedFiles.contains(_filename)"> used</tml:case>">
-			<div class="image">
-				<img src="<tml:script expression="_Attachment.getThumbnailURL()"/>">
-			</div>
-			<div class="filename">
-				<b><tml:item name="_filename"/></b>
-				<div class="metas">
-					<tml:label key="[filetype.single.{_Attachment.getType().name}]"/>
-					-
-					<tml:script expression="AFW.Util.renderFileSize(_file_md.size)"/>
-					<tml:case condition="_file_md && _file_md.displayWidth>0">
-						<br>
-						<tml:script expression="_file_md.displayWidth"/>
-						x
-						<tml:script expression="_file_md.displayHeight"/>
-						Pixel
-					</tml:case>
-					<tml:case condition="_file_md && _file_md.getCustomFieldValue('pageCount')">
-						<tml:script>
-							_pages = _file_md.getCustomFieldValue('pageCount')
-						</tml:script>
-						<p><tml:script expression="_pages > 1 ? _pages + ' Seiten' : 'Eine Seite'"/></p>
-					</tml:case>
+		
+		Möchten Sie die folgenden Dateianhänge löschen?	
+		<tml:foreach item="_filenames" currentvalue="_filename">
+			<tml:script>
+				_file_md = content().getFileMetaData(_filename)
+				_Attachment = AFW.content().attachment(_filename)
+			</tml:script>
+			<div class="file<tml:case condition="_usedFiles.contains(_filename)"> used</tml:case>">
+				<div class="image">
+					<img src="<tml:script expression="_Attachment.getThumbnailURL()"/>">
+				</div>
+				<div class="filename">
+					<b><tml:item name="_filename"/></b>
+					<div class="metas">
+						<tml:label key="[filetype.single.{_Attachment.getType().name}]"/>
+						-
+						<tml:script expression="AFW.Util.renderFileSize(_file_md.size)"/>
+						<tml:case condition="_file_md && _file_md.displayWidth>0">
+							<br>
+							<tml:script expression="_file_md.displayWidth"/>
+							x
+							<tml:script expression="_file_md.displayHeight"/>
+							Pixel
+						</tml:case>
+						<tml:case condition="_file_md && _file_md.getCustomFieldValue('pageCount')">
+							<tml:script>
+								_pages = _file_md.getCustomFieldValue('pageCount')
+							</tml:script>
+							<p><tml:script expression="_pages > 1 ? _pages + ' Seiten' : 'Eine Seite'"/></p>
+						</tml:case>
+					</div>
 				</div>
 			</div>
-		</div>
-	</tml:foreach>
+		</tml:foreach>
+		
+		<tml:case if="_usedFiles.size">
+			<b style="color:red">ACHTUNG:</b>
+			<p>
+				Die rot markierten Dateien werden derzeit noch in Inhaltsmodulen oder Richtext Feldern auf dieser Seite verwendet.
+			</p>
+		</tml:case>
 	
-	<tml:case if="_usedFiles.size">
-		<b style="color:red">ACHTUNG:</b>
-		<p>
-			Die rot markierten Dateien werden derzeit noch in Inhaltsmodulen auf dieser Seite verwendet.
-		</p>
-	</tml:case>
-
-</div>
-
-<div class="footer">
-	<a class="btn btn-default" data-modal="hide">Abbrechen</a>
-	<tml:button cssclass="btn btn-danger" clickaction="delete-attachments" param1="{request.getParameter('filenames')}">Löschen</tml:button>
-</div>
+	</div>
+	
+	<div class="footer">
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:button cssclass="btn btn-danger" clickaction="delete-attachments" param1="{request.getParameter('filenames')}">Löschen</tml:button>
+	</div>
+	
+</tml:case>
