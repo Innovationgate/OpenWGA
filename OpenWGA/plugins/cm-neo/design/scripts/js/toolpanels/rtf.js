@@ -414,9 +414,9 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 					$("#rtf-tab-image [data-action=remove-image-styles]").show()
 				else $("#rtf-tab-image [data-action=remove-image-styles]").hide()
 				
-				if(options.customImageSizes)
-					$("#rtf-tab-image [data-id=image-size]").show()
-				else $("#rtf-tab-image [data-id=image-size]").hide()
+				if(options.customImageSizes===false)
+					$("#rtf-tab-image [data-id=image-size]").hide()
+				else $("#rtf-tab-image [data-id=image-size]").show()
 				
 				$("#editor-panel-rtf [data-id=image-info-wrapper]").show()
 
