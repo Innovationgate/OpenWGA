@@ -80,12 +80,13 @@ define([
 					if(img.style){
 						if(img.style.width){
 							var w = img.style.width.indexOf("px");
-							if(w)
+							if(w>0)
 								filename += "?width~"+parseInt(img.style.width.substr(0, w));
 						}
 						else if(img.style.height){
 							var h = img.style.height.indexOf("px");
-							filename += "?height~"+parseInt(img.style.height.substr(0, h));
+							if(h>0)
+								filename += "?height~"+parseInt(img.style.height.substr(0, h));
 						}
 					}
 					
@@ -108,12 +109,13 @@ define([
 					if(img.style){
 						if(img.style.width && img.style.width!="auto"){
 							var index = img.style.width.indexOf("px");
-							if(index)
+							if(index>0)
 								wgakey += "?width~"+parseInt(img.style.width.substr(0, index));
 						}
 						else if(img.style.height && img.style.height!="auto"){
 							var index = img.style.height.indexOf("px");
-							wgakey += "?height~"+parseInt(img.style.height.substr(0, index));
+							if(index>0)
+								wgakey += "?height~"+parseInt(img.style.height.substr(0, index));
 						}
 					}
 					
