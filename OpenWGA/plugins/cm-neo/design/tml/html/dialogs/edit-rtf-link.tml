@@ -59,6 +59,12 @@
 					o_placeholder="- keine -"
 				/>
 			</tml:case>
+			<tml:case value="mailto">
+				<tml:[form-field] o_label="Mailadresse" o_name="mailto" 
+					o_default="{$option_dialog_options.key || $option_dialog_options.url}"
+					o_placeholder="Adresse ..."
+				/>
+			</tml:case>
 			<tml:case value="exturl">
 				<tml:[form-field] o_label="Zieladresse" o_name="url" 
 					o_default="{$option_dialog_options.key || $option_dialog_options.url}"
@@ -247,7 +253,7 @@
 					$("[name=url]", form).focus();
 					return;
 				}
-				a = editor.createLink(url, url, "exturl");
+				a = editor.createLink(url, url);
 				editor.setURLInfo(a, {type:"exturl", key:url})
 				if(target_window=="default" && url.indexOf("mailto:")==-1 && url.indexOf("tel:")==-1) 
 					a.target = "_blank"
@@ -259,7 +265,7 @@
 					$("[name=layout]", form).focus();
 					return;
 				}
-				a = editor.createLink("layouturl", layout, "layout");
+				a = editor.createLink("layouturl", layout);
 				editor.setURLInfo(a, {type:"layout", key:layout})
 			}
 			else if(type=="scriptlet"){
@@ -269,7 +275,7 @@
 					$("[name=scriptlet]", form).focus();
 					return;
 				}
-				a = editor.createLink("scriptlet", scriptlet, "scriptlet");
+				a = editor.createLink("scriptlet", scriptlet);
 				editor.setURLInfo(a, {type:"scriptlet", key:scriptlet})
 			}
 			else if(type=="intfile"){
@@ -278,8 +284,10 @@
 					alert("Bitte wählen Sie eine Datei aus.");
 					return;
 				}
-				a = editor.createLink(key, key, "intfile");
+				a = editor.createLink(key, key);
 				editor.setURLInfo(a, {type:type, key:key})
+				if(target_window=="default") 
+					a.target = "_blank"
 			}
 			else if(type=="extfile"){
 				var dbkey = $("[name=dbkey]", form).val();
@@ -290,12 +298,14 @@
 					alert("Bitte wählen Sie eine Datei aus.");
 					return;
 				}
-				a = editor.createLink(filename, filename, "extfile");
+				a = editor.createLink(filename, filename);
 				editor.setURLInfo(a, {
 					type: type,
 					key: container+"." + lang + ".0/"+filename 
 							+ (dbkey=="this" ? "" :  "/"+dbkey)
 				})
+				if(target_window=="default") 
+					a.target = "_blank"
 			}
 			else if(type=="int"){
 				var key = $("[name=key]", form).val();
@@ -308,11 +318,22 @@
 				}
 				if(anker)
 					key = key + "#" + anker
-				a = editor.createLink(key, link_text||key, "int");
+				a = editor.createLink(key, link_text||key);
 				editor.setURLInfo(a, {
 					type: type, 
 					key: key
 				})				
+			}
+			else if(type=="mailto"){
+				var mailto = $("[name=mailto]", form).val();
+				if(!mailto){
+					alert("Bitte geben Sie eine Mailadresse an.");
+					$("[name=mailto]", form).focus();
+					return;
+				}
+				a = editor.createLink("mailto:" + mailto, mailto);
+				a.href="mailto:" + mailto;
+				editor.setURLInfo(a, {type:"mailto", key:mailto});
 			}
 			else{
 				alert("Unbekannter Link-Typ: " + type);
@@ -412,6 +433,17 @@
 				editor.setURLInfo(a, {type:"scriptlet", key:scriptlet})
 			}
 
+			else if(type=="mailto"){
+				var mailto = $("[name=mailto]", form).val();
+				if(!mailto){
+					alert("Bitte geben Sie eine Mailadresse an.");
+					$("[name=mailto]", form).focus();
+					return;
+				}
+				a.href="mailto:" + mailto;
+				editor.setURLInfo(a, {type:"mailto", key:mailto});
+			}
+			
 			else{	// exturl
 				var url = $("[name=url]", form).val().toLowerCase();
 				if(!url){

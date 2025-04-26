@@ -19,6 +19,7 @@ Controller.prototype.prepare = function($cx) {
 	this.link_types=[
 		"Externer Link|exturl",
 		"Interner Link|int",
+		"Mail|mailto",
 		"Link auf Datei aus diesem Dokument|intfile",
 		"Link auf Datei aus beliebigem Dokument|extfile"
 	]

@@ -363,6 +363,7 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 				var types={
 					"int": "Interner Link",
 					"exturl": "Externer Link",
+					"mailto": "Mail",
 					"intfile": "Link auf Datei",
 					"extfile": "Link auf externe Datei",
 					"scriptlet": "Projekt-Link",
@@ -371,9 +372,7 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 				$("#editor-panel-rtf [data-id=link-type]").html(types[info.type||"undefined"])
 				if(info.type=="exturl")
 					$("#editor-panel-rtf [data-id=link-info]").html(info.key || $(el).prop("href"))
-				else if(info.type=="intfile")
-					$("#editor-panel-rtf [data-id=link-info]").html(info.key)
-				else if(info.type=="scriptlet")
+				else if(info.type=="intfile" || info.type=="mailto" || info.type=="scriptlet")
 					$("#editor-panel-rtf [data-id=link-info]").html(info.key)
 				else if(info.type=="extfile"){
 					var parts = info.key.split("/");
