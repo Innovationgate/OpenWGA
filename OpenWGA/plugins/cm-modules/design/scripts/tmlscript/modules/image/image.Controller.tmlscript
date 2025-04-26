@@ -69,10 +69,29 @@ Controller.prototype.prepare = function($cx, CMM) {
 	var onclick = setting("onclick");
 	if(onclick=="link"){
 		this.link_target = setting('link_target');
-		if(setting('link_type')=='int' && setting('wgakey'))
+		if(setting('link_type')=='int' && setting('wgakey')){
 			this.link_url = WGA.context("docid:"+setting('wgakey')).contenturl()
-		else if(setting('link_type')=='ext' && setting('url'))
+			if(this.link_target=="default")
+				this.link_target=null;
+		}
+		else if(setting('link_type')=='ext' && setting('url')){
 			this.link_url = setting('url');
+			if(this.link_target=="default"){
+				if(this.link_url.indexOf("mailto:")==-1 && this.link_url.indexOf("tel:")==-1)
+					this.link_target="_blank";
+				else this.link_target=null;
+			}
+		}
+		else if(setting('link_type')=='intfile' && setting('filename')){
+			this.link_url = $cx.fileurl(setting('filename'));
+			if(this.link_target=="default")
+				this.link_target="_blank";
+		}
+		else if(setting('link_type')=='mailto' && setting('mailto')){
+			this.link_url = "mailto:" + setting('mailto');
+			if(this.link_target=="default")
+				this.link_target=null;
+		}
 		else if(setting('url')){
 			// old style url
 			var target = WGA.context("docid:" + setting('url'), false)

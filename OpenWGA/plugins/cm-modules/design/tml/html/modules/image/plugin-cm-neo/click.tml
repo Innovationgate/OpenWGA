@@ -25,28 +25,43 @@
 				}
 			</tml:script>
 			<tml:input name="{scoped:link_type}" default="int" type="select" cssclass="form-control" options="{label('image.setting.link.options')}" changeaction="$refresh" mode="{option:mode}"/>
-			<tml:if condition="tmlform.field(WGA.scoped('link_type'))=='int'">
-				<tml:then>
-					<div style="margin: 5px 0">
+			<div style="margin: 5px 0">
+				<tml:if condition="tmlform.field(WGA.scoped('link_type'))=='int'">
+					<tml:then>
 						<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document">
 							<tml:option name="fieldname" expression="WGA.scoped('wgakey')"/>
 						</tml:include>
-					</div>
-				</tml:then>
-				<tml:else>
-					<tml:input name="{scoped:url}" cssstyle="width:100%" mode="{option:mode}" cssclass="form-control" html_placeholder="absolute URL ..."/>
-				</tml:else>
-			</tml:if>			
+					</tml:then>
+					
+					<tml:elseif condition="tmlform.field(WGA.scoped('link_type'))=='intfile'">
+						<tml:include ref="util:select-file" o_fieldname="filename" o_placeholder="Bitte auswählen ..."/>
+					</tml:elseif>
+
+					<tml:elseif condition="tmlform.field(WGA.scoped('link_type'))=='mailto'">
+						<tml:input name="{scoped:mailto}" cssstyle="width:100%" mode="{option:mode}" cssclass="form-control" html_placeholder="Mail Adresse ..."/>
+					</tml:elseif>
+					
+					<tml:else>
+						<tml:input name="{scoped:url}" cssstyle="width:100%" mode="{option:mode}" cssclass="form-control" html_placeholder="absolute URL ..."/>
+					</tml:else>
+				</tml:if>
+			</div>
 		</div>
 
 		<label>Zielfenster:</label>
 		<div style="margin:10px">
 			<tml:script>
 				// stay compatible with existing custom target names: set ist to _blank.
-				if(tmlform.field(WGA.scoped('link_target')) && tmlform.field(WGA.scoped('link_target'))!="_self")
+				if(tmlform.field(WGA.scoped('link_target')) && tmlform.field(WGA.scoped('link_target'))!="_self" && tmlform.field(WGA.scoped('link_target'))!="default")
 					tmlform.setfield(WGA.scoped('link_target'), "_blank")
 			</tml:script>
-			<tml:input name="{scoped:link_target}" type="select" cssclass="form-control" mode="{option:mode}" options="gleiches Fenster|_self,neues Fenster|_blank"/>
+			<tml:input name="{scoped:link_target}" type="select" cssclass="form-control" mode="{option:mode}" options="Default|default,Gleiches Fenster|_self,Neues Fenster|_blank"
+				default="default"
+				changeaction="$refresh"
+			/>
+			<tml:case condition="tmlform.field(WGA.scoped('link_target'))=='default'">
+				Interne Links im gleichen Fenster, externe Links und Dateien in neuem Fenster
+			</tml:case>
 		</div>
 	</tml:case>
 	<tml:case value="zoom">
