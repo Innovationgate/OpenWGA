@@ -28,6 +28,12 @@
 </div>
 
 <tml:case condition="tmlform.field(WGA.scoped('link'))">
+
+	<label>Optionaler Link-Titel:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:link_title}" cssclass="form-control" html_placeholder="- kein Titel -"/>
+	</div>
+		
 	<tml:script>
 		// stay compatible with existing custom target names: set ist to _blank.
 		if(tmlform.field(WGA.scoped('link_target')) && tmlform.field(WGA.scoped('link_target'))!="_self" && tmlform.field(WGA.scoped('link_target'))!="default")
