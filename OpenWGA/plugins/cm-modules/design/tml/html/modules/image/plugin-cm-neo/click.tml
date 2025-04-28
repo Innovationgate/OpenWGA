@@ -48,6 +48,11 @@
 			</div>
 		</div>
 
+		<label>Optionaler Link-Titel:</label>
+		<div style="margin:10px">
+			<tml:input name="{scoped:link_title}" cssclass="form-control" html_placeholder="- kein Titel -"/>
+		</div>
+		
 		<label>Zielfenster:</label>
 		<div style="margin:10px">
 			<tml:script>

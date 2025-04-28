@@ -69,6 +69,7 @@ Controller.prototype.prepare = function($cx, CMM) {
 	var onclick = setting("onclick");
 	if(onclick=="link"){
 		this.link_target = setting('link_target');
+		this.link_title = setting('link_title');
 		if(setting('link_type')=='int' && setting('wgakey')){
 			this.link_url = WGA.context("docid:"+setting('wgakey')).contenturl()
 			if(this.link_target=="default")
