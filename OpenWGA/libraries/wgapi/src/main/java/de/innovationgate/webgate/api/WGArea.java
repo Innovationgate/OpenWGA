@@ -445,6 +445,17 @@ public class WGArea extends WGSchemaDocument implements PageHierarchyNode {
      * @throws WGAPIException
      */
     public boolean mayEditPages() throws WGAPIException {
+    	
+        // Ask PageRightsFilter first and stop other checks if DENIED or ALLOWED_SKIP_DEFAULT_CHECKS
+        PageRightsFilter rightsFilter = getDatabase().getPageRightsFilter();
+        if(rightsFilter instanceof PageAndAreaRightsFilter) {
+        	PageRightsFilter.Right editRight = ((PageAndAreaRightsFilter)rightsFilter).mayEditPages(this, getDatabase().getSessionContext().getUserAccess());
+            if (editRight == PageRightsFilter.Right.DENIED) 
+            	return false;
+            else if (editRight == PageRightsFilter.Right.ALLOWED_SKIP_DEFAULT_CHECKS)
+            	return true;
+        }
+    	
         if( this.db.getSessionContext().getAccessLevel() >= WGDatabase.ACCESSLEVEL_CHIEF_EDITOR ){
             return true;
         }
