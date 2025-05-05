@@ -565,6 +565,10 @@ public class Design {
                 if (param == null) {
                     param = "";
                 }
+                /*
+                 
+                See #00006394
+                 
                 if (_designContext.getVersionCompliance().isAtLeast(6, 2)) {
                     try {
                         param = _wga.encode(getTmlDefaultEncoding(), param);
@@ -574,6 +578,7 @@ public class Design {
                         param = "";
                     }
                 }
+                */
             }
             else {
                 param = "";
