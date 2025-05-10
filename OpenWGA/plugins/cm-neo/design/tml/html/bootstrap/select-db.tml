@@ -5,7 +5,7 @@
 
 		<tml:case if="$option_no_websites_available">
 			<div class="alert alert-danger" style="margin-top:30px">
-				<h4>Keine Websites / Web-Anwendungn verfügbar</h4>
+				<h4>Keine Websites verfügbar</h4>
 				Es stehen keine Websites zum Bearbeiten zur Verfügung.
 				<br>
 				Bitte wenden Sie sich an Ihren Administrator.
