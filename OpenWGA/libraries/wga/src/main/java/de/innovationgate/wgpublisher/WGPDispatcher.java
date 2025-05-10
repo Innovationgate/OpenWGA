@@ -101,6 +101,7 @@ import de.innovationgate.webgate.api.WGUnresolveableVirtualLinkException;
 import de.innovationgate.webgate.api.WGUserProfile;
 import de.innovationgate.wga.common.Constants;
 import de.innovationgate.wga.common.beans.csconfig.v1.MediaKey;
+import de.innovationgate.wga.config.VirtualHost;
 import de.innovationgate.wga.model.BrowsingSecurity;
 import de.innovationgate.wga.server.api.App;
 import de.innovationgate.wga.server.api.Database;
@@ -125,6 +126,7 @@ import de.innovationgate.wgpublisher.files.derivates.TypeQueryTermProcessor;
 import de.innovationgate.wgpublisher.files.derivates.WGFailedDerivateQueryException;
 import de.innovationgate.wgpublisher.files.derivates.WGInvalidDerivateQueryException;
 import de.innovationgate.wgpublisher.filter.WGAFilter;
+import de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
 import de.innovationgate.wgpublisher.lang.LanguageBehaviour;
 import de.innovationgate.wgpublisher.lang.LanguageBehaviourTools;
 import de.innovationgate.wgpublisher.lang.RequestLanguageChooser;
@@ -510,6 +512,13 @@ public class WGPDispatcher extends HttpServlet {
 
             if (path.equals("/login")) {
 
+            	VirtualHost vHost = (VirtualHost)request.getAttribute(WGAVirtualHostingFilter.REQUESTATTRIB_VIRTUAL_HOST);
+            	if(vHost!=null && vHost.getAllowedDatabases().isEmpty()) {
+            		_log.error("Logins not allowed on vHost '" + vHost.getServername() + "' requested from IP " + request.getRemoteAddr() + " on path " + String.valueOf(request.getRequestURL()));
+            		response.sendError(HttpServletResponse.SC_FORBIDDEN, "Logins not allowed on this host");
+            		return;
+            	}
+            	
                 doLogin(request, response);
                 return;
 
