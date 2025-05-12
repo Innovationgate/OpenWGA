@@ -92,11 +92,9 @@
 	});
 	<tml:case condition="CMM.setting('lightbox')">
 		require(["jquery", "jquery-lightbox"], function($){
-			$(function(){
-				$("#album-<tml:option name="ns"/>").find("img").lightbox({
-					group: "<tml:script expression="CMM.setting('image_group')||'default'"/>",
-					download: <tml:script expression="CMM.setting('download')"/>
-				})
+			$("#album-<tml:option name="ns"/>").find("img").lightbox({
+				group: "<tml:script expression="CMM.setting('image_group')||'default'"/>",
+				download: <tml:script expression="CMM.setting('download')"/>
 			})
 		})
 	</tml:case>
