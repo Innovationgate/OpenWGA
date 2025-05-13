@@ -191,7 +191,7 @@
 			o_changeaction="setTargetWindow"
 		>
 			<tml:case condition="tmlform.target_window=='default'">
-				Interne Links im gleichen Fenster, externe Links in neuem Fenster
+				Interne Links im gleichen Fenster, externe Links und Dateien in neuem Fenster
 			</tml:case>
 		</tml:[form-field]>
 		
