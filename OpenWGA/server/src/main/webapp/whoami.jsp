@@ -6,9 +6,6 @@
 	jspHelper.setContentType("text/html");
 %>
 <%@ page import="de.innovationgate.webgate.api.*" %>
-<DOCTYPE html>
-<HTML>
-<HEAD>
 
 <%
 String wgaBaseURL = jspHelper.getPublisherPath();
@@ -61,25 +58,31 @@ if (userDetails != null) {
 }
 String docTitle = "You are logged in to database '" + db.getTitle() +"' ("+ dbKey + ") as user '"+ db.getSessionContext().getUser() +"'";
 %>
-</HEAD>
-<BODY>
 
-	<p><b><%= docTitle %></b></p>
-	<p>
-		<b>Primary username:</b><br><%= db.getSessionContext().getUser() %>
-	</p>
-	<p>
-		<b>Access level:</b><br><%= de.innovationgate.webgate.api.WGDatabase.accessLevelText(accessLevel) %>
-	</p>
+<!doctype html>
+<html>
+	<head>
+		<title>Who am I</title>
+	</head>
 
-	<%
-	if (userDetails != null) {
-	%>
-		<p><b>Groups:</b><br><%=groupsText%></p>
-		<p><b>Roles:</b><br><%=rolesText%></p>
-	<%
-	}
-	%>
+	<body>
 
-</BODY>
-</HTML>
+		<p><b><%= docTitle %></b></p>
+		<p>
+			<b>Primary username:</b><br><%= db.getSessionContext().getUser() %>
+		</p>
+		<p>
+			<b>Access level:</b><br><%= de.innovationgate.webgate.api.WGDatabase.accessLevelText(accessLevel) %>
+		</p>
+
+		<%
+		if (userDetails != null) {
+		%>
+			<p><b>Groups:</b><br><%=groupsText%></p>
+			<p><b>Roles:</b><br><%=rolesText%></p>
+		<%
+		}
+		%>
+
+	</body>
+</html>
