@@ -1,4 +1,6 @@
-function Renderer() {}
+function Renderer() {
+	WGA.accessLogging().loggingEnabled=false
+}
 
 Renderer.prototype.render = function(App, $urlParam_id, $urlParam_dbkey, $urlParam_area, $urlParam_language) {
 

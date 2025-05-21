@@ -325,6 +325,38 @@ body .modal-popup{
 	}
 }
 
+#dialog-delete-attachments{
+	
+	.file{
+		display: flex;
+		align-items: center;
+		margin: 10px 0;
+		padding: 10px;
+		box-sizing: border-box;
+		border-radius: 5px;
+		&.used{
+			background: #efefef;
+			border: solid red 1px;
+		}
+		.image{
+			width: 80px;
+			text-align: center;
+			img{
+				max-width: 100%;
+			}
+		}
+		.filename{
+			margin-left: 10px;
+			
+			.metas{
+				color: gray;
+				font-size: .8em;
+			}
+		}
+	}
+	
+}
+
 form .select-tree{
 
 	position: relative;

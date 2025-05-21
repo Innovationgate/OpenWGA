@@ -1,9 +1,9 @@
-<tml:{a} wrapif="$mc.link_url" html-href="$mc.link_url" html_target="{$mc.link_target || VOID}">
+<tml:{a} wrapif="$mc.link_url" html-href="$mc.link_url" html_target="{$mc.link_target || VOID}" html_title="{$mc.link_title || VOID}">
 	<tml:if context="{$mc.context}" iscontextvalid="true" condition="$mc.filename">
 		<tml:then>		
 			<tml:image file="{$mc.filename}"
 				html-alt="$mc.img_alt"
-				html-title="$mc.img_title"
+				html_title="{$mc.img_title || VOID}"
 				html-data-image-url="$mc.lightbox_url"
 				html-data-image-download-url="$mc.download_url"
 				html-data-image-download="$mc.downloads"

@@ -220,6 +220,14 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 
 		"chatgpt": function(el){
 			CM.openDialog("chatgpt");
+		},
+		
+		"remove-image-styles": function(){
+			var el = editor.getNearestTagFromSelection("img")
+			if(el){
+				el.removeAttribute("style");
+				editor.focus();
+			}
 		}
 	
 	}
@@ -242,21 +250,22 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 			
 			if(!value){
 				img.css("width", "");
-			}
-			else if(value != img.width()){
-				img.css("width", value);
 				img.css("height", "");
-				if(value != img.width())
+			}
+			else if(value != img.outerWidth()){
+				img.css("width", value);
+				img.css("height", "auto");
+				if(value != img.outerWidth())
 					img.css("width", "");
 			}
 			
-			h_el.css("color", img.prop("style").height ? "brown" : "gray")
-			w_el.css("color", img.prop("style").width ? "brown" : "gray")
+			h_el.css("color", img.prop("style").height && img.prop("style").height!="auto" ? "brown" : "gray")
+			w_el.css("color", img.prop("style").width && img.prop("style").width!="auto" ? "brown" : "gray")
 			
-			if(h_el.val() != img.height())
-				h_el.val(parseInt(img.height()));
-			if(w_el.val() != img.width())
-				w_el.val(parseInt(img.width()));
+			if(h_el.val() != img.outerHeight())
+				h_el.val(parseInt(img.outerHeight()));
+			if(w_el.val() != img.outerWidth())
+				w_el.val(parseInt(img.outerWidth()));
 		}
 	})
 	$("#rtf-tab-image [name=height]").on({
@@ -277,21 +286,22 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 			
 			if(!value){
 				img.css("height", "");
-			}
-			else if(value != img.height()){
-				img.css("height", value);
 				img.css("width", "");
-				if(value != img.height())
+			}
+			else if(value != img.outerHeight()){
+				img.css("height", value);
+				img.css("width", "auto");
+				if(value != img.outerHeight())
 					img.css("height", "");
 			}
 			
-			h_el.css("color", img.prop("style").height ? "brown" : "gray")
-			w_el.css("color", img.prop("style").width ? "brown" : "gray")
+			h_el.css("color", img.prop("style").height && img.prop("style").height!="auto" ? "brown" : "gray")
+			w_el.css("color", img.prop("style").width && img.prop("style").width!="auto" ? "brown" : "gray")
 			
-			if(h_el.val() != img.height())
-				h_el.val(parseInt(img.height()));
-			if(w_el.val() != img.width())
-				w_el.val(parseInt(img.width()));
+			if(h_el.val() != img.outerHeight())
+				h_el.val(parseInt(img.outerHeight()));
+			if(w_el.val() != img.outerWidth())
+				w_el.val(parseInt(img.outerWidth()));
 		}
 	})
 	
@@ -353,6 +363,7 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 				var types={
 					"int": "Interner Link",
 					"exturl": "Externer Link",
+					"mailto": "Mail",
 					"intfile": "Link auf Datei",
 					"extfile": "Link auf externe Datei",
 					"scriptlet": "Projekt-Link",
@@ -361,9 +372,7 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 				$("#editor-panel-rtf [data-id=link-type]").html(types[info.type||"undefined"])
 				if(info.type=="exturl")
 					$("#editor-panel-rtf [data-id=link-info]").html(info.key || $(el).prop("href"))
-				else if(info.type=="intfile")
-					$("#editor-panel-rtf [data-id=link-info]").html(info.key)
-				else if(info.type=="scriptlet")
+				else if(info.type=="intfile" || info.type=="mailto" || info.type=="scriptlet")
 					$("#editor-panel-rtf [data-id=link-info]").html(info.key)
 				else if(info.type=="extfile"){
 					var parts = info.key.split("/");
@@ -399,16 +408,27 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 				$("#rtf-tab-image [data-action=create-image]").hide()
 				$("#rtf-tab-image [data-action=edit-image]").show()
 				$("#editor-panel-rtf .img-options").show()
-				$("#editor-panel-rtf [data-id=image-info-wrapper]").show()
-				
-				$("#rtf-tab-image [name=width]").val(parseInt(el.width)).css("color", el.style.width?"brown":"gray")
-				$("#rtf-tab-image [name=height]").val(parseInt(el.height)).css("color", el.style.height?"brown":"gray")
 
+				if(el.style.length)
+					$("#rtf-tab-image [data-action=remove-image-styles]").show()
+				else $("#rtf-tab-image [data-action=remove-image-styles]").hide()
+				
+				if(options.customImageSizes===false)
+					$("#rtf-tab-image [data-id=image-size]").hide()
+				else $("#rtf-tab-image [data-id=image-size]").show()
+				
+				$("#editor-panel-rtf [data-id=image-info-wrapper]").show()
+
+				$("#rtf-tab-image [name=width]").val(parseInt(el.width)).css("color", el.style.width && el.style.width!="auto" ? "brown":"gray")
+				$("#rtf-tab-image [name=height]").val(parseInt(el.height)).css("color", el.style.height && el.style.height!="auto" ? "brown":"gray")
+				
 				var classes = el.className.split(" ");
 				if(options && options.imageStyleList && options.imageStyleList.length){
 					$("#editor-panel-rtf [data-id=image-style]").show()
 					MS.select("#image-style-ms", classes);					
 				}
+				else $("#editor-panel-rtf [data-id=image-style]").hide()
+				
 				var info = editor.getURLInfo(el)
 				var types={
 					"exturl": "Externes Bild",
@@ -438,13 +458,11 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 			}
 			else{
 				$("#rtf-tab-image [data-action=edit-image]").hide()
+				$("#rtf-tab-image [data-action=remove-image-styles]").hide()
 				$("#editor-panel-rtf [data-id=image-info-wrapper]").hide()
 				$("#rtf-tab-image [data-action=create-image]").show()
-				$("#rtf-tab-image [name=width]").val("").css("color", "black")
-				$("#rtf-tab-image [name=height]").val("").css("color", "black")
 				
 				$("#editor-panel-rtf .img-options").hide()
-				$("#editor-panel-rtf [data-id=image-style]").show()
 			}
 		
 		},

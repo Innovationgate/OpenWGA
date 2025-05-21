@@ -362,7 +362,7 @@ define(["jquery"], function($){
 		return imgTag;
 	}
 
-	editor.prototype.createLink=function(url, linktext, urltype){
+	editor.prototype.createLink=function(url, linktext){
 		var aTag=this.getNearestTagFromSelection("A");    	
 		if (!aTag){
 			linktext = linktext || url;
@@ -526,10 +526,12 @@ define(["jquery"], function($){
 		 * We check this by comparing the domain part of the url with the currently used domain. 
 		 */
 		var urlinfo = tag.getAttribute("data-wga-urlinfo") || tag.getAttribute("wga:urlinfo");
-		if(urlinfo && domain==document.domain) {
-			var parts = urlinfo.split("|");
-			info.type=parts[0];
-			info.key=parts[1];
+		if(urlinfo){
+			if(domain==document.domain || urlinfo.indexOf("mailto|")==0){
+				var parts = urlinfo.split("|");
+				info.type=parts[0];
+				info.key=parts[1];
+			}
 		}
 		return info;
 	}

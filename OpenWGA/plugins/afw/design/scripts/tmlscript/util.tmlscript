@@ -1038,7 +1038,6 @@ this.excelWriter = function(config){
 		  		console.error("no file")
 		  		return;
 		  	}
-		  	console.log("out", out, "stream_or_file", stream_or_file)
 		  	
 			var itemlist = config.columns;
 			if(itemlist instanceof Array)

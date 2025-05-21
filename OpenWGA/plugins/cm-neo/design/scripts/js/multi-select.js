@@ -17,11 +17,16 @@ define([
 				title = $(this).data("group-label") + " " + title;
 			selected.push(title)
 		})
-		if(selected.length==0)
+		if(selected.length==0){
 			$("button .text", el).html(config.nonSelectedText || "Nichts ausgewählt")
-		else if(selected.length<3)
-			$("button .text", el).html(selected.join(", "))
-		else $("button .text", el).html(selected.length + " " + (config.nSelectedText || "Werte ausgewählt"))		
+			$("button", el).attr("title", "")
+		}
+		else{
+			if(selected.length<3)
+				$("button .text", el).html(selected.join(", "))
+			else $("button .text", el).html(selected.length + " " + (config.nSelectedText || "Werte ausgewählt"))
+			$("button", el).attr("title", selected.join(", "))
+		}		
 	}
 	
 	function buildValue(value){

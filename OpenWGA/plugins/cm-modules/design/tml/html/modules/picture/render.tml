@@ -16,20 +16,22 @@
 		<tml:script>
 			_w = String(_responsive.medium.width-1);
 			_d_w = String(Math.min(_w, _max_width) || _w);
+			_srcset = createSrcSet(CMM.setting('image_small'), 'width~'+_d_w);
 		</tml:script>
 		<source
 			media="(max-width:<tml:item name="_w"/>px)"
-			srcset="<tml:url file="{CMM.setting('image_small')}" derivate="[width~{_d_w}]"/> <tml:script expression="createSrcSet(CMM.setting('image_small'), 'width~'+_d_w)"/>"
+			srcset="<tml:url file="{CMM.setting('image_small')}" derivate="[width~{_d_w}]"/><tml:case if="_srcset">, @{_srcset}</tml:case>"
 		>
 	</tml:case>
 	<tml:case condition="CMM.setting('image_medium')">
 		<tml:script>
-			_w = String(_responsive.maxPageWidth-1);
+			_w = String(_responsive.large.width-1);
 			_d_w = String(Math.min(_w, _max_width) || _w);
+			_srcset = createSrcSet(CMM.setting('image_medium'), 'width~'+_d_w);
 		</tml:script>
 		<source
 			media="(max-width:<tml:item name="_w"/>px)"
-			srcset="<tml:url file="{CMM.setting('image_medium')}" derivate="[width~{_d_w}]"/> <tml:script expression="createSrcSet(CMM.setting('image_medium'), 'width~'+_d_w)"/>"
+			srcset="<tml:url file="{CMM.setting('image_medium')}" derivate="[width~{_d_w}]"/><tml:case if="_srcset">, @{_srcset}</tml:case>"
 		>
 	</tml:case>
 	

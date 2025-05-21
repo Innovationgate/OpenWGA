@@ -1,31 +1,52 @@
 <label>Link:</label>
 <div style="margin:10px">
 	<tml:input name="{scoped:link}" type="select" cssclass="form-control" options="{label('tiles.tile.setting.link.options')}" changeaction="$refresh" mode="{option:mode}"/>
-	<tml:select switch="tmlform.field(WGA.scoped('link'))">
-		<tml:case value="int">
-			<div style="margin: 5px 0">
+	<div style="margin: 5px 0">
+		<tml:select switch="tmlform.field(WGA.scoped('link'))">
+
+			<tml:case value="int">
 				<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document" o_mode="{option:mode}">
 					<tml:option name="fieldname" expression="WGA.scoped('wgakey')"/>
 					<tml:option name="changeaction"><tml:action ref="$refresh"/></tml:option>
 				</tml:include>
-			</div>
-		</tml:case>
-		<tml:case value="ext">
-			<div style="margin:5px 0">
+			</tml:case>
+
+			<tml:case value="ext">
 				<tml:input name="{scoped:url}" cssclass="form-control" html_placeholder="URL" mode="{option:mode}"/>
-			</div>
-		</tml:case>	
-	</tml:select>
+			</tml:case>	
+
+			<tml:case value="intfile">
+				<tml:include ref="util:select-file" o_fieldname="filename" o_placeholder="Bitte auswählen ..."/>
+			</tml:case>
+			
+			<tml:case value="mailto">
+				<tml:input name="{scoped:mailto}" cssstyle="width:100%" mode="{option:mode}" cssclass="form-control" html_placeholder="Mail Adresse ..."/>
+			</tml:case>
+			
+		</tml:select>
+	</div>
 </div>
 
 <tml:case condition="tmlform.field(WGA.scoped('link'))">
+
+	<label>Optionaler Link-Titel:</label>
+	<div style="margin:10px">
+		<tml:input name="{scoped:link_title}" cssclass="form-control" html_placeholder="- kein Titel -"/>
+	</div>
+		
 	<tml:script>
 		// stay compatible with existing custom target names: set ist to _blank.
-		if(tmlform.field(WGA.scoped('link_target')) && tmlform.field(WGA.scoped('link_target'))!="_self")
+		if(tmlform.field(WGA.scoped('link_target')) && tmlform.field(WGA.scoped('link_target'))!="_self" && tmlform.field(WGA.scoped('link_target'))!="default")
 			tmlform.setfield(WGA.scoped('link_target'), "_blank")
 	</tml:script>
 	<label>Zielfenster:</label>
 	<div style="margin:10px">
-		<tml:input name="{scoped:link_target}" type="select" cssclass="form-control" mode="{option:mode}" options="gleiches Fenster|_self,neues Fenster|_blank"/> 
+		<tml:input name="{scoped:link_target}" type="select" cssclass="form-control" mode="{option:mode}" options="Default|default,Gleiches Fenster|_self,Neues Fenster|_blank"
+			default="default"
+			changeaction="$refresh"
+		/> 
+		<tml:case condition="tmlform.field(WGA.scoped('link_target'))=='default'">
+			Interne Links im gleichen Fenster, externe Links und Dateien in neuem Fenster
+		</tml:case>
 	</div>
 </tml:case>

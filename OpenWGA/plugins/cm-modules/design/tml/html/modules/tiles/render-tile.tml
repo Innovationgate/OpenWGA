@@ -1,21 +1,36 @@
-##MDSET preprocess=true
-
 <tml:script>
 	var url = null,
-		link_title = "", 
+		link_title = CMM.setting("link_title"), 
 		link_target = CMM.setting("link_target");
 	if(CMM.setting("link")=="int"){
 		var ctx = context("docid:"+CMM.setting("wgakey")) 
 		url = ctx.contenturl()
-		link_title = ctx.TITLE
+		if(link_target=="default")
+			link_target=null;
 	}
 	else if(CMM.setting("link")=="ext"){
 		url = CMM.setting("url");
-		link_title = url
+		if(link_target=="default")
+			link_target="_blank";
+	}
+	else if(CMM.setting("link")=="mailto"){
+		url = "mailto:"+CMM.setting("mailto");
+		if(link_target=="default")
+			link_target=null;
+	}
+	else if(CMM.setting("link")=="intfile"){
+		url = fileurl(CMM.setting("filename"));
+		if(link_target=="default")
+			link_target="_blank";
 	}
 
 	_wrap_tag = url ? "a" : "div";
-	_wrap_attribs = (url && STATUS!=content().STATUS_DRAFT) ? 'href="' + url + '" title="' + link_title + (link_target ? '" target="' + link_target : '') + '"' : ''
+	_wrap_attribs = (url && STATUS!=content().STATUS_DRAFT) ? 
+		'href="' + url + '"' 
+			+ (link_title ? ' title="' + link_title + '"' : '')
+			+ (link_target ? ' target="' + link_target + '"': '') 
+		: 
+		''
 	
 	// calc image derivates width
 	_imagederivates=null;

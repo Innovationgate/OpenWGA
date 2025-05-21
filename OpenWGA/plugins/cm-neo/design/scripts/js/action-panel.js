@@ -68,7 +68,12 @@ define(["cm", "jquery", "editors", "uploadmanager", "sitepanel", "jquery-wga-dro
 		$("#panel-set-edit").css("display", "inline-block").find("a:first").tab("show");
 		$("#panel-set-content").hide().find("li").removeClass("active");
 		var opts={}
-		ev.params.options && eval("opts="+ev.params.options)
+		try{
+			ev.params.options && eval("opts="+ev.params.options)
+		}
+		catch(e){
+			alert("Fehler in der Definition der RTF Optionen:\n" + e);
+		}
 		editor = Editors[ev.params.editor];
 		edit_item = ev.params.item;
 		edit_item_format = ev.params.format;
