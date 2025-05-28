@@ -247,7 +247,7 @@
 			}
 			
 			if(type=="exturl"){
-				var url = $("[name=url]", form).val().toLowerCase();
+				var url = $("[name=url]", form).val();
 				if(!url){
 					alert("Bitte geben Sie eine Link-URL ein.");
 					$("[name=url]", form).focus();
@@ -255,7 +255,8 @@
 				}
 				a = editor.createLink(url, url);
 				editor.setURLInfo(a, {type:"exturl", key:url})
-				if(target_window=="default" && url.indexOf("mailto:")==-1 && url.indexOf("tel:")==-1) 
+				var lc_url = url.toLowerCase(); 
+				if(target_window=="default" && lc_url.indexOf("mailto:")==-1 && lc_url.indexOf("tel:")==-1) 
 					a.target = "_blank"
 			}
 			else if(type=="layout"){
@@ -445,7 +446,7 @@
 			}
 			
 			else{	// exturl
-				var url = $("[name=url]", form).val().toLowerCase();
+				var url = $("[name=url]", form).val();
 				if(!url){
 					alert("Bitte geben Sie eine Link-URL ein.");
 					$("[name=url]", form).focus();
@@ -456,7 +457,8 @@
 					type: type, 
 					key: url
 				})
-				if(target_window=="default" && url.indexOf("mailto:")==-1 && url.indexOf("tel:")==-1) 
+				var lc_url = url.toLowerCase();
+				if(target_window=="default" && lc_url.indexOf("mailto:")==-1 && lc_url.indexOf("tel:")==-1) 
 					a.target = "_blank"
 			}
 			
