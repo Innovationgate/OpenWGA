@@ -149,7 +149,7 @@
 						{{#pagereaders.length}}
 							<ul>
 							{{#pagereaders}}
-								<li title="{{title}}">{{name}}</li>
+								<li title="{{title}}"><div>{{name}}</div></li>
 							{{/pagereaders}}
 							</ul>
 						{{/pagereaders.length}}
