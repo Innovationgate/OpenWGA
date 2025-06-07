@@ -740,9 +740,10 @@ this.csvReader = function(config){
 			else {
 				inDoubleQuote=false;
                 if (c == divider && !inQuote) {
-                	if(field!='"')
-                    	result.push(field)
-                    field="";
+					if(field=='"')
+						field="";
+					result.push(field)
+					field="";
                 } else {
                     field += c;                 
                 }
