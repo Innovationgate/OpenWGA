@@ -48,6 +48,9 @@ public class VirtualHost extends IdentifiableConfigBean {
     @Attribute (required=false)
     private boolean enabled = true;
 
+    @Attribute (required=false)
+    private boolean loginsAllowed = true;
+
     @Attribute
     @NotNull
     private String servername;
@@ -189,6 +192,13 @@ public class VirtualHost extends IdentifiableConfigBean {
     }
     public void setForceSSL(boolean value){
     	this.forceSSL=value;
+    }
+
+    public boolean isLoginsAllowed(){
+    	return this.loginsAllowed;
+    }
+    public void setLoginsAllowed(boolean value){
+    	this.loginsAllowed=value;
     }
 
     public String getRobotsTxt(){

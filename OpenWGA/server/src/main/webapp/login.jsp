@@ -39,6 +39,10 @@
 	}
 	domain = wga.encode("html", domain);
 	
+	if(!jspHelper.isLoginsAllowed()) {
+		response.sendError(403, "Access to this resource is not allowed");
+	}
+	
 	if (WGACore.DOMAIN_ADMINLOGINS.equals(domain) && !jspHelper.getCore().isAdministrativePort(request.getLocalPort())) {
 	    response.sendError(403, "Access to administrative resources is disabled");
 	    return;
