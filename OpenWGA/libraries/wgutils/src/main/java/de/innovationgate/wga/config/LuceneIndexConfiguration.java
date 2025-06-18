@@ -94,26 +94,21 @@ public class LuceneIndexConfiguration extends ConfigBean {
         this.enabled = enabled;
     }
 
-    public synchronized List<LuceneIndexItemRule> getItemRules() {
-		Iterator<LuceneIndexItemRule> itemRulesIt = itemRules.iterator();
-		boolean hasDefaultRule = false;
-		while (itemRulesIt.hasNext()) {
-			LuceneIndexItemRule rule = itemRulesIt.next();
-			if (rule.getItemExpression().equals(LuceneIndexItemRule.DEFAULT_RULE.getItemExpression())) {
-				hasDefaultRule = true;
-				break;
-			}
-		}
-		if (!hasDefaultRule) {
-			itemRules.add(LuceneIndexItemRule.DEFAULT_RULE);
-		}    		
-		Collections.sort(itemRules, LuceneIndexItemRule.COMPARATOR);
-		
-		// return a copy of itemRules to avoid ConcurrentModificationException
-		ArrayList<LuceneIndexItemRule> result = new ArrayList<LuceneIndexItemRule>();
-		result.addAll(itemRules);
-        return result; 
+    public void sortItemRules() {
+    	Collections.sort(itemRules, LuceneIndexItemRule.COMPARATOR);
     }
+
+    public void addDefaultItemRule() {
+    	itemRules.add(LuceneIndexItemRule.DEFAULT_RULE);
+    }
+    
+    public synchronized List<LuceneIndexItemRule> getItemRules() {
+    	return itemRules;
+    }
+
+	public void setItemRules(List<LuceneIndexItemRule> rules) {
+		itemRules = rules;
+	}
 
     public synchronized List<LuceneIndexFileRule> getFileRules() {
 		Iterator<LuceneIndexFileRule> fileRulesIt = fileRules.iterator();
@@ -137,16 +132,6 @@ public class LuceneIndexConfiguration extends ConfigBean {
     
     }
     
-	public void setItemRules(List<LuceneIndexItemRule> itemRules) {
-		if (itemRules == null) {
-			this.itemRules = new ArrayList<LuceneIndexItemRule>();
-			this.itemRules.add(LuceneIndexItemRule.DEFAULT_RULE);
-		} else {
-			this.itemRules = itemRules;
-		}
-		Collections.sort(this.itemRules, LuceneIndexItemRule.COMPARATOR);
-	}
-
 	public void setFileRules(List<LuceneIndexFileRule> fileRules) {
 		if (fileRules == null) {
 			this.fileRules = new ArrayList<LuceneIndexFileRule>();

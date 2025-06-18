@@ -30,6 +30,7 @@
 	_rule_errors = rule.validate();
 	if(isEmptyValue(_rule_errors)){
 		_config_bean.luceneIndexConfiguration.itemRules.add(rule);
+		_config_bean.luceneIndexConfiguration.sortItemRules();
 		_config_bean.changed=true;
 		portlet.setMode("view");
 	}
@@ -56,6 +57,7 @@
 	if(!isEmptyValue(_rule_errors)){
 		_luceneAction = "editItemRule"	
 	}
+	_config_bean.luceneIndexConfiguration.sortItemRules();
 	_config_bean.changed=true;
 	portlet.setMode("view");
 </tml:action>
@@ -85,8 +87,10 @@
 	<tml:script>
 		_config_bean = DBM.getConfigBean();
 		_rules = _config_bean.luceneIndexConfiguration.itemRules
+		if(_rules.isEmpty())
+			_config_bean.luceneIndexConfiguration.addDefaultItemRule();		
 	</tml:script>
-	<table class="collection" width="100%"  style="margin-bottom:20px">
+	<table class="collection" width="100%" style="margin-bottom:20px">
 		<tr class="collection-title">
 			<td>Item Expression</td>
 			<td  width="10%">Index Type</td>
