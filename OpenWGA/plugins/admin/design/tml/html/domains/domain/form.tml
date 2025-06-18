@@ -41,7 +41,8 @@
 <fieldset>
 	<tml:[system:fs-input] o_field="name" o_validation="$E_VALUE!=''" o_message="Please enter a domain name" o_mode="{_config_bean.isDefaultResource()?'view':'edit'}"/>
 	<tml:[system:fs-input] o_field="defaultManager" o_allowblank="true" o_emptytext="- none -"/>
-	<tml:[system:fs-input] o_field="maximumLoginAttempts" o_type="number" o_format="0"/>		
+	<tml:[system:fs-input] o_field="maximumLoginAttempts" o_type="number" o_format="0"/>
+	<tml:[system:fs-input] o_field="loginBlockMinutes" o_type="number" o_format="0"/>
 </fieldset>
 
 <fieldset>
