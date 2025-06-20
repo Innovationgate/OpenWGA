@@ -609,7 +609,7 @@ public class WcssCompiler {
 						getParentBlock().getVars().putAll(b.getVars());
 						getParentBlock().getMixins().putAll(b.getMixins());
 					}
-					else LOG.error("@import: ResourceRef not found: " + ref);
+					else LOG.error("@import: WcssResource not found: " + ref);
 				}
 			}
 			else if(directive.equalsIgnoreCase("importcss") && params_string.length()>1){	
