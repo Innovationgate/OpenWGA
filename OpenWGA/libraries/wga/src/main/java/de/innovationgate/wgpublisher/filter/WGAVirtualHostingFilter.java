@@ -277,7 +277,7 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                 else {
                     // normal db request
                     String requestedDBKey = pathElements[1];
-                    if (vHost.isHideDefaultDatabaseInURL() && defaultDBKey != null && !requestedDBKey.startsWith("plugin-")) {
+                    if (vHost.isHideDefaultDatabaseInURL() && defaultDBKey != null) {
                     	// we need to know if requestedDBKey really is a DBKEY or part of a content path in a title path url 
                     	boolean hasValidTitlePath = false;
                     	try{
@@ -335,9 +335,23 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 	            		    
 	                        // we have to check if requestedDBKey is a valid content database
 	                        // - if not we use defaultDatabase
-	                        if (!_core.getContentdbs().containsKey(requestedDBKey.toLowerCase())) {
+            		    	WGDatabase database = _core.getContentdbs().get(requestedDBKey.toLowerCase());
+	                        if (database==null) {	// db does not exist
 	                            requestedDBKey = defaultDBKey;
 	                            httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
+	                        }
+	                        else {
+	                        	// Db found. Check if (anonymous) requests are allowed. If not check if logins are allowed
+	                        	try {
+									database = _core.openContentDB(database, httpRequest, false);
+									if(!database.isSessionOpen() && !vHost.isLoginsAllowed()) {
+			                            requestedDBKey = defaultDBKey;
+			                            httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);										
+									}
+								} catch (WGException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 	                        }
             		    }
 
@@ -348,8 +362,8 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
                     // I believe the above code is logically meant as
                     //	if (!(requestedDBKey.equalsIgnoreCase("login") && httpRequest.getMethod().equalsIgnoreCase("post")))
                     //	-> if not a post to /login
-                    // as effect ALL post requests are not handled here wich leads to unwanted behaviour.
-                    // however this case is already tested at the beginning of the method so it's not nessessarry to test it again here.
+                    // as effect ALL post requests are not handled here witch leads to unwanted behaviour.
+                    // however this case is already tested at the beginning of the method so it's not necessarry to test it again here.
                     // We leave the test to /login
                     
                     if (!requestedDBKey.equalsIgnoreCase("login")) {
