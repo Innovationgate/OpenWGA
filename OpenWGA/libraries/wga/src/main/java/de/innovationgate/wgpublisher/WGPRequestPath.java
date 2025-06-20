@@ -230,20 +230,17 @@ public class WGPRequestPath {
         // Handle special db commands "login" and "logout". The only one not requiring to login to the database
         if (this.pathElements.size() == 2) {
             if ("login".equals(this.pathElements.get(1))) {
-            	
             	VirtualHost vHost = (VirtualHost)request.getAttribute(WGAVirtualHostingFilter.REQUESTATTRIB_VIRTUAL_HOST);
-            	if(vHost!=null && !vHost.isLoginsAllowed()) {
-            		throw new HttpErrorException(HttpServletResponse.SC_FORBIDDEN, "Logins to this resource are not allowed", null);
-            	}            	
-            	
-                this.pathType = TYPE_REDIRECT;
-                String sourceURL =
-                    (request.getParameter("redirect") != null
-                        ? dispatcher.getCore().getURLEncoder().decode(request.getParameter("redirect"))
-                        : WGPDispatcher.getPublisherURL(request) + "/" + this.databaseKey);
-                this.resourcePath = dispatcher.getLoginURL(request, database, sourceURL);
-                this.appendQueryString = false;
-                return;
+            	if(vHost==null || vHost.isLoginsAllowed()) {
+	                this.pathType = TYPE_REDIRECT;
+	                String sourceURL =
+	                    (request.getParameter("redirect") != null
+	                        ? dispatcher.getCore().getURLEncoder().decode(request.getParameter("redirect"))
+	                        : WGPDispatcher.getPublisherURL(request) + "/" + this.databaseKey);
+	                this.resourcePath = dispatcher.getLoginURL(request, database, sourceURL);
+	                this.appendQueryString = false;
+	                return;
+            	}
             }
             else if ("logout".equals(this.pathElements.get(1))) {
                 this.pathType = TYPE_LOGOUT;
