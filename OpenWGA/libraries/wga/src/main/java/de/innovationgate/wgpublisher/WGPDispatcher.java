@@ -1409,7 +1409,7 @@ public class WGPDispatcher extends HttpServlet {
             outerLayout = wga.design(database).resolve(entry.getContentType().getOuterLayoutName());
             WGTMLModule tmlLib = outerLayout.getTMLModule(mediaKey);
             if(tmlLib==null){
-                throw new HttpErrorException(java.net.HttpURLConnection.HTTP_NOT_FOUND, "Design not found for mediakey '" + mediaKey +"': " + outerLayout.toString(), path.getDatabaseKey());
+                throw new HttpErrorException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Design not found for mediakey '" + mediaKey +"': " + outerLayout.toString(), path.getDatabaseKey());
             }
         }
 
