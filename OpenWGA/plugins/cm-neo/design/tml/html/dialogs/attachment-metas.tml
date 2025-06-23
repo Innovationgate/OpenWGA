@@ -131,7 +131,7 @@
 		
 		<div class="metas form-horizontal">
 			<tml:[form-field] o_label="Dateiname" o_name="filename" o_default="{_file_md.name}"/>
-			<tml:[form-field] o_label="Titel / ALT-Text" o_name="title" o_default="{_file_md.title}"/>
+			<tml:[form-field] o_label="Titel" o_name="title" o_default="{_file_md.title}"/>
 			<tml:[form-field] o_label="Copyright" o_name="copyright" o_default="{_file_md.copyright}"/>
 			<tml:[form-field] o_label="Beschreibung" o_name="description" o_default="{_file_md.description}" o_type="textarea"/>
 			<tml:case condition="$urlParam_type!='extfile'">
