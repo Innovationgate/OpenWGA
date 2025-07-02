@@ -486,7 +486,13 @@ public class WcssCompiler {
 
 			// clone sub blocks
 			for(CssBlock sub: source.getSubBlocks()){
-				sub.cloneCssBlock(sub.getName(), this, contentBlock);
+				if(sub instanceof CssPropertiesBlock) {
+					// special handling: add additional properties instead of block-clone.
+					for(Map.Entry<String,String> entry: sub.getProperties().entrySet()){
+						props.put(sub.getName() + "-" + entry.getKey(), entry.getValue());
+					}					
+				}
+				else sub.cloneCssBlock(sub.getName(), this, contentBlock);				
 			}
 			
 		}
