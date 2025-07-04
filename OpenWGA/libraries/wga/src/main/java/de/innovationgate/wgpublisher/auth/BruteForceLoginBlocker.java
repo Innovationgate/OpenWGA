@@ -185,6 +185,8 @@ public class BruteForceLoginBlocker {
         }
         inf.addFailedAttempt(ip);
         
+        LOG.warn("Login from IP " + ip + " for user '" + username + "' failed: " + request.getRequestURL());
+        
         if (inf.isBlocked()) {
             try {
                 // notify cluster members about blocked login
@@ -255,6 +257,8 @@ public class BruteForceLoginBlocker {
                 inf.map(_failedLoginAttempts);
             }
             inf.addFailedAttempt(ip);
+
+            LOG.warn("Login from IP " + ip + " for user '" + username + "' failed: " + request.getRequestURL());
             
             if (inf.isBlocked()) {
                 try {
