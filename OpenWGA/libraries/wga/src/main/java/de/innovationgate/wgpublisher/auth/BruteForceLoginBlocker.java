@@ -185,7 +185,7 @@ public class BruteForceLoginBlocker {
         }
         inf.addFailedAttempt(ip);
         
-        LOG.warn("Login from IP " + ip + " for user '" + username + "' failed: " + request.getMethod() + " " + request.getRequestURL());
+        LOG.warn("Login from IP " + ip + " for user '" + username + "' failed: " + request.getProtocol() + " " + request.getMethod() + " " + request.getRequestURL());
         
         if (inf.isBlocked()) {
             try {
@@ -258,7 +258,7 @@ public class BruteForceLoginBlocker {
             }
             inf.addFailedAttempt(ip);
 
-            LOG.warn("Login from IP " + ip + " for user '" + username + "' failed: " + request.getMethod() + " " + request.getRequestURL());
+            LOG.warn("Login from IP " + ip + " for user '" + username + "' failed: " + request.getProtocol() + " " + request.getMethod() + " " + request.getRequestURL());
             
             if (inf.isBlocked()) {
                 try {
