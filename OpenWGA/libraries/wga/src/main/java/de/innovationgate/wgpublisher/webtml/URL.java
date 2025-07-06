@@ -388,7 +388,7 @@ public class URL extends ActionBase implements DynamicAttributes {
         
     }
 
-    public void createFileURL(WGContent content, StringBuffer url) throws WGException, UnsupportedEncodingException {
+    public void createFileURL(WGContent content, StringBuffer url, String fileName) throws WGException, UnsupportedEncodingException {
         
         Status status = (Status) getStatus();
         
@@ -396,10 +396,10 @@ public class URL extends ActionBase implements DynamicAttributes {
         TMLContext fileContext = getTMLContext();
 
         if (!stringToBoolean(getDataurl())) {
-            url.append(getTMLContext().getURLBuilder().buildFileURL(getTMLContext(), getDb(), getDoc(), getFile()));
+            url.append(getTMLContext().getURLBuilder().buildFileURL(getTMLContext(), getDb(), getDoc(), fileName));
         } else {
             //render data url (RFC 2397)
-            url.append(fileContext.filedataurl(getDb(), getDoc(), getFile(), null, getDerivate()));
+            url.append(fileContext.filedataurl(getDb(), getDoc(), fileName, null, getDerivate()));
             status.encodeURL = false;
         }
         return;
@@ -692,7 +692,10 @@ public class URL extends ActionBase implements DynamicAttributes {
                 createLayoutURL(url);
             }
             else if (type.equals("file")) {
-                createFileURL(content, url);
+            	if(fileName==null) 
+            		fileName = getTMLContext().getprimaryfilename();	// try primary file
+            	if(fileName!=null)
+            		createFileURL(content, url, fileName);
             }
             else if (type.equals("nextpage") || type.equals("previouspage") || type.equals("selectpage")) {
                 status.keepParams = true;
@@ -770,7 +773,7 @@ public class URL extends ActionBase implements DynamicAttributes {
             
             // Add derivate parameter if neccessary
             if (type.equals("file")) {
-                completeURL = addDerivateParameter(completeURL, absoluteURL);
+                completeURL = addDerivateParameter(completeURL, fileName, absoluteURL);
             }
             
             // Add parameters to URL
@@ -914,7 +917,7 @@ public class URL extends ActionBase implements DynamicAttributes {
         
     }
 
-    private String addDerivateParameter(String url, boolean absolute) {
+    private String addDerivateParameter(String url, String fileName, boolean absolute) {
         
         try {
             String derivate = getDerivate();
@@ -927,8 +930,8 @@ public class URL extends ActionBase implements DynamicAttributes {
             boolean usePredefinedQuery = false;
             if (predefinedImageQuery != null) {
                 WGDocument doc = getFileContainerDocument();
-                if (doc != null) {
-                    WGFileMetaData md = doc.getFileMetaData(getFile());
+                if (doc != null && fileName!=null) {
+                    WGFileMetaData md = doc.getFileMetaData(fileName);
                     if (md != null && md.getMimeType() != null && md.getMimeType().startsWith("image/")) {
                         usePredefinedQuery = true;
                     }
