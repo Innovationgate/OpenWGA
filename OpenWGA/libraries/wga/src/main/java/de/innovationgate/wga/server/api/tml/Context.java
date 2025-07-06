@@ -175,6 +175,15 @@ public interface Context {
     public abstract WGDatabase db();
 
     /**
+     * Creates a URL pointing to the primary file attachment on the current context document
+     * @return URL pointing to a file attachment 
+     * @throws UnsupportedEncodingException
+     * @throws WGException
+     */
+    @CodeCompletion(preferredCase="fileURL")
+    public abstract String fileurl() throws UnsupportedEncodingException, WGException;
+    
+    /**
      * Creates a URL pointing to a file attachment on the current context document
      * @param fileName Name of the file attachment on file container or content document. If the file is a ZIP archive you can address files inside it by specifying the path in the ZIP file after the name, divided by slashes.
      * @return URL pointing to a file attachment 

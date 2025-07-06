@@ -4164,10 +4164,21 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
      * This method is identical to fileurl() if the file is an image (mimetype=image/*)
      * For non-image files we add a derivate usage=poster to hopefully get an url for an image.
      */
+    public String fileImageURL() throws WGException{
+    	String fileName = getprimaryfilename();
+    	if(fileName!=null)
+    		return fileImageURL(null, null, fileName);
+    	return "";	// no primary file name found
+    }
+
+    public String fileImageURL(String filename) throws WGException{
+    	return fileImageURL(null, null, filename);
+    }
+
     public String fileImageURL(String container, String filename) throws WGException{
     	return fileImageURL(null, container, filename);
     }
-    
+
     public String fileImageURL(String dbkey, String container, String filename) throws WGException{
     	String url = getURLBuilder().buildFileURL(toUnlockedVersion(), dbkey, container, filename);
     	
@@ -4205,7 +4216,14 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         	return url;
         }
     }
-    
+
+    public String fileImageDerivateURL() throws WGException{
+    	String fileName = getprimaryfilename();
+    	if(fileName!=null)
+    		return fileImageDerivateURL(fileName, null);
+    	return "";		// no primary file name found
+    }
+
     public String fileImageDerivateURL(String filename) throws WGException{
     	return fileImageDerivateURL(filename, null);
     }
@@ -4229,7 +4247,7 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     }
     
     /* (non-Javadoc)
-     * @see de.innovationgate.wgpublisher.webtml.utils.Context#fileurl(java.lang.String, java.lang.String, java.lang.String)
+     * @see de.innovationgate.wga.server.api.tml.Context#fileurl(java.lang.String, java.lang.String, java.lang.String)
      */
     @Override
     public String fileurl(String dbKey, String containerName, String fileName) throws WGException {
@@ -4245,7 +4263,18 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     }
     
     /* (non-Javadoc)
-     * @see de.innovationgate.wgpublisher.webtml.utils.Context#fileurl(java.lang.String)
+     * @see de.innovationgate.wga.server.api.tml.Context#fileurl()
+     */
+    @Override
+    public String fileurl() throws WGException {
+    	String fileName = getprimaryfilename();
+    	if(fileName!=null)
+    		return fileurl(null, null, fileName);
+    	return "";
+    }
+    
+    /* (non-Javadoc)
+     * @see de.innovationgate.wga.server.api.tml.Context#fileurl(String fileName)
      */
     @Override
     public String fileurl(String fileName) throws WGException {
