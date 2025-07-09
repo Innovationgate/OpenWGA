@@ -2093,7 +2093,10 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
     	
     	if (!editor.equalsIgnoreCase("custom")) {
     		prefix.append("<div class=\"WGA-Editor-Options\" style=\"display:none\">");
-    		prefix.append("{" + getResultString(false) +"}");
+    		String editorOptions = getResultString(false).trim();
+    		if(!editorOptions.startsWith("{")) 
+        		prefix.append("{" + editorOptions +"}");
+    		else prefix.append(editorOptions);     		
     		prefix.append("</div>\n");
     	
     		// Old Style WGA4 Options:

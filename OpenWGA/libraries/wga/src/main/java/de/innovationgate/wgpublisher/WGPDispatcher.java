@@ -513,9 +513,9 @@ public class WGPDispatcher extends HttpServlet {
             if (path.equals("/login")) {
 
             	VirtualHost vHost = (VirtualHost)request.getAttribute(WGAVirtualHostingFilter.REQUESTATTRIB_VIRTUAL_HOST);
-            	if(vHost!=null && vHost.getAllowedDatabases().isEmpty()) {
+            	if(vHost!=null && (vHost.getAllowedDatabases().isEmpty() || !vHost.isLoginsAllowed())) {
             		_log.error("Logins not allowed on vHost '" + vHost.getServername() + "' requested from IP " + request.getRemoteAddr() + " on path " + String.valueOf(request.getRequestURL()));
-            		response.sendError(HttpServletResponse.SC_FORBIDDEN, "Logins not allowed on this host");
+            		response.sendError(HttpServletResponse.SC_FORBIDDEN, "Logins not allowed");
             		return;
             	}
             	
@@ -743,9 +743,12 @@ public class WGPDispatcher extends HttpServlet {
 
         	LoginAttemptInformation inf = _core.getBruteForceLoginBlocker().getLoginAttemptInformation(domain, username); 
         	if(inf!=null && inf.isBlocked()){
-        		long now = System.currentTimeMillis();
-        		Float minutes = (float)LoginAttemptInformation.BLOCKED_MINUTES - ((now - inf.getBlockedDate().getTime())/(1000*60)); 
-        		request.setAttribute(WGACore.ATTRIB_LOGINERROR, "Login for username '" + username + "' is blocked for the next " + minutes.intValue() + " minutes because of too many wrong login attempts.");
+        		if(inf.getLoginBlockMinutes()>0) {
+	        		long now = System.currentTimeMillis();        		
+	        		Float minutes = (float)inf.getLoginBlockMinutes() - ((now - inf.getBlockedDate().getTime())/(1000*60));
+	        		request.setAttribute(WGACore.ATTRIB_LOGINERROR, "Login for username '" + username + "' is blocked for the next " + minutes.intValue() + " minutes because of too many failed login attempts.");
+        		}
+        		else request.setAttribute(WGACore.ATTRIB_LOGINERROR, "Login for username '" + username + "' is blocked because of too many failed login attempts.");
         	}
         	
         	else if (WGACore.DOMAIN_ADMINLOGINS.equals(domain)) {
@@ -1406,7 +1409,7 @@ public class WGPDispatcher extends HttpServlet {
             outerLayout = wga.design(database).resolve(entry.getContentType().getOuterLayoutName());
             WGTMLModule tmlLib = outerLayout.getTMLModule(mediaKey);
             if(tmlLib==null){
-                throw new HttpErrorException(java.net.HttpURLConnection.HTTP_NOT_FOUND, "Design not found for mediakey '" + mediaKey +"': " + outerLayout.toString(), path.getDatabaseKey());
+                throw new HttpErrorException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Design not found for mediakey '" + mediaKey +"': " + outerLayout.toString(), path.getDatabaseKey());
             }
         }
 

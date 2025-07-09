@@ -48,13 +48,15 @@ public class LoginAttemptInformation implements Serializable {
     private boolean _blocked = false;
     private Date _blockedDate;
     private int _maxAttempts;
+    private int _loginBlockMinutes;
     
     private ArrayList<String> _ips = new ArrayList<String>();
     
-    public LoginAttemptInformation(String domain, String name, int maxAttempts) {
+    public LoginAttemptInformation(String domain, String name, int maxAttempts, int loginBlockMinutes) {
         _domain = domain;
         _name = name;
         _maxAttempts = maxAttempts;
+        _loginBlockMinutes = loginBlockMinutes;
     }
     
     /**
@@ -89,6 +91,9 @@ public class LoginAttemptInformation implements Serializable {
         }
     }
     
+    public int getLoginBlockMinutes() {
+    	return _loginBlockMinutes;
+    }
 
     /**
      * @return Returns the domain.
@@ -103,10 +108,10 @@ public class LoginAttemptInformation implements Serializable {
      * @return Returns the blocked.
      */
     public boolean isBlocked() {
-    	if(_blocked && _blockedDate!=null){
-    		// check if blocked date is older then 30 minutes and reset state.
+    	if(_blocked && _blockedDate!=null && _loginBlockMinutes>0){
+    		// check if blocked date is older then _loginBlockMinutes minutes reset state.
     		long now = System.currentTimeMillis();
-    		if(now - _blockedDate.getTime() > 1000*60*BLOCKED_MINUTES)
+    		if(now - _blockedDate.getTime() > 1000*60*_loginBlockMinutes)
     			reset();
     	}
         return _blocked;

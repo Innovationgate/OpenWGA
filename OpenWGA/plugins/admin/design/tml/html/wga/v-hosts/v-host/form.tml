@@ -84,6 +84,7 @@
 
 <fieldset>
 	<legend>Restrictions</legend>
+	<tml:[system:fs-input] o_field="loginsAllowed" o_type="boolean"/>
 	<tml:[system:fs-input] o_field="allowAdminApps" o_type="boolean"/>
 	<tml:[system:fs-input] o_field="allowAuthoringApps" o_type="boolean"/>
 </fieldset>	

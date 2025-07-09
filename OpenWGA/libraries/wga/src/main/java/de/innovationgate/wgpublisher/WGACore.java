@@ -1468,6 +1468,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             if (db.isSessionOpen() && session != null) {
                 updateLoginInfo(db, request, DBLoginInfo.AuthType.PASSWORD);
             }
+            else getLog().warn("HTTP basic authentication login failed for user '" + httpLoginInfo.getUserName() + "'.");
             return prepareDB(db, request);
         }
 

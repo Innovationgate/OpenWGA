@@ -40,6 +40,9 @@ public class Domain extends IdentifiableConfigBean {
 	private int maximumLoginAttempts = 5;
 
 	@Element(required=false)
+	private int loginBlockMinutes = 30;
+
+	@Element(required=false)
 	private String pwdSelfserviceURL;
 
 	@Element(required=false)
@@ -76,6 +79,14 @@ public class Domain extends IdentifiableConfigBean {
 
 	public void setDefaultManager(String defaultManager) {
 		this.defaultManager = defaultManager;
+	}
+
+	public int getLoginBlockMinutes() {
+		return loginBlockMinutes;
+	}
+
+	public void setLoginBlockMinutes(int minutes) {
+		loginBlockMinutes = minutes;
 	}
 
 	public int getMaximumLoginAttempts() {

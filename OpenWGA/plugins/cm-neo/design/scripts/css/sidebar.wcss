@@ -218,6 +218,10 @@
 			padding-left: 10px;
 			li{
 				cursor: pointer;
+				div{
+					overflow: hidden;
+					text-overflow: ellipsis;
+				}
 			}
 		}
 		ul.dialog-links{

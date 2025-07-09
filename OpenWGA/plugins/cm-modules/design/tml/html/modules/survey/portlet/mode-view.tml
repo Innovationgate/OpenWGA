@@ -72,7 +72,9 @@
 
 <tml:form id="{scoped:survey-form}" source="none">
 	<div class="answers">
-		<tml:input type="{CMM.setting('multiple')?'checkbox':'radio'}" name="answer" labeled="true" options="{CMM.settingList('answers')}"/>
+		<tml:input type="{CMM.setting('multiple')?'checkbox':'radio'}" name="answer" 
+			labeled="{$option_formfield_labeled!=null ? $option_formfield_labeled : true}" 
+			options="{CMM.settingList('answers')}"/>
 	</div>
 	<tml:case condition="tmlform.hasmessages()">
 		<div class="messages">

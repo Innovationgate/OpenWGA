@@ -25,7 +25,7 @@
 	}
 </tml:action>
 
-<tml:form id="upload" source="none" unless="_dialog_closed">
+<tml:form id="upload" source="none" unless="_dialog_closed" maxuploadsize="-1">
 	<div class="header">
 		Datei Upload ...
 		<a data-modal="hide">&times;</a>

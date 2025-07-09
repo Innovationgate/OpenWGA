@@ -486,7 +486,13 @@ public class WcssCompiler {
 
 			// clone sub blocks
 			for(CssBlock sub: source.getSubBlocks()){
-				sub.cloneCssBlock(sub.getName(), this, contentBlock);
+				if(sub instanceof CssPropertiesBlock) {
+					// special handling: add additional properties instead of block-clone.
+					for(Map.Entry<String,String> entry: sub.getProperties().entrySet()){
+						props.put(sub.getName() + "-" + entry.getKey(), entry.getValue());
+					}					
+				}
+				else sub.cloneCssBlock(sub.getName(), this, contentBlock);				
 			}
 			
 		}
@@ -609,7 +615,7 @@ public class WcssCompiler {
 						getParentBlock().getVars().putAll(b.getVars());
 						getParentBlock().getMixins().putAll(b.getMixins());
 					}
-					else LOG.error("@import: ResourceRef not found: " + ref);
+					else LOG.error("@import: WcssResource not found: " + ref);
 				}
 			}
 			else if(directive.equalsIgnoreCase("importcss") && params_string.length()>1){	

@@ -230,14 +230,17 @@ public class WGPRequestPath {
         // Handle special db commands "login" and "logout". The only one not requiring to login to the database
         if (this.pathElements.size() == 2) {
             if ("login".equals(this.pathElements.get(1))) {
-                this.pathType = TYPE_REDIRECT;
-                String sourceURL =
-                    (request.getParameter("redirect") != null
-                        ? dispatcher.getCore().getURLEncoder().decode(request.getParameter("redirect"))
-                        : WGPDispatcher.getPublisherURL(request) + "/" + this.databaseKey);
-                this.resourcePath = dispatcher.getLoginURL(request, database, sourceURL);
-                this.appendQueryString = false;
-                return;
+            	VirtualHost vHost = (VirtualHost)request.getAttribute(WGAVirtualHostingFilter.REQUESTATTRIB_VIRTUAL_HOST);
+            	if(vHost==null || vHost.isLoginsAllowed()) {
+	                this.pathType = TYPE_REDIRECT;
+	                String sourceURL =
+	                    (request.getParameter("redirect") != null
+	                        ? dispatcher.getCore().getURLEncoder().decode(request.getParameter("redirect"))
+	                        : WGPDispatcher.getPublisherURL(request) + "/" + this.databaseKey);
+	                this.resourcePath = dispatcher.getLoginURL(request, database, sourceURL);
+	                this.appendQueryString = false;
+	                return;
+            	}
             }
             else if ("logout".equals(this.pathElements.get(1))) {
                 this.pathType = TYPE_LOGOUT;
@@ -253,14 +256,12 @@ public class WGPRequestPath {
             }
                 
         }
-
 		
 		// Open the database
         try {
             if (pathType == TYPE_STATICTML && "admintml".equals(getPathCommand()) && dispatcher.isAdminLoggedIn(request)) {
                 this.masterLogin =  true;
-            }
-            
+            }            
             
             // Prepare HTTP credentials if available
             String credentials = request.getHeader("Authorization");
@@ -286,8 +287,13 @@ public class WGPRequestPath {
             throw new HttpErrorException(HttpServletResponse.SC_FORBIDDEN, e.getMessage(), null);
         }
         
-        
         if (!database.isSessionOpen()) {
+        	
+        	VirtualHost vHost = (VirtualHost)request.getAttribute(WGAVirtualHostingFilter.REQUESTATTRIB_VIRTUAL_HOST);
+        	if(vHost!=null && !vHost.isLoginsAllowed()) {
+        		throw new HttpErrorException(HttpServletResponse.SC_FORBIDDEN, "Access to this resource is not allowed", null);
+        	}
+        	
             handleLoginFailure(request, response, dispatcher);
             this.proceedRequest = false;
             return;
@@ -1244,6 +1250,10 @@ public class WGPRequestPath {
                 path.proceedRequest = false;
             }
             catch (IllegalDirectAccessException e) {
+            	VirtualHost vHost = (VirtualHost)request.getAttribute(WGAVirtualHostingFilter.REQUESTATTRIB_VIRTUAL_HOST);
+            	if(vHost!=null && !vHost.isLoginsAllowed()) {
+            		throw new HttpErrorException(HttpServletResponse.SC_FORBIDDEN, "Access to this resource is not allowed", null);
+            	}
                 path.handleLoginFailure(request, response, dispatcher);
                 path.proceedRequest = false;
             }

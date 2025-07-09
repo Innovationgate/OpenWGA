@@ -177,10 +177,15 @@ public class BruteForceLoginBlocker {
         }
        
         if (inf == null) {
-            inf = new LoginAttemptInformation(domain.getName(), username, domain.getConfig().getMaximumLoginAttempts());
+            inf = new LoginAttemptInformation(domain.getName(), username, 
+            			domain.getConfig().getMaximumLoginAttempts(),
+            			domain.getConfig().getLoginBlockMinutes()
+            		);
             inf.map(_failedLoginAttempts);
         }
         inf.addFailedAttempt(ip);
+        
+        LOG.warn("Login from IP " + ip + " for user '" + username + "' failed: " + request.getProtocol() + " " + request.getMethod() + " " + request.getRequestURL());
         
         if (inf.isBlocked()) {
             try {
@@ -245,10 +250,15 @@ public class BruteForceLoginBlocker {
          
         if (level == WGDatabase.ACCESSLEVEL_NOTLOGGEDIN) {
             if (inf == null) {
-                inf = new LoginAttemptInformation(domainName, username, domain.getConfig().getMaximumLoginAttempts());
+                inf = new LoginAttemptInformation(domainName, username, 
+                			domain.getConfig().getMaximumLoginAttempts(),
+                			domain.getConfig().getLoginBlockMinutes()
+                		);
                 inf.map(_failedLoginAttempts);
             }
             inf.addFailedAttempt(ip);
+
+            LOG.warn("Login from IP " + ip + " for user '" + username + "' failed: " + request.getProtocol() + " " + request.getMethod() + " " + request.getRequestURL());
             
             if (inf.isBlocked()) {
                 try {
@@ -317,7 +327,7 @@ public class BruteForceLoginBlocker {
 		}
         
         if (inf == null) {
-            inf = new LoginAttemptInformation(DOMAIN_ADMINLOGINS, username, LoginAttemptInformation.DEFAULT_MAX_FAILED_ATTEMPTS);
+            inf = new LoginAttemptInformation(DOMAIN_ADMINLOGINS, username, LoginAttemptInformation.DEFAULT_MAX_FAILED_ATTEMPTS, LoginAttemptInformation.BLOCKED_MINUTES);
             inf.map(_failedLoginAttempts);
         }
         inf.addFailedAttempt(ip);

@@ -285,7 +285,11 @@ public class WGPDeployer implements WGACoreEventListener {
             }
 
             // Preprocessor commands
-            if(name.startsWith(":")){
+            if(call.startsWith("=")) {
+            	// tmlscript expression
+            	out.write("<tml:script>return " + call.substring(1) + "</tml:script>");
+            }
+            else if(name.startsWith(":")){
             	name=name.substring(1);
 	            if (name.equals("label")) {
 	                out.write("<tml:label key=\"" + params.get(0) + "\"/>");

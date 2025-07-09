@@ -43,11 +43,12 @@ import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGException;
 import de.innovationgate.webgate.api.WGUnavailableException;
-import de.innovationgate.wga.server.api.WGA;
+import de.innovationgate.wga.config.VirtualHost;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGAError;
 import de.innovationgate.wgpublisher.WGPDispatcher;
 import de.innovationgate.wgpublisher.WGPRequestPath;
+import de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
 import de.innovationgate.wgpublisher.webtml.BaseTagStatus;
 import de.innovationgate.wgpublisher.webtml.Root;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
@@ -64,6 +65,16 @@ public class JspHelper {
 	 */
 	public JspHelper(PageContext pageContext) {
 		this._pageContext = pageContext;
+	}
+	
+	/**
+	 * Check if v-host allows logins
+	 */
+	public boolean isLoginsAllowed() {
+		VirtualHost vHost = WGAVirtualHostingFilter.findMatchingHost(getCore().getWgaConfiguration(), (HttpServletRequest) _pageContext.getRequest());
+		if(vHost != null)
+			return vHost.isLoginsAllowed();
+		return true;
 	}
 	
 	/**

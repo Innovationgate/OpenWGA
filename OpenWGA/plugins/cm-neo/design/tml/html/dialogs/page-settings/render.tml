@@ -115,7 +115,7 @@
 							o_message="Bitte geben Sie einen Titel ein"
 							o_placeholder="Bitte einen Titel eingeben"
 						/>
-						<tml:[form-field] o_label="Sichtbarkeit" o_name="pagedisabled" o_type="boolean" o_options="Diese Seite nicht anzeigen|true" o_labeled="true" o_meta="true"/>
+						<tml:[form-field] o_label="Sichtbarkeit" o_name="pagedisabled" o_type="boolean" o_options="Nur im Content Manager sichtbar|true" o_labeled="true" o_meta="true"/>
 					</tml:then>
 					<tml:else>
 						<tml:case condition="UNIQUENAME">
@@ -125,7 +125,7 @@
 						</tml:case>
 						<tml:case condition="PAGEDISABLED">
 							<tml:[form-field] o_label="Sichtbarkeit" o_mode="view">
-								Diese Seite nicht anzeigen
+								Nur im Content Manager sichtbar
 							</tml:[form-field]>
 						</tml:case>
 					</tml:else>

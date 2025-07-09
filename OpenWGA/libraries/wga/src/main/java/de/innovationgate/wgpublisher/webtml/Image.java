@@ -247,8 +247,20 @@ public class Image extends Base implements DynamicAttributes {
             else {
             	String html_alt=getDynamicHtmlAttribute("alt");
             	if(html_alt==null && file!=null) {
-            		int i = file.indexOf("."); 
-            		altAttributeString = " alt=\"" + (i>0 ? file.substring(0, i) : file) + "\"";
+            		altAttribute=null;
+            		// first try file meta "title"
+            		WGContent c = getTMLContext().getcontent();
+            		if(!c.isDummy()) {
+                		WGFileMetaData md = getTMLContext().getcontent().getFileMetaData(file);
+                		if(md!=null)
+                			altAttribute = md.getTitle();            			
+            		}
+            		// second try: use file name
+            		if(altAttribute==null) {
+            			int i = file.indexOf(".");
+            			altAttribute = (i>0 ? file.substring(0, i) : file);            			
+            		}
+                   	altAttributeString=" alt=\"" + altAttribute + "\"";
             	}
             }
 
