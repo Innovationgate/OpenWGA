@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.text.Collator;
 import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -72,6 +73,7 @@ import de.innovationgate.utils.FormattingException;
 import de.innovationgate.utils.ISO8601DateFormat;
 import de.innovationgate.utils.ImageScaler;
 import de.innovationgate.utils.IteratorWrapper;
+import de.innovationgate.utils.ObjectComparator;
 import de.innovationgate.utils.ObjectFormatter;
 import de.innovationgate.utils.PrefetchingIterator;
 import de.innovationgate.utils.SkippingIterator;
@@ -3550,6 +3552,23 @@ public class WGA {
 	public static ResourceRef ResourceRef(Design design) throws WGException {
 		return new ResourceRef(design, ResourceRef.TYPE_FILE); 
 	}
+
 	
+	/*
+	 * Compare two objects
+	 * returns 1, 0  or -1
+	 * see de.innovationgate.utils.ObjectComparator
+	 */
+	public int compare(Object o1, Object o2) {
+		ObjectComparator comperator = new ObjectComparator();
+		return comperator.compare(o1, o2);
+	}
+
+	public int compare(Object o1, Object o2, String lang) {
+		Collator collator = Collator.getInstance(WGLanguage.languageNameToLocale(lang));
+		ObjectComparator comperator = new ObjectComparator(collator);
+		return comperator.compare(o1, o2);
+	}
+
 }
  

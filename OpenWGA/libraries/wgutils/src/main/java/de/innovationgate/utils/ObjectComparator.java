@@ -34,12 +34,15 @@ import java.util.List;
  * <li> If both objects are collections it compares the collection items value by value in iteration order
  * <li> If only one object is a collection the other object is converted to a collection with the object as single value
  * <li> If the collections are of unequal size and no difference could be found by the item positions
- *   that both have in common, the collection with larger size is returned as the bigger one
+ *   that both have in common, the collection with larger size is returned as the smaller one
  * </ul>
  */
 public class ObjectComparator extends Object implements Comparator<Object> {
     
     private Collator _collator;
+
+    public ObjectComparator() {
+    }
 
     /**
      * Constructor. Takes a collator object for native language string comparison.
@@ -133,8 +136,13 @@ public class ObjectComparator extends Object implements Comparator<Object> {
 
 	}
     
-    private int compareStrings(String str1, String str2) {
-        return _collator.compare(str1, str2);
+    private int compareStrings(String str1, String str2) {    	
+    	if(_collator!=null)
+    		return _collator.compare(str1, str2);
+    	else {
+    		int compareResult = str1.compareTo(str2);
+    		return compareResult < 0 ? -1 : compareResult==0 ? 0 : 1; 
+    	}
     }
 
 }
