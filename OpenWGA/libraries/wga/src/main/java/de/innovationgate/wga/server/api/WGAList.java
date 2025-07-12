@@ -56,6 +56,15 @@ public class WGAList<T> extends ArrayList<T>{
 		return newList;
 	}
 
+	public WGAList<T> each(JSFunction f){
+		if(f==null)
+			return this;
+		for(T o: this){
+			f.call(o, null);
+		}
+		return this;
+	}
+
 	public WGAList<T> sortList(){
 		Comparator<Object> comperator = new ObjectComparator();
 		sort(comperator);
