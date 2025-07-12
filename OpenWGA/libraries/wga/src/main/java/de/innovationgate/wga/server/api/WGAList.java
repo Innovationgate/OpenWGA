@@ -1,9 +1,12 @@
 package de.innovationgate.wga.server.api;
 
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import de.innovationgate.utils.ObjectComparator;
+import de.innovationgate.webgate.api.WGLanguage;
 
 public class WGAList<T> extends ArrayList<T>{
 
@@ -54,21 +57,14 @@ public class WGAList<T> extends ArrayList<T>{
 	}
 
 	public WGAList<T> sortList(){
-		Comparator<Object> compare = new Comparator<Object>() {
-			@SuppressWarnings("unchecked")
-			@Override
-			public int compare(Object o1, Object o2) {
-	            if (o1 instanceof Comparable && o2 instanceof Comparable) {
-	            	if(o1 instanceof Integer)
-	            		o1 = ((Integer) o1).doubleValue();
-	            	if(o2 instanceof Integer)
-	            		o2 = ((Integer) o2).doubleValue();
-	                return ((Comparable<Object>) o1).compareTo(o2);
-	            }
-				return o1.toString().compareTo(o2.toString());
-			}
-		};
-		sort(compare);
+		Comparator<Object> comperator = new ObjectComparator();
+		sort(comperator);
+		return this;
+	}
+	public WGAList<T> sortList(String lang){
+		Collator collator = Collator.getInstance(WGLanguage.languageNameToLocale(lang));
+		ObjectComparator comperator = new ObjectComparator(collator);
+		sort(comperator);
 		return this;
 	}
 
@@ -116,6 +112,10 @@ public class WGAList<T> extends ArrayList<T>{
 	public WGAList<T> shuffle(){
 		Collections.shuffle(this);
 		return this;		
+	}
+	
+	public int getLength(){
+		return size();
 	}
 	
 }

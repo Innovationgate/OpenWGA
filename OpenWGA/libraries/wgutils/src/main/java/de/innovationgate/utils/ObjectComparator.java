@@ -110,6 +110,12 @@ public class ObjectComparator extends Object implements Comparator<Object> {
 		if (arg1 == null) {
 			return -1;
 		}
+
+		// Convert Integer all to Doubles
+    	if(arg0 instanceof Integer)
+    		arg0 = ((Integer) arg0).doubleValue();
+    	if(arg1 instanceof Integer)
+    		arg1 = ((Integer) arg1).doubleValue();
 		
 		if (arg0 instanceof String && arg1 instanceof String) {
             String str0 = (String) arg0;
