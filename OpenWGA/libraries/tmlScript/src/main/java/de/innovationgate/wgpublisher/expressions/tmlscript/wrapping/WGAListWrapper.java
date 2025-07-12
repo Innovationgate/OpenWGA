@@ -1,20 +1,19 @@
 package de.innovationgate.wgpublisher.expressions.tmlscript.wrapping;
 
-import java.util.ArrayList;
-
 import de.innovationgate.ext.org.mozilla.javascript.Context;
 import de.innovationgate.ext.org.mozilla.javascript.NativeJavaObject;
 import de.innovationgate.ext.org.mozilla.javascript.Scriptable;
 import de.innovationgate.ext.org.mozilla.javascript.ScriptableObject;
 import de.innovationgate.ext.org.mozilla.javascript.Undefined;
+import de.innovationgate.wga.server.api.WGAList;
 
-public class ListWrapper extends NativeJavaObject {
+public class WGAListWrapper extends NativeJavaObject {
 
 	private static final long serialVersionUID = 1L;
-	private ArrayList<Object> list;
+	private WGAList<Object> list;
 	
-	public ListWrapper(Scriptable scope, ArrayList<Object> list) {
-		super(scope, list, ArrayList.class);
+	public WGAListWrapper(Scriptable scope, WGAList<Object> list) {
+		super(scope, list, WGAList.class);
 		this.list = list;
 	}
 
@@ -22,7 +21,7 @@ public class ListWrapper extends NativeJavaObject {
 	 * @see ScriptableObject#getClassName()
 	 */
 	public String getClassName() {
-		return "de.innovationgate.wgpublisher.expressions.ListWrapper";
+		return "de.innovationgate.wgpublisher.expressions.WGAListWrapper";
 	}
 
 	/**
@@ -38,7 +37,7 @@ public class ListWrapper extends NativeJavaObject {
 			}
 			catch(Exception e) {
 				return Undefined.instance;				
-			}			
+			}
 		}
 	}
 
