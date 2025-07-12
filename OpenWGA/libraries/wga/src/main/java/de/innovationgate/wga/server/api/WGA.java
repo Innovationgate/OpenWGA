@@ -3459,7 +3459,15 @@ public class WGA {
     public WGAList<Object> List(){
     	return new WGAList<Object>();
     }
-    
+
+    // WGA.Map
+    public WGAMap<Object,Object> Map(Map<Object,Object> map){
+    	return new WGAMap<Object,Object>(map);
+    }
+    public WGAMap<Object,Object> Map(){
+    	return new WGAMap<Object,Object>();
+    }
+
     // WGA.File
     public WGAFile File(String filename){
     	return new WGAFile(this, filename);
