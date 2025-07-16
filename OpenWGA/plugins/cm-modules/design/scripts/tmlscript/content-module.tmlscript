@@ -84,7 +84,11 @@ this.settings = function(doc){
 		doc = doc.content();
 	var settings_map = this.getExtensionData(doc || content(), "content-modules-settings") || WGA.createLookupTable() 
 	return {
-		get: function(name) settings_map.get(WGA.scoped(name))
+		get: function(name) settings_map.get(WGA.scoped(name)),
+		value: function(name){
+			let list = this.get(name);
+			return list && list.size() && list.get(0);
+		}
 	}
 }
 
