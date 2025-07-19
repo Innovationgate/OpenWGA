@@ -48,6 +48,9 @@ import de.innovationgate.webgate.api.WGResultSet;
 import de.innovationgate.webgate.api.WGStandardResultSet;
 import de.innovationgate.webgate.api.WGStructEntry;
 import de.innovationgate.webgate.api.WGStructEntryList;
+import de.innovationgate.webgate.api.WGUserAccess;
+import de.innovationgate.webgate.api.WGUserDetails;
+import de.innovationgate.webgate.api.auth.AuthenticationModule;
 import de.innovationgate.webgate.api.utils.NativeQueryOptions;
 import de.innovationgate.wga.common.CodeCompletion;
 import de.innovationgate.wga.server.api.tml.Context;
@@ -745,7 +748,24 @@ public class Database {
     public String getUserName() {
         return _db.getSessionContext().getUserAccess().getPrimaryName();
     }
-    
+
+    /**
+     * Returns the common name of the user currently logged in on this database if available - distinguished name else
+     */
+    public String getUserCommonName() {
+	    // Look if we have detailed user information
+	    WGUserDetails userDetails = null;
+    	WGUserAccess userAccess = _db.getSessionContext().getUserAccess();
+	    if (userAccess instanceof WGUserDetails) {
+	        userDetails  = (WGUserDetails) userAccess;
+	        String cn = userDetails.getLabeledNames().get(AuthenticationModule.USERLABEL_COMMONNAME);
+	        if(cn!=null)
+	        	return cn;
+	    }
+
+        return userAccess.getPrimaryName();
+    }
+
     /**
      * Returns if the user is logged in anonymously to this database
      */
