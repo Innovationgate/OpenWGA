@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 public class WcssCompiler {
 
 	private static final Logger LOG = Logger.getLogger("wga.wcss");
-	private static final char QUOTE = '"';
+	private static final char QUOTE_CHAR = '"';
 
 	final static int[] toRGB(String value){
 		HashMap<String, String> colors = new HashMap<String, String>();
@@ -175,7 +175,7 @@ public class WcssCompiler {
 		st.ordinaryChar(';');
 		st.ordinaryChar('/');		// needed for comments
 		
-		st.quoteChar(QUOTE);
+		st.quoteChar(QUOTE_CHAR);
 		        
 		CssBlock rootCssBlock = new CssBlock(parent);
 		rootCssBlock.parse(st);
@@ -256,8 +256,8 @@ public class WcssCompiler {
 				
 				if(token==StreamTokenizer.TT_WORD)
 					prop.append(st.sval);
-				else if((char)token == QUOTE)		// quoted string
-					prop.append(QUOTE + st.sval + QUOTE);
+				else if((char)token == QUOTE_CHAR)		// quoted string
+					prop.append(QUOTE_CHAR + st.sval + QUOTE_CHAR);
 				else if((char)token == '/'){
 					prop.append("/");
 				}
