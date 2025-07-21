@@ -250,8 +250,8 @@ public class Image extends Base implements DynamicAttributes {
             		altAttribute=null;
             		// first try file meta "title"
             		WGContent c = getTMLContext().getcontent();
-            		if(!c.isDummy()) {
-                		WGFileMetaData md = getTMLContext().getcontent().getFileMetaData(file);
+            		if(c!=null && !c.isDummy()) {
+                		WGFileMetaData md = c.getFileMetaData(file);
                 		if(md!=null)
                 			altAttribute = md.getTitle();            			
             		}

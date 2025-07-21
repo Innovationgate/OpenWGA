@@ -57,19 +57,21 @@
 	fieldinfo.put("name", _fieldname);
 	fieldinfo.put("type", fieldtype||'text');
 
-	if(!WGA.createList(['select', 'checkbox', 'radio']).contains(fieldtype))
+	if(!WGA.List(['select', 'checkbox', 'radio']).contains(fieldtype))
 		_opts = null;
+
+	_label_for = !WGA.List(['checkbox', 'radio']).contains(fieldtype)
 
 	tmlform.processcontext.get("forminfo").put(WGA.scoped(""), fieldinfo);		
 </tml:script>
 
 <div class="clearfix formfield field-type-<tml:script expression="CMM.setting('fieldtype')"/>
 		<tml:option name="module_classes"/>
-		<tml:case condition="tmlform.hasmessage(_fieldname)"> error</tml:case>
+		<tml:case condition="_fieldname && tmlform.hasmessage(_fieldname)"> error</tml:case>
 		<tml:case condition="CMM.setting('divider')=='single-line'">single-line</tml:case>
 	">
 	<tml:case condition="_label">
-		<label <tml:case condition="!_opts">for="<tml:option name="ns"/>"</tml:case> <tml:case condition="_validation">class="required"</tml:case>>
+		<label <tml:case if="_label_for">for="<tml:option name="ns"/>"</tml:case> <tml:case condition="_validation">class="required"</tml:case>>
 			<tml:item name="_label"/>
 		</label>
 	</tml:case>

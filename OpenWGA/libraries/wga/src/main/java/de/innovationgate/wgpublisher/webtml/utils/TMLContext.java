@@ -1023,14 +1023,14 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         }
         
         if (!getwgacore().isLuceneEnabled()) {
-            addwarning("Unable to highlight item '" + name + "' bc. lucene is not enabled.");
+            //addwarning("Unable to highlight item '" + name + "' bc. lucene is not enabled.");
             return originalText;
         }
         // try to retrieve last lucene query for highlighting
         org.apache.lucene.search.Query query = (org.apache.lucene.search.Query) getrequest().getSession().getAttribute(Query.SESSION_ATTRIBUTE_SIMPLIFIED_LUCENEQUERY);
         if (query == null) {
             // no query in session - highlighting not possible
-            addwarning("Lucene highlighting not possible because there is no query with enabled highlighting support");
+            //addwarning("Lucene highlighting not possible because there is no query with enabled highlighting support");
             return originalText;
         }
         

@@ -254,7 +254,7 @@ public class OverlayDesignProvider implements WGADesignProvider {
                 for (ChangedDocument doc : provider.getStatus().getChangedDocuments().values()) {
                     
                     if (doc.getChangeType() == ChangeType.CONFLICT) {
-                        core.getLog().warn("A conflict was detected on resource '" + doc.getDocumentKey() + "' between base and overlay design. The design might not work correctly.");
+                        core.getLog().warn("App '" + db.getDbReference() + "': a conflict was detected on resource '" + doc.getDocumentKey() + "' between base and overlay design. The design might not work correctly.");
                         Problem.Vars vars = Problem.var("baseversion", overlayData.getBasepluginVersion()).var("currentversion", original.getPluginID().getVersion().toString()).var("basedesign", overlayData.getBasepluginName());
                         if (doc.getInvolvedFiles() != null && doc.getInvolvedFiles().size() > 0) {
                             List<String> resources = new ArrayList<String>();

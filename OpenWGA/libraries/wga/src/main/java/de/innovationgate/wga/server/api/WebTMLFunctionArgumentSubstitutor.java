@@ -290,7 +290,10 @@ public class WebTMLFunctionArgumentSubstitutor implements FunctionArgumentSubsti
 			}
         }
         
-        return null;
+        // else try global
+    	String global = argumentName.substring(1);
+    	return _wga.app().getGlobal(global);
+
     }
 
 

@@ -40,6 +40,8 @@ import de.innovationgate.ext.org.mozilla.javascript.WrapFactory;
 import de.innovationgate.wga.server.api.App;
 import de.innovationgate.wga.server.api.Design;
 import de.innovationgate.wga.server.api.Server;
+import de.innovationgate.wga.server.api.WGAList;
+import de.innovationgate.wga.server.api.WGAMap;
 import de.innovationgate.wga.server.api.tml.TMLPage;
 import de.innovationgate.wgpublisher.events.ApplicationEvent;
 import de.innovationgate.wgpublisher.events.ContentTypeEvent;
@@ -106,12 +108,31 @@ public class RhinoWrapFactory extends WrapFactory {
             
         });
 
+        _wrapMethods.put(WGAMap.class, new WrapMethod<WGAMap>() {
+
+			@Override
+            public Scriptable wrap(Object obj, Scriptable scope) {
+                return new WGAMapWrapper(scope, (WGAMap) obj);
+            }
+            
+        });
+
         _wrapMethods.put(ArrayList.class, new WrapMethod<ArrayList<Object>>() {
 
             @SuppressWarnings("unchecked")
 			@Override
             public Scriptable wrap(Object obj, Scriptable scope) {
                 return new ListWrapper(scope, (ArrayList<Object>) obj);
+            }
+            
+        });
+
+        _wrapMethods.put(WGAList.class, new WrapMethod<WGAList<Object>>() {
+
+            @SuppressWarnings("unchecked")
+			@Override
+            public Scriptable wrap(Object obj, Scriptable scope) {
+                return new WGAListWrapper(scope, (WGAList<Object>) obj);
             }
             
         });
