@@ -1,5 +1,5 @@
 <tml:include ref="system:outline" o_style="background:#efefef">
-	<div style="text-align:center;font-size:4em;color:silver" title="<tml:script expression="CMM.setting('image')"/>">
+	<div style="text-align:center;color:silver" title="<tml:script expression="CMM.setting('image')"/>">
 		<tml:script>
 			_url=null;
 			var ctx;
@@ -13,10 +13,10 @@
 				 
 				ctx = context(ctx_expr, false);		
 			}
-			if(ctx)
+			if(ctx && CMM.setting("image"))
 				_url = ctx.fileImageDerivateURL(CMM.setting("image"), "width~100")
 		</tml:script>
 		<tml:{img} html-src="_url" html_style="max-width:100px" if="_url"/>
-		<tml:{span} html_class="far fa-image" unless="_url"/>
+		<tml:{span} html_style="font-size:4em" html_class="far fa-image" unless="_url"/>
 	</div>
 </tml:include>
