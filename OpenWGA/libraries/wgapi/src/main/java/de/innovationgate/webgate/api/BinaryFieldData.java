@@ -34,7 +34,7 @@ import java.io.InputStream;
 
 import javax.activation.DataSource;
 
-import com.google.common.primitives.Bytes;
+import org.apache.commons.io.IOUtils;
 
 import de.innovationgate.utils.TemporaryFile;
 import de.innovationgate.wga.common.ImmutableObject;
@@ -109,8 +109,6 @@ public class BinaryFieldData implements ImmutableObject {
             }
             return value;
         }
-        
-        
 
     }
 
@@ -186,6 +184,19 @@ public class BinaryFieldData implements ImmutableObject {
             throw new IOException(e);
         }
         
+    }
+    
+    /**
+     * Returns the binary data as String
+     * @param encoding (optional)
+     * @return The text representation as a string.
+     * @throws IOException
+     */
+    public String asString(String encoding) throws IOException {
+    	return IOUtils.toString(getInputStream(), encoding);
+    }
+    public String asString() throws IOException {
+    	return IOUtils.toString(getInputStream());
     }
     
     /**
