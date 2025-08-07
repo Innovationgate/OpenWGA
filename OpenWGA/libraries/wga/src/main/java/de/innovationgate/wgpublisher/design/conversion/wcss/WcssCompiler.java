@@ -368,16 +368,22 @@ public class WcssCompiler {
 					result.append("\n");
 			}
 			for(Map.Entry<String,String> entry: _props.entrySet()){
-				if(!path.isEmpty() && !_compress){
-					result.append(prefix);
-					result.append("\t");
+				String prop = replaceCustomFunctions(replaceVars(entry.getKey()));
+				String value = replaceCustomFunctions(replaceVars(entry.getValue()));
+				
+				String[] props = prop.split(",");
+				for(int i=0; i<props.length; i++) {
+					if(!path.isEmpty() && !_compress){
+						result.append(prefix);
+						result.append("\t");
+					}
+					result.append(props[i].trim());
+					result.append(": ");
+					result.append(value);
+					result.append(";");
+					if(!_compress)
+						result.append("\n");
 				}
-				result.append(replaceCustomFunctions(replaceVars(entry.getKey())));
-				result.append(": ");
-				result.append(replaceCustomFunctions(replaceVars(entry.getValue())));
-				result.append(";");
-				if(!_compress)
-					result.append("\n");
 			}
 			if(!path.isEmpty() && !_props.isEmpty()){
 				result.append(prefix);
@@ -554,7 +560,7 @@ public class WcssCompiler {
 			
 			if(!getProperties().isEmpty()){
 				if(getSourceInfo()!=null)
-					result.append("\n" + prefix + "/* " + getSourceInfo() + " */\n");
+					result.append("\n" + prefix + "/* wcss " + getSourceInfo() + " */\n");
 				result.append(prefix);
 				result.append(getParentBlock().getPath() + "{");
 				if(!_compress)
@@ -562,15 +568,20 @@ public class WcssCompiler {
 			}
 
 			for(Map.Entry<String,String> entry: getProperties().entrySet()){
-				result.append(prefix);
-				if(!_compress)
-					result.append("\t");
-				result.append(replaceCustomFunctions(replaceVars(getName() + "-" + entry.getKey())));
-				result.append(": ");
-				result.append(replaceCustomFunctions(replaceVars(entry.getValue())));
-				result.append(";");
-				if(!_compress)
-					result.append("\n");
+				String prop = replaceCustomFunctions(replaceVars(entry.getKey()));
+				String value = replaceCustomFunctions(replaceVars(entry.getValue()));
+				String[] props = prop.split(",");
+				for(int i=0; i<props.length; i++) {
+					result.append(prefix);
+					if(!_compress)
+						result.append("\t");
+					result.append(getName() + "-" + props[i].trim());
+					result.append(": ");
+					result.append(value);
+					result.append(";");
+					if(!_compress)
+						result.append("\n");
+				}
 			}
 						
 			if(!getProperties().isEmpty()){
@@ -749,7 +760,7 @@ public class WcssCompiler {
 
 		public String getCode(String prefix) throws IOException{
 			if(getSourceInfo()!=null)
-				return "\n" + prefix + "/* " + _name + " in " + getSourceInfo() + " */\n";
+				return "\n" + prefix + "/* wcss " + _name + " in " + getSourceInfo() + " */\n";
 			return "";
 		}
 
