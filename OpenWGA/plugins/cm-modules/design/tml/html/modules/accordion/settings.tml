@@ -4,5 +4,9 @@
 </div>	
 
 <div style="margin:10px">
-	<tml:input name="{scoped:expand_first}" type="boolean" options="{label('accordion.settings.expand.first-section-options')}" default="false" mode="{option('mode')}"/>
+	<tml:input name="{scoped:expand_first}" type="boolean" options="{label('accordion.settings.expand.first-section-options')}" labeled="true" default="false" mode="{option('mode')}"/>
+</div>
+
+<div style="margin:10px">
+	<tml:input name="{scoped:multiple}" type="boolean" options="Öffnen mehrerer Seiten zulassen" labeled="true" default="false" mode="{option('mode')}"/>
 </div>
