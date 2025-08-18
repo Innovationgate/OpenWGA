@@ -1,6 +1,7 @@
 <tml:eventscript onevent="modules-copied-to-clipboard">
 	var mods = portletEvent.getParameter("mods")
 	setSessionVar("_CM_clipboard_modules", mods);
+	//console.log("_CM_clipboard_modules", mods)
 	
 	var props={};
 	copyFields(JSON.parse(mods))
@@ -10,16 +11,14 @@
 	
 	function copyFields(mod){
 		var duplicated_from = mod.duplicated_from;
-		var id = mod.id;
 		if(!duplicated_from)
 			return;
 		for(let fieldname in Iterator(tmlform.fieldnames)){
 			if(fieldname.indexOf(duplicated_from)>=0){
-				var base = fieldname.split(duplicated_from)[0];
 				var values = [];
 				for(let value in Iterator(tmlform.fieldList(fieldname)))
 					values.push(value);
-				props[base+id] = values;
+				props[fieldname] = values;
 			}
 		}
 		var children = mod.children;
@@ -30,9 +29,26 @@
 
 <tml:eventscript onevent="modules-copied-from-clipboard">
 	var props = JSON.parse(_CM_clipboard_modules_props || "{}");
-	for (let key in props) {
-		tmlform.setField(key, props[key]);
+	var mods = portletEvent.getParameter("mods");
+	copyFields(JSON.parse(mods))
+	
+	function copyFields(mod){
+		var duplicated_from = mod.duplicated_from;
+		var id = mod.id;
+		if(!duplicated_from)
+			return;
+			
+		for(key in props){
+			if(key.indexOf(duplicated_from)>=0){
+				let base = key.split(duplicated_from)[0];
+				tmlform.setField(base+id, props[key]);
+			}
+		}
+		var children = mod.children;
+		for(let [index,child] in children)
+			copyFields(child);
 	}
+
 </tml:eventscript>
 
 <tml:eventscript onevent="modules-duplicated">
