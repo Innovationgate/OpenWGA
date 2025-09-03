@@ -3,10 +3,12 @@
 	<tml:input name="{scoped:effect_speed}" type="select" cssclass="form-control" options="{label('accordion.settings.effect-speed-options')}" default="fast" mode="{option('mode')}"/>
 </div>	
 
-<div style="margin:10px">
-	<tml:input name="{scoped:expand_first}" type="boolean" options="{label('accordion.settings.expand.first-section-options')}" labeled="true" default="false" mode="{option('mode')}"/>
-</div>
-
-<div style="margin:10px">
-	<tml:input name="{scoped:multiple}" type="boolean" options="Öffnen mehrerer Seiten zulassen" labeled="true" default="false" mode="{option('mode')}"/>
+<label>Akkordeon Abschnitte/Seiten:</label>
+<div style="margin:0 10px">
+	<div>
+		<tml:input name="{scoped:expand_first}" type="boolean" options="{label('accordion.settings.expand.first-section-options')}" labeled="true" default="false" mode="{option('mode')}"/>
+	</div>
+	<div>
+		<tml:input name="{scoped:multiple}" type="boolean" options="Öffnen mehrerer Abschnitte zulassen" labeled="true" default="false" mode="{option('mode')}"/>
+	</div>
 </div>
