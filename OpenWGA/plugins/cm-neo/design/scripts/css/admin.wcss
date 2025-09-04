@@ -20,12 +20,25 @@
 	#contents{
 		.header{
 			padding: 0px 10px;
-			select{
-				font-size: 16px;
-				padding: 5px 20px 5px 10px;
+			font-size: 16px;
+			line-height: normal;
+			display: flex;
+			align-items: center;
+			.select{
+				flex: 1;
+				select{
+					padding: 5px 20px 5px 10px;
+				}
+				option[value=""]{  
+				    display: none;  
+				}
 			}
-			option[value=""]{  
-			    display: none;  
+			.filter{
+				input, button {
+					padding: 5px 10px;
+					border-radius: 5px;
+					border: solid gray 1px;
+				}
 			}
 		}
 		.content{

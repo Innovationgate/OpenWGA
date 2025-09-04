@@ -108,7 +108,9 @@ Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 			params.p_value = $form.status;
 			break;
 		case "uname":
-			query = "content.uniquename!='' OR content.structentry.uniquename!=''";
+			if($form.uname)
+				query = "content.uniquename like '"+$form.uname+"%' OR content.structentry.uniquename like '"+$form.uname+"%'";
+			else query = "content.uniquename!='' OR content.structentry.uniquename!=''";
 			break;
 		case "module":
 			if(!$portlet.module)
