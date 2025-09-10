@@ -551,47 +551,21 @@ public class WcssCompiler {
 		CssPropertiesBlock(String name, CssBlock parent) {
 			super(name, parent);
 		}
-		
-		public String getCode(String prefix) throws IOException{
-			StringBuffer result = new StringBuffer();
 
-			if(_compress)
-				prefix="";
-			
-			if(!getProperties().isEmpty()){
-				if(getSourceInfo()!=null)
-					result.append("\n" + prefix + "/* wcss " + getSourceInfo() + " */\n");
-				result.append(prefix);
-				result.append(getParentBlock().getPath() + "{");
-				if(!_compress)
-					result.append("\n");
-			}
-
+		public void parse(StreamTokenizer st) throws IOException{
+			super.parse(st);
+			Map<String, String> parent_props = getParentBlock().getProperties();
 			for(Map.Entry<String,String> entry: getProperties().entrySet()){
 				String prop = replaceCustomFunctions(replaceVars(entry.getKey()));
-				String value = replaceCustomFunctions(replaceVars(entry.getValue()));
 				String[] props = prop.split(",");
 				for(int i=0; i<props.length; i++) {
-					result.append(prefix);
-					if(!_compress)
-						result.append("\t");
-					result.append(getName() + "-" + props[i].trim());
-					result.append(": ");
-					result.append(value);
-					result.append(";");
-					if(!_compress)
-						result.append("\n");
+					parent_props.put(getName() + "-" + props[i].trim(), entry.getValue());
 				}
 			}
-						
-			if(!getProperties().isEmpty()){
-				result.append(prefix);
-				result.append("}");
-				if(!_compress)
-					result.append("\n");
-			}
-			
-			return result.toString();
+		}
+		
+		public String getCode(String prefix) throws IOException{
+			return "";
 		}
 	}
 	
