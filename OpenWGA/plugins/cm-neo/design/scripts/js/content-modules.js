@@ -355,7 +355,6 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 
 		function getNodeData(el){
 			var mod = modules[el.data("context")];
-			var new_id = mod.id + "_" + guid();
 			var children = [];
 			el.find(">ul >.node").each(function(){
 				children.push(getNodeData($(this)))
@@ -364,7 +363,6 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 				duplicated_from: el.data("id"),		// nessessarry to read module properties
 				title: mod.title,
 				iconurl: mod.icon,
-				id: new_id,
 				context: mod.id,
 				children: children
 			}
@@ -395,8 +393,18 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 			return;
 		}
 
+		// generate new id-s
+		//console.log("clipboardModules", clipboardModules)
+		function generateIds(mod){
+			mod.id = mod.module_id + "_" + guid();
+			for(let i=0; i<mod.children.length; i++)
+				generateIds(mod.children[i])
+		}
+		generateIds(clipboardModules)
+		//console.log("clipboardModules new", clipboardModules)
+
 		$("#module-tree").wga_tree("addnode", selected_tree_node, clipboardModules, true);
-		WGA.event.fireEvent("modules-copied-from-clipboard", "module-editor", {});
+		WGA.event.fireEvent("modules-copied-from-clipboard", "module-editor", {mods: JSON.stringify(clipboardModules)});
 	}
 
 	function duplicateModulesClick(e){

@@ -1,4 +1,4 @@
-define(["jquery", "jquery-textarea-autogrow", "jquery-ui-js/datepicker"], function($){
+define(["jquery"], function($){
 
 	return function(){
 		$("#form-publish-page textarea").autogrow()

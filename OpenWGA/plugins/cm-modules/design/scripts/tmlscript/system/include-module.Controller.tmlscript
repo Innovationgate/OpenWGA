@@ -68,6 +68,11 @@ Controller.prototype.prepare = function($cx, CMM){
 	// module css classes
 	this.moduleCssClasses = WGA.Utils.serializeCollection(CMM.settingList("module_css_classes", this.id), " ");
 	
+	let classes = "module module-" + this.module_id
+		+ " " + this.moduleCssClasses
+		+ " " + $cx.option("module-class");
+	this.localModuleCssClasses = classes.replace(/\s+/g, " ");
+	
 }.nonIsolated();
 
 

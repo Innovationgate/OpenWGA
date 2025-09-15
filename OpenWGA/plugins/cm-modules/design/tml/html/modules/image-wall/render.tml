@@ -91,7 +91,7 @@
 		$("#album-<tml:option name="ns"/>").imageAlbum();
 	});
 	<tml:case condition="CMM.setting('lightbox')">
-		require(["jquery", "jquery-lightbox"], function($){
+		require(["jquery", "jquery-lightbox", "jquery-swipehandler"], function($){
 			$("#album-<tml:option name="ns"/>").find("img").lightbox({
 				group: "<tml:script expression="CMM.setting('image_group')||'default'"/>",
 				download: <tml:script expression="CMM.setting('download')"/>

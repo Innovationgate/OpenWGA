@@ -17,10 +17,8 @@
 		require([
 				"jquery", 
 				"jquery-modal", 
-				"jquery-textarea-autogrow", 
-				"jquery-ui-js/datepicker", 
-				"jquery-ui-js/i18n/datepicker-de",
-				"css!jquery-ui-css"
+				"jquery-textarea-autogrow",
+				"jquery-ui-datepicker"
 			], function($, Modal){
 				Modal.show("#dialog-<tml:item name="_id"/>", function(){
 					$("textarea", this).autogrow()

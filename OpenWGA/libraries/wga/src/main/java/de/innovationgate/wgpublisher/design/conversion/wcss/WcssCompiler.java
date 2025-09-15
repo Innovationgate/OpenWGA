@@ -368,16 +368,22 @@ public class WcssCompiler {
 					result.append("\n");
 			}
 			for(Map.Entry<String,String> entry: _props.entrySet()){
-				if(!path.isEmpty() && !_compress){
-					result.append(prefix);
-					result.append("\t");
+				String prop = replaceCustomFunctions(replaceVars(entry.getKey()));
+				String value = replaceCustomFunctions(replaceVars(entry.getValue()));
+				
+				String[] props = prop.split(",");
+				for(int i=0; i<props.length; i++) {
+					if(!path.isEmpty() && !_compress){
+						result.append(prefix);
+						result.append("\t");
+					}
+					result.append(props[i].trim());
+					result.append(": ");
+					result.append(value);
+					result.append(";");
+					if(!_compress)
+						result.append("\n");
 				}
-				result.append(replaceCustomFunctions(replaceVars(entry.getKey())));
-				result.append(": ");
-				result.append(replaceCustomFunctions(replaceVars(entry.getValue())));
-				result.append(";");
-				if(!_compress)
-					result.append("\n");
 			}
 			if(!path.isEmpty() && !_props.isEmpty()){
 				result.append(prefix);
@@ -545,42 +551,21 @@ public class WcssCompiler {
 		CssPropertiesBlock(String name, CssBlock parent) {
 			super(name, parent);
 		}
+
+		public void parse(StreamTokenizer st) throws IOException{
+			super.parse(st);
+			Map<String, String> parent_props = getParentBlock().getProperties();
+			for(Map.Entry<String,String> entry: getProperties().entrySet()){
+				String prop = replaceCustomFunctions(replaceVars(entry.getKey()));
+				String[] props = prop.split(",");
+				for(int i=0; i<props.length; i++) {
+					parent_props.put(getName() + "-" + props[i].trim(), entry.getValue());
+				}
+			}
+		}
 		
 		public String getCode(String prefix) throws IOException{
-			StringBuffer result = new StringBuffer();
-
-			if(_compress)
-				prefix="";
-			
-			if(!getProperties().isEmpty()){
-				if(getSourceInfo()!=null)
-					result.append("\n" + prefix + "/* " + getSourceInfo() + " */\n");
-				result.append(prefix);
-				result.append(getParentBlock().getPath() + "{");
-				if(!_compress)
-					result.append("\n");
-			}
-
-			for(Map.Entry<String,String> entry: getProperties().entrySet()){
-				result.append(prefix);
-				if(!_compress)
-					result.append("\t");
-				result.append(replaceCustomFunctions(replaceVars(getName() + "-" + entry.getKey())));
-				result.append(": ");
-				result.append(replaceCustomFunctions(replaceVars(entry.getValue())));
-				result.append(";");
-				if(!_compress)
-					result.append("\n");
-			}
-						
-			if(!getProperties().isEmpty()){
-				result.append(prefix);
-				result.append("}");
-				if(!_compress)
-					result.append("\n");
-			}
-			
-			return result.toString();
+			return "";
 		}
 	}
 	
@@ -749,7 +734,7 @@ public class WcssCompiler {
 
 		public String getCode(String prefix) throws IOException{
 			if(getSourceInfo()!=null)
-				return "\n" + prefix + "/* " + _name + " in " + getSourceInfo() + " */\n";
+				return "\n" + prefix + "/* wcss " + _name + " in " + getSourceInfo() + " */\n";
 			return "";
 		}
 

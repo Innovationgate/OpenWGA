@@ -1443,6 +1443,7 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
                     	    List<String> relationStrings = (List<String>) fieldlist(fieldName);
                     	    if (fieldReg.isMultiple()) {
                     	        content.clearRelationGroup(targetName);
+                    	        content.removeRelation(targetName);		// just in case there is a single relation of this name
                     	        for (String relStr : relationStrings) {
                     	            TMLContext relationContext = gettargetcontext().context("docid:"+ relStr, false);
                                     if (relationContext != null) {
@@ -1457,6 +1458,7 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
                     	        }
                     	    }
                     	    else if (relationStrings.size() > 0) { // Need to test bc. of old isempty() behaviour < 6.2
+                    	    	content.clearRelationGroup(targetName);	// just in case there is a relation group of this name
                     	        TMLContext relationContext = gettargetcontext().context("docid:"+ relationStrings.get(0), false);
                     	        if (relationContext != null) {
                     	            WGContent targetContent = relationContext.content();

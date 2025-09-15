@@ -1,68 +1,76 @@
 <tml:form id="contents" source="portlet" htmlinput="true">
 
 	<div class="header">
-		<tml:input name="filter" type="select" options="Alle Inhalte|all,Seitentyp|pagetype,Sprache|language,Status|status,Enthält Inhaltsmodul|module,Mit eindeutigem Namen|uname"
-			changeaction="$store"
-		/>
-		<tml:select switch="tmlform.filter">
-			<tml:case value="pagetype">
-				<tml:input name="pagetype" type="select" optionsitem="$pc.pagetypes"
-					changeaction="$store"
-				/>
-			</tml:case>
-			<tml:case value="language">
-				<tml:input name="lang" type="select" optionsitem="$pc.languages"
-					changeaction="$store"
-				/>
-			</tml:case>
-			<tml:case value="status">
-				<tml:input name="status" type="select" optionsitem="$pc.statuse"
-					changeaction="$store"
-				/>
-			</tml:case>
-			<tml:case value="module">
-				<tml:comment><tml:input name="module" type="select" optionsitem="$pc.modules"
-					changeaction="$store"
-				/></tml:comment>
-
-				<tml:script>
-					_configs = CMM.getConfigTMLs($option_dbkey);
-					_mods = [];
-				</tml:script>
-				<tml:foreach item="_configs" currentvalue="_config">
-					<tml:include designdb="{_config.dbkey}" ref="{_config.configtml}" var="_a"/>
+		<div class="select">
+			<tml:input name="filter" type="select" options="Alle Inhalte|all,Seitentyp|pagetype,Sprache|language,Status|status,Enthält Inhaltsmodul|module,Mit eindeutigem Namen|uname"
+				changeaction="$store"
+			/>
+			<tml:select switch="tmlform.filter">
+				<tml:case value="pagetype">
+					<tml:input name="pagetype" type="select" optionsitem="$pc.pagetypes"
+						changeaction="$store"
+					/>
+				</tml:case>
+				<tml:case value="language">
+					<tml:input name="lang" type="select" optionsitem="$pc.languages"
+						changeaction="$store"
+					/>
+				</tml:case>
+				<tml:case value="status">
+					<tml:input name="status" type="select" optionsitem="$pc.statuse"
+						changeaction="$store"
+					/>
+				</tml:case>
+				<tml:case value="module">
 					<tml:script>
-						_mods = _mods.concat([<tml:item name="_a" encode="none"/>]);
+						_configs = CMM.getConfigTMLs($option_dbkey);
+						_mods = [];
 					</tml:script>
-				</tml:foreach>
-
-				<select name="module">
-					<tml:foreach item="$pc.rootModules" a-modules="_mods" currentvalue="_mod" sortexpression="_mod.title" sortorder="ascending">
-						<option title="<tml:item name="_mod.value"/>" value="<tml:item name="_mod.value"/>" <tml:case condition="portlet.module==_mod.value">selected</tml:case>>
-							<tml:item name="_mod.title"/>
-						</option>
+					<tml:foreach item="_configs" currentvalue="_config">
+						<tml:include designdb="{_config.dbkey}" ref="{_config.configtml}" var="_a"/>
+						<tml:script>
+							_mods = _mods.concat([<tml:item name="_a" encode="none"/>]);
+						</tml:script>
 					</tml:foreach>
-					<tml:foreach item="$pc.catModules" a-modules="_mods" currentvalue="_entryset" sortexpression="_entryset.key" sortorder="ascending">
-						<optgroup label="<tml:item name="_entryset.key"/>">
-							<tml:foreach item="_entryset.value" currentvalue="_mod" sortexpression="_mod.title" sortorder="ascending">
-								<option title="<tml:item name="_mod.value"/>" value="<tml:item name="_mod.value"/>" <tml:case condition="portlet.module==_mod.value">selected</tml:case>>
-									<tml:item name="_mod.title"/>
-								</option>
-							</tml:foreach>
-						</optgroup>
-					</tml:foreach>
-				</select>
-			</tml:case>
-		</tml:select>
+	
+					<select name="module">
+						<tml:foreach item="$pc.rootModules" a-modules="_mods" currentvalue="_mod" sortexpression="_mod.title" sortorder="ascending">
+							<option title="<tml:item name="_mod.value"/>" value="<tml:item name="_mod.value"/>" <tml:case condition="portlet.module==_mod.value">selected</tml:case>>
+								<tml:item name="_mod.title"/>
+							</option>
+						</tml:foreach>
+						<tml:foreach item="$pc.catModules" a-modules="_mods" currentvalue="_entryset" sortexpression="_entryset.key" sortorder="ascending">
+							<optgroup label="<tml:item name="_entryset.key"/>">
+								<tml:foreach item="_entryset.value" currentvalue="_mod" sortexpression="_mod.title" sortorder="ascending">
+									<option title="<tml:item name="_mod.value"/>" value="<tml:item name="_mod.value"/>" <tml:case condition="portlet.module==_mod.value">selected</tml:case>>
+										<tml:item name="_mod.title"/>
+									</option>
+								</tml:foreach>
+							</optgroup>
+						</tml:foreach>
+					</select>
+				</tml:case>
+			</tml:select>
+			
+			<tml:input name="order" type="select" options="Nach Erstellungsdatum|created,Nach Änderungsdatum|lastmodified"
+				default="created"
+				changeaction="$store"
+			/>
+			<tml:input name="dir" type="select" options="Absteigend|desc,Aufsteigend|asc"
+				default="desc"
+				changeaction="$store"
+			/>
+		</div>
 		
-		<tml:input name="order" type="select" options="Nach Erstellungsdatum|created,Nach Änderungsdatum|lastmodified"
-			default="created"
-			changeaction="$store"
-		/>
-		<tml:input name="dir" type="select" options="Absteigend|desc,Aufsteigend|asc"
-			default="desc"
-			changeaction="$store"
-		/>
+		<tml:case condition="tmlform.filter=='uname'">
+			<div class="filter">
+				<tml:input name="uname" html_placeholder="Name" focus="true" store="false"/>
+				<tml:button clickaction="$refresh" type="submit">
+					<i class="fa fa-filter"></i>
+					Filtern
+				</tml:button>
+			</div>
+		</tml:case>
 		
 	</div>
 	
@@ -102,7 +110,7 @@
 					</div>
 					<div class="col"><tml:meta name="area"/></div>
 					<tml:case condition="tmlform.filter=='uname'">
-						<div class="col"><tml:script expression="PAGENAME || UNIQUENAME"/></div>
+						<div class="col" style="font-weight:bold""><tml:script expression="PAGENAME || UNIQUENAME"/></div>
 					</tml:case>
 					<tml:case condition="tmlform.filter!='pagetype'">
 						<div class="col"><tml:meta name="contenttype"/></div>
@@ -145,6 +153,14 @@
 			$("#contents select[name='module']").change(function(ev){
 				WGA.ajax.callAction("<tml:action ref="$store"/>");
 			})
+			
+			$("#contents [name='uname']").keydown(function(ev){				
+				if(ev.key=="Escape"){
+					$(this).val("");
+					WGA.ajax.callAction("<tml:action ref="$refresh"/>");
+				}
+			})
+
 		})
 	</script>
 	

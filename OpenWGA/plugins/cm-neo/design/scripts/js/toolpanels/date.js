@@ -1,8 +1,6 @@
 define([
 		"jquery", 
-		"jquery-ui-js/datepicker", 
-		"jquery-ui-js/i18n/datepicker-de",
-		"css!jquery-ui-css"
+		"jquery-ui-datepicker"
 	], function($){
 
 	var editor;
