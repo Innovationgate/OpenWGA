@@ -1,12 +1,12 @@
 <tml:include ref="system:outline">
 	<tml:option name="style" scope="local">
 		flex: <tml:script format="0">
-			return (tmlform && tmlform.field(WGA.scoped("width"))) || CMM.setting('width');
+			return (tmlform && tmlform.field(WGA.scoped("width"))) || CMM.setting('width') || 1;
 		</tml:script>;
 		display: flex;
 		flex-direction: column;
 		justify-content: <tml:script>
-			return (tmlform && tmlform.field(WGA.scoped("justify_content"))) || CMM.setting('justify_content');
+			return (tmlform && tmlform.field(WGA.scoped("justify_content"))) || CMM.setting('justify_content') || "flex-start";
 		</tml:script>;
 		<tml:script>
 			var image = CMM.setting("image");
