@@ -590,7 +590,7 @@ public class WGAFilter implements Filter {
 		setupFilterChain();
 	}
 
-    public void setupFilterChain() {
+    public synchronized void setupFilterChain() {
 
         if (_wgaFilterChain != null) {
             _core.getLog().info("Shutting down filter chain");
