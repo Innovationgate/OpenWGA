@@ -105,7 +105,10 @@ public class RestService implements WGAWebService {
         
     @Override
     public void destroy() throws ServletException {
-        _jerseyServlet.destroy();
+    	try {
+    		_jerseyServlet.destroy();
+    	}
+    	catch(Exception e) {}
     }
     
     @Override
