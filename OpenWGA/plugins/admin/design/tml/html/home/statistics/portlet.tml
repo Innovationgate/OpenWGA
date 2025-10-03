@@ -25,7 +25,7 @@
 
 <tml:include designdb="@ui" ref="windowview">
 
-	<tml:option name="title">Server Statistics</tml:option>
+	<tml:option name="title">Requests per Hour</tml:option>
 
 	<div  style="margin:10px">
 		<canvas id="canvas"></canvas>
