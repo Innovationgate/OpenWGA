@@ -49,6 +49,7 @@
 					$(triggerEl).trigger("close", currentModal);	// deprecated
 					triggerEl=null;
 				}
+				currentModal=null;
 			}
 		});
 	}
@@ -62,6 +63,12 @@
 		}
 		if(!el.hasClass("modal-popup"))
 			el.addClass("modal-popup");
+		if(currentModal){
+			$("body").removeClass("modal-open");
+			currentModal.removeClass("modal-open")
+				.hide()
+				.trigger("modal-closed", currentModal);
+		}
 		currentModal=el;
 		maskBody(modal);
 		if(callback)
