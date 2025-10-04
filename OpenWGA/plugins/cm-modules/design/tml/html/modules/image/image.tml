@@ -3,6 +3,7 @@
 		<tml:then>		
 			<tml:image file="{$mc.filename}"
 				html-alt="$mc.img_alt"
+				html_loading="{$option_lazy_images ? 'lazy' : VOID}"
 				html_title="{$mc.img_title || VOID}"
 				html-data-image-url="$mc.lightbox_url"
 				html-data-image-download-url="$mc.download_url"
