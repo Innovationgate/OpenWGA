@@ -13,11 +13,11 @@ body{
 		left: 0;
 		right: 0;
 		background: black;
-		opacity: .7;
-		filter: alpha(opacity = 70);
+		opacity: 0.7;
 		display: none;
 		z-index: 101;
 	}
+	
 	.modal-popup {
 		position: fixed;
 		overflow: auto;
@@ -36,7 +36,14 @@ body{
 		background: white;
 		padding: 0;
 		box-shadow: 0 0 20px black;
+		
 		display: none;
+		opacity: 0;
+		transition: opacity .25s ease;
+		
+		&.modal-open{
+			opacity: 1;
+		}
 		
 		.header {
 			line-height: 1em;
