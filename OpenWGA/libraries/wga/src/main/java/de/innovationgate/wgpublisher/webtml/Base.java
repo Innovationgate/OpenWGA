@@ -401,8 +401,9 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
             // Set tag contexts
             status.childTMLContext = baseContext;
 
-            if (this.getContext() != null) {
-                tmlContext = baseContext.context(this.getContext(), false);
+            String contextAttribute = this.getContext();
+            if (contextAttribute != null) {
+                tmlContext = baseContext.context(contextAttribute, false);
                 if (tmlContext != null) {
                     this.setTMLContext(tmlContext);
                     this.setChildTagContext(tmlContext);
@@ -421,7 +422,7 @@ public abstract class Base extends BodyTagSupport implements DynamicAttributes {
                         }
                     }
                     if (cancelTag == true) {
-                        String msg = "Failed context change: " + getContext();
+                        String msg = "Failed context change: " + contextAttribute;
                         if (baseContext.getlasterror() != null) {
                             msg += ". Reason: " + baseContext.getlasterror();
                         }
