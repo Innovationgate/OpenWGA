@@ -62,7 +62,10 @@
 
 	_label_for = !WGA.List(['checkbox', 'radio']).contains(fieldtype)
 
-	tmlform.processcontext.get("forminfo").put(WGA.scoped(""), fieldinfo);		
+	tmlform.processcontext.get("forminfo").put(WGA.scoped(""), fieldinfo);	
+	
+	_child_mods = option("child-modules");
+		
 </tml:script>
 
 <div class="clearfix formfield field-type-<tml:script expression="CMM.setting('fieldtype')"/>
@@ -103,5 +106,13 @@
 			</div>
 		</tml:case>
 
+		<tml:case condition="_child_mods && _child_mods.size()">
+			<div class="child-mods">
+				<tml:include ref="system:include-child-modules">
+					<tml:option name="margins" expression="true" scope="local"/>
+				</tml:include>
+			</div>
+		</tml:case>
+		
 	</div>
 </div>
