@@ -53,7 +53,10 @@ public class WcssPostProcessor implements PostProcessor{
             }
         	// this is necessary for the data to be cached because TMLScript native objects are not Serializable ?
             for(Map.Entry<String, Object> entry : ((Map<String,Object>)result).entrySet()){
-            	vars.put(entry.getKey(), entry.getValue().toString());
+            	Object value = entry.getValue();
+            	if(value==null)
+            		continue;	// ignore null values
+            	vars.put(entry.getKey(), value.toString());
             }
 		}
     	
