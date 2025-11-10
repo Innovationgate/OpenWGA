@@ -7,18 +7,59 @@
 	tmlform.removeField(WGA.scoped('parent'))
 </tml:action>
 
+<tml:action id="app-changed">
+	tmlform.removeField(WGA.scoped('filename'))
+	tmlform.removeField(WGA.scoped('lang'))
+</tml:action>
+
 <label><tml:label key="downloads.source"/>:</label>
 <div style="margin:10px">
 	<tml:input type="select" name="{scoped:source}"
 			cssclass="form-control"
-			changeaction="clearFileAndParent" ajax="true"
+			changeaction="clearFileAndParent"
 			options="{label(CMM.settingSource()=='template'?'download-list-file.settings.source.template.options':'download-list-file.settings.source.options')}" 
 			mode="{option('mode')}"/>
 </div>
 
 <tml:case condition="tmlform.field(WGA.scoped('source'))=='any'">
+
+	<label><tml:label key="image.settings.database"/>:</label>
 	<div style="margin:10px">
-		<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document">
+		<tml:script>
+			_dbs = CMM.getDbKeys()
+			_dbs.remove(meta("db", "dbkey"))
+			_dbs.add(0, meta("db", "dbkey") + " (aktuelle App)|this");
+
+			_lang = LANGUAGE;
+			var database = db()
+			if(tmlform.field(WGA.scoped("dbkey")) && tmlform.field(WGA.scoped("dbkey"))!="this")
+				database = db(tmlform.field(WGA.scoped("dbkey")))
+			var langs = database.getLanguages().keySet();
+			
+			if(!langs.contains(_lang))
+				_lang = langs.iterator().next();
+
+			_langs = WGA.createList()
+			for(let lang in Iterator(database.getLanguages().entrySet())){
+				_langs.add(lang.value.title + "|" + lang.key) 
+			}
+
+		</tml:script>
+		<tml:input name="{scoped:dbkey}" type="select" optionsitem="_dbs"
+			changeaction="app-changed" ajax="true"
+			default="this"
+			mode="{option:mode}"
+			cssclass="form-control"
+		/>
+	</div>
+
+	<div style="margin:10px">
+		<tml:input name="{scoped:lang}" default="{_lang}" type="select" optionsitem="_langs" changeaction="$refresh" cssclass="form-control" mode="{option:mode}"/>
+	</div>
+
+	<div style="margin:10px">
+		<tml:include designdb="{option('cm_dbkey')}" ref="util:select-document" o_language="{tmlform.field(WGA.scoped('lang'))}">
+			<tml:option name="dbkey" expression="tmlform.field(WGA.scoped('dbkey'))=='this' ? null : tmlform.field(WGA.scoped('dbkey'))"/>
 			<tml:option name="fieldname" expression="WGA.scoped('parent')"/>
 			<tml:option name="changeaction"><tml:action ref="clearFile"/></tml:option>
 		</tml:include>
@@ -30,19 +71,23 @@
 	var source = tmlform.field(WGA.scoped('source'))
 	if(!source)
 		_context= CMM.settingSource()=="template" ? CMM.getTemplateContextPath() : "this";
-	else _context='docid:'+tmlform.field(WGA.scoped('parent'))
+	else {
+		_context="docid:"+tmlform.field(WGA.scoped('parent'))+"<"+ tmlform.field(WGA.scoped('lang')) + ">"
+		if(tmlform.field(WGA.scoped('dbkey'))!='this')
+			_context = "db:"+tmlform.field(WGA.scoped("dbkey"))+"/" + _context
+	}
 </tml:script>
 <tml:case context="{_context}" iscontextvalid="true">
 	<label><tml:label key="download-list-file.file"/>:</label>
 	<div style="margin:10px">
-		<tml:include ref="util:select-file" o_fieldname="filename"/>
+		<tml:include ref="util:select-file" o_fieldname="filename" o_changeaction="$refresh"/>
 	</div>
 </tml:case>
 
 <label><tml:label key="download-list-file.title-source"/>:</label>
 <div style="margin:10px">
 	<tml:input name="{scoped:title_source}" type="select" cssclass="form-control" options="{label('download-list-file.settings.title-source')}" mode="{option:mode}" changeaction="$refresh"/>
-	<tml:case condition="tmlform.field(WGA.scoped('title_source'))=='file_md'">
+	<tml:case condition="tmlform.field(WGA.scoped('filename')) && tmlform.field(WGA.scoped('title_source'))=='file_md'">
 		<p><tml:script context="{_context}" expression="content().getFileMetaData(tmlform.field(WGA.scoped('filename'))).title"/></p>
 	</tml:case>
 </div>
@@ -51,7 +96,6 @@
 <div style="margin:10px">
 	<tml:input name="{scoped:description}" type="textarea" cssstyle="width:100%" mode="{option:mode}"/>
 </div>
-
 
 <script>
 	BI.makeTextareasResizable("<tml:script expression="tmlform.formid"/>");

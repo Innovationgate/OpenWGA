@@ -5,13 +5,18 @@
 	_ctx = this;
 	if(!CMM.setting("source"))
 		_ctx = CMM.settingSource()=="template" ? CMM.getTemplateContext() : this;
-	else _ctx = context("docid:" + CMM.setting("parent"), false);
+	else {
+		let ctx="docid:"+CMM.setting("parent")+"<"+ CMM.setting('lang') + ">"
+		if(CMM.setting('dbkey')!='this')
+			ctx = "db:"+CMM.setting('dbkey') + "/" + ctx;
+		_ctx = context(ctx);
+	}
 
 	if(_filename && _ctx && _ctx.content().hasFile(_filename)){
 		_url = _ctx.fileurl(_filename)
 		_filesize = AFW.Util.renderFileSize(_ctx.content().getFileSize(_filename))
 	}
-	else _url=null;		
+	else _url=null;
 </tml:script>
 
 <tml:if condition="_filename && _url">
@@ -24,7 +29,7 @@
 				<tml:script format="#,##0.0" expression="_filesize"/>
 			</div>
 			<div class="image">
-				<tml:script expression="AFW.content(_ctx.KEY).attachment(_filename).getThumbnailURL({width:100})" var="_url"/>
+				<tml:script expression="AFW.content(_ctx).attachment(_filename).getThumbnailURL({width:100})" var="_url"/>
 				<tml:case condition="_url">
 					<img src="<tml:item name="_url"/>" alt="<tml:script expression="_ctx.content().getFileMetaData(_filename).title || _filename"/>">
 				</tml:case>
@@ -40,7 +45,7 @@
 							break;
 						case "file_info":
 							var filemd = _ctx.content().getFileMetaData(_filename)
-							var type = AFW.content(_ctx.KEY).attachment(_filename).getType().name;
+							var type = AFW.content(_ctx).attachment(_filename).getType().name;
 							var pages = filemd.getCustomFieldValue("pageCount");
 							return "<p>"+filemd.name + "</p>"
 								//+ "<br>"
