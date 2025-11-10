@@ -255,7 +255,7 @@ this.writeContentModulesSettingsData=function(map, doc){
 }
 
 this.getDbKeys = function(){
-	var dblist = WGA.createList()	
+	var dblist = WGA.List()	
 	var dbs=wgacore.getContentdbs().values().iterator();
 	var wgaconfig = wgacore.getWgaConfiguration()
 	var vhost_filter = Packages.de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
@@ -278,7 +278,7 @@ this.getDbKeys = function(){
 		}
 		dblist.add(db.getDbReference());
 	}			
-	return dblist
+	return dblist.sortList();
 }
 
 
