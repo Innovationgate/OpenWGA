@@ -1,9 +1,15 @@
+<tml:action id="delete-item">
+	content().removeItem(tmlparam1);
+	content().save();
+</tml:action>
+
 <table class="table">
 	<thead>
 		<tr>
 			<th>Name</th>
 			<th>Typ</th>
 			<th>Wert</th>
+			<th style="width:1px"></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -12,6 +18,13 @@
 			<td><tml:item name="_itemname"/></td>
 			<td nowrap><tml:item name="$mc.type" a-itemname="_itemname"/></td>
 			<td style="overflow-wrap:anywhere"><tml:item name="$mc.value" a-itemname="_itemname" encode="html"/></td>
+			<td>
+				<tml:case condition="WGA.app().isManager()">
+					<a title="Item löschen" href="<tml:url action="delete-item" param1="{_itemname}"/>">
+						<i class="far fa-trash-alt"></i>
+					</a>
+				</tml:case>
+			</td>
 		</tr>
 	</tml:foreach>
 	</tbody>

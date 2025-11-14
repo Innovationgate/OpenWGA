@@ -140,7 +140,7 @@
 			</div>
 
 			<div class="tab-pane" id="items">
-				<tml:include ref="::items"/>
+				<tml:portlet name="items" ref="::items"/>
 			</div>
 			
 			<div class="tab-pane" id="validity">

@@ -340,19 +340,6 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 	                            requestedDBKey = defaultDBKey;
 	                            httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);
 	                        }
-	                        else {
-	                        	// Db found. Check if (anonymous) requests are allowed. If not check if logins are allowed
-	                        	try {
-									database = _core.openContentDB(database, httpRequest, false);
-									if(!database.isSessionOpen() && !vHost.isLoginsAllowed()) {
-			                            requestedDBKey = defaultDBKey;
-			                            httpRequest = new DefaultDBRequestWrapper(_core, httpRequest, defaultDBKey);										
-									}
-								} catch (WGException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-	                        }
             		    }
 
                     }
