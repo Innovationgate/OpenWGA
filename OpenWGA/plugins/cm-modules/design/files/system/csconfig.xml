@@ -70,8 +70,8 @@
       <uniqueName>de.innovationgate.cm-modules</uniqueName>
       <version>
         <majorVersion>7</majorVersion>
-        <minorVersion>11</minorVersion>
-        <maintenanceVersion>15</maintenanceVersion>
+        <minorVersion>12</minorVersion>
+        <maintenanceVersion>0</maintenanceVersion>
         <patchVersion>0</patchVersion>
         <buildVersion>740</buildVersion>
       </version>
