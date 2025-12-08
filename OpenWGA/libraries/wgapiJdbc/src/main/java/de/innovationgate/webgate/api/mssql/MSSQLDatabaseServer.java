@@ -84,6 +84,10 @@ public class MSSQLDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             if (!path.contains("/")) {
                 //jdbcPath = JDBC_BASE_PATH + hostName + "/" + path;
                 jdbcPath = JDBC_BASE_PATH + hostName + ";databaseName=" + path;
+                String encrypt="false";
+                if(options.get("encrypt")!=null)
+                	encrypt = options.get("encrypt");
+                jdbcPath += ";encrypt=" + encrypt;
             }
             else {
                 jdbcPath = path;
