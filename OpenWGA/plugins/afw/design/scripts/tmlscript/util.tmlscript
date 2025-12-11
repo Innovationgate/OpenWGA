@@ -954,7 +954,7 @@ this.excelReader = function(config){
  *
  *	Columns Definition (config.columns):
  *		Each column is either a Sting or Object.
- *		If String, the itemvalue or metavalue is written (meta if String is all uppercase)
+ *		If String, the itemvalue or metavalue is written (meta if String is all uppercase). Possible format is also label|item-or-meta-name
  *		If Object it must have the format {label:<String>, value: <Function(TMLContext)>}
  *
  *	Sampe usages:
