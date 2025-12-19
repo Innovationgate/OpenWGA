@@ -52,6 +52,12 @@ body .modal-popup{
 				border-radius: 10px;
 				font-size: .7em;
 				cursor: pointer;
+				
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				max-width: 90%;				
+				
 				&:hover{
 					display: block;
 					background: gray;
