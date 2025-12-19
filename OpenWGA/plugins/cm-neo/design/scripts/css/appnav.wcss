@@ -27,6 +27,14 @@
 					color: white;
 				}
 			}
+			.version{
+				position: fixed;
+				bottom: 42px;
+				transform: rotate(270deg);
+				left: -26px;				
+				font-size: .8em;
+				color: silver;			
+			}
 		}
 		.content{
 			position: absolute;

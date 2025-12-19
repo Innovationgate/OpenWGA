@@ -79,7 +79,12 @@
 			</a>			
 			<a href="#" title="Dashboard" data-view="dashboard">
 				<i class="icon fas fa-tachometer-alt"></i>
-			</a>			
+			</a>
+			<div class="version">
+				CM-Neo
+				<br>
+				@{=WGA.design().plugin().version}
+			</div>
 		</tml:option>
 	
 		<tml:option name="appnav">
