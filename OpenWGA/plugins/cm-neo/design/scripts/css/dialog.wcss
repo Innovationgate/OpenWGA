@@ -56,7 +56,7 @@ body .modal-popup{
 				white-space: nowrap;
 				overflow: hidden;
 				text-overflow: ellipsis;
-				max-width: 90%;				
+				max-width: calc(100% - 20px);		
 				
 				&:hover{
 					display: block;
