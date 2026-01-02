@@ -81,7 +81,7 @@
 				<i class="icon fas fa-tachometer-alt"></i>
 			</a>
 			<div class="version">
-				CM-Neo
+				@{=WGA.Brand.name}
 				<br>
 				@{=WGA.design().plugin().version}
 			</div>
