@@ -6,7 +6,7 @@
 	portlet.setmode("select-db")
 </tml:action>
 
-<script>
+<tml:{script} encode="jsmin">
 
 	<tml:if hasurlparameter="dbkey">
 		<tml:then>
@@ -25,4 +25,5 @@
 			})
 		</tml:else>
 	</tml:if>
-</script>
+	
+</tml:{script}>

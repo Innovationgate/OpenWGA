@@ -158,6 +158,13 @@ public class WGAHttpClient {
 			entity = new FileRequestEntity((File)body, contentType);
 		else if(body instanceof WGAFile)
 			entity = new FileRequestEntity(((WGAFile)body).getFile(), contentType);
+		else if(body instanceof Map) {
+			@SuppressWarnings("unchecked")
+			Map<String,String> params = (Map<String,String>)body;
+			for(Map.Entry<String,String> entry: params.entrySet()){
+				method.addParameter(entry.getKey(), entry.getValue());
+			}			
+		}
 		if(entity!=null)
 			method.setRequestEntity(entity);
 		return executeMethod(method, callback);

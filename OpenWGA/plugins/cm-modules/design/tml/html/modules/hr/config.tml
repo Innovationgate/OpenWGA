@@ -27,5 +27,6 @@
 	category:		"Verschiedenes",
 	title:			'<tml:label key="module.horrizontal-line"/>',
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="application_split.png"/>",
-	tml:			'plugin-cm-modules/modules:hr:render'
+	tml:			'plugin-cm-modules/modules:hr:render',
+	outlinetml:		'modules:hr:outline'
 }

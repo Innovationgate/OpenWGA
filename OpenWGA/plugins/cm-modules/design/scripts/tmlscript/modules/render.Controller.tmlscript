@@ -15,8 +15,10 @@ Controller.prototype.prepare = function($option_section, $cx, CMM){
 Controller.prototype.allowedModules = function($cx, $option_modules, CMM){
 	var mods = [];
 	if($option_modules){
-		var parts = $option_modules.split(",")
-		for(let [index, value] in parts)
+		let opts = $option_modules;
+		if(typeof(opts) == "string")
+			opts = opts.split(",")
+		for(let [index, value] in opts)
 			mods.push(value.trim());
 		return JSON.stringify(mods)
 	}
@@ -24,13 +26,17 @@ Controller.prototype.allowedModules = function($cx, $option_modules, CMM){
 		var exclude = [],
 			exclude_categories = [];
 		if($cx.option("exclude-modules")){
-			var parts = $cx.option("exclude-modules").split(",");
-			for(let [index, value] in parts)
+			let opts = $cx.option("exclude-modules");
+			if(typeof(opts) == "string")
+				opts = opts.split(",");
+			for(let [index, value] in opts)
 				exclude.push(value.trim());
 		}
 		if($cx.option("exclude-module-categories")){
-			var parts = $cx.option("exclude-module-categories").split(",");
-			for(let [index, value] in parts)
+			let opts = $cx.option("exclude-module-categories");
+			if(typeof(opts) == "string")
+				opts = opts.split(",");
+			for(let [index, value] in opts)
 				exclude_categories.push(value.trim().toLowerCase());
 		}
 		var modules = CMM.getModuleDefs()

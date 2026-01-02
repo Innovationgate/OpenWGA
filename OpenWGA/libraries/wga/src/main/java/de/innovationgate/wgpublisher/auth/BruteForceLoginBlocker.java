@@ -46,6 +46,7 @@ import de.innovationgate.webgate.api.auth.AuthenticationModule;
 import de.innovationgate.webgate.api.auth.AuthenticationSession;
 import de.innovationgate.webgate.api.auth.RequestAwareAuthenticationModule;
 import de.innovationgate.wga.config.Administrator;
+import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGADomain;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.cluster.tasks.ClearFailedLoginAttemptsTask;
@@ -202,7 +203,11 @@ public class BruteForceLoginBlocker {
         	mail.append("<br>Domain: " + domain.getName());
         	mail.append("<br>");
         	mail.append("<br>Failed Login-Attempts: " + inf.getFailedAttempts());
-        	mail.append("<br>Last Used Credentials (Password): " + credentials);
+        	try {
+				mail.append("<br>Last Used Credentials (encrypted): " + WGA.get(_core).encryptString(credentials.toString()));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
         	
         	if(inf.getIps().size()>0){
         		mail.append("<p>Logins has been requested from the following IP(s):</p>");
@@ -277,7 +282,11 @@ public class BruteForceLoginBlocker {
             	mail.append("<br>");
             	mail.append("<br>Failed Login-Attempts: " + inf.getFailedAttempts());
             	mail.append("<br>Last Login-Application-Key: " + db.getDbReference());
-            	mail.append("<br>Last Used Credentials (Password): " + credentials);
+            	try {
+    				mail.append("<br>Last Used Credentials (encrypted): " + WGA.get(_core).encryptString(credentials.toString()));
+    			} catch (Exception e) {
+    				e.printStackTrace();
+    			}
 
             	if(inf.getIps().size()>0){
             		mail.append("<p>Logins has been requested from the following IP(s):</p>");
