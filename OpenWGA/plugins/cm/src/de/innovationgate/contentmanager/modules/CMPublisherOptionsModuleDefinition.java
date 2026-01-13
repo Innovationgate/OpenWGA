@@ -72,7 +72,7 @@ public class CMPublisherOptionsModuleDefinition implements ModuleDefinition {
 
         LocalizedOptionDefinition accessRightsRestriction = new LocalizedOptionDefinition("CM.accessRightsRestriction", BooleanOptionType.INSTANCE, _bundleLoader);
         accessRightsRestriction.setOptional(true);
-        accessRightsRestriction.setDefaultValue(Boolean.TRUE.toString());
+        accessRightsRestriction.setDefaultValue(Boolean.FALSE.toString());
         options.addOption(accessRightsRestriction);
         
         LocalizedOptionDefinition maxTextUploadSize = new LocalizedOptionDefinition("CM.MaxTextUploadSize", IntegerOptionType.INSTANCE, _bundleLoader);

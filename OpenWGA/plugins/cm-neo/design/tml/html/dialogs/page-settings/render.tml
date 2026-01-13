@@ -48,7 +48,7 @@
 </tml:action>
 
 <tml:script>
-	portlet.context = this;	
+	portlet.context = this;
 </tml:script>
 
 <tml:form id="form-page-settings" context="[$struct:{document.structKey}]" unless="_dialog_closed" mode="{document.mayEditPage() ? 'edit':'view'}">
@@ -88,6 +88,8 @@
 			}
 		])
 
+		_accessRightsRestricted = (db().getAttribute("CM.accessRightsRestriction")=='true' && !WGA.app().isManager())
+
 	</tml:script>
 
 	<div class="header">
@@ -103,7 +105,9 @@
 
 		<ul class="nav nav-tabs">
 			<li class="active"><a data-toggle="tab" href="#basic">Eigenschaften</a></li>
-			<li><a data-toggle="tab" id="tab-access-link" href="#access">Wer darf was ...</a></li>
+			<tml:case unless="_accessRightsRestricted">
+				<li><a data-toggle="tab" id="tab-access-link" href="#access">Wer darf was ...</a></li>
+			</tml:case>
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane active" id="basic">
