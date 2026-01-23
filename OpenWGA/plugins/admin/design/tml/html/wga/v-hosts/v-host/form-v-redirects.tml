@@ -1,3 +1,88 @@
+<tml:comment>
+	CSV-Export
+</tml:comment>
+
+<tml:action id="csv-export">
+	var file = WGA.TempFile(_config_bean.servername + ".csv");
+	
+	AFW.Util.csvWriter({
+		columns: [
+			{
+				label: "requestHosts",
+				value: function(entry){
+					return WGA.List(entry.requestHosts).join(",");
+				}
+			},
+			"path",
+			"redirect",
+			"forward",
+			"permanentRedirect",
+			"enabled"
+		],
+		contentlist: _config_bean.redirects || WGA.List()
+		
+	}).write(file)
+
+	_csv_url = WGA.urlBuilder(file.addToDownloads()).setParameter("forcedownload", "true").build();
+	
+</tml:action>
+<tml:{script} if="_csv_url">
+	window.open("@{_csv_url}");
+</tml:{script}>
+
+<tml:comment>
+	CSV-Import
+</tml:comment>
+
+<tml:action id="request-csv-import">
+	_request_csv_import = true;
+</tml:action>
+<tml:case if="_request_csv_import">
+	<tml:include designdb="@ui" ref="message">
+		<tml:option name="title">CSV-Import</tml:option>
+		<tml:option name="body">
+			<p>
+				Importing from CSV deletes all existing entries.
+			</p>
+			CSV-File:
+			<tml:input name="csv_file" type="file"/>
+			<tml:button clickaction="csv-import">Import</tml:button>
+		</tml:option>	
+	</tml:include>
+</tml:case>
+<tml:action id="csv-import">
+	if(!tmlform.csv_file)
+		return;
+	let redirects = WGA.List();
+	AFW.Util.csvReader({
+		skipLines: 1,
+		columns: [
+			"requestHosts",
+			"path",
+			"redirect",
+			"forward(boolean)",
+			"permanentRedirect(boolean)",
+			"enabled(boolean)"
+		],
+		process: function(data){
+			let redirect = new Packages.de.innovationgate.wga.config.VirtualHostRedirect()
+			redirect.requestHosts = WGA.List(data.requestHosts.split(/\s*,\s*/)).trim();
+			redirect.path = data.path;
+			redirect.redirect = data.redirect;
+			redirect.forward = data.forward
+			redirect.permanentRedirect = data.permanentRedirect;
+			redirect.enabled = data.enabled;
+			redirects.add(redirect);
+		}
+	}).read(tmlform.getfile(tmlform.csv_file))
+	_config_bean.redirects = redirects;
+</tml:action>
+
+
+<tml:comment>
+	Other actions
+</tml:comment>
+
 <tml:action id="addEntry_redirect">
 	if(!tmlform.redirect){
 		_redirect_form_msg = "Please enter redirect Path"
@@ -232,6 +317,11 @@
 	
 		<tml:elseif condition="tmlform.mode()=='edit'">
 			<tml:button clickaction="newEntry_redirect" ajax="true">Add New Redirect ...</tml:button>
+			<tml:button clickaction="request-csv-import" ajax="true">&larr; CSV Import Redirects ...</tml:button>
+		</tml:elseif>
+		
+		<tml:elseif condition="tmlform.mode()=='view'">
+			<tml:button clickaction="csv-export" ajax="true">&rarr; CSV Export Redirects</tml:button>
 		</tml:elseif>
 		
 	</tml:if>
