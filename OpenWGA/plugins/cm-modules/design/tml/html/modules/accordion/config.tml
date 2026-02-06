@@ -41,5 +41,6 @@
 	title:			'<tml:label key="module.accordion-page"/>',
 	icon:			"<tml:url db="@afw" type="file" doc="icons" file="page_white.png"/>",
 	tml:			'modules:accordion:render-page',
+	settingstml:	'modules:accordion:settings-page',
 	allowedparents: ["cm_accordion"]
 }

@@ -1,0 +1,4 @@
+<label>Titel</label>
+<div style="margin:10px">
+	<tml:input name="{scoped:title}"/>
+</div>
