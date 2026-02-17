@@ -9,6 +9,36 @@
 	tabview.deleteCurrentPage();		
 </tml:action>
 
+<tml:action id="cloneVhost">
+	var host = DBM.wgaconfig.getByUid(portlet.getSessionVar('key'));
+
+	// create config bean:
+	var bean = new Packages.de.innovationgate.wga.config.VirtualHost();
+	bean.forceDefaultHost = host.forceDefaultHost;
+	bean.forceSSL = host.forceSSL;
+	
+	bean.robotsTxt = host.robotsTxt;
+	
+	bean.allowedDatabases = host.allowedDatabases;
+	bean.defaultDatabase = host.defaultDatabase;
+	
+	bean.hideDefaultDatabaseInURL = host.hideDefaultDatabaseInURL;
+	bean.hideHomepageURL = host.hideHomepageURL;
+	
+	bean.preferedLanguages = host.preferedLanguages;
+	
+	bean.loginsAllowed = host.loginsAllowed;
+	bean.allowAdminApps = host.allowAdminApps;
+	bean.allowAuthoringApps = host.allowAuthoringApps;
+	
+	// create tab
+	var tabview=createObject("@ui/tabview", portlet.parentportlet);
+	var p=tabview.addPage("wga:v-hosts:v-host:portlet", bean.uid, "New Virtual Host");
+	p.setmode("new");	
+	DBM.wgaconfig.clone(p).getVirtualHosts().add(bean);
+	tabview.refresh();
+</tml:action>
+
 <tml:include designdb="@ui" ref="windowview">
 
 	<tml:option name="config" scope="local">
@@ -28,6 +58,14 @@
 				handler: function(){
 					WGA.ajax.callAction("<tml:action>_querydeletevhost=true</tml:action>",
 						"<tml:script expression="portlet.portletkey"/>");
+				}
+			}
+			,{
+				cls:'x-btn-text-icon',						
+				icon: '<tml:url type="file" db="plugin-wga-app-framework" doc="icons" file="page_copy.png"/>',		                
+				text: "Clone V-Host",
+				handler: function(){
+					WGA.ajax.callAction("<tml:action ref="cloneVhost"/>","<tml:script expression="portlet.portletkey"/>");
 				}
 			}
 			,"-"

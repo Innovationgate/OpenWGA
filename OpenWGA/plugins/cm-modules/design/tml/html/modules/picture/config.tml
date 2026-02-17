@@ -1,7 +1,7 @@
 {
 	id:				'cm_picture',
 	category:		'<tml:label key="module.category.media"/>',
-	title:			'Pictute',
+	title:			'Picture',
 	tml:			'modules:picture:render',
 	settingstml: 	'modules:picture:settings',
 	outlinetml:	 	'modules:image:outline',

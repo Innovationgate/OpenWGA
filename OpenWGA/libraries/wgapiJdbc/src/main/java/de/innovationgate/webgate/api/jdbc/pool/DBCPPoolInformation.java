@@ -25,19 +25,35 @@
 
 package de.innovationgate.webgate.api.jdbc.pool;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-
 
 public class DBCPPoolInformation implements DBCPPoolInformationMBean {
 
     private DBCPConnectionProvider _provider;
     private BasicDataSource _ds;
-
+    private String dbServerName = "unknown";
+    
     public DBCPPoolInformation(DBCPConnectionProvider provider) {
         _provider = provider;
         _ds = _provider.getDs();
+        
+		try {
+			Connection conn = _ds.getConnection();
+			DatabaseMetaData md = conn.getMetaData();
+			dbServerName = md.getDatabaseProductName() + " " + md.getDatabaseProductVersion();
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+    }
+    
+    public String getDbServerName() {
+    	return dbServerName;
     }
     
     /* (non-Javadoc)

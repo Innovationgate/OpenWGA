@@ -71,12 +71,14 @@ this.addPage=function(tml, key, title, newpage){
 		// check if page with given key already exist
 		var portletkeys=this.portlet.getSessionVar("portlets");
 		if (portletkeys != null) {
+			let i=1;
 			for (pInfoXML in Iterator(portletkeys)){
 				var pInfo = new XML(pInfoXML);
 				if (pInfo && pInfo.key==key){
-					this.setCurrentPage(i+1);
+					this.setCurrentPage(i);
 					return;
 				}
+				i++;
 			}
 		}
 	}

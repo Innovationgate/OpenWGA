@@ -1,4 +1,6 @@
-<label>Lade Module erst wenn Tab-Inhalt sichtbar wird:</label>
+<label>Tab-Inhalt:</label>
 <div style="margin:10px">
-	<tml:input name="{scoped:lazy_load_content_on_show}" type="boolean" mode="{option('mode')}"/>
+	<tml:input name="{scoped:lazy_load_content_on_show}" type="boolean" labeled="true" 
+		options="Lade Tab-Inhalt erst wenn Tab aktiv ist|true" 
+		mode="{option('mode')}"/>
 </div>

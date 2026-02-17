@@ -24,7 +24,7 @@
 ## LICENSE END #################################################################
 
 <div class="accordion-header">
-	<tml:option name="title"/>
+	<tml:script expression="CMM.setting('title') || $option_title"/>
 </div>
 <div class="accordion-panel">
 	<tml:include ref="system:include-child-modules">
