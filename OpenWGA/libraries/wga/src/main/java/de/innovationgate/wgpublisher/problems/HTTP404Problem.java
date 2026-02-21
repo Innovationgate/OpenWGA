@@ -30,15 +30,13 @@ import java.util.List;
 
 public class HTTP404Problem extends Problem implements AdditiveProblem<HTTP404Problem> {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
     private Date _lastCall;
     private long _calls;
     private String _uri;
     private String _url;
     private String _host;
+    private String _ip;
 
     public HTTP404Problem(ProblemPath path, ProblemText text, ProblemSeverity severity, ProblemOccasion occasion, Throwable throwable, List<MessageVariableProvider> providers) {
         super(path, text, severity, occasion, throwable, providers);
@@ -47,6 +45,7 @@ public class HTTP404Problem extends Problem implements AdditiveProblem<HTTP404Pr
         _uri = (String) getVariable("uri");
         _url = (String) getVariable("completeurl");
         _host = (String) getVariable("host");
+        _ip = (String) getVariable("ip");
     }
 
     @Override
@@ -73,6 +72,10 @@ public class HTTP404Problem extends Problem implements AdditiveProblem<HTTP404Pr
 
     public String getHost() {
         return _host;
+    }
+
+    public String getIp() {
+        return _ip;
     }
 
 }

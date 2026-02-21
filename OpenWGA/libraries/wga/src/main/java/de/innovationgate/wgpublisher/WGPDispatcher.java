@@ -210,12 +210,14 @@ public class WGPDispatcher extends HttpServlet {
         private String _dbKey;
         private String _completeUrl;
         private String _host;
+        private String _ip;
 
         public PathDispatchingOccasion(HttpServletRequest req, String dbKey) {
             _uri = req.getRequestURI();
             _completeUrl = req.getRequestURL().toString();
             _host = req.getServerName();
             _dbKey = dbKey;
+            _ip = req.getRemoteAddr();
         }
 
         @Override
@@ -240,7 +242,10 @@ public class WGPDispatcher extends HttpServlet {
 
         @Override
         public Problem.Vars getDefaultMessageVariables() {
-            return Problem.var("uri", _uri).var("completeurl", _completeUrl).var("host", _host);
+            return Problem.var("uri", _uri)
+            			.var("completeurl", _completeUrl)
+            			.var("host", _host)
+            			.var("ip", _ip);
         }
 
         @Override
@@ -263,7 +268,11 @@ public class WGPDispatcher extends HttpServlet {
         protected String getHost() {
             return _host;
         }
-        
+
+        protected String getIp() {
+            return _ip;
+        }
+
     }
 
     public static class URLID {
@@ -997,7 +1006,7 @@ public class WGPDispatcher extends HttpServlet {
         catch (HttpErrorException exc) {
             request.setAttribute(WGACore.ATTRIB_EXCEPTION, exc);
             ProblemOccasion occ = new PathDispatchingOccasion(request, exc.getDbHint());
-            _core.getProblemRegistry().addProblem(Problem.create(occ, "dispatching.http404#" + request.getRequestURL(), ProblemSeverity.LOW));
+            _core.getProblemRegistry().addProblem(Problem.create(occ, "dispatching.http404#" + request.getRemoteAddr() + ":" + request.getRequestURL(), ProblemSeverity.LOW));
             if (!response.isCommitted()) {
                 // throw exception to display errorpage - with senderror() the
                 // applicationserver use the buildin errorpage
