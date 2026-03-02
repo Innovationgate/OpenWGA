@@ -28,12 +28,9 @@ package de.innovationgate.webgate.api.mysql;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.Driver;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -45,7 +42,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
-import de.innovationgate.utils.UIDGenerator;
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGBackendException;
@@ -55,15 +51,12 @@ import de.innovationgate.webgate.api.WGDatabaseCore;
 import de.innovationgate.webgate.api.WGFactory;
 import de.innovationgate.webgate.api.WGInvalidDatabaseException;
 import de.innovationgate.webgate.api.WGNotSupportedException;
-import de.innovationgate.webgate.api.jdbc.WGDocumentImpl;
-import de.innovationgate.webgate.api.jdbc.custom.JDBCSource.TableName;
 import de.innovationgate.webgate.api.servers.DatabaseInformation;
 import de.innovationgate.webgate.api.servers.ServerDatabaseRetriever;
 import de.innovationgate.webgate.api.servers.WGDatabaseServer;
 import de.innovationgate.wga.config.Database;
 import de.innovationgate.wga.config.DatabaseServer;
 import de.innovationgate.wga.modules.ModuleDefinition;
-import de.innovationgate.wga.modules.OptionDefinitionsMap;
 import de.innovationgate.wga.modules.options.OptionReader;
 import de.innovationgate.wga.modules.types.DatabaseServerModuleType;
 
@@ -93,7 +86,7 @@ public class MySqlServerDatabaseRetriever implements ServerDatabaseRetriever {
             String path = options.get(Database.OPTION_PATH);
             String jdbcPath;
             if (!path.contains("/")) {
-                jdbcPath = MySqlDatabaseServer.JDBC_BASE_PATH + hostName + "/" + path;
+            	jdbcPath = dbServer.getJdbcBasePath() + hostName + "/" + path;
             }
             else {
                 jdbcPath = path;
@@ -102,7 +95,7 @@ public class MySqlServerDatabaseRetriever implements ServerDatabaseRetriever {
             // Retrieve driver
             Driver driver;
             try {
-                driver = DriverManager.getDriver(MySqlDatabaseServer.JDBC_BASE_PATH);
+                driver = DriverManager.getDriver(dbServer.getJdbcBasePath());
             }
             catch (Exception e) {
                 throw new WGInvalidDatabaseException("Cannot create database bc. of exception when retrieving driver: " + e.getClass().getName() + " - " + e.getMessage(), e);
@@ -118,7 +111,6 @@ public class MySqlServerDatabaseRetriever implements ServerDatabaseRetriever {
             // First connect to verify the database does not yet exist
             Connection con;
             try {
-                //con = driver.connect(jdbcPath, props);
                 con = DriverManager.getConnection(jdbcPath, props);
                 con.close();
                 throw new WGInvalidDatabaseException("Cannot create database bc. it already exists");
@@ -206,7 +198,7 @@ public class MySqlServerDatabaseRetriever implements ServerDatabaseRetriever {
             String masterUser = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_USER);
             String masterPassword = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_PASSWORD);
             
-            String jdbcPath = MySqlDatabaseServer.JDBC_BASE_PATH + hostName;
+            String jdbcPath = dbServer.getJdbcBasePath() + hostName;
             
             Properties props = new Properties();
             
@@ -218,7 +210,6 @@ public class MySqlServerDatabaseRetriever implements ServerDatabaseRetriever {
                 props.put("password", "");
             }
             
-            //Connection con = driver.connect(jdbcPath, props);
             Connection con = DriverManager.getConnection(jdbcPath, props);
             Statement showDbsStmt = null;
             try {
@@ -312,7 +303,7 @@ public class MySqlServerDatabaseRetriever implements ServerDatabaseRetriever {
             String path = options.get(Database.OPTION_PATH);
             String jdbcPath;
             if (!path.contains("/")) {
-                jdbcPath = MySqlDatabaseServer.JDBC_BASE_PATH + hostName + "/" + path;
+                jdbcPath = dbServer.getJdbcBasePath() + hostName + "/" + path;
             }
             else {
                 jdbcPath = path;

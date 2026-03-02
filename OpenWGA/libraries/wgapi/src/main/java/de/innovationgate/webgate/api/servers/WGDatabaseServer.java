@@ -37,7 +37,6 @@ import de.innovationgate.webgate.api.WGFactory;
 import de.innovationgate.webgate.api.WGInvalidDatabaseException;
 import de.innovationgate.webgate.api.modules.dbs.DatabaseProperties;
 import de.innovationgate.webgate.api.modules.servers.DatabaseServerProperties;
-import de.innovationgate.wga.config.DatabaseServer;
 import de.innovationgate.wga.modules.ModuleDefinition;
 import de.innovationgate.wga.modules.ModuleDependencyException;
 import de.innovationgate.wga.modules.types.ContentDatabaseModuleType;
@@ -297,5 +296,9 @@ public abstract class WGDatabaseServer {
     }
     
     public void importState(WGDatabaseServer oldServer) {
+    }
+    
+    public String getJdbcBasePath() {
+    	return "";
     }
 }

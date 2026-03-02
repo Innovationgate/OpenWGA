@@ -41,6 +41,7 @@ import de.innovationgate.webgate.api.jdbc.modules.dbs.MSSQLDatabaseServerModuleD
 import de.innovationgate.webgate.api.jdbc.modules.dbs.MSSQLEnhancedQueryDatabaseModuleDefinition;
 import de.innovationgate.webgate.api.jdbc.modules.dbs.MSSQLPersDBModuleDefinition;
 import de.innovationgate.webgate.api.jdbc.modules.dbs.MSSQLQueryDatabaseModuleDefinition;
+import de.innovationgate.webgate.api.jdbc.modules.dbs.MariaDbDatabaseServerModuleDefinition;
 import de.innovationgate.webgate.api.jdbc.modules.dbs.MySQLCSModuleDefinition;
 import de.innovationgate.webgate.api.jdbc.modules.dbs.MySQLDatabaseServerModuleDefinition;
 import de.innovationgate.webgate.api.jdbc.modules.dbs.MySQLEnhancedQueryDatabaseModuleDefinition;
@@ -72,6 +73,7 @@ public class JDBCRegistrar implements ModuleRegistrar {
         registry.addModuleDefinition(new JNDIDatabaseServerModuleDefinition());
         registry.addModuleDefinition(new MSSQLDatabaseServerModuleDefinition());
         registry.addModuleDefinition(new PostgresqlDatabaseServerModuleDefinition());
+        registry.addModuleDefinition(new MariaDbDatabaseServerModuleDefinition());
         
         // Content Databases
         if (useGeneric) {

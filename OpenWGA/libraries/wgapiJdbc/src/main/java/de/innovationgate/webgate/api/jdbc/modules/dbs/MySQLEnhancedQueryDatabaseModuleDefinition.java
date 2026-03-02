@@ -33,6 +33,7 @@ import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.jdbc.JDBCServerDatabaseRetriever;
 import de.innovationgate.webgate.api.jdbc.JNDIServerDatabaseRetriever;
 import de.innovationgate.webgate.api.jdbc.custom.JDBCSource;
+import de.innovationgate.webgate.api.mariadb.MariaDbDatabaseServer;
 import de.innovationgate.webgate.api.modules.dbs.DatabaseProperties;
 import de.innovationgate.webgate.api.modules.dbs.GenericContentDatabaseModuleDefinition;
 import de.innovationgate.webgate.api.mysql.MySqlDatabaseServer;
@@ -104,7 +105,15 @@ public class MySQLEnhancedQueryDatabaseModuleDefinition extends GenericContentDa
         	DriverManager.getDriver(MySqlDatabaseServer.JDBC_BASE_PATH);
         }
         catch (SQLException e) {
-            throw new ModuleDependencyException("The MySQL JDBC Driver \"Connector/J\" is not in classpath");
+
+        	// this module currently is also used by mariaDB server.
+        	try {
+        		DriverManager.getDriver(MariaDbDatabaseServer.JDBC_BASE_PATH);
+        	}
+        	catch (SQLException e2) {
+        		throw new ModuleDependencyException("MySQL/MariaDb JDBC Driver not found");
+        	}
+
         }
     }
 
