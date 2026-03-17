@@ -119,7 +119,7 @@
 								</tml:option>
 							</tml:include>									
 								<td>								
-									<tml:image doc="nuvola" file="server.png">
+									<tml:image doc="nuvola" file="{_server.config?'server.png':'wordprocessing.png'}">
 										align="left" width="28" height="28"
 					 				</tml:image>
 								</td>
