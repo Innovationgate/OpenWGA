@@ -44,6 +44,10 @@
 	}
 </tml:action>
 
+<tml:action id="hide-databases">
+	portlet.showDatabases=false;
+</tml:action>
+
 <tml:include designdb="@ui" ref="windowview">
 
 	<tml:option name="config" scope="local">
@@ -229,7 +233,7 @@
 		<tml:if condition="portlet.showDatabases">
 			<tml:then>
 				<br>
-				<tml:include designdb="@ui" ref="windowview">			
+				<tml:include designdb="@ui" ref="windowview">
 					<tml:option name="title">
 						<tml:label key="{'databases.'+(option('dbtype')||'all')}"/> in
 						<tml:form id="filter-server" source="portletsessionvars" cssstyle="display:inline">
@@ -244,7 +248,18 @@
 							</tml:script>
 							<tml:input name="filter" type="select" optionsitem="_opts" changeaction="$store" ajax="true"/>
 						</tml:form>
-					</tml:option>				
+					</tml:option>
+					<tml:option name="config" scope="local">
+						tools: [
+							{
+								id: "close",
+								qtip: "close",
+								handler: function(){
+									WGA.ajax.callAction('<tml:action ref="hide-databases"/>', '<tml:script expression="portlet.portletkey"/>')
+								}
+							}
+						]
+					</tml:option>					
 					<tml:option name="body">			
 						<tml:include ref="webprojects:projects-by-domain-listview">				
 							<tml:option name="dbserver"><tml:item name="key"/></tml:option>

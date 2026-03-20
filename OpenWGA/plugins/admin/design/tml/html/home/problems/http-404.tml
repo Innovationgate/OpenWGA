@@ -90,6 +90,7 @@
 							}
 						</tml:script>
 						</span>
+						<br>Requested from IP @{problem.ip}
 						<tml:case condition="!(problem instanceof Packages.de.innovationgate.wgpublisher.problems.HTTP404Problem)">
 							<br><tml:script expression="problem.getMessage(java.util.Locale.getDefault())"/>
 							<tml:comment><br><tml:script expression="problem.getDescription(java.util.Locale.getDefault())"/>

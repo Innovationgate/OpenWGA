@@ -33,6 +33,7 @@ import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.hsql.HsqlServerDatabaseRetriever;
 import de.innovationgate.webgate.api.jdbc.JNDIServerDatabaseRetriever;
+import de.innovationgate.webgate.api.mariadb.MariaDbDatabaseServer;
 import de.innovationgate.webgate.api.modules.dbs.DatabaseProperties;
 import de.innovationgate.webgate.api.modules.dbs.GenericPersonalisationDatabaseModuleDefinition;
 import de.innovationgate.webgate.api.mysql.MySqlDatabaseServer;
@@ -97,7 +98,13 @@ public class MySQLPersDBModuleDefinition extends GenericPersonalisationDatabaseM
         	DriverManager.getDriver(MySqlDatabaseServer.JDBC_BASE_PATH);
         }
         catch (SQLException e) {
-            throw new ModuleDependencyException("The MySQL JDBC Driver \"Connector/J\" is not in classpath");
+        	// this module currently is also used by mariaDB server.
+        	try {
+        		DriverManager.getDriver(MariaDbDatabaseServer.JDBC_BASE_PATH);
+        	}
+        	catch (SQLException e2) {
+        		throw new ModuleDependencyException("MySQL/MariaDb JDBC Driver not found");
+        	}
         }
     }
 

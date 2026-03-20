@@ -45,7 +45,7 @@
 
 		<table width="100%" class="collection">
 			<tr class="collection-title">
-				<td>Session</td>
+				<td>IP</td>
 				<td># Requests</td>
 				<td>Last access</td>
 				<td>Last app</td>
@@ -57,11 +57,11 @@
 						<a href="#"
 								title = "Click to show more info" 
 								onclick="DBM.showHideElement('sinfo_<tml:script expression="_s.getSessionId()"/>')">
-							<tml:script expression="_s.getSessionId()"/>
+							@{_s.remoteHost}
 						</a>
 					</td>
 					<td><tml:script expression="_s.getRequests()"/></td>
-					<td><tml:script format="{label('format.date.with-exact-time')}" expression="_s.getLastAccess()"/></td>
+					<td><tml:script format="dd.MM.yyyy HH:mm:ss" expression="_s.getLastAccess()"/></td>
 					<td><tml:script expression="_s.getLastApp()"/></td>
 					<td>
 						<tml:script>
@@ -79,8 +79,8 @@
 					<td colspan="5" style="border-bottom: solid silver 1px">					
 						<fieldset id="sinfo_<tml:script expression="_s.getSessionId()"/>" style="display:none">
 							
-							<label>IP:</label>
-							<div class="data"><tml:script expression="_s.getRemoteHost()"/></div>
+							<label>Session ID:</label>
+							<div class="data">@{_s.sessionId}</div>
 							<div class="clear"/></div>
 							
 							<label>User Agent:</label>

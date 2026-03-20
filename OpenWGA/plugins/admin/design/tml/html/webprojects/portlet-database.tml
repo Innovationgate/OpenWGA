@@ -79,7 +79,19 @@
 				</tml:then>
 				<tml:else>
 					Server: <b><a href="#" onclick="Ext.lib.Event.stopEvent(event);switchToObject('dbservers', '<tml:script expression="_db.dbServer"/>')">
-						<tml:script expression="wgacore.getDatabaseServers().get(_db.dbServer).getTitle(DBM.locale)"/></a></b>
+						<tml:script>
+							// special handling for default HSQL-Db-Server that is not part of the config
+							let server = DBM.wgaconfig.get().getDatabaseServer(_db.dbServer)
+							if(server)
+								return server.title
+							else {
+								// may be default HSQL-Db-Server
+								let server = wgacore.getDatabaseServers().get(_db.dbServer);
+								if(server)
+									return server.getTitle(DBM.locale)
+								else return "Server not found";
+							}
+						</tml:script></a></b>
 				</tml:else>
 			</tml:if>
 		</div>		

@@ -87,7 +87,12 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
     private JDBCCatalogSwitchingConnectionPool _pool = null;
     private Boolean _usePool;
 	private DBCPPoolInformation _poolInfo;
-    
+
+	@Override
+    public String getJdbcBasePath() {
+    	return JDBC_BASE_PATH;
+    }
+
     @Override
     public void testConnection() throws ServerConnectionException {
         
@@ -106,7 +111,7 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
         String path = options.get(Database.OPTION_PATH);
         String jdbcPath;
         if (!path.contains("/")) {
-            jdbcPath = JDBC_BASE_PATH + hostName + "/" + path;
+            jdbcPath = getJdbcBasePath() + hostName + "/" + path;
         }
         else {
             jdbcPath = path;
@@ -131,7 +136,7 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
             String masterUser = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_USER);
             String masterPassword = (String) serverOptionReader.readOptionValueOrDefault(DatabaseServer.OPTION_MASTERLOGIN_PASSWORD);
 			
-			String jdbcPath = JDBC_BASE_PATH + hostName;
+			String jdbcPath = getJdbcBasePath() + hostName;
 			if (db != null) {
 				jdbcPath += "/" + db.getOptions().get(Database.OPTION_PATH);
 			}
@@ -323,7 +328,7 @@ public class MySqlDatabaseServer extends WGDatabaseServer implements JDBCDatabas
         if (_pool == null) {
             
             // Build configuration
-            String path = JDBC_BASE_PATH + buildHostName();
+            String path = getJdbcBasePath() + buildHostName();
     
             // Configure and build pool
             Properties poolProps = new Properties();

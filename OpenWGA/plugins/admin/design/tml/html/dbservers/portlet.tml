@@ -74,13 +74,19 @@
 				</tml:option>
 			
 				<tml:option name="title">
-					Alle Datenbankserver
+					Database Server
 				</tml:option>
 				
 				<tml:option name="body">
 
 					<tml:script>
-						_servers = DBM.dbservers.getAll().values();
+						_servers = WGA.List(DBM.dbservers.getAll().values()).sortList(function(a, b){
+							if(a.config && b.config)
+								return (a.title < b.title) ? -1 : (a.titel == b.title) ? 0 : 1;
+							if(a.config)
+								return -1;
+							return 1			 
+						})
 					</tml:script>
 					
 					<table class="collection" width="100%">
@@ -91,6 +97,13 @@
 							<td></td>
 						</tr>
 						<tml:foreach type="itemvalue" item="_servers" currentvalue="_server">
+							<tml:groupchange expression="_server.config" id="gc">
+								<tml:case unless="_server.config">
+									<tr>
+										<td colspan="4" style="padding-top:20px">Internal Database Servers</td>
+									</tr>
+								</tml:case>
+							</tml:groupchange>
 							<tml:script>
 								// is server config enabled?
 								_enabled = true;
@@ -106,13 +119,15 @@
 								</tml:option>
 							</tml:include>									
 								<td>								
-									<tml:image doc="nuvola" file="server.png">
+									<tml:image doc="nuvola" file="{_server.config?'server.png':'wordprocessing.png'}">
 										align="left" width="28" height="28"
 					 				</tml:image>
 								</td>
 
-								<td><tml:script expression="_server.title"/></td>
-								<td>
+								<td style="vertical-align:middle">
+									<tml:script expression="_server.title"/>
+								</td>
+								<td style="vertical-align:middle">
 									<tml:script>
 										try{
 											var mod = DBM.getModuleDefinition("DatabaseServer", _server.implClassName);
@@ -125,11 +140,11 @@
 										}
 									</tml:script>
 								</td>
-								<td align="right">
+								<td align="right" style="vertical-align:middle">
 									<tml:case condition="!_enabled">
 										disabled
 									</tml:case>
-									<tml:case condition="!_server.runtime">
+									<tml:case condition="_enabled && !_server.runtime">
 										<div style="color:red">not avaliable</div>
 									</tml:case>
 								</td>

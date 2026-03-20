@@ -39,6 +39,7 @@ public class VirtualHostDenialProblem extends Problem implements AdditiveProblem
     private String _uri;
     private String _url;
     private String _host;
+    private String _ip;
 
     public VirtualHostDenialProblem(ProblemPath problemPath, ProblemText text, ProblemSeverity severity, ProblemOccasion occasion, Throwable throwable, List<MessageVariableProvider> providers) {
         super(problemPath, text, severity, occasion, throwable, providers);
@@ -47,6 +48,7 @@ public class VirtualHostDenialProblem extends Problem implements AdditiveProblem
         _uri = (String) getVariable("uri");
         _url = (String) getVariable("completeurl");
         _host = (String) getVariable("host");
+        _ip = (String) getVariable("ip");
     }
     
 
@@ -74,6 +76,10 @@ public class VirtualHostDenialProblem extends Problem implements AdditiveProblem
 
     public String getHost() {
         return _host;
+    }
+
+    public String getIp() {
+        return _ip;
     }
 
 }
