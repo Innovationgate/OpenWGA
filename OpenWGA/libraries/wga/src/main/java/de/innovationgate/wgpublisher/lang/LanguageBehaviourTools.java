@@ -47,6 +47,7 @@ import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.labels.WGAResourceBundle;
 import de.innovationgate.wgpublisher.labels.WGAResourceBundleManager;
 import de.innovationgate.wgpublisher.webtml.utils.TMLContext;
+import de.innovationgate.wgpublisher.webtml.utils.TMLContextEnvironment.RootEnvironmentUserData;
 
 public class LanguageBehaviourTools {
     
@@ -165,13 +166,15 @@ public class LanguageBehaviourTools {
         if (context.iswebenvironment()) {
             locales = Collections.list(context.getrequest().getLocales());
         }
-        else if (context.getEnvironment().getRootEnvironmentUserData().getLocales() != null) {
-            locales = context.getEnvironment().getRootEnvironmentUserData().getLocales();
-        }
         else {
-            return null;
+        	RootEnvironmentUserData re = context.getEnvironment().getRootEnvironmentUserData();
+        	if(re==null) {
+        		return null;
+        	}
+        	locales = re.getLocales();
+        	if(locales==null)
+        		return null;
         }
-            
         
         for (Locale locale : locales) {
             try {
