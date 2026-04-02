@@ -1,0 +1,26 @@
+function Controller(){
+
+	this.prepare = function(CMM, $cx){
+		this.condition={};
+		let condition = CMM.settings().value("condition")
+		var script = WGA.design($cx.db()).resolveSystemScriptModule("content-manager:conditions", "tmlscript")
+		if(script){
+			try{
+				var conditions = script.executeTMLScript($cx);
+				this.condition = conditions[condition];
+			}
+			catch(e){
+				//logException(e);
+				console.error("Error in conditions.tmlscript", e);
+			}
+		}			
+		
+	}.nonIsolated();	// nessesarry for Request object to be available in executed script conditions.tmlscript
+		
+	this.info = function($cx){
+		return "Bedingung '" + this.condition.label + "' "
+			+ (this.condition.condition ? "ist erfüllt" : "ist <b>nicht</b> erfüllt")
+			+ "."
+	}
+	
+}
