@@ -5624,6 +5624,16 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     	return false;
     }
 
+	/**
+	 * Tests the general visibility of this content (see WGContent.isVisibleNow())
+	 * @return boolean
+	 * @throws WGAPIException 
+	 */
+    @Override
+    public boolean isVisibleNow() throws WGAPIException {
+    	return content().isVisibleNow();
+    }
+    
 	@Override
 	public String loginurl() throws WGException {
         return getURLBuilder().buildLoginURL(db(), getrequest(), contenturl());
