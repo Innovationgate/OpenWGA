@@ -240,15 +240,8 @@ public class BruteForceLoginBlocker {
     public int login(WGDatabase db, String username, Object credentials, String filter, HttpServletRequest request) throws WGAPIException {
 
     	String ip=null;
-        if(request!=null) {
-        	
-        	VirtualHost vHost = (VirtualHost)request.getAttribute(WGAVirtualHostingFilter.REQUESTATTRIB_VIRTUAL_HOST);
-        	if(vHost!=null && !vHost.isLoginsAllowed()) {
-        		username = WGDatabase.ANONYMOUS_USER;
-        		credentials = null;
-        	}        
+        if(request!=null)
         	ip = (String)request.getAttribute(WGAFilter.REQATTRIB_ORIGINAL_IP);
-        }
 
         String domainName = (String) db.getAttribute(WGACore.DBATTRIB_DOMAIN);
         WGADomain domain = _core.getDomains(domainName);

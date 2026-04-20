@@ -266,13 +266,17 @@ public class WGPRequestPath {
             // Prepare HTTP credentials if available
             String credentials = request.getHeader("Authorization");
             if (credentials != null && credentials.trim().toLowerCase().startsWith("basic")) {
-                DBLoginInfo loginInfo = DBLoginInfo.createFromHttpCredentials(credentials);
-                if (loginInfo != null) {
-                    // Look if ANY media key uses HTTP login. Only if so we accept this login
-                    if (isHttpLoginUsed(database)) {
-                        request.setAttribute(REQATTRIB_HTTPLOGIN, loginInfo);
-                    }
-                }
+            	// check v-host for allowed logins. Ignore credentials if logins are not allowed.
+            	VirtualHost vHost = (VirtualHost)request.getAttribute(WGAVirtualHostingFilter.REQUESTATTRIB_VIRTUAL_HOST);
+            	if(vHost==null || vHost.isLoginsAllowed()) {
+	                DBLoginInfo loginInfo = DBLoginInfo.createFromHttpCredentials(credentials);
+	                if (loginInfo != null) {
+	                    // Look if ANY media key uses HTTP login. Only if so we accept this login
+	                    if (isHttpLoginUsed(database)) {
+	                        request.setAttribute(REQATTRIB_HTTPLOGIN, loginInfo);
+	                    }
+	                }
+            	}
             }
             
             this.database = core.openContentDB(database, request, this.masterLogin);
