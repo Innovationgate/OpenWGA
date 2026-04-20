@@ -477,7 +477,9 @@ public class Design {
             return applyLabelParams(label, params);
         }
         else if (usePlaceholder) {
-            return "#[" + designDB.getDbReference() + "/" + containerName + "/" + fileName + "]." + key;
+            return "#[" + designDB.getDbReference() + "/" + containerName
+            		+ "_" + _wga.tmlcontext().content().getLanguage().getName()
+            		+ "/" + fileName + "]." + key;
         }
         else {
             return null;
