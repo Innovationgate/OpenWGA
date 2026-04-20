@@ -2012,7 +2012,7 @@ public class WGA {
     }
     
     /**
-     * Creates a WGAPI URLBuilder object to contruct and modify URLs, using the current request URL
+     * Creates a WGAPI URLBuilder object to construct and modify URLs, using the current request URL
      * @return URL Builder object
      * @throws WGException
      */
@@ -2033,6 +2033,15 @@ public class WGA {
     		getLog().error("WGA.redirectTo() called in isolated environment. No request/response availabe.");
     	}
     	else ((TMLContext) tmlcontext()).redirectto(url);
+    }
+    
+    /**
+     * Redirects the users browser to a specified page (without url parameters)
+     * @throws WGException 
+     * @throws IOException 
+     */
+    public void redirectTo(TMLContext ctx) throws WGException, IOException {
+    	redirectTo(ctx.contenturl());
     }
     
     /**
