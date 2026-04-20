@@ -46,12 +46,14 @@ import de.innovationgate.webgate.api.auth.AuthenticationModule;
 import de.innovationgate.webgate.api.auth.AuthenticationSession;
 import de.innovationgate.webgate.api.auth.RequestAwareAuthenticationModule;
 import de.innovationgate.wga.config.Administrator;
+import de.innovationgate.wga.config.VirtualHost;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGADomain;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.cluster.tasks.ClearFailedLoginAttemptsTask;
 import de.innovationgate.wgpublisher.cluster.tasks.DistributeFailedLoginAttemptInformationTask;
 import de.innovationgate.wgpublisher.filter.WGAFilter;
+import de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
 import de.innovationgate.wgpublisher.mail.WGAMailNotification;
 
 public class BruteForceLoginBlocker {
@@ -238,8 +240,15 @@ public class BruteForceLoginBlocker {
     public int login(WGDatabase db, String username, Object credentials, String filter, HttpServletRequest request) throws WGAPIException {
 
     	String ip=null;
-        if(request!=null)
+        if(request!=null) {
+        	
+        	VirtualHost vHost = (VirtualHost)request.getAttribute(WGAVirtualHostingFilter.REQUESTATTRIB_VIRTUAL_HOST);
+        	if(vHost!=null && !vHost.isLoginsAllowed()) {
+        		username = WGDatabase.ANONYMOUS_USER;
+        		credentials = null;
+        	}        
         	ip = (String)request.getAttribute(WGAFilter.REQATTRIB_ORIGINAL_IP);
+        }
 
         String domainName = (String) db.getAttribute(WGACore.DBATTRIB_DOMAIN);
         WGADomain domain = _core.getDomains(domainName);
