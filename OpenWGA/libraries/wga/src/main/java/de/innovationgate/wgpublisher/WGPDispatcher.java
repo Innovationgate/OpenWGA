@@ -523,7 +523,7 @@ public class WGPDispatcher extends HttpServlet {
 
             	VirtualHost vHost = (VirtualHost)request.getAttribute(WGAVirtualHostingFilter.REQUESTATTRIB_VIRTUAL_HOST);
             	if(vHost!=null && (vHost.getAllowedDatabases().isEmpty() || !vHost.isLoginsAllowed())) {
-            		_log.error("Logins not allowed on vHost '" + vHost.getServername() + "' requested from IP " + request.getRemoteAddr() + " on path " + String.valueOf(request.getRequestURL()));
+            		_log.warn("Logins not allowed on vHost '" + vHost.getServername() + "' requested from IP " + request.getRemoteAddr() + " on path " + String.valueOf(request.getRequestURL()));
             		response.sendError(HttpServletResponse.SC_FORBIDDEN, "Logins not allowed");
             		return;
             	}
