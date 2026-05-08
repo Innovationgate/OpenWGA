@@ -1134,7 +1134,9 @@ public class WGPDispatcher extends HttpServlet {
             try {
                 String lastRedirectValue = new String(Hex.decodeHex(lastRedirectCookie.getValue().toCharArray()), "UTF-8");
                 if (redirectPath.equals(lastRedirectValue)) {
-                    getCore().getLog().warn("Unredirectable request with incomplete URL: " + request.getRequestURI() + ". Reason: Endless redirect to:" + redirectPath);
+                    getCore().getLog().warn("Unredirectable request with incomplete URL: " 
+                    		+ request.getProtocol() + " " + request.getMethod() + " " + request.getRequestURL() 
+                    		+ ". Reason: Endless redirect to:" + redirectPath);
                     return false;
                 }
             }
