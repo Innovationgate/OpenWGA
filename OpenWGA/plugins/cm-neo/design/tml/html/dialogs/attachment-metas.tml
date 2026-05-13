@@ -161,8 +161,9 @@
 				<tml:script>
 					// check for image scaler
 					_scaler = Packages.de.innovationgate.wgpublisher.webtml.utils.ImageScalerFactory.createMimeTypeSpecificImageScaler(WGA.getCore(), _file_md.mimeType)
+					_script = WGA.design(db()).resolveSystemScriptModule("content-manager:image-crop-sizes", "tmlscript")
 				</tml:script>
-				<tml:button cssclass="btn btn-default" clickaction="crop-image" if="_scaler">
+				<tml:button cssclass="btn btn-default" clickaction="crop-image" if="_scaler & _script">
 					<i class="fa-solid fa-crop-simple"></i>
 					Bild beschneiden
 				</tml:button>
