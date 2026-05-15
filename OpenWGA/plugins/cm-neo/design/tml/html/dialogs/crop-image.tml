@@ -1,0 +1,286 @@
+<tml:action id="edit-metas">
+	portlet.fireevent("open-dialog", {
+		dialog: "attachment-metas",
+		filename: portlet.filename
+	})
+	_closed=true;
+</tml:action>
+
+<tml:action id="crop-image">
+	var selectedX = parseInt(tmlform.field('x'));
+	var selectedY = parseInt(tmlform.field('y'));
+	var selectedWidth = parseInt(tmlform.field('width'));
+	var selectedHeight = parseInt(tmlform.field('height'));
+	
+	var targetName = tmlform.save_as + ".png";
+	var sourceName = portlet.filename;
+	if (sourceName && content().hasFile(sourceName)) {
+		var img = content().getFileData(sourceName);
+		var sc = createimagescaler(img);
+		sc.usePNGForOutput();
+		
+		if (content().hasFile(targetName)) {
+			content().removeFile(targetName);
+			content().save();
+		}
+
+		sc.crop(selectedX, selectedY, 
+			Math.min(selectedWidth, sc.width-selectedX), 
+			Math.min(selectedHeight, sc.height-selectedY)
+		);
+		
+		attachScaledImage(content(), sc, tmlform.save_as);
+		content().save();
+		
+		portlet.fireevent("close-dialog")
+		portlet.fireevent("attachments-updated", {
+			filename: targetName
+		})
+		_closed=true;
+		
+	}
+</tml:action>
+
+<tml:form id="crop-form" unless="_closed">
+
+	<tml:input name="x" type="hidden"/>
+	<tml:input name="y" type="hidden"/>
+	<tml:input name="width" type="hidden"/>
+	<tml:input name="height" type="hidden"/>
+
+	<tml:script>
+		var filename = request.getParameter("filename")
+		if(filename){
+			portlet.filename = filename
+			var els = filename.split(".")
+			var ext = els.pop();
+			_save_as = els.join(".") + "-crop";
+		}
+		
+		let script = WGA.design(db()).resolveSystemScriptModule("content-manager:image-crop-sizes", "tmlscript")
+		_crop_options = WGA.List(["Original|original"]);
+		if(script){
+			_crop_options.addAll(script.executeTMLScript());
+		}
+		_crop_options.add("Beliebig|free");
+		//console.log("_crop_options", _crop_options)
+	</tml:script>
+
+	<div class="header">
+		Bild @{filename type="portlet"} beschneiden
+		<a data-modal="hide">&times;</a>
+	</div>
+	
+	<div class="content">
+		<div class="cols">
+			<div class="image">
+				<div class="image-container">
+					<tml:image file="{portlet.filename}"/>
+					
+					<div class="top"></div>
+					<div class="bottom"></div>
+					<div class="left"></div>
+					<div class="right"></div>
+					
+					<div class="crop">
+						<div class="border">
+							<div class="line-h t"></div>
+							<div class="line-h b"></div>
+							<div class="line-v l"></div>
+							<div class="line-v r"></div>
+						</div>
+					</div>				
+					
+				</div>
+			</div>
+			<div class="form">
+				
+				<label>Seitenverhältnis</label>
+				<br>
+				<tml:input cssclass="form-control" name="aspectRatio" type="select" optionsitem="_crop_options"/>
+				<br>
+				
+				<div style="margin:0 0 20px 0">
+					<label>Original Bildgröße</label>
+					<div>
+						<tml:script>
+							let md = content().getFileMetaData(portlet.filename)
+							return md.getDisplayWidth() + " x " + md.getDisplayHeight() 
+						</tml:script> Pixel
+					</div>
+				</div>
+
+				<div class="new-size">
+					<label>Neue Bildgröße</label>
+					<div class="img-size"></div>
+				</div>
+				
+				<br>
+				<label>Speichern als</label>
+				<br>
+				<div class="cols">
+					<div class="col" style="flex:1">
+						<tml:input cssclass="form-control" name="save_as" defaultexpression="_save_as"/>
+					</div>
+					<div class="col-auto" style="margin: 5px 0">
+						.png
+					</div>
+				</div>
+				
+			</div>
+		</div>		
+	</div>
+	
+	<div class="footer">
+		<div class="pull-left">
+			<tml:button cssclass="btn btn-default" clickaction="edit-metas">
+				<i class="fa fa-arrow-left"></i>
+				Datei Metadaten
+			</tml:button>
+		</div>
+		
+		<a class="btn btn-default" data-modal="hide">Abbrechen</a>
+		<tml:button cssclass="btn btn-primary" clickaction="crop-image">
+			Speichern
+		</tml:button>
+	</div>
+
+
+	<script>
+		require(["jquery", "jquery-ui"], function($){
+	
+			var container = $("#dialog-crop-image .image-container");
+			var crop = $(".crop", container);
+					
+			$("#dialog-crop-image form [name=aspectRatio]").on("change", function(){
+				aspectRation($(this).val())
+			});
+		
+			function aspectRation(ratio){
+				var container = $("#dialog-crop-image .image-container");
+				var crop = $(".crop", container);
+				
+				if(ratio=="original")
+					ratio = container.width() / container.height();
+				
+				if(ratio=="free"){
+					crop.resizable("option", "aspectRatio", false)
+						.data('uiResizable')._aspectRatio = false;				
+				}
+				
+				else{					
+					ratio = eval(ratio);
+					
+					var container_w = container.width(); 
+					var crop_h = crop.outerHeight();
+					var pos = crop.position();
+	
+					var maxWidth = container_w - pos.left;
+					if(crop_h * ratio <= maxWidth){
+						crop.outerWidth(crop_h * ratio);
+					}
+					else{
+						crop.outerWidth(maxWidth);
+						crop.height(maxWidth/ratio);
+					}
+					crop.resizable("option", "aspectRatio", ratio)
+						.data('uiResizable')._aspectRatio = true;
+				}
+
+				resize();
+			}
+		
+			function resize(){
+			
+				var left = $(".left", container);
+				var right = $(".right", container);
+				var top = $(".top", container);
+				var bottom = $(".bottom", container);
+				
+				var container_w = container.width(); 
+				var container_h = container.height();
+				
+				var crop_w = crop.outerWidth();
+				var crop_h = crop.outerHeight();
+
+				var pos = crop.position();
+			
+				left.css({
+					width: pos.left + "px",
+					top: pos.top + "px",
+					bottom: (container_h - pos.top - crop_h + "px")
+				});
+				
+				top.height(pos.top);
+				
+				bottom.css({
+					height: (container_h - pos.top - crop_h) + "px",
+				})
+				
+				right.css({
+					width: (container_w - pos.left - crop_w) + "px",
+					top: pos.top + "px",
+					bottom: (container_h - pos.top - crop_h) + "px"
+				});
+				
+				var img = $("img", container)
+				var factor = img.prop("naturalWidth") / img.width();
+				$("#dialog-crop-image .img-size").html((crop_w*factor).toFixed(0) + " x " + (crop_h*factor).toFixed(0) + " Pixel").parent().show()
+				
+				var form = $("#crop-form");
+				$("[name=x]", form).val((pos.left*factor).toFixed(0))
+				$("[name=y]", form).val((pos.top*factor).toFixed(0))
+				$("[name=width]", form).val((crop_w*factor).toFixed(0))
+				$("[name=height]", form).val((crop_h*factor).toFixed(0))
+				
+			}
+			
+			$("#dialog-crop-image .image-container .crop").draggable({ 
+				containment: container,
+				stop: function(event, ui){
+					// convert to percent
+					var w = ui.helper.width(),
+						h = ui.helper.height(),
+						top = ui.position.top,
+						left = ui.position.left;
+					ui.helper.css({
+						width: (100*w/container.width()) + "%",
+						height: (100*h/container.height()) + "%",
+						top: (100*top/container.height()) + "%",
+						left: (100*left/container.width()) + "%"
+					})
+				}
+			}).on("drag", resize)
+			.resizable({
+				aspectRatio: true,
+				handles: "n, e, s, w, se",
+				containment: container,
+				stop: function(event, ui){
+					var factor_w = container.width()/ui.element.outerWidth();
+					var factor_h = container.height()/ui.element.outerHeight();
+					var w = ui.element.outerWidth(); 
+						h = ui.element.outerHeight();
+					if(factor_w < 1.01){
+						w=w*factor_w;
+						h=h*factor_w;
+					}
+					else if(factor_h < 1.01){
+						w=w*factor_h;
+						h=h*factor_h;
+					}
+					// convert to percent
+					ui.element.css({
+						width: (100*w/container.width()) + "%",
+						height: (100*h/container.height()) + "%"
+					});
+					resize();
+				}
+			}).on("resize", resize);
+
+			setTimeout(resize, 100);
+			$(window).on("resize", resize)
+						
+		})
+	</script>
+	
+</tml:form>

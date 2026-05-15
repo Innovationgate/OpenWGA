@@ -179,6 +179,16 @@ public interface Form {
     public abstract String getfiletext(String name) throws IOException, WGAPIException;
 
     /**
+     * Returns the size of a given file 
+     * @param filename
+     * @return
+     * @throws IOException
+     * @throws WGAPIException
+     */
+    @CodeCompletion(preferredCase="getFileSize")
+    public abstract long getfilesize(String name) throws IOException, WGAPIException;
+
+    /**
      * Returns the ID of the form
      */
     @CodeCompletion(preferredCase="formId",isProperty=true)

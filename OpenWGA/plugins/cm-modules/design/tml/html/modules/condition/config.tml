@@ -1,0 +1,13 @@
+{
+	id:				'cm_condition',
+	category:		'Container',
+	title:			'Bedingung',
+	icon:			"<tml:url db="@afw" type="file" doc="icons" file="application.png"/>",
+	type:			'container',
+	margins:		false, 				
+	tml:			'modules:condition:render',
+	settingstml:	'modules:condition:settings',
+	includes: {
+		css:		"modules:condition:css"
+	}	
+}

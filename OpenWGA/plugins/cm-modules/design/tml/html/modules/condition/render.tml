@@ -1,0 +1,11 @@
+<tml:case if="$is_editmode">
+	@{$mc.info wrap="div" wrap_class="info" encode="none"}
+</tml:case> 
+
+<tml:case unless="$mc.condition.condition">
+	@{$mc.condition.message encode="none" wrap="div" wrap_class="message"}
+</tml:case>
+
+<tml:case if="$mc.condition.condition | $is_editmode">
+	<tml:include ref="system:include-child-modules" o_margins="true"/>
+</tml:case>

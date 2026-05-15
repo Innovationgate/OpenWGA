@@ -67,7 +67,7 @@
 	
 	<nav id="plugins" redirectto="plugins.plugin-management" img="kcmdf.png">
 		<nav id="plugins.plugin-management" tml="plugins:portlet"/>
-		<nav id="plugins.plugin-store" tml="plugins:plugin-store:portlet"/>
+		<tml:comment><nav id="plugins.plugin-store" tml="plugins:plugin-store:portlet"/></tml:comment>
 	</nav>
 
 	<nav id="jobs" redirectto="jobs.all" img="karm.png">

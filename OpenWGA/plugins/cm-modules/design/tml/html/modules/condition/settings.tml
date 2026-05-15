@@ -1,0 +1,10 @@
+<tml:case unless="$mc.opts.length">
+	Es wurden keine Bedingungen im Projekt definiert.
+	<br>Untermodule werden nicht angezeigt.
+</tml:case>
+<tml:case if="$mc.opts.length">
+	Untermodule nur anzeigen, wenn folgende Bedingung erfüllt ist:
+	<div style="margin:10px 0">
+		<tml:input name="{scoped:condition}" type="select" optionsitem="$mc.opts" cssclass="form-control" mode="{$option_mode}"/>
+	</div>
+</tml:case>

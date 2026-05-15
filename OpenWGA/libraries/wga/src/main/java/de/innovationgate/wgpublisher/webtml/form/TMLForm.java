@@ -1754,6 +1754,7 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
 		return getProcessContext().getFiles().get(filename.toLowerCase());
 	}
 	
+	@Override
 	public long getfilesize(String name) throws IOException {
 		PCFile pcFile = getProcessContext().getFiles().get(name.toLowerCase());
 		if (pcFile != null) {

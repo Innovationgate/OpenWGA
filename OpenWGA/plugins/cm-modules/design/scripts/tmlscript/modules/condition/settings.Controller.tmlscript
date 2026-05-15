@@ -1,0 +1,22 @@
+function Controller(){
+	
+	this.opts=[];
+	
+	this.prepare = function($cx){
+	
+		var script = WGA.design($cx.db()).resolveSystemScriptModule("content-manager:conditions", "tmlscript")
+		if(script){
+			try{
+				var conditions = script.executeTMLScript($cx);
+				for(let condition in conditions){
+					this.opts.push(conditions[condition].label + "|" + condition);
+				}
+			}
+			catch(e){
+				//logException(e);
+				console.error("Error in conditions.tmlscript", e);
+			}
+		}			
+
+	}
+}

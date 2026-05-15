@@ -46,6 +46,14 @@
 	_dialog_closed=true
 </tml:action>
 
+<tml:action id="crop-image">
+	portlet.fireevent("open-dialog", {
+		dialog: "crop-image",
+		filename: portlet.filename
+	})
+	_dialog_closed=true
+</tml:action>
+
 <tml:form id="form-edit-filemetas" source="none" unless="_dialog_closed" mode="{!$urlParam_container && App.mayUpdateContent(this) ? 'edit':'view'}">
 
 	<tml:script>
@@ -147,6 +155,18 @@
 				<tml:button cssclass="btn btn-default" clickaction="edit-video">
 					<i class="fa fa-edit"></i>
 					Video bearbeiten
+				</tml:button>
+			</tml:case>
+			<tml:case condition="_Attachment.isImage() && tmlform.iseditable()">
+				<tml:script>
+					// check for image scaler
+					_scaler = Packages.de.innovationgate.wgpublisher.webtml.utils.ImageScalerFactory.createMimeTypeSpecificImageScaler(WGA.getCore(), _file_md.mimeType)
+					let script = WGA.design(db()).resolveSystemScriptModule("content-manager:image-crop-sizes", "tmlscript")
+					_crop_options = script && script.executeTMLScript().size();
+				</tml:script>
+				<tml:button cssclass="btn btn-default" clickaction="crop-image" if="_scaler & _crop_options">
+					<i class="fa-solid fa-crop-simple"></i>
+					Bild beschneiden
 				</tml:button>
 			</tml:case>
 			<a class="btn btn-default" href="<tml:url type="file" file="{portlet.filename}" context="{_ctx}" u_forcedownload="true"/>">

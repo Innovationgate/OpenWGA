@@ -46,12 +46,14 @@ import de.innovationgate.webgate.api.auth.AuthenticationModule;
 import de.innovationgate.webgate.api.auth.AuthenticationSession;
 import de.innovationgate.webgate.api.auth.RequestAwareAuthenticationModule;
 import de.innovationgate.wga.config.Administrator;
+import de.innovationgate.wga.config.VirtualHost;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.WGADomain;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.cluster.tasks.ClearFailedLoginAttemptsTask;
 import de.innovationgate.wgpublisher.cluster.tasks.DistributeFailedLoginAttemptInformationTask;
 import de.innovationgate.wgpublisher.filter.WGAFilter;
+import de.innovationgate.wgpublisher.filter.WGAVirtualHostingFilter;
 import de.innovationgate.wgpublisher.mail.WGAMailNotification;
 
 public class BruteForceLoginBlocker {

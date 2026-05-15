@@ -457,6 +457,14 @@ public interface Context {
     @CodeCompletion(preferredCase="isRoot")
     public abstract boolean isroot() throws WGAPIException;
 
+	/**
+	 * Tests the general visibility of this content (see WGContent.isVisibleNow())
+	 * @return boolean
+	 * @throws WGAPIException 
+	 */
+    @CodeCompletion(preferredCase="isVisibleNow")
+    public abstract boolean isVisibleNow() throws WGAPIException;
+    
     /**
      * Returns if the current document is the main document of the current request or an ancestor document of it
      * @throws WGAPIException

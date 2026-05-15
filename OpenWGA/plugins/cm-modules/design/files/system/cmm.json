@@ -26,5 +26,6 @@
 	{ configtml:"modules:vote:config" },
 	{ configtml:"modules:html5media:config" },
 	{ configtml:"modules:picture:config" },
-	{ configtml:"modules:image-wall:config" }
+	{ configtml:"modules:image-wall:config" },
+	{ configtml:"modules:condition:config" }
 ]
