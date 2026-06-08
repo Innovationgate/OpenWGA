@@ -36,10 +36,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.io.IOUtils;
 
 import de.innovationgate.utils.WGUtils;
 import de.innovationgate.webgate.api.WGContent;
@@ -468,6 +470,22 @@ public class Call {
         catch (UnavailableResourceException e) {
             return null;
         }
+    }
+    
+    /**
+     * Returns posted data as String
+     * @param encoding
+     * @return posted data
+     * @throws IOException
+     * @throws WGException
+     */
+    public String getPostDataAsString(String encoding) throws IOException, WGException {
+    	ServletInputStream in = _wga.getRequest().getInputStream();
+    	return IOUtils.toString(in, encoding);
+    	
+    }
+    public String getPostDataAsString() throws IOException, WGException {
+    	return getPostDataAsString(_wga.getCore().getCharacterEncoding());
     }
     
     /**
