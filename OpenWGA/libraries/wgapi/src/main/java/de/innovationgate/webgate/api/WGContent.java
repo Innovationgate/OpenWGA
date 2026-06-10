@@ -1114,34 +1114,45 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
 
 	}
 	
-	/**
-	 * For a content document in status DRAFT, set it to status REVIEW and let it enter publishing workflow.
-	 * @param comment A comment for publishing this content.
-	 * @throws WGAPIException
-	 */
-	public void publish(String comment) throws WGAPIException {
-		publish(comment, null);
-	}
-	
-	   /**
+	 /**
      * For a content document in status DRAFT, set it to status REVIEW and let it enter publishing workflow.
      * @throws WGAPIException
      */
      public void publish() throws WGAPIException {
-        publish("", null);
+        publish("", null, false);
      }
-	
+
+ 	/**
+ 	 * For a content document in status DRAFT, set it to status REVIEW and let it enter publishing workflow.
+ 	 * @param comment A comment for publishing this content.
+ 	 * @throws WGAPIException
+ 	 */
+ 	public void publish(String comment) throws WGAPIException {
+ 		publish(comment, null, false);
+ 	}
+ 	
 	/**
 	 * For a content document in status DRAFT, set it to status REVIEW and let it enter publishing workflow.
 	 * @param comment A comment for publishing this content.
-	 * @param reasonForReplacement If a released content allready exists, a reason for it's replacement can be set by this param. Allowes null value.
+	 * @param reasonForReplacement If a released content already exists, a reason for it's replacement can be set by this param. Allows null value.
 	 * @throws WGAPIException
 	 */
-	public void publish(String comment,String reasonForReplacement) throws WGAPIException {
+	public void publish(String comment, String reasonForReplacement) throws WGAPIException {
+		publish(comment, reasonForReplacement, false);
+	}
+	
+
+	/**
+	 * For a content document in status DRAFT, set it to status REVIEW and let it enter publishing workflow.
+	 * @param comment A comment for publishing this content.
+	 * @param reasonForReplacement If a released content already exists, a reason for it's replacement can be set by this param. Allows null value.
+	 * @param immediately: if true bypass workflow
+	 * @throws WGAPIException
+	 */
+	public void publish(String comment, String reasonForReplacement, boolean immediately) throws WGAPIException {
 
 		// Test access level
 		int accessLevel = this.db.getSessionContext().getAccessLevel();
-		String user = this.db.getSessionContext().getUser();
 		if (accessLevel < WGDatabase.ACCESSLEVEL_AUTHOR
 			|| (accessLevel == WGDatabase.ACCESSLEVEL_AUTHOR && !isAuthorOrOwner())) {
 			throw new WGAuthorisationException("You are not authorized to publish this document", WGAuthorisationException.ERRORCODE_OP_NEEDS_AUTHORING_RIGHTS);
@@ -1178,6 +1189,9 @@ public class WGContent extends WGDocument implements PageHierarchyNode {
     		
 		    if (getDatabase().isProjectMode()) {
 		        release(comment, workflow, "Released in project mode");
+		    }
+		    else if (immediately) {
+		    	release(comment, workflow, "Released immediately");
 		    }
 		    else {
 		        
