@@ -580,6 +580,10 @@ public class WGPRequestPath {
         	this.pathType = TYPE_RESOURCE;
         	this.resourcePath = this.basePath;
         }
+        /*
+         * We don't have any "static tmls" anymore. This special command therefore doesn't make sense and may lead to errors.
+         * See #00006491
+         *  
         else if (this.pathCommand.equals(PATHCMD_STATIC_TML) || this.pathCommand.equals(PATHCMD_ADMIN_TML)) {
         	this.pathType = TYPE_STATICTML;
             if (this.pathElements.size() >= 3) {
@@ -593,7 +597,8 @@ public class WGPRequestPath {
                 this.pathType = TYPE_INVALID;
             }
         }
-         else if (this.pathCommand.equals(WGACore.WGASERVICES_WSDL_URL)) {
+        */
+        else if (this.pathCommand.equals(WGACore.WGASERVICES_WSDL_URL)) {
             this.pathType = TYPE_STATICTML;
             this.resourcePath = "/wgaservices";
             this.databaseKey = null;
