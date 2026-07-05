@@ -10,6 +10,8 @@
 		db().moveStructEntry(struct, target);		
 	}, struct, target)
 	
+	db().reopenSession();
+	
 	portlet.fireevent("close-dialog", {
 		reloadselected: true
 	})
