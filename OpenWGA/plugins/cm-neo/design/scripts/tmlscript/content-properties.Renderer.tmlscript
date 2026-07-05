@@ -26,6 +26,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 		}
 		
 		result = {
+			is_in_trash: (c.AREA=="$trash-cm-neo"),
 			title: c.content().isInReview() && !c.content().mayEditContent() ? "- nicht sichtbar -" : WGA.encode("html", c.TITLE),
 			pagetype: db($urlParam_dbkey).getContentType(c.CONTENTTYPE).getNameForLanguage("de"),
 			pagename: c.PAGENAME,
@@ -104,6 +105,7 @@ Renderer.prototype.render = function(AFW, $urlParam_dbkey, $urlParam_contentkey,
 		var c = context("db:" + $urlParam_dbkey + "/$struct:" + $urlParam_structkey, false)
 		if(c){
 			result = {
+				is_in_trash: (c.AREA=="$trash-cm-neo"),
 				title: WGA.encode("JSON", c.TITLE),
 				pagetype: c.CONTENTTYPE,
 				pagename: c.UNIQUENAME

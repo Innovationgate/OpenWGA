@@ -162,6 +162,19 @@
 						<p class="data">{{pagepublished}}</p>
 					</div>
 				{{/pagepublished}}
+
+				{{#is_in_trash}}
+					<div class="form-group" style="color:red">
+						<label>Diese Seite ist gelöscht</label>
+						<p class="data">
+							<a href="#" data-dialog="restore-deleted-page">
+								<i class="fa-regular fa-window-restore"></i>
+								Wiederherstellen
+							</a>
+						</p>
+					</div>
+				{{/is_in_trash}}
+
 			</fieldset>
 			
 			{{#validations.length}}
