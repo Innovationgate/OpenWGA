@@ -2,13 +2,14 @@
 	let struct = content() ? content().structEntry : document;	
 	let deletedFrom = struct.getExtensionData("deletedFrom");
 	
-	struct.removeExtensionData("deletedFrom");	
+	struct.removeExtensionData("deletedFrom");
+	struct.save();
 	let target = db().getDocumentByKey(deletedFrom);
 	
 	WGA.Master.runFunction(function(struct, target){		
-		db().moveStructEntry(struct, target);
+		db().moveStructEntry(struct, target);		
 	}, struct, target)
-
+	
 	portlet.fireevent("close-dialog", {
 		reloadselected: true
 	})
