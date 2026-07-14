@@ -13,7 +13,7 @@
 		</tml:case>
 
 		<a class="btn button" href="<tml:script>
-			return WGA.urlBuilder(meta("request", "wgaurl") + "contentmanager")
+			return WGA.urlBuilder(WGA.Server.getBaseURL(false) + "/contentmanager")
 				.setParameter({
 					dbkey: option('dbkey'),
 					contentkey: option('key')

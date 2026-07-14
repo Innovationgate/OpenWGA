@@ -81,6 +81,9 @@ Controller.prototype.deletePage = function($cx, $portlet, $option_dialog_options
 		// move to trash area.
 		// must be a master action because user may have no right to "move pages".
 		WGA.Master.runFunction(function(struct, trasharea){
+		
+			struct.writeExtensionData("deletedFrom", struct.getParentNode().getNodeKey());
+		
 			db().getSessionContext().setEventsEnabled(false);	// disable content events
 			db().moveStructEntry(struct, trasharea);
 			//console.log("moveStructEntry", struct, struct.getLastModified());

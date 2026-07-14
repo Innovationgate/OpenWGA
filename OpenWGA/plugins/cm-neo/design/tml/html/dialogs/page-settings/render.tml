@@ -1,10 +1,19 @@
 <tml:action id="save-page-settings">
-
+	
+	if(tmlform.hasfield("UNIQUENAME")){
+		tmlform.UNIQUENAME = tmlform.UNIQUENAME.trim();
+		let uname_not_valid = /[^\.a-zA-Z0-9_-]/.test(tmlform.UNIQUENAME)
+		if(uname_not_valid){
+			tmlform.addmessage("Eindeutige Namen dürfen nur Zeichen a-Z, 0-9, sowie . und _ und - enthalten.")
+			return;
+		}
+	}
+	
 	if(!tmlform.validate())
 		return;
 
 	try{
-		if(tmlform.hasfield("UNIQUENAME") && tmlform.UNIQUENAME.trim()==""){
+		if(tmlform.hasfield("UNIQUENAME") && tmlform.UNIQUENAME==""){
 			document.setUniqueName(null);
 			tmlform.removefield("UNIQUENAME")
 		}
