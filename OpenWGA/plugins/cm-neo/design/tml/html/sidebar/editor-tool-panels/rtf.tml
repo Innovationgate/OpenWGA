@@ -116,8 +116,16 @@
 				</a>
 
 				<div style="margin:0 0 10px" class="table-options table-edit-actions">
-					<label>Stil:</label>
+					<label>Tabellenstil:</label>
 					<div id="table-style-ms"></div> 
+				</div>
+				<div style="margin:0 0 10px" class="table-options table-edit-actions">
+					<label>Zeilenstil:</label>
+					<div id="tr-style-ms"></div> 
+				</div>
+				<div style="margin:0 0 10px" class="table-options table-edit-actions">
+					<label>Zellenstil:</label>
+					<div id="td-style-ms"></div> 
 				</div>
 
 				<div class="btn-group table-edit-actions">
