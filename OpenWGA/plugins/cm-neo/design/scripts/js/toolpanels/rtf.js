@@ -564,30 +564,28 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 			}
 			MS.buildOptions("#para-select", heading_opts)
 			
-			if(options && options.paragraphStyleList && options.paragraphStyleList.length){
-				toolbar.paragraphStyleList = MS.buildOptions("#text-style-ms", options.paragraphStyleList);
-			}
-			
-			if(options && options.linkStyleList && options.linkStyleList.length){
-				toolbar.linkStyleList = MS.buildOptions("#link-style-ms", options.linkStyleList);
-			}
-			
-			if(options && options.imageStyleList && options.imageStyleList.length){
-				toolbar.imageStyleList = MS.buildOptions("#image-style-ms", options.imageStyleList);
-			}
+			if(options){
 
-			if(options && options.listStyleList && options.listStyleList.length){
-				toolbar.listStyleList = MS.buildOptions("#list-style-ms", options.listStyleList);
-			}
+				if(options.paragraphStyleList && options.paragraphStyleList.length)
+					MS.buildOptions("#text-style-ms", options.paragraphStyleList);
 
-			if(options && options.tableStyleList && options.tableStyleList.length){
-				toolbar.tableStyleList = MS.buildOptions("#table-style-ms", options.tableStyleList);
-			}
-			if(options && options.trStyleList && options.trStyleList.length){
-				toolbar.trStyleList = MS.buildOptions("#tr-style-ms", options.trStyleList);
-			}
-			if(options && options.tdStyleList && options.tdStyleList.length){
-				toolbar.tdStyleList = MS.buildOptions("#td-style-ms", options.tdStyleList);
+				if(options.linkStyleList && options.linkStyleList.length)
+					MS.buildOptions("#link-style-ms", options.linkStyleList);
+
+				if(options.imageStyleList && options.imageStyleList.length)
+					MS.buildOptions("#image-style-ms", options.imageStyleList);
+
+				if(options.listStyleList && options.listStyleList.length)
+					MS.buildOptions("#list-style-ms", options.listStyleList);
+
+				if(options.tableStyleList && options.tableStyleList.length)
+					MS.buildOptions("#table-style-ms", options.tableStyleList);
+
+				if(options.trStyleList && options.trStyleList.length)
+					MS.buildOptions("#tr-style-ms", options.trStyleList);
+
+				if(options.tdStyleList && options.tdStyleList.length)
+					MS.buildOptions("#td-style-ms", options.tdStyleList);
 			}
 		}
 		
