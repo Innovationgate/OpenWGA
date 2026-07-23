@@ -25,6 +25,7 @@ Controller.prototype.statuse = function($option_dbkey) {
 		"Bitte auswählen|",
 		"In Arbeit|w",
 		"Veröffentlicht|p",
+		"Abgelaufen|abgelaufen",
 		"Zur Genehmigung|g",
 		"Bevorstehend|pending",
 		"Archiviert|a"
@@ -106,6 +107,7 @@ Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 			if(!$form.status)
 				return [];
 			let status =  $form.status;
+			query = "content.status=:value";
 			if(status=="pending"){
 				status="g"
 				filter = function(doc){
@@ -117,7 +119,12 @@ Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 					return !doc.content().isPendingRelease()
 				}
 			}
-			query = "content.status=:value";
+			else if(status=="abgelaufen"){
+				status="p"
+				query += " AND content.validto < :now";
+				params.p_now = WGA.Date();
+			}
+			
 			params.p_value = status;
 			break;
 		case "uname":
