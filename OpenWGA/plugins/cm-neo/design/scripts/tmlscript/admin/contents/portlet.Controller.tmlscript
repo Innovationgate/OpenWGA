@@ -87,6 +87,7 @@ Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 		alllanguages: true,
 		onlypublished: false
 	};
+	let filter = function(doc) true;		// default no-op filter
 	this.count = 0;
 	switch($form.filter){
 		case "pagetype":
@@ -104,8 +105,20 @@ Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 		case "status":
 			if(!$form.status)
 				return [];
+			let status =  $form.status;
+			if(status=="pending"){
+				status="g"
+				filter = function(doc){
+					return doc.content().isPendingRelease()
+				}
+			}
+			else if(status=="g"){
+				filter = function(doc){
+					return !doc.content().isPendingRelease()
+				}
+			}
 			query = "content.status=:value";
-			params.p_value = $form.status;
+			params.p_value = status;
 			break;
 		case "uname":
 			if($form.uname)
@@ -125,7 +138,9 @@ Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 	var result = WGA.app($option_dbkey).query(query 
 			+ " order by content." + $form.order 
 			+ " " + $form.dir
-		, params)
-	this.count = result.size;
+		, params).map(function(doc){
+			return filter(doc) ? doc : null;
+		})
+	this.count = result.size();
 	return result;
 }
