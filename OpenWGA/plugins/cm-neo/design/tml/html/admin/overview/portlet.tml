@@ -1,0 +1,118 @@
+<div class="header"><tml:label key="admin.overview"/></div>
+
+<div class="content">
+
+	<div class="cols">
+		<div class="col">
+			
+			<div>
+				Datenbank Server: @{$mc.dbserver}
+			</div>
+			<div>
+				Letzte Änderung: @{$mc.lastDbChange}
+			</div>
+			
+			<hr>
+		
+			<div>
+				Anzahl Seiten insgesamt: @{$mc.pages}		
+			</div>
+			<ul>
+				<li>
+					im Papierkorb: @{$mc.inTrash}
+				</li>
+				<li>
+					Seitenvorlagen: @{$mc.templates}
+				</li>
+			</ul>
+			
+			<hr>
+			
+			<div>
+				Anzahl Inhaltsversionen insgesamt: @{$mc.contents}
+			</div>
+			
+			<ul>
+				<li>
+					veröffentlicht: @{$mc.contents a_status="p"}
+				</li>
+				<li>
+					... davon abgelaufen: @{$mc.abgelaufen}
+				</li>
+				<li>
+					in Arbeit: @{$mc.contents a_status="w"}
+				</li>
+				<li>
+					archiviert: @{$mc.contents a_status="a"}
+				</li>
+				<li>
+					zur Genehmigung oder bevorstehend: @{$mc.contents a_status="g"}
+				</li>
+			</ul>
+		
+			<hr>
+			
+			<div>
+				Anzahl Dateianhänge: @{$mc.attachments}
+			</div>
+		
+			<div>
+				Größe der Anhänge insgesamt: @{$mc.attachmentsize format="#,##0.0"} MB
+			</div>
+		
+			<div>
+				Größe der daraus erzeugten Datei Derivate insgesamt: @{$mc.derivate format="#,##0.0"} MB
+			</div>
+			
+			<hr>
+			
+			<div>
+				Anzahl Website Bereiche: @{$mc.areas}
+			</div>
+			
+			<div>
+				Anzahl Seitentypen: @{$mc.pagetypes}
+			</div>
+			<div>
+				Anzahl Sprachen: @{$mc.languages}
+			</div>
+		</div>
+		
+		<div class="col">
+	
+			<div>			
+				DB-Operationen der letzten 30 Tage: @{$mc.historylog}
+				<ul>
+					<li>Update: @{$mc.historylog a_type="1"}</li>
+					<li>Delete: @{$mc.historylog a_type="2"}</li>
+					<li>Move: @{$mc.historylog a_type="3"}</li>
+				</ul>
+			</div>
+			
+			<hr>
+		
+			<b>Zuletzt veröffentliche Inhaltsversionen:</b>
+			<div class="table">
+				<div class="row">
+					<div class="col">Datum</div>
+					<div class="col">Titel</div>
+					<div class="col">Autor</div>						
+				</div>
+				
+				<tml:foreach item="$mc.lastPublished" pagesize="5">
+					<div class="row">
+						<div class="col" title="@{PUBLISHED}">
+							@{PUBLISHED}
+							<br>@{=AFW.Util.timeElapsed(PUBLISHED)}
+						</div>
+						<div class="col">@{TITLE}</div>
+						<div class="col">@{AUTHORNAME}</div>							
+					</div>							
+				</tml:foreach>
+				
+			</div>
+			
+		</div>
+		
+	</div>
+</div>

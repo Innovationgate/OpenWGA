@@ -78,6 +78,13 @@
 				}
 			}
 		}
+		.cols{
+			display: flex;
+			.col{
+				flex: 1;
+				padding: 10px;
+			}
+		}
 	}
 	
 	form .content{
