@@ -3189,6 +3189,19 @@ public abstract class WGDocument implements Lockable, WGExtensionDataContainer, 
     }
     
     /**
+     * Deletes all existing file derivates
+     * @throws WGAPIException
+     */
+    public void removeAllFileDerivates() throws WGAPIException {
+    	for(String filename: getFileNames()) {
+    		List<WGFileDerivateMetaData> derivates = getFileDerivates(filename);
+    		for(WGFileDerivateMetaData d : derivates) {
+    			removeFileDerivate(d.getId());
+    		}
+    	}
+    }
+    
+    /**
      * Deletes an existing file derivate
      * @param id The derivate ID
      * @throws WGAPIException
