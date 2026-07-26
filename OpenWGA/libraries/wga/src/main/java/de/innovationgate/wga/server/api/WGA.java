@@ -3191,6 +3191,12 @@ public class WGA {
         else if (lcPattern.equals("iso8601")) {
             return new ISO8601DateFormat();
         }
+        else if (lcPattern.equals("sqldate")) {
+        	return new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+        }
+        else if (lcPattern.equals("sqldatetime")) {
+        	return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+        }
         else if (lcPattern.endsWith("date") || lcPattern.endsWith("time")) {
             int patternLength;
             if (lcPattern.startsWith("short")) {
