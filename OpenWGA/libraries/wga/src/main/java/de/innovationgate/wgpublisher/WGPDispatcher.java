@@ -1373,7 +1373,7 @@ public class WGPDispatcher extends HttpServlet {
                 getCore().getLog().warn("Could not parse multipart form data because of IO exception: " + WGUtils.getRootCause(e));
             }
             catch (Exception e) {
-                getCore().getLog().error("Exception parsing multipart form data", e);
+                getCore().getLog().error("Exception parsing multipart form data. Request from " + request.getRemoteAddr() + " to URL " + String.valueOf(request.getRequestURL()), e);
             }
         }
 
