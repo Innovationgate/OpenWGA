@@ -38,7 +38,7 @@ function Controller(){
 	}
 
 	this.historylog = function(type){
-		let query = "select count(*) from historylog where logtime >= '" + WGA.format(WGA.Date().modify("d", -30), "yyyy-MM-dd")+"'"
+		let query = "select count(*) from historylog where logtime >= '" + WGA.format(WGA.Date().modify("d", -30), "sqldate")+"'"
 		if(type)
 			query += " AND entrytype=" + type
 		return result(query);
