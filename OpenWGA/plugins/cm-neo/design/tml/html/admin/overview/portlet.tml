@@ -111,7 +111,7 @@
 				<tml:foreach item="$mc.lastPublished" pagesize="5">
 					<div class="row">
 						<div class="col" title="@{PUBLISHED}">
-							@{PUBLISHED format="mediumDateTime"}
+							@{=WGA.format(PUBLISHED, "mediumDateTime", "de")}
 							<br>@{=AFW.Util.timeElapsed(PUBLISHED)}
 						</div>
 						<div class="col">
