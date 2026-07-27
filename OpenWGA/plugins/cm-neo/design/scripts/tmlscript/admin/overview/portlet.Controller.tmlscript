@@ -73,10 +73,14 @@ function Controller(){
 		return (area && area.getRootEntries().size()) || 0;
 	}
 
-	this.contents = function(status){
+	this.contents = function(status, age){
 		let query = "select count(*) from content"
-		if(status)
+		if(status){
 			query += " where status='" + status + "'"
+			if(age)
+				query += " AND content.lastmodified < '" + WGA.format(WGA.Date().modify("M", -age), "sqldate") + "'"
+		}
+		//console.log(query)
 		return result(query);
 	}
 	

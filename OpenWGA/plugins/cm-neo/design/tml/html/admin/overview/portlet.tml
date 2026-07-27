@@ -43,10 +43,19 @@
 					in Arbeit: @{$mc.contents a_status="w"}
 				</li>
 				<li>
+					zur Genehmigung oder bevorstehend: @{$mc.contents a_status="g"}
+				</li>
+				<li>
 					archiviert: @{$mc.contents a_status="a"}
 				</li>
 				<li>
-					zur Genehmigung oder bevorstehend: @{$mc.contents a_status="g"}
+					... davon seit mehr als 12 Monaten: @{$mc.contents a_status="a" a_age="12"}
+				</li>
+				<li>
+					... davon seit mehr als 24 Monaten: @{$mc.contents a_status="a" a_age="24"}
+				</li>
+				<li>
+					... davon seit mehr als 36 Monaten: @{$mc.contents a_status="a" a_age="36"}
 				</li>
 			</ul>
 		
@@ -102,7 +111,7 @@
 				<tml:foreach item="$mc.lastPublished" pagesize="5">
 					<div class="row">
 						<div class="col" title="@{PUBLISHED}">
-							@{PUBLISHED}
+							@{PUBLISHED format="mediumDateTime"}
 							<br>@{=AFW.Util.timeElapsed(PUBLISHED)}
 						</div>
 						<div class="col">
