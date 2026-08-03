@@ -88,7 +88,7 @@ Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 		alllanguages: true,
 		onlypublished: false
 	};
-	let filter = function(doc) true;		// default no-op filter
+	let filter = null;
 	this.count = 0;
 	switch($form.filter){
 		case "pagetype":
@@ -145,9 +145,13 @@ Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 	var result = WGA.app($option_dbkey).query(query 
 			+ " order by content." + $form.order 
 			+ " " + $form.dir
-		, params).map(function(doc){
+		, params)
+	if(filter){
+		result = result.map(function(doc){
 			return filter(doc) ? doc : null;
 		})
-	this.count = result.size();
+		this.count = result.size();
+	}
+	else this.count = result.size;
 	return result;
 }
