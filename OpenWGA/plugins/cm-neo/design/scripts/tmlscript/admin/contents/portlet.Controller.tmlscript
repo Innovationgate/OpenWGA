@@ -55,8 +55,13 @@ Controller.prototype.rootModules = function(modules) {
 		value: ""
 	}]
 	for(let [index, mod] in modules){
-		if(mod.allowedparents || mod.category)
+		
+		if(mod.category)
 			continue;
+
+		if(mod.allowedparents && mod.allowedparents.indexOf("root")<0)
+			continue;
+
 		ret.push({
 			title: mod.title,
 			value: mod.id
