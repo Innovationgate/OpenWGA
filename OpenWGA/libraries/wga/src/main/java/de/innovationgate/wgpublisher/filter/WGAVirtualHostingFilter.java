@@ -213,11 +213,6 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
         		return;
         	}
 
-            if (uri.equalsIgnoreCase("/robots.txt") && findVirtualResource(vHost, "robots.txt")==null){
-            	response.getWriter().print(vHost.getRobotsTxt());
-            	return;
-            }
-
             // check for virtual root resource request (old style)
             String resource_path = uri;
             if(resource_path.startsWith("/"))
@@ -227,8 +222,24 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
             	httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, resource.getPath());
             	forwardRequest=true;
             }
-            
+
             if(!forwardRequest){
+            	
+	        	if (uri.equalsIgnoreCase("/robots.txt") && vHost.getRobotsTxt()!=null){
+	        		String txt = vHost.getSecurityTxt().trim();
+	        		if(!txt.isEmpty()) {
+		            	response.getWriter().print(txt);
+		            	return;
+	        		}
+	            }
+	        	if (uri.equalsIgnoreCase("/.well-known/security.txt") && vHost.getSecurityTxt()!=null){
+	            	String txt = vHost.getSecurityTxt().trim();
+	            	if(!txt.isEmpty()) {
+	            		response.getWriter().print(txt);
+	            		return;
+	            	}
+	            }
+            	
                 // determine default database key
                 String defaultDBKey = getDefaultDBKey(_core, vHost);
                 

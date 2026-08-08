@@ -47,6 +47,11 @@
 							</fieldset>
 						</tml:case>
 
+						<fieldset>
+							<legend>.well-known</legend>
+							<tml:[system:fs-input] o_field="securityTxt" o_type="textarea" o_width="350"/>
+						</fieldset>
+
 						<div id="v-resources-array-list" class="array-list-editor">			
 							<fieldset>
 								<legend>Virtual Resources</legend>
