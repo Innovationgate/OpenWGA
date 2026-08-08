@@ -58,6 +58,8 @@ import de.innovationgate.wga.config.VirtualHost;
 import de.innovationgate.wga.config.VirtualHostRedirect;
 import de.innovationgate.wga.config.VirtualResource;
 import de.innovationgate.wga.config.WGAConfiguration;
+import de.innovationgate.wga.server.api.WGA;
+import de.innovationgate.wga.server.api.WGADate;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGPRequestPath;
 import de.innovationgate.wgpublisher.WGPDispatcher.PathDispatchingOccasion;
@@ -235,6 +237,12 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 	        	if (uri.equalsIgnoreCase("/.well-known/security.txt") && vHost.getSecurityTxt()!=null){
 	            	String txt = vHost.getSecurityTxt().trim();
 	            	if(!txt.isEmpty()) {
+	            		WGADate expires;
+						try {
+							WGA wga = WGA.get();
+							expires = wga.Date().modify("M", 6);							
+		            		txt = txt.replace("{never}", wga.format(expires, "iso8601"));
+						} catch (WGException e) {}
 	            		response.getWriter().print(txt);
 	            		return;
 	            	}
