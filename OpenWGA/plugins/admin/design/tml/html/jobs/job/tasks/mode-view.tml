@@ -41,7 +41,7 @@
 <tml:action id="moveTaskUp">
 	log.info("move up: " + tmlparam1);
 	var jobuid = tmlparam2;
-	var config = DBM.wgaconfig.clone();
+	DBM.wgaconfig.clone();
 	var entries = DBM.wgaconfig.getByUid(jobuid).tasks;
 	var idx = tmlparam1-1;
 	var entrie = entries.get(idx)
@@ -53,7 +53,7 @@
 <tml:action id="moveTaskDown">
 	log.info("move down: " + tmlparam1);
 	var jobuid = tmlparam2;
-	var config = DBM.wgaconfig.clone();
+	DBM.wgaconfig.clone();
 	var entries = DBM.wgaconfig.getByUid(jobuid).tasks;
 	var idx = tmlparam1-1;
 	var entrie = entries.get(idx)
