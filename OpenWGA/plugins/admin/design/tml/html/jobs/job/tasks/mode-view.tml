@@ -47,7 +47,7 @@
 	var entrie = entries.get(idx)
 	entries.remove(idx)
 	entries.add(idx-1, entrie)
-	DBM.wgaconfig.save(config);
+	DBM.wgaconfig.save();
 </tml:action>
 
 <tml:action id="moveTaskDown">
@@ -59,7 +59,7 @@
 	var entrie = entries.get(idx)
 	entries.remove(idx)
 	entries.add(idx+1, entrie)
-	DBM.wgaconfig.save(config);
+	DBM.wgaconfig.save();
 </tml:action>
 
 
