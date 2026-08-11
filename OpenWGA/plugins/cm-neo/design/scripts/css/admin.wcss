@@ -85,6 +85,9 @@
 				padding: 10px;
 			}
 		}
+		ul{
+			margin: 10px 0;
+		}
 	}
 	
 	form .content{
