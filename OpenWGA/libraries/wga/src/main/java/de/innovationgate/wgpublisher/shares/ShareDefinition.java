@@ -25,9 +25,6 @@
 
 package de.innovationgate.wgpublisher.shares;
 
-import java.util.List;
-
-import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.wgpublisher.WGACore;
 
 /**
