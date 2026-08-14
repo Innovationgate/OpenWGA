@@ -605,6 +605,7 @@ public class WebTMLScriptletResolver {
             derivateQuery = targetContext.enhanceFileDerivateQuery(derivates);
             imgURL = addDerivateQueryToURL(context, derivateQuery, imgURL);
         }
+
         WGFileMetaData md = targetContext.content().getFileMetaData(fileName);
         if (md == null || md.getDisplayHeight() == -1 || md.getDisplayWidth() == -1) {
             return "";
@@ -617,12 +618,7 @@ public class WebTMLScriptletResolver {
         }
 
         SrcSetCreator scrSetCreator = wga.service(SrcSetCreator.class);
-        String usage = WGFileAnnotations.USAGE_POSTER;
-        if (derivateQuery != null && derivateQuery.containsKey(DerivateQuery.QUERYTERM_USAGE)) {
-            usage = derivateQuery.get(DerivateQuery.QUERYTERM_USAGE).getValue();
-        }
-        
-        String srcSet = scrSetCreator.createSrcSet(imgURL, scrSetCreator.getMaxAvailableSize(md, usage));
+        String srcSet = scrSetCreator.createSrcSet(imgURL, scrSetCreator.getMaxAvailablePosterSize(md));
         if (!WGUtils.isEmpty(srcSet)) {
             return "srcset=\"" + srcSet + "\"";
         }
