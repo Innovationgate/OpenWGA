@@ -179,7 +179,7 @@ public class WebTMLScriptletResolver {
             String contextExpression = scriptletToken.substring(1, endContext);
             TMLContext targetContext = context.context(contextExpression, false);
             if (targetContext == null) {
-                context.addwarning("Error executing scriptlet. Context could not be resolved: " + contextExpression, false);
+                //context.addwarning("Error executing scriptlet. Context could not be resolved: " + contextExpression, false);
                 return "";
             }
             context = targetContext;
