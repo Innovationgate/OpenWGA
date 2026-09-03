@@ -311,9 +311,7 @@ public class Call {
      * @throws WGException
      */
     public String getReferrer() throws WGException {
-        String url = getRequestHeader("Referer");
-        return _wga.urlBuilder(url).clearPathParameters().build(true);
-        
+        return getRequestHeader("Referer");
     }
     
     /**
