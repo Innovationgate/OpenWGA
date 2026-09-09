@@ -112,9 +112,15 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 
     private static final List<String> BLACK_LIST = new ArrayList<String>();
     static {
+    	
+    	BLACK_LIST.add("/static/*");
+    	BLACK_LIST.add("/admin");
+    	BLACK_LIST.add("/contentmanager");
+    	BLACK_LIST.add("/joblog");
+    	
         BLACK_LIST.add("/ajaxform*");
         BLACK_LIST.add("/tempdwn*");
-        BLACK_LIST.add("/webdav/*");
+        //BLACK_LIST.add("/webdav/*");	// no webdav anymore
         BLACK_LIST.add("/" + WGPRequestPath.PATHCMD_TMLFORM + "/*");
     }
     
