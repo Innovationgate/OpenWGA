@@ -516,7 +516,7 @@ public class CustomApiResource extends Resource<DatabaseResource> implements Api
                 
                 TMLScript tmlscript = getDatabaseResource().getContextWga().tmlscript();
                 if (!tmlscript.hasProperty(_apiObject.get(), "query")) {
-                    throw new WebApplicationException("Custom API '" + apiName + "' does not implement method GET on collection", 404);
+                    throw new WebApplicationException("Custom API '" + apiName + "' does not implement method query()", 404);
                 }
                 
                 Object scriptResult;
@@ -561,7 +561,7 @@ public class CustomApiResource extends Resource<DatabaseResource> implements Api
                     throw new WebApplicationException("Custom API '" + apiName + "' query() method returned null", 500);
                 }
                 else if (scriptResult.equals(rhino.getUndefined())) {
-                    throw new WebApplicationException("Custom API '" + apiName + "' does not implement method GET on collection", 404);
+                    throw new WebApplicationException("Custom API '" + apiName + "' does not implement method query()", 404);
                 }
                 else {
                     throw new WebApplicationException("Invalid return type from custom API '" + apiName + "' query() method: " + scriptResult.getClass().getName(), 500);

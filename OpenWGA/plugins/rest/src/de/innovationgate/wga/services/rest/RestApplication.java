@@ -27,6 +27,9 @@ import org.glassfish.jersey.moxy.xml.MoxyXmlFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 
+import de.innovationgate.utils.FormattingException;
+import de.innovationgate.utils.net.IPRestriction;
+import de.innovationgate.utils.net.IPv4Restriction;
 import de.innovationgate.webgate.api.WGDatabase;
 import de.innovationgate.webgate.api.WGDatabase.DatabaseAction;
 import de.innovationgate.webgate.api.WGException;
@@ -142,11 +145,24 @@ public class RestApplication extends ResourceConfig implements WGACoreEventListe
         private Set<String> _enabledRestAPIs = new HashSet<String>();
         private String _dbKey;
         private boolean _forceRegularLogin = false;
+        private List<IPRestriction> _whitelist = new ArrayList<IPRestriction>();
         
         public DatabaseInfo(String dbReference) {
             _dbKey = dbReference;
         }
 
+        public List<IPRestriction> getWhiteList(){
+        	return _whitelist;
+        }
+        public void setWhiteList(List<String> ips) throws FormattingException{
+        	_whitelist = new ArrayList<IPRestriction>();
+        	if(ips != null) {
+	        	for(String ip: ips){
+	        		_whitelist.add(IPv4Restriction.parseRestrictionString(ip));
+	        	}
+        	}        	
+        }
+        
         public Set<String> getEnabledRestAPIs() {
             return _enabledRestAPIs;
         }
@@ -177,6 +193,7 @@ public class RestApplication extends ResourceConfig implements WGACoreEventListe
     public static final String SERVEROPTION_SERVICE_REST = "Services.Rest.Enabled";
     public static final String DBATTRIB_ENABLED_APIS = "Services.Rest.EnabledApis";
     public static final String DBATTRIB_FORCE_REGULAR_LOGIN = "Services.Rest.ForceRegularLogin";
+    public static final String DBATTRIB_WHITELIST = "Services.Rest.whitelist";
     
     public static final String URLPARAM_SIZE = "size";
     public static final String URLPARAM_ROLE = "role";
@@ -299,6 +316,13 @@ public class RestApplication extends ResourceConfig implements WGACoreEventListe
         final DatabaseInfo dbInfo = new DatabaseInfo(db.getDbReference());
         dbInfo.getEnabledRestAPIs().addAll(enabledAPIs);
         dbInfo.setForceRegularLogin((Boolean) database.getPublisherOption(RestApplication.DBATTRIB_FORCE_REGULAR_LOGIN)); 
+        try {
+        	@SuppressWarnings("unchecked")
+			List<String> whitelist = (List<String>) database.getPublisherOption(RestApplication.DBATTRIB_WHITELIST);
+			dbInfo.setWhiteList(whitelist);
+		} catch (FormattingException e) {
+			e.printStackTrace();
+		}
         
         // Preprocess HDBModel on connect
         db.onConnect(new DatabaseAction() {

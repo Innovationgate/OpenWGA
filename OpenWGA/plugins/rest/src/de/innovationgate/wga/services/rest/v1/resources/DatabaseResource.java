@@ -20,6 +20,8 @@ import javax.xml.bind.annotation.XmlValue;
 import org.eclipse.persistence.oxm.annotations.XmlDiscriminatorValue;
 import org.eclipse.persistence.oxm.annotations.XmlVariableNode;
 
+import de.innovationgate.utils.net.IPRestriction;
+import de.innovationgate.utils.net.IPv4Address;
 import de.innovationgate.webgate.api.WGAPIException;
 import de.innovationgate.webgate.api.WGContent;
 import de.innovationgate.webgate.api.WGDatabase;
@@ -74,6 +76,7 @@ public class DatabaseResource extends EnvelopeReturningResource<RootResource> {
     private RestApplication.DatabaseInfo _dbInfo;
     
     private Boolean _isAdminLoggedIn=false;
+    private List<IPRestriction> whitelist = new ArrayList<IPRestriction>();
     
     @XmlTransient
     public Database getDatabase() {
@@ -88,11 +91,15 @@ public class DatabaseResource extends EnvelopeReturningResource<RootResource> {
         super(root, root.getURI().path(RootResource.REFLIST_DBS).path(dbKey));
         
         _isAdminLoggedIn = root.isAdminLoggedIn();
-        
+                
         _dbInfo = getRootResource().getApplication().getDatabaseInfo().get(dbKey); 
         if (_dbInfo == null) {
             throw new WebApplicationException("There is no REST API enabled for this database", 403);
         }
+
+        String ip = getRootResource().getWga().getRequest().getRemoteAddr();
+        if(!isValidIP(_dbInfo, ip))
+        	 throw new WebApplicationException("Client IP " + ip + " is not allowed to use this service", 403);
 
         if (_dbInfo.isForceRegularLogin()) {
             getRootResource().getWga().getRequest().setAttribute(WGACore.ATTRIB_FORCEREGULARLOGIN, Boolean.TRUE);
@@ -104,7 +111,26 @@ public class DatabaseResource extends EnvelopeReturningResource<RootResource> {
         }
     }
     
-    @Path(CmsApiResource.RESOURCE_TYPE)
+    private boolean isValidIP(DatabaseInfo dbinfo, String ip) {
+    	List<IPRestriction> whitelist = dbinfo.getWhiteList();
+    	if(whitelist == null || whitelist.isEmpty())
+    		return true;
+    	try {
+			IPv4Address ipv4 = new IPv4Address(ip);
+			
+			for(IPRestriction restriction: whitelist){
+				if(restriction.exists(ipv4)){
+					return true;
+				}
+			}
+			return false;
+			
+		} catch (Exception e) {
+			return true;
+		}
+	}
+
+	@Path(CmsApiResource.RESOURCE_TYPE)
     public CmsApiResource getCmsApi() throws WGException {
 
         if (!_database.db().isSessionOpen() || getAccessLevel()<WGDatabase.ACCESSLEVEL_AUTHOR) {
