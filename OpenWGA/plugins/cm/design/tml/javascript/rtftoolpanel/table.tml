@@ -178,6 +178,18 @@ for(var i=0; i<BI.rtftoolbar.tableStyleList.length; i++){
 			handler: tableStyleHandler
 		}))
 	}
+	else{
+		var grouplabel=BI.rtftoolbar.tableStyleList[i].label.split("|")[0];
+		for(let j=0; j<BI.rtftoolbar.tableStyleList[i].values.length; j++){
+			var style = BI.rtftoolbar.tableStyleList[i].values[j].split("|");
+			menu.add(new Ext.menu.CheckItem({
+				text: grouplabel + " " + style[0],
+				el_type: "table",
+				el_style: style[1],
+				handler: tableStyleHandler
+			}))
+		} 
+	}	
 }
 var tableStyleMenu = menu;
 var tableStyleButton = new Ext.Button("rtf-toolbar-table-tableStyles-button", {
@@ -187,13 +199,27 @@ var tableStyleButton = new Ext.Button("rtf-toolbar-table-tableStyles-button", {
 
 var menu = new Ext.menu.Menu()
 for(var i=0; i<BI.rtftoolbar.trStyleList.length; i++){	
-	var style = BI.rtftoolbar.trStyleList[i].split("|");
-	menu.add(new Ext.menu.CheckItem({
-		text: style[0],
-		el_type: "tr",
-		el_style: style[1],
-		handler: tableStyleHandler
-	}))
+	if(typeof(BI.rtftoolbar.trStyleList[i])=="string"){
+		var style = BI.rtftoolbar.trStyleList[i].split("|");
+		menu.add(new Ext.menu.CheckItem({
+			text: style[0],
+			el_type: "tr",
+			el_style: style[1],
+			handler: tableStyleHandler
+		}))
+	}
+	else{
+		var grouplabel=BI.rtftoolbar.trStyleList[i].label.split("|")[0];
+		for(let j=0; j<BI.rtftoolbar.trStyleList[i].values.length; j++){
+			var style = BI.rtftoolbar.trStyleList[i].values[j].split("|");
+			menu.add(new Ext.menu.CheckItem({
+				text: grouplabel + " " + style[0],
+				el_type: "tr",
+				el_style: style[1],
+				handler: tableStyleHandler
+			}))
+		} 
+	}	
 }
 var trStyleMenu = menu;
 var trStyleButton = new Ext.Button("rtf-toolbar-table-trStyles-button", {
@@ -203,13 +229,27 @@ var trStyleButton = new Ext.Button("rtf-toolbar-table-trStyles-button", {
 
 var menu = new Ext.menu.Menu()
 for(var i=0; i<BI.rtftoolbar.tdStyleList.length; i++){
-	var style = BI.rtftoolbar.tdStyleList[i].split("|");
-	menu.add(new Ext.menu.CheckItem({
-		text: style[0],
-		el_type: "td",
-		el_style: style[1],
-		handler: tableStyleHandler
-	}))
+	if(typeof(BI.rtftoolbar.tdStyleList[i])=="string"){
+		var style = BI.rtftoolbar.tdStyleList[i].split("|");
+		menu.add(new Ext.menu.CheckItem({
+			text: style[0],
+			el_type: "td",
+			el_style: style[1],
+			handler: tableStyleHandler
+		}))
+	}
+	else{
+		var grouplabel=BI.rtftoolbar.tdStyleList[i].label.split("|")[0];
+		for(let j=0; j<BI.rtftoolbar.tdStyleList[i].values.length; j++){
+			var style = BI.rtftoolbar.tdStyleList[i].values[j].split("|");
+			menu.add(new Ext.menu.CheckItem({
+				text: grouplabel + " " + style[0],
+				el_type: "td",
+				el_style: style[1],
+				handler: tableStyleHandler
+			}))
+		} 
+	}	
 }
 var tdStyleMenu = menu;
 var tdStyleButton = new Ext.Button("rtf-toolbar-table-tdStyles-button", {

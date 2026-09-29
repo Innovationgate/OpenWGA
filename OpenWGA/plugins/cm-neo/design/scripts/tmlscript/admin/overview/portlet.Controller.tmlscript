@@ -1,0 +1,99 @@
+function Controller(){
+
+	let dbkey;
+	function result(query){
+		return WGA.app(dbkey).query("sql", query).firstResult.column1
+	}
+
+	this.prepare = function($option_dbkey){
+		dbkey = $option_dbkey;
+	}
+	
+	this.dbserver = function(){
+		return WGA.app(dbkey).db().getCore().getServerName();
+	}
+	
+	this.lastDbChange = function(){
+		return WGA.app(dbkey).db().getLastChanged()
+	}
+	
+	this.pages = function(){
+		let query = "select count(*) from structentry"
+		return result(query);
+	}
+
+	this.pagetypes = function(){
+		let query = "select count(*) from contenttype"
+		return result(query);
+	}
+
+	this.languages = function(){
+		let query = "select count(*) from lang"
+		return result(query);
+	}
+
+	this.areas = function(){
+		let query = "select count(*) from webarea"
+		return result(query);
+	}
+
+	this.historylog = function(type){
+		let query = "select count(*) from historylog where logtime >= '" + WGA.format(WGA.Date().modify("d", -30), "sqldate")+"'"
+		if(type)
+			query += " AND entrytype=" + type
+		return result(query);
+	}
+
+	this.attachments = function(){
+		let query = "select count(*) from content_files_meta"
+		return result(query);
+	}
+
+	this.attachmentsize = function(){
+		let query = "select sum(filesize) from content_files_meta"
+		return result(query) / (1000*1000);
+	}
+
+	this.derivate = function(){
+		let query = "select sum(filesize) from content_filederivates"
+		return result(query) / (1000*1000);
+	}
+
+	this.inTrash = function(){
+		let count = 0;
+		let area = WGA.app(dbkey).db().getArea("$trash");
+		count += (area && area.getRootEntries().size())
+		area = WGA.app(dbkey).db().getArea("$trash-cm-neo");
+		count += (area && area.getRootEntries().size())
+		return count;
+	}
+
+	this.templates = function(){
+		let area = WGA.app(dbkey).db().getArea("$templates");
+		return (area && area.getRootEntries().size()) || 0;
+	}
+
+	this.contents = function(status, age){
+		let query = "select count(*) from content"
+		if(status){
+			query += " where status='" + status + "'"
+			if(age)
+				query += " AND content.lastmodified < '" + WGA.format(WGA.Date().modify("M", -age), "sqldate") + "'"
+		}
+		//console.log(query)
+		return result(query);
+	}
+	
+	this.abgelaufen = function(){
+		let query = "select count(*) from content where status='p' AND validto < NOW()";
+		return result(query);
+	}
+	
+	this.lastPublished = function(){
+		return WGA.app(dbkey).query("content.status='p' order by content.published DESC", {
+			alllanguages: true,
+			role: "none"
+		});
+	}
+	
+}

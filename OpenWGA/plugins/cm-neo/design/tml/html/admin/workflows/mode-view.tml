@@ -1,35 +1,48 @@
-<div class="header"><tml:label key="admin.workflows"/></div>
-
-<div class="content">
-
-	<div class="table">
-		<div class="row">
-			<div class="col">Name</div>
-			<div class="col">Admin-Genehmiger</div>
-			<div class="col">Genehmigungs-Ebenen</div>
-		</div>
-		<tml:foreach item="$pc.workflows" currentvalue="_wf">
-			<div class="row">
-				<div class="col">
-					<a href="<tml:url action="$pc.setWorkflow" a-name="_wf.name" portletmode="edit"/>"><tml:item name="_wf.name"/></a>
-				</div>
-				<div class="col">@{_wf.adminReviewers divider="<br>"}</div>
-				<div class="col">
-					<tml:script divider="<br>">
-						return WGA.List(_wf.levels).map(function(el){
-							return el.name
-						})
-					</tml:script>
-				</div>
-			</div>
-		</tml:foreach>
+<tml:form id="contents" source="portlet" htmlinput="true">
+	<div class="header">
+		<tml:label key="admin.workflows" wrap="div" wrap_style="flex:1;font-size:2em"/>
+		<div class="filter">
+			<tml:input name="filter_wfname" html_placeholder="Name" focus="true"/>
+			<tml:button clickaction="$store" type="submit">
+				<i class="fa fa-filter"></i>
+				Filtern
+			</tml:button>
+		</div>	
 	</div>
 	
-</div>
-
-<div class="footer">
-	<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="new">
-		<i class="fa-solid fa-plus"></i>
-		Neuer Workflow
-	</tml:button>
-</div>
+	<div class="content">
+	
+		<div class="table">
+			<div class="row">
+				<div class="col">Name</div>
+				<div class="col">Admin-Genehmiger</div>
+				<div class="col">Genehmigungs-Ebenen / Genehmiger</div>
+			</div>
+			<tml:foreach item="$pc.workflows" currentvalue="_wf" filter="tmlform.filter_wfname ? _wf.name.toLowerCase().indexOf(tmlform.filter_wfname.toLowerCase())>=0 : true">
+				<div class="row">
+					<div class="col">
+						<a href="<tml:url action="$pc.setWorkflow" a-name="_wf.name" portletmode="edit"/>"><tml:item name="_wf.name"/></a>
+					</div>
+					<div class="col">@{_wf.adminReviewers divider="<br>"}</div>
+					<div class="col">
+						<tml:script divider="<br>">
+							return WGA.List(_wf.levels).map(function(el){
+								return el.name
+									+ (el.reviewerCount > 1 ? " (" + el.reviewerCount + " Genehmigungen)" : "") 
+									+ ": " + WGA.List(el.reviewers).join(", ")
+							})
+						</tml:script>
+					</div>
+				</div>
+			</tml:foreach>
+		</div>
+		
+	</div>
+	
+	<div class="footer">
+		<tml:button cssclass="btn btn-default" clickaction="$refresh" portletmode="new">
+			<i class="fa-solid fa-plus"></i>
+			Neuer Workflow
+		</tml:button>
+	</div>
+</tml:form>

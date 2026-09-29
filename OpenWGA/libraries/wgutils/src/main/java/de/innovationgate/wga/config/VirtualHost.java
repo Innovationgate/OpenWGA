@@ -89,6 +89,9 @@ public class VirtualHost extends IdentifiableConfigBean {
     private String robots_txt = "User-agent: *\nAllow: *";
 
     @Element(required=false)
+    private String security_txt = null;
+
+    @Element(required=false)
     private String preferedLanguages = null;
 
     @Attribute (required=false)
@@ -206,6 +209,13 @@ public class VirtualHost extends IdentifiableConfigBean {
     }
     public void setRobotsTxt(String text){
     	this.robots_txt = text;
+    }
+
+    public String getSecurityTxt(){
+    	return security_txt;
+    }
+    public void setSecurityTxt(String text){
+    	this.security_txt = text;
     }
 
     public void setAllowAdminApps(boolean allow){

@@ -89,27 +89,9 @@ public class WGAFilterChain implements FilterChain {
 	// the following patterns are blacklisted for filter match
 	// if they are not explicit whitelisted by _whitelistURLPatterns
 	private static List<String> _blacklistURLPatterns = new LinkedList<String>();
-	static {
-		_blacklistURLPatterns.add("/static*");
-		_blacklistURLPatterns.add("/wgadmin*");		
-		_blacklistURLPatterns.add("/admin*");
-		_blacklistURLPatterns.add("/contentmanager*");
-		_blacklistURLPatterns.add("/login*");
-		_blacklistURLPatterns.add("/logout*");
-		//_blacklistURLPatterns.add("/domainkey*");			// what is /domainkey???
-		//_blacklistURLPatterns.add("*.jsp");				// JSPs never reach this filter chain
-		//_blacklistURLPatterns.add("/plugin-management*");	// why this special handling?
-		//_blacklistURLPatterns.add("/start");				// this avoids having an area or root page with this name
-		_blacklistURLPatterns.add("/joblog*");
-		_blacklistURLPatterns.add("/favicon.ico");
-		_blacklistURLPatterns.add("/tmlform/*");
-	}
 	
 	// the following patterns are explicit whitelisted from the blacklist above
 	private static List<String> _whitelistURLPatterns = new LinkedList<String>();
-	static {
-		//_whitelistURLPatterns.add("/plugin-management/html/approval:*");	// why this special handling?
-	}
 
 	public WGAFilterChain(WGACore core, ServletContext servletContext) {
 	    

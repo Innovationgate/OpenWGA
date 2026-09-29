@@ -40,12 +40,72 @@
 		if(tmlform.context.trim())
 			params.context= String("db:"+tmlform.db+"/"+tmlform.context);
 		_result = WGA.database(tmlform.db).query(tmlform.query, params);
-		
+
 	}
 	catch(e){
 		_error = e.message;
 	}
 </tml:script>
+
+<tml:action id="csv-export">
+	let result;
+	try{
+	
+		var params = {
+		     includecurrent: true,
+			 alllanguages: tmlform.alllanguages, 
+			 onlypublished: tmlform.onlypublished,
+			 onlyvisible: tmlform.onlyvisible,
+			 role: tmlform.role,
+			 type: tmlform.type,
+			 options: tmlform.options,
+			 max: 0,
+			 cache: tmlform.cache
+		}
+		if(tmlform.context.trim())
+			params.context= String("db:"+tmlform.db+"/"+tmlform.context);
+		result = WGA.database(tmlform.db).query(tmlform.query, params);
+		
+	}
+	catch(e){}
+	
+	var file = WGA.TempFile("query-result.csv");
+	
+	let itemNames = [
+		"KEY",
+		"TITLE",
+		"CREATED",
+		"MODIFIED",
+		"STATUS",
+		"LANGUAGE"
+	];
+	if(tmlform.type.indexOf('lucene')>=0)
+		itemNames.push({
+			label: "SEARCHSCORE",
+			value: function(doc) WGA.format(doc.SEARCHSCORE*100, "##0")+"%"
+		})
+	
+	if(!isEmptyValue(tmlform.items) || tmlform.type=='sql'){
+		if(tmlform.type=="sql" && isEmptyValue(tmlform.items))
+			itemNames = result.firstResultContent.getItemNames();
+		else itemNames = Packages.de.innovationgate.utils.WGUtils.deserializeCollection(tmlform.items, ",", true);
+	}
+	
+	console.log("itemNames", itemNames)
+	
+	AFW.Util.csvWriter({
+		columns: itemNames,
+		contentlist: result
+		
+	}).write(file)
+
+	_csv_url = WGA.urlBuilder(file.addToDownloads()).setParameter("forcedownload", "true").build();
+	
+</tml:action>
+<tml:{script} if="_csv_url">
+	window.open("@{_csv_url}");
+</tml:{script}>
+
 
 <tml:if condition="_error">
 	<tml:then>
@@ -74,6 +134,11 @@
 			<label>Result documents:</label>						
 			<div class="data">		
 				<tml:item name="_result.size"/>				
+			</div>						
+			<div class="clear"></div>
+			
+			<div class="data">		
+				<tml:button clickaction="csv-export" ajax="true">&rarr; CSV Export</tml:button>				
 			</div>						
 			<div class="clear"></div>
 
@@ -132,7 +197,7 @@
 							<TD>Status</TD>
 							<TD>Lang</TD>
 							<tml:case condition="tmlform.type.indexOf('lucene')>=0">
-								<TD>Score</TD>
+								<TD align="right">Score</TD>
 							</tml:case>
 							<tml:script>
 								_attachment_search=false;
@@ -165,7 +230,7 @@
 						      <td><tml:meta name="STATUS"/></td>
 						      <td><tml:meta name="LANGUAGE"/></td>
 						      <tml:case condition="tmlform.type.indexOf('lucene')==0">
-						      	<td><tml:script expression="SEARCHSCORE * 100" format="##0"/>%</td>
+						      	<td align="right"><tml:script expression="SEARCHSCORE * 100" format="##0"/>%</td>
 						      </tml:case>
 						      <tml:case condition="_attachment_search">
 						      	<td><tml:script expression="content().getSearchDetails().getFilename()"/></td>

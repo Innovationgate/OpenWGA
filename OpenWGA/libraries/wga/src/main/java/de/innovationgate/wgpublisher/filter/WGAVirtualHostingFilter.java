@@ -58,6 +58,8 @@ import de.innovationgate.wga.config.VirtualHost;
 import de.innovationgate.wga.config.VirtualHostRedirect;
 import de.innovationgate.wga.config.VirtualResource;
 import de.innovationgate.wga.config.WGAConfiguration;
+import de.innovationgate.wga.server.api.WGA;
+import de.innovationgate.wga.server.api.WGADate;
 import de.innovationgate.wgpublisher.WGACore;
 import de.innovationgate.wgpublisher.WGPRequestPath;
 import de.innovationgate.wgpublisher.WGPDispatcher.PathDispatchingOccasion;
@@ -110,10 +112,16 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 
     private static final List<String> BLACK_LIST = new ArrayList<String>();
     static {
+    	
+    	BLACK_LIST.add("/static/*");
+    	BLACK_LIST.add("/admin");
+    	BLACK_LIST.add("/contentmanager");
+    	BLACK_LIST.add("/joblog");
+    	
         BLACK_LIST.add("/ajaxform*");
-        BLACK_LIST.add("/tempdwn*");
-        BLACK_LIST.add("/webdav/*");
+        //BLACK_LIST.add("/webdav/*");	// no webdav anymore
         BLACK_LIST.add("/" + WGPRequestPath.PATHCMD_TMLFORM + "/*");
+        BLACK_LIST.add("/" + WGPRequestPath.PATHCMD_TEMP_DOWNLOAD + "/*");
     }
     
     private static final List<String> WHITE_LIST = new ArrayList<String>();
@@ -213,11 +221,6 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
         		return;
         	}
 
-            if (uri.equalsIgnoreCase("/robots.txt") && findVirtualResource(vHost, "robots.txt")==null){
-            	response.getWriter().print(vHost.getRobotsTxt());
-            	return;
-            }
-
             // check for virtual root resource request (old style)
             String resource_path = uri;
             if(resource_path.startsWith("/"))
@@ -227,8 +230,30 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
             	httpRequest.setAttribute(WGAFilterChain.FORWARD_URL, resource.getPath());
             	forwardRequest=true;
             }
-            
+
             if(!forwardRequest){
+            	
+	        	if (uri.equalsIgnoreCase("/robots.txt") && vHost.getRobotsTxt()!=null){
+	        		String txt = vHost.getSecurityTxt().trim();
+	        		if(!txt.isEmpty()) {
+		            	response.getWriter().print(txt);
+		            	return;
+	        		}
+	            }
+	        	if (uri.equalsIgnoreCase("/.well-known/security.txt") && vHost.getSecurityTxt()!=null){
+	            	String txt = vHost.getSecurityTxt().trim();
+	            	if(!txt.isEmpty()) {
+	            		WGADate expires;
+						try {
+							WGA wga = WGA.get();
+							expires = wga.Date().modify("M", 6);							
+		            		txt = txt.replace("{never}", wga.format(expires, "iso8601"));
+						} catch (WGException e) {}
+	            		response.getWriter().print(txt);
+	            		return;
+	            	}
+	            }
+            	
                 // determine default database key
                 String defaultDBKey = getDefaultDBKey(_core, vHost);
                 

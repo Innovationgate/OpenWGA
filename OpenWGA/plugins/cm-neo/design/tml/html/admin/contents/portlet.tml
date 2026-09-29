@@ -64,8 +64,8 @@
 		
 		<tml:case condition="tmlform.filter=='uname'">
 			<div class="filter">
-				<tml:input name="uname" html_placeholder="Name" focus="true" store="false"/>
-				<tml:button clickaction="$refresh" type="submit">
+				<tml:input name="uname" html_placeholder="Name" focus="true"/>
+				<tml:button clickaction="$store" type="submit">
 					<i class="fa fa-filter"></i>
 					Filtern
 				</tml:button>

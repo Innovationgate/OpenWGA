@@ -72,12 +72,9 @@
 	}
 </tml:eventscript>
 
-<tml:action id="refresh">
-	var fields = tmlform.getfieldnames().iterator()
-	while(fields.hasNext()){
-		var field = fields.next();
+<tml:action id="save-fields">
+	for(let field in Iterator(tmlform.fieldnames))
 		tmlform.setField(field, tmlform.fieldList(field));
-	}
 </tml:action>
 
 <tml:input name="designdb" type="hidden" store="false"/>
@@ -120,7 +117,7 @@
 				form.mod_id.value=module.id;
 			}
 	
-			WGA.ajax.callAction("<tml:action ref="refresh"/>");
+			WGA.ajax.callAction("<tml:action ref="{$option_mode=='edit' ? 'save-fields':'$refresh'}"/>")
 		})
 		
 		$("#<tml:script expression="tmlform.formid"/> input[type=text],input[type=number],input[type=password],textarea").addClass("form-control");

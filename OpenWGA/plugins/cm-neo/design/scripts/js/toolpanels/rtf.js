@@ -60,6 +60,28 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 		}
 	})
 
+	MS.buildSelect("#tr-style-ms", {
+		nonSelectedText: "Kein Stil ausgewählt",
+		nSelectedText: "Stile ausgwewählt",
+		buttonClass: "btn-sm",
+		multiselect: true,
+		onChange: function(options){
+			var el = editor.getNearestTagFromSelection("tr")
+			setClasses(el, options);
+		}
+	})
+
+	MS.buildSelect("#td-style-ms", {
+		nonSelectedText: "Kein Stil ausgewählt",
+		nSelectedText: "Stile ausgwewählt",
+		buttonClass: "btn-sm",
+		multiselect: true,
+		onChange: function(options){
+			var el = editor.getNearestTagFromSelection("td")
+			setClasses(el, options);
+		}
+	})
+
 	MS.buildSelect("#link-style-ms", {
 		nonSelectedText: "Kein Stil ausgewählt",
 		nSelectedText: "Stile ausgwewählt",
@@ -346,6 +368,23 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 				$("#editor-panel-rtf .table-edit-actions").hide()				
 			}
 			
+			// table row
+			var el = editor.getNearestTagFromSelection("tr")
+			if(el){
+				var classes = el.className.split(" ");
+				if(options && options.trStyleList && options.trStyleList.length){
+					MS.select("#tr-style-ms", classes);
+				}
+			}
+			// table cell
+			var el = editor.getNearestTagFromSelection("td")
+			if(el){
+				var classes = el.className.split(" ");
+				if(options && options.tdStyleList && options.tdStyleList.length){
+					MS.select("#td-style-ms", classes);
+				}
+			}
+			
 			// links
 			var el = editor.getNearestTagFromSelection("a")
 			if(el){
@@ -485,6 +524,7 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 			return editor;
 		},
 		setOptions: function(opts){
+			//console.log("opts", JSON.stringify(opts));
 			options = opts;
 			if(options.hideoptions){
 				for(var i=0; i<options.hideoptions.length; i++){
@@ -524,24 +564,28 @@ define(["jquery", "cm", "multi-select", "afw/rtfeditor"], function($, CM, MS){
 			}
 			MS.buildOptions("#para-select", heading_opts)
 			
-			if(options && options.paragraphStyleList && options.paragraphStyleList.length){
-				toolbar.paragraphStyleList = MS.buildOptions("#text-style-ms", options.paragraphStyleList);
-			}
-			
-			if(options && options.linkStyleList && options.linkStyleList.length){
-				toolbar.linkStyleList = MS.buildOptions("#link-style-ms", options.linkStyleList);
-			}
-			
-			if(options && options.imageStyleList && options.imageStyleList.length){
-				toolbar.imageStyleList = MS.buildOptions("#image-style-ms", options.imageStyleList);
-			}
+			if(options){
 
-			if(options && options.listStyleList && options.listStyleList.length){
-				toolbar.listStyleList = MS.buildOptions("#list-style-ms", options.listStyleList);
-			}
+				if(options.paragraphStyleList && options.paragraphStyleList.length)
+					MS.buildOptions("#text-style-ms", options.paragraphStyleList);
 
-			if(options && options.tableStyleList && options.tableStyleList.length){
-				toolbar.tableStyleList = MS.buildOptions("#table-style-ms", options.tableStyleList);
+				if(options.linkStyleList && options.linkStyleList.length)
+					MS.buildOptions("#link-style-ms", options.linkStyleList);
+
+				if(options.imageStyleList && options.imageStyleList.length)
+					MS.buildOptions("#image-style-ms", options.imageStyleList);
+
+				if(options.listStyleList && options.listStyleList.length)
+					MS.buildOptions("#list-style-ms", options.listStyleList);
+
+				if(options.tableStyleList && options.tableStyleList.length)
+					MS.buildOptions("#table-style-ms", options.tableStyleList);
+
+				if(options.trStyleList && options.trStyleList.length)
+					MS.buildOptions("#tr-style-ms", options.trStyleList);
+
+				if(options.tdStyleList && options.tdStyleList.length)
+					MS.buildOptions("#td-style-ms", options.tdStyleList);
 			}
 		}
 		

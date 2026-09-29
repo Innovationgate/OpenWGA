@@ -65,7 +65,8 @@
 					<img>\
 					<div class="title">\
 						<div class="image-title"></div>\
-						<a class="lightbox-close">&times;</a>\
+						<a class="lightbox-fullscreen" title="Fullscreen">&harr;</a>\
+						<a class="lightbox-close" title="Close">&times;</a>\
 					</div>\
 					<div class="image-loading"></div>\
 					<div class="image-info">\
@@ -97,8 +98,13 @@
 				}								
 			})
 			$("#lightbox a.lightbox-close").on("click", hideImage);
-			$("#lightbox a.image-prev").on("click.next", prevImage)
-			$("#lightbox a.image-next").on("click.next", nextImage)
+			$("#lightbox a.image-prev").on("click.next", prevImage);
+			$("#lightbox a.image-next").on("click.next", nextImage);
+			$("#lightbox a.lightbox-fullscreen").on("click", function(){
+				if (!document.fullscreenElement)
+					$("#lightbox")[0].requestFullscreen()
+				else document.exitFullscreen();
+			});
 			
 			$("#lightbox img").on("load", function(){
 				scaleImg(this);
@@ -146,6 +152,8 @@
 
 	function hideImage(){
 		lightbox && lightbox.hide();
+		if (document.fullscreenElement)
+			document.exitFullscreen();
 		unmaskBody();
 	}
 

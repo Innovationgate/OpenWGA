@@ -572,10 +572,13 @@ public class WGPRequestPath {
         	this.pathType = TYPE_REDIRECT;
         	this.resourcePath = this.publisherURL + "/plugin-admin";
         }
+        /*
+         * /wgadmin.jsp is no longer available
         else if (this.pathCommand.equalsIgnoreCase("wga4admin")) {
             this.pathType = TYPE_REDIRECT;
             this.resourcePath = this.publisherURL + "/wgadmin.jsp";
         }
+        */
         else if (this.pathCommand.equals(PATHCMD_STATIC_RESOURCE) || this.pathCommand.equals(PATHCMD_TEMP_DOWNLOAD)) {
         	this.pathType = TYPE_RESOURCE;
         	this.resourcePath = this.basePath;

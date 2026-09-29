@@ -18,6 +18,7 @@
 	bean.forceSSL = host.forceSSL;
 	
 	bean.robotsTxt = host.robotsTxt;
+	bean.securityTxt = host.securityTxt;
 	
 	bean.allowedDatabases = host.allowedDatabases;
 	bean.defaultDatabase = host.defaultDatabase;

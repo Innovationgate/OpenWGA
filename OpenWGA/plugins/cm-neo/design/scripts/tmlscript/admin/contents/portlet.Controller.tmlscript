@@ -25,6 +25,7 @@ Controller.prototype.statuse = function($option_dbkey) {
 		"Bitte auswählen|",
 		"In Arbeit|w",
 		"Veröffentlicht|p",
+		"Abgelaufen|abgelaufen",
 		"Zur Genehmigung|g",
 		"Bevorstehend|pending",
 		"Archiviert|a"
@@ -54,8 +55,13 @@ Controller.prototype.rootModules = function(modules) {
 		value: ""
 	}]
 	for(let [index, mod] in modules){
-		if(mod.allowedparents || mod.category)
+		
+		if(mod.category)
 			continue;
+
+		if(mod.allowedparents && mod.allowedparents.indexOf("root")<0)
+			continue;
+
 		ret.push({
 			title: mod.title,
 			value: mod.id
@@ -87,6 +93,7 @@ Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 		alllanguages: true,
 		onlypublished: false
 	};
+	let filter = null;
 	this.count = 0;
 	switch($form.filter){
 		case "pagetype":
@@ -104,8 +111,26 @@ Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 		case "status":
 			if(!$form.status)
 				return [];
+			let status =  $form.status;
 			query = "content.status=:value";
-			params.p_value = $form.status;
+			if(status=="pending"){
+				status="g"
+				filter = function(doc){
+					return doc.content().isPendingRelease()
+				}
+			}
+			else if(status=="g"){
+				filter = function(doc){
+					return !doc.content().isPendingRelease()
+				}
+			}
+			else if(status=="abgelaufen"){
+				status="p"
+				query += " AND content.validto < :now";
+				params.p_now = WGA.Date();
+			}
+			
+			params.p_value = status;
 			break;
 		case "uname":
 			if($form.uname)
@@ -126,6 +151,12 @@ Controller.prototype.contents = function($option_dbkey, $form, $portlet) {
 			+ " order by content." + $form.order 
 			+ " " + $form.dir
 		, params)
-	this.count = result.size;
+	if(filter){
+		result = result.map(function(doc){
+			return filter(doc) ? doc : null;
+		})
+		this.count = result.size();
+	}
+	else this.count = result.size;
 	return result;
 }

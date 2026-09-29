@@ -1,3 +1,7 @@
+plugins {
+    id 'java'
+}
+
 allprojects {
     apply plugin: 'java'
     group='de.innovationgate.openwga'
@@ -8,4 +12,38 @@ allprojects {
         mavenCentral()
         jcenter()
     }
-}    
+}
+
+import groovy.json.JsonOutput
+
+task generatePackageJson {
+    doLast {
+        def npmDependencies = [:]
+
+		allprojects.each { project ->
+	        // Prüfen, ob die 'compile' Konfiguration im Projekt existiert
+	        if (project.configurations.findByName('compile')) {
+	            project.configurations.compile.dependencies.each { dep ->
+	                if (dep.group && dep.name) {
+	                    // Namen für npm anpassen (Kleinbuchstaben, Bindestriche statt Punkte)
+	                    def name = "${dep.group}:${dep.name}".toLowerCase().replaceAll('\\.', '-')
+	                    def version = dep.version ?: "latest"
+	                    npmDependencies[name] = version
+	                }
+	            }
+	        }
+    	}
+
+        // JSON-Struktur aufbauen
+        def packageMap = [
+            name: project.name.toLowerCase(),
+            version: project.version && project.version != "unspecified" ? project.version : "1.0.0",
+            private: true,
+            dependencies: npmDependencies
+        ]
+        
+        // Datei im Hauptverzeichnis speichern
+        def jsonFile = file("$projectDir/package.json")
+        jsonFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(packageMap))
+    }
+}

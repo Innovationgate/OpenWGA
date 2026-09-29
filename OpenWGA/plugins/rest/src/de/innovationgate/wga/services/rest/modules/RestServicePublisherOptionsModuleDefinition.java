@@ -9,6 +9,7 @@ import de.innovationgate.wga.modules.ModuleDependencyException;
 import de.innovationgate.wga.modules.ModuleType;
 import de.innovationgate.wga.modules.OptionDefinitionsMap;
 import de.innovationgate.wga.modules.options.BooleanOptionType;
+import de.innovationgate.wga.modules.options.CommaSeparatedListOptionType;
 import de.innovationgate.wga.modules.options.LocalizedOptionDefinition;
 import de.innovationgate.wga.modules.options.MultiPredefinedValuesOptionType;
 import de.innovationgate.wga.services.rest.RestApplication;
@@ -51,6 +52,11 @@ public class RestServicePublisherOptionsModuleDefinition implements ModuleDefini
         forceRegularLogin.setOptional(true);
         forceRegularLogin.setDefaultValue(Boolean.FALSE.toString());
         options.addOption(forceRegularLogin);
+     
+        LocalizedOptionDefinition witeList = new LocalizedOptionDefinition(RestApplication.DBATTRIB_WHITELIST, CommaSeparatedListOptionType.INSTANCE, _bundleLoader);
+        witeList.setOptional(true);
+        witeList.setEmptyAllowedOverride(true);
+        options.addOption(witeList);
         
         return options;
         

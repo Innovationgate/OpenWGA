@@ -1373,7 +1373,7 @@ public class WGPDispatcher extends HttpServlet {
                 getCore().getLog().warn("Could not parse multipart form data because of IO exception: " + WGUtils.getRootCause(e));
             }
             catch (Exception e) {
-                getCore().getLog().error("Exception parsing multipart form data", e);
+                getCore().getLog().error("Exception parsing multipart form data. Request from " + request.getRemoteAddr() + " to URL " + String.valueOf(request.getRequestURL()), e);
             }
         }
 
@@ -2631,7 +2631,7 @@ public class WGPDispatcher extends HttpServlet {
         }
 
         if (file == null || !file.exists() || !file.isFile()) {
-            throw new HttpErrorException(404, "File not found: " + path.getResourcePath(), null);
+            throw new HttpErrorException(404, "Resource not found: " + path.getResourcePath(), null);
         }
 
         // / Set expiration time

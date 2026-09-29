@@ -81,7 +81,7 @@ public class SrcSetCreator implements WGAAwareService {
         }
         
         // For poster derivates of images: Just use the original
-        if (fileMeta.getMimeType() != null && fileMeta.getMimeType().startsWith("image/") && WGFileAnnotations.USAGE_POSTER.equals(usage)) {
+        if (fileMeta.getMimeType() != null && fileMeta.getMimeType().startsWith("image/") && usage.toLowerCase().contains(WGFileAnnotations.USAGE_POSTER))  {
             int width = fileMeta.getDisplayWidth();
             int height = fileMeta.getDisplayHeight();
             if (width != -1 && height != -1) {

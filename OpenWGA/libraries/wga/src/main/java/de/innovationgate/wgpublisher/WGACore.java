@@ -4372,7 +4372,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
             updateScheduler();
 
             // Init shares
-            updateShares();
+            //updateShares();	// see #00006503
             
             this.getServletContext().setAttribute(WGACore.ATTRIB_CONTENTDBS, this.contentdbs);
             
@@ -5942,7 +5942,7 @@ public class WGACore implements WGDatabaseConnectListener, ScopeProvider, ClassL
         initStartupDomains(newDomainConfigs);
         updateContentDBs();
         updateScheduler();
-        updateShares();
+        //updateShares();		// see #00006503
         initAccessLogger();
         initExternalFileServing();
         initClusterService(oldConfig);
