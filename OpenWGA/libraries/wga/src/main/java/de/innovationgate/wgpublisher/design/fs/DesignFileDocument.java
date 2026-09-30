@@ -72,6 +72,7 @@ import de.innovationgate.wga.modules.ModuleInstantiationException;
 import de.innovationgate.wga.modules.types.DesignResourceConversionModuleType;
 import de.innovationgate.wga.server.api.WGA;
 import de.innovationgate.wgpublisher.design.conversion.DesignResourceConversion;
+import de.innovationgate.wgpublisher.design.conversion.DesignResourceConversionProperties;
 import de.innovationgate.wgpublisher.design.conversion.PreProcessData;
 import de.innovationgate.wgpublisher.design.conversion.PreProcessResult;
 import de.innovationgate.wgpublisher.design.fs.FileSystemDesignManager.ModuleFile;
@@ -497,20 +498,21 @@ public class DesignFileDocument extends AbstractDesignFile implements WGDocument
 
 
     private DesignResourceConversion getDesignResourceConversion() throws ModuleDependencyException, ModuleInstantiationException {
-        
-        String key = WGDocument.doctypeNumberToName(getType()) + "/" + _docKey.getMediakey() + "/" + getSuffix();
-        ModuleDefinition modDef = _manager.getCore().getModuleRegistry().getModuleDefinitionByKey(DesignResourceConversionModuleType.class, key);
-        if (modDef == null) {
-            return null;
+
+    	int type = getType();
+    	String mediakey = _docKey.getMediakey();
+    	String suffix = getSuffix();
+    	
+        for (ModuleDefinition def : _manager.getCore().getModuleRegistry().getModulesForType(DesignResourceConversionModuleType.class).values()) {
+            DesignResourceConversionProperties props = (DesignResourceConversionProperties) def.getProperties();
+            if (props.getDesignType() == type && props.getCodeType().equals(mediakey) && props.getSuffixes().contains(suffix)) {
+                def.testDependencies();
+                return (DesignResourceConversion) _manager.getCore().getModuleRegistry().instantiate(def);
+            }
         }
-        modDef.testDependencies();
-        return (DesignResourceConversion) _manager.getCore().getModuleRegistry().instantiate(modDef);
-        
+        return null;
+    	
     }
-
-
-
-
 
     private long determineLastModifiedTime(FileObject mdFile) throws FileSystemException, WGDesignSyncException, InstantiationException, IllegalAccessException, IOException {
         long mdLastModifiedTime = Long.MIN_VALUE;

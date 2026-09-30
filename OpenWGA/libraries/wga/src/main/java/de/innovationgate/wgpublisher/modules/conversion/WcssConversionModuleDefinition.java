@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import de.innovationgate.webgate.api.WGDocument;
 import de.innovationgate.webgate.api.WGScriptModule;
+import de.innovationgate.wga.common.beans.csconfig.v1.Version;
 import de.innovationgate.wga.modules.KeyBasedModuleDefinition;
 import de.innovationgate.wga.modules.ModuleDefinition;
 import de.innovationgate.wga.modules.ModuleDependencyException;
@@ -42,6 +43,9 @@ public class WcssConversionModuleDefinition implements ModuleDefinition, KeyBase
         props.setDesignType(WGDocument.TYPE_CSSJS);
         props.setCodeType(WGScriptModule.CODETYPE_CSS);
         props.getSuffixes().add("wcss");
+        if(Version.getJavaVersion().getMinorVersion()>11) {
+        	props.getSuffixes().add("scss");
+        }
         return props;
     }
 
