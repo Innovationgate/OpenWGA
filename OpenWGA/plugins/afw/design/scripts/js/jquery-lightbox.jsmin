@@ -65,7 +65,7 @@
 					<img>\
 					<div class="title">\
 						<div class="image-title"></div>\
-						<a class="lightbox-fullscreen" title="Fullscreen">&harr;</a>\
+						<a class="lightbox-fullscreen" title="Fullscreen">&harr;&#xFE0E;</a>\
 						<a class="lightbox-close" title="Close">&times;</a>\
 					</div>\
 					<div class="image-loading"></div>\
