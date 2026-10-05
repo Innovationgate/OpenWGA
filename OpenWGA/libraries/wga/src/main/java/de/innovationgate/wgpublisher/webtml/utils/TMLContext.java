@@ -4217,6 +4217,10 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
         }
     }
 
+    /*
+     * @deprecated
+     * Use primaryImageDerivateURL() instead
+     */
     public String fileImageDerivateURL() throws WGException{
     	String fileName = getprimaryfilename();
     	if(fileName!=null)
@@ -4236,6 +4240,16 @@ public class TMLContext implements TMLObject, de.innovationgate.wga.server.api.t
     	else if(existingDerivates!=null && !existingDerivates.isEmpty())
     		url.setParameter(WGPDispatcher.URLPARAM_DERIVATE, existingDerivates);
     	return url.build();
+    }
+    
+    public String primaryImageDerivateURL(String derivate) throws WGException {
+    	String fileName = getprimaryfilename();
+    	if(fileName!=null)
+    		return fileImageDerivateURL(fileName, derivate);
+    	return "";		// no primary file name found
+    }
+    public String primaryImageDerivateURL() throws WGException {
+    	return primaryImageDerivateURL(null);
     }
     
     /* (non-Javadoc)
