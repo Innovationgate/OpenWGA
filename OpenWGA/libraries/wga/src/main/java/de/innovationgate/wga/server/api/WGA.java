@@ -1253,6 +1253,16 @@ public class WGA {
         return scoped(str, null);
     }
 
+    public String unscoped(String value) throws WGException {
+    	String scope = design().getWebtmlScope();
+    	if(scope==null)
+    		return value;
+    	int index = value.indexOf(SCOPE_DIVIDER + scope);
+    	if(index>0)
+    		return value.substring(0, index);
+    	return null;
+    }
+    
     public Plugin plugin() throws WGException {
         TMLContext cx = fetchTMLContext();
         if (cx != null) {
