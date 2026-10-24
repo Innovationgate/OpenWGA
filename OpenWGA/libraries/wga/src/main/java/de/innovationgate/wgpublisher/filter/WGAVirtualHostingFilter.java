@@ -234,22 +234,22 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
             if(!forwardRequest){
             	
 	        	if (uri.equalsIgnoreCase("/robots.txt") && vHost.getRobotsTxt()!=null){
-	        		String txt = vHost.getSecurityTxt().trim();
-	        		if(!txt.isEmpty()) {
-		            	response.getWriter().print(txt);
+	        		String txt = vHost.getRobotsTxt();
+	        		if(txt != null && !txt.trim().isEmpty()) {
+		            	response.getWriter().print(txt.trim());
 		            	return;
 	        		}
 	            }
 	        	if (uri.equalsIgnoreCase("/.well-known/security.txt") && vHost.getSecurityTxt()!=null){
-	            	String txt = vHost.getSecurityTxt().trim();
-	            	if(!txt.isEmpty()) {
+	            	String txt = vHost.getSecurityTxt();
+	            	if(txt!=null && !txt.trim().isEmpty()) {
 	            		WGADate expires;
 						try {
 							WGA wga = WGA.get();
 							expires = wga.Date().modify("M", 6);							
 		            		txt = txt.replace("{never}", wga.format(expires, "iso8601"));
 						} catch (WGException e) {}
-	            		response.getWriter().print(txt);
+	            		response.getWriter().print(txt.trim());
 	            		return;
 	            	}
 	            }
