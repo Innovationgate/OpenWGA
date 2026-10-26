@@ -179,6 +179,8 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
             _encoding = core.getCharacterEncoding();
             
             ServletFileUpload dfu = new ServletFileUpload();
+            FileItemIterator itemStreams = dfu.getItemIterator(request);
+            
             TemporaryFile repository = new TemporaryFile("upload", null, core.getWgaTempDir());
             repository.getFile().delete();
             repository.getFile().mkdir();
@@ -190,7 +192,7 @@ public class TMLForm extends de.innovationgate.wgpublisher.webtml.utils.TMLForm 
                 dfu.setHeaderEncoding(_encoding);
             }
             
-            FileItemIterator itemStreams = dfu.getItemIterator(request);
+            
             while (itemStreams.hasNext()) {
                 FileItemStream itemStream = itemStreams.next();
                 FileItem fileItem = itemFactory.createItem(itemStream.getFieldName(), itemStream.getContentType(), itemStream.isFormField(), itemStream.getName());
