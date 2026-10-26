@@ -233,14 +233,14 @@ public class WGAVirtualHostingFilter implements Filter , WGAFilterURLPatternProv
 
             if(!forwardRequest){
             	
-	        	if (uri.equalsIgnoreCase("/robots.txt") && vHost.getRobotsTxt()!=null){
+	        	if (uri.equalsIgnoreCase("/robots.txt")){
 	        		String txt = vHost.getRobotsTxt();
 	        		if(txt != null && !txt.trim().isEmpty()) {
 		            	response.getWriter().print(txt.trim());
 		            	return;
 	        		}
 	            }
-	        	if (uri.equalsIgnoreCase("/.well-known/security.txt") && vHost.getSecurityTxt()!=null){
+	        	if (uri.equalsIgnoreCase("/.well-known/security.txt")){
 	            	String txt = vHost.getSecurityTxt();
 	            	if(txt!=null && !txt.trim().isEmpty()) {
 	            		WGADate expires;
