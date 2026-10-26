@@ -92,6 +92,19 @@ this.settings = function(doc){
 	}
 }
 
+this.settingsMap = function(doc){
+	if(doc instanceof Packages.de.innovationgate.wgpublisher.webtml.utils.TMLContext)
+		doc = doc.content();
+	var settings_map = this.getExtensionData(doc || content(), "content-modules-settings") || WGA.Map() 
+	var result = WGA.Map();
+	for(let key in Iterator(settings_map.keySet())){
+		let unscoped_key = WGA.unscoped(key);
+		if(unscoped_key)
+			result.put(unscoped_key, settings_map.get(key));
+	}
+	return result;
+}
+
 this.settingList = function(name, scope){
 
 	var ret = WGA.createList();

@@ -39,6 +39,7 @@ import java.util.Map;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
@@ -626,6 +627,16 @@ public class Call {
         throw new HttpErrorException(code, message, getMainContext().db().getDbReference());
     }
      
-    
+    public HttpSession getSession() throws WGException{
+    	return isAvailable() ? getJavaRequest().getSession() : null;
+    }
 
+    public boolean isBrowserInterface() throws WGException {
+    	HttpSession session = getSession();
+    	if(session==null)
+    		return false;
+        Boolean bi = (Boolean) session.getAttribute(WGACore.ATTRIB_BROWSERINTERFACE);
+        return bi != null && bi.booleanValue() == true;
+    }
+    
 }

@@ -396,7 +396,7 @@ define(["jquery-tree", "sitepanel", "cm"], function(Tree, Sitepanel, CM){
 		// generate new id-s
 		//console.log("clipboardModules", clipboardModules)
 		function generateIds(mod){
-			mod.id = mod.module_id + "_" + guid();
+			mod.id = mod.context + "_" + guid();
 			for(let i=0; i<mod.children.length; i++)
 				generateIds(mod.children[i])
 		}

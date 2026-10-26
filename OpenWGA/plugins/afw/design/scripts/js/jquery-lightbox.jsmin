@@ -65,7 +65,7 @@
 					<img>\
 					<div class="title">\
 						<div class="image-title"></div>\
-						<a class="lightbox-fullscreen" title="Fullscreen">&harr;</a>\
+						<a class="lightbox-fullscreen" style="display:none" title="Fullscreen">&harr;&#xFE0E;</a>\
 						<a class="lightbox-close" title="Close">&times;</a>\
 					</div>\
 					<div class="image-loading"></div>\
@@ -79,6 +79,9 @@
 					</div>\
 				</div>\
 			')
+
+			if(document.fullscreenEnabled)
+				$("#lightbox .lightbox-fullscreen").show()
 
 			lightbox = $("#lightbox");
 			lightbox.swipehandler && lightbox.swipehandler({
@@ -100,10 +103,13 @@
 			$("#lightbox a.lightbox-close").on("click", hideImage);
 			$("#lightbox a.image-prev").on("click.next", prevImage);
 			$("#lightbox a.image-next").on("click.next", nextImage);
-			$("#lightbox a.lightbox-fullscreen").on("click", function(){
-				if (!document.fullscreenElement)
-					$("#lightbox")[0].requestFullscreen()
-				else document.exitFullscreen();
+			$("#lightbox a.lightbox-fullscreen").on("click", function(ev){
+				var el = $("#lightbox")[0];
+				if(el.requestFullscreen){
+					if (!document.fullscreenElement)
+						el.requestFullscreen()
+					else document.exitFullscreen();
+				}
 			});
 			
 			$("#lightbox img").on("load", function(){
